@@ -140,8 +140,8 @@ export default function Transactions() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="search-row">
-        <div className="stock-search" style={{width:"30%",minWidth:"180px",maxWidth:"400px"}}>
-          <span style={{fontSize:".75rem",color:"var(--muted)"}}>🔍</span>
+        <div className="stock-search" style={{width:"220px"}}>
+          <span>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}} />
         </div>
         <div className="stock-filter-links">
