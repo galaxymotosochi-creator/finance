@@ -147,7 +147,9 @@ export default function Transactions() {
         <div className="stock-filter-links">
           <span className="stock-filter-link">📅 Период</span>
           <span className="stock-filter-link">Скачать</span>
-          <span className="stock-filter-link">⚙️</span>
+          <span className="stock-filter-link" style={{fontSize:".9rem"}}>⚙️</span>
+          <span className="stock-filter-link">Расходы</span>
+          <span className="stock-filter-link">Доходы</span>
         </div>
       </div>
 
