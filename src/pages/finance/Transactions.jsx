@@ -192,3 +192,130 @@ export default function Transactions() {
     </div>
   );
 }
+
+      {/* INCOME MODAL */}
+      {showIncome && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setShowIncome(false)}}>
+          <div className="modal-box">
+            <button className="modal-close" onClick={function(){setShowIncome(false)}}>&times;</button>
+            <h2>Добавить доход</h2>
+            <div className="sub">Запишите новый доход</div>
+            <form onSubmit={function(e){
+              e.preventDefault();
+              if(!incName||!incAmount){alert('Заполните название и сумму');return}
+              setPendingTx({type:'income',user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+              setSelectedAcc('cash');setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+            }}>
+              <div className="form-group">
+                <label>Название *</label>
+                <input type="text" placeholder="Например: инвестиции, партнёрские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Сумма (₽) *</label>
+                  <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
+                </div>
+                <div className="form-group">
+                  <label>Дата</label>
+                  <input type="date" value={incDate} onChange={function(e){setIncDate(e.target.value)}} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Категория</label>
+                <select value={incCategory} onChange={function(e){setIncCategory(e.target.value)}}>
+                  <option value="">— выберите —</option>
+                  {incomeCats.map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
+                </select>
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Добавить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EXPENSE MODAL */}
+      {showExpense && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setShowExpense(false)}}>
+          <div className="modal-box">
+            <button className="modal-close" onClick={function(){setShowExpense(false)}}>&times;</button>
+            <h2>Добавить расход</h2>
+            <div className="sub">Запишите новый расход</div>
+            <form onSubmit={function(e){
+              e.preventDefault();
+              if(!expName||!expAmount){alert('Заполните название и сумму');return}
+              setPendingTx({type:'expense',user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+              setSelectedAcc('cash');setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+            }}>
+              <div className="form-group">
+                <label>Название *</label>
+                <input type="text" placeholder="Например: аренда, коммунальные, налоги" value={expName} onChange={function(e){setExpName(e.target.value)}} required />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Сумма (₽) *</label>
+                  <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
+                </div>
+                <div className="form-group">
+                  <label>Дата</label>
+                  <input type="date" value={expDate} onChange={function(e){setExpDate(e.target.value)}} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Категория</label>
+                <select value={expCategory} onChange={function(e){setExpCategory(e.target.value)}}>
+                  <option value="">— выберите —</option>
+                  {expenseCats.map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
+                </select>
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Добавить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ACCOUNT SELECT MODAL */}
+      {showAccSelect && (
+        <div className="modal-overlay active">
+          <div className="modal-box" style={{maxWidth:'400px'}}>
+            <button className="modal-close" onClick={function(){setShowAccSelect(false);setPendingTx(null)}}>&times;</button>
+            <h2>{pendingTx && pendingTx.type === 'expense' ? 'С какого счета списать?' : 'На какой счет зачислить?'}</h2>
+            <div className="sub">{(pendingTx ? (pendingTx.type === 'expense' ? 'Сумма расхода' : 'Сумма дохода') : '') + ': ' + (pendingTx ? Number(pendingTx.amount).toLocaleString() : '0') + '₽'}</div>
+            <div style={{display:'flex',flexDirection:'column',gap:'.5rem',margin:'.75rem 0'}}>
+              {[{type:'cash',icon:'💵',label:'Наличные'},{type:'card',icon:'💳',label:'Карта'},{type:'transfer',icon:'🔄',label:'Перевод'}].map(function(a){
+                var sel = selectedAcc === a.type;
+                return (
+                  <div key={a.type} onClick={function(){setSelectedAcc(a.type)}} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'var(--radius)',background:sel?'var(--primary-light)':'var(--white)',border:'1.5px solid '+(sel?'var(--primary)':'var(--border)')}}>
+                    <div style={{width:'18px',height:'18px',border:'2px solid '+(sel?'var(--primary)':'var(--border)'),borderRadius:'50%',flexShrink:0,borderWidth:sel?'6px':'2px'}} />
+                    <span style={{fontSize:'1rem'}}>{a.icon}</span>
+                    <span style={{flex:1,fontSize:'.85rem',fontWeight:500}}>{a.label}</span>
+                    <span style={{fontSize:'.82rem',fontWeight:600,color:'var(--primary)'}}>{((accs.find(function(x){return x && x.type === a.type})||{}).balance||0).toLocaleString()}₽</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="sub" style={{marginBottom:'.75rem',cursor:'pointer',fontSize:'.82rem',color:'var(--primary)'}} onClick={function(){
+              if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;setSplitAmounts({cash:amt,card:amt,transfer:total-amt*2})}
+              setSplitMode(!splitMode)
+            }}>{splitMode ? '➖ Разделить' : '➕ Разделить'}</div>
+            {splitMode && [{type:'cash',icon:'💵',label:'Наличные'},{type:'card',icon:'💳',label:'Карта'},{type:'transfer',icon:'🔄',label:'Перевод'}].map(function(a){
+              return (
+                <div key={a.type} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
+                  <span style={{fontSize:'1rem',width:'24px',textAlign:'center'}}>{a.icon}</span>
+                  <span style={{flex:1,fontSize:'.8rem'}}>{a.label}</span>
+                  <input type="number" value={splitAmounts[a.type]||''} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r={};r.cash=p.cash;r.card=p.card;r.transfer=p.transfer;r[a.type]=v;return r})}}
+                    style={{width:'100px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                </div>
+              );
+            })}
+            <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
+              <button className="btn btn-primary" onClick={confirmTx} style={{width:'100%'}}>
+                {(pendingTx ? (pendingTx.type === 'expense' ? 'Списать' : 'Зачислить') : '') + ' ' + (pendingTx ? Number(pendingTx.amount).toLocaleString() : '0') + '₽'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
