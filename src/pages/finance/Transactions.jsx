@@ -189,50 +189,15 @@ export default function Transactions() {
           </table>
         </div>
       )}
-    </div>
-  );
-}
       {showIncome && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setShowIncome(false)}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowIncome(false)}}>
           <div className="modal-box">
             <button className="modal-close" onClick={function(){setShowIncome(false)}}>&times;</button>
-            <h2>Добавить доход</h2>
-            <div className="sub">Запишите новый доход</div>
-            <form onSubmit={function(e){
-              e.preventDefault();
-              if(!incName || !incAmount){alert('Заполните название и сумму');return}
-              var acct = accs[0];
-              if(acct){
-                add({type:'income',user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null,account_id:acct.id});
-              }
-              setShowIncome(false);
-              setIncName('');setIncAmount('');setIncDate(new Date().toISOString().split('T')[0]);setIncCategory('');
-            }}>
-              <div className="form-group">
-                <label>Название *</label>
-                <input type="text" placeholder="Например: инвестиции" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Сумма (₽) *</label>
-                  <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
-                </div>
-                <div className="form-group">
-                  <label>Дата</label>
-                  <input type="date" value={incDate} onChange={function(e){setIncDate(e.target.value)}} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Категория</label>
-                <select value={incCategory} onChange={function(e){setIncCategory(e.target.value)}}>
-                  <option value="">— выберите —</option>
-                  {incomeCats.map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
-                </select>
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Добавить</button>
-              </div>
-            </form>
+            <h2>test</h2>
           </div>
         </div>
       )}
+
+    </div>
+  );
+}
