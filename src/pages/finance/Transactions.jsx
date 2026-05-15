@@ -191,27 +191,12 @@ export default function Transactions() {
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{tx.date ? tx.date.split("-").reverse().join(".") : "—"}</td>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{tx.date}</td>
                   <td style={{ padding: '.5rem', fontWeight: 500, textAlign: 'center' }}>{tx.description || '—'}</td>
                   <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', textAlign: 'center', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()}₽
                   </td>
                   <td style={{ padding: '.5rem', color: 'var(--muted)' , textAlign: 'center' }}>{tx.categories?.name || '—'}</td>
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <button className="act-btn prod-edit-btn">Ред.</button>
-                    <div className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={function(e){
-                        e.stopPropagation();
-                        var el = e.currentTarget.nextElementSibling;
-                        el.classList.add('open');
-                        var h = function(){el.classList.remove('open'); document.removeEventListener('click',h)};
-                        setTimeout(function(){document.addEventListener('click',h)}, 10);
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={function(){remove(tx.id)}} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
