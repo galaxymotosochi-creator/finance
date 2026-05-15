@@ -113,13 +113,10 @@ export default function Transactions() {
 
   const incomeCats = categories.filter(c => c.type === 'income');
   const expenseCats = categories.filter(c => c.type === 'expense' || c.type === 'supply_expense');
-    
+  const incomeTotal = filtered.filter(t => t.type === 'income').reduce((s, t) => s + +t.amount, 0);
+  const expenseTotal = filtered.filter(t => t.type !== 'income').reduce((s, t) => s + +t.amount, 0);
 
-  const txs = transactions || [];
-  const incomeTotal = txs.filter(t => t && t.type === "income").reduce((s, t) => s + (+(t.amount||0)), 0);
-  const expenseTotal = txs.filter(t => t && t.type !== "income").reduce((s, t) => s + (+(t.amount||0)), 0);
-    const sales = txs.filter(t => t && t.type === "sale");
-    return (
+  return (
     <>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div>
@@ -132,28 +129,29 @@ export default function Transactions() {
         </div>
       </div>
       <div className="nav-sep" style={{ margin:".25rem 0", width:"100%", border:"none", borderTop:"1px solid var(--border)" }} />
-      <div style={{ marginTop:"1rem", fontSize:".85rem", color:"var(--muted)" }}>
-                <div style={{ display:"flex", gap:".5rem", flexWrap:"wrap", margin:".75rem 0" }}>
+<div style={{ display:"flex", gap:".5rem", flexWrap:"wrap", margin:".75rem 0" }}>
           <div style={{ flex:1, minWidth:"120px", background:"linear-gradient(135deg,#dcfce7,#bbf7d0)", border:"1px solid #86efac", borderRadius:"10px", padding:".65rem .75rem" }}>
             <div style={{ fontSize:".65rem", color:"#166534", fontWeight:600, textTransform:"uppercase" }}>Выручка</div>
-            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#14532d", marginTop:".1rem" }}>{incomeTotal.toLocaleString()}₽</div>
+            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#14532d", marginTop:".1rem" }}>0₽</div>
           </div>
           <div style={{ flex:1, minWidth:"120px", background:"linear-gradient(135deg,#fce7f3,#fbcfe8)", border:"1px solid #f9a8d4", borderRadius:"10px", padding:".65rem .75rem" }}>
             <div style={{ fontSize:".65rem", color:"#9d174d", fontWeight:600, textTransform:"uppercase" }}>Расходы</div>
-            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#831843", marginTop:".1rem" }}>{expenseTotal.toLocaleString()}₽</div>
+            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#831843", marginTop:".1rem" }}>0₽</div>
           </div>
           <div style={{ flex:1, minWidth:"120px", background:"linear-gradient(135deg,#dbeafe,#bfdbfe)", border:"1px solid #93c5fd", borderRadius:"10px", padding:".65rem .75rem" }}>
             <div style={{ fontSize:".65rem", color:"#1e40af", fontWeight:600, textTransform:"uppercase" }}>Прибыль</div>
-            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#1e3a8a", marginTop:".1rem" }}>{profit.toLocaleString()}₽</div>
+            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#1e3a8a", marginTop:".1rem" }}>0₽</div>
           </div>
           <div style={{ flex:1, minWidth:"120px", background:"linear-gradient(135deg,#fef3c7,#fde68a)", border:"1px solid #fcd34d", borderRadius:"10px", padding:".65rem .75rem" }}>
             <div style={{ fontSize:".65rem", color:"#92400e", fontWeight:600, textTransform:"uppercase" }}>Средний чек</div>
-            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#78350f", marginTop:".1rem" }}>{avgCheck.toLocaleString()}₽</div>
+            <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#78350f", marginTop:".1rem" }}>0₽</div>
           </div>
         </div>
-      </div>
       <div style={{ textAlign:"center", padding:"2rem", color:"var(--muted)" }}>
         <p>Страница транзакций загружена</p>
+        <button onClick={seed} style={{ padding:".5rem 1rem", fontSize:".82rem", border:"1px solid var(--border)", borderRadius:"6px", background:"var(--white)", cursor:"pointer", fontFamily:"var(--font)" }}>
+          Заполнить демо-данными
+        </button>
       </div>
       {showIncome && <div className="modal-overlay active"><div className="modal-box"><h2>test income</h2></div></div>}
       {showExpense && <div className="modal-overlay active"><div className="modal-box"><h2>test expense</h2></div></div>}
