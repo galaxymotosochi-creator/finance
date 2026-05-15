@@ -281,3 +281,6 @@ body {
 .empty-products{text-align:center;padding:3rem 1rem;color:var(--muted)}
 .empty-products .big-icon{font-size:3rem;opacity:.15;margin-bottom:.5rem}
 .empty-products p{font-size:.9rem}
+
+#dirColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
+#dirColHeaders th:first-child{text-align:left;padding-left:0}
