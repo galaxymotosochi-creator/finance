@@ -277,3 +277,7 @@ body {
 #expenseTableBody td:first-child{text-align:left;padding-left:0}
 @media(max-width:768px){.product-table table{font-size:.8rem}.product-table th,.product-table td{padding:.35rem .3rem}}
 @media(max-width:480px){.product-table table{font-size:.75rem}.product-table th,.product-table td{padding:.4rem .3rem}}
+
+.empty-products{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.empty-products .big-icon{font-size:3rem;opacity:.15;margin-bottom:.5rem}
+.empty-products p{font-size:.9rem}
