@@ -364,25 +364,7 @@ export default function Transactions() {
               );
             })}
             <div className="modal-actions" style={{marginTop:".5rem",borderTop:"none",paddingTop:0}}>
-              <button className="btn btn-primary" onClick={async function(){
-                if(!pendingTx)return;
-                try{
-                  var accts = accs||[];
-                  if(splitMode){
-                    var entries = Object.entries(splitAmounts);
-                    for(var i=0;i<entries.length;i++){
-                      var e=entries[i];
-                      if(e[1]>0){var a=accts.find(function(x){return x&&x.type===e[0]})||accts[0];if(a)await add(Object.assign({},pendingTx,{account_id:a.id,amount:e[1]}))}
-                    }
-                  }else{
-                    var a=accts.find(function(x){return x&&x.type===selectedAcc})||accts[0];
-                    if(a)await add(Object.assign({},pendingTx,{account_id:a.id}));
-                  }
-                  setShowAccSelect(false);setPendingTx(null);setShowIncome(false);setShowExpense(false);
-                  setIncName("");setIncAmount("");setIncDate(new Date().toISOString().split("T")[0]);setIncCategory("");
-                  setExpName("");setExpAmount("");setExpDate(new Date().toISOString().split("T")[0]);setExpCategory("");
-                }catch(err){alert(err.message)}
-              }} style={{width:"100%"}}>
+              <button className="btn btn-primary" onClick={function(){confirmTx()}} style={{width:"100%"}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}
               </button>
             </div>
