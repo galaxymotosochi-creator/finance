@@ -238,3 +238,6 @@ body {
 }
 .form-row { display: flex; gap: .75rem; }
 .form-row .form-group { flex: 1; }
+
+.modal-box h2{font-size:1.2rem;font-weight:600;margin-bottom:.25rem}
+.modal-box .sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
