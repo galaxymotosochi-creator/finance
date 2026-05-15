@@ -245,7 +245,7 @@ body {
 .modal-actions{display:flex;justify-content:flex-end}
 .modal-actions .btn{border-radius:6px}
 
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:.75rem}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem}
 .page-header h1{font-size:1.2rem;font-weight:600;margin-bottom:0}
 .page-header .sub{font-size:.85rem;color:var(--muted);margin-bottom:0;width:100%}
 .page-actions{display:flex;gap:.5rem}
