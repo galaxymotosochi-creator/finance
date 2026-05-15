@@ -139,20 +139,6 @@ export default function Transactions() {
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
-      <div className="search-row">
-        <div className="stock-search" style={{width:"220px"}}>
-          <span>🔍</span>
-          <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}} />
-        </div>
-        <div className="stock-filter-links">
-          <span className="stock-filter-link">📅 Период</span>
-          <span className="stock-filter-link">Скачать</span>
-          <span className="stock-filter-link" style={{fontSize:".9rem"}}>⚙️</span>
-          <span className="stock-filter-link">Расходы</span>
-          <span className="stock-filter-link">Доходы</span>
-        </div>
-      </div>
-
       {!loading && (
         <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', margin: '.75rem 0' }}>
           <div style={{ flex: 1, minWidth: '120px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '10px', padding: '.65rem .75rem' }}>
@@ -183,7 +169,7 @@ export default function Transactions() {
         </div>
       )}
 
-      {filtered.length > 0 && (
+      {txs.length > 0 && (
         <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
