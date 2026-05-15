@@ -241,3 +241,6 @@ body {
 
 .modal-box h2{font-size:1.2rem;font-weight:600;margin-bottom:.25rem}
 .modal-box .sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+
+.modal-actions{display:flex;justify-content:flex-end}
+.modal-actions .btn{border-radius:6px}
