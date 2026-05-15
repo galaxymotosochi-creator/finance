@@ -140,7 +140,7 @@ export default function Transactions() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem"}}>
-        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:".25rem .5rem",background:"var(--white)"}}>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"5px .5rem",background:"var(--white)"}}>
           <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
