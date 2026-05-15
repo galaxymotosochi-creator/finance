@@ -271,3 +271,8 @@ body {
 .prod-dropdown.open{display:block}
 .prod-dropdown button{display:block;width:100%;text-align:left;padding:.4rem .7rem;font-size:.78rem;font-family:var(--font);border:none;background:none;cursor:pointer;color:var(--body-color)}
 .prod-dropdown button:hover{background:var(--body-bg)}
+
+.btn-outline{background:none;color:var(--muted);border:1px solid var(--border)}
+.btn-outline:hover{background:var(--body-bg);color:var(--body-color)}
+.product-table .prod-name{font-weight:500;color:var(--body-color);text-align:left;font-size:.85rem}
+.product-table .prod-cat{font-size:.68rem;padding:.08rem .4rem;border-radius:20px;background:#f1f3f5;color:var(--muted);display:inline-block;white-space:nowrap}
