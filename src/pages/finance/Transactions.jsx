@@ -181,7 +181,7 @@ export default function Transactions() {
         </div>
       )}
 
-      {txs.length > 0 && (
+      {filtered.length > 0 && (
         <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
