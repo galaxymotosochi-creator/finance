@@ -251,15 +251,6 @@ body {
 .page-actions{display:flex;gap:.5rem}
 @media(max-width:768px){.page-header{flex-direction:column;align-items:flex-start}.page-actions{width:100%}.page-actions .btn{width:100%;text-align:center}}
 .search-row{display:flex;align-items:center}
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  font-size: .75rem;
-  color: var(--muted);
-  line-height: 1;
-  pointer-events: none;
-}
 
 .act-btn{background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--muted);padding:.3rem .5rem;border-radius:.3rem;font-family:var(--font)}
 .act-btn:hover{background:var(--body-bg);color:var(--body-color)}
