@@ -207,6 +207,7 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem', color: 'var(--muted)' , textAlign: 'center' }}>{tx.categories?.name || '—'}</td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     
+                    <button className="act-btn prod-edit-btn" onClick={function(){var isExp=tx.type!=="income";setEditingId(tx.id);if(isExp){setExpName(tx.description||"");setExpAmount(String(tx.amount||""));setExpDate(tx.date||"");setExpCategory(tx.category_id||"");setShowExpense(true)}else{setIncName(tx.description||"");setIncAmount(String(tx.amount||""));setIncDate(tx.date||"");setIncCategory(tx.category_id||"");setShowIncome(true)}}}>Ред.</button>
                     <div className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={function(e){
                         e.stopPropagation();
