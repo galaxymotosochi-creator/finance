@@ -29,7 +29,13 @@ export function useTransactions() {
     await fetch();
   };
 
-  return { transactions, loading, add, remove, refresh: fetch };
+  const update = async (id, tx) => {
+    const { error } = await supabase.from('transactions').update(tx).eq('id', id);
+    if (error) throw error;
+    await fetch();
+  };
+
+  return { transactions, loading, add, remove, update, refresh: fetch };
 }
 
 export function useAccounts() {
