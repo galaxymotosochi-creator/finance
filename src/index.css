@@ -109,7 +109,7 @@ body {
 
 /* ===== MAIN ===== */
 .main { flex: 1; display: flex; flex-direction: column; transition: all .25s; overflow-y: auto; }
-.content { padding: .75rem 2rem .75rem 2.5rem; background: var(--white); }
+.content { padding: .2rem 2rem .75rem 2.5rem; background: var(--white); }
 .content h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: .25rem; }
 .content .sub { font-size: .85rem; color: var(--muted); margin-bottom: 1.5rem; }
 .content .nav-sep { margin: .25rem 0; width: 100%; }
@@ -160,7 +160,7 @@ body {
 .login-card .error { color: #dc2626; font-size: .82rem; text-align: center; margin: 0 0 .75rem; }
 
 @media (max-width: 768px) {
-  .content { padding: 1rem 1rem 1rem 1.2rem; }
+  .content { padding: .2rem 1rem 1rem 1.2rem; }
   .content h1 { font-size: 1.2rem; }
   .app-header { padding: .5rem 1rem; }
 }
