@@ -192,11 +192,11 @@ export default function Transactions() {
               {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '.5rem .5rem .5rem 0', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{tx.date}</td>
-                  <td style={{ padding: '.5rem', fontWeight: 500 }}>{tx.description || '—'}</td>
-                  <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
+                  <td style={{ padding: '.5rem', fontWeight: 500, textAlign: 'center' }}>{tx.description || '—'}</td>
+                  <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', textAlign: 'center', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()}₽
                   </td>
-                  <td style={{ padding: '.5rem', color: 'var(--muted)' }}>{tx.categories?.name || '—'}</td>
+                  <td style={{ padding: '.5rem', color: 'var(--muted)' , textAlign: 'center' }}>{tx.categories?.name || '—'}</td>
                 </tr>
               ))}
             </tbody>
