@@ -116,6 +116,8 @@ export default function Transactions() {
         if (acct) {
           if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
           else await add({ ...txData, account_id: acct.id });
+        } else {
+          alert('Сначала нажмите Заполнить демо-данными');
         }
       }
       setShowAccSelect(false);
@@ -256,7 +258,7 @@ export default function Transactions() {
             <form onSubmit={function(e){
               e.preventDefault();
               if(!incName || !incAmount){alert("Заполните название и сумму");return}
-              setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+              setPendingTx({id:editingId,type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
               setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
             }}>
               <div className="form-group">
@@ -297,7 +299,7 @@ export default function Transactions() {
             <form onSubmit={function(e){
               e.preventDefault();
               if(!expName || !expAmount){alert("Заполните название и сумму");return}
-              setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+              setPendingTx({id:editingId,type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
               setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
             }}>
               <div className="form-group">
