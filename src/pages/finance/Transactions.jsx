@@ -193,7 +193,17 @@ export default function Transactions() {
         <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowIncome(false)}}>
           <div className="modal-box">
             <button className="modal-close" onClick={function(){setShowIncome(false)}}>&times;</button>
-            <h2>test</h2>
+            <h2>Добавить доход</h2>
+            <div className="sub">Запишите новый доход</div>
+            <form>
+              <div className="form-group">
+                <label>Название *</label>
+                <input type="text" placeholder="test" />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Добавить</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
