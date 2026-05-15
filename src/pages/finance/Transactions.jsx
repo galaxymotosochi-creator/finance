@@ -5,9 +5,10 @@ import { useTransactions, useAccounts, useCategories } from '../../hooks/useTran
 
 export default function Transactions() {
   const { user } = useAuth();
-  const { transactions, loading, add, remove, refresh } = useTransactions();
+  const { transactions, loading, add, remove, update, refresh } = useTransactions();
   const accounts = useAccounts();
   const categories = useCategories();
+  const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -69,6 +70,7 @@ export default function Transactions() {
     e.preventDefault();
     if (!incName || !incAmount) { alert('Заполните название и сумму'); return; }
     setPendingTx({
+      id: editingId,
       type: 'income', user_id: user.id,
       description: incName, amount: parseFloat(incAmount),
       date: incDate, category_id: incCategory || null,
@@ -83,6 +85,7 @@ export default function Transactions() {
     e.preventDefault();
     if (!expName || !expAmount) { alert('Заполните название и сумму'); return; }
     setPendingTx({
+      id: editingId,
       type: 'expense', user_id: user.id,
       description: expName, amount: parseFloat(expAmount),
       date: expDate, category_id: expCategory || null,
@@ -96,16 +99,24 @@ export default function Transactions() {
   const confirmTx = async () => {
     if (!pendingTx) return;
     try {
+      var isEdit = !!pendingTx.id;
+      var txData = { account_id: null, amount: pendingTx.amount, description: pendingTx.description, date: pendingTx.date, category_id: pendingTx.category_id, type: pendingTx.type };
       if (splitMode) {
         for (const [type, amt] of Object.entries(splitAmounts)) {
           if (amt > 0) {
-            const acct = accs.find(a => a?.type === type) || accs[0];
-            if (acct) await add({ ...pendingTx, account_id: acct.id, amount: amt });
+            var a = accs.find(x => x?.type === type) || accs[0];
+            if (a) {
+              if (isEdit) await update(pendingTx.id, { ...txData, account_id: a.id, amount: amt });
+              else await add({ ...txData, account_id: a.id, amount: amt });
+            }
           }
         }
       } else {
-        const acct = accs.find(a => a?.type === selectedAcc) || accs[0];
-        if (acct) await add({ ...pendingTx, account_id: acct.id });
+        var acct = accs.find(a => a?.type === selectedAcc) || accs[0];
+        if (acct) {
+          if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
+          else await add({ ...txData, account_id: acct.id });
+        }
       }
       setShowAccSelect(false);
       setPendingTx(null);
@@ -122,6 +133,24 @@ export default function Transactions() {
     } catch (err) { alert(err.message); }
   };
 
+  
+  const editTx = function(tx) {
+    var isExp = tx.type !== 'income';
+    setEditingId(tx.id);
+    if (isExp) {
+      setExpName(tx.description || '');
+      setExpAmount(String(tx.amount || ''));
+      setExpDate(tx.date || '');
+      setExpCategory(tx.category_id || '');
+      setShowExpense(true);
+    } else {
+      setIncName(tx.description || '');
+      setIncAmount(String(tx.amount || ''));
+      setIncDate(tx.date || '');
+      setIncCategory(tx.category_id || '');
+      setShowIncome(true);
+    }
+  };
   const incomeCats = cats.filter(c => c?.type === 'income');
   const expenseCats = cats.filter(c => c?.type === 'expense' || c?.type === 'supply_expense');
 
@@ -198,7 +227,7 @@ export default function Transactions() {
                   </td>
                   <td style={{ padding: '.5rem', color: 'var(--muted)' , textAlign: 'center' }}>{tx.categories?.name || '—'}</td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <button className="act-btn prod-edit-btn">Ред.</button>
+                    <button className="act-btn prod-edit-btn" onClick={function(){editTx(tx)}}>Ред.</button>
                     <div className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={function(e){
                         e.stopPropagation();
@@ -219,10 +248,10 @@ export default function Transactions() {
         </div>
       )}
       {showIncome && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowIncome(false)}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowIncome(false);setEditingId(null)}}}>
           <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowIncome(false)}}>&times;</button>
-            <h2>Добавить доход</h2>
+            <button className="modal-close" onClick={function(){setShowIncome(false);setEditingId(null)}}>&times;</button>
+            <h2>{editingId ? "Редактировать доход" : "Добавить доход"}</h2>
             <div className="sub">Запишите новый доход</div>
             <form onSubmit={function(e){
               e.preventDefault();
@@ -260,10 +289,10 @@ export default function Transactions() {
       )}
 
       {showExpense && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowExpense(false)}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowExpense(false);setEditingId(null)}}}>
           <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowExpense(false)}}>&times;</button>
-            <h2>Добавить расход</h2>
+            <button className="modal-close" onClick={function(){setShowExpense(false);setEditingId(null)}}>&times;</button>
+            <h2>{editingId ? "Редактировать расход" : "Добавить расход"}</h2>
             <div className="sub">Запишите новый расход</div>
             <form onSubmit={function(e){
               e.preventDefault();

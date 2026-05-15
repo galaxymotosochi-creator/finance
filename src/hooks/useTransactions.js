@@ -29,7 +29,7 @@ export function useTransactions() {
     await fetch();
   };
 
-  return { transactions, loading, add, remove, refresh: fetch };
+  return { transactions, loading, add, remove, update, refresh: fetch };
 }
 
 export function useAccounts() {
