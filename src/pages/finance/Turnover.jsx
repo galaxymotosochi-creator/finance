@@ -1,20 +1,16 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-
 export default function Turnover() {
-  const [loading] = useState(false);
-
   return (
     <>
-<div className="page-header">
+
+      <div className="page-header">
         <div>
-          <h1 style={ {fontSize:"1.2re",fontWeight:"600",margin:"0"} }>Оборачиваемость</h1>
+          <h1 style={{fontSize:"1.2rem",fontWeight:"600",margin:"0"}}>Оборачиваемость</h1>
           <div className="sub">Анализ эффективности склада</div>
         </div>
         <div className="analytics-period">
-          <button className="ap-btn active" onClick="setTurnoverPeriod(7,this)">7 дней</button>
-          <button className="ap-btn" onClick="setTurnoverPeriod(30,this)">30 дней</button>
-          <button className="ap-btn" onClick="setTurnoverPeriod(90,this)">90 дней</button>
+          <button className="ap-btn active" onClick={function(){setTurnoverPeriod(7,this)}}>7 дней</button>
+          <button className="ap-btn" onClick={function(){setTurnoverPeriod(30,this)}}>30 дней</button>
+          <button className="ap-btn" onClick={function(){setTurnoverPeriod(90,this)}}>90 дней</button>
         </div>
       </div>
       <div className="am-grid">
@@ -28,11 +24,11 @@ export default function Turnover() {
           <div className="ac-title">ABC-анализ</div>
           <div className="ac-desc">Распределение товаров по вкладу в выручку</div>
           <div className="donut-wrap">
-            <div style={ {width:"130px",height:"130px",flexShrink:"0"} }></div>
+            <div style={{width:"130px",height:"130px",flexShrink:"0"}}></div>
             <div className="donut-legend">
-              <div className="dl-row"><span className="dl-dot" style={ {background:"#4CAF50"} }></span> A (80% выручки) — <span>0%</span></div>
-              <div className="dl-row"><span className="dl-dot" style={ {background:"#FF9800"} }></span> B (15% выручки) — <span>0%</span></div>
-              <div className="dl-row"><span className="dl-dot" style={ {background:"#F44336"} }></span> C (5% выручки) — <span>0%</span></div>
+              <div className="dl-row"><span className="dl-dot" style={{background:"#4CAF50"}}></span> A (80% выручки) — <span>0%</span></div>
+              <div className="dl-row"><span className="dl-dot" style={{background:"#FF9800"}}></span> B (15% выручки) — <span>0%</span></div>
+              <div className="dl-row"><span className="dl-dot" style={{background:"#F44336"}}></span> C (5% выручки) — <span>0%</span></div>
             </div>
           </div>
         </div>
@@ -60,6 +56,7 @@ export default function Turnover() {
           </table>
         </div>
       </div>
+    
     </>
   );
 }

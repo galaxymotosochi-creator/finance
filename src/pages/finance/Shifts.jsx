@@ -1,22 +1,18 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-
 export default function Shifts() {
-  const [loading] = useState(false);
-
   return (
     <>
-<div className="page-header">
+
+      <div className="page-header">
         <div>
-          <h1 style={ {fontSize:"1.2re",fontWeight:"600",margin:"0"} }>Кассовые смены</h1>
+          <h1 style={{fontSize:"1.2rem",fontWeight:"600",margin:"0"}}>Кассовые смены</h1>
           <div className="sub">История работы кассиров и продаж</div>
         </div>
       </div>
-      <div className="nav-sep" style={ {margin:".25rem 0",width:"100%"} }></div>
+      <div className="nav-sep" style={{margin:".25rem 0",width:"100%"}}></div>
       <div className="search-row">
         <div className="stock-filter-links">
-          <span className="stock-filter-link" onClick="toggleShiftEmpFilter()">Сотрудник</span>
-          <span className="stock-filter-link" onClick="toggleShiftDateFilter()">Дата</span>
+          <span className="stock-filter-link" onClick={function(){toggleShiftEmpFilter()}}>Сотрудник</span>
+          <span className="stock-filter-link" onClick={function(){toggleShiftDateFilter()}}>Дата</span>
         </div>
       </div>
       <div className="shift-metrics">
@@ -33,6 +29,7 @@ export default function Shifts() {
         <div className="big-icon">📊</div>
         <p>Смен пока нет. Откройте кассу!</p>
       </div>
+    
     </>
   );
 }
