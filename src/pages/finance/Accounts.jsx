@@ -1,10 +1,10 @@
-export default function Dashboard() {
+export default function Accounts() {
   return (
     <div>
-      <h1 style={styles.title}>Панель управления</h1>
-      <p style={styles.sub}>Сводка по бизнесу</p>
+      <h1 style={styles.title}>Счета</h1>
+      <p style={styles.sub}>Расчётные счета и кассы</p>
       <div style={styles.sep} />
-      <p style={styles.placeholder}>Сводка по финансам, складу и продажам появится здесь.</p>
+      <p style={styles.placeholder}>Управление счетами появится здесь.</p>
     </div>
   );
 }

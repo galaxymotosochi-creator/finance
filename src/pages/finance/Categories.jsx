@@ -1,10 +1,10 @@
-export default function Dashboard() {
+export default function Categories() {
   return (
     <div>
-      <h1 style={styles.title}>Панель управления</h1>
-      <p style={styles.sub}>Сводка по бизнесу</p>
+      <h1 style={styles.title}>Справочник</h1>
+      <p style={styles.sub}>Категории доходов и расходов</p>
       <div style={styles.sep} />
-      <p style={styles.placeholder}>Сводка по финансам, складу и продажам появится здесь.</p>
+      <p style={styles.placeholder}>Управление категориями появится здесь.</p>
     </div>
   );
 }

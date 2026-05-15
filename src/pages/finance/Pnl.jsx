@@ -1,10 +1,10 @@
-export default function Dashboard() {
+export default function Pnl() {
   return (
     <div>
-      <h1 style={styles.title}>Панель управления</h1>
-      <p style={styles.sub}>Сводка по бизнесу</p>
+      <h1 style={styles.title}>P&L</h1>
+      <p style={styles.sub}>Прибыли и убытки</p>
       <div style={styles.sep} />
-      <p style={styles.placeholder}>Сводка по финансам, складу и продажам появится здесь.</p>
+      <p style={styles.placeholder}>Графики и сводка доходов/расходов появятся здесь.</p>
     </div>
   );
 }
