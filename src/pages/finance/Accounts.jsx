@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+
 export default function Accounts() {
+  const [loading] = useState(false);
+
   return (
     <>
-      <h1>Счета</h1>
-      <div className="sub">Расчётные счета и кассы</div>
-      <div className="nav-sep" />
-      <p style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Управление счетами появится после подключения данных.</p>
+<div className="page-header"><div><h1>Счета</h1><div className="sub">Управление счетами (в разработке)</div></div></div>
     </>
   );
 }
