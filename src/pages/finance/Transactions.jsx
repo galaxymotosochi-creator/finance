@@ -132,7 +132,7 @@ export default function Transactions() {
       <div style={{ display:"flex", gap:".5rem", flexWrap:"wrap", margin:".75rem 0" }}>
         <div style={{ flex:1, minWidth:"120px", background:"#dcfce7", border:"1px solid #86efac", borderRadius:"10px", padding:".65rem .75rem" }}>
           <div style={{ fontSize:".65rem", color:"#166534", fontWeight:600, textTransform:"uppercase" }}>ВЫРУЧКА</div>
-          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#14532d", marginTop:".1rem" }}>0₽</div>
+          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#14532d", marginTop:".1rem" }}>{incomeTotal.toLocaleString()}₽</div>
         </div>
         <div style={{ flex:1, minWidth:"120px", background:"#fce7f3", border:"1px solid #f9a8d4", borderRadius:"10px", padding:".65rem .75rem" }}>
           <div style={{ fontSize:".65rem", color:"#9d174d", fontWeight:600, textTransform:"uppercase" }}>РАСХОДЫ</div>
