@@ -3,23 +3,20 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 
-const accMeta = [
-  { type: 'cash', icon: '\u{1F4B5}', label: '\u041D\u0430\u043B\u0438\u0447\u043D\u044B\u0435' },
-  { type: 'card', icon: '\u{1F4B3}', label: '\u041A\u0430\u0440\u0442\u0430' },
-  { type: 'transfer', icon: '\u{1F504}', label: '\u041F\u0435\u0440\u0435\u0432\u043E\u0434' },
-];
-
 export default function Transactions() {
   const { user } = useAuth();
   const { transactions, loading, add, remove, refresh } = useTransactions();
   const accounts = useAccounts();
   const categories = useCategories();
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('all');
-
-  /* Form state */
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
+  const [showAccSelect, setShowAccSelect] = useState(false);
+  const [pendingTx, setPendingTx] = useState(null);
+  const [selectedAcc, setSelectedAcc] = useState('cash');
+  const [splitMode, setSplitMode] = useState(false);
+  const [splitAmounts, setSplitAmounts] = useState({ cash: 0, card: 0, transfer: 0 });
+
   const [incName, setIncName] = useState('');
   const [incAmount, setIncAmount] = useState('');
   const [incDate, setIncDate] = useState(new Date().toISOString().split('T')[0]);
@@ -29,133 +26,169 @@ export default function Transactions() {
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
 
-  /* Account select state */
-  const [showAccSelect, setShowAccSelect] = useState(false);
-  const [pendingTx, setPendingTx] = useState(null);
-  const [selectedAcc, setSelectedAcc] = useState('cash');
+  const txs = transactions || [];
+  const accs = accounts || [];
+  const cats = categories || [];
+
+  const incomeTotal = txs.filter(t => t && t.type === 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = txs.filter(t => t && t.type !== 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const profit = incomeTotal - expenseTotal;
+  const sales = txs.filter(t => t && t.type === 'sale');
+  const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
 
   const seed = async () => {
-    if (accounts.length === 0) {
-      await supabase.from('accounts').insert([
-        { user_id: user.id, name: '\u041D\u0430\u043B\u0438\u0447\u043D\u044B\u0435', type: 'cash' },
-        { user_id: user.id, name: '\u041A\u0430\u0440\u0442\u0430', type: 'card' },
-        { user_id: user.id, name: '\u041F\u0435\u0440\u0435\u0432\u043E\u0434', type: 'transfer' },
-      ]);
-    }
-    if (categories.length === 0) {
-      await supabase.from('categories').insert([
-        { user_id: user.id, name: '\u041F\u0440\u043E\u0434\u0430\u0436\u0438', type: 'income' },
-        { user_id: user.id, name: '\u0410\u0440\u0435\u043D\u0434\u0430', type: 'expense' },
-        { user_id: user.id, name: '\u041A\u043E\u043C\u043C\u0443\u043D\u0430\u043B\u044C\u043D\u044B\u0435', type: 'expense' },
-        { user_id: user.id, name: '\u041D\u0430\u043B\u043E\u0433\u0438', type: 'expense' },
-        { user_id: user.id, name: '\u0417\u0430\u0440\u043F\u043B\u0430\u0442\u0430', type: 'expense' },
-        { user_id: user.id, name: '\u041F\u0440\u043E\u0447\u0435\u0435', type: 'expense' },
-        { user_id: user.id, name: '\u041F\u0440\u043E\u0447\u0438\u0435 \u0434\u043E\u0445\u043E\u0434\u044B', type: 'income' },
-      ]);
-    }
-    await refresh();
+    try {
+      if (accs.length === 0) {
+        await supabase.from('accounts').insert([
+          { user_id: user.id, name: 'Наличные', type: 'cash' },
+          { user_id: user.id, name: 'Карта', type: 'card' },
+          { user_id: user.id, name: 'Перевод', type: 'transfer' },
+        ]);
+      }
+      if (cats.length === 0) {
+        await supabase.from('categories').insert([
+          { user_id: user.id, name: 'Продажи', type: 'income' },
+          { user_id: user.id, name: 'Аренда', type: 'expense' },
+          { user_id: user.id, name: 'Коммунальные', type: 'expense' },
+          { user_id: user.id, name: 'Налоги', type: 'expense' },
+          { user_id: user.id, name: 'Зарплата', type: 'expense' },
+          { user_id: user.id, name: 'Прочее', type: 'expense' },
+          { user_id: user.id, name: 'Прочие доходы', type: 'income' },
+        ]);
+      }
+      await refresh();
+    } catch (e) { console.error(e); }
   };
 
-  /* Income: form -> account select */
-  const handleIncomeSubmit = (e) => {
+  const openIncome = () => {
+    setShowIncome(true);
+  };
+
+  const submitIncome = (e) => {
     e.preventDefault();
-    if (!incName || !incAmount) { alert('\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0438 \u0441\u0443\u043C\u043C\u0443'); return; }
+    if (!incName || !incAmount) { alert('Заполните название и сумму'); return; }
     setPendingTx({
       type: 'income', user_id: user.id,
       description: incName, amount: parseFloat(incAmount),
       date: incDate, category_id: incCategory || null,
     });
     setSelectedAcc('cash');
+    setSplitMode(false);
+    setSplitAmounts({ cash: 0, card: 0, transfer: 0 });
     setShowAccSelect(true);
   };
 
-  /* Expense: form -> account select */
-  const handleExpenseSubmit = (e) => {
+  const submitExpense = (e) => {
     e.preventDefault();
-    if (!expName || !expAmount) { alert('\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0438 \u0441\u0443\u043C\u043C\u0443'); return; }
+    if (!expName || !expAmount) { alert('Заполните название и сумму'); return; }
     setPendingTx({
       type: 'expense', user_id: user.id,
       description: expName, amount: parseFloat(expAmount),
       date: expDate, category_id: expCategory || null,
     });
     setSelectedAcc('cash');
+    setSplitMode(false);
+    setSplitAmounts({ cash: 0, card: 0, transfer: 0 });
     setShowAccSelect(true);
   };
 
-  /* Confirm account -> save to DB */
-  const confirmAccount = async () => {
+  const confirmTx = async () => {
     if (!pendingTx) return;
     try {
-      const account = accounts.find(a => a.type === selectedAcc) || accounts[0];
-      await add({ ...pendingTx, account_id: account?.id });
+      if (splitMode) {
+        for (const [type, amt] of Object.entries(splitAmounts)) {
+          if (amt > 0) {
+            const acct = accs.find(a => a?.type === type) || accs[0];
+            if (acct) await add({ ...pendingTx, account_id: acct.id, amount: amt });
+          }
+        }
+      } else {
+        const acct = accs.find(a => a?.type === selectedAcc) || accs[0];
+        if (acct) await add({ ...pendingTx, account_id: acct.id });
+      }
       setShowAccSelect(false);
       setPendingTx(null);
       setShowIncome(false);
       setShowExpense(false);
-      resetForms();
+      setIncName('');
+      setIncAmount('');
+      setIncDate(new Date().toISOString().split('T')[0]);
+      setIncCategory('');
+      setExpName('');
+      setExpAmount('');
+      setExpDate(new Date().toISOString().split('T')[0]);
+      setExpCategory('');
     } catch (err) { alert(err.message); }
   };
 
-  const resetForms = () => {
-    setIncName(''); setIncAmount('');
-    setIncDate(new Date().toISOString().split('T')[0]); setIncCategory('');
-    setExpName(''); setExpAmount('');
-    setExpDate(new Date().toISOString().split('T')[0]); setExpCategory('');
-  };
-
-  /* Filters */
-  const filtered = transactions.filter(tx => {
-    if (filterType === 'income') return tx.type === 'income';
-    if (filterType === 'expense') return (tx.type === 'expense' || tx.type === 'supply_expense');
-    if (search) return tx.description?.toLowerCase().includes(search.toLowerCase());
-    return true;
-  });
-
-  const incomeCats = categories.filter(c => c.type === 'income');
-  const expenseCats = categories.filter(c => c.type === 'expense' || c.type === 'supply_expense');
-  const txs = transactions || [];
-  const incomeTotal = txs.filter(function(t) { return t && t.type === 'income'; }).reduce(function(s, t) { return s + (Number(t.amount) || 0); }, 0);
-  const expenseTotal = txs.filter(function(t) { return t && t.type !== 'income'; }).reduce(function(s, t) { return s + (Number(t.amount) || 0); }, 0);
-  const profit = incomeTotal - expenseTotal;
-  const sales = txs.filter(function(t) { return t && t.type === 'sale'; });
-  const avgCheck = sales.length ? Math.round(sales.reduce(function(s, t) { return s + (Number(t.amount) || 0); }, 0) / sales.length) : 0;
+  const incomeCats = cats.filter(c => c?.type === 'income');
+  const expenseCats = cats.filter(c => c?.type === 'expense' || c?.type === 'supply_expense');
 
   return (
-    <>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize:"1.2rem", fontWeight:600, margin:0 }}>Транзакции</h1>
-          <div className="sub" style={{ fontSize:".85rem", color:"var(--muted)", margin:0 }}>Все приходы и расходы в одном месте</div>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Транзакции</h1>
+          <div className="sub" style={{ fontSize: '.85rem', color: 'var(--muted)', margin: 0 }}>Все приходы и расходы в одном месте</div>
         </div>
-        <div style={{ display:"flex", gap:".5rem" }}>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
           <button className="btn-red" onClick={() => setShowExpense(true)}>+ Расход</button>
           <button className="btn-green" onClick={() => setShowIncome(true)}>+ Доход</button>
         </div>
       </div>
-      <div className="nav-sep" style={{ margin:".25rem 0", width:"100%", border:"none", borderTop:"1px solid var(--border)" }} />
-      <div style={{ display:"flex", gap:".5rem", flexWrap:"wrap", margin:".75rem 0" }}>
-        <div style={{ flex:1, minWidth:"120px", background:"#dcfce7", border:"1px solid #86efac", borderRadius:"10px", padding:".65rem .75rem" }}>
-          <div style={{ fontSize:".65rem", color:"#166534", fontWeight:600, textTransform:"uppercase" }}>ВЫРУЧКА</div>
-          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#14532d", marginTop:".1rem" }}>{incomeTotal.toLocaleString()}₽</div>
+      <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
+
+      {!loading && (
+        <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', margin: '.75rem 0' }}>
+          <div style={{ flex: 1, minWidth: '120px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '10px', padding: '.65rem .75rem' }}>
+            <div style={{ fontSize: '.65rem', color: '#166534', fontWeight: 600, textTransform: 'uppercase' }}>ВЫРУЧКА</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#14532d', marginTop: '.1rem' }}>{incomeTotal.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex: 1, minWidth: '120px', background: '#fce7f3', border: '1px solid #f9a8d4', borderRadius: '10px', padding: '.65rem .75rem' }}>
+            <div style={{ fontSize: '.65rem', color: '#9d174d', fontWeight: 600, textTransform: 'uppercase' }}>РАСХОДЫ</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#831843', marginTop: '.1rem' }}>{expenseTotal.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex: 1, minWidth: '120px', background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: '10px', padding: '.65rem .75rem' }}>
+            <div style={{ fontSize: '.65rem', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase' }}>ПРИБЫЛЬ</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e3a8a', marginTop: '.1rem' }}>{profit.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex: 1, minWidth: '120px', background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '10px', padding: '.65rem .75rem' }}>
+            <div style={{ fontSize: '.65rem', color: '#92400e', fontWeight: 600, textTransform: 'uppercase' }}>СРЕДНИЙ ЧЕК</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#78350f', marginTop: '.1rem' }}>{avgCheck.toLocaleString()}₽</div>
+          </div>
         </div>
-        <div style={{ flex:1, minWidth:"120px", background:"#fce7f3", border:"1px solid #f9a8d4", borderRadius:"10px", padding:".65rem .75rem" }}>
-          <div style={{ fontSize:".65rem", color:"#9d174d", fontWeight:600, textTransform:"uppercase" }}>РАСХОДЫ</div>
-          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#831843", marginTop:".1rem" }}>{expenseTotal.toLocaleString()}₽</div>
+      )}
+
+      {!loading && txs.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
+          <p style={{ marginBottom: '.75rem' }}>Пока нет транзакций</p>
+          <button onClick={seed} style={{ padding: '.5rem 1rem', fontSize: '.82rem', border: '1px solid var(--border)', borderRadius: '6px', background: 'var(--white)', cursor: 'pointer', fontFamily: 'var(--font)' }}>
+            Заполнить демо-данными
+          </button>
         </div>
-        <div style={{ flex:1, minWidth:"120px", background:"#dbeafe", border:"1px solid #93c5fd", borderRadius:"10px", padding:".65rem .75rem" }}>
-          <div style={{ fontSize:".65rem", color:"#1e40af", fontWeight:600, textTransform:"uppercase" }}>ПРИБЫЛЬ</div>
-          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#1e3a8a", marginTop:".1rem" }}>{profit.toLocaleString()}₽</div>
+      )}
+
+      {txs.length > 0 && (
+        <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead><tr id="colHeaders">
+              <th>Дата</th><th>Название</th><th>Сумма</th><th>Категория</th>
+            </tr></thead>
+            <tbody>
+              {txs.map(tx => (
+                <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{tx.date}</td>
+                  <td style={{ padding: '.5rem', fontWeight: 500 }}>{tx.description || '—'}</td>
+                  <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
+                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()}₽
+                  </td>
+                  <td style={{ padding: '.5rem', color: 'var(--muted)' }}>{tx.categories?.name || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div style={{ flex:1, minWidth:"120px", background:"#fef3c7", border:"1px solid #fcd34d", borderRadius:"10px", padding:".65rem .75rem" }}>
-          <div style={{ fontSize:".65rem", color:"#92400e", fontWeight:600, textTransform:"uppercase" }}>СРЕДНИЙ ЧЕК</div>
-          <div style={{ fontSize:"1.1rem", fontWeight:700, color:"#78350f", marginTop:".1rem" }}>{avgCheck.toLocaleString()}₽</div>
-        </div>
-      </div>
-      <div style={{ textAlign:"center", padding:"2rem", color:"var(--muted)" }}>
-        <p>Страница транзакций загружена</p>
-      </div>
-      {showIncome && <div className="modal-overlay active"><div className="modal-box"><h2>test income</h2></div></div>}
-      {showExpense && <div className="modal-overlay active"><div className="modal-box"><h2>test expense</h2></div></div>}
-    </>
+      )}
+    </div>
   );
 }
