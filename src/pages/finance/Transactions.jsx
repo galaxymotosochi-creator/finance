@@ -228,9 +228,9 @@ export default function Transactions() {
         </div>
       )}
       {showIncome && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowIncome(false);setEditingId(null)}}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowIncome(false)}}>
           <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowIncome(false);setEditingId(null)}}>&times;</button>
+            <button className="modal-close" onClick={function(){setShowIncome(false)}}>&times;</button>
             <h2>{editingId ? "Редактировать доход" : "Добавить доход"}</h2>
             <div className="sub">Запишите новый доход</div>
             <form onSubmit={function(e){
@@ -269,9 +269,9 @@ export default function Transactions() {
       )}
 
       {showExpense && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowExpense(false);setEditingId(null)}}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active")setShowExpense(false)}}>
           <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowExpense(false);setEditingId(null)}}>&times;</button>
+            <button className="modal-close" onClick={function(){setShowExpense(false)}}>&times;</button>
             <h2>{editingId ? "Редактировать расход" : "Добавить расход"}</h2>
             <div className="sub">Запишите новый расход</div>
             <form onSubmit={function(e){
@@ -309,9 +309,9 @@ export default function Transactions() {
         </div>
       )}
       {showAccSelect && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowAccSelect(false);setPendingTx(null);setEditingId(null)}}}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowAccSelect(false);setPendingTx(null)}}}>
           <div className="modal-box" style={{maxWidth:"400px"}}>
-            <button className="modal-close" onClick={function(){setShowAccSelect(false);setPendingTx(null);setEditingId(null)}}>&times;</button>
+            <button className="modal-close" onClick={function(){setShowAccSelect(false);setPendingTx(null)}}>&times;</button>
             <h2>{pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"}</h2>
             <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}</div>
             <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
