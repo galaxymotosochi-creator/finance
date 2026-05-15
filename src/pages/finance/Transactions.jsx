@@ -186,7 +186,7 @@ export default function Transactions() {
         <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
-              <th>Дата</th><th>Название</th><th>Сумма</th><th>Категория</th>
+              <th>Дата</th><th>Название</th><th>Сумма</th><th>Категория</th><th className="actions"></th>
             </tr></thead>
             <tbody>
               {filtered.map(tx => (
