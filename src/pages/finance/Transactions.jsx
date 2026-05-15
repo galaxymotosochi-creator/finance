@@ -138,18 +138,40 @@ export default function Transactions() {
       </div>
 
       {/* Search + filter */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1rem' }}>
-        <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
-          <span style={{ position: 'absolute', left: '.5rem', top: '50%', transform: 'translateY(-50%)', fontSize: '.75rem', color: 'var(--muted)' }}>🔍</span>
+      <div style={{ display:'flex', alignItems:'center' }}>
+        <div style={{ width:'30%', minWidth:'180px', maxWidth:'400px', display:'flex', alignItems:'center', gap:'.3rem', border:'1px solid var(--border)', borderRadius:'6px', padding:'.25rem .5rem' }}>
+          <span style={{ fontSize:'.75rem', color:'var(--muted)' }}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
-            style={{ width: '100%', padding: '.35rem .35rem .35rem 1.6rem', fontSize: '.8rem', border: '1px solid var(--border)', borderRadius: '6px', outline: 'none', fontFamily: 'var(--font)' }} />
+            style={{ border:'none', outline:'none', flex:1, fontSize:'.8rem', fontFamily:'var(--font)', background:'none' }} />
         </div>
-        <div className="stock-filter-links">
-          <span className="stock-filter-link" onClick={() => setFilterType('all')} style={{ fontWeight: filterType === 'all' ? 600 : 400 }}>Все</span>
-          <span className="stock-filter-link" onClick={() => setFilterType('income')} style={{ fontWeight: filterType === 'income' ? 600 : 400 }}>Доходы</span>
-          <span className="stock-filter-link" onClick={() => setFilterType('expense')} style={{ fontWeight: filterType === 'expense' ? 600 : 400 }}>Расходы</span>
+        <div style={{ display:'flex', alignItems:'center', gap:'.15rem', marginLeft:'auto' }}>
+          <span style={{ padding:'.15rem .4rem', fontSize:'.75rem', color:'var(--primary)', cursor:'pointer', borderRight:'1px solid var(--border)', lineHeight:1 }}>📅 Период</span>
+          <span style={{ padding:'.15rem .4rem', fontSize:'.75rem', color:'var(--primary)', cursor:'pointer', borderRight:'1px solid var(--border)', lineHeight:1 }}>Скачать</span>
+          <span style={{ padding:'.15rem .4rem', fontSize:'.9rem', color:'var(--primary)', cursor:'pointer', borderRight:'none', lineHeight:1 }}>⚙️</span>
         </div>
       </div>
+
+      {/* Metrics */}
+      {!loading && (
+        <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap', margin:'.75rem 0' }}>
+          <div style={{ flex:1, minWidth:'120px', background:'linear-gradient(135deg,#dcfce7,#bbf7d0)', border:'1px solid #86efac', borderRadius:'10px', padding:'.65rem .75rem' }}>
+            <div style={{ fontSize:'.65rem', color:'#166534', fontWeight:600, textTransform:'uppercase' }}>Выручка</div>
+            <div style={{ fontSize:'1.1rem', fontWeight:700, color:'#14532d', marginTop:'.1rem' }}>{incomeTotal.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex:1, minWidth:'120px', background:'linear-gradient(135deg,#fce7f3,#fbcfe8)', border:'1px solid #f9a8d4', borderRadius:'10px', padding:'.65rem .75rem' }}>
+            <div style={{ fontSize:'.65rem', color:'#9d174d', fontWeight:600, textTransform:'uppercase' }}>Расходы</div>
+            <div style={{ fontSize:'1.1rem', fontWeight:700, color:'#831843', marginTop:'.1rem' }}>{expenseTotal.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex:1, minWidth:'120px', background:'linear-gradient(135deg,#dbeafe,#bfdbfe)', border:'1px solid #93c5fd', borderRadius:'10px', padding:'.65rem .75rem' }}>
+            <div style={{ fontSize:'.65rem', color:'#1e40af', fontWeight:600, textTransform:'uppercase' }}>Прибыль</div>
+            <div style={{ fontSize:'1.1rem', fontWeight:700, color:'#1e3a8a', marginTop:'.1rem' }}>{profit.toLocaleString()}₽</div>
+          </div>
+          <div style={{ flex:1, minWidth:'120px', background:'linear-gradient(135deg,#fef3c7,#fde68a)', border:'1px solid #fcd34d', borderRadius:'10px', padding:'.65rem .75rem' }}>
+            <div style={{ fontSize:'.65rem', color:'#92400e', fontWeight:600, textTransform:'uppercase' }}>Средний чек</div>
+            <div style={{ fontSize:'1.1rem', fontWeight:700, color:'#78350f', marginTop:'.1rem' }}>{avgCheck.toLocaleString()}₽</div>
+          </div>
+        </div>
+      )}
 
       {/* Empty state */}
       {!loading && transactions.length === 0 && (
