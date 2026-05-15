@@ -27,6 +27,7 @@ export default function Transactions() {
   const [expCategory, setExpCategory] = useState('');
 
   const txs = transactions || [];
+  const filtered = search ? txs.filter(function(tx){return (tx.description||"").toLowerCase().includes(search.toLowerCase())}) : txs;
   const accs = accounts || [];
   const cats = categories || [];
 
@@ -159,7 +160,7 @@ export default function Transactions() {
         </div>
       )}
 
-      {!loading && txs.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
           <p style={{ marginBottom: '.75rem' }}>Пока нет транзакций</p>
           <button onClick={seed} style={{ padding: '.5rem 1rem', fontSize: '.82rem', border: '1px solid var(--border)', borderRadius: '6px', background: 'var(--white)', cursor: 'pointer', fontFamily: 'var(--font)' }}>
@@ -175,7 +176,7 @@ export default function Transactions() {
               <th>Дата</th><th>Название</th><th>Сумма</th><th>Категория</th>
             </tr></thead>
             <tbody>
-              {txs.map(tx => (
+              {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '.5rem .5rem .5rem 0', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{tx.date}</td>
                   <td style={{ padding: '.5rem', fontWeight: 500 }}>{tx.description || '—'}</td>
