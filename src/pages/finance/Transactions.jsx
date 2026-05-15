@@ -129,7 +129,7 @@ export default function Transactions() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Транзакции</h1>
-          <div className="sub" style={{ fontSize: '.85rem', color: 'var(--muted)', margin: 0 }}>Все приходы и расходы в одном месте</div>
+          <div className="sub">Все приходы и расходы в одном месте</div>
         </div>
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <button className="btn-red" onClick={() => setShowExpense(true)}>+ Расход</button>
