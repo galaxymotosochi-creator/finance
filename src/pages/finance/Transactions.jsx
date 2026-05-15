@@ -100,7 +100,7 @@ export default function Transactions() {
     if (!pendingTx) return;
     try {
       var isEdit = !!pendingTx.id;
-      var txData = { account_id: null, amount: pendingTx.amount, description: pendingTx.description, date: pendingTx.date, category_id: pendingTx.category_id, type: pendingTx.type };
+      var txData = { account_id: null, user_id: pendingTx.user_id, amount: pendingTx.amount, description: pendingTx.description, date: pendingTx.date, category_id: pendingTx.category_id, type: pendingTx.type };
       if (splitMode) {
         for (const [type, amt] of Object.entries(splitAmounts)) {
           if (amt > 0) {
@@ -162,8 +162,8 @@ export default function Transactions() {
           <div className="sub">Все приходы и расходы в одном месте</div>
         </div>
         <div className="page-actions">
-          <button className="btn-red" onClick={() => setShowExpense(true)}>+ Расход</button>
-          <button className="btn-green" onClick={() => setShowIncome(true)}>+ Доход</button>
+          <button className="btn-red" onClick={function(){setEditingId(null);setShowExpense(true)}}>+ Расход</button>
+          <button className="btn-green" onClick={function(){setEditingId(null);setShowIncome(true)}}>+ Доход</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
