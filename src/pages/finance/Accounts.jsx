@@ -107,7 +107,7 @@ export default function Accounts() {
   const saveInitBalances = async (e) => {
     e.preventDefault();
     try {
-      for (const type of ['cash', 'card', 'transfer']) {
+      for (const type of Object.keys(initAmounts)) {
         const amt = parseFloat(initAmounts[type]) || 0;
         if (amt > 0) {
           const acct = getAccount(type);
@@ -122,6 +122,7 @@ export default function Accounts() {
         }
       }
       setShowInitModal(false);
+      setInitAmounts({});
       await fetchTx();
     } catch (err) { alert(err.message); }
   };
