@@ -41,8 +41,15 @@ export default function Accounts() {
   const fetchAccounts = async () => {
     var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
     if (!d.data) return;
-    var seen = {}, toDel = [];
-    var cl = d.data.filter(a => { if (seen[a.type]) { toDel.push(a.id); return false; } seen[a.type] = true; return true; });
+    // Удаляем дубли только среди стандартных типов
+    var stdSeen = {}, toDel = [];
+    var cl = d.data.filter(a => {
+      if (['cash','card','transfer'].includes(a.type)) {
+        if (stdSeen[a.type]) { toDel.push(a.id); return false; }
+        stdSeen[a.type] = true;
+      }
+      return true;
+    });
     if (toDel.length > 0) await supabase.from('accounts').delete().in('id', toDel);
     var need = {cash:!cl.some(a=>a.type==='cash'), card:!cl.some(a=>a.type==='card'), transfer:!cl.some(a=>a.type==='transfer')};
     if (user && (need.cash||need.card||need.transfer)) {
@@ -102,7 +109,7 @@ export default function Accounts() {
         if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'cash',balance:ib});
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom_'+Date.now(),balance:ib});
         if (ins.error) { alert(ins.error.message); return; }
       }
       await fetchAccounts();
