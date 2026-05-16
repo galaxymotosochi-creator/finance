@@ -189,7 +189,7 @@ body {
 .stock-add-btn:hover{opacity:.9}
 .stock-filterbar{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:.5rem;flex-wrap:wrap}
 .stock-search{display:flex;align-items:center;gap:.3rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:5px;background:var(--white)}
-.stock-search input{border:none;outline:none;font-family:var(--font);font-size:.78rem;padding:.2rem 0;width:140px;background:transparent}
+.stock-search input{border:none;outline:none;font-family:var(--font);font-size:.8rem;padding:.2rem 0;width:140px;background:transparent}
 .stock-filter-links { display: flex; align-items: center; gap: .15rem; }
 .stock-filter-link {
   padding: .15rem .4rem; font-size: .75rem;
