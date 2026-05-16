@@ -109,8 +109,13 @@ export default function Accounts() {
         if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom_'+Date.now(),balance:ib});
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'cash',balance:ib}).select();
         if (ins.error) { alert(ins.error.message); return; }
+        if (ins.data && ins.data[0]) {
+          var dt = JSON.parse(localStorage.getItem('accountDisplayTypes')||'{}');
+          dt[ins.data[0].id] = modalType;
+          localStorage.setItem('accountDisplayTypes', JSON.stringify(dt));
+        }
       }
       await fetchAccounts();
       await fetchTx();
@@ -293,7 +298,7 @@ export default function Accounts() {
             <div className="sub">Используйте эту функцию при первом заполнении программы</div>
             <form onSubmit={saveInit}>
               {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
-                var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
+                var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
                 return (
                   <div key={a.id} className="form-group">
                     <label>{ic} {a.name} ({lb})</label>
@@ -321,13 +326,13 @@ export default function Accounts() {
               <div className="form-group">
                 <label>С какого счёта</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name} ({getBal(a.type).toLocaleString()}₽)</option>})}
+                  {accounts.map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name} ({getBal(a.type).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>На какой счёт</label>
                 <select value={trTo} onChange={e=>setTrTo(e.target.value)}>
-                  {accounts.filter(a=>a.type!==trFrom).map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
+                  {accounts.filter(a=>a.type!==trFrom).map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
                 </select>
               </div>
               <div className="form-group">
