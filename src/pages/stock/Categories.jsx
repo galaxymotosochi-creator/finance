@@ -20,8 +20,6 @@ export default function Categories() {
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
   const [fType, setFType] = useState('product');
-  const [filter, setFilter] = useState('all');
-
   const load = () => setCatsState(getCats());
   useEffect(() => { load(); }, []);
 
@@ -61,10 +59,6 @@ export default function Categories() {
     load();
   };
 
-  let filtered = cats;
-  if (filter === 'product') filtered = cats.filter(c => c.type === 'product');
-  else if (filter === 'service') filtered = cats.filter(c => c.type === 'service');
-
   return (
     <>
       <div className="page-header">
@@ -78,17 +72,6 @@ export default function Categories() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="search-row">
-        <div className="actions-group" style={{marginLeft:0}}>
-          <button className={`text-btn${filter === 'all' ? ' active' : ''}`}
-            onClick={() => setFilter('all')}>Все</button>
-          <button className={`text-btn${filter === 'product' ? ' active' : ''}`}
-            onClick={() => setFilter('product')}>Товары</button>
-          <button className={`text-btn${filter === 'service' ? ' active' : ''}`}
-            onClick={() => setFilter('service')}>Услуги</button>
-        </div>
-      </div>
-
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table style={{minWidth:'500px'}}>
           <thead id="catColHeaders">
@@ -99,7 +82,7 @@ export default function Categories() {
             </tr>
           </thead>
           <tbody id="catTableBody">
-            {filtered.length === 0 ? (
+            {cats.length === 0 ? (
               <tr>
                 <td colSpan="3">
                   <div className="empty-products">
@@ -108,7 +91,7 @@ export default function Categories() {
                   </div>
                 </td>
               </tr>
-            ) : filtered.map(c => (
+            ) : cats.map(c => (
               <tr key={c.id}>
                 <td><div className="prod-name" style={{fontSize:'.85rem'}}>{c.name}</div></td>
                 <td><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
