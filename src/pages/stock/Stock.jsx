@@ -58,7 +58,7 @@ export default function Stock() {
 
   return (
     <>
-      <div className="stock-toolbar" style={{paddingBottom:0}}>
+      <div className="stock-toolbar" style={{paddingBottom:0,marginBottom:'1.5rem'}}>
         <div>
           <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
             <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Остатки</h1>
