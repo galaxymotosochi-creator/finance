@@ -59,9 +59,12 @@ export default function Stock() {
   return (
     <>
       <div className="stock-toolbar">
-        <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
-          <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Остатки</h1>
-          <span className="stock-count">{items.length}</span>
+        <div>
+          <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+            <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Остатки</h1>
+            <span className="stock-count">{items.length}</span>
+          </div>
+          <div className="sub">Управляйте остатками на складе</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'.3rem'}}>
           <button className="stock-icon-btn">📊</button>
@@ -71,7 +74,9 @@ export default function Stock() {
         </div>
       </div>
 
-      <div className="stock-filterbar">
+      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
+
+      <div className="stock-filterbar" style={{borderTop:'none'}}>
         <div className="stock-search">
           <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)} />
@@ -86,7 +91,7 @@ export default function Stock() {
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table style={{minWidth:'680px'}}>
-          <thead>
+          <thead id="stockColHeaders">
             <tr>
               <th>Артикул</th>
               <th>Товар</th>

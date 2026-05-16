@@ -299,6 +299,11 @@ body {
 #catColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #catColHeaders th:first-child{text-align:left;padding-left:0}
 
+/* === Stock (Остатки) === */
+#stockColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
+#stockColHeaders th:first-child{text-align:left}
+#stockTableBody td:first-child{text-align:left}
+
 /* === Products (Товары) === */
 .product-table .prod-name{font-weight:500;color:var(--body-color);text-align:left;font-size:.85rem}
 .product-table .prod-sku{color:var(--muted);font-size:.7rem;display:block;text-align:left}
