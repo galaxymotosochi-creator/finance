@@ -308,3 +308,10 @@ body {
 .promo-dot.active{background:#16a34a}
 .promo-dot.planned{background:#f59e0b}
 .promo-dot.ended{background:#ccc}
+
+.promo-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.promo-cal-month{font-size:.95rem;font-weight:600;color:var(--body-color)}
+.promo-cal-nav{background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .12s}
+.promo-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:.78rem;margin-bottom:.5rem}
+.promo-cal-legend{display:flex;gap:.75rem;justify-content:center;font-size:.7rem;color:var(--muted);padding-top:.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
+.promo-detail{background:var(--white);border:1px solid var(--border);border-radius:.75rem;padding:.65rem .75rem;margin-top:.5rem}
