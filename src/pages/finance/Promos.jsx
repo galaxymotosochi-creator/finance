@@ -82,18 +82,18 @@ export default function Promos() {
 
       <div className="promo-calendar-wrap">
       <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1rem',marginBottom:'.75rem'}}>
-        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}} style={{background:'none',border:'1px solid var(--border)',borderRadius:'50%',width:'32px',height:'32px',fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)'}}>‹</button>
+        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}} className='promo-cal-nav'>‹</button>
         <div style={{fontSize:'.95rem',fontWeight:600}}>{months[m]} {y}</div>
-        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()+1);setCal(d)}} style={{background:'none',border:'1px solid var(--border)',borderRadius:'50%',width:'32px',height:'32px',fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)'}}>›</button>
+        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()+1);setCal(d)}} className='promo-cal-nav'>›</button>
       </div>
 
       <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'2px',marginBottom:'.5rem'}}>
-        {daysShort.map(n => <div key={n} style={{fontSize:'.7rem',color:'var(--muted)',textAlign:'center',padding:'.25rem 0',fontWeight:600}}>{n}</div>)}
+        {daysShort.map(n => <div key={n} className='wd'>{n}</div>)}
         {cells.map((c,i) => {
           if (!c) return <div key={i} />;
           const s = c.promos.length ? status(c.promos[0]) : null;
           const bg = s === 'active' ? '#22c55e' : s === 'planned' ? '#3b82f6' : s === 'ended' ? '#e5e7eb' : 'transparent';
-          return <div key={i} onClick={() => c.promos.length && setDetail(c.promos[0].id)} style={{fontSize:'.78rem',textAlign:'center',padding:'.35rem 0',borderRadius:'6px',cursor:c.promos.length?'pointer':'default',background:bg,color:s?'#fff':'var(--body-color)'}}>{c.day}</div>;
+          return <div key={i} onClick={() => c.promos.length && setDetail(c.promos[0].id)} className={'day' + (s ? ' has-promo ' + s : '')} style={{background:bg,color:s?'#fff':'var(--body-color)'}}>{c.day}</div>;
         })}
       </div>
 
