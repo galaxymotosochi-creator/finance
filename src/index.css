@@ -317,7 +317,7 @@ body {
 .loy-dots{display:flex;gap:.35rem;justify-content:center;margin:-.25rem 0 .75rem}
 .loy-dot{width:8px;height:8px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s}
 .loy-dot.active{background:var(--primary);width:20px;border-radius:4px}
-.promo-menu-dropdown{position:absolute;top:100%;right:0;background:var(--white);border:1px solid var(--border);border-radius:.5rem;box-shadow:0 .25rem .75rem rgba(0,0,0,.1);min-width:140px;padding:.25rem;z-index:10;display:none}
+.promo-menu-dropdown{position:absolute;top:100%;right:0;background:var(--white);border:1px solid var(--border);border-radius:.5rem;box-shadow:0 .25rem .75rem rgba(0,0,0,.1);padding:.25rem;z-index:10;display:none;white-space:nowrap}
 .promo-menu-dropdown.open{display:block}
 .promo-menu-item{padding:.35rem .5rem;font-size:.78rem;cursor:pointer;border-radius:4px;font-family:var(--font);color:var(--body-color)}
 .promo-menu-item:hover{background:var(--primary-light)}
