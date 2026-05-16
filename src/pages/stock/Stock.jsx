@@ -76,7 +76,7 @@ export default function Stock() {
 
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="stock-filterbar" style={{borderTop:'none',borderBottom:'none'}}>
+      <div className="stock-filterbar" style={{borderTop:'none',borderBottom:'none',paddingTop:0,paddingBottom:0}}>
         <div className="stock-search">
           <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)} />

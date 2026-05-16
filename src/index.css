@@ -301,8 +301,8 @@ body {
 
 /* === Stock (Остатки) === */
 #stockColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
-#stockColHeaders th:first-child{text-align:left}
-#stockTableBody td:first-child{text-align:left}
+#stockColHeaders th:first-child{text-align:left;padding-left:0}
+#stockTableBody td:first-child{text-align:left;padding-left:0}
 
 /* === Products (Товары) === */
 .product-table .prod-name{font-weight:500;color:var(--body-color);text-align:left;font-size:.85rem}
