@@ -41,6 +41,19 @@ export default function Accounts() {
     setLoading(false);
   };
 
+  // Создать 3 стандартных счёта при первом входе
+  useEffect(() => {
+    if (!loading && accounts.length === 0 && user) {
+      supabase.from('accounts').insert([
+        { user_id: user.id, name: 'Касса', type: 'cash', balance: 0 },
+        { user_id: user.id, name: 'Бизнес-карта', type: 'card', balance: 0 },
+        { user_id: user.id, name: 'Расчётный счёт', type: 'transfer', balance: 0 },
+      ]).select().then(r => {
+        if (r.data) fetchAccounts();
+      });
+    }
+  }, [loading, accounts.length, user]);
+
   useEffect(() => { fetchAccounts(); fetchTx(); }, []);
 
   const getBalance = (type) => {
@@ -108,9 +121,15 @@ export default function Accounts() {
     } catch (err) { alert(err.message); }
   };
 
-  const remove = async (id) => {
-    if (!confirm('Удалить счёт?')) return;
-    await supabase.from('accounts').delete().eq('id', id);
+  const remove = async (acct) => {
+    if (!acct) return;
+    // Проверяем, есть ли транзакции на этом счету
+    const hasTx = (transactions || []).some(t => t.account_id === acct.id);
+    if (hasTx) {
+      return alert('Нельзя удалить счёт — на нём есть движения. Сначала удалите транзакции.');
+    }
+    if (!confirm('Удалить счёт «' + acct.name + '»?')) return;
+    await supabase.from('accounts').delete().eq('id', acct.id);
     await fetchAccounts();
   };
 
@@ -194,7 +213,7 @@ export default function Accounts() {
                 <div className="prod-more-wrap">
                   <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
                   <div className="prod-dropdown">
-                    <button onClick={function () { remove(acct.id); }} style={{ color: '#dc3545' }}>Удалить</button>
+                    <button onClick={function () { remove(acct); }} style={{ color: '#dc3545' }}>Удалить</button>
                   </div>
                 </div>
               </div>
