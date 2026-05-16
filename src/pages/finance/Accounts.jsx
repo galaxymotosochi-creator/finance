@@ -5,8 +5,12 @@ import { useState, useEffect } from 'react';
 
 const accMeta = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
-  { type: 'card', icon: '💳', label: 'Карта' },
-  { type: 'transfer', icon: '🔄', label: 'Перевод' },
+  { type: 'checking', icon: '🏦', label: 'Расчётный счёт' },
+  { type: 'card', icon: '💳', label: 'Бизнес-карта' },
+  { type: 'bank', icon: '🏛️', label: 'Банковский счёт' },
+  { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
+  { type: 'reserve', icon: '🔒', label: 'Резерв' },
+  { type: 'deposit', icon: '📜', label: 'Депозит' },
 ];
 
 export default function Accounts() {
@@ -202,9 +206,13 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Тип</label>
                 <select value={modalType} onChange={function (e) { setModalType(e.target.value); }}>
-                  <option value="cash">Наличные</option>
-                  <option value="card">Карта</option>
-                  <option value="transfer">Перевод</option>
+                  <option value="cash">💵 Наличные</option>
+                  <option value="checking">🏦 Расчётный счёт</option>
+                  <option value="card">💳 Бизнес-карта</option>
+                  <option value="bank">🏛️ Банковский счёт</option>
+                  <option value="electronic">🌐 Электронные деньги</option>
+                  <option value="reserve">🔒 Резерв</option>
+                  <option value="deposit">📜 Депозит</option>
                 </select>
               </div>
               <div className="modal-actions">
@@ -254,9 +262,7 @@ export default function Accounts() {
               <div className="form-group">
                 <label>С какого счёта</label>
                 <select value={transferFrom} onChange={function (e) { setTransferFrom(e.target.value); }}>
-                  {accMeta.filter(t => getAccount(t.type)).map(a => (
-                    <option key={a.type} value={a.type}>{a.icon} {a.label} ({getBalance(a.type).toLocaleString()}₽)</option>
-                  ))}
+                  {accMeta.filter(t => getAccount(t.type)).map(function(a){return <option key={a.type} value={a.type}>{a.icon} {a.label} ({getBalance(a.type).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">

@@ -357,7 +357,7 @@ export default function Transactions() {
             <h2>{pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"}</h2>
             <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}</div>
             <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
-              {[{type:"cash",icon:"💵",label:"Наличные"},{type:"card",icon:"💳",label:"Карта"},{type:"transfer",icon:"🔄",label:"Перевод"}].map(function(a){
+              {[{type:"cash",icon:"💵",label:"Наличные"},{type:"checking",icon:"🏦",label:"Расчётный счёт"},{type:"card",icon:"💳",label:"Бизнес-карта"},{type:"bank",icon:"🏛️",label:"Банковский счёт"},{type:"electronic",icon:"🌐",label:"Электронные деньги"},{type:"reserve",icon:"🔒",label:"Резерв"},{type:"deposit",icon:"📜",label:"Депозит"}].map(function(a){
                 var sel = selectedAcc === a.type;
                 return (
                   <div key={a.type} onClick={function(){setSelectedAcc(a.type)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--white)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
@@ -373,7 +373,7 @@ export default function Transactions() {
               if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;setSplitAmounts({cash:amt,card:amt,transfer:total-amt*2})}
               setSplitMode(!splitMode)
             }}>{splitMode ? "➖ Разделить" : "➕ Разделить"}</div>
-            {splitMode && [{type:"cash",icon:"💵",label:"Наличные"},{type:"card",icon:"💳",label:"Карта"},{type:"transfer",icon:"🔄",label:"Перевод"}].map(function(a){
+            {splitMode && [{type:"cash",icon:"💵",label:"Наличные"},{type:"checking",icon:"🏦",label:"Расчётный счёт"},{type:"card",icon:"💳",label:"Бизнес-карта"},{type:"bank",icon:"🏛️",label:"Банковский счёт"},{type:"electronic",icon:"🌐",label:"Электронные деньги"},{type:"reserve",icon:"🔒",label:"Резерв"},{type:"deposit",icon:"📜",label:"Депозит"}].map(function(a){
               return (
                 <div key={a.type} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".35rem 0"}}>
                   <span style={{fontSize:"1rem",width:"24px",textAlign:"center"}}>{a.icon}</span>
