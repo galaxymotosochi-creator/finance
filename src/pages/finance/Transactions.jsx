@@ -6,8 +6,8 @@ import { useTransactions, useAccounts, useCategories } from '../../hooks/useTran
 export default function Transactions() {
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
-  const accounts = useAccounts();
-  const categories = useCategories();
+  const { accounts, refreshAccounts } = useAccounts();
+  const { categories, refreshCategories } = useCategories();
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
@@ -59,6 +59,8 @@ export default function Transactions() {
         ]);
       }
       await refresh();
+      refreshAccounts();
+      refreshCategories();
     } catch (e) { console.error(e); }
   };
 
