@@ -222,7 +222,7 @@ export default function Transactions() {
           <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='expense'?600:400,color:typeFilter==='expense'?'var(--primary)':'var(--muted)',cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
             onClick={()=>setTypeFilter(typeFilter==='expense'?null:'expense')}>Расход</span>
           <div style={{position:'relative'}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:600,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
