@@ -26,6 +26,8 @@ export default function Accounts() {
   const [modalName, setModalName] = useState('');
   const [modalType, setModalType] = useState('cash');
   const [modalBalance, setModalBalance] = useState('0');
+  const [showInit, setShowInit] = useState(false);
+  const [initAmts, setInitAmts] = useState({});
   const [showTransfer, setShowTransfer] = useState(false);
   const [trFrom, setTrFrom] = useState('cash');
   const [trTo, setTrTo] = useState('card');
@@ -105,6 +107,20 @@ export default function Accounts() {
     await fetchAccounts();
   };
 
+  var saveInit = async (e) => {
+    e.preventDefault();
+    try {
+      for (var type of Object.keys(initAmts)) {
+        var amt = parseFloat(initAmts[type])||0;
+        if (amt > 0) {
+          await supabase.from('accounts').update({balance:amt}).eq('type',type).eq('user_id',user.id);
+        }
+      }
+      setShowInit(false); setInitAmts({});
+      await fetchAccounts();
+    } catch(err) {alert(err.message);}
+  };
+
   var goTransfer = async (e) => {
     e.preventDefault();
     if (!trAmt||parseFloat(trAmt)<=0) return;
@@ -134,7 +150,7 @@ export default function Accounts() {
 
       <div className="stock-filterbar" style={{border:'none',paddingTop:0}}>
         <div className="stock-filter-links" style={{marginLeft:0}}>
-          <span className="stock-filter-link" onClick={openAdd}>📋 Ввести начальные остатки</span>
+          <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>📋 Ввести начальные остатки</span>
           <span className="stock-filter-link" onClick={()=>setShowTransfer(true)}>🔄 Перевод между счетами</span>
         </div>
       </div>
@@ -203,6 +219,32 @@ export default function Accounts() {
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Создать'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showInit && (
+        <div className="modal-overlay active">
+          <div className="modal-box" style={{maxWidth:'500px'}}>
+            <button className="modal-close" onClick={()=>setShowInit(false)}>&times;</button>
+            <h2>Введите первоначальные остатки</h2>
+            <div className="sub">Используйте эту функцию при первом заполнении программы</div>
+            <form onSubmit={saveInit}>
+              {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
+                var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
+                return (
+                  <div key={a.id} className="form-group">
+                    <label>{ic} {a.name} ({lb})</label>
+                    <input type="number" placeholder="0" min="0" step="0.01"
+                      value={initAmts[a.type]||""}
+                      onChange={function(e){var v=parseFloat(e.target.value)||0;setInitAmts(p=>{var r=Object.assign({},p);r[a.type]=v;return r;})}} />
+                  </div>
+                );
+              })}
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
           </div>
