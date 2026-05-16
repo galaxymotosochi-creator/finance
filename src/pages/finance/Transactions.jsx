@@ -28,8 +28,37 @@ export default function Transactions() {
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
 
+  // Период
+  const [period, setPeriod] = useState('all');
+  const [periodLabel, setPeriodLabel] = useState('Всё время');
+  const [periodFrom, setPeriodFrom] = useState('');
+  const [periodTo, setPeriodTo] = useState('');
+  const [showPeriod, setShowPeriod] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
+
   const txs = transactions || [];
-  const filtered = search ? txs.filter(function(tx){return (tx.description||"").toLowerCase().includes(search.toLowerCase())}) : txs;
+  // Фильтр по дате
+  var dateFilter = function(tx) {
+    if (period === 'all') return true;
+    var d = (tx.date || tx.created_at || '').split('T')[0];
+    if (period === 'today') return d === new Date().toISOString().split('T')[0];
+    if (period === 'yesterday') { var y = new Date(); y.setDate(y.getDate()-1); return d === y.toISOString().split('T')[0]; }
+    if (period === 'week') { var w = new Date(); w.setDate(w.getDate()-7); return d >= w.toISOString().split('T')[0]; }
+    if (period === 'custom') return d >= periodFrom && d <= periodTo;
+    return true;
+  };
+  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
+
+  var exportCsv = function(list) {
+    var rows = [['Дата','Описание','Тип','Счёт','Сумма']];
+    list.forEach(function(tx){
+      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',tx.type||'',tx.account_name||'',tx.amount||'']);
+    });
+    var csv = rows.map(function(r){return r.join(',')}).join('\n');
+    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'transactions.csv'; a.click();
+  };
+
   var accs = accounts || [];
   const cats = categories || [];
 
@@ -187,8 +216,44 @@ export default function Transactions() {
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}>Период</span>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}>Скачать</span>
+          <div style={{position:'relative'}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel} ▼</span>
+            {showPeriod && (
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
+                {[{key:'all',label:'Всё время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
+                  <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
+                    style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:period===p.key?'var(--primary)':'var(--body-color)',fontWeight:period===p.key?600:400,background:period===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
+                ))}
+                <div style={{borderTop:'1px solid var(--border)',marginTop:'.25rem',paddingTop:'.25rem'}}>
+                  <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem'}}>Свой период</div>
+                  <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
+                    <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px'}} />
+                    <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px'}} />
+                  </div>
+                  <div style={{padding:'.25rem .5rem'}}>
+                    <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setShowPeriod(false)}}
+                      style={{width:'100%',padding:'.3rem',background:'var(--primary)',color:'#fff',border:'none',borderRadius:'5px',fontSize:'.72rem',cursor:'pointer',fontFamily:'var(--font)'}}>Применить</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{position:'relative'}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать ▼</span>
+            {showDownload && (
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
+                <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
+                  Вы скачиваете отчёт за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
+                </div>
+                <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
+                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} style={{padding:'.25rem .6rem',fontSize:'.78rem',borderRadius:'5px',cursor:'pointer',background:'var(--primary)',color:'#fff',fontFamily:'var(--font)'}}>Скачать</span>
+                  <span onClick={()=>{setShowDownload(false);setShowPeriod(true)}} style={{padding:'.25rem .6rem',fontSize:'.78rem',borderRadius:'5px',cursor:'pointer',background:'transparent',border:'1px solid var(--border)',color:'var(--muted)',fontFamily:'var(--font)'}}>Изменить даты</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
