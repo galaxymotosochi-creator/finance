@@ -33,10 +33,10 @@ export default function Transactions() {
   var accs = accounts || [];
   const cats = categories || [];
 
-  const incomeTotal = txs.filter(t => t && t.type === 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const expenseTotal = txs.filter(t => t && t.type !== 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const incomeTotal = txs.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = txs.filter(t => t && t.type !== 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const profit = incomeTotal - expenseTotal;
-  const sales = txs.filter(t => t && t.type === 'sale');
+  const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
 
   const seed = async () => {
