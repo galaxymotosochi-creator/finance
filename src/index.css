@@ -299,6 +299,11 @@ body {
 #catColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #catColHeaders th:first-child{text-align:left;padding-left:0}
 
+/* === Clients (Клиенты) === */
+#clientTableBody td:first-child{text-align:left;padding-left:0}
+#clientColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
+#clientColHeaders th:first-child{text-align:left;padding-left:0}
+
 /* === Inventory (Инвентаризация) === */
 #invColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #invColHeaders th:first-child{text-align:left;padding-left:0}
