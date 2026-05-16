@@ -64,7 +64,7 @@ export default function Stock() {
             <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Остатки</h1>
             <span className="stock-count">{items.length}</span>
           </div>
-          <div className="sub">Управляйте остатками на складе</div>
+          <div className="sub" style={{marginBottom:0}}>Управляйте остатками на складе</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'.3rem'}}>
           <button className="stock-icon-btn">📊</button>
@@ -76,7 +76,7 @@ export default function Stock() {
 
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="stock-filterbar" style={{borderTop:'none'}}>
+      <div className="stock-filterbar" style={{borderTop:'none',borderBottom:'none'}}>
         <div className="stock-search">
           <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)} />
