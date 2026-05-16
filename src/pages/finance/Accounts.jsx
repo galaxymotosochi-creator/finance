@@ -83,7 +83,7 @@ export default function Accounts() {
       }
       setShowModal(false);
       setEditingId(null);
-      await fetchAccounts();
+      fetchAccounts();
     } catch (err) { alert(err.message); }
   };
 
