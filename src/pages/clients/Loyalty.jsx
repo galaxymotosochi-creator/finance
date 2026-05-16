@@ -177,7 +177,6 @@ export default function Loyalty() {
                   }}>⋮</span>
                 <div className="promo-menu-dropdown" style={{display:'none'}}>
                   <div className="promo-menu-item" onClick={() => { openEdit(current); }}>Редактировать</div>
-                  <div className="promo-menu-item" onClick={() => { remove(current.id); }} style={{color:'#dc2626'}}>Удалить</div>
                 </div>
               </div>
             </div>
