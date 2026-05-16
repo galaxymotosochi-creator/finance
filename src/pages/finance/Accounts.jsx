@@ -1,5 +1,4 @@
 import { useAuth } from '../../hooks/useAuth';
-import { useAccounts } from '../../hooks/useTransactions';
 import { supabase } from '../../lib/supabase';
 import { useState, useEffect } from 'react';
 
@@ -15,7 +14,7 @@ const accMeta = [
 
 export default function Accounts() {
   const { user } = useAuth();
-  const { accounts, refreshAccounts } = useAccounts();
+  const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -29,6 +28,11 @@ export default function Accounts() {
   const [transferTo, setTransferTo] = useState('card');
   const [transferAmount, setTransferAmount] = useState('');
 
+  const fetchAccounts = async () => {
+    var d = await supabase.from('accounts').select('*');
+    if (d.data) setAccounts(d.data);
+  };
+
   const fetchTx = async () => {
     const { data } = await supabase
       .from('transactions')
@@ -38,7 +42,7 @@ export default function Accounts() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchTx(); }, []);
+  useEffect(() => { fetchAccounts(); fetchTx(); }, []);
 
   const getBalance = (type) => {
     const acct = accounts.find(a => a?.type === type);
@@ -79,14 +83,14 @@ export default function Accounts() {
       }
       setShowModal(false);
       setEditingId(null);
-      await refreshAccounts();
+      await fetchAccounts();
     } catch (err) { alert(err.message); }
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить счёт?')) return;
     await supabase.from('accounts').delete().eq('id', id);
-    await refreshAccounts();
+    await fetchAccounts();
   };
 
   const toggleMenu = (e) => {
