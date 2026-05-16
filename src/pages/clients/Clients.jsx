@@ -121,9 +121,9 @@ export default function Clients() {
               <th>Клиент</th>
               <th>Телефон</th>
               <th>ДР</th>
-              <th className="tr">Покупок</th>
-              <th className="tr">Ср. чек</th>
-              <th className="tr">Сумма</th>
+              <th>Покупок</th>
+              <th>Ср. чек</th>
+              <th>Сумма</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
@@ -151,9 +151,9 @@ export default function Clients() {
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="tr">{st.checks > 0 ? st.checks : '—'}</td>
-                  <td className="tr">{avg > 0 ? avg.toLocaleString()+'₽' : '—'}</td>
-                  <td className="tr" style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+'₽' : '—'}</td>
+                  <td>{st.checks > 0 ? st.checks : '—'}</td>
+                  <td>{avg > 0 ? avg.toLocaleString()+'₽' : '—'}</td>
+                  <td style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+'₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
