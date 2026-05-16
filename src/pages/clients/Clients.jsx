@@ -77,23 +77,6 @@ export default function Clients() {
 
   return (
     <>
-      {/* Жёлтая плашка дня рождения */}
-      {birthdayClients.length > 0 && (
-        <div style={{
-          background: 'linear-gradient(135deg,#fef3cd,#fde68a)',
-          border: '1px solid #f59e0b',
-          borderRadius: '8px',
-          padding: '.5rem .75rem',
-          marginBottom: '.5rem',
-          fontSize: '.85rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '.5rem'
-        }}>
-          🎉 <b>День рождения</b> у {birthdayClients.map(c => c.name).join(', ')}! Предложите скидку или поздравьте!
-        </div>
-      )}
-
       <div className="page-header">
         <div>
           <h1>Клиенты</h1>
@@ -113,6 +96,23 @@ export default function Clients() {
             value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </div>
+
+      {/* Жёлтая плашка дня рождения — под поиском */}
+      {birthdayClients.length > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg,#fef3cd,#fde68a)',
+          border: '1px solid #f59e0b',
+          borderRadius: '8px',
+          padding: '.5rem .75rem',
+          marginBottom: '.5rem',
+          fontSize: '.85rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '.5rem'
+        }}>
+          🎉 <b>День рождения</b> у {birthdayClients.map(c => c.name).join(', ')}! Предложите скидку или поздравьте!
+        </div>
+      )}
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
