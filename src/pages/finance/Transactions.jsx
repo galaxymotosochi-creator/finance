@@ -35,6 +35,7 @@ export default function Transactions() {
   const [periodTo, setPeriodTo] = useState('');
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+  const [typeFilter, setTypeFilter] = useState(null);
 
   const txs = transactions || [];
   // Фильтр по дате
@@ -47,7 +48,7 @@ export default function Transactions() {
     if (period === 'custom') return d >= periodFrom && d <= periodTo;
     return true;
   };
-  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
+  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || tx.type===typeFilter) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   var exportCsv = function(list) {
     var rows = [['Дата','Описание','Тип','Счёт','Сумма']];
@@ -216,8 +217,12 @@ export default function Transactions() {
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='income'?600:400,color:typeFilter==='income'?'var(--primary)':'var(--muted)',cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доход</span>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='expense'?600:400,color:typeFilter==='expense'?'var(--primary)':'var(--muted)',cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>setTypeFilter(typeFilter==='expense'?null:'expense')}>Расход</span>
           <div style={{position:'relative'}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:600,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
