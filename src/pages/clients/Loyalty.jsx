@@ -9,7 +9,18 @@ const LD = [
 const LOY_EMOJIS = ['🎯','🏆','💎','🥇','🚀','🎁','💝','✨','🔥','👑','🛡️','🍀'];
 const TYPE_LABELS = {constant:'Постоянная',accumulative:'📈 Накопительная',bonus:'🎯 Бонусная',birthday:'🎂 ДР-скидка'};
 
-const getProgs = () => LD.concat(JSON.parse(localStorage.getItem('loyalty88') || '[]'));
+const LD_IDS = new Set(LD.map(x => x.id));
+const getProgs = () => {
+  const custom = JSON.parse(localStorage.getItem('loyalty88') || '[]');
+  // Сначала LD, потом кастомные (кроме тех, что перекрывают LD — они уже учтены)
+  const merged = LD.map(ld => {
+    const override = custom.find(x => x.id === ld.id);
+    return override || ld;
+  });
+  // Добавляем уникальные кастомные (с новыми id)
+  custom.forEach(x => { if (!LD_IDS.has(x.id)) merged.push(x); });
+  return merged;
+};
 const setProgs = (list) => localStorage.setItem('loyalty88', JSON.stringify(list));
 
 export default function Loyalty() {
@@ -91,7 +102,6 @@ export default function Loyalty() {
     setIdx(0);
   };
 
-  const isDefault = (p) => LD.some(d => d.id === p.id);
   const current = allProgs[idx];
   const ap = allProgs;
 
@@ -166,12 +176,8 @@ export default function Loyalty() {
                     }
                   }}>⋮</span>
                 <div className="promo-menu-dropdown" style={{display:'none'}}>
-                  {!isDefault(current) && (
-                    <>
-                      <div className="promo-menu-item" onClick={() => { openEdit(current); }}>Редактировать</div>
-                      <div className="promo-menu-item" onClick={() => { remove(current.id); }} style={{color:'#dc2626'}}>Удалить</div>
-                    </>
-                  )}
+                  <div className="promo-menu-item" onClick={() => { openEdit(current); }}>Редактировать</div>
+                  <div className="promo-menu-item" onClick={() => { remove(current.id); }} style={{color:'#dc2626'}}>Удалить</div>
                 </div>
               </div>
             </div>
@@ -182,9 +188,6 @@ export default function Loyalty() {
               <div className="loy-detail-item"><div className="lbl">Выручка</div><div className="val">0₽</div></div>
             </div>
             <div style={{fontSize:'.82rem',color:'var(--body-color)',marginBottom:'.5rem'}}>{current.desc}</div>
-            {isDefault(current) && (
-              <div style={{fontSize:'.8rem',color:'var(--muted)',padding:'.5rem 0'}}>Эта программа предустановлена системой</div>
-            )}
           </div>
         </div>
       ) : (
