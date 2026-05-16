@@ -21,8 +21,7 @@ export default function Accounts() {
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
   const [modalType, setModalType] = useState('cash');
-  const [showInitModal, setShowInitModal] = useState(false);
-  const [initAmounts, setInitAmounts] = useState({});
+  const [modalBalance, setModalBalance] = useState('0');
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [transferFrom, setTransferFrom] = useState('cash');
   const [transferTo, setTransferTo] = useState('card');
@@ -47,7 +46,8 @@ export default function Accounts() {
   const getBalance = (type) => {
     const acct = accounts.find(a => a?.type === type);
     if (!acct) return 0;
-    let bal = 0;
+    // Баланс = начальный остаток (balance) + доходы − расходы
+    let bal = parseFloat(acct.balance) || 0;
     (transactions || []).forEach(t => {
       if (t.account_id === acct.id) {
         bal += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1);
@@ -56,12 +56,26 @@ export default function Accounts() {
     return bal;
   };
 
+  const getMovements = (type) => {
+    const acct = accounts.find(a => a?.type === type);
+    if (!acct) return { income: 0, expense: 0 };
+    let inc = 0, exp = 0;
+    (transactions || []).forEach(t => {
+      if (t.account_id === acct.id) {
+        if (t.type === 'income') inc += Number(t.amount || 0);
+        else exp += Number(t.amount || 0);
+      }
+    });
+    return { income: inc, expense: exp };
+  };
+
   const getAccount = (type) => accounts.find(a => a?.type === type);
 
   const openAddModal = () => {
     setEditingId(null);
     setModalName('');
     setModalType('cash');
+    setModalBalance('0');
     setShowModal(true);
   };
 
@@ -69,24 +83,28 @@ export default function Accounts() {
     setEditingId(acct.id);
     setModalName(acct.name);
     setModalType(acct.type);
+    setModalBalance(String(parseFloat(acct.balance) || 0));
     setShowModal(true);
   };
 
   const saveAccount = async (e) => {
     e.preventDefault();
     if (!modalName.trim()) return;
+    const initialBalance = parseFloat(modalBalance) || 0;
     try {
       if (editingId) {
-        await supabase.from('accounts').update({ name: modalName.trim(), type: modalType }).eq('id', editingId);
+        await supabase.from('accounts').update({
+          name: modalName.trim(), type: modalType, balance: initialBalance
+        }).eq('id', editingId);
+        setAccounts(prev => prev.map(a => a.id === editingId ? {...a, name: modalName.trim(), type: modalType, balance: initialBalance} : a));
       } else {
-        const { data } = await supabase.from('accounts').insert({ user_id: user.id, name: modalName.trim(), type: modalType }).select();
-        if (data && data.length > 0) {
-          setAccounts(prev => [...prev, data[0]]);
-        }
+        const { data } = await supabase.from('accounts').insert({
+          user_id: user.id, name: modalName.trim(), type: modalType, balance: initialBalance
+        }).select();
+        if (data && data.length > 0) setAccounts(prev => [...prev, data[0]]);
       }
       setShowModal(false);
       setEditingId(null);
-      await fetchAccounts();
     } catch (err) { alert(err.message); }
   };
 
@@ -102,29 +120,6 @@ export default function Accounts() {
     el.classList.add('open');
     var h = function () { el.classList.remove('open'); document.removeEventListener('click', h); };
     setTimeout(function () { document.addEventListener('click', h); }, 10);
-  };
-
-  const saveInitBalances = async (e) => {
-    e.preventDefault();
-    try {
-      for (const type of Object.keys(initAmounts)) {
-        const amt = parseFloat(initAmounts[type]) || 0;
-        if (amt > 0) {
-          const acct = getAccount(type);
-          if (acct) {
-            await supabase.from('transactions').insert({
-              user_id: user.id, account_id: acct.id,
-              type: 'income', amount: amt,
-              description: 'Первоначальный остаток',
-              date: new Date().toISOString().split('T')[0],
-            });
-          }
-        }
-      }
-      setShowInitModal(false);
-      setInitAmounts({});
-      await fetchTx();
-    } catch (err) { alert(err.message); }
   };
 
   const doTransfer = async (e) => {
@@ -146,7 +141,7 @@ export default function Accounts() {
     } catch (err) { alert(err.message); }
   };
 
-  const totalBalance = accounts.reduce(function (s, a) { return s + getBalance(a.type); }, 0);
+  const totalBalance = accounts.reduce((s, a) => s + getBalance(a.type), 0);
 
   return (
     <>
@@ -164,7 +159,6 @@ export default function Accounts() {
       {!loading && accounts.length > 0 && (
         <>
           <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem' }}>
-            <button className="btn btn-outline" onClick={function () { setShowInitModal(true); }}>📋 Ввести первоначальные остатки</button>
             <button className="btn btn-outline" onClick={function () { setShowTransferModal(true); }}>🔄 Перевод между счетами</button>
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111', marginBottom: '1rem' }}>
@@ -173,6 +167,8 @@ export default function Accounts() {
           {accMeta.filter(t => getAccount(t.type)).map(a => {
             const acct = getAccount(a.type);
             const balance = getBalance(a.type);
+            const mv = getMovements(a.type);
+            const initial = parseFloat(acct.balance) || 0;
             return (
               <div key={a.type} style={{
                 display: 'flex', alignItems: 'center', padding: '.75rem 0',
@@ -181,7 +177,15 @@ export default function Accounts() {
                 <span style={{ fontSize: '1.5rem', marginRight: '.75rem' }}>{a.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '.9rem', fontWeight: 600 }}>{a.label}</div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--muted)' }}>{acct?.name}</div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--muted)' }}>
+                    <span style={{color:'var(--muted)'}}>{acct?.name}</span>
+                    <span style={{margin:'0 .35rem'}}>·</span>
+                    <span style={{color:'var(--muted)'}}>Было: {initial.toLocaleString()}₽</span>
+                    <span style={{margin:'0 .35rem'}}>·</span>
+                    <span style={{color:'#16a34a'}}>Доход: +{mv.income.toLocaleString()}₽</span>
+                    <span style={{margin:'0 .35rem'}}>·</span>
+                    <span style={{color:'#dc2626'}}>Расход: −{mv.expense.toLocaleString()}₽</span>
+                  </div>
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 700, color: balance >= 0 ? '#16a34a' : '#dc2626', marginRight: '1rem' }}>
                   {balance.toLocaleString()}₽
@@ -196,7 +200,6 @@ export default function Accounts() {
               </div>
             );
           })}
-
         </>
       )}
 
@@ -206,7 +209,7 @@ export default function Accounts() {
           <div className="modal-box">
             <button className="modal-close" onClick={function () { setShowModal(false); setEditingId(null); }}>&times;</button>
             <h2>{editingId ? 'Редактировать счёт' : 'Добавить счёт'}</h2>
-            <div className="sub">Введите название и выберите тип</div>
+            <div className="sub">{editingId ? 'Измените данные счёта' : 'Введите название и начальный остаток'}</div>
             <form onSubmit={saveAccount}>
               <div className="form-group">
                 <label>Название *</label>
@@ -224,36 +227,13 @@ export default function Accounts() {
                   <option value="deposit">📜 Депозит</option>
                 </select>
               </div>
-              <div className="modal-actions">
-                
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+              <div className="form-group">
+                <label>Начальный остаток (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01"
+                  value={modalBalance} onChange={function (e) { setModalBalance(e.target.value); }} />
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* INITIAL BALANCE MODAL */}
-      {showInitModal && (
-        <div className="modal-overlay active">
-          <div className="modal-box">
-            <button className="modal-close" onClick={function () { setShowInitModal(false); }}>&times;</button>
-            <h2>Ввести первоначальные остатки</h2>
-            <div className="sub">Укажите начальный баланс по каждому счёту</div>
-            <form onSubmit={saveInitBalances}>
-              {accMeta.filter(t => getAccount(t.type)).map(a => (
-                <div key={a.type} className="form-group">
-                  <label>{a.icon} {a.label}</label>
-                  <input type="number" placeholder="0" min="0" step="0.01"
-                    value={initAmounts[a.type] || ""} onChange={function (e) {
-                      var v = parseFloat(e.target.value) || 0;
-                      setInitAmounts(function (p) { var r = Object.assign({}, p); r[a.type] = v; return r; });
-                    }} />
-                </div>
-              ))}
               <div className="modal-actions">
-                
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                <button type="submit" className="btn btn-primary">{editingId ? 'Сохранить' : 'Создать'}</button>
               </div>
             </form>
           </div>
@@ -287,7 +267,6 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={transferAmount} onChange={function (e) { setTransferAmount(e.target.value); }} required />
               </div>
               <div className="modal-actions">
-                
                 <button type="submit" className="btn btn-primary">Перевести</button>
               </div>
             </form>
