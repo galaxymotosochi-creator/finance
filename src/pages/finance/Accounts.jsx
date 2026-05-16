@@ -2,22 +2,20 @@ import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import { useState, useEffect } from 'react';
 
-const accMeta = [
+const ACC_TYPES = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
-  { type: 'checking', icon: '🏦', label: 'Расчётный счёт' },
-  { type: 'card', icon: '💳', label: 'Бизнес-карта' },
-  { type: 'bank', icon: '🏛️', label: 'Банковский счёт' },
-  { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
-  { type: 'reserve', icon: '🔒', label: 'Резерв' },
-  { type: 'transfer', icon: '🔄', label: 'Переводы' },
-  { type: 'deposit', icon: '📜', label: 'Депозит' },
+  { type: 'transfer', icon: '🔄', label: 'Перевод' },
+  { type: 'card', icon: '💳', label: 'Оплата картой' },
 ];
+
+const DEFAULT_TYPES = new Set(['cash', 'transfer', 'card']);
 
 export default function Accounts() {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [initDone, setInitDone] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
@@ -29,27 +27,35 @@ export default function Accounts() {
   const [transferAmount, setTransferAmount] = useState('');
 
   const fetchAccounts = async () => {
-    var d = await supabase.from('accounts').select('*');
-    if (d.data) {
-      if (d.data.length === 0 && user) {
-        await supabase.from('accounts').insert([
-          { user_id: user.id, name: 'Касса', type: 'cash', balance: 0 },
-          { user_id: user.id, name: 'Бизнес-карта', type: 'card', balance: 0 },
-          { user_id: user.id, name: 'Расчётный счёт', type: 'transfer', balance: 0 },
-        ]).select();
-        var r = await supabase.from('accounts').select('*');
-        if (r.data) setAccounts(r.data);
-      } else {
-        setAccounts(d.data);
+    var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
+    if (!d.data) return;
+    // Удаляем дубли
+    var seen = {}, toDelete = [];
+    var cleaned = d.data.filter(a => {
+      if (seen[a.type]) { toDelete.push(a.id); return false; }
+      seen[a.type] = true; return true;
+    });
+    if (toDelete.length > 0) await supabase.from('accounts').delete().in('id', toDelete);
+    // Создаём стандартные, если нет
+    var needCash = !cleaned.some(a => a.type === 'cash');
+    var needCard = !cleaned.some(a => a.type === 'card');
+    var needTransfer = !cleaned.some(a => a.type === 'transfer');
+    if (user && (needCash || needCard || needTransfer)) {
+      var toCreate = [];
+      if (needCash) toCreate.push({ user_id: user.id, name: 'Наличные', type: 'cash', balance: 0 });
+      if (needTransfer) toCreate.push({ user_id: user.id, name: 'Перевод', type: 'transfer', balance: 0 });
+      if (needCard) toCreate.push({ user_id: user.id, name: 'Оплата картой', type: 'card', balance: 0 });
+      if (toCreate.length > 0) {
+        var r = await supabase.from('accounts').insert(toCreate).select();
+        if (r.data) cleaned = cleaned.concat(r.data);
       }
     }
+    setAccounts(cleaned);
+    setInitDone(true);
   };
 
   const fetchTx = async () => {
-    const { data } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data } = await supabase.from('transactions').select('*').order('created_at', { ascending: false });
     setTransactions(data || []);
     setLoading(false);
   };
@@ -59,12 +65,9 @@ export default function Accounts() {
   const getBalance = (type) => {
     const acct = accounts.find(a => a?.type === type);
     if (!acct) return 0;
-    // Баланс = начальный остаток (balance) + доходы − расходы
     let bal = parseFloat(acct.balance) || 0;
     (transactions || []).forEach(t => {
-      if (t.account_id === acct.id) {
-        bal += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1);
-      }
+      if (t.account_id === acct.id) bal += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1);
     });
     return bal;
   };
@@ -82,53 +85,38 @@ export default function Accounts() {
     return { income: inc, expense: exp };
   };
 
-  const getAccount = (type) => accounts.find(a => a?.type === type);
+  const isDefault = (acct) => DEFAULT_TYPES.has(acct?.type);
 
   const openAddModal = () => {
-    setEditingId(null);
-    setModalName('');
-    setModalType('cash');
-    setModalBalance('0');
-    setShowModal(true);
+    setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setShowModal(true);
   };
 
   const openEditModal = (acct) => {
-    setEditingId(acct.id);
-    setModalName(acct.name);
-    setModalType(acct.type);
-    setModalBalance(String(parseFloat(acct.balance) || 0));
-    setShowModal(true);
+    setEditingId(acct.id); setModalName(acct.name); setModalType(acct.type);
+    setModalBalance(String(parseFloat(acct.balance) || 0)); setShowModal(true);
   };
 
   const saveAccount = async (e) => {
     e.preventDefault();
     if (!modalName.trim()) return;
-    const initialBalance = parseFloat(modalBalance) || 0;
+    var ib = parseFloat(modalBalance) || 0;
     try {
       if (editingId) {
-        await supabase.from('accounts').update({
-          name: modalName.trim(), type: modalType, balance: initialBalance
-        }).eq('id', editingId);
-        setAccounts(prev => prev.map(a => a.id === editingId ? {...a, name: modalName.trim(), type: modalType, balance: initialBalance} : a));
+        await supabase.from('accounts').update({ name: modalName.trim(), type: modalType, balance: ib }).eq('id', editingId);
+        setAccounts(prev => prev.map(a => a.id === editingId ? {...a, name: modalName.trim(), type: modalType, balance: ib} : a));
       } else {
-        const { data } = await supabase.from('accounts').insert({
-          user_id: user.id, name: modalName.trim(), type: modalType, balance: initialBalance
-        }).select();
-        if (data && data.length > 0) setAccounts(prev => [...prev, data[0]]);
+        var r = await supabase.from('accounts').insert({ user_id: user.id, name: modalName.trim(), type: modalType, balance: ib }).select();
+        if (r.data && r.data.length > 0) setAccounts(prev => [...prev, r.data[0]]);
       }
-      setShowModal(false);
-      setEditingId(null);
+      setShowModal(false); setEditingId(null);
     } catch (err) { alert(err.message); }
   };
 
   const remove = async (acct) => {
     if (!acct) return;
-    // Проверяем, есть ли транзакции на этом счету
-    const hasTx = (transactions || []).some(t => t.account_id === acct.id);
-    if (hasTx) {
-      return alert('Нельзя удалить счёт — на нём есть движения. Сначала удалите транзакции.');
-    }
-    if (!confirm('Удалить счёт «' + acct.name + '»?')) return;
+    if (isDefault(acct)) return alert('Это базовый счёт, его нельзя удалить');
+    if ((transactions || []).some(t => t.account_id === acct.id)) return alert('Нельзя удалить счёт — на нём есть движения');
+    if (!confirm('Удалить счёт "' + acct.name + '"?')) return;
     await supabase.from('accounts').delete().eq('id', acct.id);
     await fetchAccounts();
   };
@@ -144,146 +132,145 @@ export default function Accounts() {
   const doTransfer = async (e) => {
     e.preventDefault();
     if (!transferAmount || parseFloat(transferAmount) <= 0) return;
-    const amt = parseFloat(transferAmount);
+    var amt = parseFloat(transferAmount);
     try {
-      const from = getAccount(transferFrom);
-      const to = getAccount(transferTo);
+      var from = accounts.find(a => a.type === transferFrom);
+      var to = accounts.find(a => a.type === transferTo);
       if (!from || !to) { alert('Счёт не найден'); return; }
       if (getBalance(transferFrom) < amt) { alert('Недостаточно средств'); return; }
       await supabase.from('transactions').insert([
         { user_id: user.id, account_id: from.id, type: 'expense', amount: amt, description: 'Перевод на ' + to.name, date: new Date().toISOString().split('T')[0] },
         { user_id: user.id, account_id: to.id, type: 'income', amount: amt, description: 'Перевод с ' + from.name, date: new Date().toISOString().split('T')[0] },
       ]);
-      setShowTransferModal(false);
-      setTransferAmount('');
+      setShowTransferModal(false); setTransferAmount('');
       await fetchTx();
     } catch (err) { alert(err.message); }
   };
 
-  const totalBalance = accounts.reduce((s, a) => s + getBalance(a.type), 0);
+  var sorted = [...accounts].sort((a, b) => {
+    if (isDefault(a) && !isDefault(b)) return -1;
+    if (!isDefault(a) && isDefault(b)) return 1;
+    return 0;
+  });
+
+  var total = accounts.reduce((s, a) => s + getBalance(a.type), 0);
 
   return (
     <>
       <div className="page-header">
-        <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Счета</h1>
-          <div className="sub" style={{ fontSize: '.85rem', color: 'var(--muted)', margin: 0 }}>Управление счетами</div>
-        </div>
-        <div className="page-actions">
-          <button className="btn-green" onClick={openAddModal}>+ Добавить счёт</button>
-        </div>
+        <div><h1>Счета</h1><div className="sub">Управление счетами</div></div>
+        <div className="page-actions"><button className="btn-green" onClick={openAddModal}>+ Добавить счёт</button></div>
       </div>
-      <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
+      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      {!loading && accounts.length > 0 && (
+      {!loading && initDone && (
         <>
-          <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem' }}>
-            <button className="btn btn-outline" onClick={function () { setShowTransferModal(true); }}>🔄 Перевод между счетами</button>
+          <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'1rem',padding:'1rem 1.25rem',marginBottom:'1rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.04)'}}>
+            <div style={{fontSize:'1.8rem',fontWeight:700,color:'#111'}}>{total.toLocaleString()}₽</div>
+            <div style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.15rem'}}>Общий баланс всех счетов</div>
           </div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111', marginBottom: '1rem' }}>
-            {totalBalance.toLocaleString()}₽
-          </div>
-          {accMeta.filter(t => getAccount(t.type)).map(a => {
-            const acct = getAccount(a.type);
-            const balance = getBalance(a.type);
-            const mv = getMovements(a.type);
-            const initial = parseFloat(acct.balance) || 0;
+
+          {sorted.map(a => {
+            var meta = ACC_TYPES.find(t => t.type === a.type);
+            var icon = meta ? meta.icon : '🏦';
+            var label = meta ? meta.label : a.type;
+            var bal = getBalance(a.type);
+            var mv = getMovements(a.type);
+            var init = parseFloat(a.balance) || 0;
             return (
-              <div key={a.type} style={{
-                display: 'flex', alignItems: 'center', padding: '.75rem 0',
-                borderBottom: '1px solid var(--border)',
-              }}>
-                <span style={{ fontSize: '1.5rem', marginRight: '.75rem' }}>{a.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '.9rem', fontWeight: 600 }}>{a.label}</div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--muted)' }}>
-                    <span style={{color:'var(--muted)'}}>{acct?.name}</span>
-                    <span style={{margin:'0 .35rem'}}>·</span>
-                    <span style={{color:'var(--muted)'}}>Было: {initial.toLocaleString()}₽</span>
-                    <span style={{margin:'0 .35rem'}}>·</span>
-                    <span style={{color:'#16a34a'}}>Доход: +{mv.income.toLocaleString()}₽</span>
-                    <span style={{margin:'0 .35rem'}}>·</span>
-                    <span style={{color:'#dc2626'}}>Расход: −{mv.expense.toLocaleString()}₽</span>
+              <div key={a.id} style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.85rem',padding:'.85rem',marginBottom:'.5rem',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.35rem'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                    <span style={{fontSize:'1.5rem'}}>{icon}</span>
+                    <div>
+                      <div style={{fontWeight:600,fontSize:'.85rem'}}>{a.name}</div>
+                      <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{label}</div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    <button className="act-btn prod-edit-btn" onClick={() => openEditModal(a)}>Ред.</button>
+                    {!isDefault(a) && (
+                      <div className="prod-more-wrap">
+                        <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
+                        <div className="prod-dropdown"><button onClick={() => remove(a)} style={{color:'#dc3545'}}>Удалить</button></div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: balance >= 0 ? '#16a34a' : '#dc2626', marginRight: '1rem' }}>
-                  {balance.toLocaleString()}₽
+                <div className="nav-sep" style={{margin:'.35rem 0',width:'100%',opacity:.3}} />
+                <div style={{fontSize:'.82rem',color:'var(--muted)',lineHeight:1.6}}>
+                  <span>Было: {init.toLocaleString()}₽</span>
+                  <span style={{margin:'0 .35rem'}}>·</span>
+                  <span style={{color:'#16a34a'}}>+Доход: {mv.income.toLocaleString()}₽</span>
+                  <span style={{margin:'0 .35rem'}}>·</span>
+                  <span style={{color:'#dc2626'}}>−Расход: {mv.expense.toLocaleString()}₽</span>
                 </div>
-                <button className="act-btn prod-edit-btn" onClick={function () { openEditModal(acct); }}>Ред.</button>
-                <div className="prod-more-wrap">
-                  <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
-                  <div className="prod-dropdown">
-                    <button onClick={function () { remove(acct); }} style={{ color: '#dc3545' }}>Удалить</button>
-                  </div>
+                <div style={{fontSize:'1.05rem',fontWeight:700,color:bal>=0?'#16a34a':'#dc2626',marginTop:'.25rem'}}>
+                  = {bal.toLocaleString()}₽
                 </div>
               </div>
             );
           })}
+
+          <div style={{display:'flex',gap:'.5rem',marginTop:'.75rem'}}>
+            <button className="btn btn-outline" onClick={() => setShowTransferModal(true)}>🔄 Перевод между счетами</button>
+          </div>
         </>
       )}
 
-      {/* ADD/EDIT MODAL */}
       {showModal && (
-        <div className="modal-overlay active" onClick={function (e) { if (e.target.className === 'modal-overlay active') { setShowModal(false); setEditingId(null); } }}>
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowModal(false);setEditingId(null)}}}>
           <div className="modal-box">
-            <button className="modal-close" onClick={function () { setShowModal(false); setEditingId(null); }}>&times;</button>
-            <h2>{editingId ? 'Редактировать счёт' : 'Добавить счёт'}</h2>
-            <div className="sub">{editingId ? 'Измените данные счёта' : 'Введите название и начальный остаток'}</div>
+            <button className="modal-close" onClick={function(){setShowModal(false);setEditingId(null)}}>&times;</button>
+            <h2>{editingId?'Редактировать счёт':'Добавить счёт'}</h2>
+            <div className="sub">{editingId?'Измените данные счёта':'Введите название и начальный остаток'}</div>
             <form onSubmit={saveAccount}>
               <div className="form-group">
                 <label>Название *</label>
-                <input type="text" placeholder="Например, Касса магазина" value={modalName} onChange={function (e) { setModalName(e.target.value); }} required />
+                <input type="text" placeholder="Например, Касса магазина" value={modalName} onChange={function(e){setModalName(e.target.value)}} required />
               </div>
-              <div className="form-group">
-                <label>Тип</label>
-                <select value={modalType} onChange={function (e) { setModalType(e.target.value); }}>
-                  <option value="cash">💵 Наличные</option>
-                  <option value="checking">🏦 Расчётный счёт</option>
-                  <option value="card">💳 Бизнес-карта</option>
-                  <option value="bank">🏛️ Банковский счёт</option>
-                  <option value="electronic">🌐 Электронные деньги</option>
-                  <option value="reserve">🔒 Резерв</option>
-                  <option value="deposit">📜 Депозит</option>
-                </select>
-              </div>
+              {!editingId && (
+                <div className="form-group">
+                  <label>Тип</label>
+                  <select value={modalType} onChange={function(e){setModalType(e.target.value)}}>
+                    {ACC_TYPES.map(t => <option key={t.type} value={t.type}>{t.icon} {t.label}</option>)}
+                  </select>
+                </div>
+              )}
               <div className="form-group">
                 <label>Начальный остаток (₽)</label>
-                <input type="number" placeholder="0" min="0" step="0.01"
-                  value={modalBalance} onChange={function (e) { setModalBalance(e.target.value); }} />
+                <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={function(e){setModalBalance(e.target.value)}} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editingId ? 'Сохранить' : 'Создать'}</button>
+                <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Создать'}</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* TRANSFER MODAL */}
       {showTransferModal && (
         <div className="modal-overlay active">
           <div className="modal-box">
-            <button className="modal-close" onClick={function () { setShowTransferModal(false); }}>&times;</button>
+            <button className="modal-close" onClick={function(){setShowTransferModal(false)}}>&times;</button>
             <h2>Перевод между счетами</h2>
             <div className="sub">Переместите деньги между счетами</div>
             <form onSubmit={doTransfer}>
               <div className="form-group">
                 <label>С какого счёта</label>
-                <select value={transferFrom} onChange={function (e) { setTransferFrom(e.target.value); }}>
-                  {accMeta.filter(t => getAccount(t.type)).map(function(a){return <option key={a.type} value={a.type}>{a.icon} {a.label} ({getBalance(a.type).toLocaleString()}₽)</option>})}
+                <select value={transferFrom} onChange={function(e){setTransferFrom(e.target.value)}}>
+                  {accounts.map(a => {var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name} ({getBalance(a.type).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>На какой счёт</label>
-                <select value={transferTo} onChange={function (e) { setTransferTo(e.target.value); }}>
-                  {accMeta.filter(t => getAccount(t.type) && t.type !== transferFrom).map(a => (
-                    <option key={a.type} value={a.type}>{a.icon} {a.label}</option>
-                  ))}
+                <select value={transferTo} onChange={function(e){setTransferTo(e.target.value)}}>
+                  {accounts.filter(a => a.type !== transferFrom).map(a => {var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>Сумма (₽) *</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={transferAmount} onChange={function (e) { setTransferAmount(e.target.value); }} required />
+                <input type="number" placeholder="0" min="0" step="0.01" value={transferAmount} onChange={function(e){setTransferAmount(e.target.value)}} required />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">Перевести</button>
