@@ -28,14 +28,21 @@ export default function Transactions() {
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
 
-  // Период
-  const [period, setPeriod] = useState('all');
-  const [periodLabel, setPeriodLabel] = useState('Всё время');
+  // Период — сохраняем в localStorage
+  var saved = JSON.parse(localStorage.getItem('txFilters')||'{}');
+  const [period, setPeriodRaw] = useState(saved.period||'all');
+  const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Всё время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
-  const [typeFilter, setTypeFilter] = useState(null);
+  const [typeFilter, setTypeFilterRaw] = useState(saved.typeFilter||null);
+  var saveFilters = function(p, pl, tf) {
+    localStorage.setItem('txFilters', JSON.stringify({period:p||period,periodLabel:pl||periodLabel,typeFilter:tf!==undefined?tf:typeFilter}));
+  };
+  var setPeriod = function(p) { setPeriodRaw(p); saveFilters(p, null, null); };
+  var setPeriodLabel = function(l) { setPeriodLabelRaw(l); saveFilters(null, l, null); };
+  var setTypeFilter = function(t) { setTypeFilterRaw(t); saveFilters(null, null, t); };
 
   const txs = transactions || [];
   // Фильтр по дате
