@@ -218,7 +218,7 @@ export default function Transactions() {
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
           <div style={{position:'relative'}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel} ▼</span>
+              onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
                 {[{key:'all',label:'Всё время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
@@ -241,7 +241,7 @@ export default function Transactions() {
           </div>
           <div style={{position:'relative'}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать ▼</span>
+              onClick={()=>{setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
