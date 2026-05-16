@@ -22,7 +22,7 @@ export default function Accounts() {
   const [modalName, setModalName] = useState('');
   const [modalType, setModalType] = useState('cash');
   const [showInitModal, setShowInitModal] = useState(false);
-  const [initAmounts, setInitAmounts] = useState({ cash: 0, card: 0, transfer: 0 });
+  const [initAmounts, setInitAmounts] = useState({});
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [transferFrom, setTransferFrom] = useState('cash');
   const [transferTo, setTransferTo] = useState('card');
@@ -240,9 +240,9 @@ export default function Accounts() {
                 <div key={a.type} className="form-group">
                   <label>{a.icon} {a.label}</label>
                   <input type="number" placeholder="0" min="0" step="0.01"
-                    value={initAmounts[a.type]} onChange={function (e) {
+                    value={initAmounts[a.type] || ""} onChange={function (e) {
                       var v = parseFloat(e.target.value) || 0;
-                      setInitAmounts(function (p) { var r = {}; r.cash = p.cash; r.card = p.card; r.transfer = p.transfer; r[a.type] = v; return r; });
+                      setInitAmounts(function (p) { var r = Object.assign({}, p); r[a.type] = v; return r; });
                     }} />
                 </div>
               ))}
