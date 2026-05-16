@@ -93,8 +93,9 @@ export default function Stock() {
         <table style={{minWidth:'680px'}}>
           <thead id="stockColHeaders">
             <tr>
-              <th>Артикул</th>
               <th>Товар</th>
+              <th>Артикул</th>
+              <th>Штрихкод</th>
               <th>Категория</th>
               <th className="tr">Остаток</th>
               <th className="tr">Закуп</th>
@@ -107,7 +108,7 @@ export default function Stock() {
           <tbody id="stockTableBody">
             {items.length === 0 ? (
               <tr>
-                <td colSpan="9">
+                <td colSpan="10">
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
                     <p>Товаров на складе нет</p>
@@ -126,11 +127,12 @@ export default function Stock() {
 
               return (
                 <tr key={p.id}>
-                  <td style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
                   <td>
                     <span style={{fontWeight:400}}>{p.name}</span>
                     {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
                   </td>
+                  <td style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
+                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{p.barcode || '—'}</td>
                   <td><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
                   <td className={`tr${low ? ' stock-low' : ''}`}>{qty}</td>
                   <td className="tr">{costPrice.toLocaleString()}</td>
@@ -154,8 +156,9 @@ export default function Stock() {
             })}
             {items.length > 0 && (
               <tr className="total-row">
-                <td></td>
                 <td style={{fontWeight:600}}>Итого</td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td className="tr" style={{fontWeight:700}}>{totalQty}</td>
                 <td></td>
