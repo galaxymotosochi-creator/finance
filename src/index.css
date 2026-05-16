@@ -284,3 +284,8 @@ body {
 
 #dirColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #dirColHeaders th:first-child{text-align:left;padding-left:0}
+
+.promo-calendar-wrap{background:var(--white);border:1px solid var(--border);border-radius:1rem;padding:1rem .75rem;margin-bottom:.75rem;box-shadow:0 .25rem .75rem rgba(0,0,0,.04)}
+.promo-cal-grid .day{padding:.45rem .2rem;border-radius:8px;cursor:pointer;transition:all .12s;color:var(--body-color)}
+.promo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:2px}
+.promo-dot.active{background:#16a34a} .promo-dot.planned{background:#f59e0b} .promo-dot.ended{background:#ccc}

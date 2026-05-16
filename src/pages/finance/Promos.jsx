@@ -80,6 +80,7 @@ export default function Promos() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
+      <div className="promo-calendar-wrap">
       <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1rem',marginBottom:'.75rem'}}>
         <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}} style={{background:'none',border:'1px solid var(--border)',borderRadius:'50%',width:'32px',height:'32px',fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)'}}>‹</button>
         <div style={{fontSize:'.95rem',fontWeight:600}}>{months[m]} {y}</div>
@@ -100,6 +101,7 @@ export default function Promos() {
         <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#22c55e',marginRight:'.25rem'}} /> Активна</span>
         <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#3b82f6',marginRight:'.25rem'}} /> Планируется</span>
         <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#e5e7eb',marginRight:'.25rem'}} /> Завершена</span>
+        </div>
       </div>
 
       <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.5rem'}}>Все акции</div>
