@@ -14,6 +14,7 @@ import Accounts from './pages/finance/Accounts';
 import Promos from './pages/finance/Promos';
 import Products from './pages/stock/Products';
 import StockCategories from './pages/stock/Categories';
+import Stock from './pages/stock/Stock';
 
 function AppRoutes() {
   return (
@@ -35,6 +36,7 @@ function AppRoutes() {
 
       <Route path="/stock/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
       <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />

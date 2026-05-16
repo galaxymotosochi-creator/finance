@@ -181,6 +181,15 @@ body {
 .btn-primary:hover { opacity: .85; }
 
 /* ===== FILTER LINKS ===== */
+.stock-toolbar{display:flex;align-items:center;justify-content:space-between;padding:0 0 .4rem 0;flex-wrap:wrap;gap:.4rem}
+.stock-count{font-size:.8rem;color:var(--muted);font-weight:400}
+.stock-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;font-size:.8rem;color:var(--muted);transition:all .12s}
+.stock-icon-btn:hover{border-color:var(--primary);color:var(--primary)}
+.stock-add-btn{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .8rem;background:#16a34a;color:#fff;border:none;border-radius:5px;font-size:.78rem;cursor:pointer;font-family:var(--font);font-weight:500}
+.stock-add-btn:hover{opacity:.9}
+.stock-filterbar{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:.5rem;flex-wrap:wrap}
+.stock-search{display:flex;align-items:center;gap:.3rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:5px;background:var(--white)}
+.stock-search input{border:none;outline:none;font-family:var(--font);font-size:.78rem;padding:.2rem 0;width:140px;background:transparent}
 .stock-filter-links { display: flex; align-items: center; gap: .15rem; }
 .stock-filter-link {
   padding: .15rem .4rem; font-size: .75rem;
@@ -296,6 +305,10 @@ body {
 .product-table .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
 .product-table .prod-price{font-weight:500}
 .product-table .stock-low{color:#dc2626;font-weight:700}
+.product-table .markup-badge{display:inline-block;padding:.08rem .35rem;border-radius:4px;font-size:.68rem;font-weight:500;background:#f0fdf4;color:#166534}
+.product-table .markup-badge.neg{background:#fef2f2;color:#991b1b}
+.product-table .editable-price{cursor:pointer;color:var(--primary);font-weight:500;border-bottom:1px dashed var(--primary);padding-bottom:1px}
+.product-table .editable-price:hover{background:var(--primary-light);border-radius:3px}
 .product-table .total-row{background:transparent}
 .product-table .total-row td{font-weight:700;border-top:2px solid var(--border);padding:.6rem .5rem}
 .product-table .total-row:hover td{background:transparent}
