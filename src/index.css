@@ -298,9 +298,9 @@ body {
 .product-table .act-btn:hover{background:var(--body-bg);color:var(--body-color)}
 
 .search-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
-.search-input-wrap{display:flex;align-items:center;border:1px solid var(--border);border-radius:6px;padding:.35rem .5rem;width:30%;min-width:180px;max-width:400px;gap:.35rem}
-.search-icon{font-size:.8rem;line-height:1;flex-shrink:0}
-.search-field{border:none;outline:none;flex:1;font-size:.8rem;padding:0;background:transparent;color:var(--body-color);font-family:var(--font)}
+.search-input-wrap{display:flex;align-items:center;gap:.3rem;width:30%;min-width:180px;max-width:400px;border:1px solid var(--border);border-radius:6px;padding:7px .5rem;background:var(--white)}
+.search-icon{font-size:.75rem;color:var(--muted);line-height:1;flex-shrink:0}
+.search-field{border:none;outline:none;flex:1;font-size:.8rem;font-family:var(--font);background:none;padding:0}
 .actions-group{display:flex;align-items:center;gap:.25rem;margin-left:auto}
 .text-btn{background:none;border:none;cursor:pointer;font-size:.78rem;color:var(--primary);padding:.35rem .5rem;border-radius:5px;display:inline-flex;align-items:center;gap:.3rem;font-family:var(--font)}
 .text-btn:hover{background:var(--primary-light)}
