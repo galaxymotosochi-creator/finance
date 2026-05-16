@@ -40,16 +40,18 @@ export function useTransactions() {
 
 export function useAccounts() {
   const [accounts, setAccounts] = useState([]);
-  useEffect(() => {
-    supabase.from('accounts').select('*').then(({ data }) => setAccounts(data || []));
-  }, []);
-  return accounts;
+  const refresh = () => {
+    return supabase.from('accounts').select('*').then(({ data }) => { setAccounts(data || []); return data || []; });
+  };
+  useEffect(() => { refresh(); }, []);
+  return { accounts, refreshAccounts: refresh };
 }
 
 export function useCategories() {
   const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    supabase.from('categories').select('*').then(({ data }) => setCategories(data || []));
-  }, []);
-  return categories;
+  const refresh = () => {
+    return supabase.from('categories').select('*').then(({ data }) => { setCategories(data || []); return data || []; });
+  };
+  useEffect(() => { refresh(); }, []);
+  return { categories, refreshCategories: refresh };
 }
