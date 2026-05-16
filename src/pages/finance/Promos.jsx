@@ -80,6 +80,8 @@ export default function Promos() {
     const pd = promoDays(d);
     cells.push({ day: d, promos: pd, date: y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0') });
   }
+  const rem = (7 - (off + daysInM) % 7) % 7;
+  for (let i = 0; i < rem; i++) cells.push(null);
 
   return (
     <>
@@ -98,7 +100,7 @@ export default function Promos() {
         <div className="promo-cal-grid">
           {daysShort.map(n => <div className="wd" key={n}>{n}</div>)}
           {cells.map((c,i) => {
-            if (!c) return <div key={i} />;
+            if (!c) return <div key={i} className="day other">&nbsp;</div>;
             const pd = c.promos && c.promos.length ? status(c.promos[0]) : null;
             const past = isPast(c.day);
             const td = isToday(c.day);
