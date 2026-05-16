@@ -20,6 +20,7 @@ import Suppliers from './pages/stock/Suppliers';
 import Writeoffs from './pages/stock/Writeoffs';
 import Inventory from './pages/stock/Inventory';
 import Clients from './pages/clients/Clients';
+import Loyalty from './pages/clients/Loyalty';
 
 function AppRoutes() {
   return (
@@ -38,6 +39,7 @@ function AppRoutes() {
 
       {/* Clients */}
       <Route path="/clients/promos" element={<ProtectedRoute><AppLayout><Promos /></AppLayout></ProtectedRoute>} />
+      <Route path="/clients/loyalty" element={<ProtectedRoute><AppLayout><Loyalty /></AppLayout></ProtectedRoute>} />
 
       <Route path="/stock/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />

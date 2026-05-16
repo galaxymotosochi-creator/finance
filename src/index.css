@@ -299,6 +299,25 @@ body {
 #catColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #catColHeaders th:first-child{text-align:left;padding-left:0}
 
+/* === Loyalty (Лояльность) === */
+.loy-carousel-wrap{position:relative;display:flex;align-items:center;gap:.5rem;margin:.75rem 0}
+.loy-carousel{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:.5rem 0;flex:1;-ms-overflow-style:none;scrollbar-width:none}
+.loy-carousel::-webkit-scrollbar{display:none}
+.loy-card{scroll-snap-align:center;min-width:240px;max-width:280px;flex-shrink:0;background:var(--white);border:1px solid var(--border);border-radius:1rem;padding:1.25rem;cursor:pointer;transition:all .25s;position:relative;box-shadow:0 .25rem .75rem rgba(0,0,0,.04)}
+.loy-card:hover{transform:translateY(-3px);box-shadow:0 .5rem 1.5rem rgba(0,0,0,.1);border-color:var(--primary)}
+.loy-card.active{transform:translateY(-3px);box-shadow:0 .5rem 1.5rem rgba(0,0,0,.12);border-color:var(--primary);border-width:1.5px}
+.loy-card-icon{font-size:2rem;margin-bottom:.5rem}
+.loy-card-title{font-size:.9rem;font-weight:600;color:var(--body-color);margin-bottom:.15rem}
+.loy-card-desc{font-size:.75rem;color:var(--muted);margin-bottom:.6rem;line-height:1.3}
+.loy-card-badge{display:inline-block;font-size:.7rem;font-weight:600;padding:.15rem .5rem;border-radius:20px;margin-bottom:.5rem}
+.loy-card-stat{display:flex;gap:.35rem;flex-wrap:wrap;font-size:.72rem;color:var(--muted)}
+.loy-card-stat span{background:#f8f9fa;padding:.1rem .4rem;border-radius:4px}
+.loy-arrow{background:var(--white);border:1px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;transition:all .12s;z-index:2}
+.loy-arrow:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+.loy-dots{display:flex;gap:.35rem;justify-content:center;margin:-.25rem 0 .75rem}
+.loy-dot{width:8px;height:8px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s}
+.loy-dot.active{background:var(--primary);width:20px;border-radius:4px}
+@media(max-width:768px){.loy-card{min-width:200px;max-width:240px;padding:1rem}.loy-arrow{display:none}}
 /* === Clients (Клиенты) === */
 #clientTableBody td:first-child{text-align:left;padding-left:0}
 #clientColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
