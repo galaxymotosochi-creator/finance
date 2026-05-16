@@ -23,6 +23,7 @@ export default function Transactions() {
   const [incDate, setIncDate] = useState(new Date().toISOString().split('T')[0]);
   const [incCategory, setIncCategory] = useState('');
   const [expName, setExpName] = useState('');
+  const [txAccountId, setTxAccountId] = useState(null);
   const [expAmount, setExpAmount] = useState('');
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
@@ -147,7 +148,7 @@ export default function Transactions() {
   
   const editTx = function(tx) {
     var isExp = tx.type !== 'income';
-    setEditingId(tx.id);
+    setEditingId(tx.id);setTxAccountId(tx.account_id || null);
     if (isExp) {
       setExpName(tx.description || '');
       setExpAmount(String(tx.amount || ''));
@@ -267,8 +268,13 @@ export default function Transactions() {
             <form onSubmit={function(e){
               e.preventDefault();
               if(!incName || !incAmount){alert("Заполните название и сумму");return}
-              setPendingTx({id:editingId,type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-              setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+              if(editingId){
+                update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                setShowIncome(false);setEditingId(null);resetForms();
+              }else{
+                setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+              }
             }}>
               <div className="form-group">
                 <label>Название *</label>
@@ -292,7 +298,7 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Добавить</button>
+                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
           </div>
@@ -308,8 +314,13 @@ export default function Transactions() {
             <form onSubmit={function(e){
               e.preventDefault();
               if(!expName || !expAmount){alert("Заполните название и сумму");return}
-              setPendingTx({id:editingId,type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-              setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+              if(editingId){
+                update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                setShowExpense(false);setEditingId(null);resetForms();
+              }else{
+                setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+              }
             }}>
               <div className="form-group">
                 <label>Название *</label>
@@ -333,7 +344,7 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Добавить</button>
+                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
           </div>
