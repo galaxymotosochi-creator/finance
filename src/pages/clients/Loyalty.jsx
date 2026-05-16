@@ -150,18 +150,26 @@ export default function Loyalty() {
                 <div style={{fontSize:'.8rem',color:'var(--muted)'}}>{TYPE_LABELS[current.type] || 'Постоянная'}</div>
               </div>
               <div style={{position:'relative',flexShrink:0}}>
-                <span className="act-btn prod-more-btn" style={{fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)',padding:'4px',borderRadius:'4px'}}
+                <span style={{fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)',padding:'4px',borderRadius:'4px'}}
                   onClick={(e) => {
                     e.stopPropagation();
                     const dd = e.currentTarget.nextElementSibling;
-                    document.querySelectorAll('.promo-menu-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                    dd.classList.toggle('open');
+                    document.querySelectorAll('.promo-menu-dropdown').forEach(d => { if (d !== dd) d.style.display = 'none'; });
+                    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+                    if (dd.style.display === 'block') {
+                      document.addEventListener('click', function handler(ev) {
+                        if (!ev.target.closest('.promo-menu-dropdown') && ev.target !== e.currentTarget) {
+                          dd.style.display = 'none';
+                          document.removeEventListener('click', handler);
+                        }
+                      });
+                    }
                   }}>⋮</span>
-                <div className="promo-menu-dropdown" style={{display:'none',position:'absolute',top:'100%',right:0,background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.5rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.1)',minWidth:'140px',padding:'.25rem',zIndex:10}}>
+                <div className="promo-menu-dropdown" style={{display:'none'}}>
                   {!isDefault(current) && (
                     <>
-                      <div className="promo-menu-item" onClick={() => { openEdit(current); closePromoMenus(); }}>Редактировать</div>
-                      <div className="promo-menu-item" onClick={() => { remove(current.id); closePromoMenus(); }} style={{color:'#dc2626'}}>Удалить</div>
+                      <div className="promo-menu-item" onClick={() => { openEdit(current); }}>Редактировать</div>
+                      <div className="promo-menu-item" onClick={() => { remove(current.id); }} style={{color:'#dc2626'}}>Удалить</div>
                     </>
                   )}
                 </div>
