@@ -7,6 +7,7 @@ const getSales = () => JSON.parse(localStorage.getItem('sales88') || '[]');
 export default function Clients() {
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
+  const [search, setSearch] = useState('');
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
@@ -15,10 +16,7 @@ export default function Clients() {
   const [fBirthday, setFBirthday] = useState('');
   const [fComment, setFComment] = useState('');
 
-  const load = () => {
-    setClientsState(getClients());
-    setSalesState(getSales());
-  };
+  const load = () => { setClientsState(getClients()); setSalesState(getSales()); };
   useEffect(() => { load(); }, []);
 
   const openAdd = () => {
@@ -28,8 +26,7 @@ export default function Clients() {
 
   const openEdit = (c) => {
     setEditId(c.id); setFName(c.name); setFPhone(c.phone||'');
-    setFEmail(c.email||''); setFBirthday(c.birthday||'');
-    setFComment(c.comment||''); setShow(true);
+    setFEmail(c.email||''); setFBirthday(c.birthday||''); setFComment(c.comment||''); setShow(true);
   };
 
   const save = (e) => {
@@ -49,7 +46,6 @@ export default function Clients() {
     setClients(getClients().filter(x => x.id !== id)); load();
   };
 
-  // Форматирование даты
   const fmtDate = (d) => {
     if (!d) return null;
     const parts = d.split('-');
@@ -57,26 +53,47 @@ export default function Clients() {
     return parts[2] + '.' + parts[1];
   };
 
-  // Подсчёт статистики по каждому клиенту
+  // Статистика по каждому клиенту
   const clientStats = {};
   sales.forEach(s => {
-    const clientId = s.clientId;
-    if (!clientId) return;
-    if (!clientStats[clientId]) clientStats[clientId] = { cash: 0, card: 0, profit: 0, checks: 0, total: 0 };
-    const st = clientStats[clientId];
-    if (s.payM === 'cash') st.cash += s.total;
-    else if (s.payM === 'card') st.card += s.total;
-    else st.total += s.total;
-    st.profit += (s.total - (s.cost || 0));
-    st.checks += 1;
+    const cid = s.clientId;
+    if (!cid) return;
+    if (!clientStats[cid]) clientStats[cid] = { checks: 0, total: 0 };
+    clientStats[cid].total += s.total || 0;
+    clientStats[cid].checks += 1;
   });
 
-  // Сегодняшняя дата для подсветки ДР
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayMD = todayStr.slice(5); // MM-DD
+  const todayMD = new Date().toISOString().slice(5, 10);
+
+  // Именинники
+  const birthdayClients = clients.filter(c => c.birthday && c.birthday.slice(5) === todayMD);
+
+  // Поиск
+  const q = search.toLowerCase().trim();
+  let filtered = clients;
+  if (q) filtered = filtered.filter(c =>
+    c.name.toLowerCase().includes(q) || (c.phone||'').includes(q) || (c.email||'').toLowerCase().includes(q)
+  );
 
   return (
     <>
+      {/* Жёлтая плашка дня рождения */}
+      {birthdayClients.length > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg,#fef3cd,#fde68a)',
+          border: '1px solid #f59e0b',
+          borderRadius: '8px',
+          padding: '.5rem .75rem',
+          marginBottom: '.5rem',
+          fontSize: '.85rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '.5rem'
+        }}>
+          🎉 <b>День рождения</b> у {birthdayClients.map(c => c.name).join(', ')}! Предложите скидку или поздравьте!
+        </div>
+      )}
+
       <div className="page-header">
         <div>
           <h1>Клиенты</h1>
@@ -88,11 +105,12 @@ export default function Clients() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      {/* Модуль с кнопками фильтров */}
-      <div className="stock-filterbar" style={{borderTop:'none',borderBottom:'none',paddingTop:0}}>
-        <div className="stock-filter-links" style={{marginLeft:0}}>
-          <span className="stock-filter-link">Группа</span>
-          <span className="stock-filter-link">Фильтр</span>
+      {/* Быстрый поиск — как в Товарах */}
+      <div className="search-row">
+        <div className="search-input-wrap">
+          <span className="search-icon">🔍</span>
+          <input type="text" className="search-field" placeholder="Быстрый поиск"
+            value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </div>
 
@@ -103,46 +121,39 @@ export default function Clients() {
               <th>Клиент</th>
               <th>Телефон</th>
               <th>ДР</th>
-              <th className="tr">Наличными</th>
-              <th className="tr">Карточкой</th>
-              <th className="tr">Прибыль</th>
-              <th className="tr">Чеки</th>
-              <th className="tr">Средний чек</th>
+              <th className="tr">Покупок</th>
+              <th className="tr">Ср. чек</th>
+              <th className="tr">Сумма</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
           <tbody id="clientTableBody">
-            {clients.length === 0 ? (
-              <tr><td colSpan="9"><div className="empty-products"><div className="big-icon">👤</div><p>Клиентов пока нет. Нажмите «+ Добавить клиента»</p></div></td></tr>
-            ) : clients.map(c => {
-              const st = clientStats[c.id] || { cash: 0, card: 0, profit: 0, checks: 0, total: 0 };
+            {filtered.length === 0 ? (
+              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">👤</div><p>Клиентов пока нет. Нажмите «+ Добавить клиента»</p></div></td></tr>
+            ) : filtered.map(c => {
+              const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
-              const isBirthday = c.birthday && c.birthday.slice(5) === todayMD;
+              const isBday = c.birthday && c.birthday.slice(5) === todayMD;
               return (
                 <tr key={c.id}>
                   <td>
                     <div className="prod-name">
                       {c.name}
-                      {isBirthday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
+                      {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
                     </div>
                     <div className="prod-sku">{c.email || ''}{c.comment ? ' • '+c.comment : ''}</div>
                   </td>
                   <td style={{fontSize:'.82rem'}}>{c.phone || '—'}</td>
                   <td style={{fontSize:'.82rem',color:'var(--muted)'}}>
                     {c.birthday ? (
-                      <span style={{color:isBirthday?'#ec4899':'inherit',fontWeight:isBirthday?600:'inherit'}}>
-                        {fmtDate(c.birthday)}
-                        {isBirthday && ' 🎉'}
+                      <span style={{color:isBday?'#ec4899':'inherit',fontWeight:isBday?600:'inherit'}}>
+                        {fmtDate(c.birthday)}{isBday && ' 🎉'}
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="tr">{st.cash > 0 ? st.cash.toLocaleString()+'₽' : '—'}</td>
-                  <td className="tr">{st.card > 0 ? st.card.toLocaleString()+'₽' : '—'}</td>
-                  <td className="tr" style={{color:st.profit>0?'#16a34a':(st.profit<0?'#dc2626':'')}}>
-                    {st.profit > 0 ? '+' : ''}{st.profit.toLocaleString()}₽
-                  </td>
                   <td className="tr">{st.checks > 0 ? st.checks : '—'}</td>
                   <td className="tr">{avg > 0 ? avg.toLocaleString()+'₽' : '—'}</td>
+                  <td className="tr" style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+'₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -163,15 +174,6 @@ export default function Clients() {
           </tbody>
         </table>
       </div>
-
-      {/* Пустая статистика */}
-      {clients.length === 0 && (
-        <div className="cl-stats-empty" style={{textAlign:'center',padding:'3rem 1rem',color:'var(--muted)'}}>
-          <div style={{fontSize:'3rem',opacity:.15,marginBottom:'.5rem'}}>📊</div>
-          <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.25rem'}}>Здесь будет статистика покупок клиентов</div>
-          <div style={{fontSize:'.82rem'}}>Добавьте ваших гостей, чтобы контролировать выручку, средний чек и количество продаж</div>
-        </div>
-      )}
 
       {/* Модалка */}
       {show && (
