@@ -30,7 +30,19 @@ export default function Accounts() {
 
   const fetchAccounts = async () => {
     var d = await supabase.from('accounts').select('*');
-    if (d.data) setAccounts(d.data);
+    if (d.data) {
+      if (d.data.length === 0 && user) {
+        await supabase.from('accounts').insert([
+          { user_id: user.id, name: 'Касса', type: 'cash', balance: 0 },
+          { user_id: user.id, name: 'Бизнес-карта', type: 'card', balance: 0 },
+          { user_id: user.id, name: 'Расчётный счёт', type: 'transfer', balance: 0 },
+        ]).select();
+        var r = await supabase.from('accounts').select('*');
+        if (r.data) setAccounts(r.data);
+      } else {
+        setAccounts(d.data);
+      }
+    }
   };
 
   const fetchTx = async () => {
@@ -41,19 +53,6 @@ export default function Accounts() {
     setTransactions(data || []);
     setLoading(false);
   };
-
-  // Создать 3 стандартных счёта при первом входе
-  useEffect(() => {
-    if (!loading && accounts.length === 0 && user) {
-      supabase.from('accounts').insert([
-        { user_id: user.id, name: 'Касса', type: 'cash', balance: 0 },
-        { user_id: user.id, name: 'Бизнес-карта', type: 'card', balance: 0 },
-        { user_id: user.id, name: 'Расчётный счёт', type: 'transfer', balance: 0 },
-      ]).select().then(r => {
-        if (r.data) fetchAccounts();
-      });
-    }
-  }, [loading, accounts.length, user]);
 
   useEffect(() => { fetchAccounts(); fetchTx(); }, []);
 
