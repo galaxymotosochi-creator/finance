@@ -299,6 +299,10 @@ body {
 #catColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #catColHeaders th:first-child{text-align:left;padding-left:0}
 
+/* === Inventory (Инвентаризация) === */
+#inventoryTableBody td:first-child{padding-left:0}
+.prod-table-th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
+
 /* === Writeoffs (Списания) === */
 #writeoffTableBody td:first-child{text-align:left;padding-left:0}
 #woColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
