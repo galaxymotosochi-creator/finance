@@ -216,7 +216,7 @@ export default function Accounts() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={function () { setShowModal(false); setEditingId(null); }}>Отмена</button>
+                
                 <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
@@ -243,7 +243,7 @@ export default function Accounts() {
                 </div>
               ))}
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={function () { setShowInitModal(false); }}>Отмена</button>
+                
                 <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
@@ -278,7 +278,7 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={transferAmount} onChange={function (e) { setTransferAmount(e.target.value); }} required />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={function () { setShowTransferModal(false); }}>Отмена</button>
+                
                 <button type="submit" className="btn btn-primary">Перевести</button>
               </div>
             </form>
