@@ -17,6 +17,7 @@ import StockCategories from './pages/stock/Categories';
 import Stock from './pages/stock/Stock';
 import Supplies from './pages/stock/Supplies';
 import Suppliers from './pages/stock/Suppliers';
+import Writeoffs from './pages/stock/Writeoffs';
 
 function AppRoutes() {
   return (
@@ -41,6 +42,7 @@ function AppRoutes() {
       <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/supplies" element={<ProtectedRoute><AppLayout><Supplies /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/suppliers" element={<ProtectedRoute><AppLayout><Suppliers /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/writeoffs" element={<ProtectedRoute><AppLayout><Writeoffs /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
       <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
