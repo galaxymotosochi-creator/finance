@@ -6,8 +6,8 @@ import { useTransactions, useAccounts, useCategories } from '../../hooks/useTran
 export default function Transactions() {
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
-  const { accounts, refreshAccounts } = useAccounts();
-  const { categories, refreshCategories } = useCategories();
+  const accounts = useAccounts();
+  const categories = useCategories();
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
@@ -29,7 +29,7 @@ export default function Transactions() {
 
   const txs = transactions || [];
   const filtered = search ? txs.filter(function(tx){return (tx.description||"").toLowerCase().includes(search.toLowerCase())}) : txs;
-  const accs = accounts || [];
+  var accs = accounts || [];
   const cats = categories || [];
 
   const incomeTotal = txs.filter(t => t && t.type === 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
@@ -59,8 +59,6 @@ export default function Transactions() {
         ]);
       }
       await refresh();
-      refreshAccounts();
-      refreshCategories();
     } catch (e) { console.error(e); }
   };
 
@@ -114,12 +112,19 @@ export default function Transactions() {
           }
         }
       } else {
+        if (accs.length === 0) {
+          await supabase.from('accounts').insert([
+            { user_id: user.id, name: 'Наличные', type: 'cash' },
+            { user_id: user.id, name: 'Карта', type: 'card' },
+            { user_id: user.id, name: 'Перевод', type: 'transfer' },
+          ]);
+          var r = await supabase.from('accounts').select('*');
+          if (r.data) { accs = r.data; }
+        }
         var acct = accs.find(a => a?.type === selectedAcc) || accs[0];
         if (acct) {
           if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
           else await add({ ...txData, account_id: acct.id });
-        } else {
-          alert('Сначала нажмите Заполнить демо-данными');
         }
       }
       setShowAccSelect(false);
@@ -346,7 +351,7 @@ export default function Transactions() {
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--primary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     <span style={{fontSize:"1rem"}}>{a.icon}</span>
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.label}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(txs||[]).reduce(function(s,t){return s+Number(t.amount||0)*(t.type==="income"?1:-1)},0)}₽</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id){var ac=(accs||[]).find(function(x){return x&&x.type===a.type});if(ac&&t.account_id===ac.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}}});return b})()}₽</span>
                   </div>
                 );
               })}
