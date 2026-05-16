@@ -187,9 +187,8 @@ export default function Transactions() {
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}>📅 Период</span>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}>Период</span>
           <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}>Скачать</span>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".9rem",color:"var(--primary)",cursor:"pointer",borderRight:"none",lineHeight:1}}>⚙️</span>
         </div>
       </div>
 
@@ -216,10 +215,7 @@ export default function Transactions() {
 
       {!loading && filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
-          <p style={{ marginBottom: '.75rem' }}>Пока нет транзакций</p>
-          <button onClick={seed} style={{ padding: '.5rem 1rem', fontSize: '.82rem', border: '1px solid var(--border)', borderRadius: '6px', background: 'var(--white)', cursor: 'pointer', fontFamily: 'var(--font)' }}>
-            Заполнить демо-данными
-          </button>
+          <p>Пока нет транзакций</p>
         </div>
       )}
 
