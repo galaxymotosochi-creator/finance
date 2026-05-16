@@ -79,11 +79,14 @@ export default function Accounts() {
       if (editingId) {
         await supabase.from('accounts').update({ name: modalName.trim(), type: modalType }).eq('id', editingId);
       } else {
-        await supabase.from('accounts').insert({ user_id: user.id, name: modalName.trim(), type: modalType });
+        const { data } = await supabase.from('accounts').insert({ user_id: user.id, name: modalName.trim(), type: modalType }).select();
+        if (data && data.length > 0) {
+          setAccounts(prev => [...prev, data[0]]);
+        }
       }
       setShowModal(false);
       setEditingId(null);
-      fetchAccounts();
+      await fetchAccounts();
     } catch (err) { alert(err.message); }
   };
 
