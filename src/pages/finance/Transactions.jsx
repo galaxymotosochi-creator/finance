@@ -344,7 +344,7 @@ export default function Transactions() {
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--primary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     <span style={{fontSize:"1rem"}}>{a.icon}</span>
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.label}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{((accs||[]).find(function(x){return x&&x.type===a.type})||{}).balance||0}₽</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id){var ac=(accs||[]).find(function(x){return x&&x.type===a.type});if(ac&&t.account_id===ac.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}}});return b})()}₽</span>
                   </div>
                 );
               })}
