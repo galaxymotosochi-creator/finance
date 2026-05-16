@@ -39,6 +39,15 @@ export default function Promos() {
     return 'active';
   };
 
+  const isPast = (d) => {
+    const ds = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    return ds < today;
+  };
+
+  const isToday = (d) => {
+    return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0') === today;
+  };
+
   const openAdd = () => {
     setEditId(null); setName(''); setDiscount(''); setStart(today); setEnd(''); setDesc(''); setShow(true);
   };
@@ -81,26 +90,29 @@ export default function Promos() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="promo-calendar-wrap">
-      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1rem',marginBottom:'.75rem'}}>
-        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}} className='promo-cal-nav'>‹</button>
-        <div style={{fontSize:'.95rem',fontWeight:600}}>{months[m]} {y}</div>
-        <button onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()+1);setCal(d)}} className='promo-cal-nav'>›</button>
-      </div>
-
-      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'2px',marginBottom:'.5rem'}}>
-        {daysShort.map(n => <div key={n} className='wd'>{n}</div>)}
-        {cells.map((c,i) => {
-          if (!c) return <div key={i} />;
-          const s = c.promos.length ? status(c.promos[0]) : null;
-          const bg = s === 'active' ? '#22c55e' : s === 'planned' ? '#3b82f6' : s === 'ended' ? '#e5e7eb' : 'transparent';
-          return <div key={i} onClick={() => c.promos.length && setDetail(c.promos[0].id)} className={'day' + (s ? ' has-promo ' + s : '')} style={{background:bg,color:s?'#fff':'var(--body-color)'}}>{c.day}</div>;
-        })}
-      </div>
-
-      <div style={{display:'flex',gap:'1rem',fontSize:'.72rem',color:'var(--muted)',marginBottom:'1rem'}}>
-        <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#22c55e',marginRight:'.25rem'}} /> Активна</span>
-        <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#3b82f6',marginRight:'.25rem'}} /> Планируется</span>
-        <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#e5e7eb',marginRight:'.25rem'}} /> Завершена</span>
+        <div className="promo-cal-header">
+          <button className="promo-cal-nav" onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}}>‹</button>
+          <div className="promo-cal-month">{months[m]} {y}</div>
+          <button className="promo-cal-nav" onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()+1);setCal(d)}}>›</button>
+        </div>
+        <div className="promo-cal-grid">
+          {daysShort.map(n => <div className="wd" key={n}>{n}</div>)}
+          {cells.map((c,i) => {
+            if (!c) return <div key={i} />;
+            const pd = c.promos && c.promos.length ? status(c.promos[0]) : null;
+            const past = isPast(c.day);
+            const td = isToday(c.day);
+            let cls = 'day';
+            if (pd) cls += ' has-promo ' + pd;
+            if (past && !pd) cls += ' other';
+            if (td) cls += ' today';
+            return <div key={i} className={cls} onClick={() => c.promos.length && setDetail(c.promos[0].id)}>{c.day}</div>;
+          })}
+        </div>
+        <div className="promo-cal-legend">
+          <span><span className="promo-dot active"></span> Активна</span>
+          <span><span className="promo-dot planned"></span> Планируется</span>
+          <span><span className="promo-dot ended"></span> Завершена</span>
         </div>
       </div>
 
@@ -110,8 +122,8 @@ export default function Promos() {
 
       {promos.map(p => {
         const s = status(p);
-        const sc = s === 'active' ? '#16a34a' : s === 'planned' ? '#2563eb' : '#9ca3af';
-        const sb = s === 'active' ? '#f0fdf4' : s === 'planned' ? '#eff6ff' : '#f9fafb';
+        const sc = s === 'active' ? '#16a34a' : s === 'planned' ? '#92400e' : '#9ca3af';
+        const sb = s === 'active' ? '#dcfce7' : s === 'planned' ? '#fef3c7' : '#f1f3f5';
         return (
           <div key={p.id} onClick={() => setDetail(detail === p.id ? null : p.id)} style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',border:'1px solid var(--border)',borderRadius:'.75rem',marginBottom:'.5rem',cursor:'pointer',gap:'.75rem'}}>
             <div style={{fontSize:'2rem'}}>🔥</div>
@@ -136,7 +148,7 @@ export default function Promos() {
         if (!p) return null;
         const s = status(p);
         return (
-          <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.75rem',padding:'1rem',marginTop:'.5rem'}}>
+          <div className="promo-detail">
             <div style={{display:'flex',alignItems:'flex-start',gap:'.75rem'}}>
               <div style={{fontSize:'2.5rem'}}>🔥</div>
               <div style={{flex:1}}>
