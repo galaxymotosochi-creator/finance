@@ -150,8 +150,8 @@ export default function Accounts() {
 
       <div className="stock-filterbar" style={{border:'none',paddingTop:0}}>
         <div className="stock-filter-links" style={{marginLeft:0}}>
-          <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>📋 Ввести начальные остатки</span>
-          <span className="stock-filter-link" onClick={()=>setShowTransfer(true)}>🔄 Перевод между счетами</span>
+          <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
+          <span className="stock-filter-link" onClick={()=>setShowTransfer(true)}>Перевод между счетами</span>
         </div>
       </div>
 
