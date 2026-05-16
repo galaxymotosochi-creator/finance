@@ -29,7 +29,7 @@ export default function Transactions() {
   const [expCategory, setExpCategory] = useState('');
 
   // Период — сохраняем в localStorage
-  var saved = JSON.parse(localStorage.getItem('txFilters')||'{}');
+  var saved = (function(){try{return JSON.parse(localStorage.getItem('txFilters')||'{}')}catch(e){return {}}})();
   const [period, setPeriodRaw] = useState(saved.period||'all');
   const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Всё время');
   const [periodFrom, setPeriodFrom] = useState('');
@@ -38,7 +38,9 @@ export default function Transactions() {
   const [showDownload, setShowDownload] = useState(false);
   const [typeFilter, setTypeFilterRaw] = useState(saved.typeFilter||null);
   var saveFilters = function(p, pl, tf) {
-    localStorage.setItem('txFilters', JSON.stringify({period:p||period,periodLabel:pl||periodLabel,typeFilter:tf!==undefined?tf:typeFilter}));
+    try {
+      localStorage.setItem('txFilters', JSON.stringify({period:p||period,periodLabel:pl||periodLabel,typeFilter:tf!==undefined?tf:typeFilter}));
+    } catch(e) {}
   };
   var setPeriod = function(p) { setPeriodRaw(p); saveFilters(p, null, null); };
   var setPeriodLabel = function(l) { setPeriodLabelRaw(l); saveFilters(null, l, null); };
