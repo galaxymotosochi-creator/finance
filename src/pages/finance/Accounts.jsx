@@ -159,6 +159,10 @@ export default function Accounts() {
 
       {!loading && accounts.length > 0 && (
         <>
+          <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem' }}>
+            <button className="btn btn-outline" onClick={function () { setShowInitModal(true); }}>📋 Ввести первоначальные остатки</button>
+            <button className="btn btn-outline" onClick={function () { setShowTransferModal(true); }}>🔄 Перевод между счетами</button>
+          </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111', marginBottom: '1rem' }}>
             {totalBalance.toLocaleString()}₽
           </div>
@@ -188,10 +192,7 @@ export default function Accounts() {
               </div>
             );
           })}
-          <div style={{ display: 'flex', gap: '.5rem', marginTop: '1.5rem' }}>
-            <button className="btn btn-outline" onClick={function () { setShowInitModal(true); }}>📋 Ввести первоначальные остатки</button>
-            <button className="btn btn-outline" onClick={function () { setShowTransferModal(true); }}>🔄 Перевод между счетами</button>
-          </div>
+
         </>
       )}
 
