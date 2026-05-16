@@ -11,6 +11,7 @@ import Categories from './pages/finance/Categories';
 import Shifts from './pages/finance/Shifts';
 import Salary from './pages/finance/Salary';
 import Accounts from './pages/finance/Accounts';
+import Promos from './pages/finance/Promos';
 
 function AppRoutes() {
   return (
@@ -27,11 +28,13 @@ function AppRoutes() {
       <Route path="/finance/salary" element={<ProtectedRoute><AppLayout><Salary /></AppLayout></ProtectedRoute>} />
       <Route path="/finance/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
 
-      {/* Stock, Clients, Team, Settings — в разработке */}
-      <Route path="/stock/*" element={<ProtectedRoute><AppLayout><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Склад</h1><div className="sub" style={{fontSize:'.85rem',color:'var(--muted)',margin:0}}>Раздел в разработке</div><div className="nav-sep" style={{margin:'.25rem 0',width:'100%',border:'none',borderTop:'1px solid var(--border)'}} /></AppLayout></ProtectedRoute>} />
-      <Route path="/clients/*" element={<ProtectedRoute><AppLayout><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Клиенты</h1><div className="sub" style={{fontSize:'.85rem',color:'var(--muted)',margin:0}}>Раздел в разработке</div><div className="nav-sep" style={{margin:'.25rem 0',width:'100%',border:'none',borderTop:'1px solid var(--border)'}} /></AppLayout></ProtectedRoute>} />
-      <Route path="/employees/*" element={<ProtectedRoute><AppLayout><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Команда</h1><div className="sub" style={{fontSize:'.85rem',color:'var(--muted)',margin:0}}>Раздел в разработке</div><div className="nav-sep" style={{margin:'.25rem 0',width:'100%',border:'none',borderTop:'1px solid var(--border)'}} /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/*" element={<ProtectedRoute><AppLayout><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Настройки</h1><div className="sub" style={{fontSize:'.85rem',color:'var(--muted)',margin:0}}>Раздел в разработке</div><div className="nav-sep" style={{margin:'.25rem 0',width:'100%',border:'none',borderTop:'1px solid var(--border)'}} /></AppLayout></ProtectedRoute>} />
+      {/* Clients */}
+      <Route path="/clients/promos" element={<ProtectedRoute><AppLayout><Promos /></AppLayout></ProtectedRoute>} />
+
+      <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
+      <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
+      <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
+      <Route path="/settings/*" element={<ProtectedRoute><AppLayout><div>Настройки</div></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
