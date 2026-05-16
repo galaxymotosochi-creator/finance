@@ -98,12 +98,15 @@ export default function Accounts() {
     var ib = parseFloat(modalBalance)||0;
     try {
       if (editingId) {
-        await supabase.from('accounts').update({name:modalName.trim()}).eq('id',editingId);
+        var up = await supabase.from('accounts').update({name:modalName.trim()}).eq('id',editingId);
+        if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib});
-        await fetchAccounts();
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'cash',balance:ib});
+        if (ins.error) { alert(ins.error.message); return; }
       }
+      await fetchAccounts();
+      await fetchTx();
       setShowModal(false); setEditingId(null);
     } catch(err) {alert(err.message);}
   };
