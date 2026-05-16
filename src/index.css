@@ -300,7 +300,9 @@ body {
 #catColHeaders th:first-child{text-align:left;padding-left:0}
 
 /* === Suppliers (Поставщики) === */
-#supplierTableBody td:first-child{padding-left:0}
+#supplierTableBody td:first-child{text-align:left;padding-left:0}
+#supColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
+#supColHeaders th:first-child{text-align:left;padding-left:0}
 
 /* === Supplies (Поставки) === */
 #supplyTableBody td:first-child{padding-left:0}

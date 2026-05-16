@@ -148,7 +148,6 @@ export default function Suppliers() {
                 <div className="form-group"></div>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={()=>setShowModal(false)}>Отмена</button>
                 <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Добавить'}</button>
               </div>
             </form>
