@@ -9,6 +9,7 @@ const accMeta = [
   { type: 'bank', icon: '🏛️', label: 'Банковский счёт' },
   { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
   { type: 'reserve', icon: '🔒', label: 'Резерв' },
+  { type: 'transfer', icon: '🔄', label: 'Переводы' },
   { type: 'deposit', icon: '📜', label: 'Депозит' },
 ];
 
