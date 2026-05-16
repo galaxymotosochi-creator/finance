@@ -32,6 +32,11 @@ export default function Accounts() {
   const [trFrom, setTrFrom] = useState('cash');
   const [trTo, setTrTo] = useState('card');
   const [trAmt, setTrAmt] = useState('');
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [corAcct, setCorAcct] = useState('cash');
+  const [corType, setCorType] = useState('income');
+  const [corAmt, setCorAmt] = useState('');
+  const [corDesc, setCorDesc] = useState('');
 
   const fetchAccounts = async () => {
     var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
@@ -80,17 +85,21 @@ export default function Accounts() {
     return {i,e};
   };
   var isSys = (ac) => systemIds.has(ac?.id);
+  var hasAct = (ac) => parseFloat(ac.balance)>0||(transactions||[]).some(t=>t.account_id===ac.id);
 
   var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setShowModal(true); };
-  var openEdit = (ac) => { setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance(String(parseFloat(ac.balance)||0)); setShowModal(true); };
+  var openEdit = (ac) => {
+    if (hasAct(ac)) return alert('Нельзя редактировать счёт — на нём есть движения или начальный остаток');
+    setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setShowModal(true);
+  };
 
   var save = async (e) => {
     e.preventDefault(); if (!modalName.trim()) return;
     var ib = parseFloat(modalBalance)||0;
     try {
       if (editingId) {
-        await supabase.from('accounts').update({name:modalName.trim(),type:modalType,balance:ib}).eq('id',editingId);
-        setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim(),type:modalType,balance:ib}:a));
+        await supabase.from('accounts').update({name:modalName.trim()}).eq('id',editingId);
+        setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
         var r = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib}).select();
         if (r.data&&r.data.length>0) setAccounts(p=>[...p,r.data[0]]);
@@ -152,6 +161,7 @@ export default function Accounts() {
         <div className="stock-filter-links" style={{marginLeft:0}}>
           <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
           <span className="stock-filter-link" onClick={()=>setShowTransfer(true)}>Перевод между счетами</span>
+          <span className="stock-filter-link" onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
         </div>
       </div>
 
@@ -219,6 +229,44 @@ export default function Accounts() {
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Создать'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCorrect && (
+        <div className="modal-overlay active">
+          <div className="modal-box" style={{maxWidth:'450px'}}>
+            <button className="modal-close" onClick={()=>setShowCorrect(false)}>&times;</button>
+            <h2>Корректировка баланса</h2>
+            <div className="sub">Исправьте остаток на счёте</div>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.type===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
+              <div className="form-group">
+                <label>Счёт</label>
+                <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
+                </select>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Тип</label>
+                  <select value={corType} onChange={e=>setCorType(e.target.value)}>
+                    <option value="income">➕ Приход</option>
+                    <option value="expense">➖ Расход</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Сумма (₽)</label>
+                  <input type="number" placeholder="0" min="0" step="0.01" value={corAmt} onChange={e=>setCorAmt(e.target.value)} required />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Комментарий</label>
+                <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Применить</button>
               </div>
             </form>
           </div>
