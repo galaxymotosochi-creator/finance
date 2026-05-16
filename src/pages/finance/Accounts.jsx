@@ -101,8 +101,8 @@ export default function Accounts() {
         await supabase.from('accounts').update({name:modalName.trim()}).eq('id',editingId);
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        var r = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib}).select();
-        if (r.data&&r.data.length>0) setAccounts(p=>[...p,r.data[0]]);
+        await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib});
+        await fetchAccounts();
       }
       setShowModal(false); setEditingId(null);
     } catch(err) {alert(err.message);}
@@ -223,10 +223,12 @@ export default function Accounts() {
                   </select>
                 </div>
               )}
-              <div className="form-group">
-                <label>Начальный остаток (₽)</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
-              </div>
+              {!editingId && (
+                <div className="form-group">
+                  <label>Начальный остаток (₽)</label>
+                  <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
+                </div>
+              )}
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Создать'}</button>
               </div>
