@@ -317,6 +317,11 @@ body {
 .loy-dots{display:flex;gap:.35rem;justify-content:center;margin:-.25rem 0 .75rem}
 .loy-dot{width:8px;height:8px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s}
 .loy-dot.active{background:var(--primary);width:20px;border-radius:4px}
+.loy-detail{background:var(--white);border:1px solid var(--border);border-radius:.75rem;padding:.65rem .75rem;margin-top:.5rem}
+.loy-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.75rem 0}
+.loy-detail-item{background:#f8f9fa;border-radius:.6rem;padding:.55rem .7rem}
+.loy-detail-item .lbl{font-size:.63rem;color:var(--muted);text-transform:uppercase;font-weight:600}
+.loy-detail-item .val{font-size:.95rem;font-weight:600;color:var(--body-color);margin-top:.1rem}
 @media(max-width:768px){.loy-card{min-width:200px;max-width:240px;padding:1rem}.loy-arrow{display:none}}
 /* === Clients (Клиенты) === */
 #clientTableBody td:first-child{text-align:left;padding-left:0}
