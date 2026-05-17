@@ -391,7 +391,7 @@ export default function Employees() {
 
               <div className="emp-section-label" style={{marginTop:'.75rem'}}>Выдать доступ</div>
               <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придёт ссылка-приглашение для входа в систему.</p>
-              <button type="button" className="btn btn-primary" onClick={() => alert('Функция будет доступна позже')}>
+              <button type="button" className="btn btn-primary" style={{borderRadius:'6px'}} onClick={() => alert('Функция будет доступна позже')}>
                 ✉️ Выдать доступ
               </button>
 
