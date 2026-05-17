@@ -137,7 +137,7 @@ export default function Categories() {
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
-                <input type="text" placeholder="Например, Доставка" value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
+                <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, подписка на CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
               </div>
               <div className="form-group">
                 <label>Вид</label>
