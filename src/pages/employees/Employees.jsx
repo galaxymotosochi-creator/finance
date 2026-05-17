@@ -312,7 +312,7 @@ export default function Employees() {
                 })}
               </div>
 
-              <div style={{position:'relative',marginTop:'.35rem'}}>
+              <div style={{position:'relative',marginTop:'.15rem'}}>
                 <button type="button" className="emp-rule-add" onClick={() => setShowAddRule(!showAddRule)}>
                   {showAddRule ? '✕ Отмена' : '+ Добавить правило'}
                 </button>
@@ -389,13 +389,11 @@ export default function Employees() {
                 </div>
               )}
 
-              <div className="form-group">
-                <label>Выдать доступ</label>
-                <p className="sub" style={{fontSize:'.78rem',marginBottom:'.4rem'}}>Сотруднику на e-mail придёт ссылка-приглашение для входа в систему.</p>
-                <button type="button" className="btn btn-primary" style={{fontSize:'.82rem'}} onClick={() => alert('Функция будет доступна позже')}>
-                  ✉️ Выдать доступ
-                </button>
-              </div>
+              <div className="emp-section-label" style={{marginTop:'.75rem'}}>Выдать доступ</div>
+              <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придёт ссылка-приглашение для входа в систему.</p>
+              <button type="button" className="btn btn-primary" style={{fontSize:'.82rem'}} onClick={() => alert('Функция будет доступна позже')}>
+                ✉️ Выдать доступ
+              </button>
 
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
