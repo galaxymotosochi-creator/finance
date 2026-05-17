@@ -38,6 +38,8 @@ export default function Employees() {
   const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
   const [fPin, setFPin] = useState('');
   const [fStatus, setFStatus] = useState('active');
+  const [openCatDD, setOpenCatDD] = useState(null); // 'product' | 'service' | null
+  const [openItemDD, setOpenItemDD] = useState(null); // 'product' | 'service' | null
 
   const load = async () => {
     setLoading(true);
@@ -289,61 +291,169 @@ export default function Employees() {
                 </div>
               </div>
 
-              {/* ── По категориям ── */}
-              <div className="emp-subsection-title" style={{marginTop:'.75rem'}}>По категориям</div>
-              {fBonusRules.filter(r => r.scope==='category').map(rule => {
-                const realIdx = fBonusRules.indexOf(rule);
-                const allTabs = [{id:'product',label:'Товары',list:prodCats},{id:'service',label:'Услуги',list:svcCats}];
-                const tab = allTabs.find(t => t.id === rule.type) || allTabs[0];
-                return (
-                  <div key={realIdx} className="emp-row">
-                    <select className="emp-row-sel" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
-                      <option value="product">Товары</option>
-                      <option value="service">Услуги</option>
-                    </select>
-                    <select className="emp-row-sel" value={rule.catId} onChange={e => {
-                      const cat = allCats.find(c => c.id === e.target.value || c.name === e.target.value);
-                      updRule(realIdx,'catId',e.target.value);
-                      updRule(realIdx,'catName',cat ? cat.name : e.target.value);
-                    }}>
-                      <option value="">— Категория —</option>
-                      {tab.list.map(c => <option key={c.id||c.name} value={c.id||c.name}>{c.name}</option>)}
-                    </select>
-                    <input type="number" className="emp-row-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
-                    <span className="emp-row-curr">{rule.rate}%</span>
-                    <button type="button" className="emp-row-rm" onClick={() => rmRule(realIdx)}>✕</button>
+              {/* ── Категории товаров и услуг ── */}
+              <div className="form-row" style={{marginTop:'.75rem'}}>
+                <div className="form-group" style={{position:'relative'}}>
+                  <label>Категории товаров (%)</label>
+                  <div style={{display:'flex',gap:'.4rem'}}>
+                    <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='category'&&r.type==='product');return r?r.rate:''})()}
+                      onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='category'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('category','product',v)}}
+                      placeholder="%" min="0" max="100" style={{width:'60px',flexShrink:0}} />
+                    <button type="button" className="emp-dd-btn" onClick={() => setOpenCatDD(openCatDD==='product'?null:'product')}>
+                      Выбрать ({prodCats.length}) ▾
+                    </button>
                   </div>
-                );
-              })}
-              <button type="button" className="emp-rule-add" onClick={() => addBonusRule('category','product')}>+ Добавить категорию</button>
+                  {openCatDD === 'product' && (
+                    <div className="emp-dd">
+                      {prodCats.length === 0 ? <div className="emp-dd-empty">Нет категорий</div> :
+                        prodCats.map(c => {
+                          const has = fBonusRules.some(r => r.scope==='category-item' && r.catId === (c.id||c.name));
+                          return (
+                            <label key={c.id||c.name} className="emp-dd-item">
+                              <input type="checkbox" checked={has}
+                                onChange={() => {
+                                  if(has) {
+                                    const idx = fBonusRules.findIndex(r => r.scope==='category-item' && r.catId === (c.id||c.name));
+                                    if(idx>-1) rmRule(idx);
+                                  } else {
+                                    addBonusRule('category-item','product',0);
+                                    setTimeout(() => {
+                                      const idx = fBonusRules.length;
+                                      updRule(idx,'catId',c.id||c.name);
+                                      updRule(idx,'catName',c.name);
+                                    }, 0);
+                                  }
+                                }} />
+                              <span>{c.name}</span>
+                            </label>
+                          );
+                        })
+                      }
+                    </div>
+                  )}
+                </div>
+                <div className="form-group" style={{position:'relative'}}>
+                  <label>Категории услуг (%)</label>
+                  <div style={{display:'flex',gap:'.4rem'}}>
+                    <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='category'&&r.type==='service');return r?r.rate:''})()}
+                      onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='category'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('category','service',v)}}
+                      placeholder="%" min="0" max="100" style={{width:'60px',flexShrink:0}} />
+                    <button type="button" className="emp-dd-btn" onClick={() => setOpenCatDD(openCatDD==='service'?null:'service')}>
+                      Выбрать ({svcCats.length}) ▾
+                    </button>
+                  </div>
+                  {openCatDD === 'service' && (
+                    <div className="emp-dd">
+                      {svcCats.length === 0 ? <div className="emp-dd-empty">Нет категорий</div> :
+                        svcCats.map(c => {
+                          const has = fBonusRules.some(r => r.scope==='category-item' && r.catId === (c.id||c.name));
+                          return (
+                            <label key={c.id||c.name} className="emp-dd-item">
+                              <input type="checkbox" checked={has}
+                                onChange={() => {
+                                  if(has) {
+                                    const idx = fBonusRules.findIndex(r => r.scope==='category-item' && r.catId === (c.id||c.name));
+                                    if(idx>-1) rmRule(idx);
+                                  } else {
+                                    addBonusRule('category-item','service',0);
+                                    setTimeout(() => {
+                                      const idx = fBonusRules.length - 1;
+                                      updRule(idx,'catId',c.id||c.name);
+                                      updRule(idx,'catName',c.name);
+                                    }, 0);
+                                  }
+                                }} />
+                              <span>{c.name}</span>
+                            </label>
+                          );
+                        })
+                      }
+                    </div>
+                  )}
+                </div>
+              </div>
 
-              {/* ── По товарам ── */}
-              <div className="emp-subsection-title" style={{marginTop:'.75rem'}}>По товарам</div>
-              {fBonusRules.filter(r => r.scope==='item').map(rule => {
-                const realIdx = fBonusRules.indexOf(rule);
-                return (
-                  <div key={realIdx} className="emp-row">
-                    <select className="emp-row-sel" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
-                      <option value="product">Товар</option>
-                      <option value="service">Услуга</option>
-                    </select>
-                    <select className="emp-row-sel" value={rule.itemId} onChange={e => {
-                      const item = products.find(p => p.id === e.target.value || p.name === e.target.value);
-                      updRule(realIdx,'itemId',e.target.value);
-                      updRule(realIdx,'itemName',item ? item.name : e.target.value);
-                    }}>
-                      <option value="">— Товар/услуга —</option>
-                      {products.filter(p => !rule.type || p.type === rule.type).map(p =>
-                        <option key={p.id||p.name} value={p.id||p.name}>{p.name}</option>
-                      )}
-                    </select>
-                    <input type="number" className="emp-row-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
-                    <span className="emp-row-curr">{rule.rate}%</span>
-                    <button type="button" className="emp-row-rm" onClick={() => rmRule(realIdx)}>✕</button>
+              {/* ── Товары и услуги ── */}
+              <div className="form-row" style={{marginTop:'.5rem'}}>
+                <div className="form-group" style={{position:'relative'}}>
+                  <label>Товары (%)</label>
+                  <div style={{display:'flex',gap:'.4rem'}}>
+                    <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='item'&&r.type==='product');return r?r.rate:''})()}
+                      onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='item'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('item','product',v)}}
+                      placeholder="%" min="0" max="100" style={{width:'60px',flexShrink:0}} />
+                    <button type="button" className="emp-dd-btn" onClick={() => setOpenItemDD(openItemDD==='product'?null:'product')}>
+                      Выбрать ({products.filter(p=>p.type==='product').length}) ▾
+                    </button>
                   </div>
-                );
-              })}
-              <button type="button" className="emp-rule-add" onClick={() => addBonusRule('item','product')}>+ Добавить товар</button>
+                  {openItemDD === 'product' && (
+                    <div className="emp-dd">
+                      {products.filter(p=>p.type==='product').length === 0 ? <div className="emp-dd-empty">Нет товаров</div> :
+                        products.filter(p=>p.type==='product').map(p => {
+                          const has = fBonusRules.some(r => r.scope==='item-item' && r.itemId === (p.id||p.name));
+                          return (
+                            <label key={p.id||p.name} className="emp-dd-item">
+                              <input type="checkbox" checked={has}
+                                onChange={() => {
+                                  if(has) {
+                                    const idx = fBonusRules.findIndex(r => r.scope==='item-item' && r.itemId === (p.id||p.name));
+                                    if(idx>-1) rmRule(idx);
+                                  } else {
+                                    addBonusRule('item-item','product',0);
+                                    setTimeout(() => {
+                                      const last = fBonusRules.length;
+                                      updRule(last,'itemId',p.id||p.name);
+                                      updRule(last,'itemName',p.name);
+                                    }, 0);
+                                  }
+                                }} />
+                              <span>{p.name}</span>
+                            </label>
+                          );
+                        })
+                      }
+                    </div>
+                  )}
+                </div>
+                <div className="form-group" style={{position:'relative'}}>
+                  <label>Услуги (%)</label>
+                  <div style={{display:'flex',gap:'.4rem'}}>
+                    <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='item'&&r.type==='service');return r?r.rate:''})()}
+                      onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='item'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('item','service',v)}}
+                      placeholder="%" min="0" max="100" style={{width:'60px',flexShrink:0}} />
+                    <button type="button" className="emp-dd-btn" onClick={() => setOpenItemDD(openItemDD==='service'?null:'service')}>
+                      Выбрать ({products.filter(p=>p.type==='service').length}) ▾
+                    </button>
+                  </div>
+                  {openItemDD === 'service' && (
+                    <div className="emp-dd">
+                      {products.filter(p=>p.type==='service').length === 0 ? <div className="emp-dd-empty">Нет услуг</div> :
+                        products.filter(p=>p.type==='service').map(p => {
+                          const has = fBonusRules.some(r => r.scope==='item-item' && r.itemId === (p.id||p.name));
+                          return (
+                            <label key={p.id||p.name} className="emp-dd-item">
+                              <input type="checkbox" checked={has}
+                                onChange={() => {
+                                  if(has) {
+                                    const idx = fBonusRules.findIndex(r => r.scope==='item-item' && r.itemId === (p.id||p.name));
+                                    if(idx>-1) rmRule(idx);
+                                  } else {
+                                    addBonusRule('item-item','service',0);
+                                    setTimeout(() => {
+                                      const last = fBonusRules.length;
+                                      updRule(last,'itemId',p.id||p.name);
+                                      updRule(last,'itemName',p.name);
+                                    }, 0);
+                                  }
+                                }} />
+                              <span>{p.name}</span>
+                            </label>
+                          );
+                        })
+                      }
+                    </div>
+                  )}
+                </div>
+              </div>
               </>)}
 
               {/* БЛОК 4: ДОСТУПЫ + КАССА */}

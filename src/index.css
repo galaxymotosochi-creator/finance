@@ -652,6 +652,56 @@ body {
   padding: .2rem;
   line-height: 1;
 }
+.emp-dd-btn {
+  font-size: .78rem;
+  padding: .35rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+  white-space: nowrap;
+}
+.emp-dd-btn:hover { border-color: var(--primary); color: var(--primary); }
+.emp-dd {
+  position: absolute;
+  z-index: 50;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  max-height: 180px;
+  overflow-y: auto;
+  padding: .25rem;
+}
+.emp-dd-empty {
+  text-align: center;
+  padding: .75rem;
+  font-size: .8rem;
+  color: var(--muted);
+}
+.emp-dd-item {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .4rem;
+  font-size: .8rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background .1s;
+}
+.emp-dd-item:hover { background: var(--primary-light); }
+.emp-dd-item input[type=checkbox] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+}
 .emp-rule-add {
   font-size: .78rem;
   color: var(--primary);
