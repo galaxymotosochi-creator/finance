@@ -11,9 +11,10 @@ CREATE TABLE IF NOT EXISTS timesheet_entries (
   bonus_comment TEXT DEFAULT '',
   deduct_amount DECIMAL(12,2) DEFAULT 0,
   deduct_comment TEXT DEFAULT '',
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(employee_id, date)
+  created_at TIMESTAMPTZ DEFAULT now()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_timesheet_employee_date ON timesheet_entries (employee_id, date);
 
 ALTER TABLE timesheet_entries ENABLE ROW LEVEL SECURITY;
 
