@@ -77,7 +77,7 @@ export default function Employees() {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
     setFPositionId(''); setFHireDate(new Date().toISOString().split('T')[0]);
     setFBaseSalary(''); setFBonusType('none'); setFBonusValue('');
-    setFBonusRules([]); setFPermissions(['clients', 'stock']);
+    setFBonusRules([]); setFPermissions([]);
     setFPin(''); setFStatus('active'); setShow(true);
   };
 

@@ -32,14 +32,26 @@ export default function Positions() {
   const [fBonusValue, setFBonusValue] = useState('');
   const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
 
+  const [empCount, setEmpCount] = useState({});
+
   const load = async () => {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const { data, error } = await supabase.from('position_templates').select('*')
-        .eq('user_id', user.id).order('created_at', { ascending: false });
-      if (error) { alert('Ошибка загрузки: ' + error.message); return; }
-      if (data) setPositionsState(data);
+      const [posRes, empRes] = await Promise.all([
+        supabase.from('position_templates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('employees').select('position_id').eq('user_id', user.id),
+      ]);
+      if (posRes.error) { alert('Ошибка загрузки: ' + posRes.error.message); return; }
+      if (posRes.data) setPositionsState(posRes.data);
+      // Считаем сотрудников по должностям
+      const counts = {};
+      if (empRes.data) {
+        empRes.data.forEach(e => {
+          if (e.position_id) counts[e.position_id] = (counts[e.position_id] || 0) + 1;
+        });
+      }
+      setEmpCount(counts);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     setLoading(false);
   };
@@ -147,7 +159,7 @@ export default function Positions() {
                 <div className="pos-row">
                   <span className="pos-icon">👥</span>
                   <span className="pos-label">
-                    В штате: <strong>0 человек</strong>
+                    В штате: <strong>{empCount[p.id] || 0} {empCount[p.id] === 1 ? 'человек' : 'человека'}</strong>
                   </span>
                 </div>
                 <div className="pos-row">
