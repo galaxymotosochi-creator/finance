@@ -271,7 +271,7 @@ export default function Employees() {
                 </div>
               )}
 
-              {fBonusType === 'percent' && <>
+              {fBonusType === 'percent' && (<>
               <div className="emp-section-label">Процент с продаж</div>
 
               {/* ── Общие ── */}
@@ -348,7 +348,7 @@ export default function Employees() {
                 );
               })}
               <button type="button" className="emp-rule-add" onClick={() => addBonusRule('item','product')}>+ Добавить товар</button>
-              </>
+              </>)}
 
               {/* БЛОК 4: ДОСТУПЫ + КАССА */}
               <div className="emp-section-label">Доступы</div>
