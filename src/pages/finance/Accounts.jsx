@@ -91,6 +91,13 @@ export default function Accounts() {
     var i=0,e=0; (transactions||[]).forEach(t=>{if(t.account_id===ac.id){if(t.type==='income')i+=Number(t.amount||0);else e+=Number(t.amount||0);}});
     return {i,e};
   };
+  var getTypeMeta = (ac) => {
+    try {
+      var dt = JSON.parse(localStorage.getItem('accountDisplayTypes')||'{}');
+      var t = (dt && dt[ac.id]) || ac.type;
+      return ACC_TYPES.find(x => x.type === t);
+    } catch(e) { return ACC_TYPES.find(x => x.type === ac.type); }
+  };
   var isSys = (ac) => systemIds.has(ac?.id);
   var hasAct = (ac) => parseFloat(ac.balance)>0||(transactions||[]).some(t=>t.account_id===ac.id);
 
