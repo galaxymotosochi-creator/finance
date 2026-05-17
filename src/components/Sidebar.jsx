@@ -81,49 +81,51 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
-      <div className="sidebar-inner">
-        <div className="sidebar-user">
-          <div className="sidebar-toggle" onClick={()=>{if(window.innerWidth<=768){setMobileOpen(!mobileOpen)}else{setCollapsed(!collapsed)}}} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>{collapsed||mobileOpen?'☰':'✕'}</div>
-          {!collapsed && <div className="sidebar-user-info">
-            <div className="sidebar-user-email">Finance</div>
-          </div>}
-        </div>
-        <nav className="sidebar-nav">
-          {menu.map((item) => {
-            if (item.children) {
-              const open = expanded === item.label;
-              const anyChildActive = item.children.some((c) => isActive(c.path));
-              return (
-                <div className="nav-group" key={item.label}>
-                  <a className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active' : ''}`}
-                    onClick={() => toggleGroup(item.label)}>
-                    <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
-                    {item.label}<span className="arrow">&#9656;</span>
-                  </a>
-                  <div className={`nav-children${open ? ' open' : ''}`}>
-                    {item.children.map((child) => (
-                      <a key={child.path}
-                        className={`nav-child${isActive(child.path) ? ' active' : ''}`}
-                        onClick={() => navigate(child.path)}>{child.label}</a>
-                    ))}
+    <>
+      <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
+        <div className="sidebar-inner">
+          <div className="sidebar-user">
+            <div className="sidebar-toggle" onClick={()=>{if(window.innerWidth<=768){setMobileOpen(!mobileOpen)}else{setCollapsed(!collapsed)}}} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>{collapsed||mobileOpen?'☰':'✕'}</div>
+            {!collapsed && <div className="sidebar-user-info">
+              <div className="sidebar-user-email">Finance</div>
+            </div>}
+          </div>
+          <nav className="sidebar-nav">
+            {menu.map((item) => {
+              if (item.children) {
+                const open = expanded === item.label;
+                const anyChildActive = item.children.some((c) => isActive(c.path));
+                return (
+                  <div className="nav-group" key={item.label}>
+                    <a className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active' : ''}`}
+                      onClick={() => toggleGroup(item.label)}>
+                      <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
+                      {item.label}<span className="arrow">&#9656;</span>
+                    </a>
+                    <div className={`nav-children${open ? ' open' : ''}`}>
+                      {item.children.map((child) => (
+                        <a key={child.path}
+                          className={`nav-child${isActive(child.path) ? ' active' : ''}`}
+                          onClick={() => navigate(child.path)}>{child.label}</a>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                );
+              }
+              return (
+                <a key={item.path}
+                  className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
+                  onClick={() => navigate(item.path)}>
+                  <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
+                  {item.label}
+                </a>
               );
-            }
-            return (
-              <a key={item.path}
-                className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
-                onClick={() => navigate(item.path)}>
-                <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
-                {item.label}
-              </a>
-            );
-          })}
-        </nav>
-      </div>
+            })}
+          </nav>
+        </div>
+      </aside>
       {mobileOpen && <div onClick={()=>setMobileOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.3)',zIndex:199}} />}
       {!mobileOpen && window.innerWidth <= 768 && <div onClick={()=>setMobileOpen(true)} style={{position:'fixed',top:'8px',left:'8px',zIndex:201,width:'36px',height:'36px',borderRadius:'8px',background:'var(--white)',border:'1px solid var(--border)',cursor:'pointer',fontSize:'1.2rem',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(0,0,0,.08)',color:'var(--body-color)'}}>☰</div>}
-    </aside>
+    </>
   );
 }
