@@ -1,23 +1,34 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
-const getClients = () => JSON.parse(localStorage.getItem('clients88') || '[]');
-const setClients = (list) => localStorage.setItem('clients88', JSON.stringify(list));
 const getSales = () => JSON.parse(localStorage.getItem('sales88') || '[]');
 
 export default function Clients() {
+  const { user } = useAuth();
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
   const [search, setSearch] = useState('');
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [fName, setFName] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fEmail, setFEmail] = useState('');
   const [fBirthday, setFBirthday] = useState('');
   const [fComment, setFComment] = useState('');
 
-  const load = () => { setClientsState(getClients()); setSalesState(getSales()); };
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    if (!user) { setLoading(false); return; }
+    const { data } = await supabase.from('clients').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+    if (data) setClientsState(data);
+    setSalesState(getSales());
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [user]);
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
@@ -29,21 +40,32 @@ export default function Clients() {
     setFEmail(c.email||''); setFBirthday(c.birthday||''); setFComment(c.comment||''); setShow(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите имя');
-    const list = getClients();
-    const obj = { name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(), birthday: fBirthday, comment: fComment.trim() };
-    if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) list[idx] = { ...list[idx], ...obj };
-    } else { obj.id = Date.now(); obj.createdAt = new Date().toISOString(); list.unshift(obj); }
-    setClients(list); load(); setShow(false);
+    try {
+      if (editId) {
+        await supabase.from('clients').update({
+          name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
+          birthday: fBirthday || null, comment: fComment.trim()
+        }).eq('id', editId);
+      } else {
+        await supabase.from('clients').insert({
+          user_id: user.id, name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
+          birthday: fBirthday || null, comment: fComment.trim()
+        });
+      }
+      await load();
+      setShow(false);
+    } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить клиента?')) return;
-    setClients(getClients().filter(x => x.id !== id)); load();
+    try {
+      await supabase.from('clients').delete().eq('id', id);
+      await load();
+    } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
   const fmtDate = (d) => {
@@ -88,7 +110,7 @@ export default function Clients() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      {/* Быстрый поиск — как в Товарах */}
+      {/* Быстрый поиск */}
       <div className="search-row">
         <div className="search-input-wrap">
           <span className="search-icon">🔍</span>
@@ -97,7 +119,7 @@ export default function Clients() {
         </div>
       </div>
 
-      {/* Жёлтая плашка дня рождения — под поиском */}
+      {/* Жёлтая плашка дня рождения */}
       {birthdayClients.length > 0 && (
         <div style={{
           background: 'linear-gradient(135deg,#fef3cd,#fde68a)',
@@ -114,6 +136,9 @@ export default function Clients() {
         </div>
       )}
 
+      {loading ? (
+        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка клиентов...</p></div>
+      ) : (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
           <thead id="clientColHeaders">
@@ -174,6 +199,7 @@ export default function Clients() {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Модалка */}
       {show && (

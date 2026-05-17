@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const LD = [
   {id:'loyal',icon:'⭐',name:'Постоянный клиент',discount:5,condition:50000,desc:'Скидка 5% при покупках от 50 000₽',type:'accumulative',color:'#f59e0b',bg:'#fffbeb'},
@@ -10,24 +12,14 @@ const LOY_EMOJIS = ['🎯','🏆','💎','🥇','🚀','🎁','💝','✨','🔥
 const TYPE_LABELS = {constant:'Постоянная',accumulative:'📈 Накопительная',bonus:'🎯 Бонусная',birthday:'🎂 ДР-скидка'};
 
 const LD_IDS = new Set(LD.map(x => x.id));
-const getProgs = () => {
-  const custom = JSON.parse(localStorage.getItem('loyalty88') || '[]');
-  // Сначала LD, потом кастомные (кроме тех, что перекрывают LD — они уже учтены)
-  const merged = LD.map(ld => {
-    const override = custom.find(x => x.id === ld.id);
-    return override || ld;
-  });
-  // Добавляем уникальные кастомные (с новыми id)
-  custom.forEach(x => { if (!LD_IDS.has(x.id)) merged.push(x); });
-  return merged;
-};
-const setProgs = (list) => localStorage.setItem('loyalty88', JSON.stringify(list));
 
 export default function Loyalty() {
+  const { user } = useAuth();
   const [allProgs, setAllProgs] = useState([]);
   const [idx, setIdx] = useState(0);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const carRef = useRef(null);
 
   const [fIcon, setFIcon] = useState('🎯');
@@ -37,12 +29,29 @@ export default function Loyalty() {
   const [fCondition, setFCondition] = useState('');
   const [fDesc, setFDesc] = useState('');
 
-  const load = () => setAllProgs(getProgs());
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    // База: LD + кастомные из Supabase
+    let custom = [];
+    if (user) {
+      const { data } = await supabase.from('loyalty_programs').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+      if (data) custom = data;
+    }
+    // Склеиваем: LD, потом кастомные (кроме тех, что перекрывают LD)
+    const merged = LD.map(ld => {
+      const override = custom.find(x => x.id === ld.id);
+      return override || ld;
+    });
+    custom.forEach(x => { if (!LD_IDS.has(x.id)) merged.push(x); });
+    setAllProgs(merged);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [user]);
 
   const selectCard = (i) => {
     setIdx(i);
-    setAllProgs(getProgs());
+    const ap = allProgs;
     if (carRef.current) {
       const cards = carRef.current.querySelectorAll('.loy-card');
       if (cards[i]) cards[i].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
@@ -50,10 +59,9 @@ export default function Loyalty() {
   };
 
   const scrollLoyalty = (d) => {
-    const ap = getProgs();
     let i = idx + d;
-    if (i < 0) i = ap.length - 1;
-    if (i >= ap.length) i = 0;
+    if (i < 0) i = allProgs.length - 1;
+    if (i >= allProgs.length) i = 0;
     selectCard(i);
   };
 
@@ -70,40 +78,56 @@ export default function Loyalty() {
     setShow(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const list = JSON.parse(localStorage.getItem('loyalty88') || '[]');
-    const obj = {
-      id: editId || Date.now(), icon: fIcon, name: fName.trim(), type: fType,
-      discount: parseFloat(fDiscount)||0, condition: parseFloat(fCondition)||0,
-      desc: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+'₽':'')),
-      color:'#1983dd', bg:'#eaf5ff'
-    };
-    if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) list[idx] = obj;
-    } else {
-      list.push(obj);
-      setProgs(list);
-    }
-    setProgs(list);
-    const newAll = getProgs();
-    setAllProgs(newAll);
-    if (newAll.length > 0) selectCard(0);
-    setShow(false);
+    if (!user) return alert('Ошибка: пользователь не авторизован');
+    try {
+      const obj = {
+        user_id: user.id, name: fName.trim(), type: fType,
+        discount: parseFloat(fDiscount)||0, condition: parseFloat(fCondition)||0,
+        icon: fIcon,
+        description: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+'₽':'')),
+        color:'#1983dd', bg:'#eaf5ff'
+      };
+      if (editId) {
+        await supabase.from('loyalty_programs').update(obj).eq('id', editId);
+      } else {
+        await supabase.from('loyalty_programs').insert(obj);
+      }
+      await load();
+      if (allProgs.length > 0) selectCard(0);
+      setShow(false);
+    } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
 
-  const remove = (id) => {
-    const p = JSON.parse(localStorage.getItem('loyalty88') || '[]').find(x => x.id === id);
-    if (!p || !confirm('Удалить программу "'+p.name+'"?')) return;
-    setProgs(JSON.parse(localStorage.getItem('loyalty88') || '[]').filter(x => x.id !== id));
-    setAllProgs(getProgs());
-    setIdx(0);
+  const remove = async (id) => {
+    if (LD_IDS.has(id)) { alert('Встроенную программу нельзя удалить'); return; }
+    if (!confirm('Удалить программу "'+(allProgs.find(p=>p.id===id)?.name||'')+'"?')) return;
+    try {
+      await supabase.from('loyalty_programs').delete().eq('id', id);
+      await load();
+      setIdx(0);
+    } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
   const current = allProgs[idx];
   const ap = allProgs;
+
+  if (loading) {
+    return (
+      <>
+        <div className="page-header">
+          <div>
+            <h1>Программы лояльности</h1>
+            <div className="sub">Системы скидок и поощрений для клиентов</div>
+          </div>
+        </div>
+        <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
+        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -129,7 +153,7 @@ export default function Loyalty() {
               <div key={p.id || i} className={`loy-card${i === idx ? ' active' : ''}`} onClick={() => selectCard(i)}>
                 <div className="loy-card-icon">{p.icon}</div>
                 <div className="loy-card-title">{p.name}</div>
-                <div className="loy-card-desc">{p.desc}</div>
+                <div className="loy-card-desc">{p.desc || p.description}</div>
                 <span className="loy-card-badge" style={{background:p.bg,color:p.color}}>{badge}</span>
                 <div className="loy-card-stat">
                   <span>💰 {p.discount ? p.discount+'%' : '—'}</span>
@@ -186,7 +210,7 @@ export default function Loyalty() {
               <div className="loy-detail-item"><div className="lbl">Клиентов</div><div className="val">0</div></div>
               <div className="loy-detail-item"><div className="lbl">Выручка</div><div className="val">0₽</div></div>
             </div>
-            <div style={{fontSize:'.82rem',color:'var(--body-color)',marginBottom:'.5rem'}}>{current.desc}</div>
+            <div style={{fontSize:'.82rem',color:'var(--body-color)',marginBottom:'.5rem'}}>{current.desc || current.description}</div>
           </div>
         </div>
       ) : (
