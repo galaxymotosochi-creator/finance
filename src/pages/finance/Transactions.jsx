@@ -14,9 +14,9 @@ export default function Transactions() {
   const [showExpense, setShowExpense] = useState(false);
   const [showAccSelect, setShowAccSelect] = useState(false);
   const [pendingTx, setPendingTx] = useState(null);
-  const [selectedAcc, setSelectedAcc] = useState('cash');
+  const [selectedAcc, setSelectedAcc] = useState(null);
   const [splitMode, setSplitMode] = useState(false);
-  const [splitAmounts, setSplitAmounts] = useState({ cash: 0, card: 0, transfer: 0 });
+  const [splitAmounts, setSplitAmounts] = useState({});
 
   const [incName, setIncName] = useState('');
   const [incAmount, setIncAmount] = useState('');
@@ -70,6 +70,7 @@ export default function Transactions() {
   };
 
   var accs = accounts || [];
+  const accIcons = { cash:'💵', card:'💳', transfer:'🔄', checking:'🏦', bank:'🏛️', electronic:'🌐', reserve:'🔒', deposit:'📜' };
   const cats = categories || [];
 
   const incomeTotal = txs.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
@@ -117,9 +118,9 @@ export default function Transactions() {
       description: incName, amount: parseFloat(incAmount),
       date: incDate, category_id: incCategory || null,
     });
-    setSelectedAcc('cash');
+    setSelectedAcc(accs.length > 0 ? accs[0].id : null);
     setSplitMode(false);
-    setSplitAmounts({ cash: 0, card: 0, transfer: 0 });
+    setSplitAmounts({});
     setShowAccSelect(true);
   };
 
@@ -144,13 +145,11 @@ export default function Transactions() {
       var isEdit = !!pendingTx.id;
       var txData = { account_id: null, user_id: pendingTx.user_id, amount: pendingTx.amount, description: pendingTx.description, date: pendingTx.date, category_id: pendingTx.category_id, type: pendingTx.type };
       if (splitMode) {
-        for (const [type, amt] of Object.entries(splitAmounts)) {
+        for (const a of accs) {
+          var amt = splitAmounts[a.id] || 0;
           if (amt > 0) {
-            var a = accs.find(x => x?.type === type) || accs[0];
-            if (a) {
-              if (isEdit) await update(pendingTx.id, { ...txData, account_id: a.id, amount: amt });
-              else await add({ ...txData, account_id: a.id, amount: amt });
-            }
+            if (isEdit) await update(pendingTx.id, { ...txData, account_id: a.id, amount: amt });
+            else await add({ ...txData, account_id: a.id, amount: amt });
           }
         }
       } else {
@@ -163,7 +162,7 @@ export default function Transactions() {
           var r = await refreshAccounts();
           accs = r || [];
         }
-        var acct = accs.find(a => a?.type === selectedAcc) || accs[0];
+        var acct = accs.find(a => a?.id === selectedAcc) || accs[0];
         if (acct) {
           if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
           else await add({ ...txData, account_id: acct.id });
@@ -394,7 +393,7 @@ export default function Transactions() {
                 setShowExpense(false);setEditingId(null);resetForms();
               }else{
                 setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
               <div className="form-group">
@@ -432,28 +431,31 @@ export default function Transactions() {
             <h2>{pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"}</h2>
             <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}</div>
             <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
-              {[{type:"cash",icon:"💵",label:"Наличные"},{type:"checking",icon:"🏦",label:"Расчётный счёт"},{type:"card",icon:"💳",label:"Бизнес-карта"},{type:"bank",icon:"🏛️",label:"Банковский счёт"},{type:"electronic",icon:"🌐",label:"Электронные деньги"},{type:"reserve",icon:"🔒",label:"Резерв"},{type:"deposit",icon:"📜",label:"Депозит"}].map(function(a){
-                var sel = selectedAcc === a.type;
+              {accs.map(function(a){
+                var sel = selectedAcc === a.id;
+                var ic = accIcons[a.type] || '🏦';
                 return (
-                  <div key={a.type} onClick={function(){setSelectedAcc(a.type)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--white)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--white)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--primary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
-                    <span style={{fontSize:"1rem"}}>{a.icon}</span>
-                    <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.label}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id){var ac=(accs||[]).find(function(x){return x&&x.type===a.type});if(ac&&t.account_id===ac.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}}});return b})()}₽</span>
+                    <span style={{fontSize:"1rem"}}>{ic}</span>
+                    <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b})()}₽</span>
                   </div>
                 );
               })}
+              {accs.length === 0 && <div style={{textAlign:"center",padding:"1rem",color:"var(--muted)",fontSize:".85rem"}}>Нет счетов. Добавьте в разделе Счета</div>}
             </div>
             <div className="sub" style={{marginBottom:".75rem",cursor:"pointer",fontSize:".82rem",color:"var(--primary)"}} onClick={function(){
-              if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;setSplitAmounts({cash:amt,card:amt,transfer:total-amt*2})}
+              if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;var sa={};accs.forEach(function(a,i){sa[a.id]=i<accs.length-1?amt:total-amt*(accs.length-1)});setSplitAmounts(sa)}
               setSplitMode(!splitMode)
             }}>{splitMode ? "➖ Разделить" : "➕ Разделить"}</div>
-            {splitMode && [{type:"cash",icon:"💵",label:"Наличные"},{type:"checking",icon:"🏦",label:"Расчётный счёт"},{type:"card",icon:"💳",label:"Бизнес-карта"},{type:"bank",icon:"🏛️",label:"Банковский счёт"},{type:"electronic",icon:"🌐",label:"Электронные деньги"},{type:"reserve",icon:"🔒",label:"Резерв"},{type:"deposit",icon:"📜",label:"Депозит"}].map(function(a){
+            {splitMode && accs.map(function(a){
+              var ic = accIcons[a.type] || '🏦';
               return (
-                <div key={a.type} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".35rem 0"}}>
-                  <span style={{fontSize:"1rem",width:"24px",textAlign:"center"}}>{a.icon}</span>
-                  <span style={{flex:1,fontSize:".8rem"}}>{a.label}</span>
-                  <input type="number" value={splitAmounts[a.type]||""} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r=Object.assign({},p);r[a.type]=v;return r})}}
+                <div key={a.id} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".35rem 0"}}>
+                  <span style={{fontSize:"1rem",width:"24px",textAlign:"center"}}>{ic}</span>
+                  <span style={{flex:1,fontSize:".8rem"}}>{a.name}</span>
+                  <input type="number" value={splitAmounts[a.id]||""} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r=Object.assign({},p);r[a.id]=v;return r})}}
                     style={{width:"100px",padding:".35rem .4rem",fontSize:".8rem",border:"1px solid var(--border)",borderRadius:"5px",outline:"none",textAlign:"center",fontFamily:"var(--font)"}} />
                 </div>
               );
