@@ -303,7 +303,7 @@ body {
 
 /* Table styles from original */
 .product-table table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:700px}
-.product-table th{text-align:center;padding:.6rem .5rem;color:var(--muted);font-weight:700;font-size:.7rem;text-transform:uppercase;background:transparent;white-space:nowrap;border-bottom:2px solid #c0c4c8}
+.product-table th{text-align:center;padding:.6rem .5rem;color:#4b5563;font-weight:700;font-size:.7rem;text-transform:uppercase;background:transparent;white-space:nowrap;border-bottom:2px solid #c0c4c8}
 .product-table td{padding:.5rem .5rem;border-bottom:1px solid #e9ecef;vertical-align:middle;text-align:center;background:transparent}
 .product-table td.tr{text-align:right;font-variant-numeric:tabular-nums}
 #dirTableBody td:first-child{text-align:left;padding-left:0}
@@ -315,7 +315,7 @@ body {
 .empty-products .big-icon{font-size:3rem;opacity:.15;margin-bottom:.5rem}
 .empty-products p{font-size:.9rem}
 
-#dirColHeaders th{font-size:.72rem;font-weight:400;color:var(--muted);text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:2px solid #c0c4c8;background:var(--white);text-align:center}
+#dirColHeaders th{font-size:.72rem;font-weight:400;color:#4b5563;text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:2px solid #c0c4c8;background:var(--white);text-align:center}
 #dirColHeaders th:first-child{text-align:left;padding-left:0;width:45%}
 
 /* === Categories (Категории) === */
