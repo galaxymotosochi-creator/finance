@@ -123,7 +123,7 @@ export default function Sidebar() {
         </nav>
       </div>
       {mobileOpen && <div onClick={()=>setMobileOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.3)',zIndex:199}} />}
-    </aside>
       {!mobileOpen && window.innerWidth <= 768 && <div onClick={()=>setMobileOpen(true)} style={{position:'fixed',top:'8px',left:'8px',zIndex:201,width:'36px',height:'36px',borderRadius:'8px',background:'var(--white)',border:'1px solid var(--border)',cursor:'pointer',fontSize:'1.2rem',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(0,0,0,.08)',color:'var(--body-color)'}}>☰</div>}
+    </aside>
   );
 }
