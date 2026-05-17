@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
-const STATUS_LABELS = {accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
+const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
 const STATUS_COLORS = {accrued:'#2563eb',paid:'#16a34a',cancelled:'#dc2626'};
 
 function daysInMonth(y,m){return new Date(y,m,0).getDate()}
@@ -63,7 +63,7 @@ export default function Salary() {
   const [fBonusComment, setFBonusComment] = useState('');
   const [fDeductAmt, setFDeductAmt] = useState('');
   const [fDeductComment, setFDeductComment] = useState('');
-  const [fStatus, setFStatus] = useState('accrued');
+  const [fStatus, setFStatus] = useState('pending');
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
   const [fDays, setFDays] = useState(0);
 
@@ -116,7 +116,7 @@ export default function Salary() {
     setFBaseSalary(0); setFCommissionPct(0); setFSalesTotal('');
     setFCommissionAmt(0); setFSalaryTotal(0); setFBonusAmt('');
     setFBonusComment(''); setFDeductAmt(''); setFDeductComment('');
-    setFStatus('accrued'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0);
+    setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0);
     setShow(true);
   };
 
@@ -127,7 +127,7 @@ export default function Salary() {
     setFSalesTotal(String(s.sales_total||'')); setFCommissionAmt(s.commission_amount||0);
     setFSalaryTotal(s.base_salary||0); setFBonusAmt(String(s.bonus_amount||''));
     setFBonusComment(s.bonus_comment||''); setFDeductAmt(String(s.deduct_amount||''));
-    setFDeductComment(s.deduct_comment||''); setFStatus(s.status||'accrued');
+    setFDeductComment(s.deduct_comment||''); setFStatus(s.status||'pending');
     setFDate(s.date||new Date().toISOString().split('T')[0]); setFDays(s.days_worked||0);
     setShow(true);
   };
@@ -145,6 +145,8 @@ export default function Salary() {
         employee_name: emp ? emp.name : 'Сотрудник',
         period_from: fPeriodFrom,
         period_to: fPeriodTo,
+        period_start: fPeriodFrom,
+        period_end: fPeriodTo,
         base_salary: fBaseSalary,
         commission_percent: fCommissionPct,
         sales_total: parseFloat(fSalesTotal)||0,
@@ -230,7 +232,7 @@ export default function Salary() {
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
                     <div className="prod-dropdown">
-                      {s.status==='accrued'&&<button onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}} style={{color:'#16a34a'}}>Выплатить</button>}
+                      {(s.status==='pending'||s.status==='accrued')&&<button onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}} style={{color:'#16a34a'}}>Выплатить</button>}
                       <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
@@ -325,7 +327,7 @@ export default function Salary() {
               <div className="form-group">
                 <label>Статус</label>
                 <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
-                  <option value="accrued">Начислено</option>
+                  <option value="pending">Начислено</option>
                   <option value="paid">Выплачено</option>
                 </select>
               </div>

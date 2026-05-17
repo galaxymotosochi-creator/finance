@@ -2,7 +2,7 @@
 -- МИГРАЦИЯ: ЗАРПЛАТА — новые поля
 -- ============================================
 
-ALTER TABLE salary ADD COLUMN IF NOT EXISTS employee_id UUID REFERENCES employees(id) ON DELETE SET NULL;
+ALTER TABLE salary ADD COLUMN IF NOT EXISTS employee_id UUID;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS base_salary DECIMAL(12,2) DEFAULT 0;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS commission_percent DECIMAL(5,2) DEFAULT 0;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS commission_amount DECIMAL(12,2) DEFAULT 0;
@@ -15,3 +15,7 @@ ALTER TABLE salary ADD COLUMN IF NOT EXISTS sales_total DECIMAL(12,2) DEFAULT 0;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS period_from DATE;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS period_to DATE;
 ALTER TABLE salary ADD COLUMN IF NOT EXISTS employee_name TEXT DEFAULT '';
+ALTER TABLE salary ALTER COLUMN period_start DROP NOT NULL;
+ALTER TABLE salary ALTER COLUMN period_end DROP NOT NULL;
+ALTER TABLE salary DROP CONSTRAINT IF EXISTS salary_status_check;
+ALTER TABLE salary ADD CONSTRAINT salary_status_check CHECK (status IN ('pending','accrued','paid','cancelled'));
