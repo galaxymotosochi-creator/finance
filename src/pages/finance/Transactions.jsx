@@ -219,15 +219,15 @@ export default function Transactions() {
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
-      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem"}}>
+      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%'}}>
         <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--white)"}}>
           <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
-          <div style={{position:'relative'}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,whiteSpace:'nowrap'}}
               onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
@@ -253,7 +253,7 @@ export default function Transactions() {
             onClick={()=>setTypeFilter(typeFilter==='expense'?null:'expense')}>Расходы</span>
           <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='income'?600:400,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
-          <div style={{position:'relative'}}>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={()=>{setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
