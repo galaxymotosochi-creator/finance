@@ -275,45 +275,38 @@ export default function Employees() {
               {/* БЛОК 3: ПРОЦЕНТ С ПРОДАЖ */}
               <div className="emp-section-label">Процент с продаж</div>
 
-              {/* Все товары / Все услуги — кнопки-переключатели */}
-              <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap',marginBottom:'.75rem'}}>
-                <div onClick={() => {
-                  const has = fBonusRules.some(r => r.scope==='all' && r.type==='product');
-                  if(has) { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='product'); rmRule(idx); }
-                  else addBonusRule('all','product');
-                }}
-                  className={`emp-toggle-btn${fBonusRules.some(r => r.scope==='all' && r.type==='product') ? ' active' : ''}`}>
-                  Все товары
-                  {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='product'); return r ? (
-                    <input type="number" className="emp-toggle-input" value={r.rate} onChange={e => {e.stopPropagation(); const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" onClick={e => e.stopPropagation()} />
-                  ) : null})()}
-                </div>
-                <div onClick={() => {
-                  const has = fBonusRules.some(r => r.scope==='all' && r.type==='service');
-                  if(has) { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='service'); rmRule(idx); }
-                  else addBonusRule('all','service');
-                }}
-                  className={`emp-toggle-btn${fBonusRules.some(r => r.scope==='all' && r.type==='service') ? ' active' : ''}`}>
-                  Все услуги
-                  {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='service'); return r ? (
-                    <input type="number" className="emp-toggle-input" value={r.rate} onChange={e => {e.stopPropagation(); const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" onClick={e => e.stopPropagation()} />
-                  ) : null})()}
-                </div>
+              {/* ── Общие ── */}
+              <div className="emp-subsection-title">Общие</div>
+              <div className="emp-row">
+                <span className="emp-row-label">Все товары</span>
+                <input type="number" className="emp-row-input"
+                  value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate:''})()}
+                  onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','product')}}
+                  placeholder="%" min="0" max="100" />
+                <span className="emp-row-curr">{(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate+'%':''})()}</span>
+              </div>
+              <div className="emp-row">
+                <span className="emp-row-label">Все услуги</span>
+                <input type="number" className="emp-row-input"
+                  value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate:''})()}
+                  onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','service')}}
+                  placeholder="%" min="0" max="100" />
+                <span className="emp-row-curr">{(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate+'%':''})()}</span>
               </div>
 
-              {/* По категориям */}
-              <div className="emp-subsection-title">По категориям</div>
-              {fBonusRules.filter(r => r.scope==='category').map((rule, i) => {
+              {/* ── По категориям ── */}
+              <div className="emp-subsection-title" style={{marginTop:'.75rem'}}>По категориям</div>
+              {fBonusRules.filter(r => r.scope==='category').map(rule => {
                 const realIdx = fBonusRules.indexOf(rule);
                 const allTabs = [{id:'product',label:'Товары',list:prodCats},{id:'service',label:'Услуги',list:svcCats}];
                 const tab = allTabs.find(t => t.id === rule.type) || allTabs[0];
                 return (
-                  <div key={realIdx} className="emp-rule-row">
-                    <select className="emp-rule-select" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
+                  <div key={realIdx} className="emp-row">
+                    <select className="emp-row-sel" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
                       <option value="product">Товары</option>
                       <option value="service">Услуги</option>
                     </select>
-                    <select className="emp-rule-select" value={rule.catId} onChange={e => {
+                    <select className="emp-row-sel" value={rule.catId} onChange={e => {
                       const cat = allCats.find(c => c.id === e.target.value || c.name === e.target.value);
                       updRule(realIdx,'catId',e.target.value);
                       updRule(realIdx,'catName',cat ? cat.name : e.target.value);
@@ -321,24 +314,25 @@ export default function Employees() {
                       <option value="">— Категория —</option>
                       {tab.list.map(c => <option key={c.id||c.name} value={c.id||c.name}>{c.name}</option>)}
                     </select>
-                    <input type="number" className="emp-rule-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
-                    <button type="button" className="emp-rule-rm" onClick={() => rmRule(realIdx)}>✕</button>
+                    <input type="number" className="emp-row-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
+                    <span className="emp-row-curr">{rule.rate}%</span>
+                    <button type="button" className="emp-row-rm" onClick={() => rmRule(realIdx)}>✕</button>
                   </div>
                 );
               })}
               <button type="button" className="emp-rule-add" onClick={() => addBonusRule('category','product')}>+ Добавить категорию</button>
 
-              {/* По товарам */}
-              <div className="emp-subsection-title">По товарам</div>
-              {fBonusRules.filter(r => r.scope==='item').map((rule, i) => {
+              {/* ── По товарам ── */}
+              <div className="emp-subsection-title" style={{marginTop:'.75rem'}}>По товарам</div>
+              {fBonusRules.filter(r => r.scope==='item').map(rule => {
                 const realIdx = fBonusRules.indexOf(rule);
                 return (
-                  <div key={realIdx} className="emp-rule-row">
-                    <select className="emp-rule-select" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
+                  <div key={realIdx} className="emp-row">
+                    <select className="emp-row-sel" value={rule.type} onChange={e => updRule(realIdx,'type',e.target.value)}>
                       <option value="product">Товар</option>
                       <option value="service">Услуга</option>
                     </select>
-                    <select className="emp-rule-select" value={rule.itemId} onChange={e => {
+                    <select className="emp-row-sel" value={rule.itemId} onChange={e => {
                       const item = products.find(p => p.id === e.target.value || p.name === e.target.value);
                       updRule(realIdx,'itemId',e.target.value);
                       updRule(realIdx,'itemName',item ? item.name : e.target.value);
@@ -348,8 +342,9 @@ export default function Employees() {
                         <option key={p.id||p.name} value={p.id||p.name}>{p.name}</option>
                       )}
                     </select>
-                    <input type="number" className="emp-rule-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
-                    <button type="button" className="emp-rule-rm" onClick={() => rmRule(realIdx)}>✕</button>
+                    <input type="number" className="emp-row-input" value={rule.rate} onChange={e => updRule(realIdx,'rate',parseFloat(e.target.value)||0)} placeholder="%" min="0" max="100" />
+                    <span className="emp-row-curr">{rule.rate}%</span>
+                    <button type="button" className="emp-row-rm" onClick={() => rmRule(realIdx)}>✕</button>
                   </div>
                 );
               })}
