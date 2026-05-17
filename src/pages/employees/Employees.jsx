@@ -274,22 +274,19 @@ export default function Employees() {
               <div className="emp-section-label">Процент с продаж</div>
 
               {/* ── Общие ── */}
-              <div className="emp-subsection-title">Общие</div>
-              <div className="emp-row">
-                <span className="emp-row-label">Все товары</span>
-                <input type="number" className="emp-row-input"
-                  value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate:''})()}
-                  onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','product')}}
-                  placeholder="%" min="0" max="100" />
-                <span className="emp-row-curr">{(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate+'%':''})()}</span>
-              </div>
-              <div className="emp-row">
-                <span className="emp-row-label">Все услуги</span>
-                <input type="number" className="emp-row-input"
-                  value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate:''})()}
-                  onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','service')}}
-                  placeholder="%" min="0" max="100" />
-                <span className="emp-row-curr">{(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate+'%':''})()}</span>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Все товары (%)</label>
+                  <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate:''})()}
+                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','product')}}
+                    placeholder="%" min="0" max="100" />
+                </div>
+                <div className="form-group">
+                  <label>Все услуги (%)</label>
+                  <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate:''})()}
+                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','service')}}
+                    placeholder="%" min="0" max="100" />
+                </div>
               </div>
 
               {/* ── По категориям ── */}
