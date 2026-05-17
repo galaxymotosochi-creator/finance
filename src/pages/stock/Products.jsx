@@ -275,21 +275,18 @@ export default function Products() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="search-row">
-        <div className="search-input-wrap">
-          <span className="search-icon">🔍</span>
-          <input type="text" className="search-field" placeholder="Быстрый поиск"
-            value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--white)"}}>
+          <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
+          <input type="text" placeholder="Быстрый поиск" value={search} onChange={e=>setSearch(e.target.value)}
+            style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
-        <div className="actions-group">
-
-          {/* Категория */}
-          <div className="cat-wrapper">
-            <button className="text-btn" onClick={() => { setCatOpen(!catOpen); setColsOpen(false); setExportOpen(false); }}>
-              Категория <span className={`act-arrow${catOpen ? ' open' : ''}`}>▼</span>
-            </button>
+        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
             {catOpen && (
-              <div className="cat-dropdown open">
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="cat-dd-actions">
                   <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
                   <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
@@ -312,33 +309,26 @@ export default function Products() {
               </div>
             )}
           </div>
-
-          {/* Корзина */}
-          <button className="text-btn" onClick={() => { setCatOpen(false); setColsOpen(false); setExportOpen(false); setShowTrash(true); }}>Корзина</button>
-
-          {/* Скачать */}
-          <div className="export-wrapper">
-            <button className="text-btn" onClick={() => { setExportOpen(!exportOpen); setCatOpen(false); setColsOpen(false); }}>
-              Скачать <span className="act-arrow">▼</span>
-            </button>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</span>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setExportOpen(!exportOpen);setCatOpen(false);setColsOpen(false)}}>Скачать</span>
             {exportOpen && (
-              <div className="export-dropdown open">
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'170px',padding:'.45rem',zIndex:100}}>
                 <div className="export-dd-title">Вы хотите скачать товары в Excel?</div>
                 <div className="export-dd-actions">
-                  <span className="export-dd-btn" onClick={() => { setExportOpen(false); exportExcel(); }}>Да</span>
-                  <span className="export-dd-btn export-dd-cancel" onClick={() => setExportOpen(false)}>Нет</span>
+                  <span className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}}>Да</span>
+                  <span className="export-dd-btn export-dd-cancel" onClick={()=>setExportOpen(false)}>Нет</span>
                 </div>
               </div>
             )}
           </div>
-
-          {/* Столбцы */}
-          <div className="cols-wrapper">
-            <button className="text-btn" onClick={() => { setColsOpen(!colsOpen); setCatOpen(false); setExportOpen(false); }}>
-              Столбцы <span className="act-arrow">▼</span>
-            </button>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"none",lineHeight:1}}
+              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
-              <div className="cols-dropdown open">
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                 <div className="cols-title">Отображать столбцы</div>
                 <div className="cols-list">
                   {ALL_COLUMNS.filter(c => !c.always).map(c => {
@@ -357,7 +347,6 @@ export default function Products() {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
