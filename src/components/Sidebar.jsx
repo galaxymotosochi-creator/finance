@@ -47,6 +47,7 @@ const menu = [
     label: 'Команда', icon: 'team', children: [
       { label: 'Сотрудники', path: '/employees' },
       { label: 'Должности', path: '/employees/positions' },
+      { label: 'Табель', path: '/employees/timesheet' },
     ],
   },
   {
