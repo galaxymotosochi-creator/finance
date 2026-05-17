@@ -118,7 +118,7 @@ export default function Employees() {
 
   const togglePerm = (pid) => setFPermissions(prev => prev.includes(pid) ? prev.filter(p => p !== pid) : [...prev, pid]);
   const genPin = () => setFPin(String(1000 + Math.floor(Math.random() * 9000)));
-  const addBonusRule = (scope, type) => setFBonusRules(prev => [...prev, { scope, type, rate: 0, name: '', catId: '', catName: '', itemId: '', itemName: '' }]);
+  const addBonusRule = (scope, type, rate = 0) => setFBonusRules(prev => [...prev, { scope, type, rate, name: '', catId: '', catName: '', itemId: '', itemName: '' }]);
   const updRule = (idx, field, val) => setFBonusRules(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: val }; return n; });
   const rmRule = (idx) => setFBonusRules(prev => prev.filter((_, i) => i !== idx));
 
@@ -278,13 +278,13 @@ export default function Employees() {
                 <div className="form-group">
                   <label>Все товары (%)</label>
                   <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='product');return r?r.rate:''})()}
-                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','product')}}
+                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='product');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','product',v)}}
                     placeholder="%" min="0" max="100" />
                 </div>
                 <div className="form-group">
                   <label>Все услуги (%)</label>
                   <input type="number" value={(()=>{const r=fBonusRules.find(r=>r.scope==='all'&&r.type==='service');return r?r.rate:''})()}
-                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','service')}}
+                    onChange={e=>{const v=parseFloat(e.target.value)||0;const existing=fBonusRules.findIndex(r=>r.scope==='all'&&r.type==='service');if(existing>-1)updRule(existing,'rate',v);else addBonusRule('all','service',v)}}
                     placeholder="%" min="0" max="100" />
                 </div>
               </div>
