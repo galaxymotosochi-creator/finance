@@ -104,7 +104,7 @@ export default function Salary() {
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
-          <thead><tr>
+          <thead id="salaryColHeaders"><tr>
             <th>Сотрудник</th><th>Период</th><th className="tr">Оклад</th><th className="tr">% продаж</th>
             <th className="tr">Премия</th><th className="tr">Вычеты</th><th className="tr">Итого</th><th>Статус</th>
             <th style={{width:'130px'}}></th>
