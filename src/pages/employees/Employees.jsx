@@ -248,7 +248,6 @@ export default function Employees() {
               </div>
 
               {/* БЛОК 2: ЗАРПЛАТА */}
-              <div className="emp-section-label">Зарплата <span style={{fontWeight:400,fontSize:'.75rem',color:'var(--muted)'}}>(зарплата применится автоматически на основе данных из должности)</span></div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Оклад (₽)</label>
