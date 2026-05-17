@@ -190,6 +190,14 @@ body {
 }
 .btn-green { background: #16a34a; }
 .btn-green:hover { opacity: .9; }
+.btn-mint {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .6rem .95rem; border: none;
+  border-radius: 6px; font-size: .82rem; cursor: pointer;
+  font-family: var(--font); font-weight: 500; transition: all .12s;
+  background: #e2fbe8; color: #1a1a1a;
+}
+.btn-mint:hover { background: #c8f7d4; }
 .btn-red { background: #dc2626; }
 .btn-red:hover { opacity: .9; }
 .btn { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font); font-size: .82rem; font-weight: 500; padding: .5rem 1.2rem; border-radius: var(--radius); border: none; cursor: pointer; transition: all .2s; text-decoration: none; }
