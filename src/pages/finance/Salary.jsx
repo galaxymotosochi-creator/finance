@@ -63,6 +63,8 @@ export default function Salary() {
   const [fBonusComment, setFBonusComment] = useState('');
   const [fDeductAmt, setFDeductAmt] = useState('');
   const [fDeductComment, setFDeductComment] = useState('');
+  const [fPayType, setFPayType] = useState('salary');
+  const [existingDebt, setExistingDebt] = useState(0);
   const [fStatus, setFStatus] = useState('pending');
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
   const [fDays, setFDays] = useState(0);
@@ -101,13 +103,27 @@ export default function Salary() {
 
   // Пересчёт при изменении периода, оклада, комиссии
   useEffect(() => {
+    if (fPayType !== 'salary') { setFSalaryTotal(0); setFCommissionAmt(0); setFDays(0); return; }
     const sal = calcProportionalSalary(fBaseSalary, fPeriodFrom, fPeriodTo);
     setFSalaryTotal(sal);
     setFDays(calcDays(fPeriodFrom, fPeriodTo));
 
     const sales = parseFloat(fSalesTotal) || 0;
     setFCommissionAmt(Math.round(sales * fCommissionPct / 100));
-  }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalesTotal, fCommissionPct]);
+  }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalesTotal, fCommissionPct, fPayType]);
+
+  // Считаем долг сотрудника при выборе
+  useEffect(() => {
+    if (!fEmpId) return;
+    const debt = list
+      .filter(s => s.employee_id === fEmpId && s.status !== 'cancelled' && s.pay_type !== 'bonus')
+      .reduce((sum, s) => {
+        const amt = Number(s.amount) || 0;
+        return s.status === 'paid' ? sum - amt :
+          s.pay_type === 'advance' ? sum - amt : sum + amt;
+      }, 0);
+    setExistingDebt(debt);
+  }, [fEmpId, list]);
 
   const grandTotal = fSalaryTotal + fCommissionAmt + (parseFloat(fBonusAmt)||0) - (parseFloat(fDeductAmt)||0);
 
