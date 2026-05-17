@@ -13,20 +13,32 @@ function calcProportionalSalary(monthlySalary, from, to){
   if(!monthlySalary||!from||!to) return 0;
   var f=new Date(from), t=new Date(to);
   if(f>t) return 0;
-  // Если период — полные календарные месяцы
+
+  // Если с 1-го по последний день месяца → полный оклад
+  var lastDay = new Date(t.getFullYear(), t.getMonth()+1, 0);
+  if(f.getDate()===1 && t.getTime()===lastDay.getTime()) return Math.round(monthlySalary);
+
+  // Если одинаковые числа и разница ровно 1 месяц → полный оклад
+  // например 17.05 → 17.06, 01.05 → 01.06
+  if(f.getDate()===t.getDate()){
+    var monthsDiff = (t.getFullYear()-f.getFullYear())*12 + t.getMonth()-f.getMonth();
+    if(monthsDiff === 1) return Math.round(monthlySalary);
+  }
+
+  // Иначе — пропорциональный расчёт по дням
   var total=0;
   var cur=new Date(f);
   while(cur<=t){
     var y=cur.getFullYear(), m=cur.getMonth();
-    var last=new Date(y,m+1,0); // последний день месяца
+    var last=new Date(y,m+1,0);
     var monthEnd=last<t?last:t;
     var monthStart=(cur.getTime()===f.getTime())?f:new Date(y,m,1);
     var daysInM=daysInMonth(y,m+1);
     var daysWorked=Math.round((monthEnd-monthStart)/(1000*60*60*24))+1;
     if(daysWorked===daysInM){
-      total+=monthlySalary; // полный месяц
+      total+=monthlySalary;
     } else {
-      total+=monthlySalary/daysInM*daysWorked; // часть месяца
+      total+=monthlySalary/daysInM*daysWorked;
     }
     cur=new Date(y,m+1,1);
   }
