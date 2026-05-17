@@ -63,6 +63,13 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const [expanded, setExpanded] = React.useState('Финансы');
   const [collapsed, setCollapsed] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const h = () => { if (window.innerWidth > 768) setMobileOpen(false); };
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
 
   const toggleGroup = (label) => {
     setExpanded((prev) => (prev === label ? null : label));
@@ -77,7 +84,7 @@ export default function Sidebar() {
     <aside className={`sidebar${collapsed ? ' collapsed' : ''}`} id="mainSidebar">
       <div className="sidebar-inner">
         <div className="sidebar-user">
-          <div className="sidebar-toggle" onClick={()=>setCollapsed(!collapsed)} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>☰</div>
+          <div className="sidebar-toggle" onClick={()=>{if(window.innerWidth<=768){setMobileOpen(!mobileOpen)}else{setCollapsed(!collapsed)}}} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>{collapsed||mobileOpen?'☰':'✕'}</div>
           {!collapsed && <div className="sidebar-user-info">
             <div className="sidebar-user-email">Finance</div>
           </div>}
@@ -115,6 +122,7 @@ export default function Sidebar() {
           })}
         </nav>
       </div>
+      {mobileOpen && <div onClick={()=>setMobileOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.3)',zIndex:199}} />}
     </aside>
   );
 }

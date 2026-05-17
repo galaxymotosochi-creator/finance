@@ -70,6 +70,22 @@ body {
 .sidebar-toggle:hover { color: var(--body-color); background: rgba(25,131,221,0.08); border-color: var(--border); }
 .sidebar.collapsed .sidebar-toggle { right: 14px; font-size: .8rem; }
 
+@media (max-width: 768px) {
+  .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; z-index: 200; transition: left .3s; }
+  .sidebar.open { left: 0; }
+  .sidebar-inner { width: 250px; min-width: 250px; }
+  .sidebar.collapsed .sidebar-inner { width: 250px; min-width: 250px; }
+  .sidebar.collapsed .sidebar-user { font-size: 1rem; padding: .5rem; }
+  .sidebar.collapsed .sidebar-user-info { display: block; }
+  .sidebar.collapsed .nav-parent { font-size: .82rem; padding: .6rem .65rem; justify-content: flex-start; gap: .5rem; }
+  .sidebar.collapsed .nav-parent .ic { font-size: 1.2rem; }
+  .sidebar.collapsed .nav-parent .arrow { display: inline; }
+  .sidebar.collapsed .nav-children { display: none !important; }
+  .sidebar.collapsed .nav-child { display: block; }
+  .sidebar.collapsed .nav-sep { display: block; }
+  .sidebar.collapsed .sidebar-user .sidebar-toggle { font-size: 1.1rem; }
+}
+
 .sidebar-user { padding: .75rem .65rem; display: flex; align-items: center; justify-content: space-between; }
 .sidebar-user-info { font-size: .75rem; }
 .sidebar-user-email { color: var(--muted); }
