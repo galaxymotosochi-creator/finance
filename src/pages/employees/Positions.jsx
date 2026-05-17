@@ -29,7 +29,6 @@ export default function Positions() {
   const [fSalary, setFSalary] = useState('');
   const [fBonusType, setFBonusType] = useState('none');
   const [fBonusValue, setFBonusValue] = useState('');
-  const [fEmployees, setFEmployees] = useState('');
   const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
 
   const load = () => setPositionsState(getPositions());
@@ -37,14 +36,14 @@ export default function Positions() {
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFSalary(''); setFBonusType('none');
-    setFBonusValue(''); setFEmployees(''); setFPermissions(['clients', 'stock']);
+    setFBonusValue(''); setFPermissions(['clients', 'stock']);
     setShow(true);
   };
 
   const openEdit = (p) => {
     setEditId(p.id); setFName(p.name); setFSalary(String(p.salary||''));
     setFBonusType(p.bonusType||'none'); setFBonusValue(String(p.bonusValue||''));
-    setFEmployees(p.employees||''); setFPermissions(p.permissions||['clients','stock']);
+    setFPermissions(p.permissions||['clients','stock']);
     setShow(true);
   };
 
@@ -55,7 +54,7 @@ export default function Positions() {
     const obj = {
       name: fName.trim(), salary: parseFloat(fSalary)||0,
       bonusType: fBonusType, bonusValue: parseFloat(fBonusValue)||0,
-      employees: fEmployees.trim(), permissions: fPermissions,
+      permissions: fPermissions,
     };
     if (editId) {
       const idx = list.findIndex(x => x.id === editId);
@@ -87,17 +86,7 @@ export default function Positions() {
     return null;
   };
 
-  const getEmployeeNames = (empStr) => {
-    if (!empStr) return [];
-    return empStr.split(',').map(s => s.trim()).filter(Boolean);
-  };
-
   const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
-
-  const countEmployees = (empStr) => {
-    if (!empStr) return 0;
-    return empStr.split(',').map(s => s.trim()).filter(Boolean).length;
-  };
 
   return (
     <>
@@ -122,8 +111,6 @@ export default function Positions() {
             <p>Должностей пока нет. Нажмите «+ Добавить должность»</p>
           </div>
         ) : positions.map(p => {
-          const names = getEmployeeNames(p.employees);
-          const count = names.length;
           const bonus = formatBonus(p);
           return (
             <div key={p.id} className="pos-card">
@@ -138,10 +125,7 @@ export default function Positions() {
                 <div className="pos-row">
                   <span className="pos-icon">👥</span>
                   <span className="pos-label">
-                    В штате: <strong>{count} {count === 1 ? 'человек' : 'человека'}</strong>
-                    {names.length > 0 && (
-                      <span className="pos-names"> ({names.join(', ')})</span>
-                    )}
+                    В штате: <strong>0 человек</strong>
                   </span>
                 </div>
                 <div className="pos-row">
@@ -231,10 +215,7 @@ export default function Positions() {
                     placeholder={fBonusType === 'percent' ? '5' : fBonusType === 'fixed' ? '10000' : 'Зависит от категории'} />
                 </div>
               )}
-              <div className="form-group">
-                <label>Сотрудники (имена через запятую)</label>
-                <input type="text" value={fEmployees} onChange={e=>setFEmployees(e.target.value)} placeholder="Павел, Иван, Ангелина" />
-              </div>
+
 
               {/* Доступы */}
               <div className="form-group">
