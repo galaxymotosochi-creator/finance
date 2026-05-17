@@ -41,7 +41,7 @@ export function useTransactions() {
 export function useAccounts() {
   const [accounts, setAccounts] = useState([]);
   const refresh = () => {
-    return supabase.from('accounts').select('*').eq('user_id', user.id).then(({ data }) => { setAccounts(data || []); return data || []; });
+    return supabase.from('accounts').select('*').then(({ data }) => { setAccounts(data || []); return data || []; });
   };
   useEffect(() => { refresh(); }, []);
   return { accounts, refreshAccounts: refresh };
