@@ -22,6 +22,7 @@ import Inventory from './pages/stock/Inventory';
 import Clients from './pages/clients/Clients';
 import Loyalty from './pages/clients/Loyalty';
 import Positions from './pages/employees/Positions';
+import Employees from './pages/employees/Employees';
 
 function AppRoutes() {
   return (
@@ -53,6 +54,7 @@ function AppRoutes() {
       <Route path="/clients" element={<ProtectedRoute><AppLayout><Clients /></AppLayout></ProtectedRoute>} />
       <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
       <Route path="/employees/positions" element={<ProtectedRoute><AppLayout><Positions /></AppLayout></ProtectedRoute>} />
+      <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><div>Настройки</div></AppLayout></ProtectedRoute>} />
 

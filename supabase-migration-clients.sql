@@ -60,3 +60,29 @@ ALTER TABLE position_templates ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can manage their own position templates"
   ON position_templates FOR ALL USING (auth.uid() = user_id);
+
+-- ============================================
+-- 4. СОТРУДНИКИ
+-- ============================================
+CREATE TABLE employees (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  phone TEXT DEFAULT '',
+  email TEXT DEFAULT '',
+  position_id UUID REFERENCES position_templates(id) ON DELETE SET NULL,
+  hire_date DATE DEFAULT CURRENT_DATE,
+  base_salary NUMERIC(12,2) DEFAULT 0,
+  bonus_type TEXT DEFAULT 'none',
+  bonus_value NUMERIC(12,2) DEFAULT 0,
+  bonus_rules JSONB DEFAULT '[]'::jsonb,
+  permissions TEXT[] DEFAULT '{clients,stock}',
+  pin TEXT DEFAULT '',
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own employees"
+  ON employees FOR ALL USING (auth.uid() = user_id);
