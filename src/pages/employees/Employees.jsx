@@ -312,7 +312,7 @@ export default function Employees() {
                 })}
               </div>
 
-              <div style={{position:'relative',marginTop:'.15rem'}}>
+              <div style={{position:'relative',marginTop:'.08rem'}}>
                 <button type="button" className="emp-rule-add" onClick={() => setShowAddRule(!showAddRule)}>
                   {showAddRule ? '✕ Отмена' : '+ Добавить правило'}
                 </button>
@@ -391,7 +391,7 @@ export default function Employees() {
 
               <div className="emp-section-label" style={{marginTop:'.75rem'}}>Выдать доступ</div>
               <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придёт ссылка-приглашение для входа в систему.</p>
-              <button type="button" className="btn btn-primary" style={{fontSize:'.82rem'}} onClick={() => alert('Функция будет доступна позже')}>
+              <button type="button" className="btn-green" onClick={() => alert('Функция будет доступна позже')}>
                 ✉️ Выдать доступ
               </button>
 
