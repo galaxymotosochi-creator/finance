@@ -190,7 +190,7 @@ export default function Salary() {
               </div>
               <div style={{textAlign:'right',fontSize:'1rem',fontWeight:600,marginBottom:'.75rem'}}>Итого: {total.toLocaleString()}₽</div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Начислить'}</button>
+                <button type="submit" className="btn btn-primary">{editId?'Сохранить':(fStatus==='paid'?'Выплатить':'Начислить')}</button>
               </div>
             </form>
           </div>
