@@ -19,3 +19,4 @@ ALTER TABLE salary ALTER COLUMN period_start DROP NOT NULL;
 ALTER TABLE salary ALTER COLUMN period_end DROP NOT NULL;
 ALTER TABLE salary DROP CONSTRAINT IF EXISTS salary_status_check;
 ALTER TABLE salary ADD CONSTRAINT salary_status_check CHECK (status IN ('pending','accrued','paid','cancelled'));
+ALTER TABLE salary ADD COLUMN IF NOT EXISTS pay_type TEXT DEFAULT 'salary';

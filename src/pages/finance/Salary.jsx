@@ -116,7 +116,7 @@ export default function Salary() {
     setFBaseSalary(0); setFCommissionPct(0); setFSalesTotal('');
     setFCommissionAmt(0); setFSalaryTotal(0); setFBonusAmt('');
     setFBonusComment(''); setFDeductAmt(''); setFDeductComment('');
-    setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0);
+    setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0); setExistingDebt(0);
     setShow(true);
   };
 
@@ -127,7 +127,7 @@ export default function Salary() {
     setFSalesTotal(String(s.sales_total||'')); setFCommissionAmt(s.commission_amount||0);
     setFSalaryTotal(s.base_salary||0); setFBonusAmt(String(s.bonus_amount||''));
     setFBonusComment(s.bonus_comment||''); setFDeductAmt(String(s.deduct_amount||''));
-    setFDeductComment(s.deduct_comment||''); setFStatus(s.status||'pending');
+    setFDeductComment(s.deduct_comment||''); setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
     setFDate(s.date||new Date().toISOString().split('T')[0]); setFDays(s.days_worked||0);
     setShow(true);
   };
@@ -208,17 +208,20 @@ export default function Salary() {
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
           <thead id="salaryColHeaders"><tr>
-            <th>Сотрудник</th><th>Период</th><th className="tr">Оклад</th><th className="tr">Продажи</th>
+            <th>Сотрудник</th><th>Тип</th><th>Период</th><th className="tr">Оклад</th><th className="tr">Продажи</th>
             <th className="tr">%</th><th className="tr">Комиссия</th><th className="tr">Премия</th><th className="tr">Вычеты</th>
             <th className="tr">Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
           </tr></thead>
           <tbody>
             {list.length === 0 ? (
-              <tr><td colSpan="11"><div className="empty-products"><div className="big-icon">💼</div><p>Начислений пока нет</p></div></td></tr>
-            ) : list.map(s => (
+              <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">💼</div><p>Начислений пока нет</p></div></td></tr>
+            ) : list.map(s => {
+              const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
+              return (
               <tr key={s.id}>
                 <td><div className="prod-name" style={{fontSize:'.85rem'}}>{s.employee_name||'—'}</div></td>
-                <td style={{fontSize:.82+'rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td style={{fontSize:'.78rem'}}><span className="prod-cat" style={{background: (s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></td>
+                <td style={{fontSize:'.82rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td className="tr">{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
                 <td className="tr">{s.sales_total?s.sales_total.toLocaleString()+'₽':'—'}</td>
                 <td className="tr">{s.commission_percent?s.commission_percent+'%':'—'}</td>
@@ -238,7 +241,8 @@ export default function Salary() {
                   </div>
                 </td>
               </tr>
-            ))}
+            );
+          })}
           </tbody>
         </table>
       </div>
@@ -323,6 +327,27 @@ export default function Salary() {
                   <input type="text" value={fDeductComment} onChange={e=>setFDeductComment(e.target.value)} placeholder="За что" />
                 </div>
               </div>
+
+              <div className="form-group">
+                <label>Статус</label>
+                <select value={fPayType} onChange={e=>setFPayType(e.target.value)}>
+                  <option value="salary">Зарплата</option>
+                  <option value="advance">Аванс</option>
+                  <option value="bonus">Бонус</option>
+                </select>
+              </div>
+
+              {existingDebt !== 0 && (
+                <div style={{background:'#fef3c7',border:'1px solid #f59e0b',borderRadius:'.75rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
+                  <span>⚠️</span>
+                  <span>
+                    <b>У сотрудника {(existingDebt>0)?'невыплаченных':'переплата'}: {Math.abs(existingDebt).toLocaleString()}₽</b>
+                    {fPayType === 'salary' && existingDebt > 0 && (
+                      <span> — после начисления долг будет {(existingDebt + grandTotal).toLocaleString()}₽</span>
+                    )}
+                  </span>
+                </div>
+              )}
 
               <div className="form-group">
                 <label>Статус</label>
