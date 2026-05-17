@@ -148,7 +148,6 @@ export default function Categories() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={function () { setShowModal(false); setEditingId(null); }}>Отмена</button>
                 <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
