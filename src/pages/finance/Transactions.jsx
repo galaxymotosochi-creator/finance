@@ -9,14 +9,6 @@ export default function Transactions() {
   const { accounts, refreshAccounts } = useAccounts();
   const { categories, refreshCategories } = useCategories();
   const [editingId, setEditingId] = useState(null);
-
-  // Закрытие дропдаунов при клике вне
-  useEffect(() => {
-    if (!showPeriod && !showDownload) return;
-    const handler = () => { setShowPeriod(false); setShowDownload(false); };
-    document.addEventListener('click', handler);
-    return () => document.removeEventListener('click', handler);
-  }, [showPeriod, showDownload]);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -44,6 +36,14 @@ export default function Transactions() {
   const [periodTo, setPeriodTo] = useState('');
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+
+  // Закрытие дропдаунов при клике вне
+  useEffect(() => {
+    if (!showPeriod && !showDownload) return;
+    const handler = () => { setShowPeriod(false); setShowDownload(false); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [showPeriod, showDownload]);
   const [typeFilter, setTypeFilterRaw] = useState(saved.typeFilter||null);
   var saveFilters = function(p, pl, tf) {
     try {
