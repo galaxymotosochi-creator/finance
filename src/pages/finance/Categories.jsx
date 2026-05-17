@@ -78,7 +78,7 @@ export default function Categories() {
       <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Финансовые категории</h1>
-          <div className="sub">Структура распределения доходов и расходов бизнеса</div>
+          <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
         <div className="page-actions">
           <button className="btn-green" onClick={function () { openModal(null); }}>+ Добавить категорию</button>
@@ -132,15 +132,15 @@ export default function Categories() {
         <div className="modal-overlay active" onClick={function (e) { if (e.target.className === 'modal-overlay active') { setShowModal(false); setEditingId(null); } }}>
           <div className="modal-box">
             <button className="modal-close" onClick={function () { setShowModal(false); setEditingId(null); }}>&times;</button>
-            <h2>{editingId ? 'Редактировать категорию' : 'Добавить категорию'}</h2>
-            <div className="sub">{editingId ? 'Измените название и вид' : 'Введите название и выберите вид'}</div>
+            <h2>{editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'}</h2>
+            <div className="sub">{editingId ? 'Измените название и тип' : 'Введите название и выберите тип'}</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
                 <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
               </div>
               <div className="form-group">
-                <label>Вид</label>
+                <label>Тип категории</label>
                 <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
                   <option value="income">Доходы (Внекассовые)</option>
                   <option value="expense">Расходы бизнеса (Операционные)</option>
