@@ -222,13 +222,12 @@ export default function Positions() {
                 <label>Разрешенные разделы меню</label>
                 <div className="pos-perms-grid">
                   {ALL_SECTIONS.map(s => (
-                    <label key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
-                      onClick={() => togglePerm(s.id)}>
-                      <input type="checkbox" checked={fPermissions.includes(s.id)}
-                        onChange={() => {}} style={{display:'none'}} />
+                    <div key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
+                      onClick={() => togglePerm(s.id)} role="button" tabIndex={0}
+                      onKeyDown={e => { if(e.key==='Enter'||e.key===' ') { e.preventDefault(); togglePerm(s.id); } }}>
                       <span className="pos-perm-check-icon">{s.icon}</span>
                       <span>{s.label}</span>
-                    </label>
+                    </div>
                   ))}
                 </div>
               </div>
