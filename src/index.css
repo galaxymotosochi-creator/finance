@@ -48,8 +48,8 @@ body {
 .sidebar.collapsed .sidebar-inner { width: 52px; min-width: 52px; }
 .sidebar.collapsed .sidebar-user-info,
 .sidebar.collapsed .sidebar-user-logout,
-.sidebar.collapsed .nav-parent { font-size: 0; padding: .6rem .55rem; justify-content: center; gap: 0; }
-.sidebar.collapsed .nav-parent .ic { font-size: 1.4rem; width: auto; margin: 0; filter: none; opacity: 1; }
+.sidebar.collapsed .nav-parent { font-size: 0; padding: .4rem 0; justify-content: center; gap: 0; line-height: 1; min-height: 44px; }
+.sidebar.collapsed .nav-parent .ic { font-size: 1.3rem; width: auto; margin: 0; filter: none; opacity: 1; display: flex; align-items: center; justify-content: center; }
 .sidebar.collapsed .nav-parent .arrow { display: none; }
 .sidebar.collapsed .nav-children { display: none !important; }
 .sidebar.collapsed .nav-child { display: none; }
