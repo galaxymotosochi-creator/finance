@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
@@ -9,6 +9,14 @@ export default function Transactions() {
   const { accounts, refreshAccounts } = useAccounts();
   const { categories, refreshCategories } = useCategories();
   const [editingId, setEditingId] = useState(null);
+
+  // Закрытие дропдаунов при клике вне
+  useEffect(() => {
+    if (!showPeriod && !showDownload) return;
+    const handler = () => { setShowPeriod(false); setShowDownload(false); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [showPeriod, showDownload]);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -227,9 +235,9 @@ export default function Transactions() {
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"var(--primary)",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,whiteSpace:'nowrap'}}
-              onClick={()=>{setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
+              onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
                 {[{key:'all',label:'Всё время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
                   <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
                     style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:period===p.key?'var(--primary)':'var(--body-color)',fontWeight:period===p.key?600:400,background:period===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
@@ -254,9 +262,9 @@ export default function Transactions() {
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"none",lineHeight:1}}
-              onClick={()=>{setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
+              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
                   Вы скачиваете отчёт за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
                 </div>
@@ -291,11 +299,7 @@ export default function Transactions() {
         </div>
       )}
 
-      {!loading && filtered.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
-          <p>Пока нет транзакций</p>
-        </div>
-      )}
+
 
       {txs.length > 0 && (
         <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
