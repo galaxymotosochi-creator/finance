@@ -61,6 +61,7 @@ export default function Salary() {
   const [editId, setEditId] = useState(null);
   const [showAcc, setShowAcc] = useState(false);
   const [pendingPayId, setPendingPayId] = useState(null);
+  const [detailEmpId, setDetailEmpId] = useState(null);
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
@@ -252,7 +253,7 @@ export default function Salary() {
               const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
               return (
               <tr key={s.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem'}}>{s.employee_name||'—'}</div></td>
+                <td><div className="prod-name" style={{fontSize:'.85rem',cursor:'pointer',color:'var(--primary)'}} onClick={()=>setDetailEmpId(s.employee_id)}>{s.employee_name||'—'}</div></td>
                 <td style={{fontSize:'.78rem'}}><span className="prod-cat" style={{background: (s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></td>
                 <td style={{fontSize:'.82rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td className="tr">{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
@@ -439,6 +440,59 @@ export default function Salary() {
                   <span style={{fontWeight:600,fontSize:'.85rem',color:'#dc2626'}}>Списать</span>
                 </div>
               ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* МОДАЛКА ДЕТАЛЕЙ СОТРУДНИКА */}
+      {detailEmpId && (()=>{
+        const emp = employees.find(e => e.id === detailEmpId);
+        const empRecords = list.filter(s => s.employee_id === detailEmpId);
+        const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
+        const STL = {pending:'⏳',paid:'✅',accrued:'⏳',cancelled:'❌'};
+        const nac = empRecords.filter(s => s.pay_type==='salary' && s.status!=='cancelled').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
+        const paid = empRecords.filter(s => s.status==='paid').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
+        const adv = empRecords.filter(s => s.pay_type==='advance').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
+        const bonus = empRecords.filter(s => s.pay_type==='bonus'&&s.status!=='cancelled').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
+        const debt = nac - paid - adv;
+        return (
+          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active')setDetailEmpId(null)}}>
+            <div className="modal-box" style={{maxWidth:'500px'}}>
+              <button className="modal-close" onClick={()=>setDetailEmpId(null)}>&times;</button>
+              <h2>👤 {emp ? emp.name : 'Сотрудник'}</h2>
+              <div className="sub">История начислений и выплат</div>
+
+              {/* Сводка */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.5rem',marginBottom:'1rem'}}>
+                <div className="emp-detail-stat"><span className="lbl">Начислено</span><span className="val">{nac.toLocaleString()}₽</span></div>
+                <div className="emp-detail-stat"><span className="lbl">Выплачено</span><span className="val" style={{color:'#16a34a'}}>{paid.toLocaleString()}₽</span></div>
+                <div className="emp-detail-stat"><span className="lbl">Авансы</span><span className="val">{adv.toLocaleString()}₽</span></div>
+                <div className="emp-detail-stat"><span className="lbl">Бонусы</span><span className="val" style={{color:'var(--primary)'}}>{bonus.toLocaleString()}₽</span></div>
+                <div className="emp-detail-stat" style={{gridColumn:'1/-1'}}>
+                  <span className="lbl">Долг</span>
+                  <span className="val" style={{color:debt>0?'#dc2626':'#16a34a',fontWeight:700}}>{debt>0?debt.toLocaleString()+'₽':'✅'} </span>
+                </div>
+              </div>
+
+              {/* История */}
+              <div className="emp-section-label">История</div>
+              {empRecords.length === 0 ? (
+                <div style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей</div>
+              ) : (
+                <div style={{display:'flex',flexDirection:'column',gap:'.25rem'}}>
+                  {empRecords.map(s => (
+                    <div key={s.id} className="emp-detail-row">
+                      <span className="emp-detail-status">{STL[s.status]||'⏳'}</span>
+                      <span className="emp-detail-type"><span className="prod-cat" style={{background:(s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></span>
+                      <span className="emp-detail-date">{s.period_from?fmtD(s.period_from):(s.created_at?fmtD(s.created_at.split('T')[0]):'—')}</span>
+                      <span className="emp-detail-amount" style={{color:(s.pay_type==='advance'||s.status==='paid')?'#dc2626':(s.pay_type==='bonus'?'var(--primary)':'')}}>
+                        {(s.status==='paid'||s.pay_type==='advance'?'−':'+')}{Number(s.amount).toLocaleString()}₽
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
