@@ -59,6 +59,12 @@ export default function Accounts() {
         }
       }
     }
+    // Исправляем опечатку 'Наличие' → 'Наличные'
+    var fixAccount = cl.find(a => a.name === 'Наличие');
+    if (fixAccount && user) {
+      await supabase.from('accounts').update({name:'Наличные'}).eq('id', fixAccount.id);
+      fixAccount.name = 'Наличные';
+    }
     setAccounts(cl);
     setInitDone(true);
   };
