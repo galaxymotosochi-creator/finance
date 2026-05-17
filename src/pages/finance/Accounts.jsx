@@ -160,7 +160,13 @@ export default function Accounts() {
   };
 
   var sorted = [...accounts].sort((a,b)=>{if(isSys(a)&&!isSys(b))return -1;if(!isSys(a)&&isSys(b))return 1;return 0;});
-  var total = accounts.reduce((s,a)=>s+getBal(a.type),0);
+  // Общий баланс: начальный остаток + транзакции по каждому счёту (по id, а не по type)
+  var balById = {};
+  (transactions||[]).forEach(t => {
+    if (!balById[t.account_id]) balById[t.account_id] = 0;
+    balById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
+  });
+  var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
 
   return (
     <>
