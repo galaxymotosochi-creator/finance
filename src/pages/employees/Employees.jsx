@@ -263,11 +263,10 @@ export default function Employees() {
                   </select>
                 </div>
               </div>
-              {fBonusType !== 'none' && (
+              {fBonusType === 'fixed' && (
                 <div className="form-group">
-                  <label>{fBonusType === 'percent' ? 'Процент от продаж' : 'Сумма бонуса (₽)'}</label>
-                  <input type="text" value={fBonusValue} onChange={e=>setFBonusValue(e.target.value)}
-                    placeholder={fBonusType==='percent'?'5':'10000'} />
+                  <label>Сумма бонуса (₽)</label>
+                  <input type="text" value={fBonusValue} onChange={e=>setFBonusValue(e.target.value)} placeholder="10000" />
                 </div>
               )}
 
