@@ -112,6 +112,7 @@ export default function Salary() {
   const grandTotal = fSalaryTotal + fCommissionAmt + (parseFloat(fBonusAmt)||0) - (parseFloat(fDeductAmt)||0);
 
   const openAdd = () => {
+    console.log('openAdd called');
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
     setFBaseSalary(0); setFCommissionPct(0); setFSalesTotal('');
     setFCommissionAmt(0); setFSalaryTotal(0); setFBonusAmt('');
@@ -198,7 +199,7 @@ export default function Salary() {
     <>
       <div className="page-header">
         <div><h1>Зарплата</h1><div className="sub">Расчёт и выплата заработной платы</div></div>
-        <div className="page-actions"><button className="btn-green" onClick={openAdd}>+ Начислить</button></div>
+        <div className="page-actions"><button className="btn-green" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
