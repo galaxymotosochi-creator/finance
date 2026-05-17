@@ -62,6 +62,7 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = React.useState('Финансы');
+  const [collapsed, setCollapsed] = React.useState(false);
 
   const toggleGroup = (label) => {
     setExpanded((prev) => (prev === label ? null : label));
@@ -73,12 +74,13 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar" id="mainSidebar">
+    <aside className={`sidebar${collapsed ? ' collapsed' : ''}`} id="mainSidebar">
       <div className="sidebar-inner">
         <div className="sidebar-user">
-          <div className="sidebar-user-info">
+          <div className="sidebar-toggle" onClick={()=>setCollapsed(!collapsed)} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>☰</div>
+          {!collapsed && <div className="sidebar-user-info">
             <div className="sidebar-user-email">Finance</div>
-          </div>
+          </div>}
         </div>
         <nav className="sidebar-nav">
           {menu.map((item) => {
