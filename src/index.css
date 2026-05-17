@@ -672,3 +672,35 @@ body {
   color: var(--muted);
   margin: .5rem 0 .35rem;
 }
+.emp-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .78rem;
+  color: var(--muted);
+  background: var(--white);
+  border: 1px dashed var(--border);
+  border-radius: 5px;
+  padding: .35rem .6rem;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .12s;
+}
+.emp-toggle-btn.active {
+  color: var(--primary);
+  border-color: var(--primary);
+  border-style: solid;
+  background: var(--primary-light);
+}
+.emp-toggle-input {
+  width: 50px;
+  padding: .2rem .3rem;
+  font-size: .78rem;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  outline: none;
+  text-align: center;
+  font-family: var(--font);
+  background: var(--white);
+  color: var(--body-color);
+}

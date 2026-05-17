@@ -219,7 +219,6 @@ export default function Employees() {
             <form onSubmit={save}>
 
               {/* БЛОК 1: БАЗА */}
-              <div className="emp-section-label">👤 Основное</div>
               <div className="form-group">
                 <label>ФИО *</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Петров" required />
@@ -249,7 +248,7 @@ export default function Employees() {
               </div>
 
               {/* БЛОК 2: ЗАРПЛАТА */}
-              <div className="emp-section-label">💰 Зарплата</div>
+              <div className="emp-section-label">Зарплата <span style={{fontWeight:400,fontSize:'.75rem',color:'var(--muted)'}}>(зарплата применится автоматически на основе данных из должности)</span></div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Оклад (₽)</label>
@@ -274,31 +273,32 @@ export default function Employees() {
               )}
 
               {/* БЛОК 3: ПРОЦЕНТ С ПРОДАЖ */}
-              <div className="emp-section-label">🎯 Процент с продаж</div>
-              <p className="sub" style={{marginBottom:'.5rem',fontSize:'.78rem'}}>Правила применяются по приоритету: товар → категория → всё. </p>
+              <div className="emp-section-label">Процент с продаж</div>
 
-              {/* Все товары */}
-              <div className="emp-rule-row">
-                <label className="emp-rule-label">
-                  <input type="checkbox" checked={fBonusRules.some(r => r.scope==='all' && r.type==='product')}
-                    onChange={e => { if(e.target.checked) addBonusRule('all','product'); else { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='product'); if(idx>-1) rmRule(idx); } }} />
-                  <span>Все товары</span>
-                </label>
-                {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='product'); return r ? (
-                  <input type="number" className="emp-rule-input" value={r.rate} onChange={e => {const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" />
-                ) : null})()}
-              </div>
-
-              {/* Все услуги */}
-              <div className="emp-rule-row">
-                <label className="emp-rule-label">
-                  <input type="checkbox" checked={fBonusRules.some(r => r.scope==='all' && r.type==='service')}
-                    onChange={e => { if(e.target.checked) addBonusRule('all','service'); else { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='service'); if(idx>-1) rmRule(idx); } }} />
-                  <span>Все услуги</span>
-                </label>
-                {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='service'); return r ? (
-                  <input type="number" className="emp-rule-input" value={r.rate} onChange={e => {const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" />
-                ) : null})()}
+              {/* Все товары / Все услуги — кнопки-переключатели */}
+              <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap',marginBottom:'.75rem'}}>
+                <div onClick={() => {
+                  const has = fBonusRules.some(r => r.scope==='all' && r.type==='product');
+                  if(has) { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='product'); rmRule(idx); }
+                  else addBonusRule('all','product');
+                }}
+                  className={`emp-toggle-btn${fBonusRules.some(r => r.scope==='all' && r.type==='product') ? ' active' : ''}`}>
+                  Все товары
+                  {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='product'); return r ? (
+                    <input type="number" className="emp-toggle-input" value={r.rate} onChange={e => {e.stopPropagation(); const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" onClick={e => e.stopPropagation()} />
+                  ) : null})()}
+                </div>
+                <div onClick={() => {
+                  const has = fBonusRules.some(r => r.scope==='all' && r.type==='service');
+                  if(has) { const idx = fBonusRules.findIndex(r => r.scope==='all' && r.type==='service'); rmRule(idx); }
+                  else addBonusRule('all','service');
+                }}
+                  className={`emp-toggle-btn${fBonusRules.some(r => r.scope==='all' && r.type==='service') ? ' active' : ''}`}>
+                  Все услуги
+                  {(()=>{const r = fBonusRules.find(r => r.scope==='all' && r.type==='service'); return r ? (
+                    <input type="number" className="emp-toggle-input" value={r.rate} onChange={e => {e.stopPropagation(); const idx=fBonusRules.indexOf(r); updRule(idx,'rate',parseFloat(e.target.value)||0)}} placeholder="%" min="0" max="100" onClick={e => e.stopPropagation()} />
+                  ) : null})()}
+                </div>
               </div>
 
               {/* По категориям */}
@@ -356,7 +356,7 @@ export default function Employees() {
               <button type="button" className="emp-rule-add" onClick={() => addBonusRule('item','product')}>+ Добавить товар</button>
 
               {/* БЛОК 4: ДОСТУПЫ + КАССА */}
-              <div className="emp-section-label">🔐 Доступы</div>
+              <div className="emp-section-label">Доступы</div>
               <div className="pos-perms-grid" style={{marginBottom:'.75rem'}}>
                 {ALL_SECTIONS.map(s => (
                   <div key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
