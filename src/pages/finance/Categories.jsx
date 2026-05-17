@@ -3,9 +3,9 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 const dirTypeLabels = {
-  income: 'Категории доходов',
-  expense: 'Категории расходов бизнеса',
-  supply_expense: 'Категории расходов поставки',
+  income: 'Доходы (Прочие)',
+  expense: 'Расходы бизнеса (Операционные)',
+  supply_expense: 'Расходы поставки (Себестоимость)',
 };
 
 export default function Categories() {
@@ -142,9 +142,9 @@ export default function Categories() {
               <div className="form-group">
                 <label>Вид</label>
                 <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-                  <option value="income">Категории доходов</option>
-                  <option value="expense">Категории расходов бизнеса</option>
-                  <option value="supply_expense">Категории расходов поставки</option>
+                  <option value="income">Доходы (Прочие)</option>
+                  <option value="expense">Расходы бизнеса (Операционные)</option>
+                  <option value="supply_expense">Расходы поставки (Себестоимость)</option>
                 </select>
               </div>
               <div className="modal-actions">
