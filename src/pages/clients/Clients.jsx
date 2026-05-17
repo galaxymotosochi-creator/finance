@@ -22,8 +22,10 @@ export default function Clients() {
   const load = async () => {
     setLoading(true);
     if (!user) { setLoading(false); return; }
-    const { data } = await supabase.from('clients').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (data) setClientsState(data);
+    try {
+      const { data } = await supabase.from('clients').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+      if (data) setClientsState(data);
+    } catch (e) { /* таблица ещё не создана */ }
     setSalesState(getSales());
     setLoading(false);
   };

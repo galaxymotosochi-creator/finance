@@ -34,8 +34,10 @@ export default function Loyalty() {
     // База: LD + кастомные из Supabase
     let custom = [];
     if (user) {
-      const { data } = await supabase.from('loyalty_programs').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-      if (data) custom = data;
+      try {
+        const { data } = await supabase.from('loyalty_programs').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+        if (data) custom = data;
+      } catch (e) { /* таблица ещё не создана */ }
     }
     // Склеиваем: LD, потом кастомные (кроме тех, что перекрывают LD)
     const merged = LD.map(ld => {
