@@ -91,7 +91,7 @@ export default function Categories() {
           <thead id="dirColHeaders">
             <tr>
               <th>Название</th>
-              <th>Вид категории</th>
+              <th>Тип категории</th>
               <th style={{ width: '130px' }}></th>
             </tr>
           </thead>
