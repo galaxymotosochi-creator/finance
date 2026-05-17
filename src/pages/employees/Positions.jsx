@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления', icon: '📊' },
@@ -17,11 +19,10 @@ const BONUS_TYPES = [
   { value: 'category', label: 'Зависит от категории' },
 ];
 
-const getPositions = () => JSON.parse(localStorage.getItem('positions88') || '[]');
-const setPositions = (list) => localStorage.setItem('positions88', JSON.stringify(list));
-
 export default function Positions() {
+  const { user } = useAuth();
   const [positions, setPositionsState] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -31,8 +32,18 @@ export default function Positions() {
   const [fBonusValue, setFBonusValue] = useState('');
   const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
 
-  const load = () => setPositionsState(getPositions());
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    if (!user) { setLoading(false); return; }
+    try {
+      const { data } = await supabase.from('position_templates').select('*')
+        .eq('user_id', user.id).order('created_at', { ascending: false });
+      if (data) setPositionsState(data);
+    } catch (e) { /* таблица ещё не создана */ }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [user]);
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFSalary(''); setFBonusType('none');
@@ -42,34 +53,39 @@ export default function Positions() {
 
   const openEdit = (p) => {
     setEditId(p.id); setFName(p.name); setFSalary(String(p.salary||''));
-    setFBonusType(p.bonusType||'none'); setFBonusValue(String(p.bonusValue||''));
+    setFBonusType(p.bonus_type||'none'); setFBonusValue(String(p.bonus_value||''));
     setFPermissions(p.permissions||['clients','stock']);
     setShow(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название должности');
-    const list = getPositions();
-    const obj = {
-      name: fName.trim(), salary: parseFloat(fSalary)||0,
-      bonusType: fBonusType, bonusValue: parseFloat(fBonusValue)||0,
-      permissions: fPermissions,
-    };
-    if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) list[idx] = { ...list[idx], ...obj };
-    } else {
-      obj.id = Date.now(); obj.createdAt = new Date().toISOString();
-      list.unshift(obj);
-    }
-    setPositions(list); load(); setShow(false);
+    if (!user) return alert('Ошибка: пользователь не авторизован');
+    try {
+      const obj = {
+        user_id: user.id, name: fName.trim(),
+        salary: parseFloat(fSalary)||0,
+        bonus_type: fBonusType,
+        bonus_value: parseFloat(fBonusValue)||0,
+        permissions: fPermissions,
+      };
+      if (editId) {
+        await supabase.from('position_templates').update(obj).eq('id', editId);
+      } else {
+        await supabase.from('position_templates').insert(obj);
+      }
+      await load();
+      setShow(false);
+    } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить должность?')) return;
-    setPositions(getPositions().filter(x => x.id !== id));
-    load();
+    try {
+      await supabase.from('position_templates').delete().eq('id', id);
+      await load();
+    } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
   const togglePerm = (permId) => {
@@ -79,10 +95,12 @@ export default function Positions() {
   };
 
   const formatBonus = (p) => {
-    if (p.bonusType === 'none' || !p.bonusType) return null;
-    if (p.bonusType === 'percent') return `${p.bonusValue}% с продаж`;
-    if (p.bonusType === 'fixed') return `${p.bonusValue.toLocaleString()}₽`;
-    if (p.bonusType === 'category') return 'Зависит от категории';
+    const bt = p.bonus_type;
+    const bv = p.bonus_value;
+    if (bt === 'none' || !bt) return null;
+    if (bt === 'percent') return `${bv}% с продаж`;
+    if (bt === 'fixed') return `${Number(bv).toLocaleString()}₽`;
+    if (bt === 'category') return 'Зависит от категории';
     return null;
   };
 
@@ -101,6 +119,9 @@ export default function Positions() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
+      {loading ? (
+        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+      ) : (
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
         gap: '1.25rem', padding: '.75rem 0',
@@ -131,7 +152,7 @@ export default function Positions() {
                 <div className="pos-row">
                   <span className="pos-icon">💰</span>
                   <span className="pos-label">
-                    Оклад по умолчанию: <strong>{p.salary ? p.salary.toLocaleString() + ' ₽' : '—'}</strong>
+                    Оклад по умолчанию: <strong>{p.salary ? Number(p.salary).toLocaleString() + ' ₽' : '—'}</strong>
                   </span>
                 </div>
                 {bonus && (
@@ -183,6 +204,7 @@ export default function Positions() {
           );
         })}
       </div>
+      )}
 
       {/* Модалка */}
       {show && (
@@ -215,7 +237,6 @@ export default function Positions() {
                     placeholder={fBonusType === 'percent' ? '5' : fBonusType === 'fixed' ? '10000' : 'Зависит от категории'} />
                 </div>
               )}
-
 
               {/* Доступы */}
               <div className="form-group">

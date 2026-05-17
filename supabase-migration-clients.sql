@@ -41,3 +41,22 @@ CREATE POLICY "Users can manage their own clients"
 
 CREATE POLICY "Users can manage their own loyalty programs"
   ON loyalty_programs FOR ALL USING (auth.uid() = user_id);
+
+-- ============================================
+-- 3. ДОЛЖНОСТИ (шаблоны ролей)
+-- ============================================
+CREATE TABLE position_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  salary NUMERIC(12,2) DEFAULT 0,
+  bonus_type TEXT DEFAULT 'none' CHECK (bonus_type IN ('none','percent','fixed','category')),
+  bonus_value NUMERIC(12,2) DEFAULT 0,
+  permissions TEXT[] DEFAULT '{clients,stock}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE position_templates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own position templates"
+  ON position_templates FOR ALL USING (auth.uid() = user_id);
