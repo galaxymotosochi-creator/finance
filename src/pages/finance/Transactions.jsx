@@ -9,6 +9,7 @@ export default function Transactions() {
   const { accounts, refreshAccounts } = useAccounts();
   const { categories, refreshCategories } = useCategories();
   const [editingId, setEditingId] = useState(null);
+  const [origAmount, setOrigAmount] = useState(null);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -194,7 +195,7 @@ export default function Transactions() {
   
   const editTx = function(tx) {
     var isExp = tx.type !== 'income';
-    setEditingId(tx.id);setTxAccountId(tx.account_id || null);
+    setEditingId(tx.id);setTxAccountId(tx.account_id || null);setOrigAmount(tx.amount);
     if (isExp) {
       setExpName(tx.description || '');
       setExpAmount(String(tx.amount || ''));
@@ -343,13 +344,21 @@ export default function Transactions() {
           <div className="modal-box">
             <button className="modal-close" onClick={function(){setShowIncome(false);setEditingId(null)}}>&times;</button>
             <h2>{editingId ? "Редактировать доход" : "Добавить доход"}</h2>
-            <div className="sub">Запишите новый доход</div>
+
             <form onSubmit={function(e){
               e.preventDefault();
               if(!incName || !incAmount){alert("Заполните название и сумму");return}
               if(editingId){
-                update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                setShowIncome(false);setEditingId(null);resetForms();
+                var amtChanged = parseFloat(incAmount) !== parseFloat(origAmount);
+                if(amtChanged){
+                  update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  setShowIncome(false);setEditingId(null);resetForms();
+                  setPendingTx({id:editingId,type:'income',user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowAccSelect(true);
+                } else {
+                  update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  setShowIncome(false);setEditingId(null);resetForms();
+                }
               }else{
                 setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                 setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
@@ -389,13 +398,21 @@ export default function Transactions() {
           <div className="modal-box">
             <button className="modal-close" onClick={function(){setShowExpense(false);setEditingId(null)}}>&times;</button>
             <h2>{editingId ? "Редактировать расход" : "Добавить расход"}</h2>
-            <div className="sub">Запишите новый расход</div>
+
             <form onSubmit={function(e){
               e.preventDefault();
               if(!expName || !expAmount){alert("Заполните название и сумму");return}
               if(editingId){
-                update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                setShowExpense(false);setEditingId(null);resetForms();
+                var amtChanged = parseFloat(expAmount) !== parseFloat(origAmount);
+                if(amtChanged){
+                  update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  setShowExpense(false);setEditingId(null);resetForms();
+                  setPendingTx({id:editingId,type:'expense',user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowAccSelect(true);
+                } else {
+                  update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  setShowExpense(false);setEditingId(null);resetForms();
+                }
               }else{
                 setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                 setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
