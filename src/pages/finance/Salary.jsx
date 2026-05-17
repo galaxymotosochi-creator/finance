@@ -71,10 +71,8 @@ export default function Salary() {
   const [fSalesTotal, setFSalesTotal] = useState('');
   const [fCommissionAmt, setFCommissionAmt] = useState(0);
   const [fSalaryTotal, setFSalaryTotal] = useState(0);
-  const [fBonusAmt, setFBonusAmt] = useState('');
-  const [fBonusComment, setFBonusComment] = useState('');
-  const [fDeductAmt, setFDeductAmt] = useState('');
-  const [fDeductComment, setFDeductComment] = useState('');
+  const [fBonuses, setFBonuses] = useState([]); // [{amount, comment}]
+  const [fDeductions, setFDeductions] = useState([]); // [{amount, comment}]
   const [fPayType, setFPayType] = useState('salary');
   const [existingDebt, setExistingDebt] = useState(0);
   const [fStatus, setFStatus] = useState('pending');
@@ -137,14 +135,15 @@ export default function Salary() {
     setExistingDebt(debt);
   }, [fEmpId, list]);
 
-  const grandTotal = fSalaryTotal + fCommissionAmt + (parseFloat(fBonusAmt)||0) - (parseFloat(fDeductAmt)||0);
+  const bonusTotal = fBonuses.reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
+  const deductTotal = fDeductions.reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
+  const grandTotal = fSalaryTotal + fCommissionAmt + bonusTotal - deductTotal;
 
   const openAdd = () => {
     console.log('openAdd called');
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
     setFBaseSalary(0); setFCommissionPct(0); setFSalesTotal('');
-    setFCommissionAmt(0); setFSalaryTotal(0); setFBonusAmt('');
-    setFBonusComment(''); setFDeductAmt(''); setFDeductComment('');
+    setFCommissionAmt(0); setFSalaryTotal(0); setFBonuses([]); setFDeductions([]);
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0); setExistingDebt(0);
     setShow(true);
   };
@@ -154,9 +153,12 @@ export default function Salary() {
     setFPeriodFrom(s.period_from||''); setFPeriodTo(s.period_to||'');
     setFBaseSalary(s.base_salary||0); setFCommissionPct(s.commission_percent||0);
     setFSalesTotal(String(s.sales_total||'')); setFCommissionAmt(s.commission_amount||0);
-    setFSalaryTotal(s.base_salary||0); setFBonusAmt(String(s.bonus_amount||''));
-    setFBonusComment(s.bonus_comment||''); setFDeductAmt(String(s.deduct_amount||''));
-    setFDeductComment(s.deduct_comment||''); setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
+    setFSalaryTotal(s.base_salary||0);
+    // Восстанавливаем массивы из JSONB или из старых полей
+    if(s.bonus_items && Array.isArray(s.bonus_items)) setFBonuses(s.bonus_items);
+    else setFBonuses(s.bonus_amount ? [{amount: s.bonus_amount, comment: s.bonus_comment||''}] : []);
+    if(s.deduct_items && Array.isArray(s.deduct_items)) setFDeductions(s.deduct_items);
+    else setFDeductions(s.deduct_amount ? [{amount: s.deduct_amount, comment: s.deduct_comment||''}] : []); setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
     setFDate(s.date||new Date().toISOString().split('T')[0]); setFDays(s.days_worked||0);
     setShow(true);
   };
@@ -180,10 +182,12 @@ export default function Salary() {
         commission_percent: fCommissionPct,
         sales_total: parseFloat(fSalesTotal)||0,
         commission_amount: fCommissionAmt,
-        bonus_amount: parseFloat(fBonusAmt)||0,
-        bonus_comment: fBonusComment,
-        deduct_amount: parseFloat(fDeductAmt)||0,
-        deduct_comment: fDeductComment,
+        bonus_amount: bonusTotal,
+        bonus_comment: fBonuses.map(i => (i.comment||'') + ': ' + (parseFloat(i.amount)||0).toLocaleString()+'₽').join('; '),
+        bonus_items: fBonuses,
+        deduct_amount: deductTotal,
+        deduct_comment: fDeductions.map(i => (i.comment||'') + ': ' + (parseFloat(i.amount)||0).toLocaleString()+'₽').join('; '),
+        deduct_items: fDeductions,
         days_worked: fDays,
         amount: grandTotal,
         status: fStatus,
@@ -333,29 +337,37 @@ export default function Salary() {
 
               {/* Премия */}
               <div className="emp-section-label">Премия</div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Сумма (₽)</label>
-                  <input type="number" value={fBonusAmt} onChange={e=>setFBonusAmt(e.target.value)} placeholder="0" min="0" />
+              {fBonuses.map((item, i) => (
+                <div key={i} className="form-row" style={{alignItems:'center'}}>
+                  <div className="form-group">
+                    <label>Сумма (₽)</label>
+                    <input type="number" value={item.amount} onChange={e=>{const n=[...fBonuses]; n[i]={...n[i],amount:e.target.value}; setFBonuses(n)}} placeholder="0" min="0" />
+                  </div>
+                  <div className="form-group">
+                    <label>Примечание</label>
+                    <input type="text" value={item.comment} onChange={e=>{const n=[...fBonuses]; n[i]={...n[i],comment:e.target.value}; setFBonuses(n)}} placeholder="За что" />
+                  </div>
+                  <button type="button" className="emp-row-rm" onClick={()=>setFBonuses(fBonuses.filter((_,j)=>j!==i))} style={{marginTop:'1.2rem'}}>✕</button>
                 </div>
-                <div className="form-group">
-                  <label>Примечание</label>
-                  <input type="text" value={fBonusComment} onChange={e=>setFBonusComment(e.target.value)} placeholder="За что" />
-                </div>
-              </div>
+              ))}
+              <button type="button" className="emp-rule-add" onClick={()=>setFBonuses([...fBonuses,{amount:'',comment:''}])}>+ Добавить премию</button>
 
               {/* Вычеты */}
-              <div className="emp-section-label">Вычеты</div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Сумма (₽)</label>
-                  <input type="number" value={fDeductAmt} onChange={e=>setFDeductAmt(e.target.value)} placeholder="0" min="0" />
+              <div className="emp-section-label" style={{marginTop:'.75rem'}}>Вычеты</div>
+              {fDeductions.map((item, i) => (
+                <div key={i} className="form-row" style={{alignItems:'center'}}>
+                  <div className="form-group">
+                    <label>Сумма (₽)</label>
+                    <input type="number" value={item.amount} onChange={e=>{const n=[...fDeductions]; n[i]={...n[i],amount:e.target.value}; setFDeductions(n)}} placeholder="0" min="0" />
+                  </div>
+                  <div className="form-group">
+                    <label>Примечание</label>
+                    <input type="text" value={item.comment} onChange={e=>{const n=[...fDeductions]; n[i]={...n[i],comment:e.target.value}; setFDeductions(n)}} placeholder="За что" />
+                  </div>
+                  <button type="button" className="emp-row-rm" onClick={()=>setFDeductions(fDeductions.filter((_,j)=>j!==i))} style={{marginTop:'1.2rem'}}>✕</button>
                 </div>
-                <div className="form-group">
-                  <label>Примечание</label>
-                  <input type="text" value={fDeductComment} onChange={e=>setFDeductComment(e.target.value)} placeholder="За что" />
-                </div>
-              </div>
+              ))}
+              <button type="button" className="emp-rule-add" onClick={()=>setFDeductions([...fDeductions,{amount:'',comment:''}])}>+ Добавить вычет</button>
 
               <div className="form-group">
                 <label>Статус</label>
@@ -388,7 +400,7 @@ export default function Salary() {
 
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.75rem',padding:'.75rem',background:'#f8f9fa',borderRadius:'.75rem'}}>
                 <div>
-                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Оклад {fSalaryTotal.toLocaleString()}₽ + Комиссия {fCommissionAmt.toLocaleString()}₽ + Премия {(parseFloat(fBonusAmt)||0).toLocaleString()}₽ — Вычеты {(parseFloat(fDeductAmt)||0).toLocaleString()}₽</div>
+                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Оклад {fSalaryTotal.toLocaleString()}₽ + Комиссия {fCommissionAmt.toLocaleString()}₽ + Премия {bonusTotal.toLocaleString()}₽ — Вычеты {deductTotal.toLocaleString()}₽</div>
                 </div>
                 <div style={{fontSize:'1.2rem',fontWeight:700,color:'var(--primary)'}}>{grandTotal.toLocaleString()}₽</div>
               </div>
