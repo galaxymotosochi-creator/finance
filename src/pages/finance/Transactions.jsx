@@ -305,7 +305,7 @@ export default function Transactions() {
         <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
-              <th>Дата</th><th>Название</th><th>Сумма</th><th>Категория</th><th className="actions"></th>
+              <th>Дата</th><th>Название</th><th>Сумма</th><th>Счёт</th><th>Категория</th><th className="actions"></th>
             </tr></thead>
             <tbody>
               {filtered.map(tx => (
@@ -315,6 +315,7 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', textAlign: 'center', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()}₽
                   </td>
+                  <td style={{ padding: '.5rem', color: 'var(--muted)', textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', color: 'var(--muted)' , textAlign: 'center' }}>{tx.categories?.name || '—'}</td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button className="act-btn prod-edit-btn" onClick={function(){editTx(tx)}}>Ред.</button>
