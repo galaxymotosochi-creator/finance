@@ -30,8 +30,8 @@ export default function Salary() {
   const [accs, setAccs] = useState([]);
 
   useEffect(() => {
-    supabase.from('accounts').select('*').then(r => { if (r.data) setAccs(r.data); });
-  }, []);
+    if (user) supabase.from('accounts').select('*').eq('user_id', user.id).then(r => { if (r.data) setAccs(r.data); });
+  }, [user]);
 
   const load = () => setList(getSalary());
   useEffect(() => { load(); }, []);
