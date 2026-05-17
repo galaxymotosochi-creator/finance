@@ -77,8 +77,8 @@ export default function Categories() {
     <>
       <div className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Категории расходов и доходов</h1>
-          <div className="sub">Управляйте категориями</div>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Финансовые категории</h1>
+          <div className="sub">Структура распределения доходов и расходов бизнеса</div>
         </div>
         <div className="page-actions">
           <button className="btn-green" onClick={function () { openModal(null); }}>+ Добавить категорию</button>
