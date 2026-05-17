@@ -36,10 +36,11 @@ export default function Positions() {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const { data } = await supabase.from('position_templates').select('*')
+      const { data, error } = await supabase.from('position_templates').select('*')
         .eq('user_id', user.id).order('created_at', { ascending: false });
+      if (error) { alert('Ошибка загрузки: ' + error.message); return; }
       if (data) setPositionsState(data);
-    } catch (e) { /* таблица ещё не создана */ }
+    } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     setLoading(false);
   };
 
