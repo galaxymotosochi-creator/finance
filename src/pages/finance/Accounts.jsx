@@ -59,24 +59,6 @@ export default function Accounts() {
         }
       }
     }
-    // Переносим displayType из localStorage в БД для старых счетов
-    try {
-      var dt = JSON.parse(localStorage.getItem('accountDisplayTypes')||'{}');
-      for (var id of Object.keys(dt)) {
-        var ac = cl.find(x => x.id == id);
-        if (ac && ac.type !== dt[id]) {
-          await supabase.from('accounts').update({type: dt[id]}).eq('id', id);
-          ac.type = dt[id];
-        }
-      }
-      localStorage.removeItem('accountDisplayTypes');
-    } catch(e) {}
-    // Исправляем опечатку 'Наличие' → 'Наличные'
-    var fixAccount = cl.find(a => a.name === 'Наличие');
-    if (fixAccount && user) {
-      await supabase.from('accounts').update({name:'Наличные'}).eq('id', fixAccount.id);
-      fixAccount.name = 'Наличные';
-    }
     setAccounts(cl);
     setInitDone(true);
   };
