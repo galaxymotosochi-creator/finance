@@ -81,7 +81,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`sidebar${collapsed ? ' collapsed' : ''}`} id="mainSidebar">
+    <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
       <div className="sidebar-inner">
         <div className="sidebar-user">
           <div className="sidebar-toggle" onClick={()=>{if(window.innerWidth<=768){setMobileOpen(!mobileOpen)}else{setCollapsed(!collapsed)}}} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>{collapsed||mobileOpen?'☰':'✕'}</div>
