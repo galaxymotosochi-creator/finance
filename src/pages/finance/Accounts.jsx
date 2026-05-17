@@ -59,6 +59,18 @@ export default function Accounts() {
         }
       }
     }
+    // Переносим displayType из localStorage в БД для старых счетов
+    try {
+      var dt = JSON.parse(localStorage.getItem('accountDisplayTypes')||'{}');
+      for (var id of Object.keys(dt)) {
+        var ac = cl.find(x => x.id == id);
+        if (ac && ac.type !== dt[id]) {
+          await supabase.from('accounts').update({type: dt[id]}).eq('id', id);
+          ac.type = dt[id];
+        }
+      }
+      localStorage.removeItem('accountDisplayTypes');
+    } catch(e) {}
     // Исправляем опечатку 'Наличие' → 'Наличные'
     var fixAccount = cl.find(a => a.name === 'Наличие');
     if (fixAccount && user) {
@@ -113,13 +125,8 @@ export default function Accounts() {
         if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'cash',balance:ib}).select();
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib}).select();
         if (ins.error) { alert(ins.error.message); return; }
-        if (ins.data && ins.data[0]) {
-          var dt = JSON.parse(localStorage.getItem('accountDisplayTypes')||'{}');
-          dt[ins.data[0].id] = modalType;
-          localStorage.setItem('accountDisplayTypes', JSON.stringify(dt));
-        }
       }
       await fetchAccounts();
       await fetchTx();
