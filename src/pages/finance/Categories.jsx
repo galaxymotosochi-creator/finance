@@ -148,7 +148,7 @@ export default function Categories() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                <button type="submit" className="btn-mint">Сохранить</button>
               </div>
             </form>
           </div>
