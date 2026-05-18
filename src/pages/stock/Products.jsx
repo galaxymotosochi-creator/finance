@@ -4,18 +4,32 @@ const CAT_LABELS = { material:'Материалы', tool:'Инструменты
 
 const ALL_COLUMNS = [
   { id:'name', label:'Название', always: true },
+  { id:'type', label:'Тип', def:true },
   { id:'category', label:'Категория', def:true },
-  { id:'barcode', label:'Штрихкод', def:false },
-  { id:'type', label:'Тип', def:false },
-  { id:'weight', label:'Весовой товар', def:false },
-  { id:'unit', label:'Ед. измерения', def:false },
+  { id:'cost', label:'Себестоимость', def:true },
   { id:'price', label:'Цена', def:true },
+  { id:'markup', label:'Наценка', def:true },
 ];
 
 const getCats = () => JSON.parse(localStorage.getItem('prodCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 const setProducts = (list) => localStorage.setItem('products88', JSON.stringify(list));
 const getTrash = () => JSON.parse(localStorage.getItem('trash88') || '[]');
+const getCostMap = () => {
+  const supplies = JSON.parse(localStorage.getItem('supplies88') || '[]');
+  const map = {};
+  supplies.forEach(sp => {
+    if (!sp || !sp.prodId) return;
+    if (!map[sp.prodId]) map[sp.prodId] = { qty:0, cost:0 };
+    map[sp.prodId].qty += sp.qty || 0;
+    map[sp.prodId].cost += (sp.cost || 0) * (sp.qty || 0);
+  });
+  const result = {};
+  Object.keys(map).forEach(id => {
+    result[id] = map[id].qty > 0 ? Math.round(map[id].cost / map[id].qty) : 0;
+  });
+  return result;
+};
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
 const getCols = () => {
   const saved = localStorage.getItem('productsCols');
@@ -24,8 +38,8 @@ const getCols = () => {
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
-const COL_ORDER = ['name','category','barcode','type','weight','unit','price'];
-const COL_LABELS = { name:'Название', category:'Категория', barcode:'Штрихкод', type:'Тип', weight:'Весовой товар', unit:'Ед. измерения', price:'Цена' };
+const COL_ORDER = ['name','type','category','cost','price','markup'];
+const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка' };
 
 export default function Products() {
   const [products, setProductsState] = useState([]);
@@ -37,6 +51,8 @@ export default function Products() {
   const [mode, setMode] = useState('add');
   const [showTrash, setShowTrash] = useState(false);
   const [toast, setToast] = useState(null);
+  const [viewProduct, setViewProduct] = useState(null);
+  const [costMap, setCostMap] = useState({});
 
   // Форма
   const [fName, setFName] = useState('');
@@ -60,6 +76,8 @@ export default function Products() {
   const load = useCallback(() => { setProductsState(getProducts().filter(p => !p.hidden)); }, []);
 
   useEffect(() => { load(); }, [load]);
+  
+  useEffect(() => { setCostMap(getCostMap()); }, []);
 
   useEffect(() => {
     if (window.location.hash.includes('add=true') || window.location.search.includes('add=true')) {
@@ -231,18 +249,29 @@ export default function Products() {
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
 
+  const costPrice = (p) => costMap[p.id] || 0;
+
   const cellHtml = (col, p) => {
     switch(col) {
-      case 'name': return `<div class="prod-name">${p.name}</div>`;
+      case 'name': return `<div class="prod-name" style="cursor:pointer;color:var(--primary)">${p.name}</div>`;
+      case 'type':
+        const isSvc = p.type === 'service';
+        return `<span style="display:inline-block;padding:.1rem .45rem;border-radius:20px;font-size:.7rem;font-weight:500;${isSvc?'background:#fef9c3;color:#854d0e':'background:#e0f2fe;color:#075985'}">${isSvc ? 'Услуга' : 'Товар'}</span>`;
       case 'category': return `<span class="prod-cat">${CAT_LABELS[p.cat] || p.cat || '—'}</span>`;
-      case 'barcode': return `<span style="font-size:.8rem;color:var(--muted)">${p.barcode || p.sku || '—'}</span>`;
-      case 'type': return `<span style="font-size:.78rem">${p.type === 'service' ? 'Услуга' : 'Товар'}</span>`;
-      case 'weight': return p.weight ? `${p.weight} ${p.weightUnit || 'кг'}` : '—';
-      case 'unit': return p.unit || '—';
-      case 'costNoVat': return `<span class="num">${p.costNoVat != null ? p.costNoVat.toLocaleString() + '₽' : '—'}</span>`;
-      case 'costWithVat': return `<span class="num">${p.costWithVat != null ? p.costWithVat.toLocaleString() + '₽' : '—'}</span>`;
+      case 'cost': {
+        const cp = costPrice(p);
+        if (p.type === 'service') return '<span style="color:var(--muted)">—</span>';
+        return `<span class="num">${cp > 0 ? cp.toLocaleString() + '₽' : '—'}</span>`;
+      }
       case 'price': return `<span class="prod-price">${(p.price || 0).toLocaleString()}₽</span>`;
-
+      case 'markup': {
+        if (p.type === 'service') return '<span style="color:var(--muted)">—</span>';
+        const cp = costPrice(p);
+        if (cp <= 0) return '<span style="color:var(--muted)">—</span>';
+        const mk = Math.round(((p.price || 0) - cp) / cp * 100);
+        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : 'var(--muted)';
+        return `<span style="color:${color};font-weight:600;font-size:.8rem">${mk > 0 ? '+' : ''}${mk}%</span>`;
+      }
       default: return '—';
     }
   };
@@ -336,7 +365,7 @@ export default function Products() {
       </div>
 
       {/* Таблица */}
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'hidden'}}>
         <table>
           <thead id="colHeaders">
             <tr>
@@ -363,6 +392,9 @@ export default function Products() {
               <tr key={p.id}>
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
+                    if (col === 'name') {
+                      return <td key={col} style={{cursor:'pointer'}} onClick={() => setViewProduct(p)} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
+                    }
                     return <td key={col} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
                   return null;
