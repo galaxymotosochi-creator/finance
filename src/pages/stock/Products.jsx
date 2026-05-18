@@ -436,8 +436,8 @@ export default function Products() {
         <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать товар' : 'Добавить товар или услугу'}</h2>
-            <div className="sub">Заполните поля и нажмите Сохранить</div>
+            <h2>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h2>
+            <div className="sub">Заполните данные для каталога и нажмите Сохранить</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
@@ -448,8 +448,7 @@ export default function Products() {
                   <label>Категория</label>
                   <select value={fCat} onChange={e => setFCat(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {Object.entries(CAT_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                    {getCats().filter(c => !CAT_LABELS[c.name]).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                    {getCats().map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
