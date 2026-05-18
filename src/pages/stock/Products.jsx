@@ -290,8 +290,8 @@ export default function Products() {
     <>
       <div className="page-header">
         <div>
-          <h1>Товары и услуги</h1>
-          <div className="sub">Управляйте — добавляйте, редактируйте, ищите</div>
+          <h1>Каталог позиций</h1>
+          <div className="sub">Единый каталог товаров, услуг и цен вашей компании</div>
         </div>
         <div className="page-actions">
           <button className="btn-green" onClick={openAdd}>+ Добавить</button>

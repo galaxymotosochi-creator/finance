@@ -26,7 +26,7 @@ const menu = [
   },
   {
     label: 'Склад', icon: 'stock', children: [
-      { label: 'Товары и услуги', path: '/stock/products' },
+      { label: 'Каталог позиций', path: '/stock/products' },
       { label: 'Категории', path: '/stock/categories' },
       { label: 'Здоровье товаров', path: '/stock/turnover' },
       { label: 'Остатки', path: '/stock/stock' },
