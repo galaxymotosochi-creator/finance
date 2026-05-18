@@ -192,24 +192,20 @@ body {
 .btn-green:hover { opacity: .9; }
 .btn-income {
   display: inline-flex; align-items: center; gap: .3rem;
-  padding: .6rem .95rem;
+  padding: .6rem .95rem; border: 1px solid var(--border);
   border-radius: 6px; font-size: .82rem; cursor: pointer;
-  font-family: var(--font); font-weight: 500; transition: all .15s;
-  background: var(--white); color: #1a1a1a;
-  border: 1px solid var(--border);
-  text-decoration: none;
+  font-family: var(--font); font-weight: 500; transition: all .12s;
+  background: #dcfce7; color: #166534;
 }
-.btn-income:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-income:hover { background: #c4f5d2; }
 .btn-expense {
   display: inline-flex; align-items: center; gap: .3rem;
-  padding: .6rem .95rem;
+  padding: .6rem .95rem; border: 1px solid var(--border);
   border-radius: 6px; font-size: .82rem; cursor: pointer;
-  font-family: var(--font); font-weight: 500; transition: all .15s;
-  background: var(--white); color: #1a1a1a;
-  border: 1px solid var(--border);
-  text-decoration: none;
+  font-family: var(--font); font-weight: 500; transition: all .12s;
+  background: #fce7f3; color: #9d174d;
 }
-.btn-expense:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-expense:hover { background: #f5d0e6; }
 .btn-mint {
   display: inline-flex; align-items: center; gap: .3rem;
   padding: .6rem .95rem; border: none;
