@@ -386,7 +386,7 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="btn-income">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
           </div>
@@ -440,7 +440,7 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="btn-income">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
           </div>
