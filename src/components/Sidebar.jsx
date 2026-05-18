@@ -17,7 +17,7 @@ const menu = [
   {
     label: 'Финансы', icon: 'finance', children: [
       { label: 'P&L', path: '/finance/pnl' },
-      { label: 'Транзакции', path: '/finance/transactions' },
+      { label: 'Движение денег', path: '/finance/transactions' },
       { label: 'Финансовые категории', path: '/finance/categories' },
       { label: 'Смены', path: '/finance/shifts' },
       { label: 'Зарплата', path: '/finance/salary' },
