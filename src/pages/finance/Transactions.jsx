@@ -483,7 +483,7 @@ export default function Transactions() {
               );
             })}
             <div className="modal-actions" style={{marginTop:".5rem",borderTop:"none",paddingTop:0}}>
-              <button className="btn btn-primary" onClick={function(){confirmTx()}} style={{width:"100%"}}>
+              <button className="btn btn-account-select" onClick={function(){confirmTx()}} style={{width:"100%"}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}
               </button>
             </div>

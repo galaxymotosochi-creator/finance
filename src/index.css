@@ -219,6 +219,8 @@ body {
 .btn { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font); font-size: .82rem; font-weight: 500; padding: .5rem 1.2rem; border-radius: var(--radius); border: none; cursor: pointer; transition: all .2s; text-decoration: none; }
 .btn-primary { background: var(--primary); color: var(--white); }
 .btn-primary:hover { opacity: .85; }
+.btn-account-select { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); font-weight: 600; }
+.btn-account-select:hover { background: var(--primary); color: var(--white); }
 
 /* ===== FILTER LINKS ===== */
 .stock-toolbar{display:flex;align-items:center;justify-content:space-between;padding:0 0 .4rem 0;flex-wrap:wrap;gap:.4rem}
