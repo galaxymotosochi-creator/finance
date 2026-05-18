@@ -303,7 +303,7 @@ export default function Transactions() {
 
 
       {txs.length > 0 && (
-        <div style={{ overflowX: 'auto', marginTop: '.5rem' }}>
+        <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
               <th>Дата</th><th>Название</th><th>Сумма</th><th>Счёт</th><th>Категория</th><th className="actions"></th>
