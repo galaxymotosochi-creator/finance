@@ -221,8 +221,8 @@ export default function Transactions() {
           <div className="sub">Все приходы и расходы в одном месте</div>
         </div>
         <div className="page-actions">
-          <button className="btn-red" onClick={function(){setEditingId(null);setShowExpense(true)}}>+ Расход</button>
-          <button className="btn-green" onClick={function(){setEditingId(null);setShowIncome(true)}}>+ Доход</button>
+          <button className="btn-expense" onClick={function(){setEditingId(null);setShowExpense(true)}}>+ Расход</button>
+          <button className="btn-income" onClick={function(){setEditingId(null);setShowIncome(true)}}>+ Доход</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
