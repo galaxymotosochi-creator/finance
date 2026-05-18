@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
+const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
+const genBarcode = () => {
+  let s = '';
+  for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += parseInt(s[i]) * (i % 2 === 0 ? 1 : 3);
+  const check = (10 - (sum % 10)) % 10;
+  return s + check;
+};
 
 const ALL_COLUMNS = [
   { id:'name', label:'Название', always: true },
@@ -431,7 +440,7 @@ export default function Products() {
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
-                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: Цемент М500" />
+                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -457,7 +466,10 @@ export default function Products() {
                 </div>
                 <div className="form-group">
                   <label>Ед. измерения</label>
-                  <input type="text" value={fUnit} onChange={e => setFUnit(e.target.value)} placeholder="шт, кг, м²..." />
+                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
                 </div>
               </div>
               <div className="form-row">
@@ -467,7 +479,10 @@ export default function Products() {
                 </div>
                 <div className="form-group">
                   <label>Штрихкод</label>
-                  <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
+                  <div style={{display:'flex',gap:'.3rem',alignItems:'center'}}>
+                    <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
+                    <span className="cat-dd-action" onClick={() => setFBarcode(genBarcode())}>сгенерировать</span>
+                  </div>
                 </div>
               </div>
               <div className="form-row">
