@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
+const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд'];
 const genBarcode = () => {
   let s = '';
   for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
@@ -468,7 +469,7 @@ export default function Products() {
                   <label>Ед. измерения</label>
                   <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                    {(fType === 'service' ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
               </div>
@@ -477,12 +478,13 @@ export default function Products() {
                   <label>Артикул</label>
                   <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
                 </div>
-                <div className="form-group">
+                {fType !== 'service' && <div className="form-group">
                   <label>Штрихкод <span className="cat-dd-action" onClick={() => setFBarcode(genBarcode())}>сгенерировать</span></label>
                   <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
-                </div>
+                </div>}
+                {fType === 'service' && <div className="form-group"></div>}
               </div>
-              <div className="form-row">
+              {fType !== 'service' && <div className="form-row">
                 <div className="form-group">
                   <label>Вес</label>
                   <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
@@ -495,7 +497,7 @@ export default function Products() {
                     <option value="т">т</option>
                   </select>
                 </div>
-              </div>
+              </div>}
 
               <div className="form-group">
                 <label>Описание</label>
