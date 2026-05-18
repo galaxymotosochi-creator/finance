@@ -17,9 +17,11 @@ function buildStockMap(supplies, initial) {
   if (initial && initial.done && initial.items) {
     Object.keys(initial.items).forEach(id => {
       const q = parseInt(initial.items[id]) || 0;
+      const c = (initial.costs && parseInt(initial.costs[id])) || 0;
       if (q > 0) {
         if (!map[id]) map[id] = { qty: 0, cost: 0 };
         map[id].qty += q;
+        map[id].cost += c * q;
       }
     });
   }
@@ -42,6 +44,7 @@ export default function Stock() {
   const [showInitModal, setShowInitModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [initQty, setInitQty] = useState({});
+  const [initCost, setInitCost] = useState({});
   const [initSearch, setInitSearch] = useState('');
   const [toast, setToast] = useState(null);
 
@@ -102,10 +105,13 @@ export default function Stock() {
   const prepareInitModal = () => {
     const existing = getInitialStock();
     const qtyMap = {};
+    const costMap = {};
     products.forEach(p => {
       qtyMap[p.id] = existing && existing.items ? (existing.items[p.id] || 0) : 0;
+      costMap[p.id] = existing && existing.costs ? (existing.costs[p.id] || 0) : 0;
     });
     setInitQty(qtyMap);
+    setInitCost(costMap);
     setInitSearch('');
     setShowInitModal(true);
   };
@@ -121,16 +127,17 @@ export default function Stock() {
 
   const saveInitialStock = () => {
     const filtered = {};
+    const filteredCosts = {};
     let hasData = false;
     Object.keys(initQty).forEach(id => {
       const v = parseInt(initQty[id]) || 0;
-      if (v > 0) { filtered[id] = v; hasData = true; }
+      if (v > 0) { filtered[id] = v; filteredCosts[id] = parseInt(initCost[id]) || 0; hasData = true; }
     });
     if (!hasData && products.length > 0) {
       alert('Введите количество хотя бы для одного товара');
       return;
     }
-    setInitialStock({ done: true, items: filtered });
+    setInitialStock({ done: true, items: filtered, costs: filteredCosts });
     setShowInitModal(false);
     load();
     setToast('Начальные остатки сохранены');
@@ -301,6 +308,10 @@ export default function Stock() {
                   <input type="number" min="0" value={initQty[p.id] || ''}
                     onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
                     placeholder="0"
+                    style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                  <input type="number" min="0" value={initCost[p.id] || ''}
+                    onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
+                    placeholder="Цена"
                     style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                 </div>
               ))}

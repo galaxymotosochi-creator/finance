@@ -9,11 +9,7 @@ const ALL_COLUMNS = [
   { id:'type', label:'Тип', def:false },
   { id:'weight', label:'Весовой товар', def:false },
   { id:'unit', label:'Ед. измерения', def:false },
-  { id:'costNoVat', label:'Себес. без НДС', def:true },
-  { id:'costWithVat', label:'Себес. с НДС', def:false },
   { id:'price', label:'Цена', def:true },
-  { id:'profit', label:'Прибыль', def:false },
-  { id:'margin', label:'Наценка', def:true },
 ];
 
 const getCats = () => JSON.parse(localStorage.getItem('prodCats88') || '[]');
@@ -28,8 +24,8 @@ const getCols = () => {
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
-const COL_ORDER = ['name','category','barcode','type','weight','unit','costNoVat','costWithVat','price','profit','margin'];
-const COL_LABELS = { name:'Название', category:'Категория', barcode:'Штрихкод', type:'Тип', weight:'Весовой товар', unit:'Ед. измерения', costNoVat:'Себес. без НДС', costWithVat:'Себес. с НДС', price:'Цена', profit:'Прибыль', margin:'Наценка' };
+const COL_ORDER = ['name','category','barcode','type','weight','unit','price'];
+const COL_LABELS = { name:'Название', category:'Категория', barcode:'Штрихкод', type:'Тип', weight:'Весовой товар', unit:'Ед. измерения', price:'Цена' };
 
 export default function Products() {
   const [products, setProductsState] = useState([]);
@@ -52,8 +48,6 @@ export default function Products() {
   const [fType, setFType] = useState('product');
   const [fWeight, setFWeight] = useState('0');
   const [fWeightUnit, setFWeightUnit] = useState('кг');
-  const [fCostNoVat, setFCostNoVat] = useState('0');
-  const [fCostWithVat, setFCostWithVat] = useState('0');
   const [fDesc, setFDesc] = useState('');
   const [fHidden, setFHidden] = useState(false);
 
@@ -107,8 +101,7 @@ export default function Products() {
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
-    setFWeightUnit(p.weightUnit || 'кг'); setFCostNoVat(String(p.costNoVat || '0'));
-    setFCostWithVat(String(p.costWithVat || '0')); setFDesc(p.desc || '');
+    setFWeightUnit(p.weightUnit || 'кг'); setFDesc(p.desc || '');
     setShowModal(true);
   };
 
@@ -116,11 +109,6 @@ export default function Products() {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
     const price = parseFloat(fPrice) || 0;
-    const costNoVat = parseFloat(fCostNoVat) || 0;
-    const costWithVat = parseFloat(fCostWithVat) || 0;
-    const cost = costWithVat || costNoVat;
-    const profit = price - cost;
-    const margin = cost > 0 ? (profit / cost * 100) : 0;
     let list = getProducts();
     if (editId) {
       const idx = list.findIndex(x => x.id === editId);
@@ -129,16 +117,14 @@ export default function Products() {
         name: fName.trim(), cat: fCat, price: price, unit: fUnit,
         sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
         weight: parseFloat(fWeight) || 0, weightUnit: fWeightUnit,
-        costNoVat: costNoVat, costWithVat: costWithVat,
-        profit: profit, margin: margin, hidden: fHidden
+        hidden: fHidden
       };
     } else {
       list.unshift({
         id: Date.now(), name: fName.trim(), cat: fCat, price: price,
         unit: fUnit, sku: fSku.trim(), barcode: fBarcode.trim(),
         type: fType, weight: parseFloat(fWeight) || 0, weightUnit: fWeightUnit,
-        costNoVat: costNoVat, costWithVat: costWithVat,
-        profit: profit, margin: margin, hidden: false,
+        hidden: false,
         desc: fDesc
       });
     }
@@ -256,16 +242,7 @@ export default function Products() {
       case 'costNoVat': return `<span class="num">${p.costNoVat != null ? p.costNoVat.toLocaleString() + '₽' : '—'}</span>`;
       case 'costWithVat': return `<span class="num">${p.costWithVat != null ? p.costWithVat.toLocaleString() + '₽' : '—'}</span>`;
       case 'price': return `<span class="prod-price">${(p.price || 0).toLocaleString()}₽</span>`;
-      case 'profit': {
-        const profit = p.profit;
-        const color = profit > 0 ? 'color:#16a34a' : profit < 0 ? 'color:#dc2626' : '';
-        return `<span class="num" style="${color}">${profit != null ? (profit > 0 ? '+' : '') + profit.toFixed(0) + '₽' : '—'}</span>`;
-      }
-      case 'margin': {
-        const margin = p.margin;
-        const color = margin > 0 ? 'color:#16a34a' : margin < 0 ? 'color:#dc2626' : '';
-        return `<span class="num" style="${color}">${margin != null ? margin.toFixed(1) + '%' : '—'}</span>`;
-      }
+
       default: return '—';
     }
   };
@@ -475,16 +452,7 @@ export default function Products() {
                   </select>
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Себестоимость без НДС</label>
-                  <input type="number" min="0" step="0.01" value={fCostNoVat} onChange={e => setFCostNoVat(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Себестоимость с НДС</label>
-                  <input type="number" min="0" step="0.01" value={fCostWithVat} onChange={e => setFCostWithVat(e.target.value)} />
-                </div>
-              </div>
+
               <div className="form-group">
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
