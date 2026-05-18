@@ -203,9 +203,9 @@ body {
   padding: .6rem .95rem; border: 1px solid var(--border);
   border-radius: 6px; font-size: .82rem; cursor: pointer;
   font-family: var(--font); font-weight: 500; transition: all .12s;
-  background: #fce7f3; color: #9d174d;
+  background: #fee2e2; color: #b91c1c;
 }
-.btn-expense:hover { background: #f5d0e6; }
+.btn-expense:hover { background: #fecaca; }
 .btn-mint {
   display: inline-flex; align-items: center; gap: .3rem;
   padding: .6rem .95rem; border: none;
