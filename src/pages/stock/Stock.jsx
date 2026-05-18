@@ -70,7 +70,7 @@ export default function Stock() {
           <button className="stock-icon-btn">📊</button>
           <button className="stock-icon-btn">📥</button>
           <button className="stock-icon-btn">🖨</button>
-          <button className="btn-green" onClick={() => navigateTo('/stock/products')}>+ Добавить</button>
+          <button className="btn-green" onClick={() => navigateTo('/stock/products?add=true')}>+ Добавить</button>
         </div>
       </div>
 

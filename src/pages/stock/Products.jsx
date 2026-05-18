@@ -67,6 +67,14 @@ export default function Products() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    if (window.location.hash.includes('add=true') || window.location.search.includes('add=true')) {
+      setEditId(null);
+      setShowModal(true);
+      window.history.replaceState(null, '', '#/stock/products');
+    }
+  }, []);
+
   // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
