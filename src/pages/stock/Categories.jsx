@@ -136,8 +136,7 @@ export default function Categories() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={() => setShowModal(false)}>Отмена</button>
-                <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить'}</button>
+                <button type="submit" className="btn btn-account-select">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
           </div>
