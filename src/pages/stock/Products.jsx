@@ -110,7 +110,7 @@ export default function Products() {
     setEditId(null); setMode('add'); setFHidden(false);
     setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
-    setFCostNoVat('0'); setFCostWithVat('0'); setFDesc('');
+    setFDesc('');
     setShowModal(true);
   };
 
