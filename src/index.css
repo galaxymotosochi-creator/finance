@@ -241,9 +241,9 @@ body {
 
 /* ===== TABLE HEADERS ===== */
 #colHeaders th {
-  font-size: .72rem; font-weight: 400; color: var(--muted);
+  font-size: .72rem; font-weight: 400; color: #4b5563;
   text-transform: uppercase; padding: .5rem .5rem;
-  white-space: nowrap; border-bottom: 1px solid var(--border);
+  white-space: nowrap; border-bottom: 2px solid #c0c4c8;
   background: var(--white); text-align: center;
 }
 #colHeaders th:first-child { text-align: left; padding-left: 0; }
