@@ -358,7 +358,7 @@ body {
 .loy-carousel::-webkit-scrollbar{display:none}
 
 /* Тонкий скроллбар */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #c0c4c8; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #a0a4a8; }
