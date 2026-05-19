@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
-const getSuppliers = () => JSON.parse(localStorage.getItem('suppliers88') || '[]');
-const setSuppliers = (list) => localStorage.setItem('suppliers88', JSON.stringify(list));
 const getSupplies = () => JSON.parse(localStorage.getItem('supplies88') || '[]');
 
 const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
 const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
 
 export default function Suppliers() {
+  const { user } = useAuth();
   const [suppliers, setSuppliersState] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -15,9 +16,32 @@ export default function Suppliers() {
   const [fContact, setFContact] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fMethod, setFMethod] = useState('telegram');
+  const [loading, setLoading] = useState(true);
 
-  const load = () => setSuppliersState(getSuppliers());
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at');
+    if (data) setSuppliersState(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { if (user) load(); }, [user]);
+
+  useEffect(() => {
+    if (!user || suppliers.length > 0) return;
+    const old = JSON.parse(localStorage.getItem('suppliers88') || '[]');
+    if (old.length > 0) {
+      old.forEach(async (s) => {
+        await supabase.from('suppliers').insert({
+          id: s.id, user_id: user.id, name: s.name, contact: s.contact || '',
+          phone: s.phone || '', inn: '', address: '', comment: s.comment || '',
+          created_at: new Date().toISOString()
+        });
+      });
+      localStorage.removeItem('suppliers88');
+      load();
+    }
+  }, [user, suppliers.length]);
 
   const openAdd = () => {
     setEditId(null);
@@ -31,24 +55,30 @@ export default function Suppliers() {
     setShowModal(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const list = getSuppliers();
     const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contactMethod: fMethod };
     if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx > -1) list[idx] = { ...list[idx], ...obj };
-    } else { obj.id = Date.now(); list.unshift(obj); }
-    setSuppliers(list); load(); setShowModal(false);
+      const { error } = await supabase.from('suppliers').update(obj).eq('id', editId);
+      if (error) return alert(error.message);
+    } else {
+      const { error } = await supabase.from('suppliers').insert({ ...obj, id: Date.now(), user_id: user.id });
+      if (error) return alert(error.message);
+    }
+    await load(); setShowModal(false);
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить поставщика?')) return;
-    setSuppliers(getSuppliers().filter(x => x.id !== id)); load();
+    const { error } = await supabase.from('suppliers').delete().eq('id', id);
+    if (error) return alert(error.message);
+    await load();
   };
 
   const supplies = getSupplies();
+
+  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
   return (
     <>
@@ -148,7 +178,7 @@ export default function Suppliers() {
                 <div className="form-group"></div>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Добавить'}</button>
+                <button type="submit" className="btn btn-account-select">{editId?'Сохранить':'Добавить'}</button>
               </div>
             </form>
           </div>
