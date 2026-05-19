@@ -20,7 +20,7 @@ const menu = [
       { label: 'Движение денег', path: '/finance/transactions' },
       { label: 'Финансовые категории', path: '/finance/categories' },
       { label: 'Смены', path: '/finance/shifts' },
-      { label: 'Зарплата', path: '/finance/salary' },
+      { label: 'Учет зарплаты', path: '/finance/salary' },
       { label: 'Счета', path: '/finance/accounts' },
     ],
   },
