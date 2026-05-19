@@ -84,6 +84,9 @@ export default function Transactions() {
   };
 
   var accs = accounts || [];
+  var accBalance = {};
+  accs.forEach(function(a){ accBalance[a.id] = parseFloat(a.balance)||0; });
+  txs.forEach(function(t){ if (t.account_id && accBalance[t.account_id] !== undefined) { accBalance[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); } });
   const accIcons = { cash:'💵', card:'💳', transfer:'🔄', checking:'🏦', bank:'🏛️', electronic:'🌐', reserve:'🔒', deposit:'📜' };
   const cats = categories || [];
 
@@ -399,14 +402,14 @@ export default function Transactions() {
                 <label>С какого счета</label>
                 <select value={trFrom} onChange={function(e){setTrFrom(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>На какой счет</label>
                 <select value={trTo} onChange={function(e){setTrTo(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
