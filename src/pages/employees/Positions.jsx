@@ -124,7 +124,7 @@ export default function Positions() {
       <div className="page-header">
         <div>
           <h1>Должности</h1>
-          <div className="sub">Шаблоны ролей для сотрудников</div>
+          <div className="sub">Управление должностями и группами прав доступа</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить должность</button>
