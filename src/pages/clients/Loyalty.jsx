@@ -230,7 +230,7 @@ export default function Loyalty() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
             <h2>{editId ? 'Редактировать программу' : 'Добавить программу'}</h2>
-            <div className="sub">Настройте новую программу лояльности</div>
+            <div className="sub">Создание и настройка условий лояльности</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
