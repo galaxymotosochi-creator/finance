@@ -133,7 +133,7 @@ export default function Writeoffs() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
             <h2>{editId?'Редактировать списание':'Списать товар'}</h2>
-            <div className="sub">Выберите товар и укажите причину</div>
+            <div className="sub">Оформление брака, порчи или утери</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Товар *</label>
