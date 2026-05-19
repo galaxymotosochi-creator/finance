@@ -32,7 +32,9 @@ const getCatsFromLocal = () => {
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 const setProducts = (list) => localStorage.setItem('products88', JSON.stringify(list));
 const getTrash = () => JSON.parse(localStorage.getItem('trash88') || '[]');
+let costMapCache = null;
 const getCostMap = () => {
+  if (costMapCache) return costMapCache;
   const supplies = JSON.parse(localStorage.getItem('supplies88') || '[]');
   const map = {};
   supplies.forEach(sp => {
@@ -45,6 +47,21 @@ const getCostMap = () => {
   Object.keys(map).forEach(id => {
     result[id] = map[id].qty > 0 ? Math.round(map[id].cost / map[id].qty) : 0;
   });
+  costMapCache = result;
+  return result;
+};
+const refreshCostMap = async (userId) => {
+  const { data } = await supabase.from('supplies').select('items').eq('user_id', userId);
+  const map = {};
+  (data || []).forEach(sp => { (sp.items||[]).forEach(it => {
+    if (!it || !it.prodId) return;
+    if (!map[it.prodId]) map[it.prodId] = { qty:0, cost:0 };
+    map[it.prodId].qty += it.qty || 0;
+    map[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+  }); });
+  const result = {};
+  Object.keys(map).forEach(id => { result[id] = map[id].qty > 0 ? Math.round(map[id].cost / map[id].qty) : 0; });
+  costMapCache = result;
   return result;
 };
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
@@ -120,7 +137,7 @@ export default function Products() {
 
   useEffect(() => { if (user) { migrateLocalData().then(() => load()); } }, [user, load, migrateLocalData]);
   
-  useEffect(() => { setCostMap(getCostMap()); }, []);
+  useEffect(() => { if (user) { refreshCostMap(user.id).then(m => setCostMap(m)); } }, [user]);
   
   useEffect(() => {
     if (!user) return;

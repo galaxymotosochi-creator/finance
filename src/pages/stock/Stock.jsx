@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 const setProducts = (list) => localStorage.setItem('products88', JSON.stringify(list));
-const getSupplies = () => JSON.parse(localStorage.getItem('supplies88') || '[]');
 const INITIAL_KEY = 'initialStock88';
 
 function buildStockMap(supplies, initial) {
@@ -38,6 +39,7 @@ const setInitialStock = (data) => {
 };
 
 export default function Stock() {
+  const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
   const [stockMap, setStockMap] = useState({});
@@ -48,14 +50,30 @@ export default function Stock() {
   const [initSearch, setInitSearch] = useState('');
   const [toast, setToast] = useState(null);
 
-  const load = () => {
-    const supplies = getSupplies();
-    const initial = getInitialStock();
+  const load = async () => {
+    setLoading(true);
+    const [supRes, prodRes, initRes] = await Promise.all([
+      supabase.from('supplies').select('items').eq('user_id', user.id),
+      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('initial_stocks').select('*').eq('user_id', user.id).single()
+    ]);
+    const items = supRes.data || [];
+    const supplies = [];
+    items.forEach(sp => { (sp.items||[]).forEach(it => { supplies.push(it); }); });
+    setSuppliesCache(supplies);
+    const initial = initRes.data || getInitialStock();
+    if (!initRes.data && initial && initial.done) {
+      const { error } = await supabase.from('initial_stocks').insert({ id: Date.now(), user_id: user.id, items: initial.items || {}, costs: initial.costs || {}, done: initial.done });
+      if (!error) localStorage.removeItem(INITIAL_KEY);
+    }
+    setInitialCache(initial);
     setStockMap(buildStockMap(supplies, initial));
-    setProductsState(getProducts());
+    if (prodRes.data) setProductsState(prodRes.data);
+    setProductsFromDB(prodRes.data || []);
+    setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { if (user) load(); }, [user]);
 
   useEffect(() => {
     if (toast) {
@@ -106,12 +124,13 @@ export default function Stock() {
     const existing = getInitialStock();
     const qtyMap = {};
     const costMap = {};
-    products.forEach(p => {
+    (productsFromDB.length ? productsFromDB : products).forEach(p => {
       qtyMap[p.id] = existing && existing.items ? (existing.items[p.id] || 0) : 0;
       costMap[p.id] = existing && existing.costs ? (existing.costs[p.id] || 0) : 0;
     });
     setInitQty(qtyMap);
     setInitCost(costMap);
+    setInitSearch('');
     setInitSearch('');
     setShowInitModal(true);
   };
@@ -125,7 +144,7 @@ export default function Stock() {
     setShowConfirm(false);
   };
 
-  const saveInitialStock = () => {
+  const saveInitialStock = async () => {
     const filtered = {};
     const filteredCosts = {};
     let hasData = false;
@@ -137,15 +156,14 @@ export default function Stock() {
       alert('Введите количество хотя бы для одного товара');
       return;
     }
-    setInitialStock({ done: true, items: filtered, costs: filteredCosts });
-    setShowInitModal(false);
-    load();
-    setToast('Начальные остатки сохранены');
+    const { error } = await supabase.from('initial_stocks').upsert({ user_id: user.id, items: filtered, costs: filteredCosts, done: true }).eq('user_id', user.id);
+    if (!error) { setShowInitModal(false); await load(); setToast('Начальные остатки сохранены'); }
+    else alert(error.message);
   };
 
   const filteredProducts = initSearch.trim()
-    ? products.filter(p => p.name.toLowerCase().includes(initSearch.toLowerCase().trim()))
-    : products;
+    ? (productsFromDB.length ? productsFromDB : products).filter(p => p.name.toLowerCase().includes(initSearch.toLowerCase().trim()))
+    : (productsFromDB.length ? productsFromDB : products);
 
   return (
     <>
