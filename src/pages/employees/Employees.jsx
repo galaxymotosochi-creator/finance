@@ -150,7 +150,7 @@ export default function Employees() {
       <div className="page-header">
         <div>
           <h1>Сотрудники</h1>
-          <div className="sub">Управление персоналом</div>
+          <div className="sub">Учет команды, настройка прав доступа и должностей</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить сотрудника</button>
@@ -217,7 +217,7 @@ export default function Employees() {
           <div className="modal-box" style={{maxWidth:'560px'}}>
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
             <h2>{editId ? 'Редактировать' : 'Новый сотрудник'}</h2>
-            <div className="sub">Заполните данные</div>
+            <div className="sub">Создание карточки сотрудника</div>
             <form onSubmit={save}>
 
               {/* БЛОК 1: БАЗА */}
