@@ -285,7 +285,8 @@ export default function Inventory() {
           </thead>
           <tbody id="inventoryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">📋</div><p>Инвентаризаций пока нет. Нажмите «+ Новая инвентаризация»</p></div></td></tr>
+              <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">📋</div><p>Инвентаризации не проводились</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
             ) : list.map(inv => {
               const diffCount = inv.items.filter(it => it.actual !== it.expected).length;
               return (
