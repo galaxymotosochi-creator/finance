@@ -365,12 +365,12 @@ export default function Transactions() {
               }
             }}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Сумма (₽) *</label>
+                  <label>Сумма (₽)</label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
                 </div>
                 <div className="form-group">
@@ -419,12 +419,12 @@ export default function Transactions() {
               }
             }}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" placeholder="Например: аренда, коммунальные, налоги" value={expName} onChange={function(e){setExpName(e.target.value)}} required />
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Сумма (₽) *</label>
+                  <label>Сумма (₽)</label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
                 </div>
                 <div className="form-group">

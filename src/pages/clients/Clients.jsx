@@ -212,7 +212,7 @@ export default function Clients() {
             <div className="sub">Создание карточки нового покупателя</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Имя *</label>
+                <label>Имя</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Иванов" required />
               </div>
               <div className="form-row">

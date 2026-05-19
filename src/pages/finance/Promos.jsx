@@ -182,7 +182,7 @@ export default function Promos() {
             <div className="sub">Настройка условий и сроков действия акции</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" placeholder="Например: Новогодняя распродажа" value={name} onChange={e=>setName(e.target.value)} required />
               </div>
               <div className="form-row">

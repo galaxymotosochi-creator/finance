@@ -293,7 +293,7 @@ export default function Salary() {
 
               {/* Сотрудник */}
               <div className="form-group">
-                <label>Сотрудник *</label>
+                <label>Сотрудник</label>
                 <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required>
                   <option value="">— выберите —</option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name} {e.base_salary ? '— '+e.base_salary.toLocaleString()+'₽' : ''}</option>)}
@@ -303,11 +303,11 @@ export default function Salary() {
               {/* Период */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>Начало периода *</label>
+                  <label>Начало периода</label>
                   <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required />
                 </div>
                 <div className="form-group">
-                  <label>Конец периода *</label>
+                  <label>Конец периода</label>
                   <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required />
                 </div>
               </div>

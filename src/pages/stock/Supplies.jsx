@@ -272,7 +272,7 @@ export default function Supplies() {
             <form onSubmit={save}>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Поставщик *</label>
+                  <label>Поставщик</label>
                   <select value={fSupName} onChange={e=>setFSupName(e.target.value)}>
                     <option value="">— выберите поставщика —</option>
                     {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}

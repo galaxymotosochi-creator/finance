@@ -490,7 +490,7 @@ export default function Products() {
             <div className="sub">Заполните данные для каталога и нажмите Сохранить</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
               </div>
               <div className="form-row">

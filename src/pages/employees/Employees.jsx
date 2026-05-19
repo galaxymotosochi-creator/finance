@@ -222,7 +222,7 @@ export default function Employees() {
 
               {/* БЛОК 1: БАЗА */}
               <div className="form-group">
-                <label>ФИО *</label>
+                <label>ФИО</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Петров" required />
               </div>
               <div className="form-row">

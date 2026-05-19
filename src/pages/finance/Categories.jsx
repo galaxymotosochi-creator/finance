@@ -137,7 +137,7 @@ export default function Categories() {
             <div className="sub">{editingId ? 'Измените название и тип' : 'Введите название и выберите тип'}</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
               </div>
               <div className="form-group">

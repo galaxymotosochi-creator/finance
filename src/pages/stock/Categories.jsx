@@ -154,7 +154,7 @@ export default function Categories() {
             <div className="sub">Настройте новую группу для каталога</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)}
                   placeholder="Например, Электроинструменты" required />
               </div>

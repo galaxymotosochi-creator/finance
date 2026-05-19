@@ -226,7 +226,7 @@ export default function Accounts() {
             <div className="sub">{editingId?'Измените данные счета':'Введите название и начальный остаток'}</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" placeholder="Например, Касса магазина" value={modalName} onChange={e=>setModalName(e.target.value)} required />
               </div>
               {!editingId && (
@@ -335,7 +335,7 @@ export default function Accounts() {
                 </select>
               </div>
               <div className="form-group">
-                <label>Сумма (₽) *</label>
+                <label>Сумма (₽)</label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">

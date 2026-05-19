@@ -153,7 +153,7 @@ export default function Suppliers() {
             <div className="sub">Создание карточки нового контрагента</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название *</label>
+                <label>Название</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например, ООО СтройМаркет" required />
               </div>
               <div className="form-row">
