@@ -179,7 +179,7 @@ export default function Promos() {
           <div className="modal-box">
             <button className="modal-close" onClick={function(){setShow(false);setEditId(null)}}>&times;</button>
             <h2>{editId ? 'Редактировать акцию' : 'Добавить акцию'}</h2>
-            <div className="sub">Настройте новую акцию</div>
+            <div className="sub">Настройка условий и сроков действия акции</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
