@@ -95,6 +95,7 @@ export default function Categories() {
     e.stopPropagation();
     const el = e.currentTarget.nextElementSibling;
     el.classList.add('open');
+    var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');
     const h = function () { el.classList.remove('open'); document.removeEventListener('click', h); };
     setTimeout(function () { document.addEventListener('click', h); }, 10);
   };

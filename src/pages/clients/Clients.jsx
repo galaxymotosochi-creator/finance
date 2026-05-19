@@ -188,7 +188,7 @@ export default function Clients() {
                         e.stopPropagation();
                         const dd = e.currentTarget.nextElementSibling;
                         document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');
+                        dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => remove(c.id)} style={{color:'#dc3545'}}>Удалить</button>
