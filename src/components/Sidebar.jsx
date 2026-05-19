@@ -21,7 +21,7 @@ const menu = [
       { label: 'Финансовые категории', path: '/finance/categories' },
       { label: 'Смены', path: '/finance/shifts' },
       { label: 'Учет зарплаты', path: '/finance/salary' },
-      { label: 'Счета', path: '/finance/accounts' },
+      { label: 'Денежные счета', path: '/finance/accounts' },
     ],
   },
   {

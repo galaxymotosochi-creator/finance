@@ -166,7 +166,7 @@ export default function Accounts() {
    return (
     <>
       <div className="page-header">
-        <div><h1>Счета</h1><div className="sub">Управление счетами</div></div>
+        <div><h1>Денежные счета</h1><div className="sub">Общий баланс всех ваших счетов</div></div>
         <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить счет</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -244,7 +244,7 @@ export default function Accounts() {
                 </div>
               )}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Создать'}</button>
+                <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Создать'}</button>
               </div>
             </form>
           </div>
