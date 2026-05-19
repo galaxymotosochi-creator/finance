@@ -188,7 +188,7 @@ body {
   border-radius: 6px; font-size: .82rem; cursor: pointer;
   font-family: var(--font); font-weight: 500; transition: all .12s;
 }
-.btn-green { background: #16a34a; outline: none; }
+.btn-green { background: #059669; outline: none; }
 .btn-green:hover { opacity: .9; }
 .btn-green:active { background: #16a34a; }
 .btn-income {
