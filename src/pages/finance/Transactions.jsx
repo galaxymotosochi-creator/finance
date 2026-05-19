@@ -258,7 +258,7 @@ export default function Transactions() {
                   </div>
                   <div style={{padding:'.25rem .5rem'}}>
                     <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setShowPeriod(false)}}
-                      className="btn btn-account-select" style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem'}}>Применить</button>
+                      className="btn-account-select" style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',borderRadius:0}}>Применить</button>
                   </div>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function Transactions() {
                   Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
                 </div>
                 <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
-                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} className="btn btn-account-select" style={{padding:'.25rem .6rem',fontSize:'.75rem',fontWeight:600}}>Скачать</span>
+                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} className="btn-account-select" style={{padding:'.25rem .6rem',fontSize:'.75rem',fontWeight:600,borderRadius:0}}>Скачать</span>
                   <span onClick={()=>{setShowDownload(false);setShowPeriod(true)}} style={{padding:'.25rem .6rem',fontSize:'.78rem',borderRadius:'5px',cursor:'pointer',background:'transparent',border:'1px solid var(--border)',color:'var(--muted)',fontFamily:'var(--font)'}}>Изменить даты</span>
                 </div>
               </div>
