@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
-const getInv = () => JSON.parse(localStorage.getItem('inventory88') || '[]');
-const setInv = (list) => localStorage.setItem('inventory88', JSON.stringify(list));
-const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
-const getSupplies = () => JSON.parse(localStorage.getItem('supplies88') || '[]');
+
 
 const CAT_LABELS = {material:'Материалы',tool:'Инструменты',equipment:'Оборудование',other:'Прочее'};
-
-function buildStockMap() {
-  const map = {};
-  getSupplies().forEach(sp => { if (!map[sp.prodId]) map[sp.prodId] = 0; map[sp.prodId] += sp.qty || 0; });
-  return map;
-}
 
 function recalcTotals(doc) {
   let tb = 0, ta = 0, sh = 0, su = 0;
@@ -27,19 +20,53 @@ function recalcTotals(doc) {
 }
 
 export default function Inventory() {
+  const { user } = useAuth();
   const [list, setList] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [supplies, setSupplies] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [viewing, setViewing] = useState(null);
   const [showResult, setShowResult] = useState(null);
 
-  const load = () => setList(getInv());
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    const [invRes, prodRes, supRes] = await Promise.all([
+      supabase.from('inventory').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('supplies').select('items').eq('user_id', user.id)
+    ]);
+    if (invRes.data) setList(invRes.data);
+    if (prodRes.data) setProducts(prodRes.data);
+    if (supRes.data) {
+      const map = {};
+      supRes.data.forEach(sp => {
+        (sp.items||[]).forEach(it => { if (!map[it.prodId]) map[it.prodId] = 0; map[it.prodId] += it.qty || 0; });
+      });
+      setSupplies(Object.keys(map).map(k => ({ prodId: parseInt(k), qty: map[k] })));
+    }
+    setLoading(false);
+  };
+  
+  useEffect(() => { if (user) load(); }, [user]);
 
-  const startNew = () => {
-    const all = getInv();
-    const num = 'INV-' + String(all.length + 1).padStart(3, '0');
-    const stockMap = buildStockMap();
-    const items = getProducts().filter(p => !p.hidden).map(p => ({
+  const migrate = async () => {
+    const old = JSON.parse(localStorage.getItem('inventory88') || '[]');
+    if (old.length > 0) {
+      old.forEach(async (d) => {
+        await supabase.from('inventory').insert({ id: d.id, user_id: user.id, number: d.number || '', status: d.status || 'draft', items: d.items || [], result: JSON.stringify(d.totals || {}), date: d.date || '', created_at: new Date().toISOString() });
+      });
+      localStorage.removeItem('inventory88');
+      load();
+    }
+  };
+  useEffect(() => { if (user && list.length === 0) migrate(); }, [user, list.length]);
+  
+  const startNew = async () => {
+    const num = 'INV-' + String(list.length + 1).padStart(3, '0');
+    const stockMap = {};
+    supplies.forEach(sp => { stockMap[sp.prodId] = sp.qty || 0; });
+    const items = products.filter(p => !p.hidden).map(p => ({
       prodId: p.id, name: p.name, sku: p.sku || '',
       cat: CAT_LABELS[p.cat] || p.cat || '',
       expected: stockMap[p.id] || 0, actual: stockMap[p.id] || 0,
@@ -51,51 +78,50 @@ export default function Inventory() {
       responsible: '', status: 'draft', items,
       totals: { totalBefore, totalAfter: totalBefore, shortage: 0, surplus: 0, result: 0 }
     };
-    all.unshift(doc); setInv(all); load(); setEditing(doc);
+    const { error } = await supabase.from('inventory').insert({ id: doc.id, user_id: user.id, number: doc.number, date: doc.date, status: doc.status, items: doc.items, result: JSON.stringify(doc.totals) });
+    if (!error) { await load(); setEditing(doc); }
   };
 
-  const cancelEdit = () => {
-    if (editing) { setInv(getInv().filter(d => d.id !== editing.id)); load(); }
+  const cancelEdit = async () => {
+    if (editing) { await supabase.from('inventory').delete().eq('id', editing.id); await load(); }
     setEditing(null);
   };
 
-  const updateMeta = (id, field, value) => {
-    const all = getInv(); const doc = all.find(d => d.id === id);
-    if (!doc) return; doc[field] = value; setInv(all); setEditing({...doc});
+  const updateMeta = async (id, field, value) => {
+    const { data } = await supabase.from('inventory').update({ [field]: value }).eq('id', id).select(); if (data) { setEditing({...editing, [field]: value}); load(); }
   };
 
-  const updateItem = (id, idx, actual) => {
-    const all = getInv(); const doc = all.find(d => d.id === id);
-    if (!doc) return;
-    doc.items[idx].actual = parseInt(actual) || 0;
-    recalcTotals(doc); setInv(all); setEditing({...doc});
+  const updateItem = async (id, idx, actual) => {
+    const items = [...editing.items]; items[idx] = {...items[idx], actual: parseInt(actual) || 0};
+    const updated = { ...editing, items }; recalcTotals(updated);
+    await supabase.from('inventory').update({ items: updated.items, result: JSON.stringify(updated.totals) }).eq('id', id);
+    setEditing(updated); load();
   };
 
-  const complete = (id) => {
-    const all = getInv(); const doc = all.find(d => d.id === id);
-    if (!doc) return; recalcTotals(doc); setShowResult(doc);
+  const complete = async (id) => {
+    const doc = editing; if (!doc) return; setShowResult(doc);
   };
 
-  const confirmResult = () => {
+  const confirmResult = async () => {
     if (!showResult) return;
-    const all = getInv(); const doc = all.find(d => d.id === showResult.id);
-    if (!doc) return; doc.status = 'completed';
-    setInv(all); setShowResult(null); setEditing(null); load();
+    await supabase.from('inventory').update({ status: 'completed' }).eq('id', showResult.id);
+    setShowResult(null); setEditing(null); await load();
   };
 
   const view = (id) => {
-    const doc = getInv().find(d => d.id === id);
+    const doc = list.find(d => d.id === id);
     if (doc) setViewing(viewing?.id === id ? null : doc);
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить инвентаризацию?')) return;
-    setInv(getInv().filter(d => d.id !== id));
+    await supabase.from('inventory').delete().eq('id', id);
     if (viewing?.id === id) setViewing(null);
     if (editing?.id === id) setEditing(null);
-    load();
+    await load();
   };
 
+  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
   // Режим редактирования
   if (editing) {
     const doc = editing;
