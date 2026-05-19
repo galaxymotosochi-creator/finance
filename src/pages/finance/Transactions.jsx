@@ -417,7 +417,7 @@ export default function Transactions() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary" style={{background:'#1983dd',color:'#fff',border:'1px solid #dee2e6',borderRadius:'6px',fontWeight:600}}>Перевести</button>
+                <button type="submit" className="btn btn-account-select">Перевести</button>
               </div>
             </form>
           </div>
