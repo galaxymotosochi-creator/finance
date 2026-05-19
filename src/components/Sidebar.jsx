@@ -16,12 +16,12 @@ const menu = [
   { label: 'Касса', path: '/registers', icon: 'registers' },
   {
     label: 'Финансы', icon: 'finance', children: [
-      { label: 'P&L', path: '/finance/pnl' },
       { label: 'Движение денег', path: '/finance/transactions' },
-      { label: 'Финансовые категории', path: '/finance/categories' },
+      { label: 'Финансовые счета', path: '/finance/accounts' },
       { label: 'Кассовые смены', path: '/finance/shifts' },
       { label: 'Учет зарплаты', path: '/finance/salary' },
-      { label: 'Финансовые счета', path: '/finance/accounts' },
+      { label: 'P&L', path: '/finance/pnl' },
+      { label: 'Финансовые категории', path: '/finance/categories' },
     ],
   },
   {
