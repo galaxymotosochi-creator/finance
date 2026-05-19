@@ -74,7 +74,7 @@ export default function Writeoffs() {
       <div className="page-header">
         <div>
           <h1>Списания</h1>
-          <div className="sub">Списание товаров со склада (брак, потеря)</div>
+          <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Списать товар</button>
