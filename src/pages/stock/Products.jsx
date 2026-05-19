@@ -444,7 +444,8 @@ export default function Products() {
                 <td colSpan={2 + activeCols.size}>
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
-                    <p>Товаров пока нет. Нажмите «+ Добавить»</p>
+                    <p>Каталог пуст</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первый товар или услугу, чтобы начать работу</p>
                   </div>
                 </td>
               </tr>
