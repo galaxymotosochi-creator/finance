@@ -93,8 +93,8 @@ export default function Categories() {
     <>
       <div className="page-header">
         <div>
-          <h1>Категории товаров и услуг</h1>
-          <div className="sub">Управляйте категориями</div>
+          <h1>Категории позиций</h1>
+          <div className="sub">Настройка групп для товаров и услуг</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить категорию</button>
