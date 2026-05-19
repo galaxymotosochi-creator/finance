@@ -232,7 +232,7 @@ export default function Inventory() {
           <div className="sub">Сверка фактических остатков с учетными</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={startNew}>+ Новая инвентаризация</button>
+          <button className="btn-mint" onClick={startNew}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

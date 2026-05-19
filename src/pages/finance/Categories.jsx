@@ -82,7 +82,7 @@ export default function Categories() {
           <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={function () { openModal(null); }} style={{background:'#1983dd',color:'#fff',border:'none',borderRadius:'6px'}}>+ Добавить категорию</button>
+          <button className="btn-mint" onClick={function () { openModal(null); }} style={{background:'#1983dd',color:'#fff',border:'none',borderRadius:'6px'}}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }}></div>

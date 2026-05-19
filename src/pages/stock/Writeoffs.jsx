@@ -77,7 +77,7 @@ export default function Writeoffs() {
           <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Списать товар</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

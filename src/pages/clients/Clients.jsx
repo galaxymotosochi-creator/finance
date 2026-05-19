@@ -107,7 +107,7 @@ export default function Clients() {
           <div className="sub">История покупок, лояльность и статистика</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Добавить клиента</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

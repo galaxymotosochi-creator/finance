@@ -167,7 +167,7 @@ export default function Accounts() {
     <>
       <div className="page-header">
         <div><h1>Денежные счета</h1><div className="sub">Общий баланс всех ваших счетов</div></div>
-        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить счет</button></div>
+        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 

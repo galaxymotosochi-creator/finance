@@ -156,7 +156,7 @@ export default function Supplies() {
           <div className="sub">Учет поступлений товаров от поставщиков</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Новая поставка</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
