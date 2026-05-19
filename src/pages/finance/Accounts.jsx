@@ -28,10 +28,6 @@ export default function Accounts() {
   const [modalBalance, setModalBalance] = useState('0');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
-  const [showTransfer, setShowTransfer] = useState(false);
-  const [trFrom, setTrFrom] = useState('cash');
-  const [trTo, setTrTo] = useState('card');
-  const [trAmt, setTrAmt] = useState('');
   const [showCorrect, setShowCorrect] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
@@ -158,22 +154,7 @@ export default function Accounts() {
       setShowInit(false); setInitAmts({});
       await fetchAccounts();
     } catch(err) {alert(err.message);}
-  };
 
-  var goTransfer = async (e) => {
-    e.preventDefault();
-    if (!trAmt||parseFloat(trAmt)<=0) return;
-    var amt=parseFloat(trAmt);
-    try {
-      var fr=accounts.find(a=>a.type===trFrom), to=accounts.find(a=>a.type===trTo);
-      if (!fr||!to) {alert('Счет не найден');return;}
-      if (getBal(trFrom)<amt) {alert('Недостаточно средств');return;}
-      await supabase.from('transactions').insert([
-        {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0]},
-        {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод с '+fr.name,date:new Date().toISOString().split('T')[0]}
-      ]);
-      setShowTransfer(false); setTrAmt(''); await fetchTx();
-    } catch(err) {alert(err.message);}
   };
 
   var sorted = [...accounts].sort((a,b)=>{if(isSys(a)&&!isSys(b))return -1;if(!isSys(a)&&isSys(b))return 1;return 0;});
@@ -197,7 +178,6 @@ export default function Accounts() {
       <div className="stock-filterbar" style={{border:'none',paddingTop:0}}>
         <div className="stock-filter-links" style={{marginLeft:0}}>
           <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
-          <span className="stock-filter-link" onClick={()=>setShowTransfer(true)}>Перевод между счетами</span>
           <span className="stock-filter-link" onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
         </div>
       </div>
@@ -338,36 +318,6 @@ export default function Accounts() {
         </div>
       )}
 
-      {showTransfer && (
-        <div className="modal-overlay active">
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
-            <h2>Перевод между счетами</h2>
-            <div className="sub">Переместите деньги между счетами</div>
-            <form onSubmit={goTransfer}>
-              <div className="form-group">
-                <label>С какого счета</label>
-                <select value={trFrom} onChange={e=>setTrFrom(e.target.value)}>
-                  {accounts.map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name} ({getBal(a.type).toLocaleString()}₽)</option>})}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>На какой счет</label>
-                <select value={trTo} onChange={e=>setTrTo(e.target.value)}>
-                  {accounts.filter(a=>a.type!==trFrom).map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Сумма (₽)</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Перевести</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
       {showConfirm && (
         <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
           <div className="modal-box" style={{maxWidth:'420px'}}>
