@@ -33,6 +33,16 @@ export default function Accounts() {
   const [trTo, setTrTo] = useState('card');
   const [trAmt, setTrAmt] = useState('');
   const [showCorrect, setShowCorrect] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 7000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
   const [corAcct, setCorAcct] = useState('cash');
   const [corType, setCorType] = useState('income');
   const [corAmt, setCorAmt] = useState('');
@@ -116,12 +126,24 @@ export default function Accounts() {
     } catch(err) {alert(err.message);}
   };
 
-  var remove = async (ac) => {
+  var remove = (ac) => {
     if (!ac||isSys(ac)) return;
-    if ((transactions||[]).some(t=>t.account_id===ac.id)) return alert('Нельзя удалить счет — на нем есть движения');
-    if (!confirm('Удалить счет "'+ac.name+'"?')) return;
-    await supabase.from('accounts').delete().eq('id',ac.id);
-    await fetchAccounts();
+    if ((transactions||[]).some(t=>t.account_id===ac.id)) {
+      setToast('⚠️ Нельзя удалить счет — на нем есть движения');
+      return;
+    }
+    setPendingDeleteAc(ac);
+    setShowConfirm(true);
+  };
+
+  var confirmDelete = async () => {
+    if (!pendingDeleteAc) return;
+    setShowConfirm(false);
+    try {
+      await supabase.from('accounts').delete().eq('id',pendingDeleteAc.id);
+      await fetchAccounts();
+    } catch(err) {setToast('⚠️ '+err.message);}
+    setPendingDeleteAc(null);
   };
 
   var saveInit = async (e) => {
@@ -165,6 +187,7 @@ export default function Accounts() {
    if (loading || !initDone) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
    return (
     <>
+      {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
       <div className="page-header">
         <div><h1>Денежные счета</h1><div className="sub">Общий баланс всех ваших счетов</div></div>
         <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
@@ -342,6 +365,18 @@ export default function Accounts() {
                 <button type="submit" className="btn btn-primary">Перевести</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {showConfirm && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
+            <h2 style={{fontSize:'1rem'}}>Удалить счет?</h2>
+            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>Счет «{pendingDeleteAc?.name}» будет удален навсегда.</p>
+            <div className="modal-actions">
+              <button className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
+              <button className="btn btn-primary" onClick={confirmDelete} style={{marginLeft:'.5rem'}}>Да, удалить</button>
+            </div>
           </div>
         </div>
       )}
