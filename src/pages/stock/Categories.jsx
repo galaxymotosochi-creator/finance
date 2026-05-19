@@ -117,7 +117,8 @@ export default function Categories() {
                 <td colSpan="3">
                   <div className="empty-products">
                     <div className="big-icon">🏷️</div>
-                    <p>Категорий пока нет. Нажмите «+ Добавить категорию»</p>
+                    <p>Список категорий пуст</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую категорию, чтобы распределить товары и услуги</p>
                   </div>
                 </td>
               </tr>
