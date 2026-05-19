@@ -388,7 +388,7 @@ body {
 @media(max-width:768px){.loy-card{min-width:200px;max-width:240px;padding:1rem}.loy-arrow{display:none}}
 /* === Clients (Клиенты) === */
 #clientTableBody td:first-child{text-align:left;padding-left:0}
-#clientColHeaders th{font-size:.72rem;font-weight:400;color:#4b5563;text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:2px solid #c0c4c8;background:var(--white);text-align:center}
+#clientColHeaders th{font-size:.72rem;font-weight:400;color:#4b5563;text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #clientColHeaders th:first-child{text-align:left;padding-left:0}
 
 /* === Inventory (Инвентаризация) === */
@@ -403,7 +403,7 @@ body {
 #woColHeaders th:first-child{text-align:left;padding-left:0}
 
 /* === Salary (Зарплата) === */
-#salaryColHeaders th{font-size:.72rem;font-weight:400;color:#4b5563;text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:2px solid #c0c4c8;background:var(--white);text-align:center}
+#salaryColHeaders th{font-size:.72rem;font-weight:400;color:#4b5563;text-transform:uppercase;padding:.5rem .5rem;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--white);text-align:center}
 #salaryColHeaders th:first-child{text-align:left;padding-left:0}
 
 /* === Suppliers (Поставщики) === */
