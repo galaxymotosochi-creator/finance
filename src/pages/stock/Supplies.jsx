@@ -268,7 +268,7 @@ export default function Supplies() {
           <div className="modal-box" style={{maxWidth:'650px'}}>
             <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([])}}>&times;</button>
             <h2>{editId?'Редактировать поставку':'Новая поставка'}</h2>
-            <div className="sub">{editId?'Товары в накладной':'Добавьте товары в накладную'}</div>
+            <div className="sub">Добавление товаров на склад</div>
             <form onSubmit={save}>
               <div className="form-row">
                 <div className="form-group">
