@@ -150,7 +150,7 @@ export default function Employees() {
       <div className="page-header">
         <div>
           <h1>Сотрудники</h1>
-          <div className="sub">Учет команды, настройка прав доступа и должностей</div>
+          <div className="sub">Управление командой, должностями и правами</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить сотрудника</button>
