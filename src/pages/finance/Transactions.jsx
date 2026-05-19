@@ -28,6 +28,11 @@ export default function Transactions() {
   const [expAmount, setExpAmount] = useState('');
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
+  const [showActionSelect, setShowActionSelect] = useState(false);
+  const [showTransfer, setShowTransfer] = useState(false);
+  const [trFrom, setTrFrom] = useState('');
+  const [trTo, setTrTo] = useState('');
+  const [trAmt, setTrAmt] = useState('');
 
   // Период — сохраняем в localStorage
   var saved = (function(){try{return JSON.parse(localStorage.getItem('txFilters')||'{}')}catch(e){return {}}})();
@@ -221,8 +226,7 @@ export default function Transactions() {
           <div className="sub">Доходы, расходы и перемещения</div>
         </div>
         <div className="page-actions">
-          <button className="btn-expense" onClick={function(){setEditingId(null);setShowExpense(true)}}>+ Расход</button>
-          <button className="btn-income" onClick={function(){setEditingId(null);setShowIncome(true)}}>+ Доход</button>
+          <button className="btn-mint" onClick={function(){setShowActionSelect(true)}} style={{background:'#1983dd',color:'#fff',border:'none',borderRadius:'6px'}}>+ Операция</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
@@ -343,6 +347,77 @@ export default function Transactions() {
           <div className="big-icon">💸</div>
           <p>История операций пуста</p>
           <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первую финансовую операцию, чтобы начать учет</p>
+        </div>
+      )}
+      {showActionSelect && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowActionSelect(false)}}}>
+          <div className="modal-box" style={{maxWidth:'460px'}}>
+            <button className="modal-close" onClick={()=>setShowActionSelect(false)}>&times;</button>
+            <h2>Что вы хотите сделать?</h2>
+            <div className="sub" style={{marginBottom:'1rem'}}>Выберите тип операции</div>
+            <div style={{display:'flex',flexDirection:'column',gap:'.6rem'}}>
+              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
+                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
+                <span style={{fontSize:'2rem',lineHeight:1}}>➖</span>
+                <div><div style={{fontWeight:600}}>Добавить расход</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Списание средств</div></div>
+              </button>
+              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setEditingId(null);setShowIncome(true)}}
+                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
+                <span style={{fontSize:'2rem',lineHeight:1}}>➕</span>
+                <div><div style={{fontWeight:600}}>Добавить доход</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Поступление средств</div></div>
+              </button>
+              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setShowTransfer(true);setTrFrom('');setTrTo('');setTrAmt('')}}
+                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
+                <span style={{fontSize:'2rem',lineHeight:1}}>🔄</span>
+                <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showTransfer && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowTransfer(false)}}}>
+          <div className="modal-box">
+            <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
+            <h2>Перевод между счетами</h2>
+            <div className="sub">Переместите деньги между счетами</div>
+            <form onSubmit={async function(e){
+              e.preventDefault();
+              if (!trAmt||parseFloat(trAmt)<=0) {alert('Введите сумму');return;}
+              var amt=parseFloat(trAmt);
+              try {
+                var fr=accs.find(function(a){return a.id===trFrom}), to=accs.find(function(a){return a.id===trTo});
+                if (!fr||!to) {alert('Выберите оба счета');return;}
+                await supabase.from('transactions').insert([
+                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0]},
+                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод с '+fr.name,date:new Date().toISOString().split('T')[0]}
+                ]);
+                setShowTransfer(false); setTrAmt(''); await refresh();
+              } catch(err) {alert(err.message);}
+            }}>
+              <div className="form-group">
+                <label>С какого счета</label>
+                <select value={trFrom} onChange={function(e){setTrFrom(e.target.value)}} required>
+                  <option value="">— выберите —</option>
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>На какой счет</label>
+                <select value={trTo} onChange={function(e){setTrTo(e.target.value)}} required>
+                  <option value="">— выберите —</option>
+                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Сумма (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">Перевести</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
       {showIncome && (
