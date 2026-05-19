@@ -285,7 +285,7 @@ export default function Accounts() {
                 <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Применить</button>
+                <button type="submit" className="btn btn-account-select">Применить</button>
               </div>
             </form>
           </div>
