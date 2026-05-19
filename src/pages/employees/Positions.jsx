@@ -127,7 +127,7 @@ export default function Positions() {
           <div className="sub">Управление должностями и группами прав доступа</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Добавить должность</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
