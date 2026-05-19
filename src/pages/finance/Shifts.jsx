@@ -27,7 +27,8 @@ export default function Shifts() {
 
       <div className="empty-products">
         <div className="big-icon">📊</div>
-        <p>Смен пока нет. Откройте кассу!</p>
+        <p>История смен пуста</p>
+          <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Откройте первую кассовую смену, чтобы начать продажи</p>
       </div>
     
     </>
