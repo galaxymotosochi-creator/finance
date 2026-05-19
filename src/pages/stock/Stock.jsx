@@ -49,6 +49,10 @@ export default function Stock() {
   const [initCost, setInitCost] = useState({});
   const [initSearch, setInitSearch] = useState('');
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [suppliesCache, setSuppliesCache] = useState([]);
+  const [initialCache, setInitialCache] = useState(null);
+  const [productsFromDB, setProductsFromDB] = useState([]);
 
   const load = async () => {
     setLoading(true);
