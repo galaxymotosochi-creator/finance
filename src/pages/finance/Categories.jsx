@@ -73,6 +73,7 @@ export default function Categories() {
     setTimeout(function () { document.addEventListener('click', h); }, 10);
   };
 
+  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
   return (
     <>
       <div className="page-header">

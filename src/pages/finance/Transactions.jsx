@@ -212,8 +212,8 @@ export default function Transactions() {
   };
   const incomeCats = cats.filter(c => c?.type === 'income');
   const expenseCats = cats.filter(c => c?.type === 'expense' || c?.type === 'supply_expense');
-
-  return (
+   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+   return (
     <div>
       <div className="page-header">
         <div>

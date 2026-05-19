@@ -162,8 +162,8 @@ export default function Accounts() {
     balById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
   });
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
-
-  return (
+   if (loading || !initDone) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+   return (
     <>
       <div className="page-header">
         <div><h1>Счета</h1><div className="sub">Управление счетами</div></div>
