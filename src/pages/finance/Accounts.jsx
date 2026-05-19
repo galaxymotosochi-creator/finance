@@ -189,7 +189,7 @@ export default function Accounts() {
     <>
       {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
       <div className="page-header">
-        <div><h1>Денежные счета</h1><div className="sub">Общий баланс всех ваших счетов</div></div>
+        <div><h1>Финансовые счета</h1><div className="sub">Управление счетами и учет остатков</div></div>
         <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -206,7 +206,7 @@ export default function Accounts() {
         <>
           <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'1rem',padding:'1rem 1.25rem',marginBottom:'1rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.04)'}}>
             <div style={{fontSize:'1.8rem',fontWeight:700,color:'#111'}}>{total.toLocaleString()}₽</div>
-            <div style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.15rem'}}>Общий баланс всех счетов</div>
+            <div style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.15rem'}}>Управление счетами и учет остатков</div>
           </div>
           {sorted.map(a => {
             var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
@@ -246,11 +246,11 @@ export default function Accounts() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>{setShowModal(false);setEditingId(null)}}>&times;</button>
             <h2>{editingId?'Редактировать счет':'Добавить счет'}</h2>
-            <div className="sub">{editingId?'Измените данные счета':'Введите название и начальный остаток'}</div>
+            <div className="sub">{editingId?'Измените данные счета':'Настройка нового кошелька, расчетного счета или кассы'}</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
-                <input type="text" placeholder="Например, Касса магазина" value={modalName} onChange={e=>setModalName(e.target.value)} required />
+                <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
               </div>
               {!editingId && (
                 <div className="form-group">
@@ -267,7 +267,7 @@ export default function Accounts() {
                 </div>
               )}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Создать'}</button>
+                <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Добавить'}</button>
               </div>
             </form>
           </div>
