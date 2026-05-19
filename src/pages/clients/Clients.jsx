@@ -156,7 +156,7 @@ export default function Clients() {
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">👤</div><p>Клиентов пока нет. Нажмите «+ Добавить клиента»</p></div></td></tr>
+              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
