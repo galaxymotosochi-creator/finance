@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../hooks/useAuth';
 
-
+const getSupplies = () => JSON.parse(localStorage.getItem('supplies88') || '[]');
+const setSupplies = (list) => localStorage.setItem('supplies88', JSON.stringify(list));
+const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
+const getSuppliers = () => JSON.parse(localStorage.getItem('suppliers88') || '[]');
 const SUPPLY_STATUSES = ['ordered','transit','received'];
 const SUPPLY_LABELS = {ordered:'Заказано',transit:'В пути',received:'Оприходовано'};
 const SUPPLY_COLORS = {ordered:'#2563eb',transit:'#d97706',received:'#16a34a'};
@@ -18,11 +19,7 @@ function getPayStatus(s) {
 }
 
 export default function Supplies() {
-  const { user } = useAuth();
   const [supplies, setSuppliesState] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [viewId, setViewId] = useState(null);
@@ -40,37 +37,9 @@ export default function Supplies() {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 1500); };
 
-  const load = async () => {
-    setLoading(true);
-    const [supRes, prodRes, suppRes] = await Promise.all([
-      supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at')
-    ]);
-    if (supRes.data) setSuppliesState(supRes.data);
-    if (prodRes.data) setProducts(prodRes.data);
-    if (suppRes.data) setSuppliers(suppRes.data);
-    setLoading(false);
-  };
-  useEffect(() => { if (user) load(); }, [user]);
+  const load = () => setSuppliesState(getSupplies());
+  useEffect(() => { load(); }, []);
 
-  // Миграция из localStorage
-  useEffect(() => {
-    if (!user || supplies.length > 0) return;
-    const old = JSON.parse(localStorage.getItem('supplies88') || '[]');
-    if (old.length > 0) {
-      old.forEach(async (s) => {
-        await supabase.from('supplies').insert({
-          id: s.id, user_id: user.id, supplier_id: null, supplier_name: s.supplierName || '',
-          invoice: s.invoice || '', status: s.supplyStatus || 'ordered', date: s.date || '',
-          items: s.items || [{prodId:s.prodId,name:'Товар',qty:s.qty||0,cost:s.cost||0}],
-          total: s.total || 0, paid: s.paid || 0
-        });
-      });
-      localStorage.removeItem('supplies88');
-      load();
-    }
-  }, [user, supplies.length]);
   const openAdd = () => {
     setEditId(null);
     setFInvoice(''); setFStatus('ordered'); setFPaid('0'); setFItems([]);
@@ -83,70 +52,75 @@ export default function Supplies() {
     if (!prodId) return alert('Выберите товар');
     const qty = parseFloat(fAddQty) || 1;
     const cost = parseFloat(fAddCost) || 0;
-    const prod = products.find(p => p.id === prodId);
+    const prod = getProducts().find(p => p.id === prodId);
     setFItems(prev => [...prev, { prodId, name: prod ? prod.name : 'Товар', qty, cost }]);
     setFAddProd(''); setFAddQty(''); setFAddCost('');
   };
 
   const removeItem = (idx) => setFItems(prev => prev.filter((_, i) => i !== idx));
 
-  const save = async (e) => {
+  const save = (e) => {
     e.preventDefault();
     if (!fItems.length) return alert('Добавьте хотя бы один товар');
     const total = fItems.reduce((acc, it) => acc + it.qty * it.cost, 0);
-    const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, paid: parseFloat(fPaid) || 0, date: new Date().toISOString().split('T')[0] };
+    const list = getSupplies();
+    const obj = {
+      invoice: fInvoice.trim(), supplierName: fSupName.trim(), items: fItems,
+      total, supplyStatus: fStatus, paid: parseFloat(fPaid) || 0, payments: [],
+      date: new Date().toLocaleDateString('ru-RU')
+    };
     if (editId) {
-      await supabase.from('supplies').update(obj).eq('id', editId);
-    } else { await supabase.from('supplies').insert({ ...obj, id: Date.now() }); }
-    await load(); setShowModal(false);
+      const idx = list.findIndex(x => x.id === editId);
+      if (idx > -1) list[idx] = { ...list[idx], ...obj };
+    } else { obj.id = Date.now(); list.unshift(obj); }
+    setSupplies(list); load(); setShowModal(false);
     showToast('✅ Поставка проведена');
   };
 
-  const cycleStatus = async (id) => {
-    const s = supplies.find(x => x.id === id);
+  const cycleStatus = (id) => {
+    const list = getSupplies();
+    const s = list.find(x => x.id === id);
     if (!s) return;
-    const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
-    await supabase.from('supplies').update({ status: SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length] }).eq('id', id);
-    await load();
+    const idx = SUPPLY_STATUSES.indexOf(s.supplyStatus || 'ordered');
+    s.supplyStatus = SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length];
+    setSupplies(list); load();
   };
 
   const edit = (id) => {
-    const s = supplies.find(x => x.id === id);
+    const s = getSupplies().find(x => x.id === id);
     if (!s) return;
     setEditId(id); setFInvoice(s.invoice||''); setFSupName(s.supplierName||'');
-    setFStatus(s.status||'ordered'); setFPaid(String(s.paid||0));
+    setFStatus(s.supplyStatus||'ordered'); setFPaid(String(s.paid||0));
     setFItems((s.items||[{prodId:s.prodId,name:'Товар',qty:s.qty||0,cost:s.cost||0}]).slice());
     setShowModal(true);
   };
 
-  const remove = async (id) => {
+  const remove = (id) => {
     if (!confirm('Удалить поставку?')) return;
-    await supabase.from('supplies').delete().eq('id', id); await load();
+    setSupplies(getSupplies().filter(x => x.id !== id)); load();
   };
 
-  const copy = async (id) => {
-    const s = supplies.find(x => x.id === id);
+  const copy = (id) => {
+    const list = getSupplies(); const s = list.find(x => x.id === id);
     if (!s) return;
-    await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
-    await load(); showToast('📋 Поставка скопирована');
+    list.push({...s, id:Date.now(), invoice:(s.invoice||'')+' (копия)'});
+    setSupplies(list); load(); showToast('📋 Поставка скопирована');
   };
 
-  const confirmPay = async (e) => {
+  const confirmPay = (e) => {
     e.preventDefault();
     const amount = parseFloat(document.getElementById('payAmount').value) || 0;
     const method = document.getElementById('payMethod').value;
     if (amount <= 0) return alert('Введите сумму');
-    const s = supplies.find(x => x.id === showPay);
+    const list = getSupplies(); const s = list.find(x => x.id === showPay);
     if (!s) return;
     if (!s.payments) s.payments = [];
     s.payments.push({ amount, method, date: new Date().toLocaleDateString('ru-RU') });
-    await supabase.from('supplies').update({ paid: (s.paid||0) + amount }).eq('id', showPay); await load(); setShowPay(null);
+    s.paid = (s.paid||0) + amount; setSupplies(list); load(); setShowPay(null);
     showToast('💳 Оплата проведена');
   };
 
   const totalItems = (s) => (s.items||[s]).length;
-  
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
   return (
     <>
@@ -180,9 +154,9 @@ export default function Supplies() {
             ) : supplies.map(s => {
               const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0);
               const payStatus = getPayStatus(s);
-              const supSt = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
+              const supSt = SUPPLY_LABELS[s.supplyStatus||'ordered']||'Заказано';
               const paySt = PAY_LABELS[payStatus]||'Не оплачено';
-              const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
+              const supColor = SUPPLY_COLORS[s.supplyStatus||'ordered']||'#2563eb';
               const payColor = PAY_COLORS[payStatus]||'#dc2626';
               return (
                 <tr key={s.id}>
@@ -221,14 +195,14 @@ export default function Supplies() {
 
       {/* Просмотр поставки */}
       {viewId && (() => {
-        const s = supplies.find(x => x.id === viewId);
+        const s = getSupplies().find(x => x.id === viewId);
         if (!s) return null;
         const items = s.items || [{name:'Товар',qty:s.qty||0,cost:s.cost||0}];
         const total = s.total || items.reduce((sum,it) => sum + it.qty*it.cost, 0);
-        const supSt = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
+        const supSt = SUPPLY_LABELS[s.supplyStatus||'ordered']||'Заказано';
         const payStatus = getPayStatus(s);
         const paySt = PAY_LABELS[payStatus];
-        const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
+        const supColor = SUPPLY_COLORS[s.supplyStatus||'ordered']||'#2563eb';
         const payColor = PAY_COLORS[payStatus]||'#dc2626';
         return (
           <div className="promo-detail" style={{marginTop:'.5rem'}}>
@@ -275,7 +249,7 @@ export default function Supplies() {
                   <label>Поставщик *</label>
                   <select value={fSupName} onChange={e=>setFSupName(e.target.value)}>
                     <option value="">— выберите поставщика —</option>
-                    {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}
+                    {getSuppliers().map(s=><option key={s.name} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
@@ -300,7 +274,7 @@ export default function Supplies() {
                 <div style={{display:'flex',gap:'.35rem'}}>
                   <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}}>
                     <option value="">— выберите товар —</option>
-                    {products.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+                    {getProducts().map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                   <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Количество" min="1" step="any"
                     style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}} />
@@ -338,7 +312,7 @@ export default function Supplies() {
 
       {/* Модалка оплаты */}
       {showPay && (() => {
-        const s = supplies.find(x => x.id === showPay);
+        const s = getSupplies().find(x => x.id === showPay);
         if (!s) return null;
         const total = s.total || (s.items||[]).reduce((sum,it)=>sum+it.qty*it.cost,0) || 0;
         const paid = s.paid || 0;
