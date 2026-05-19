@@ -142,7 +142,8 @@ export default function Positions() {
         {positions.length === 0 ? (
           <div className="empty-products" style={{gridColumn:'1/-1'}}>
             <div className="big-icon">👤</div>
-            <p>Должностей пока нет. Нажмите «+ Добавить должность»</p>
+            <p>Список должностей пуст</p>
+            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую должность, чтобы настроить шаблоны прав доступа</p>
           </div>
         ) : positions.map(p => {
           const bonus = formatBonus(p);
