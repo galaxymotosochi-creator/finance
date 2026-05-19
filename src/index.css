@@ -193,32 +193,32 @@ body {
 .btn-green:active { background: #16a34a; }
 .btn-income {
   display: inline-flex; align-items: center; gap: .3rem;
-  padding: .6rem .95rem; border: 1px solid var(--border);
+  padding: .6rem .95rem; border: 1px solid #1983dd;
   border-radius: 6px; font-size: .82rem; cursor: pointer;
   font-family: var(--font); font-weight: 600; transition: all .12s;
-  background: #dcfce7; color: #166534;
+  background: #1983dd; color: #fff;
 }
-.btn-income:hover { background: #c4f5d2; }
-.btn-income:active { background: #dcfce7; outline: none; }
+.btn-income:hover { background: #156cc0; }
+.btn-income:active { background: #0f55a0; outline: none; }
 .btn-expense {
   display: inline-flex; align-items: center; gap: .3rem;
-  padding: .6rem .95rem; border: 1px solid var(--border);
+  padding: .6rem .95rem; border: 1px solid #1983dd;
   border-radius: 6px; font-size: .82rem; cursor: pointer;
   font-family: var(--font); font-weight: 600; transition: all .12s;
-  background: #fee2e2; color: #b91c1c;
+  background: #1983dd; color: #fff;
 }
-.btn-expense:hover { background: #fecaca; }
-.btn-expense:active { background: #fee2e2; outline: none; }
+.btn-expense:hover { background: #156cc0; }
+.btn-expense:active { background: #0f55a0; outline: none; }
 .btn-mint {
   display: inline-flex; align-items: center; gap: .3rem;
-  padding: .6rem .95rem; border: 1px solid var(--border);
+  padding: .6rem .95rem; border: 1px solid #1983dd;
   border-radius: 6px; font-size: .82rem; cursor: pointer;
   font-family: var(--font); font-weight: 600; transition: all .12s;
-  background: #dcfce7; color: #166534;
+  background: #1983dd; color: #fff;
   outline: none; -webkit-tap-highlight-color: transparent;
 }
-.btn-mint:hover { background: #c4f5d2; }
-.btn-mint:active { background: #dcfce7; outline: none; }
+.btn-mint:hover { background: #156cc0; }
+.btn-mint:active { background: #0f55a0; outline: none; }
 .btn-red { background: #dc2626; outline: none; }
 .btn-red:hover { opacity: .9; }
 .btn-red:active { background: #dc2626; }
