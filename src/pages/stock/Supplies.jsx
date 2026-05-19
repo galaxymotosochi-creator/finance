@@ -176,7 +176,7 @@ export default function Supplies() {
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">📦</div><p>Поставок пока нет. Нажмите «+ Новая поставка»</p></div></td></tr>
+              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.map(s => {
               const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0);
               const payStatus = getPayStatus(s);
