@@ -96,7 +96,8 @@ export default function Writeoffs() {
           </thead>
           <tbody id="writeoffTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Списаний пока нет</p></div></td></tr>
+              <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Список списаний пуст</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
             ) : list.map(w => (
               <tr key={w.id}>
                 <td><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
