@@ -53,7 +53,7 @@ export default function Writeoffs() {
           <div className="sub">Списание товаров со склада (брак, потеря)</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Списать товар</button>
+          <button className="btn-mint" onClick={openAdd}>+ Списать товар</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

@@ -58,7 +58,7 @@ export default function Suppliers() {
           <div className="sub">Управляйте списком поставщиков</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Добавить поставщика</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить поставщика</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

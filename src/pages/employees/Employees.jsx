@@ -153,7 +153,7 @@ export default function Employees() {
           <div className="sub">Управление персоналом</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Добавить сотрудника</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить сотрудника</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

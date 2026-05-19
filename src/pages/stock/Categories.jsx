@@ -67,7 +67,7 @@ export default function Categories() {
           <div className="sub">Управляйте категориями</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Добавить категорию</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить категорию</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

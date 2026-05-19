@@ -130,7 +130,7 @@ export default function Supplies() {
           <div className="sub">Оприходование товаров на склад</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Новая поставка</button>
+          <button className="btn-mint" onClick={openAdd}>+ Новая поставка</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

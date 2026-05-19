@@ -232,7 +232,7 @@ export default function Salary() {
     <>
       <div className="page-header">
         <div><h1>Учет зарплаты</h1><div className="sub">Расчет начислений, бонусов и выплат команде</div></div>
-        <div className="page-actions"><button className="btn-green" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
+        <div className="page-actions"><button className="btn-mint" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 

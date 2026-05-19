@@ -139,7 +139,7 @@ export default function Loyalty() {
           <div className="sub">Системы скидок и поощрений для клиентов</div>
         </div>
         <div className="page-actions">
-          <button className="btn-green" onClick={openAdd}>+ Добавить</button>
+          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
