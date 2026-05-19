@@ -85,7 +85,7 @@ export default function Suppliers() {
       <div className="page-header">
         <div>
           <h1>Поставщики</h1>
-          <div className="sub">Управляйте списком поставщиков</div>
+          <div className="sub">База контрагентов и история сотрудничества</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить поставщика</button>
@@ -150,7 +150,7 @@ export default function Suppliers() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShowModal(false)}>&times;</button>
             <h2>{editId?'Редактировать поставщика':'Добавить поставщика'}</h2>
-            <div className="sub">Введите данные поставщика</div>
+            <div className="sub">Создание карточки нового контрагента</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
