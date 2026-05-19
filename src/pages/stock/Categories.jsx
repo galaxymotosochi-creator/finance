@@ -107,7 +107,7 @@ export default function Categories() {
           <thead id="catColHeaders">
             <tr>
               <th>Название</th>
-              <th>Вид</th>
+              <th>Тип</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
@@ -151,7 +151,7 @@ export default function Categories() {
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
             <h2>{editId ? 'Редактировать категорию' : 'Добавить категорию'}</h2>
-            <div className="sub">Введите название и выберите вид</div>
+            <div className="sub">Введите название и выберите тип</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
