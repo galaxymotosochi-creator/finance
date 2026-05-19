@@ -183,7 +183,7 @@ export default function Positions() {
 
               {/* Доступы */}
               <div className="pos-card-section">
-                <div className="pos-perms-label">Разрешенные разделы меню:</div>
+                <div className="pos-perms-label">Группы прав доступа:</div>
                 <div className="pos-perms-tags">
                   {p.permissions && p.permissions.length > 0 ? (
                     p.permissions.map(permId => {
@@ -225,10 +225,10 @@ export default function Positions() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
             <h2>{editId ? 'Редактировать должность' : 'Новая должность'}</h2>
-            <div className="sub">Настройте шаблон роли</div>
+            <div className="sub">Параметры и права доступа новой должности</div>
             <form onSubmit={save}>
               <div className="form-group">
-                <label>Название должности *</label>
+                <label>Название должности</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
               </div>
               <div className="form-row">
@@ -253,7 +253,7 @@ export default function Positions() {
 
               {/* Доступы */}
               <div className="form-group">
-                <label>Разрешенные разделы меню</label>
+                <label>Группы прав доступа</label>
                 <div className="pos-perms-grid">
                   {ALL_SECTIONS.map(s => (
                     <div key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
@@ -267,7 +267,7 @@ export default function Positions() {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Создать должность'}</button>
+                <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
           </div>
