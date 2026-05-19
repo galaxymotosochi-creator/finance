@@ -218,7 +218,7 @@ export default function Transactions() {
       <div className="page-header">
         <div>
           <h1>Движение денег</h1>
-          <div className="sub">Все приходы и расходы в одном месте</div>
+          <div className="sub">Доходы, расходы и перемещения</div>
         </div>
         <div className="page-actions">
           <button className="btn-expense" onClick={function(){setEditingId(null);setShowExpense(true)}}>+ Расход</button>
