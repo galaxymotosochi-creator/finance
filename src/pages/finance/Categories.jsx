@@ -64,7 +64,12 @@ export default function Categories() {
     if (!confirm('Удалить категорию?')) return;
     try {
       const { error } = await supabase.from('categories').delete().eq('id', id).eq('user_id', user.id);
-      if (error) { alert(error.message); return; }
+      if (error) {
+        if ((error.code === '23503') || (error.message && error.message.includes('foreign key'))) {
+          alert('Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию.');
+        } else { alert(error.message); }
+        return;
+      }
       await fetch();
     } catch (err) { alert(err.message); }
   };
