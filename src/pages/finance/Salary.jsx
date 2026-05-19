@@ -25,7 +25,7 @@ function calcProportionalSalary(monthlySalary, from, to){
     if(monthsDiff === 1) return Math.round(monthlySalary);
   }
 
-  // Иначе — пропорциональный расчёт по дням
+  // Иначе — пропорциональный расчет по дням
   var total=0;
   var cur=new Date(f);
   while(cur<=t){
@@ -112,7 +112,7 @@ export default function Salary() {
     }
   }, [fEmpId, employees]);
 
-  // Пересчёт при изменении периода, оклада, комиссии
+  // Пересчет при изменении периода, оклада, комиссии
   useEffect(() => {
     if (fPayType !== 'salary') { setFSalaryTotal(0); setFCommissionAmt(0); setFDays(0); return; }
     const sal = calcProportionalSalary(fBaseSalary, fPeriodFrom, fPeriodTo);
@@ -231,7 +231,7 @@ export default function Salary() {
   return (
     <>
       <div className="page-header">
-        <div><h1>Зарплата</h1><div className="sub">Расчёт и выплата заработной платы</div></div>
+        <div><h1>Зарплата</h1><div className="sub">Расчет и выплата заработной платы</div></div>
         <div className="page-actions"><button className="btn-green" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -312,8 +312,8 @@ export default function Salary() {
                 </div>
               </div>
 
-              {/* Расчёт */}
-              <div className="emp-section-label">Расчёт</div>
+              {/* Расчет */}
+              <div className="emp-section-label">Расчет</div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Оклад (мес.)</label>
@@ -414,7 +414,7 @@ export default function Salary() {
         </div>
       )}
 
-      {/* МОДАЛКА ВЫБОРА СЧЁТА */}
+      {/* МОДАЛКА ВЫБОРА СЧЕТА */}
       {showAcc && (()=>{
         const item = list.find(x => x.id === pendingPayId);
         if (!item) return null;
@@ -427,7 +427,7 @@ export default function Salary() {
                 {item.employee_name||'Сотрудник'} — <b>{Number(item.amount).toLocaleString()}₽</b>
               </div>
               <div style={{marginBottom:'1rem',fontSize:'.82rem',color:'var(--muted)'}}>
-                Выберите счёт для списания
+                Выберите счет для списания
               </div>
               {accs.map(a => (
                 <div key={a.id} onClick={()=>confirmPay(a.id)}

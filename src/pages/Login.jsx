@@ -35,7 +35,7 @@ export default function Login() {
     <div className="login-wrapper">
       <div className="login-card">
         <h1>Финансы</h1>
-        <p className="sub">Учёт для бизнеса</p>
+        <p className="sub">Учет для бизнеса</p>
 
         <form onSubmit={handleSubmit}>
           <input

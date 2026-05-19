@@ -244,7 +244,7 @@ export default function Employees() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Дата приёма</label>
+                  <label>Дата приема</label>
                   <input type="date" value={fHireDate} onChange={e=>setFHireDate(e.target.value)} />
                 </div>
               </div>
@@ -390,7 +390,7 @@ export default function Employees() {
               )}
 
               <div className="emp-section-label" style={{marginTop:'.75rem'}}>Выдать доступ</div>
-              <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придёт ссылка-приглашение для входа в систему.</p>
+              <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придет ссылка-приглашение для входа в систему.</p>
               <button type="button" className="btn btn-primary" style={{borderRadius:'6px'}} onClick={() => alert('Функция будет доступна позже')}>
                 ✉️ Выдать доступ
               </button>

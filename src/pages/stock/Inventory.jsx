@@ -104,7 +104,7 @@ export default function Inventory() {
         <div className="page-header">
           <div>
             <h1>Инвентаризация</h1>
-            <div className="sub">Сверка фактических остатков с учётными</div>
+            <div className="sub">Сверка фактических остатков с учетными</div>
           </div>
           <div className="page-actions">
             <button className="btn btn-outline" onClick={cancelEdit} style={{fontSize:'.8rem'}}>← Назад</button>
@@ -203,7 +203,7 @@ export default function Inventory() {
       <div className="page-header">
         <div>
           <h1>Инвентаризация</h1>
-          <div className="sub">Сверка фактических остатков с учётными</div>
+          <div className="sub">Сверка фактических остатков с учетными</div>
         </div>
         <div className="page-actions">
           <button className="btn-green" onClick={startNew}>+ Новая инвентаризация</button>

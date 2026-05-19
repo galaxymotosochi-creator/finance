@@ -7,7 +7,7 @@ const STATUS_OPTS = [
   { value: 'sick', icon: '🏥', label: 'Больничный' },
   { value: 'vacation', icon: '🏖', label: 'Отпуск' },
   { value: 'absent', icon: '❌', label: 'Прогул' },
-  { value: 'remote', icon: '🏠', label: 'Удалёнка' },
+  { value: 'remote', icon: '🏠', label: 'Удаленка' },
 ];
 
 const STATUS_ICONS = { present:'✅', sick:'🏥', vacation:'🏖', absent:'❌', remote:'🏠' };
@@ -116,7 +116,7 @@ export default function Timesheet() {
       <div className="page-header">
         <div>
           <h1>Табель</h1>
-          <div className="sub">Учёт рабочего времени, бонусы и штрафы</div>
+          <div className="sub">Учет рабочего времени, бонусы и штрафы</div>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

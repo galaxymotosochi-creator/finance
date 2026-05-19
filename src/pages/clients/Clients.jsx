@@ -25,7 +25,7 @@ export default function Clients() {
     try {
       const { data } = await supabase.from('clients').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       if (data) setClientsState(data);
-    } catch (e) { /* таблица ещё не создана */ }
+    } catch (e) { /* таблица еще не создана */ }
     setSalesState(getSales());
     setLoading(false);
   };
@@ -121,7 +121,7 @@ export default function Clients() {
         </div>
       </div>
 
-      {/* Жёлтая плашка дня рождения */}
+      {/* Желтая плашка дня рождения */}
       {birthdayClients.length > 0 && (
         <div style={{
           background: 'linear-gradient(135deg,#fef3cd,#fde68a)',

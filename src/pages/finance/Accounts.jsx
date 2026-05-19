@@ -6,8 +6,8 @@ const ACC_TYPES = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
   { type: 'card', icon: '💳', label: 'Оплата картой' },
   { type: 'transfer', icon: '🔄', label: 'Перевод' },
-  { type: 'checking', icon: '🏦', label: 'Расчётный счёт' },
-  { type: 'bank', icon: '🏛️', label: 'Банковский счёт' },
+  { type: 'checking', icon: '🏦', label: 'Расчетный счет' },
+  { type: 'bank', icon: '🏛️', label: 'Банковский счет' },
   { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
   { type: 'reserve', icon: '🔒', label: 'Резерв' },
   { type: 'deposit', icon: '📜', label: 'Депозит' },
@@ -94,7 +94,7 @@ export default function Accounts() {
 
   var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setShowModal(true); };
   var openEdit = (ac) => {
-    if (hasAct(ac)) return alert('Нельзя редактировать счёт — на нём есть движения или начальный остаток');
+    if (hasAct(ac)) return alert('Нельзя редактировать счет — на нем есть движения или начальный остаток');
     setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setShowModal(true);
   };
 
@@ -118,8 +118,8 @@ export default function Accounts() {
 
   var remove = async (ac) => {
     if (!ac||isSys(ac)) return;
-    if ((transactions||[]).some(t=>t.account_id===ac.id)) return alert('Нельзя удалить счёт — на нём есть движения');
-    if (!confirm('Удалить счёт "'+ac.name+'"?')) return;
+    if ((transactions||[]).some(t=>t.account_id===ac.id)) return alert('Нельзя удалить счет — на нем есть движения');
+    if (!confirm('Удалить счет "'+ac.name+'"?')) return;
     await supabase.from('accounts').delete().eq('id',ac.id);
     await fetchAccounts();
   };
@@ -144,7 +144,7 @@ export default function Accounts() {
     var amt=parseFloat(trAmt);
     try {
       var fr=accounts.find(a=>a.type===trFrom), to=accounts.find(a=>a.type===trTo);
-      if (!fr||!to) {alert('Счёт не найден');return;}
+      if (!fr||!to) {alert('Счет не найден');return;}
       if (getBal(trFrom)<amt) {alert('Недостаточно средств');return;}
       await supabase.from('transactions').insert([
         {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0]},
@@ -155,7 +155,7 @@ export default function Accounts() {
   };
 
   var sorted = [...accounts].sort((a,b)=>{if(isSys(a)&&!isSys(b))return -1;if(!isSys(a)&&isSys(b))return 1;return 0;});
-  // Общий баланс: начальный остаток + транзакции по каждому счёту (по id, а не по type)
+  // Общий баланс: начальный остаток + транзакции по каждому счету (по id, а не по type)
   var balById = {};
   (transactions||[]).forEach(t => {
     if (!balById[t.account_id]) balById[t.account_id] = 0;
@@ -167,7 +167,7 @@ export default function Accounts() {
     <>
       <div className="page-header">
         <div><h1>Счета</h1><div className="sub">Управление счетами</div></div>
-        <div className="page-actions"><button className="btn-green" onClick={openAdd}>+ Добавить счёт</button></div>
+        <div className="page-actions"><button className="btn-green" onClick={openAdd}>+ Добавить счет</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
@@ -222,8 +222,8 @@ export default function Accounts() {
         <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowModal(false);setEditingId(null)}}}>
           <div className="modal-box">
             <button className="modal-close" onClick={()=>{setShowModal(false);setEditingId(null)}}>&times;</button>
-            <h2>{editingId?'Редактировать счёт':'Добавить счёт'}</h2>
-            <div className="sub">{editingId?'Измените данные счёта':'Введите название и начальный остаток'}</div>
+            <h2>{editingId?'Редактировать счет':'Добавить счет'}</h2>
+            <div className="sub">{editingId?'Измените данные счета':'Введите название и начальный остаток'}</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
@@ -256,10 +256,10 @@ export default function Accounts() {
           <div className="modal-box" style={{maxWidth:'450px'}}>
             <button className="modal-close" onClick={()=>setShowCorrect(false)}>&times;</button>
             <h2>Корректировка баланса</h2>
-            <div className="sub">Исправьте остаток на счёте</div>
+            <div className="sub">Исправьте остаток на счете</div>
             <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.type===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
-                <label>Счёт</label>
+                <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
                   {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
                 </select>
@@ -323,13 +323,13 @@ export default function Accounts() {
             <div className="sub">Переместите деньги между счетами</div>
             <form onSubmit={goTransfer}>
               <div className="form-group">
-                <label>С какого счёта</label>
+                <label>С какого счета</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)}>
                   {accounts.map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name} ({getBal(a.type).toLocaleString()}₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
-                <label>На какой счёт</label>
+                <label>На какой счет</label>
                 <select value={trTo} onChange={e=>setTrTo(e.target.value)}>
                   {accounts.filter(a=>a.type!==trFrom).map(a=>{var m=getTypeMeta(a);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
                 </select>

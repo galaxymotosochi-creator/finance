@@ -37,7 +37,7 @@ export default function Loyalty() {
       try {
         const { data } = await supabase.from('loyalty_programs').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
         if (data) custom = data;
-      } catch (e) { /* таблица ещё не создана */ }
+      } catch (e) { /* таблица еще не создана */ }
     }
     // Склеиваем: LD, потом кастомные (кроме тех, что перекрывают LD)
     const merged = LD.map(ld => {
@@ -234,7 +234,7 @@ export default function Loyalty() {
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
-                <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнёрская программа" required />
+                <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнерская программа" required />
               </div>
               <div className="form-group">
                 <label>Иконка (эмодзи)</label>
@@ -249,7 +249,7 @@ export default function Loyalty() {
                 <label>Тип программы</label>
                 <select value={fType} onChange={e=>setFType(e.target.value)}>
                   <option value="constant">📋 Постоянная — фиксированная скидка</option>
-                  <option value="accumulative">📈 Накопительная — скидка растёт от суммы</option>
+                  <option value="accumulative">📈 Накопительная — скидка растет от суммы</option>
                   <option value="bonus">🎯 Бонусная — баллы за покупки</option>
                   <option value="birthday">🎂 ДР-скидка — автоскидка в день рождения</option>
                 </select>
@@ -266,7 +266,7 @@ export default function Loyalty() {
               </div>
               <div className="form-group">
                 <label>Описание</label>
-                <textarea value={fDesc} onChange={e=>setFDesc(e.target.value)} placeholder="Например: Скидка 10% для постоянных партнёров" rows="2" />
+                <textarea value={fDesc} onChange={e=>setFDesc(e.target.value)} placeholder="Например: Скидка 10% для постоянных партнеров" rows="2" />
               </div>
               <div className="loy-modal-preview" id="loyPreview">
                 <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>

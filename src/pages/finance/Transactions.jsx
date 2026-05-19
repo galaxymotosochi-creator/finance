@@ -32,7 +32,7 @@ export default function Transactions() {
   // Период — сохраняем в localStorage
   var saved = (function(){try{return JSON.parse(localStorage.getItem('txFilters')||'{}')}catch(e){return {}}})();
   const [period, setPeriodRaw] = useState(saved.period||'all');
-  const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Всё время');
+  const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
   const [showPeriod, setShowPeriod] = useState(false);
@@ -69,7 +69,7 @@ export default function Transactions() {
   const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || tx.type===typeFilter) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   var exportCsv = function(list) {
-    var rows = [['Дата','Описание','Тип','Счёт','Сумма']];
+    var rows = [['Дата','Описание','Тип','Счет','Сумма']];
     list.forEach(function(tx){
       rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',tx.type||'',tx.account_name||'',tx.amount||'']);
     });
@@ -239,7 +239,7 @@ export default function Transactions() {
               onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
-                {[{key:'all',label:'Всё время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
+                {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
                   <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
                     style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:period===p.key?'var(--primary)':'var(--body-color)',fontWeight:period===p.key?600:400,background:period===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
                 ))}
@@ -267,7 +267,7 @@ export default function Transactions() {
             {showDownload && (
               <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
-                  Вы скачиваете отчёт за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
+                  Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
                 </div>
                 <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
                   <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} style={{padding:'.25rem .6rem',fontSize:'.78rem',borderRadius:'5px',cursor:'pointer',background:'var(--primary)',color:'#fff',fontFamily:'var(--font)'}}>Скачать</span>
@@ -306,7 +306,7 @@ export default function Transactions() {
         <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
-              <th>Дата</th><th>Название</th><th>Сумма</th><th>Счёт</th><th>Категория</th><th className="actions"></th>
+              <th>Дата</th><th>Название</th><th>Сумма</th><th>Счет</th><th>Категория</th><th className="actions"></th>
             </tr></thead>
             <tbody>
               {filtered.map(tx => (
@@ -366,7 +366,7 @@ export default function Transactions() {
             }}>
               <div className="form-group">
                 <label>Название *</label>
-                <input type="text" placeholder="Например: инвестиции, партнёрские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
+                <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
               </div>
               <div className="form-row">
                 <div className="form-group">

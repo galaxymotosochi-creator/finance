@@ -174,7 +174,7 @@ export default function Products() {
     setProducts(list);
     setTrash(trash);
     load();
-    showToast('🗑️ Товар перемещён в корзину');
+    showToast('🗑️ Товар перемещен в корзину');
   };
 
   const hide = (id) => {
