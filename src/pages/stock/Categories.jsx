@@ -150,8 +150,8 @@ export default function Categories() {
         <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать категорию' : 'Добавить категорию'}</h2>
-            <div className="sub">Введите название и выберите тип</div>
+            <h2>{editId ? 'Редактировать категорию' : 'Добавьте категорию'}</h2>
+            <div className="sub">Настройте новую группу для каталога</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название *</label>
