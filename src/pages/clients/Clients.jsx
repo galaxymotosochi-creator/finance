@@ -104,7 +104,7 @@ export default function Clients() {
       <div className="page-header">
         <div>
           <h1>Клиенты</h1>
-          <div className="sub">База клиентов и статистика покупок</div>
+          <div className="sub">История покупок, лояльность и статистика</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить клиента</button>
@@ -209,7 +209,7 @@ export default function Clients() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
             <h2>{editId ? 'Редактировать клиента' : 'Добавить клиента'}</h2>
-            <div className="sub">Введите контактные данные</div>
+            <div className="sub">Создание карточки нового покупателя</div>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Имя *</label>
