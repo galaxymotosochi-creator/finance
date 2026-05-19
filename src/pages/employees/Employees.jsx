@@ -175,7 +175,8 @@ export default function Employees() {
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>Сотрудников пока нет</p></div></td></tr>
+              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>Список сотрудников пуст</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
             ) : filtered.map(emp => {
               const pos = getPosition(emp.position_id);
               return (
