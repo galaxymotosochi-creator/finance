@@ -302,7 +302,7 @@ export default function Transactions() {
 
 
 
-      {txs.length > 0 && (
+      {txs.length > 0 ? (
         <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr id="colHeaders">
@@ -337,6 +337,12 @@ export default function Transactions() {
               ))}
             </tbody>
           </table>
+        </div>
+      ) : (
+        <div className="empty-products">
+          <div className="big-icon">💸</div>
+          <p>История операций пуста</p>
+          <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первую финансовую операцию, чтобы начать учет</p>
         </div>
       )}
       {showIncome && (
