@@ -246,7 +246,7 @@ export default function Salary() {
             <th className="tr">%</th><th className="tr">Комиссия</th><th className="tr">Премия</th><th className="tr">Вычеты</th>
             <th className="tr">Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
           </tr></thead>
-          <tbody>
+          <tbody id="salaryTableBody">
             {list.length === 0 ? (
               <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">💼</div><p>Начислений пока нет</p></div></td></tr>
             ) : list.map(s => {
