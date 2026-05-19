@@ -19,7 +19,7 @@ const menu = [
       { label: 'P&L', path: '/finance/pnl' },
       { label: 'Движение денег', path: '/finance/transactions' },
       { label: 'Финансовые категории', path: '/finance/categories' },
-      { label: 'Смены', path: '/finance/shifts' },
+      { label: 'Кассовые смены', path: '/finance/shifts' },
       { label: 'Учет зарплаты', path: '/finance/salary' },
       { label: 'Финансовые счета', path: '/finance/accounts' },
     ],

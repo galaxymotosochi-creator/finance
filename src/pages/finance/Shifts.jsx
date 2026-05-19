@@ -5,7 +5,7 @@ export default function Shifts() {
       <div className="page-header">
         <div>
           <h1 style={{fontSize:"1.2rem",fontWeight:"600",margin:"0"}}>Кассовые смены</h1>
-          <div className="sub">История работы кассиров и продаж</div>
+          <div className="sub">Контроль работы касс и выручки за день</div>
         </div>
       </div>
       <div className="nav-sep" style={{margin:".25rem 0",width:"100%"}}></div>
