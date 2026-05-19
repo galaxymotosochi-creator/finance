@@ -1,27 +1,51 @@
 import { useState, useEffect } from 'react';
-
-const getCats = () => {
-  let list = JSON.parse(localStorage.getItem('allCats88') || '[]');
-  // Миграция старых данных
-  if (!list.length) {
-    const prodCats = JSON.parse(localStorage.getItem('prodCats88') || '[]');
-    const svcCats = JSON.parse(localStorage.getItem('svcCats88') || '[]');
-    prodCats.forEach(c => list.push({ id: c.id, name: c.name, type: 'product' }));
-    svcCats.forEach(c => list.push({ id: c.id + 100000, name: c.name, type: 'service' }));
-    localStorage.setItem('allCats88', JSON.stringify(list));
-  }
-  return list;
-};
-const setCats = (list) => localStorage.setItem('allCats88', JSON.stringify(list));
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Categories() {
-  const [cats, setCatsState] = useState([]);
+  const { user } = useAuth();
+  const [cats, setCats] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
   const [fType, setFType] = useState('product');
-  const load = () => setCatsState(getCats());
-  useEffect(() => { load(); }, []);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at');
+    if (data) setCats(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { if (user) load(); }, [user]);
+
+  // Миграция старых данных из localStorage
+  useEffect(() => {
+    if (!user || cats.length > 0) return;
+    const oldList = JSON.parse(localStorage.getItem('allCats88') || '[]');
+    if (oldList.length === 0) {
+      const prodCats = JSON.parse(localStorage.getItem('prodCats88') || '[]');
+      const svcCats = JSON.parse(localStorage.getItem('svcCats88') || '[]');
+      prodCats.forEach(c => oldList.push({ id: c.id, name: c.name, type: 'product' }));
+      svcCats.forEach(c => oldList.push({ id: c.id + 100000, name: c.name, type: 'service' }));
+    }
+    if (oldList.length > 0) {
+      oldList.forEach(async (c) => {
+        await supabase.from('stock_categories').upsert({
+          id: c.id,
+          user_id: user.id,
+          name: c.name,
+          type: c.type || 'product',
+          created_at: new Date().toISOString()
+        }).select();
+      });
+      localStorage.removeItem('allCats88');
+      localStorage.removeItem('prodCats88');
+      localStorage.removeItem('svcCats88');
+      load();
+    }
+  }, [user, cats.length]);
 
   const openAdd = () => {
     setEditId(null);
@@ -37,27 +61,33 @@ export default function Categories() {
     setShowModal(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    let list = getCats();
     if (editId) {
-      const idx = list.findIndex(c => c.id === editId);
-      if (idx >= 0) { list[idx].name = fName.trim(); list[idx].type = fType; }
+      const { error } = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType }).eq('id', editId);
+      if (error) return alert(error.message);
     } else {
-      list.push({ id: Date.now(), name: fName.trim(), type: fType });
+      const { error } = await supabase.from('stock_categories').insert({
+        id: Date.now(),
+        user_id: user.id,
+        name: fName.trim(),
+        type: fType
+      });
+      if (error) return alert(error.message);
     }
-    setCats(list);
-    load();
+    await load();
     setShowModal(false);
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить категорию?')) return;
-    let list = getCats().filter(c => c.id !== id);
-    setCats(list);
-    load();
+    const { error } = await supabase.from('stock_categories').delete().eq('id', id);
+    if (error) return alert(error.message);
+    await load();
   };
+
+  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
   return (
     <>
