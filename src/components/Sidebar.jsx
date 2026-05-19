@@ -29,7 +29,7 @@ const menu = [
       { label: 'Каталог позиций', path: '/stock/products' },
       { label: 'Категории позиций', path: '/stock/categories' },
       { label: 'Здоровье товаров', path: '/stock/turnover' },
-      { label: 'Остатки', path: '/stock/stock' },
+      { label: 'Складские остатки', path: '/stock/stock' },
       { label: 'Поставки', path: '/stock/supplies' },
       { label: 'Инвентаризация', path: '/stock/inventory' },
       { label: 'Списания', path: '/stock/writeoffs' },

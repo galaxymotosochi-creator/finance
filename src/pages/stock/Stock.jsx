@@ -176,10 +176,10 @@ export default function Stock() {
       <div className="stock-toolbar" style={{paddingBottom:0,marginBottom:'1.5rem'}}>
         <div>
           <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
-            <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Остатки</h1>
+            <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Складские остатки</h1>
             <span className="stock-count">{items.length}</span>
           </div>
-          <div className="sub" style={{marginBottom:0}}>Управляйте остатками на складе</div>
+          <div className="sub" style={{marginBottom:0}}>Учет количества и фактического наличия товаров</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'.3rem'}}>
           <button className="stock-icon-btn">📊</button>
