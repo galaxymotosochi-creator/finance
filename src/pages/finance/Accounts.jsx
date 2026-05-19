@@ -331,7 +331,7 @@ export default function Accounts() {
                 );
               })}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                <button type="submit" className="btn btn-account-select">Сохранить</button>
               </div>
             </form>
           </div>
