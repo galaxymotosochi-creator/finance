@@ -242,9 +242,9 @@ export default function Salary() {
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
           <thead id="salaryColHeaders"><tr>
-            <th>Сотрудник</th><th>Тип</th><th>Период</th><th className="tr">Оклад</th><th className="tr">Продажи</th>
-            <th className="tr">%</th><th className="tr">Комиссия</th><th className="tr">Премия</th><th className="tr">Вычеты</th>
-            <th className="tr">Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
+            <th>Сотрудник</th><th>Тип</th><th>Период</th><th>Оклад</th><th>Продажи</th>
+            <th>%</th><th>Комиссия</th><th>Премия</th><th>Вычеты</th>
+            <th>Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
           </tr></thead>
           <tbody id="salaryTableBody">
             {list.length === 0 ? (
@@ -256,13 +256,13 @@ export default function Salary() {
                 <td><div className="prod-name" style={{fontSize:'.85rem',cursor:'pointer',color:'var(--primary)'}} onClick={()=>setDetailEmpId(s.employee_id)}>{s.employee_name||'—'}</div></td>
                 <td style={{fontSize:'.78rem'}}><span className="prod-cat" style={{background: (s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></td>
                 <td style={{fontSize:'.82rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td className="tr">{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
-                <td className="tr">{s.sales_total?s.sales_total.toLocaleString()+'₽':'—'}</td>
-                <td className="tr">{s.commission_percent?s.commission_percent+'%':'—'}</td>
-                <td className="tr">{s.commission_amount?s.commission_amount.toLocaleString()+'₽':'—'}</td>
-                <td className="tr" style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+'₽':'—'}</td>
-                <td className="tr" style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+'₽':'—'}</td>
-                <td className="tr" style={{fontWeight:600}}>{Number(s.amount).toLocaleString()}₽</td>
+                <td>{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
+                <td>{s.sales_total?s.sales_total.toLocaleString()+'₽':'—'}</td>
+                <td>{s.commission_percent?s.commission_percent+'%':'—'}</td>
+                <td>{s.commission_amount?s.commission_amount.toLocaleString()+'₽':'—'}</td>
+                <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+'₽':'—'}</td>
+                <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+'₽':'—'}</td>
+                <td style={{fontWeight:600}}>{Number(s.amount).toLocaleString()}₽</td>
                 <td><span className="prod-cat" style={{background:STATUS_COLORS[s.status]+'20',color:STATUS_COLORS[s.status]}}>{STATUS_LABELS[s.status]||s.status}</span></td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={()=>openEdit(s)}>Ред.</button>
