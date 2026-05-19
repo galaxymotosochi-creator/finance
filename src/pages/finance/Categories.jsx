@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -16,6 +16,16 @@ export default function Categories() {
   const [editingId, setEditingId] = useState(null);
   const [dirName, setDirName] = useState('');
   const [dirType, setDirType] = useState('income');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
 
   const fetch = async () => {
     setLoading(true);
@@ -45,7 +55,7 @@ export default function Categories() {
 
   const save = async (e) => {
     e.preventDefault();
-    if (!dirName.trim()) { alert('Введите название'); return; }
+    if (!dirName.trim()) { setToast('⚠️ Введите название'); return; }
     try {
       if (editingId) {
         await supabase.from('categories').update({ name: dirName.trim(), type: dirType }).eq('id', editingId);
@@ -57,21 +67,28 @@ export default function Categories() {
       setDirName('');
       setDirType('income');
       await fetch();
-    } catch (err) { alert(err.message); }
+    } catch (err) { setToast('⚠️ ' + err.message); }
   };
 
-  const remove = async (id) => {
-    if (!confirm('Удалить категорию?')) return;
+  const remove = (id) => {
+    setPendingDeleteId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    setShowConfirm(false);
     try {
-      const { error } = await supabase.from('categories').delete().eq('id', id).eq('user_id', user.id);
+      const { error } = await supabase.from('categories').delete().eq('id', pendingDeleteId).eq('user_id', user.id);
       if (error) {
         if ((error.code === '23503') || (error.message && error.message.includes('foreign key'))) {
-          alert('Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию.');
-        } else { alert(error.message); }
+          setToast('⚠️ Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию.');
+        } else { setToast('⚠️ ' + error.message); }
         return;
       }
       await fetch();
-    } catch (err) { alert(err.message); }
+    } catch (err) { setToast('⚠️ ' + err.message); }
+    setPendingDeleteId(null);
   };
 
   const toggleMenu = (e) => {
@@ -85,6 +102,7 @@ export default function Categories() {
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
   return (
     <>
+      {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
       <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Финансовые категории</h1>
@@ -161,6 +179,19 @@ export default function Categories() {
                 <button type="submit" className="btn btn-account-select">Сохранить</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {showConfirm && (
+        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
+            <button className="modal-close" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>&times;</button>
+            <h2 style={{fontSize:'1rem'}}>Удалить категорию?</h2>
+            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>Это действие нельзя отменить. Категория будет удалена навсегда.</p>
+            <div className="modal-actions">
+              <button className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>Отмена</button>
+              <button className="btn btn-primary" onClick={confirmDelete} style={{marginLeft:'.5rem'}}>Да, удалить</button>
+            </div>
           </div>
         </div>
       )}
