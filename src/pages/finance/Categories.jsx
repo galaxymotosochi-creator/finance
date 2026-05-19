@@ -22,7 +22,7 @@ export default function Categories() {
 
   useEffect(() => {
     if (toast) {
-      const t = setTimeout(() => setToast(null), 3000);
+      const t = setTimeout(() => setToast(null), 7000);
       return () => clearTimeout(t);
     }
   }, [toast]);
@@ -82,7 +82,7 @@ export default function Categories() {
       const { error } = await supabase.from('categories').delete().eq('id', pendingDeleteId).eq('user_id', user.id);
       if (error) {
         if ((error.code === '23503') || (error.message && error.message.includes('foreign key'))) {
-          setToast('⚠️ Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию.');
+          setToast('⚠️ Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию');
         } else { setToast('⚠️ ' + error.message); }
         return;
       }
@@ -185,7 +185,6 @@ export default function Categories() {
       {showConfirm && (
         <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
           <div className="modal-box" style={{maxWidth:'420px'}}>
-            <button className="modal-close" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>&times;</button>
             <h2 style={{fontSize:'1rem'}}>Удалить категорию?</h2>
             <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>Это действие нельзя отменить. Категория будет удалена навсегда.</p>
             <div className="modal-actions">
