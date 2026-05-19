@@ -231,7 +231,7 @@ export default function Salary() {
   return (
     <>
       <div className="page-header">
-        <div><h1>Учет зарплаты</h1><div className="sub">Начисление окладов, расчет бонусов и фиксация выплат сотрудникам</div></div>
+        <div><h1>Учет зарплаты</h1><div className="sub">Расчет начислений, бонусов и выплат команде</div></div>
         <div className="page-actions"><button className="btn-green" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
