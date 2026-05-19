@@ -108,7 +108,7 @@ export default function Suppliers() {
           </thead>
           <tbody id="supplierTableBody">
             {suppliers.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">🏢</div><p>Поставщиков пока нет. Нажмите «+ Добавить поставщика»</p></div></td></tr>
+              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">🏢</div><p>Список поставщиков пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Внесите первого контрагента, чтобы начать работу</p></div></td></tr>
             ) : suppliers.map(s => {
               const supSupplies = supplies.filter(sp => sp.supplierName === s.name);
               const supplyCount = supSupplies.length;
