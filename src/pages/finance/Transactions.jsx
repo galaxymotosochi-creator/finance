@@ -383,7 +383,7 @@ export default function Transactions() {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
             <h2>Перевод между счетами</h2>
-            <div className="sub">Переместите деньги между счетами</div>
+            <div className="sub">Перемещение средств со счета на счет</div>
             <form onSubmit={async function(e){
               e.preventDefault();
               if (!trAmt||parseFloat(trAmt)<=0) {alert('Введите сумму');return;}
