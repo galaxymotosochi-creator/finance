@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
@@ -21,11 +23,10 @@ const ALL_COLUMNS = [
   { id:'markup', label:'Наценка', def:true },
 ];
 
-const getCats = () => {
+const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
+const getCatsFromLocal = () => {
   let list = JSON.parse(localStorage.getItem('allCats88') || '[]');
-  if (list.length === 0) {
-    list = JSON.parse(localStorage.getItem('prodCats88') || '[]');
-  }
+  if (list.length === 0) list = JSON.parse(localStorage.getItem('prodCats88') || '[]');
   return list;
 };
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
@@ -58,6 +59,7 @@ const COL_ORDER = ['name','type','category','cost','price','markup'];
 const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка' };
 
 export default function Products() {
+  const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
   const [activeCols, setActiveColsState] = useState(getCols);
@@ -69,6 +71,8 @@ export default function Products() {
   const [toast, setToast] = useState(null);
   const [viewProduct, setViewProduct] = useState(null);
   const [costMap, setCostMap] = useState({});
+  const [cats, setCats] = useState([]);
+  const [catsLoaded, setCatsLoaded] = useState(false);
 
   // Форма
   const [fName, setFName] = useState('');
@@ -89,11 +93,42 @@ export default function Products() {
   const [exportOpen, setExportOpen] = useState(false);
   const [catFilter, setCatFilter] = useState('');
 
-  const load = useCallback(() => { setProductsState(getProducts().filter(p => !p.hidden)); }, []);
+  const migrateLocalData = useCallback(async () => {
+    const local = JSON.parse(localStorage.getItem('products88') || '[]');
+    if (local.length > 0) {
+      const { data: existing } = await supabase.from('products').select('id').eq('user_id', user.id);
+      if (!existing || existing.length === 0) {
+        for (const p of local) {
+          await supabase.from('products').insert({
+            id: p.id, user_id: user.id, name: p.name, cat: p.cat,
+            price: p.price, unit: p.unit, sku: p.sku, barcode: p.barcode,
+            type: p.type || 'product', weight: p.weight || 0, weight_unit: p.weightUnit || 'кг',
+            description: p.desc || '', hidden: p.hidden || false
+          });
+        }
+        localStorage.removeItem('products88');
+        localStorage.removeItem('trash88');
+      }
+    }
+  }, [user]);
 
-  useEffect(() => { load(); }, [load]);
+  const load = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+    if (data) setProductsState(data.filter(p => !p.hidden));
+  }, [user]);
+
+  useEffect(() => { if (user) { migrateLocalData().then(() => load()); } }, [user, load, migrateLocalData]);
   
   useEffect(() => { setCostMap(getCostMap()); }, []);
+  
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at').then(({ data }) => {
+      if (data) setCats(data);
+      setCatsLoaded(true);
+    });
+  }, [user]);
 
   useEffect(() => {
     if (window.location.hash.includes('add=true') || window.location.search.includes('add=true')) {
@@ -139,61 +174,53 @@ export default function Products() {
     setShowModal(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
     const price = parseFloat(fPrice) || 0;
-    let list = getProducts();
+    const productData = {
+      name: fName.trim(), cat: fCat, price: price, unit: fUnit,
+      sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
+      weight: parseFloat(fWeight) || 0, weight_unit: fWeightUnit,
+      user_id: user.id, description: fDesc,
+      hidden: editId ? fHidden : false
+    };
     if (editId) {
-      const idx = list.findIndex(x => x.id === editId);
-      if (idx === -1) return alert('Товар не найден');
-      list[idx] = { ...list[idx],
-        name: fName.trim(), cat: fCat, price: price, unit: fUnit,
-        sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
-        weight: parseFloat(fWeight) || 0, weightUnit: fWeightUnit,
-        hidden: fHidden
-      };
+      const { error } = await supabase.from('products').update(productData).eq('id', editId);
+      if (error) return alert(error.message);
     } else {
-      list.unshift({
-        id: Date.now(), name: fName.trim(), cat: fCat, price: price,
-        unit: fUnit, sku: fSku.trim(), barcode: fBarcode.trim(),
-        type: fType, weight: parseFloat(fWeight) || 0, weightUnit: fWeightUnit,
-        hidden: false,
-        desc: fDesc
-      });
+      const { error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
+      if (error) return alert(error.message);
     }
-    setProducts(list);
     setShowModal(false);
     load();
     showToast();
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить товар?')) return;
-    let list = getProducts();
+    // Move to trash in localStorage for now
     let trash = getTrash();
-    const idx = list.findIndex(p => p.id === id);
-    if (idx === -1) return;
-    const item = { ...list[idx], deletedAt: Date.now() };
-    trash.unshift(item);
-    list.splice(idx, 1);
-    setProducts(list);
-    setTrash(trash);
+    const { data: items } = await supabase.from('products').select('*').eq('id', id);
+    if (items && items[0]) {
+      trash.unshift({ ...items[0], deletedAt: Date.now() });
+      setTrash(trash);
+    }
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) return alert(error.message);
     load();
     showToast('🗑️ Товар перемещен в корзину');
   };
 
-  const hide = (id) => {
-    let list = getProducts();
-    list = list.map(p => p.id === id ? { ...p, hidden: true } : p);
-    setProducts(list);
+  const hide = async (id) => {
+    const { error } = await supabase.from('products').update({ hidden: true }).eq('id', id);
+    if (error) return alert(error.message);
     load();
   };
 
-  const unhide = (id) => {
-    let list = getProducts();
-    list = list.map(p => p.id === id ? { ...p, hidden: false } : p);
-    setProducts(list);
+  const unhide = async (id) => {
+    const { error } = await supabase.from('products').update({ hidden: false }).eq('id', id);
+    if (error) return alert(error.message);
     load();
   };
 
@@ -325,7 +352,7 @@ export default function Products() {
                   <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
                 </div>
                 <div className="cat-dd-list">
-                  {getCats().filter(c => !catFilter || c.name.toLowerCase().includes(catFilter.toLowerCase())).map(c => {
+                  {(catsLoaded ? cats : []).filter(c => !catFilter || c.name.toLowerCase().includes(catFilter.toLowerCase())).map(c => {
                     const checked = selectedCats.has(c.name);
                     return (
                       <div key={c.name} className="cat-dd-item" onClick={() => toggleCat(c.name)}>
@@ -334,7 +361,7 @@ export default function Products() {
                       </div>
                     );
                   })}
-                  {getCats().length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
+                  {cats.length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
                 </div>
               </div>
             )}
@@ -454,7 +481,7 @@ export default function Products() {
                   <label>Категория</label>
                   <select value={fCat} onChange={e => setFCat(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {getCats().map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                    {(catsLoaded ? cats : []).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
