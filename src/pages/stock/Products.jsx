@@ -21,7 +21,13 @@ const ALL_COLUMNS = [
   { id:'markup', label:'Наценка', def:true },
 ];
 
-const getCats = () => JSON.parse(localStorage.getItem('prodCats88') || '[]');
+const getCats = () => {
+  let list = JSON.parse(localStorage.getItem('allCats88') || '[]');
+  if (list.length === 0) {
+    list = JSON.parse(localStorage.getItem('prodCats88') || '[]');
+  }
+  return list;
+};
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 const setProducts = (list) => localStorage.setItem('products88', JSON.stringify(list));
 const getTrash = () => JSON.parse(localStorage.getItem('trash88') || '[]');
