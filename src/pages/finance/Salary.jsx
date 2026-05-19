@@ -248,7 +248,8 @@ export default function Salary() {
           </tr></thead>
           <tbody id="salaryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">💼</div><p>Начислений пока нет</p></div></td></tr>
+              <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">💼</div><p>История начислений пуста</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Проведите первое начисление оклада или бонусов команде</p></div></td></tr>
             ) : list.map(s => {
               const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
               return (
