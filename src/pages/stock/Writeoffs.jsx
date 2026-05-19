@@ -1,49 +1,73 @@
 import { useState, useEffect } from 'react';
-
-const getWriteoffs = () => JSON.parse(localStorage.getItem('writeoffs88') || '[]');
-const setWriteoffs = (list) => localStorage.setItem('writeoffs88', JSON.stringify(list));
-const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const REASONS = ['Списание','Брак','Потеря','Порча','Окончание срока','Инвентаризация','Прочее'];
 
 export default function Writeoffs() {
+  const { user } = useAuth();
   const [list, setList] = useState([]);
+  const [products, setProducts] = useState([]);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fProd, setFProd] = useState('');
   const [fQty, setFQty] = useState('1');
   const [fReason, setFReason] = useState('Списание');
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
+  const [loading, setLoading] = useState(true);
 
-  const load = () => setList(getWriteoffs());
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    setLoading(true);
+    const [wRes, pRes] = await Promise.all([
+      supabase.from('writeoffs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+    ]);
+    if (wRes.data) setList(wRes.data);
+    if (pRes.data) setProducts(pRes.data);
+    setLoading(false);
+  };
+
+  useEffect(() => { if (user) load(); }, [user]);
+
+  useEffect(() => {
+    if (!user || list.length > 0) return;
+    const old = JSON.parse(localStorage.getItem('writeoffs88') || '[]');
+    if (old.length > 0) {
+      old.forEach(async (w) => {
+        await supabase.from('writeoffs').insert({ id: w.id, user_id: user.id, product_id: w.prodId || 0, quantity: w.qty || 1, reason: w.reason || 'Списание', date: w.date || new Date().toISOString().split('T')[0] });
+      });
+      localStorage.removeItem('writeoffs88');
+      load();
+    }
+  }, [user, list.length]);
 
   const openAdd = () => {
     setEditId(null); setFProd(''); setFQty('1'); setFReason('Списание');
     setFDate(new Date().toISOString().split('T')[0]); setShow(true);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     const prodId = parseInt(fProd);
     if (!prodId) return alert('Выберите товар');
     const qty = parseInt(fQty) || 1;
     if (qty <= 0) return alert('Введите количество');
-    const prod = getProducts().find(p => p.id === prodId);
+    const prod = products.find(p => p.id === prodId);
     const cost = prod ? (prod.price || 0) : 0;
-    const all = getWriteoffs();
-    const obj = { prodId, name: prod ? prod.name : 'Товар', qty, cost, reason: fReason, date: fDate };
     if (editId) {
-      const idx = all.findIndex(x => x.id === editId);
-      if (idx > -1) all[idx] = { ...all[idx], ...obj };
-    } else { obj.id = Date.now(); all.unshift(obj); }
-    setWriteoffs(all); load(); setShow(false);
+      await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
+    } else {
+      await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
+    }
+    await load(); setShow(false);
   };
 
-  const remove = (id) => {
+  const remove = async (id) => {
     if (!confirm('Удалить списание?')) return;
-    setWriteoffs(getWriteoffs().filter(x => x.id !== id)); load();
+    await supabase.from('writeoffs').delete().eq('id', id); await load();
   };
+
+  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
   return (
     <>
@@ -75,14 +99,14 @@ export default function Writeoffs() {
               <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Списаний пока нет</p></div></td></tr>
             ) : list.map(w => (
               <tr key={w.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name}</div></td>
-                <td>{w.qty}</td>
-                <td><span className="num">{(w.qty * (w.cost||0)).toLocaleString()}₽</span></td>
+                <td><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
+                <td>{w.quantity}</td>
+                <td><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()}₽</span></td>
                 <td><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={() => {
-                    setEditId(w.id); setFProd(String(w.prodId)); setFQty(String(w.qty));
+                    setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));
                     setFReason(w.reason||'Списание'); setFDate(w.date||new Date().toISOString().split('T')[0]);
                     setShow(true);
                   }}>Ред.</button>
@@ -115,7 +139,7 @@ export default function Writeoffs() {
                 <label>Товар *</label>
                 <select value={fProd} onChange={e=>setFProd(e.target.value)} required>
                   <option value="">— выберите товар —</option>
-                  {getProducts().map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
               <div className="form-row">
@@ -135,7 +159,7 @@ export default function Writeoffs() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Списать'}</button>
+                <button type="submit" className="btn btn-account-select">{editId?'Сохранить':'Списать'}</button>
               </div>
             </form>
           </div>
