@@ -22,12 +22,13 @@ export default function Categories() {
     const { data } = await supabase
       .from('categories')
       .select('*')
+      .eq('user_id', user.id)
       .order('name');
     setList(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { if (user) fetch(); }, [user]);
 
   const openModal = (cat) => {
     if (cat) {
@@ -61,8 +62,11 @@ export default function Categories() {
 
   const remove = async (id) => {
     if (!confirm('Удалить категорию?')) return;
-    await supabase.from('categories').delete().eq('id', id);
-    await fetch();
+    try {
+      const { error } = await supabase.from('categories').delete().eq('id', id).eq('user_id', user.id);
+      if (error) { alert(error.message); return; }
+      await fetch();
+    } catch (err) { alert(err.message); }
   };
 
   const toggleMenu = (e) => {
