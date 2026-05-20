@@ -316,7 +316,7 @@ export default function Products() {
       case 'name': return `<div class="prod-name" style="cursor:pointer;color:var(--primary)">${p.name}</div>`;
       case 'type':
         const isSvc = p.type === 'service';
-        return `<span style="display:inline-block;padding:.1rem .45rem;border-radius:20px;font-size:.7rem;font-weight:500;${isSvc?'background:#fef9c3;color:#854d0e':'background:#e0f2fe;color:#075985'}">${isSvc ? 'Услуга' : 'Товар'}</span>`;
+        return `<span class="prod-cat">${isSvc ? 'Услуга' : 'Товар'}</span>`;
       case 'category': return `<span class="prod-cat">${CAT_LABELS[p.cat] || p.cat || '—'}</span>`;
       case 'cost': {
         const cp = costPrice(p);
@@ -454,7 +454,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer'}} onClick={() => setViewProduct(p)} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left'}} onClick={() => setViewProduct(p)} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                     }
                     return <td key={col} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
