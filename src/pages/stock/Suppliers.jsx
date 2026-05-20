@@ -51,14 +51,14 @@ export default function Suppliers() {
 
   const openEdit = (s) => {
     setEditId(s.id); setFName(s.name); setFContact(s.contact||'');
-    setFPhone(s.phone||''); setFMethod(s.contactMethod||'telegram');
+    setFPhone(s.phone||''); setFMethod(s.contact_method||'telegram');
     setShowModal(true);
   };
 
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contactMethod: fMethod };
+    const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contact_method: fMethod };
     if (editId) {
       const { error } = await supabase.from('suppliers').update(obj).eq('id', editId);
       if (error) return alert(error.message);
@@ -113,8 +113,8 @@ export default function Suppliers() {
               const supSupplies = supplies.filter(sp => sp.supplierName === s.name);
               const supplyCount = supSupplies.length;
               const totalSum = supSupplies.reduce((sum, sp) => sum + ((sp.qty||0) * (sp.cost||0)), 0);
-              const icon = CONTACT_ICONS[s.contactMethod] || '📞';
-              const label = CONTACT_LABELS[s.contactMethod] || s.contactMethod || '—';
+              const icon = CONTACT_ICONS[s.contact_method] || '📞';
+              const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
               return (
                 <tr key={s.id}>
                   <td><div className="prod-name" style={{fontSize:'.85rem'}}>{s.name}</div></td>
