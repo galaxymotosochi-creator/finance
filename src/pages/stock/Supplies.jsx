@@ -195,7 +195,7 @@ export default function Supplies() {
                   <td><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td><span style={{cursor:'pointer',color:supColor}} onClick={() => cycleStatus(s.id)} title="Нажмите чтобы изменить">{supSt}</span></td>
                   <td><span style={{color:payColor}}>{paySt}</span></td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{s.date||'—'}</td>
+                  <td style={{fontSize:'.82rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{s.date||'—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     {payStatus !== 'paid' && <button className="act-btn prod-edit-btn" onClick={() => setShowPay(s.id)}>Оплатить</button>}
                     <button className="act-btn prod-edit-btn" onClick={() => edit(s.id)}>Ред.</button>
