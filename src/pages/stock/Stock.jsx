@@ -210,22 +210,21 @@ export default function Stock() {
         <table style={{minWidth:'680px'}}>
           <thead id="stockColHeaders">
             <tr>
-              <th>Товар</th>
+              <th style={{textAlign:'left'}}>Товар</th>
               <th>Артикул</th>
               <th>Штрихкод</th>
               <th>Категория</th>
-              <th className="tr">Остаток</th>
-              <th className="tr">Закуп</th>
-              <th className="tr">Продажа</th>
-              <th className="tr">Наценка</th>
-              <th className="tr">Сумма</th>
-              <th>Действия</th>
+              <th>Остаток</th>
+              <th>Закуп</th>
+              <th>Продажа</th>
+              <th>Наценка</th>
+              <th>Сумма</th>
             </tr>
           </thead>
           <tbody id="stockTableBody">
             {items.length === 0 ? (
               <tr>
-                <td colSpan="10">
+                <td colSpan="9">
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
                     <p>Товаров на складе нет</p>
@@ -244,45 +243,40 @@ export default function Stock() {
 
               return (
                 <tr key={p.id}>
-                  <td>
+                  <td style={{textAlign:'left'}}>
                     <span style={{fontWeight:400}}>{p.name}</span>
                     {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
                   </td>
-                  <td style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
-                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{p.barcode || '—'}</td>
-                  <td><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
-                  <td className={`tr${low ? ' stock-low' : ''}`}>{qty}</td>
-                  <td className="tr">{costPrice.toLocaleString()}</td>
-                  <td className="tr">
+                  <td style={{textAlign:'center',fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
+                  <td style={{textAlign:'center',fontSize:'.78rem',color:'var(--muted)'}}>{p.barcode || '—'}</td>
+                  <td style={{textAlign:'center'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
+                  <td style={{textAlign:'center'}} className={low ? 'stock-low' : ''}>{qty}</td>
+                  <td style={{textAlign:'center'}}>{costPrice.toLocaleString()}</td>
+                  <td style={{textAlign:'center'}}>
                     <span className="editable-price"
                       style={{cursor:'pointer',color:'var(--primary)',fontWeight:500,borderBottom:'1px dashed var(--primary)',paddingBottom:'1px'}}
                       onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
                   </td>
-                  <td className="tr">
+                  <td style={{textAlign:'center'}}>
                     <span className={`markup-badge${markup >= 0 ? '' : ' neg'}`}>
                       {markup >= 0 ? '+' : ''}{markup.toLocaleString()}{markupPct ? ` (${markupPct}%)` : ''}
                     </span>
                   </td>
-                  <td className="tr">{sumValue.toLocaleString()}</td>
-                  <td>
-                    <span style={{color:'var(--primary)',cursor:'pointer',fontSize:'.72rem'}}
-                      onClick={() => navigateTo('/stock/products')}>Ред.</span>
-                  </td>
+                  <td style={{textAlign:'center'}}>{sumValue.toLocaleString()}</td>
                 </tr>
               );
             })}
             {items.length > 0 && (
               <tr className="total-row">
-                <td style={{fontWeight:600}}>Итого</td>
+                <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td className="tr" style={{fontWeight:700}}>{totalQty}</td>
+                <td style={{textAlign:'center',fontWeight:700}}>{totalQty}</td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td className="tr" style={{fontWeight:700}}>{totalSum.toLocaleString()}</td>
-                <td></td>
+                <td style={{textAlign:'center',fontWeight:700}}>{totalSum.toLocaleString()}</td>
               </tr>
             )}
           </tbody>
