@@ -113,7 +113,7 @@ export default function Supplies() {
   const edit = (id) => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
-    setEditId(id); setFInvoice(s.invoice||''); setFSupName(s.supplierName||'');
+    setEditId(id); setFInvoice(s.invoice||''); setFSupName(s.supplier_name||'');
     setFStatus(s.status||'ordered'); setFPaid(String(s.paid||0));
     setFItems((s.items||[{prodId:s.prodId,name:'Товар',qty:s.qty||0,cost:s.cost||0}]).slice());
     setShowModal(true);
@@ -191,7 +191,7 @@ export default function Supplies() {
                       onClick={() => setViewId(prev => prev === s.id ? null : s.id)}>{s.invoice||'—'}</div>
                     <div className="prod-sku">{totalItems(s)} поз.</div>
                   </td>
-                  <td><span className="prod-cat">{s.supplierName||'—'}</span></td>
+                  <td><span className="prod-cat">{s.supplier_name||'—'}</span></td>
                   <td><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td><span style={{cursor:'pointer',color:supColor}} onClick={() => cycleStatus(s.id)} title="Нажмите чтобы изменить">{supSt}</span></td>
                   <td><span style={{color:payColor}}>{paySt}</span></td>
@@ -237,7 +237,7 @@ export default function Supplies() {
               <span style={{cursor:'pointer',color:'var(--muted)',fontSize:'1.1rem'}} onClick={() => setViewId(null)}>✕</span>
             </div>
             <div style={{marginBottom:'.5rem',fontSize:'.82rem'}}>
-              <div><span style={{color:'var(--muted)'}}>Поставщик:</span> {s.supplierName||'—'}</div>
+              <div><span style={{color:'var(--muted)'}}>Поставщик:</span> {s.supplier_name||'—'}</div>
               <div><span style={{color:'var(--muted)'}}>Статус поставки:</span> <span style={{color:supColor}}>{supSt}</span></div>
               <div><span style={{color:'var(--muted)'}}>Статус оплаты:</span> <span style={{color:payColor}}>{paySt}</span></div>
               <div><span style={{color:'var(--muted)'}}>Дата:</span> {s.date||'—'}</div>
@@ -348,7 +348,7 @@ export default function Supplies() {
             <div className="modal-box" style={{maxWidth:'450px'}}>
               <button className="modal-close" onClick={()=>setShowPay(null)}>&times;</button>
               <h2>💳 Оплата {s.invoice||'поставки'}</h2>
-              <div className="sub">{s.supplierName||''}</div>
+              <div className="sub">{s.supplier_name||''}</div>
               <div id="payModalInfo" style={{margin:'.5rem 0'}}>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.25rem'}}><span>Сумма накладной:</span><span>{total.toFixed(2)}₽</span></div>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.25rem'}}><span>Уже оплачено:</span><span style={{color:'#16a34a'}}>{paid.toFixed(2)}₽</span></div>
