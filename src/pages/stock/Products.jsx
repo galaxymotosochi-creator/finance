@@ -313,7 +313,7 @@ export default function Products() {
 
   const cellHtml = (col, p) => {
     switch(col) {
-      case 'name': return `<div class="prod-name" style="cursor:pointer;color:var(--primary)">${p.name}</div>`;
+      case 'name': return `<div class="prod-name" style="cursor:pointer">${p.name}</div>`;
       case 'type':
         const isSvc = p.type === 'service';
         return `<span class="prod-cat">${isSvc ? 'Услуга' : 'Товар'}</span>`;
