@@ -257,6 +257,7 @@ body {
   background: var(--white); text-align: center;
 }
 #colHeaders th:first-child { text-align: left; padding-left: 0; }
+#productTableBody td:first-child { text-align: left; padding-left: 0; }
 #colHeaders th:nth-child(2) { text-align: center; min-width: 140px; }
 #colHeaders th:nth-child(4) { min-width: 100px; }
 #colHeaders th:nth-child(5) { min-width: 110px; }
