@@ -12,7 +12,7 @@ const svgIcons = {
 };
 
 const menu = [
-  { label: 'Панель управления', path: '/', icon: 'dashboard' },
+  { label: 'Панель управления', path: '/dashboard', icon: 'dashboard' },
   { label: 'Касса', path: '/registers', icon: 'registers' },
   {
     label: 'Финансы', icon: 'finance', children: [
@@ -77,7 +77,7 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/' || location.hash === '#/';
+    if (path === '/dashboard') return location.pathname === '/dashboard' || location.hash === '#/dashboard';
     return location.pathname.startsWith(path);
   };
 
