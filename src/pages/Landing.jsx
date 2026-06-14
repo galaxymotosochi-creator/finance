@@ -81,10 +81,10 @@ export default function Landing() {
             Первая программа с AI аналитикой
           </div>
           <h1 style={{fontSize:"clamp(32px,5vw,48px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
-            Управляйте бизнесом<br/>с умом
+            Ваш бизнес на ладони.<br/>Смарт-учёт без рутины
           </h1>
-          <p style={{fontSize:16,color:"rgba(0,0,0,.54)",lineHeight:1.5,marginBottom:28}}>
-            Единая платформа для учёта доходов, расходов, склада, зарплаты и клиентов. Без сложных настроек и лишних кнопок.
+          <p style={{fontSize:15,color:"rgba(0,0,0,.54)",lineHeight:1.55,marginBottom:28}}>
+            Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
           </p>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
             <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
