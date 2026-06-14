@@ -212,7 +212,22 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== ДЛЯ КОГО ===== */}
+      {/* ===== СТАТИСТИКА (стильная) ===== */}
+      <section style={{maxWidth:900,margin:"60px auto",padding:"0 24px"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
+          {[
+            {num:"100+",label:"компаний",desc:"уже используют FINANCE для учёта",color:"#000",bg:"#fff8d6"},
+            {num:"4",label:"сервиса",desc:"заменяет одна система — склад, финансы, зп, клиенты",color:"#fff",bg:"#000"},
+            {num:"70%",label:"экономия",desc:"времени на учёт по сравнению с Excel",color:"#000",bg:"#ffdd2d"},
+          ].map((s,i)=>(
+            <div key={i} style={{background:s.bg,color:s.color,borderRadius:20,padding:"28px 20px",textAlign:"center",border:"1px solid rgba(0,0,0,.06)"}}>
+              <div style={{fontSize:40,fontWeight:800,lineHeight:1,marginBottom:6,letterSpacing:"-.03em"}}>{s.num}</div>
+              <div style={{fontSize:15,fontWeight:600,marginBottom:4}}>{s.label}</div>
+              <div style={{fontSize:12,opacity:.6,lineHeight:1.4}}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>\
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
         <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для кого подходит</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36}}>FINANCE одинаково полезен разному бизнесу</p>
