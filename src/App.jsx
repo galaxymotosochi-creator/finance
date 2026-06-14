@@ -2,6 +2,11 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
+import Variant1 from './pages/Variant1';
+import Variant2 from './pages/Variant2';
+import Variant3 from './pages/Variant3';
+import Variant4 from './pages/Variant4';
+import Variant5 from './pages/Variant5';
 import Dashboard from './pages/Dashboard';
 import AppLayout from './layouts/AppLayout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -32,6 +37,11 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Landing />} />
       <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+      <Route path="/variant/1" element={<Variant1 />} />
+      <Route path="/variant/2" element={<Variant2 />} />
+      <Route path="/variant/3" element={<Variant3 />} />
+      <Route path="/variant/4" element={<Variant4 />} />
+      <Route path="/variant/5" element={<Variant5 />} />
       <Route path="/registers" element={<ProtectedRoute><AppLayout><div>Касса</div></AppLayout></ProtectedRoute>} />
 
       {/* Finance */}
