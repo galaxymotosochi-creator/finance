@@ -129,15 +129,15 @@ export default function Landing() {
           <MiniAppWindow title="Панель управления">
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
                 <div style={{background:"#f9f9f9",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Доходы</span>
+                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Доходы </span>
                   <span style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>+284 000 ₽</span>
                 </div>
                 <div style={{background:"#f9f9f9",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расходы</span>
+                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расходы </span>
                   <span style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>−123 000 ₽</span>
                 </div>
                 <div style={{background:"#ffdd2d",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Итого</span>
+                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Итого </span>
                   <span style={{fontSize:11,fontWeight:800}}>+161 000 ₽</span>
                 </div>
               </div>
