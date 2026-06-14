@@ -378,35 +378,45 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== ТАРИФЫ (из варианта 4) ===== */}
-      <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:36,letterSpacing:"-.02em"}}>Тарифы</h2>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
+      {/* ===== ТАРИФЫ ===== */}
+      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Тарифы</h2>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Прозрачные цены для бизнеса любого масштаба</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,alignItems:"stretch"}}>
           {[
-            {name:"Базовый",price:"Бесплатно",desc:"Для одного пользователя",features:["Учёт доходов/расходов","База клиентов","Базовая аналитика"],popular:false},
-            {name:"Бизнес",price:"2 900 ₽",desc:"Для команды до 5 человек",features:["Всё из Базового","Складской учёт","Зарплата и табель","5 пользователей"],popular:true},
-            {name:"Профи",price:"6 900 ₽",desc:"Без ограничений",features:["Всё из Бизнес","Неограниченно пользователей","API","Поддержка 24/7"],popular:false},
+            {name:"Базовый",price:"490 ₽",period:"/мес",desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Начать"},
+            {name:"Старт",price:"990 ₽",period:"/мес",desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация от AI","До 2 пользователей"],popular:false,btn:"Подключить"},
+            {name:"Бизнес",price:"2 900 ₽",period:"/мес",desc:"Для компаний с командой",features:["Все функции тарифа «Старт»","Зарплата и табель сотрудников","Управление ролями и доступом","Безлимитный AI-помощник","До 5 пользователей"],popular:true,btn:"Подключить"},
+            {name:"Профи",price:"6 900 ₽",period:"/мес",desc:"Для сетей и крупных проектов",features:["Все функции тарифа «Бизнес»","Мульти-аккаунты (несколько точек)","Интеграции и доступ к API","ИИ-мониторинг аномалий","Безлимитные пользователи"],popular:false,btn:"Подключить"},
           ].map((t,i)=>(
             <div key={i} style={{
               border:`1.5px solid ${t.popular?"#ffdd2d":"rgba(0,0,0,.08)"}`,
-              borderRadius:20,padding:28,background:t.popular?"#fff":"#fff",
-              position:"relative",boxShadow:t.popular?"0 8px 24px rgba(0,0,0,.06)":"none",
+              borderRadius:20,padding:"24px 20px",background:"#fff",
+              position:"relative",boxShadow:t.popular?"0 8px 24px rgba(0,0,0,.08)":"none",
+              display:"flex",flexDirection:"column",
             }}>
-              {t.popular && <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",padding:"3px 14px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000"}}>Популярный</div>}
-              <div style={{fontSize:17,fontWeight:700,marginBottom:4}}>{t.name}</div>
-              <div style={{fontSize:24,fontWeight:800,marginBottom:4}}>{t.price}</div>
-              <div style={{fontSize:12,color:"rgba(0,0,0,.54)",marginBottom:16}}>{t.desc}</div>
-              <div style={{borderTop:"1px solid rgba(0,0,0,.06)",paddingTop:16,marginBottom:20}}>
+              {t.popular && <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",padding:"3px 14px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",whiteSpace:"nowrap"}}>Популярный</div>}
+              <div style={{fontSize:15,fontWeight:700,marginBottom:2}}>{t.name}</div>
+              <div style={{marginBottom:4}}>
+                <span style={{fontSize:22,fontWeight:800}}>{t.price}</span>
+                <span style={{fontSize:11,color:"rgba(0,0,0,.34)"}}>{t.period}</span>
+              </div>
+              <div style={{fontSize:11,color:"rgba(0,0,0,.54)",marginBottom:12,lineHeight:1.3}}>{t.desc}</div>
+              <div style={{borderTop:"1px solid rgba(0,0,0,.06)",paddingTop:12,marginBottom:12,flex:1}}>
                 {t.features.map((f,j)=>(
-                  <div key={j} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13}}>
-                    <span style={{color:"#16a34a",fontWeight:700}}>✓</span>{f}
+                  <div key={j} style={{display:"flex",alignItems:"center",gap:8,padding:"3px 0",fontSize:12}}>
+                    <span style={{color:"#16a34a",fontWeight:700,flexShrink:0}}>✓</span>
+                    <span>{f}</span>
                   </div>
                 ))}
               </div>
               <button onClick={()=>n('/register')} style={{
-                width:"100%",padding:"10px",borderRadius:100,border:"none",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
+                width:"100%",padding:"9px",borderRadius:100,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
                 background:t.popular?"#ffdd2d":"rgba(0,0,0,.06)",color:t.popular?"#000":"#111",
-              }}>{t.price==="Бесплатно"?"Начать":"Подключить"}</button>
+                transition:"all .15s",
+              }}
+                onMouseEnter={e=>{if(t.popular)e.currentTarget.style.background="#f5d100"}}
+                onMouseLeave={e=>{if(t.popular)e.currentTarget.style.background="#ffdd2d"}}>{t.btn}</button>
             </div>
           ))}
         </div>
