@@ -265,7 +265,7 @@ export default function Landing() {
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <div style={{background:"#000",borderRadius:24,padding:"48px 40px",color:"#fff"}}>
           <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:100,background:"rgba(255,255,255,.1)",fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)",marginBottom:16}}>
-            🤖 AI-аналитика
+            AI-аналитика
           </div>
           <h2 style={{fontSize:"clamp(24px,3.5vw,32px)",fontWeight:700,letterSpacing:"-.02em",marginBottom:8}}>
             Искусственный интеллект<br/>в помощь бизнесу
