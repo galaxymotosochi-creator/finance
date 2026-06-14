@@ -256,7 +256,7 @@ export default function Landing() {
 
       {/* ===== КОНТРАСТ СИСТЕМ ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках и хаосе в Excel</h2>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Сравните, как работают привычные методы и наша умная платформа</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20,alignItems:"start"}}>
           {/* Карточка 1 — ERP */}
