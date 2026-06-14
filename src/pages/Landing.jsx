@@ -167,7 +167,7 @@ export default function Landing() {
               <MiniStat label="Итого" value="+161 000 ₽" color="#000" bg="#ffdd2d" />
             </div>
             <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
-            {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
+            {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
               <MiniRow key={i} label={r[0]} value={r[1]} color={r[2]} />
             ))}
           </MiniAppWindow>
