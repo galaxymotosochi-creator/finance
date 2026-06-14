@@ -134,13 +134,13 @@ export default function Landing() {
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Почему выбирают нас</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины работать с FINANCE</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в Finance</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"center"}}>
         {[
-          {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения. Всё интуитивно."},
-          {num:"02",title:"Надёжность",desc:"Данные хранятся в Supabase - современная защита."},
-          {num:"03",title:"Экономия",desc:"Заменяет 3-4 сервиса. Платите в разы меньше."},
-          {num:"04",title:"Поддержка",desc:"Отвечаем быстро, помогаем с настройкой."},
+          {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
+          {num:"02",title:"Надёжность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
+          {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учёт и CRM-систему. Вы получаете всё в одной вкладке и не переплачиваете за разные сервисы."},
+          {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесём ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
         ].map((f,i)=>(
           <div key={i} style={{display:"flex",gap:16,padding:"16px 0",borderTop:"1px solid rgba(0,0,0,.06)",alignItems:"flex-start"}}>
             <div style={{fontSize:36,fontWeight:800,color:"rgba(0,0,0,.06)",lineHeight:1,flexShrink:0,minWidth:50}}>{f.num}</div>
