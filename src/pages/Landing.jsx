@@ -21,9 +21,9 @@ export default function Landing() {
     </div>
   );
   const MiniStat = ({label,value,color,bg}) => (
-    <div style={{background:bg||"#f9f9f9",borderRadius:8,padding:8,textAlign:"center"}}>
+    <div style={{background:bg||"#f9f9f9",borderRadius:6,padding:"4px 4px",textAlign:"center"}}>
       <div style={{fontSize:9,color:"rgba(0,0,0,.54)",marginBottom:1}}>{label}</div>
-      <div style={{fontSize:12,fontWeight:700,color:color||"#111"}}>{value}</div>
+      <div style={{fontSize:11,fontWeight:700,color:color||"#111",whiteSpace:"nowrap"}}>{value}</div>
     </div>
   );
   const MiniLabel = ({text}) => (
