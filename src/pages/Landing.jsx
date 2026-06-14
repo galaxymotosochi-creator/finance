@@ -331,7 +331,7 @@ export default function Landing() {
             AI-аналитика
           </div>
           <h2 style={{fontSize:"clamp(24px,3.5vw,32px)",fontWeight:700,letterSpacing:"-.02em",marginBottom:8}}>
-            Искусственный интеллект<br/>для вашего бизнеса
+            AI-помощник<br/>для вашего бизнеса
           </h2>
           <p style={{fontSize:14,color:"rgba(255,255,255,.6)",lineHeight:1.5,marginBottom:40,maxWidth:500}}>
             AI-помощник анализирует данные, находит закономерности и подсказывает, как увеличить прибыль. Просто задайте вопрос.
