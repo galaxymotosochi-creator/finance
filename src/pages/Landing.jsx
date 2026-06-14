@@ -248,6 +248,43 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ===== AI-ПОМОЩНИК ===== */}
+      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+        <div style={{background:"#000",borderRadius:24,padding:"48px 40px",color:"#fff"}}>
+          <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:100,background:"rgba(255,255,255,.1)",fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)",marginBottom:16}}>
+            🤖 AI-аналитика
+          </div>
+          <h2 style={{fontSize:"clamp(24px,3.5vw,32px)",fontWeight:700,letterSpacing:"-.02em",marginBottom:8}}>
+            Искусственный интеллект<br/>в помощь бизнесу
+          </h2>
+          <p style={{fontSize:14,color:"rgba(255,255,255,.6)",lineHeight:1.5,marginBottom:32,maxWidth:500}}>
+            AI-помощник анализирует данные, находит закономерности и подсказывает, как увеличить прибыль. Просто задайте вопрос.
+          </p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))",gap:12}}>
+            {[
+              {emoji:"📊",title:"Анализ прибыли",desc:
+                "Автоматически считает P&L, показывает какие товары приносят больше всего денег, а какие съедают маржу."},
+              {emoji:"🔍",title:"Поиск аномалий",desc:
+                "Замечает необычные расходы, резкие скачки продаж или подозрительные операции и сразу сообщает."},
+              {emoji:"📈",title:"Прогноз кассы",desc:
+                "Предсказывает остаток денег на конец месяца на основе истории доходов и расходов."},
+              {emoji:"💡",title:"Рекомендации",desc:
+                "Подсказывает, какие товары пора дозаказать, на что поднять цену, а что уценить."},
+              {emoji:"❓",title:"Ответы на вопросы",desc:
+                "Спросите «Сколько заработали в марте?» или «Какой сотрудник принёс больше всего прибыли?»."},
+              {emoji:"🔄",title:"Автокатегоризация",desc:
+                "Сама распределяет операции по категориям — не нужно вручную разносить каждую трату."},
+            ].map((f,i)=>(
+              <div key={i} style={{background:"rgba(255,255,255,.06)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.08)"}}>
+                <span style={{fontSize:22}}>{f.emoji}</span>
+                <div style={{fontSize:14,fontWeight:600,margin:"8px 0 4px"}}>{f.title}</div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.45}}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== FAQ ===== */}
       <section style={{maxWidth:700,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:36,letterSpacing:"-.02em"}}>Частые вопросы</h2>
