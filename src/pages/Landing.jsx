@@ -14,7 +14,7 @@ export default function Landing() {
         <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>FINANCE</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid #000",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Войти</button>
-          <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"none",background:"#000",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff"}}>Регистрация</button>
+          <button onClick={()=>n('/register')} style={{padding:"8px 20px",borderRadius:100,border:"none",background:"#000",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff"}}>Регистрация</button>
         </div>
       </header>
 
@@ -31,7 +31,7 @@ export default function Landing() {
             Единая платформа для учёта доходов, расходов, склада, зарплаты и клиентов. Без сложных настроек и лишних кнопок.
           </p>
           <div style={{display:"flex",gap:10}}>
-            <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Зарегистрироваться</button>
+            <button onClick={()=>n('/register')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Зарегистрироваться</button>
             <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"1.5px solid rgba(0,0,0,.12)",background:"transparent",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <button onClick={()=>n('/login')} style={{
+              <button onClick={()=>n('/register')} style={{
                 width:"100%",padding:"10px",borderRadius:100,border:"none",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
                 background:t.popular?"#ffdd2d":"rgba(0,0,0,.06)",color:t.popular?"#000":"#111",
               }}>{t.price==="Бесплатно"?"Начать":"Подключить"}</button>
@@ -132,7 +132,7 @@ export default function Landing() {
           <p style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:24,maxWidth:400,margin:"0 auto 24px"}}>
             Зарегистрируйтесь за 1 минуту и начните управлять финансами вашего бизнеса
           </p>
-          <button onClick={()=>n('/login')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Создать аккаунт</button>
+          <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Создать аккаунт</button>
         </div>
       </section>
 

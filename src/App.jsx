@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
+import Register from './pages/Register';
 import Variant1 from './pages/Variant1';
 import Variant2 from './pages/Variant2';
 import Variant3 from './pages/Variant3';
@@ -34,6 +35,7 @@ import Timesheet from './pages/employees/Timesheet';
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Landing />} />
       <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
