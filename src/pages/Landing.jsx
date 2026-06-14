@@ -76,19 +76,10 @@ export default function Landing() {
                 <span style={{fontWeight:700}}>Панель управления</span>
                 <span style={{color:"rgba(0,0,0,.34)"}}>сегодня</span>
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}}>
-                <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Доходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 ₽</div>
-                </div>
-                <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Расходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 ₽</div>
-                </div>
-                <div style={{background:"#ffdd2d",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Итого</div>
-                  <div style={{fontSize:14,fontWeight:800}}>+161 000 ₽</div>
-                </div>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:12,fontSize:12,padding:"0 2px"}}>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Доходы </span><span style={{fontWeight:700,color:"#16a34a"}}>+284 000 ₽</span></span>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Расходы </span><span style={{fontWeight:700,color:"#dc2626"}}>−123 000 ₽</span></span>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Итого </span><span style={{fontWeight:800,background:"#ffdd2d",padding:"2px 8px",borderRadius:6}}>+161 000 ₽</span></span>
               </div>
               <div style={{fontSize:11,color:"rgba(0,0,0,.34)",marginBottom:6}}>ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
               {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
@@ -127,11 +118,11 @@ export default function Landing() {
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
-              <MiniStat label="Доходы" value="+284 000" color="#16a34a" />
-              <MiniStat label="Расходы" value="−123 000" color="#dc2626" />
-              <MiniStat label="Итого" value="+161 000" color="#000" bg="#ffdd2d" />
-            </div>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:6,fontSize:10,padding:"0 2px"}}>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Доходы </span><span style={{fontWeight:700,color:"#16a34a"}}>+284 000 ₽</span></span>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Расходы </span><span style={{fontWeight:700,color:"#dc2626"}}>−123 000 ₽</span></span>
+                <span><span style={{color:"rgba(0,0,0,.54)"}}>Итого </span><span style={{fontWeight:800,background:"#ffdd2d",padding:"1px 6px",borderRadius:4}}>+161 000 ₽</span></span>
+              </div>
             <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
             {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
               <MiniRow key={i} label={r[0]} value={r[1]} color={r[2]} />
