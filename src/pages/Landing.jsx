@@ -1,11 +1,26 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useEffect } from 'react';
 
 export default function Landing() {
   const n = useNavigate();
   const { user } = useAuth();
   useEffect(() => { if (user) n('/dashboard', { replace: true }); }, [user, n]);
+
+  const FaqItem = ({question,answer}) => {
+    const [open, setOpen] = useState(false);
+    return (
+      <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden"}}>
+        <div onClick={()=>setOpen(!open)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",cursor:"pointer",fontSize:14,fontWeight:600,userSelect:"none",transition:"background .15s"}}
+          onMouseEnter={e=>e.currentTarget.style.background="#fafafa"}
+          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+          <span>{question}</span>
+          <span style={{fontSize:12,color:"rgba(0,0,0,.34)",transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0)"}}>▼</span>
+        </div>
+        {open && <div style={{padding:"0 16px 14px",fontSize:13,color:"rgba(0,0,0,.54)",lineHeight:1.5}}>{answer}</div>}
+      </div>
+    );
+  };
 
   const MiniAppWindow = ({title, children}) => (
     <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.04)"}}>
@@ -194,6 +209,60 @@ export default function Landing() {
               </div>
             </div>
           </MiniAppWindow>
+        </div>
+      </section>
+
+      {/* ===== СТАТИСТИКА ===== */}
+      <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
+        <h2 style={{fontSize:26,fontWeight:700,marginBottom:36,letterSpacing:"-.02em"}}>FINANCE в цифрах</h2>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:24}}>
+          {[
+            {num:"100+",label:"Компаний используют",color:"#ffdd2d"},
+            {num:"4",label:"Сервиса заменяет",color:"#428bf9"},
+            {num:"70%",label:"Экономия времени",color:"#16a34a"},
+          ].map((s,i)=>(
+            <div key={i}>
+              <div style={{fontSize:42,fontWeight:800,color:s.color,marginBottom:4,letterSpacing:"-.03em"}}>{s.num}</div>
+              <div style={{fontSize:15,color:"rgba(0,0,0,.54)"}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== ДЛЯ КОГО ===== */}
+      <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
+        <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для кого подходит</h2>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36}}>FINANCE одинаково полезен разному бизнесу</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
+          {[
+            {emoji:"🛵",title:"Мотосалоны",desc:"Учёт продаж, аренды, сервиса и запчастей в одном окне"},
+            {emoji:"🏪",title:"Магазины",desc:"Товарный учёт, поставщики, наценки и складские остатки"},
+            {emoji:"🍕",title:"Общепит",desc:"Доходы, расходы, зарплата и аналитика прибыли"},
+          ].map((t,i)=>(
+            <div key={i} style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:20,transition:"all .2s"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.06)"}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
+              <div style={{fontSize:28,marginBottom:8}}>{t.emoji}</div>
+              <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>{t.title}</div>
+              <div style={{fontSize:13,color:"rgba(0,0,0,.54)",lineHeight:1.4}}>{t.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section style={{maxWidth:700,margin:"80px auto",padding:"0 24px"}}>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:36,letterSpacing:"-.02em"}}>Частые вопросы</h2>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {[ 
+            {q:"Сколько стоит FINANCE?",a:"Есть бесплатный тариф «Старт» — до 50 операций в месяц. Для активного бизнеса — «Бизнес» за 2 900 ₽/мес или «Профи» за 6 900 ₽/мес без ограничений."},
+            {q:"Можно ли попробовать бесплатно?",a:"Да, тариф «Старт» бесплатный навсегда. Для доступа к полному функционалу — первые 14 дней бесплатно."},
+            {q:"Нужно ли устанавливать программу?",a:"Нет, всё работает в браузере. Достаточно зарегистрироваться и войти."},
+            {q:"Мои данные в безопасности?",a:"Да, используем Supabase. Доступ только по email и паролю."},
+            {q:"Можно ли добавить сотрудников?",a:"Да, на тарифе «Бизнес» — до 5 пользователей, на «Профи» — без ограничений."},
+          ].map((f,i)=>(
+            <FaqItem key={i} question={f.q} answer={f.a} />
+          ))}
         </div>
       </section>
 
