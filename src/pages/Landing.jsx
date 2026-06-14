@@ -331,15 +331,15 @@ export default function Landing() {
             AI-аналитика
           </div>
           <h2 style={{fontSize:"clamp(24px,3.5vw,32px)",fontWeight:700,letterSpacing:"-.02em",marginBottom:8}}>
-            Искусственный интеллект<br/>в помощь бизнесу
+            Искусственный интеллект<br/>для вашего бизнеса
           </h2>
-          <p style={{fontSize:14,color:"rgba(255,255,255,.6)",lineHeight:1.5,marginBottom:32,maxWidth:500}}>
+          <p style={{fontSize:14,color:"rgba(255,255,255,.6)",lineHeight:1.5,marginBottom:40,maxWidth:500}}>
             AI-помощник анализирует данные, находит закономерности и подсказывает, как увеличить прибыль. Просто задайте вопрос.
           </p>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))",gap:12}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,alignItems:"stretch"}}>
             {[
               {icon:"chart",title:"Анализ прибыли",desc:
-                "Автоматически считает P&L, показывает какие товары приносят больше всего денег, а какие съедают маржу."},
+                "Автоматически считает P&L, показывает, какие товары приносят больше всего денег, а какие съедают маржу."},
               {icon:"search",title:"Поиск аномалий",desc:
                 "Замечает необычные расходы, резкие скачки продаж или подозрительные операции и сразу сообщает."},
               {icon:"trend",title:"Прогноз кассы",desc:
@@ -351,10 +351,10 @@ export default function Landing() {
               {icon:"refresh",title:"Автокатегоризация",desc:
                 "Сама распределяет операции по категориям — не нужно вручную разносить каждую трату."},
             ].map((f,i)=>(
-              <div key={i} style={{background:"rgba(255,255,255,.06)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.08)"}}>
+              <div key={i} style={{background:"rgba(255,255,255,.06)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.08)",display:"flex",flexDirection:"column"}}>
                 <AIIcon type={f.icon} />
                 <div style={{fontSize:14,fontWeight:600,margin:"8px 0 4px"}}>{f.title}</div>
-                <div style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.45}}>{f.desc}</div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.45,flex:1}}>{f.desc}</div>
               </div>
             ))}
           </div>
