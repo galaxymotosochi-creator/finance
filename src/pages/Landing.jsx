@@ -142,7 +142,9 @@ export default function Landing() {
           {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учёт и CRM-систему. Вы получаете всё в одной вкладке и не переплачиваете за разные сервисы."},
           {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесём ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
         ].map((f,i)=>(
-          <div key={i} style={{display:"flex",gap:16,padding:"16px 0",borderTop:"1px solid rgba(0,0,0,.06)",alignItems:"flex-start"}}>
+          <div key={i} style={{display:"flex",gap:16,padding:20,border:"1px solid rgba(0,0,0,.08)",borderRadius:14,alignItems:"flex-start",transition:"all .15s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
             <div style={{fontSize:36,fontWeight:800,color:"rgba(0,0,0,.06)",lineHeight:1,flexShrink:0,minWidth:50}}>{f.num}</div>
             <div>
               <div style={{fontSize:17,fontWeight:700,marginBottom:4}}>{f.title}</div>
