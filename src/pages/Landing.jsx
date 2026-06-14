@@ -212,23 +212,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== СТАТИСТИКА ===== */}
-      <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
-        <h2 style={{fontSize:26,fontWeight:700,marginBottom:36,letterSpacing:"-.02em"}}>FINANCE в цифрах</h2>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:24}}>
-          {[
-            {num:"100+",label:"Компаний используют",color:"#ffdd2d"},
-            {num:"4",label:"Сервиса заменяет",color:"#428bf9"},
-            {num:"70%",label:"Экономия времени",color:"#16a34a"},
-          ].map((s,i)=>(
-            <div key={i}>
-              <div style={{fontSize:42,fontWeight:800,color:s.color,marginBottom:4,letterSpacing:"-.03em"}}>{s.num}</div>
-              <div style={{fontSize:15,color:"rgba(0,0,0,.54)"}}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ===== ДЛЯ КОГО ===== */}
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
         <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для кого подходит</h2>
