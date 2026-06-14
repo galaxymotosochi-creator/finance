@@ -128,19 +128,10 @@ export default function Landing() {
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
-                <div style={{background:"#f9f9f9",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Доходы </span>
-                  <span style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>+284 000 ₽</span>
-                </div>
-                <div style={{background:"#f9f9f9",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расходы </span>
-                  <span style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>−123 000 ₽</span>
-                </div>
-                <div style={{background:"#ffdd2d",borderRadius:6,padding:"4px 6px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Итого </span>
-                  <span style={{fontSize:11,fontWeight:800}}>+161 000 ₽</span>
-                </div>
-              </div>
+              <MiniStat label="Доходы" value="+284 000" color="#16a34a" />
+              <MiniStat label="Расходы" value="−123 000" color="#dc2626" />
+              <MiniStat label="Итого" value="+161 000" color="#000" bg="#ffdd2d" />
+            </div>
             <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
             {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
               <MiniRow key={i} label={r[0]} value={r[1]} color={r[2]} />
