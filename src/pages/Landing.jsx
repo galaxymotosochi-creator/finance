@@ -88,8 +88,10 @@ export default function Landing() {
             Единая платформа для учёта доходов, расходов, склада, зарплаты и клиентов. Без сложных настроек и лишних кнопок.
           </p>
           <div style={{display:"flex",gap:10}}>
-            <button onClick={()=>n('/register')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Зарегистрироваться</button>
-            <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"1.5px solid rgba(0,0,0,.12)",background:"transparent",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
+            <button onClick={()=>n('/register')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
+            <span onClick={()=>n('/variant/1')} style={{fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"rgba(0,0,0,.54)",display:"inline-flex",alignItems:"center",gap:4,padding:"12px 0",border:"none",background:"transparent",transition:"color .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.color="#000"}
+              onMouseLeave={e=>e.currentTarget.style.color="rgba(0,0,0,.54)"}>Посмотреть демо-версию <span style={{fontSize:16,transition:"transform .15s"}}>→</span></span>
           </div>
         </div>
         <div>
