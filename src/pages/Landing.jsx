@@ -36,14 +36,14 @@ export default function Landing() {
   };
 
   const MiniAppWindow = ({title, children}) => (
-    <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.04)"}}>
+    <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.04)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"#000",padding:"5px 10px",display:"flex",gap:5,alignItems:"center"}}>
         <span style={{width:6,height:6,borderRadius:"50%",background:"#ff6052"}}/>
         <span style={{width:6,height:6,borderRadius:"50%",background:"#ffbd2e"}}/>
         <span style={{width:6,height:6,borderRadius:"50%",background:"#28c93f"}}/>
         <span style={{fontSize:9,fontWeight:600,color:"rgba(255,255,255,.6)",marginLeft:6}}>{title}</span>
       </div>
-      <div style={{padding:10,background:"#fff",fontSize:11,lineHeight:1.5}}>
+      <div style={{padding:10,background:"#fff",fontSize:11,lineHeight:1.5,flex:1}}>
         {children}
       </div>
     </div>
@@ -120,7 +120,7 @@ export default function Landing() {
                 </div>
               </div>
               <div style={{fontSize:11,color:"rgba(0,0,0,.34)",marginBottom:6}}>ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
-              {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
+              {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
                 <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #f0f0f0"}}>
                   <span style={{fontWeight:500}}>{r[0]}</span>
                   <span style={{fontWeight:600,color:r[2]}}>{r[1]} ₽</span>
@@ -156,15 +156,15 @@ export default function Landing() {
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Возможности системы</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Посмотрите, как работают разделы</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри Finance: от кассы до чистой прибыли</h2>
+        <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — всё работает так, как вы видите</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,alignItems:"stretch"}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
-              <MiniStat label="Доходы" value="+284 000" color="#16a34a" />
-              <MiniStat label="Расходы" value="−123 000" color="#dc2626" />
-              <MiniStat label="Итого" value="+161 000" color="#000" bg="#ffdd2d" />
+              <MiniStat label="Доходы" value="+284 000 ₽" color="#16a34a" />
+              <MiniStat label="Расходы" value="−123 000 ₽" color="#dc2626" />
+              <MiniStat label="Итого" value="+161 000 ₽" color="#000" bg="#ffdd2d" />
             </div>
             <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
             {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
@@ -198,15 +198,15 @@ export default function Landing() {
             <div style={{display:"flex",gap:6,marginBottom:6}}>
               <div style={{flex:1,background:"#f0fdf4",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Приход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>1.2M ₽</div>
+                <div style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>284K ₽</div>
               </div>
               <div style={{flex:1,background:"#fef2f2",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>845K ₽</div>
+                <div style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>123K ₽</div>
               </div>
             </div>
             <MiniLabel text="P&amp;L" />
-            <div style={{fontSize:11,fontWeight:700,color:"#16a34a",textAlign:"center",padding:"4px 0",background:"#f9f9f9",borderRadius:6}}>+355 000 ₽ прибыль</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#16a34a",textAlign:"center",padding:"4px 0",background:"#f9f9f9",borderRadius:6}}>+161 000 ₽ прибыль</div>
           </MiniAppWindow>
           {/* Касса */}
           <MiniAppWindow title="Кассовые смены">
