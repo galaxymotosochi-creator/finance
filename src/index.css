@@ -280,8 +280,8 @@ body {
 .btn-account-select { background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary); }
 .btn-account-select:hover { background: var(--primary); color: var(--primary-text); }
 
-.btn-green { background: var(--success); color: #fff; border: none; border-radius: var(--radius-pill); padding: .5rem .8rem; font-size: .78rem; cursor: pointer; font-family: var(--font); }
-.btn-green:hover { opacity: .9; }
+.btn-green { display: inline-flex; align-items: center; gap: .3rem; padding: .5rem .8rem; font-size: .78rem; border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font); font-weight: 600; background: var(--primary); color: var(--primary-text); border: none; transition: all var(--transition); }
+.btn-green:hover { background: var(--primary-hover); box-shadow: var(--shadow-sm); }
 
 /* ======== PAGE HEADER ======== */
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: wrap; gap: .5rem; }
@@ -500,8 +500,8 @@ body {
 .stock-count { font-size: .78rem; color: var(--muted); font-weight: 400; }
 .stock-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-size: .78rem; color: var(--muted); transition: all var(--transition); }
 .stock-icon-btn:hover { border-color: var(--secondary); color: var(--secondary); }
-.stock-add-btn { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .7rem; background: var(--success); color: #fff; border: none; border-radius: var(--radius-pill); font-size: .75rem; cursor: pointer; font-family: var(--font); font-weight: 500; }
-.stock-add-btn:hover { opacity: .9; }
+.stock-add-btn { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem .7rem; background: var(--primary); color: var(--primary-text); border: none; border-radius: var(--radius-pill); font-size: .75rem; cursor: pointer; font-family: var(--font); font-weight: 600; transition: all var(--transition); }
+.stock-add-btn:hover { background: var(--primary-hover); box-shadow: var(--shadow-sm); }
 .stock-filterbar { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: .5rem; flex-wrap: wrap; }
 .total-row { background: transparent; }
 .total-row td { font-weight: 700; border-top: 2px solid var(--border); padding: .6rem .4rem; }
