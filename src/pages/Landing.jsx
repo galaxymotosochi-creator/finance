@@ -494,8 +494,12 @@ export default function Landing() {
       </section>
 
       {/* ===== ФУТЕР ===== */}
-      <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"20px auto 0",display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(0,0,0,.34)"}}>
+      <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"20px auto 0",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,color:"rgba(0,0,0,.34)",flexWrap:"wrap",gap:12}}>
         <span>© 2026 Finance</span>
+        <div style={{display:"flex",gap:16}}>
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Политика конфиденциальности</a>
+          <a href="/terms" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Пользовательское соглашение</a>
+        </div>
       </footer>
     </div>
   );
