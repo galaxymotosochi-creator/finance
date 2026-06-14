@@ -135,7 +135,7 @@ export default function Landing() {
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Почему выбирают нас</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в Finance</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"center"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"stretch"}}>
         {[
           {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
           {num:"02",title:"Надёжность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
@@ -146,7 +146,7 @@ export default function Landing() {
             onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
             onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
             <div style={{fontSize:36,fontWeight:800,color:"rgba(0,0,0,.06)",lineHeight:1,flexShrink:0,minWidth:50}}>{f.num}</div>
-            <div>
+            <div style={{display:"flex",flexDirection:"column",justifyContent:"center",flex:1}}>
               <div style={{fontSize:17,fontWeight:700,marginBottom:4}}>{f.title}</div>
               <div style={{fontSize:14,color:"rgba(0,0,0,.54)",lineHeight:1.5}}>{f.desc}</div>
             </div>
