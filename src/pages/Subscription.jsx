@@ -7,6 +7,11 @@ export default function Subscription() {
   const [autoRenew, setAutoRenew] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDiscountOffer, setShowDiscountOffer] = useState(false);
+  const [switchPlan, setSwitchPlan] = useState(null);
+  const confirmSwitchPlan = (plan, price) => {
+    // Здесь будет интеграция с эквайрингом
+    setSwitchPlan(null);
+  };
   const [cards, setCards] = useState([
     { id: 1, brand: 'visa', last4: '1234', exp: '12/27', main: true },
   ]);
@@ -84,12 +89,11 @@ export default function Subscription() {
           const isCurrent = t.name === currentPlan.name;
           return (
           <div key={i} style={{
-            border:`1.5px solid ${t.popular?"#ffdd2d":isCurrent?"#000":"rgba(0,0,0,.08)"}`,
+            border:`1.5px solid ${isCurrent?"#ffdd2d":"rgba(0,0,0,.08)"}`,
             borderRadius:16,padding:"20px 14px",background:"#fff",
             position:"relative",display:"flex",flexDirection:"column",
           }}>
-            {t.popular && <div style={{position:"absolute",top:-9,left:"50%",transform:"translateX(-50%)",padding:"2px 12px",borderRadius:100,background:"#ffdd2d",fontSize:9,fontWeight:700,color:"#000",whiteSpace:"nowrap"}}>Популярный</div>}
-            {isCurrent && <div style={{position:"absolute",top:-9,right:12,padding:"2px 10px",borderRadius:100,background:"#000",fontSize:9,fontWeight:600,color:"#fff"}}>Текущий</div>}
+            {isCurrent && <div style={{position:"absolute",top:-9,right:12,padding:"2px 10px",borderRadius:100,background:"#ffdd2d",fontSize:9,fontWeight:700,color:"#000"}}>Текущий</div>}
             <div style={{fontSize:14,fontWeight:700,marginBottom:2}}>{t.name}</div>
             <div style={{marginBottom:2}}>
               {period === '1m' ? (
@@ -117,7 +121,7 @@ export default function Subscription() {
                 </div>
               ))}
             </div>
-            <button onClick={()=>{}} style={{
+            <button onClick={()=>{if(!isCurrent) setSwitchPlan({name:t.name, price:currentPrice, period:period})}} style={{
               width:"100%",padding:"8px",borderRadius:100,border:"none",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
               background:isCurrent?"rgba(0,0,0,.06)":"#000",color:isCurrent?"#555":"#fff",
               transition:"all .15s",
@@ -215,7 +219,32 @@ export default function Subscription() {
               textDecoration:'underline',cursor:'pointer',fontFamily:'inherit',padding:'4px 8px',
             }}>Нет, отписаться</button>
           </div>
+        
+      {/* Switch plan confirmation */}
+      {switchPlan && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}
+          onClick={()=>setSwitchPlan(null)}>
+          <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.12)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:"2rem",marginBottom:12,textAlign:"center"}}>🔄</div>
+            <h2 style={{fontSize:"1.1rem",fontWeight:700,textAlign:"center",marginBottom:8}}>Смена тарифа</h2>
+            <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:4,lineHeight:1.4}}>
+              Вы переходите на тариф <strong>{switchPlan.name}</strong>
+            </p>
+            <p style={{fontSize:".9rem",fontWeight:700,textAlign:"center",marginBottom:16}}>{switchPlan.price.toLocaleString()} ₽/мес</p>
+            <button onClick={()=>{confirmSwitchPlan(switchPlan.name, switchPlan.price);setSwitchPlan(null)}} style={{
+              width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",color:"#000",
+              fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",marginBottom:8,
+            }}>Подтвердить смену тарифа</button>
+            <div style={{textAlign:"center"}}>
+              <button onClick={()=>setSwitchPlan(null)} style={{
+                background:"none",border:"none",fontSize:12,color:"rgba(0,0,0,.34)",
+                textDecoration:"underline",cursor:"pointer",fontFamily:"inherit",
+              }}>Отмена</button>
+            </div>
+          </div>
         </div>
+      )}
+</div>
       )}
     </div>
   );
