@@ -35,17 +35,28 @@ export default function Landing() {
     return <span dangerouslySetInnerHTML={{__html: svgs[type]}} style={{display:"inline-flex"}} />;
   };
 
-  const CompareItem = ({icon,text}) => {
-    const isGreen = icon === '#16a34a';
-    const color = isGreen ? '#16a34a' : '#999';
+  const CompareItem = ({type,text}) => {
+    const isGood = type === 'good';
+    const bg = isGood ? '#f0fdf4' : '#fef2f2';
+    const color = isGood ? '#16a34a' : '#dc2626';
+    // Split text at first colon — bold the label
+    const colonIdx = text.indexOf(':');
+    const label = colonIdx > -1 ? text.slice(0, colonIdx + 1) : '';
+    const rest = colonIdx > -1 ? text.slice(colonIdx + 1) : text;
     return (
       <div style={{display:"flex",gap:10,alignItems:"flex-start",fontSize:12,lineHeight:1.45,color:"rgba(0,0,0,.65)"}}>
-        <span style={{flexShrink:0,width:18,height:18,borderRadius:"50%",background:isGreen?"#f0fdf4":"#f5f5f5",display:"flex",alignItems:"center",justifyContent:"center",marginTop:1}}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={color} stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+        <span style={{flexShrink:0,width:18,height:18,borderRadius:"50%",background:bg,display:"flex",alignItems:"center",justifyContent:"center",marginTop:1}}>
+          {isGood ? (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={color} stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={color} stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
         </span>
-        <span>{text}</span>
+        <span><span style={{fontWeight:700}}>{label}</span>{rest}</span>
       </div>
     );
   };
@@ -252,28 +263,28 @@ export default function Landing() {
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
             <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжёлые программы<br/>(1С и аналоги)</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <CompareItem icon="#999" text="Сложное внедрение: требуются недели обучения персонала и платные услуги программистов для любой настройки." />
-              <CompareItem icon="#999" text="Перегруженный интерфейс: сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники." />
-              <CompareItem icon="#999" text="Высокая стоимость: дорогие лицензии, привязка к серверам и постоянная плата за каждое мелкое обновление." />
+              <CompareItem type="bad" text="Сложное внедрение: требуются недели обучения персонала и платные услуги программистов для любой настройки." />
+              <CompareItem type="bad" text="Перегруженный интерфейс: сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники." />
+              <CompareItem type="bad" text="Высокая стоимость: дорогие лицензии, привязка к серверам и постоянная плата за каждое мелкое обновление." />
             </div>
           </div>
           {/* Карточка 2 — Excel */}
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
             <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Таблицы и блокноты<br/>(Excel / Sheets)</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <CompareItem icon="#999" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьётся с реальными остатками на складе." />
-              <CompareItem icon="#999" text="Человеческий фактор: сотрудники регулярно забывают вовремя вносить продажи, путают позиции товара или теряют чеки." />
-              <CompareItem icon="#999" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
+              <CompareItem type="bad" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьётся с реальными остатками на складе." />
+              <CompareItem type="bad" text="Человеческий фактор: сотрудники регулярно забывают вовремя вносить продажи, путают позиции товара или теряют чеки." />
+              <CompareItem type="bad" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
             </div>
           </div>
           {/* Карточка 3 — FINANCE */}
-          <div style={{border:"2px solid #ffdd2d",borderRadius:16,padding:28,background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
+          <div style={{border:"2px solid #ffdd2d",borderRadius:16,padding:"24px 28px 28px",background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",marginBottom:12}}>Рекомендуем</div>
             <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа Finance</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
-              <CompareItem icon="#16a34a" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
-              <CompareItem icon="#16a34a" text="Всё в одной вкладке: живая касса, складской учёт, база клиентов и финансы команды работают в единой связке." />
-              <CompareItem icon="#16a34a" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
+              <CompareItem type="good" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
+              <CompareItem type="good" text="Всё в одной вкладке: живая касса, складской учёт, база клиентов и финансы команды работают в единой связке." />
+              <CompareItem type="good" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
             </div>
             <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",transition:"all .15s"}}
               onMouseEnter={e=>e.currentTarget.style.background="#f5d100"}
