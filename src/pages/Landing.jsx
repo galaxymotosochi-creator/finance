@@ -385,13 +385,13 @@ export default function Landing() {
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,alignItems:"stretch"}}>
           {[
             {name:"Базовый",price:"490 ₽",period:"/мес",desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Начать"},
-            {name:"Старт",price:"990 ₽",period:"/мес",desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация от AI","До 2 пользователей"],popular:false,btn:"Подключить"},
+            {name:"Старт",price:"990 ₽",period:"/мес",desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false,btn:"Подключить"},
             {name:"Бизнес",price:"2 900 ₽",period:"/мес",desc:"Для компаний с командой",features:["Все функции тарифа «Старт»","Зарплата и табель сотрудников","Управление ролями и доступом","Безлимитный AI-помощник","До 5 пользователей"],popular:true,btn:"Подключить"},
             {name:"Профи",price:"6 900 ₽",period:"/мес",desc:"Для сетей и крупных проектов",features:["Все функции тарифа «Бизнес»","Мульти-аккаунты (несколько точек)","Интеграции и доступ к API","ИИ-мониторинг аномалий","Безлимитные пользователи"],popular:false,btn:"Подключить"},
           ].map((t,i)=>(
             <div key={i} style={{
               border:`1.5px solid ${t.popular?"#ffdd2d":"rgba(0,0,0,.08)"}`,
-              borderRadius:20,padding:"24px 20px",background:"#fff",
+              borderRadius:20,padding:"24px 14px",background:"#fff",
               position:"relative",boxShadow:t.popular?"0 8px 24px rgba(0,0,0,.08)":"none",
               display:"flex",flexDirection:"column",
             }}>
@@ -404,8 +404,8 @@ export default function Landing() {
               <div style={{fontSize:11,color:"rgba(0,0,0,.54)",marginBottom:12,lineHeight:1.3}}>{t.desc}</div>
               <div style={{borderTop:"1px solid rgba(0,0,0,.06)",paddingTop:12,marginBottom:12,flex:1}}>
                 {t.features.map((f,j)=>(
-                  <div key={j} style={{display:"flex",alignItems:"center",gap:8,padding:"3px 0",fontSize:12}}>
-                    <span style={{color:"#16a34a",fontWeight:700,flexShrink:0}}>✓</span>
+                  <div key={j} style={{display:"flex",alignItems:"flex-start",gap:8,padding:"3px 0",fontSize:12}}>
+                    <span style={{color:"#16a34a",fontWeight:700,flexShrink:0,marginTop:2}}>✓</span>
                     <span>{f}</span>
                   </div>
                 ))}
