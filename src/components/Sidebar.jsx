@@ -1,14 +1,15 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+// Иконки в белом цвете для чёрного сайдбара
 const svgIcons = {
-  dashboard: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1" fill="#6366f1" opacity=".15"/><rect x="14" y="3" width="7" height="7" rx="1" fill="#6366f1" opacity=".15"/><rect x="3" y="14" width="7" height="7" rx="1" fill="#6366f1" opacity=".15"/><rect x="14" y="14" width="7" height="7" rx="1" fill="#6366f1" opacity=".15"/></svg>',
-  registers: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#f59e0b"/><circle cx="20" cy="21" r="1" fill="#f59e0b"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
-  finance: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
-  stock: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polyline points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5" fill="#8b5cf6"/><circle cx="18.5" cy="18.5" r="2.5" fill="#8b5cf6"/></svg>',
-  clients: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
-  team: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
-  settings: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1" opacity=".4"/><rect x="14" y="3" width="7" height="7" rx="1" opacity=".4"/><rect x="3" y="14" width="7" height="7" rx="1" opacity=".4"/><rect x="14" y="14" width="7" height="7" rx="1" opacity=".4"/></svg>',
+  registers: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" opacity=".4"/><circle cx="20" cy="21" r="1" opacity=".4"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
+  finance: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
+  stock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polyline points="16 8 20 8 23 11 23 16 16 16 16 8"/></svg>',
+  clients: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+  team: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  settings: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
 };
 
 const menu = [
@@ -86,10 +87,19 @@ export default function Sidebar() {
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
         <div className="sidebar-inner">
           <div className="sidebar-user">
-            <div className="sidebar-toggle" onClick={()=>{if(window.innerWidth<=768){setMobileOpen(!mobileOpen)}else{setCollapsed(!collapsed)}}} style={{fontSize:'1.1rem',cursor:'pointer',padding:'.5rem',color:'var(--muted)',textAlign:'center'}}>{collapsed||mobileOpen?'☰':'✕'}</div>
-            {!collapsed && <div className="sidebar-user-info">
-              <div className="sidebar-user-email">Finance</div>
-            </div>}
+            <div className="sidebar-toggle"
+              onClick={() => {
+                if (window.innerWidth <= 768) { setMobileOpen(!mobileOpen); }
+                else { setCollapsed(!collapsed); }
+              }}
+            >
+              {collapsed || mobileOpen ? '☰' : '✕'}
+            </div>
+            {!collapsed && (
+              <div className="sidebar-user-info">
+                <div className="sidebar-user-email">Finance</div>
+              </div>
+            )}
           </div>
           <nav className="sidebar-nav">
             {menu.map((item) => {
@@ -101,7 +111,8 @@ export default function Sidebar() {
                     <a className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active' : ''}`}
                       onClick={() => toggleGroup(item.label)}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
-                      {item.label}<span className="arrow">&#9656;</span>
+                      {!collapsed && item.label}
+                      {!collapsed && <span className="arrow">&#9656;</span>}
                     </a>
                     <div className={`nav-children${open ? ' open' : ''}`}>
                       {item.children.map((child) => (
@@ -118,15 +129,21 @@ export default function Sidebar() {
                   className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
                   onClick={() => navigate(item.path)}>
                   <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
-                  {item.label}
+                  {!collapsed && item.label}
                 </a>
               );
             })}
           </nav>
         </div>
       </aside>
-      {mobileOpen && <div onClick={()=>setMobileOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.3)',zIndex:199}} />}
-      {!mobileOpen && window.innerWidth <= 768 && <div onClick={()=>setMobileOpen(true)} style={{position:'fixed',top:'8px',left:'8px',zIndex:201,width:'36px',height:'36px',borderRadius:'8px',background:'var(--white)',border:'1px solid var(--border)',cursor:'pointer',fontSize:'1.2rem',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(0,0,0,.08)',color:'var(--body-color)'}}>☰</div>}
+      {mobileOpen && (
+        <div onClick={() => setMobileOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 199 }} />
+      )}
+      {!mobileOpen && window.innerWidth <= 768 && (
+        <div onClick={() => setMobileOpen(true)}
+          className="mobile-hamburger">☰</div>
+      )}
     </>
   );
 }
