@@ -103,7 +103,10 @@ export default function Landing() {
       </section>
 
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"center"}}>
+      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Почему выбирают нас</h2>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины работать с FINANCE</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"center"}}>
         {[
           {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения. Всё интуитивно."},
           {num:"02",title:"Надёжность",desc:"Данные хранятся в Supabase - современная защита."},
@@ -118,7 +121,7 @@ export default function Landing() {
             </div>
           </div>
         ))}
-      </section>
+      </div></section>
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
