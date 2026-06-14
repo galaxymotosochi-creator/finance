@@ -308,7 +308,7 @@ export default function Supplies() {
                     style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}} />
                 </div>
                 <div style={{display:'flex',justifyContent:'flex-end',marginTop:'.35rem'}}>
-                  <button type="button" onClick={addItem} style={{padding:'.25rem .55rem',fontSize:'.75rem',background:'#16a34a',color:'#fff',border:'none',borderRadius:'5px',cursor:'pointer',fontFamily:'var(--font)'}}>+ Добавить</button>
+                  <button type="button" onClick={addItem} style={{padding:'.35rem .7rem',fontSize:'.75rem',background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',cursor:'pointer',fontFamily:'var(--font)',fontWeight:'600'}}>+ Добавить</button>
                 </div>
               </div>
               <div className="form-row">

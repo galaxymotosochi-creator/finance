@@ -444,9 +444,9 @@ body {
 
 .export-dd-title { font-size: .7rem; color: var(--muted); text-align: center; margin-bottom: .35rem; }
 .export-dd-actions { display: flex; gap: .35rem; justify-content: center; }
-.export-dd-btn { padding: .25rem .6rem; font-size: .75rem; border-radius: var(--radius-pill); cursor: pointer; background: var(--secondary); color: #fff; font-family: var(--font); }
-.export-dd-btn:hover { opacity: .9; }
-.export-dd-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.export-dd-btn { padding: .25rem .6rem; font-size: .75rem; border-radius: var(--radius-pill); cursor: pointer; background: var(--primary); color: var(--primary-text); font-family: var(--font); transition: all var(--transition); }
+.export-dd-btn:hover { background: var(--primary-hover); }
+.export-dd-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius-pill); padding: .25rem .6rem; font-size: .75rem; cursor: pointer; font-family: var(--font); }
 
 /* ======== EMPLOYEES ======== */
 .emp-rule-pct { width: 50px; padding: .2rem .3rem; font-size: .78rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); outline: none; text-align: center; font-family: var(--font); }

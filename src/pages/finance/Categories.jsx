@@ -110,7 +110,7 @@ export default function Categories() {
           <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={function () { openModal(null); }} style={{background:'#1983dd',color:'#fff',border:'none',borderRadius:'6px'}}>+ Добавить</button>
+          <button className="btn-mint" onClick={function () { openModal(null); }} style={{background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',padding:'.5rem .8rem',fontWeight:'600',fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }}></div>

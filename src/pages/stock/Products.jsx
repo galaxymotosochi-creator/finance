@@ -555,7 +555,7 @@ export default function Products() {
               </div>
               <div className="modal-actions">
                 {editId && fHidden && (
-                  <button type="button" className="btn" style={{background:'var(--primary)',color:'#fff',marginRight:'.5rem'}} onClick={() => restore(editId)}>Восстановить товар</button>
+                  <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => restore(editId)}>Восстановить товар</button>
                 )}
                 <button type="submit" className="btn btn-account-select">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
