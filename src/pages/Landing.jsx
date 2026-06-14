@@ -7,6 +7,33 @@ export default function Landing() {
   const { user } = useAuth();
   useEffect(() => { if (user) n('/dashboard', { replace: true }); }, [user, n]);
 
+    const [period, setPeriod] = useState("1m");
+
+  // Prices for each period
+  const periodPrices = {
+    "1m": [490, 990, 2900, 6900],
+    "3m": [440, 890, 2600, 6200],
+    "6m": [390, 790, 2300, 5500],
+    "1y": [340, 690, 1990, 4800],
+  };
+  const periodSavings = {
+    "3m": [150, 300, 900, 2100],
+    "6m": [600, 1200, 3600, 8400],
+    "1y": [1800, 3600, 10920, 25200],
+  };
+  const periodLabels = {
+    "1m": "1 месяц",
+    "3m": "3 месяца",
+    "6m": "6 месяцев",
+    "1y": "1 год",
+  };
+
+  const periodMultiplier = {
+    "1m": 1,
+    "3m": 3,
+    "6m": 6,
+    "1y": 12,
+  };
   const FaqItem = ({question,answer}) => {
     const [open, setOpen] = useState(false);
     return (
@@ -381,26 +408,63 @@ export default function Landing() {
       {/* ===== ТАРИФЫ ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Тарифы</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Прозрачные цены для бизнеса любого масштаба</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:24}}>Прозрачные цены для бизнеса любого масштаба</p>
+
+        <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:32}}>
+          {["1m","3m","6m","1y"].map((key) => (
+            <button key={key} onClick={()=>setPeriod(key)}
+              style={{
+                padding:"6px 18px",borderRadius:100,border:"1.5px solid",cursor:"pointer",
+                fontFamily:"inherit",fontSize:12,fontWeight:600,transition:"all .15s",
+                background:period===key?"#000":"transparent",
+                color:period===key?"#fff":"rgba(0,0,0,.54)",
+                borderColor:period===key?"#000":"rgba(0,0,0,.12)",
+              }}
+            >{periodLabels[key]}</button>
+          ))}
+        </div>
+
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,alignItems:"stretch"}}>
           {[
-            {name:"Базовый",price:"490 ₽",period:"/мес",desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Начать"},
-            {name:"Старт",price:"990 ₽",period:"/мес",desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false,btn:"Подключить"},
-            {name:"Бизнес",price:"2 900 ₽",period:"/мес",desc:"Для компаний с командой",features:["Все функции тарифа «Старт»","Зарплата и табель сотрудников","Управление ролями и доступом","Безлимитный AI-помощник","До 5 пользователей"],popular:true,btn:"Подключить"},
-            {name:"Профи",price:"6 900 ₽",period:"/мес",desc:"Для сетей и крупных проектов",features:["Все функции тарифа «Бизнес»","Мульти-аккаунты (несколько точек)","Интеграции и доступ к API","ИИ-мониторинг аномалий","Безлимитные пользователи"],popular:false,btn:"Подключить"},
-          ].map((t,i)=>(
+            {name:"Базовый",price:490,desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Начать"},
+            {name:"Старт",price:990,desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false,btn:"Подключить"},
+            {name:"Бизнес",price:2900,desc:"Для компаний с командой",features:["Все функции тарифа «Старт»","Зарплата и табель сотрудников","Управление ролями и доступом","Безлимитный AI-помощник","До 5 пользователей"],popular:true,btn:"Подключить"},
+            {name:"Профи",price:6900,desc:"Для сетей и крупных проектов",features:["Все функции тарифа «Бизнес»","Мульти-аккаунты (несколько точек)","Интеграции и доступ к API","ИИ-мониторинг аномалий","Безлимитные пользователи"],popular:false,btn:"Подключить"},
+          ].map((t,i)=>{
+            const basePrice = t.price;
+            const currentPrice = periodPrices[period][i];
+            const saving = period === '1m' ? 0 : periodSavings[period][i];
+            const periodText = period === '1y' ? 'год' : period === '6m' ? '6 мес' : period === '3m' ? '3 мес' : 'мес';
+            return (
             <div key={i} style={{
-              border:`1.5px solid ${t.popular?"#ffdd2d":"rgba(0,0,0,.08)"}`,
+              border: t.popular ? "1.5px solid #ffdd2d" : "1.5px solid rgba(0,0,0,.08)",
               borderRadius:20,padding:"24px 14px",background:"#fff",
               position:"relative",boxShadow:t.popular?"0 8px 24px rgba(0,0,0,.08)":"none",
               display:"flex",flexDirection:"column",
             }}>
               {t.popular && <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",padding:"3px 14px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",whiteSpace:"nowrap"}}>Популярный</div>}
               <div style={{fontSize:15,fontWeight:700,marginBottom:2}}>{t.name}</div>
-              <div style={{marginBottom:4}}>
-                <span style={{fontSize:22,fontWeight:800}}>{t.price}</span>
-                <span style={{fontSize:11,color:"rgba(0,0,0,.34)"}}>{t.period}</span>
+              <div style={{marginBottom:2}}>
+                {period === '1m' ? (
+                  <>
+                    <span style={{fontSize:22,fontWeight:800}}>{basePrice.toLocaleString()} ₽</span>
+                    <span style={{fontSize:11,color:"rgba(0,0,0,.34)",marginLeft:2}}>/ {periodText}</span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{fontSize:15,fontWeight:600,color:"rgba(0,0,0,.3)",textDecoration:"line-through",position:"relative"}}>
+                      {basePrice.toLocaleString()} ₽
+                    </span>
+                    <span style={{fontSize:22,fontWeight:800,marginLeft:6}}>{currentPrice.toLocaleString()} ₽</span>
+                    <span style={{fontSize:11,color:"rgba(0,0,0,.34)",marginLeft:2}}>/ {periodText}</span>
+                  </>
+                )}
               </div>
+              {period !== '1m' && (
+                <div style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f0fdf4",borderRadius:6,padding:"3px 8px",fontSize:10,fontWeight:600,color:"#16a34a",marginBottom:6,width:"fit-content"}}>
+                  🎯 Выгода {saving.toLocaleString()} ₽
+                </div>
+              )}
               <div style={{fontSize:11,color:"rgba(0,0,0,.54)",marginBottom:12,lineHeight:1.3}}>{t.desc}</div>
               <div style={{borderTop:"1px solid rgba(0,0,0,.06)",paddingTop:12,marginBottom:12,flex:1}}>
                 {t.features.map((f,j)=>(
@@ -418,11 +482,9 @@ export default function Landing() {
                 onMouseEnter={e=>{if(t.popular)e.currentTarget.style.background="#f5d100"}}
                 onMouseLeave={e=>{if(t.popular)e.currentTarget.style.background="#ffdd2d"}}>{t.btn}</button>
             </div>
-          ))}
+          )})}
         </div>
-      </section>
-
-      {/* ===== ГОТОВЫ НАЧАТЬ? (из варианта 3) ===== */}
+      </section>{/* ===== ГОТОВЫ НАЧАТЬ? (из варианта 3) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <div style={{background:"#000",borderRadius:20,padding:"40px 32px",textAlign:"center",color:"#fff"}}>
           <h2 style={{fontSize:22,fontWeight:700,marginBottom:8}}>Готовы начать?</h2>
