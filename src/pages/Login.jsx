@@ -8,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const { signIn, user } = useAuth();
@@ -34,9 +35,10 @@ export default function Login() {
     }
   };
 
-  const handleResetPassword = async () => {
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
     if (!email.trim()) {
-      setError('Введите email в поле выше');
+      setError('Введите ваш email');
       return;
     }
     setError('');
@@ -65,16 +67,47 @@ export default function Login() {
             <div style={{ textAlign: 'center', padding: '1rem 0' }}>
               <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>📧</div>
               <p style={{ fontSize: '.85rem', color: 'var(--body-color)', lineHeight: 1.4 }}>
-                Письмо для сброса пароля отправлено на <strong>{email}</strong>
+                Письмо отправлено на <strong>{email}</strong>
               </p>
               <p style={{ fontSize: '.78rem', color: 'var(--muted)', marginTop: '.5rem' }}>
-                Проверьте почту и перейдите по ссылке в письме.
+                Перейдите по ссылке в письме, чтобы задать новый пароль.
               </p>
             </div>
-            <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => setResetSent(false)}>
+            <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => { setResetSent(false); setResetMode(false); }}>
               Назад ко входу
             </button>
           </>
+        ) : resetMode ? (
+          <form onSubmit={handleResetPassword}>
+            <p style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: '1rem', textAlign: 'center' }}>
+              Введите email — пришлём ссылку для сброса пароля
+            </p>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+            />
+            {error && <p className="error">{error}</p>}
+            <button type="submit" disabled={resetLoading}>
+              {resetLoading ? 'Отправка...' : 'Отправить письмо'}
+            </button>
+            <div style={{ textAlign: 'center', marginTop: '.75rem' }}>
+              <button
+                type="button"
+                onClick={() => { setResetMode(false); setError(''); }}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '.78rem', color: 'var(--muted)', fontFamily: 'var(--font)',
+                  padding: '.3rem', textDecoration: 'underline',
+                }}
+              >
+                ← Назад
+              </button>
+            </div>
+          </form>
         ) : (
           <form onSubmit={handleSubmit}>
             <input
@@ -101,15 +134,14 @@ export default function Login() {
             <div style={{ textAlign: 'center', marginTop: '.75rem' }}>
               <button
                 type="button"
-                onClick={handleResetPassword}
-                disabled={resetLoading}
+                onClick={() => { setResetMode(true); setError(''); }}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: '.78rem', color: 'var(--secondary)', fontFamily: 'var(--font)',
                   padding: '.3rem', textDecoration: 'underline',
                 }}
               >
-                {resetLoading ? 'Отправка...' : 'Забыли пароль?'}
+                Забыли пароль?
               </button>
             </div>
           </form>
