@@ -22,6 +22,19 @@ export default function Landing() {
     );
   };
 
+  
+  const AIIcon = ({type}) => {
+    const svgs = {
+      chart: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
+      search: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+      trend: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+      bulb: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 008.91 14"/></svg>',
+      help: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      refresh: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>',
+    };
+    return <span dangerouslySetInnerHTML={{__html: svgs[type]}} style={{display:"inline-flex"}} />;
+  };
+
   const MiniAppWindow = ({title, children}) => (
     <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.04)"}}>
       <div style={{background:"#000",padding:"5px 10px",display:"flex",gap:5,alignItems:"center"}}>
@@ -262,21 +275,21 @@ export default function Landing() {
           </p>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))",gap:12}}>
             {[
-              {emoji:"📊",title:"Анализ прибыли",desc:
+              {icon:"chart",title:"Анализ прибыли",desc:
                 "Автоматически считает P&L, показывает какие товары приносят больше всего денег, а какие съедают маржу."},
-              {emoji:"🔍",title:"Поиск аномалий",desc:
+              {icon:"search",title:"Поиск аномалий",desc:
                 "Замечает необычные расходы, резкие скачки продаж или подозрительные операции и сразу сообщает."},
-              {emoji:"📈",title:"Прогноз кассы",desc:
+              {icon:"trend",title:"Прогноз кассы",desc:
                 "Предсказывает остаток денег на конец месяца на основе истории доходов и расходов."},
-              {emoji:"💡",title:"Рекомендации",desc:
+              {icon:"bulb",title:"Рекомендации",desc:
                 "Подсказывает, какие товары пора дозаказать, на что поднять цену, а что уценить."},
-              {emoji:"❓",title:"Ответы на вопросы",desc:
+              {icon:"help",title:"Ответы на вопросы",desc:
                 "Спросите «Сколько заработали в марте?» или «Какой сотрудник принёс больше всего прибыли?»."},
-              {emoji:"🔄",title:"Автокатегоризация",desc:
+              {icon:"refresh",title:"Автокатегоризация",desc:
                 "Сама распределяет операции по категориям — не нужно вручную разносить каждую трату."},
             ].map((f,i)=>(
               <div key={i} style={{background:"rgba(255,255,255,.06)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.08)"}}>
-                <span style={{fontSize:22}}>{f.emoji}</span>
+                <AIIcon type={f.icon} />
                 <div style={{fontSize:14,fontWeight:600,margin:"8px 0 4px"}}>{f.title}</div>
                 <div style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.45}}>{f.desc}</div>
               </div>
