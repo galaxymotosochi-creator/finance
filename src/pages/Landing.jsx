@@ -448,17 +448,11 @@ export default function Landing() {
                 {period === '1m' ? (
                   <>
                     <span style={{fontSize:22,fontWeight:800}}>{basePrice.toLocaleString()} ₽</span>
-                    <span style={{fontSize:22,fontWeight:800}}>{basePrice.toLocaleString()} ₽</span>
                   </>
                 ) : (
                   <>
-                    <span style={{position:"relative",display:"inline-block"}}>
-                      <span style={{fontSize:15,fontWeight:600,color:"rgba(0,0,0,.2)"}}>
-                        {basePrice.toLocaleString()} ₽
-                      </span>
-                      <svg width="120%" height="12" viewBox="0 0 120 12" preserveAspectRatio="none" style={{position:"absolute",top:"40%",left:"-10%",transform:"translateY(-50%) rotate(-6deg)",pointerEvents:"none",overflow:"visible"}}>
-                        <path d="M5,6 Q15,0 25,6 Q35,12 45,6 Q55,0 65,6 Q75,12 85,6 Q95,0 105,6 Q115,12 115,6" fill="none" stroke="rgba(220,38,38,.3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
+                    <span style={{fontSize:15,fontWeight:600,color:"rgba(0,0,0,.2)",textDecoration:"line-through",textDecorationColor:"rgba(220,38,38,.4)",textDecorationThickness:2}}>
+                      {basePrice.toLocaleString()} ₽
                     </span>
                     <span style={{fontSize:22,fontWeight:800,marginLeft:6}}>{currentPrice.toLocaleString()} ₽</span>
                   </>
