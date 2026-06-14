@@ -487,7 +487,7 @@ export default function Landing() {
         <div style={{background:"#000",borderRadius:20,padding:"40px 32px",textAlign:"center",color:"#fff"}}>
           <h2 style={{fontSize:22,fontWeight:700,marginBottom:8}}>Готовы начать?</h2>
           <p style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:24,maxWidth:400,margin:"0 auto 24px"}}>
-            Зарегистрируйтесь за 1 минуту и начните управлять финансами вашего бизнеса
+            Зарегистрируйтесь за 1 минуту и начните<br/>управлять финансами вашего бизнеса.
           </p>
           <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Создать аккаунт</button>
         </div>
