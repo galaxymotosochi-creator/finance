@@ -80,7 +80,7 @@ export default function Landing() {
           <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"4px 12px",borderRadius:100,background:"#000",fontSize:11,fontWeight:600,color:"#ffdd2d",marginBottom:16}}>
             Первая программа с AI аналитикой
           </div>
-          <h1 style={{fontSize:"clamp(32px,5vw,48px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
+          <h1 style={{fontSize:"clamp(31px,5vw,47px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
             Ваш бизнес на ладони.<br/>Смарт-учёт без рутины
           </h1>
           <p style={{fontSize:15,color:"rgba(0,0,0,.54)",lineHeight:1.55,marginBottom:28}}>
