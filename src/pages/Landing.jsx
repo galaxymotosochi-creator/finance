@@ -149,7 +149,7 @@ export default function Landing() {
               {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
                 <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #f0f0f0"}}>
                   <span style={{fontWeight:500}}>{r[0]}</span>
-                  <span style={{fontWeight:600,color:r[2]}}>{r[1]} ₽</span>
+                  <span style={{fontWeight:600,color:r[2]}}>{r[1]}</span>
                 </div>
               ))}
             </div>
