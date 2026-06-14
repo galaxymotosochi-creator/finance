@@ -26,6 +26,7 @@ import Supplies from './pages/stock/Supplies';
 import Suppliers from './pages/stock/Suppliers';
 import Writeoffs from './pages/stock/Writeoffs';
 import Inventory from './pages/stock/Inventory';
+import Subscription from './pages/Subscription';
 import Clients from './pages/clients/Clients';
 import Loyalty from './pages/clients/Loyalty';
 import Positions from './pages/employees/Positions';
@@ -73,6 +74,7 @@ function AppRoutes() {
       <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><div>Настройки</div></AppLayout></ProtectedRoute>} />
+      <Route path="/settings/subscription" element={<ProtectedRoute><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
