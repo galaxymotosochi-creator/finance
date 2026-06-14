@@ -35,6 +35,21 @@ export default function Landing() {
     return <span dangerouslySetInnerHTML={{__html: svgs[type]}} style={{display:"inline-flex"}} />;
   };
 
+  const CompareItem = ({icon,text}) => {
+    const isGreen = icon === '#16a34a';
+    const color = isGreen ? '#16a34a' : '#999';
+    return (
+      <div style={{display:"flex",gap:10,alignItems:"flex-start",fontSize:12,lineHeight:1.45,color:"rgba(0,0,0,.65)"}}>
+        <span style={{flexShrink:0,width:18,height:18,borderRadius:"50%",background:isGreen?"#f0fdf4":"#f5f5f5",display:"flex",alignItems:"center",justifyContent:"center",marginTop:1}}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={color} stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+        <span>{text}</span>
+      </div>
+    );
+  };
+
   const MiniAppWindow = ({title, children}) => (
     <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:12,overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.04)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"#000",padding:"5px 10px",display:"flex",gap:5,alignItems:"center"}}>
@@ -228,22 +243,42 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ===== СТАТИСТИКА ===== */}
-      <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>FINANCE в цифрах</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Результаты, которые говорят сами за себя</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:0,textAlign:"center"}}>
-          {[
-            {num:"100+",label:"компаний",desc:"уже используют FINANCE для учёта"},
-            {num:"4",label:"сервиса",desc:"заменяет одна система — склад, финансы, зп, клиенты"},
-            {num:"70%",label:"экономия",desc:"времени на учёт по сравнению с Excel"},
-          ].map((s,i)=>(
-            <div key={i} style={{borderRight:i<2?"1px solid rgba(0,0,0,.08)":"none",padding:"0 24px"}}>
-              <div style={{fontSize:44,fontWeight:800,lineHeight:1,marginBottom:8,letterSpacing:"-.03em",color:"#111"}}>{s.num}</div>
-              <div style={{fontSize:15,fontWeight:600,marginBottom:6,color:"#333"}}>{s.label}</div>
-              <div style={{fontSize:13,color:"rgba(0,0,0,.5)",lineHeight:1.4}}>{s.desc}</div>
+      {/* ===== КОНТРАСТ СИСТЕМ ===== */}
+      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках и хаосе в Excel</h2>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Сравните, как работают привычные методы и наша умная платформа</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20,alignItems:"start"}}>
+          {/* Карточка 1 — ERP */}
+          <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
+            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжёлые программы<br/>(1С и аналоги)</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <CompareItem icon="#999" text="Сложное внедрение: требуются недели обучения персонала и платные услуги программистов для любой настройки." />
+              <CompareItem icon="#999" text="Перегруженный интерфейс: сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники." />
+              <CompareItem icon="#999" text="Высокая стоимость: дорогие лицензии, привязка к серверам и постоянная плата за каждое мелкое обновление." />
             </div>
-          ))}
+          </div>
+          {/* Карточка 2 — Excel */}
+          <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
+            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Таблицы и блокноты<br/>(Excel / Sheets)</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <CompareItem icon="#999" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьётся с реальными остатками на складе." />
+              <CompareItem icon="#999" text="Человеческий фактор: сотрудники регулярно забывают вовремя вносить продажи, путают позиции товара или теряют чеки." />
+              <CompareItem icon="#999" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
+            </div>
+          </div>
+          {/* Карточка 3 — FINANCE */}
+          <div style={{border:"2px solid #ffdd2d",borderRadius:16,padding:28,background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",marginBottom:12}}>Рекомендуем</div>
+            <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа Finance</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
+              <CompareItem icon="#16a34a" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
+              <CompareItem icon="#16a34a" text="Всё в одной вкладке: живая касса, складской учёт, база клиентов и финансы команды работают в единой связке." />
+              <CompareItem icon="#16a34a" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
+            </div>
+            <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",transition:"all .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#f5d100"}
+              onMouseLeave={e=>e.currentTarget.style.background="#ffdd2d"}>Попробовать бесплатно</button>
+          </div>
         </div>
       </section>
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
