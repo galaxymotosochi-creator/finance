@@ -493,8 +493,9 @@ body {
 .act-btn:hover { background: #f8f9fa; }
 .prod-dropdown.up { top: auto; bottom: 100%; margin-top: 0; margin-bottom: 2px; }
 .search-row .stock-filter-links { display: flex; align-items: center; gap: .15rem; }
-.search-row .stock-filter-link { padding: .15rem .4rem; font-size: .72rem; color: var(--secondary); cursor: pointer; border-right: 1px solid var(--border); line-height: 1; }
+.search-row .stock-filter-link { padding: .15rem .4rem; font-size: .72rem; color: #555; cursor: pointer; border-right: 1px solid var(--border); line-height: 1; }
 .search-row .stock-filter-link:last-child { border-right: none; }
+.search-row .stock-filter-link:hover { color: #000; }
 .search-row .stock-filter-link:hover { color: var(--body-color); }
 .stock-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 0 0 .4rem 0; flex-wrap: wrap; gap: .4rem; }
 .stock-count { font-size: .78rem; color: var(--muted); font-weight: 400; }
