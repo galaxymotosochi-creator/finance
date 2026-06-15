@@ -61,12 +61,12 @@ export default function AiChat() {
   const [loading, setLoading] = useState(false);
   const [notifDot, setNotifDot] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
-  const [notifLoaded, setNotifLoaded] = useState(false);
+  const notifLoaded = useRef(false);
   const listRef = useRef(null);
 
   // Генерируем уведомления на клиенте (один раз)
   useEffect(() => {
-    if (!user || notifLoaded) return;
+    if (!user || notifLoaded.current) return;
     (async () => {
       try {
         const now = new Date();
@@ -116,10 +116,10 @@ export default function AiChat() {
           setNotifCount(notifs.length);
           setMessages(prev => [...prev, ...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color }))]);
         }
-        setNotifLoaded(true);
-      } catch (e) { setNotifLoaded(true); }
+        notifLoaded.current = true;
+      } catch (e) { notifLoaded.current = true; }
     })();
-  }, [user, notifLoaded]);
+  }, [user]);
 
   // Сбрасываем уведомления при открытии чата (прочитано)
   useEffect(() => {
