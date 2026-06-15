@@ -1,5 +1,6 @@
 import { useAuth } from '../hooks/useAuth';
 import Sidebar from '../components/Sidebar';
+import AiChat from '../components/AiChat';
 
 export default function AppLayout({ children }) {
   const { user, signOut } = useAuth();
@@ -15,6 +16,7 @@ export default function AppLayout({ children }) {
         <div className="content">
           {children}
         </div>
+        <AiChat />
       </div>
     </>
   );
