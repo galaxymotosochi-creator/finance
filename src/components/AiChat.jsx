@@ -184,7 +184,6 @@ export default function AiChat() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'inherit',
           animation: notifDot ? 'pulse-ai 2s infinite' : 'none',
-          position: 'relative',
         }}>
         {open ? '✕' : (notifDot ? <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round'><rect x='2' y='4' width='20' height='16' rx='2'/><path d='M22 4L12 13 2 4'/></svg> : 'AI')}
         {!open && notifDot && (
