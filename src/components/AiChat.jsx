@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
@@ -55,11 +55,69 @@ export default function AiChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Я AI-помощник. Могу:\n• Добавить расход/доход\n• Создать товар/категорию\n• Сделать отчёт\n\nНапример: "добавь расход 5000 на запчасти"' },
+    { role: 'assistant', text: '👋 Привет! Я AI-помощник. Могу:\n• Добавить расход/доход\n• Создать товар/категорию\n• Сделать отчёт\n\nНапример: "добавь расход 5000 на запчасти"', isNotification: false },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [notifDot, setNotifDot] = useState(null);
+  const [notifCount, setNotifCount] = useState(0);
   const listRef = useRef(null);
+
+  // Генерируем уведомления на клиенте
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const now = new Date();
+        const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+        const monthAgo = new Date(now); monthAgo.setDate(monthAgo.getDate() - 30);
+
+        const [txRes, prodRes] = await Promise.all([
+          supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
+          supabase.from('products').select('*').eq('user_id', user.id),
+        ]);
+
+        const transactions = txRes.data || [];
+        const products = prodRes.data || [];
+
+        const weekTx = transactions.filter(t => t.date && new Date(t.date) >= weekAgo);
+        const monthTx = transactions.filter(t => t.date && new Date(t.date) >= monthAgo);
+
+        const weekIncome = weekTx.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
+        const weekExpense = weekTx.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
+        const monthIncome = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
+        const monthExpense = monthTx.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
+
+        const notifs = [];
+
+        if (weekExpense > weekIncome && weekExpense > 0)
+          notifs.push({ level: 'critical', title: '📉 Убыток за неделю', text: 'Доходы ' + weekIncome.toLocaleString() + '₽, расходы ' + weekExpense.toLocaleString() + '₽', color: '#dc2626' });
+
+        const monthProfit = monthIncome - monthExpense;
+        if (monthProfit > 0)
+          notifs.push({ level: 'info', title: '📈 Прибыль за месяц', text: '+' + monthProfit.toLocaleString() + '₽ при доходах ' + monthIncome.toLocaleString() + '₽', color: '#16a34a' });
+        else if (monthProfit < 0 && monthTx.length > 0)
+          notifs.push({ level: 'critical', title: '📉 Убыток за месяц', text: '−' + Math.abs(monthProfit).toLocaleString() + '₽', color: '#dc2626' });
+
+        if (weekIncome > 0 && weekExpense > 0) {
+          const ratio = Math.round(weekExpense / weekIncome * 100);
+          if (ratio > 70)
+            notifs.push({ level: 'warning', title: '⚠️ Высокие расходы', text: ratio + '% доходов уходит на расходы', color: '#f59e0b' });
+        }
+
+        if (weekTx.length === 0 && transactions.length > 5)
+          notifs.push({ level: 'warning', title: '📭 Нет операций за неделю', text: 'За 7 дней не было ни одной операции', color: '#f59e0b' });
+
+        if (notifs.length > 0) {
+          const topLevel = ['critical', 'warning', 'info'].find(l => notifs.some(n => n.level === l));
+          const colors = { critical: '#dc2626', warning: '#f59e0b', info: '#16a34a' };
+          setNotifDot(colors[topLevel]);
+          setNotifCount(notifs.length);
+          setMessages(prev => [...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color })), ...prev]);
+        }
+      } catch (e) {}
+    })();
+  }, [user]);
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
@@ -69,7 +127,7 @@ export default function AiChat() {
     if (!input.trim() || loading) return;
     const userMsg = input.trim();
     setInput('');
-    setMessages(p => [...p, { role: 'user', text: userMsg }]);
+    setMessages(p => [...p, { role: 'user', text: userMsg, isNotification: false }]);
     setLoading(true);
 
     try {
@@ -78,13 +136,12 @@ export default function AiChat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMsg,
-          history: messages.slice(-10).map(m => ({ role: m.role, text: m.text })),
+          history: messages.filter(m => !m.isNotification).slice(-10).map(m => ({ role: m.role, text: m.text })),
         }),
       });
       const data = await res.json();
       let reply = data.reply || '...';
 
-      // Если AI вернул действие — выполняем
       if (data.action) {
         const fn = ACTION_MAP[data.action];
         if (fn) {
@@ -93,14 +150,13 @@ export default function AiChat() {
         }
       }
 
-      setMessages(p => [...p, { role: 'assistant', text: reply }]);
+      setMessages(p => [...p, { role: 'assistant', text: reply, isNotification: false }]);
 
-      // Автообновление страницы через 1.5 сек после действия
       if (data.action && data.action !== 'GET_REPORT') {
         setTimeout(() => window.location.reload(), 2000);
       }
     } catch (err) {
-      setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка соединения с сервером' }]);
+      setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка соединения с сервером', isNotification: false }]);
     }
     setLoading(false);
   };
@@ -116,13 +172,33 @@ export default function AiChat() {
           position: 'fixed', bottom: '24px', right: '24px', zIndex: 999,
           width: '56px', height: '56px', borderRadius: '50%',
           background: '#000', color: '#fff', border: 'none',
-          fontSize: '1rem', fontWeight: 700, cursor: 'pointer',
+          fontSize: '1.2rem', fontWeight: 700, cursor: 'pointer',
           boxShadow: '0 2px 12px rgba(0,0,0,.15)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'inherit', letterSpacing: '.05em',
-          animation: 'pulse-ai 2s infinite',
+          fontFamily: 'inherit',
+          animation: notifDot ? 'pulse-ai 2s infinite' : 'none',
+          position: 'relative',
         }}>
-        {open ? '✕' : 'AI'}
+        {open ? '✕' : '📩'}
+        {!open && notifDot && (
+          <>
+            <span style={{
+              position: 'absolute', top: '2px', right: '2px',
+              width: '14px', height: '14px', borderRadius: '50%',
+              background: notifDot, border: '2px solid #000',
+            }} />
+            {notifCount > 1 && (
+              <span style={{
+                position: 'absolute', top: '-4px', right: '-4px',
+                background: '#000', color: '#fff', fontSize: '9px',
+                fontWeight: 700, borderRadius: '8px', padding: '1px 5px',
+                lineHeight: '14px', border: '1.5px solid #fff',
+              }}>
+                {notifCount}
+              </span>
+            )}
+          </>
+        )}
       </button>
 
       {open && (
@@ -145,9 +221,10 @@ export default function AiChat() {
             {messages.map((m, i) => (
               <div key={i} style={{
                 maxWidth: '85%', padding: '6px 10px', borderRadius: '8px',
-                background: m.role === 'user' ? '#e8f0ff' : '#f5f5f5',
+                background: m.isNotification ? (m.color ? m.color + '18' : '#fff7ed') : (m.role === 'user' ? '#e8f0ff' : '#f5f5f5'),
                 color: '#333', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
                 whiteSpace: 'pre-wrap',
+                borderLeft: m.isNotification && m.color ? `3px solid ${m.color}` : 'none',
               }}>
                 {m.text}
               </div>
