@@ -227,7 +227,6 @@ export default function Subscription() {
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}
           onClick={()=>setSwitchPlan(null)}>
           <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.12)"}} onClick={e=>e.stopPropagation()}>
-            <div style={{fontSize:"2rem",marginBottom:12,textAlign:"center"}}>🔄</div>
             <h2 style={{fontSize:"1.1rem",fontWeight:700,textAlign:"center",marginBottom:8}}>Смена тарифа</h2>
             <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:4,lineHeight:1.4}}>
               Вы переходите на тариф <strong>{switchPlan.name}</strong>
