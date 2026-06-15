@@ -518,7 +518,7 @@ body {
 .stock-add-btn:hover { background: var(--primary-hover); box-shadow: var(--shadow-sm); }
 .stock-filterbar { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: .5rem; flex-wrap: wrap; }
 .total-row { background: transparent; }
-.total-row td { font-weight: 700; border-top: 2px solid var(--border); padding: .6rem .4rem; }
+.total-row td { font-weight: 700; border-top: 1px solid var(--border); padding: .6rem .4rem; }
 .empty-products { text-align: center; padding: 3rem 1rem; color: var(--muted); }
 .empty-products .big-icon { font-size: 3rem; opacity: .15; margin-bottom: .5rem; }
 .empty-products p { font-size: .85rem; }
