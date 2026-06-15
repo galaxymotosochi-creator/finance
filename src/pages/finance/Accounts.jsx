@@ -184,40 +184,68 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          <div style={{background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'1rem',padding:'1rem 1.25rem',marginBottom:'1rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.04)'}}>
-            <div style={{fontSize:'1.8rem',fontWeight:700,color:'#111'}}>{total.toLocaleString()}₽</div>
-            <div style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.15rem'}}>Управление счетами и учет остатков</div>
+          <div style={{display:'flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px'}}>
+            <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс</div>
           </div>
-          {sorted.map(a => {
-            var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
-            var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
-            return (
-              <div key={a.id} style={{background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.85rem',padding:'.85rem',marginBottom:'.5rem',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.35rem'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
-                    <span style={{fontSize:'1.5rem'}}>{ic}</span>
-                    <div><div style={{fontWeight:600,fontSize:'.85rem'}}>{a.name}</div><div style={{fontSize:'.72rem',color:'var(--muted)'}}>{lb}</div></div>
-                  </div>
-                  <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                    <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
-                    {!isSys(a) && (
-                      <div className="prod-more-wrap">
-                        <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
-                        <div className="prod-dropdown"><button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="nav-sep" style={{margin:'.35rem 0',width:'100%',opacity:.3}} />
-                <div style={{fontSize:'.82rem',color:'var(--muted)',lineHeight:1.6}}>
-                  <span>Было: {in0.toLocaleString()}₽</span><span style={{margin:'0 .35rem'}}>·</span>
-                  <span style={{color:'#16a34a'}}>+Доход: {mv.i.toLocaleString()}₽</span><span style={{margin:'0 .35rem'}}>·</span>
-                  <span style={{color:'#dc2626'}}>−Расход: {mv.e.toLocaleString()}₽</span>
-                </div>
-                <div style={{fontSize:'1.05rem',fontWeight:700,color:bl>=0?'#16a34a':'#dc2626',marginTop:'.25rem'}}>= {bl.toLocaleString()}₽</div>
-              </div>
-            );
-          })}
+          <div className="product-table">
+            <table>
+              <thead id="colHeaders">
+                <tr>
+                  <th style={{textAlign:'left',paddingLeft:0}}>Счет</th>
+                  <th>Начальный остаток</th>
+                  <th>Доходы</th>
+                  <th>Расходы</th>
+                  <th>Баланс</th>
+                  <th className="actions"></th>
+                </tr>
+              </thead>
+              <tbody id="dirTableBody">
+                {sorted.length === 0 ? (
+                  <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
+                ) : sorted.map(a => {
+                  var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
+                  var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
+                  return (
+                    <tr key={a.id}>
+                      <td style={{textAlign:'left'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                          <span style={{fontSize:'1rem'}}>{ic}</span>
+                          <div>
+                            <div className="prod-name">{a.name}</div>
+                            <div className="prod-sku">{lb}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{in0.toLocaleString()}₽</td>
+                      <td style={{color:'#16a34a',fontWeight:600}}>+{mv.i.toLocaleString()}₽</td>
+                      <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()}₽</td>
+                      <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()}₽</td>
+                      <td style={{textAlign:'right'}}>
+                        <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
+                        {!isSys(a) && (
+                          <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
+                            <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
+                            <div className="prod-dropdown"><button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button></div>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {sorted.length > 0 && (
+                  <tr className="total-row">
+                    <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
+                    <td style={{textAlign:'center',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()}₽</td>
+                    <td></td>
+                    <td></td>
+                    <td style={{textAlign:'center',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()}₽</td>
+                    <td></td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
 
