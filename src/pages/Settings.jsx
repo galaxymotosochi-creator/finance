@@ -1,0 +1,116 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function Settings() {
+  const n = useNavigate();
+  const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
+  const [country, setCountry] = useState('Россия');
+  const [lang, setLang] = useState('Русский');
+  const [currency, setCurrency] = useState('RUB');
+  const [tz, setTz] = useState('Europe/Moscow');
+  const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
+
+  const countries = ['Россия', 'Казахстан', 'Беларусь', 'Армения', 'Узбекистан', 'Кыргызстан'];
+  const regLabels = { 'Россия': 'ИНН', 'Казахстан': 'БИН', 'Беларусь': 'УНП', 'Армения': 'ИНН', 'Узбекистан': 'ИНН', 'Кыргызстан': 'ИНН' };
+  const timezones = ['Europe/Moscow (МСК)', 'Asia/Almaty (+5)', 'Asia/Nur-Sultan (+5)', 'Europe/Minsk (+3)', 'Asia/Yerevan (+4)', 'Asia/Tashkent (+5)', 'Asia/Bishkek (+6)'];
+
+  return (
+    <div style={{ fontFamily: "'Inter',sans-serif", color: '#111' }}>
+      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
+      <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 24 }}>Компания, локализация, уведомления и данные</p>
+
+      {/* 1. Профиль */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Профиль компании</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+          {[['Название компании', company.name, v => setCompany({...company, name: v})],
+            ['Юридический адрес', company.address, v => setCompany({...company, address: v})],
+            [`${regLabels[country] || 'Регистрационный номер'}`, company.regNumber, v => setCompany({...company, regNumber: v})],
+            ['Телефон', company.phone, v => setCompany({...company, phone: v})],
+          ].map(([label, val, setter], i) => (
+            <div key={i}>
+              <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
+              <input value={val} onChange={e => setter(e.target.value)} placeholder={label}
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Email для счетов</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
+              style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
+            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Загрузить логотип</button>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Локализация */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Локализация и стандарты</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+          {[['Страна', country, setCountry, countries],
+            ['Язык интерфейса', lang, setLang, ['Русский', 'Казахский', 'Английский']],
+            ['Валюта по умолчанию', currency, setCurrency, ['RUB', 'KZT', 'BYN', 'AMD', 'UZS', 'KGS']],
+            ['Часовой пояс', tz, setTz, timezones],
+          ].map(([label, val, setter, options], i) => (
+            <div key={i}>
+              <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
+              <select value={val} onChange={e => { setter(e.target.value); if (label === 'Страна') setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB'); }}
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+                {options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Уведомления */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>Уведомления и связь</h2>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Канал уведомлений</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[['email', 'Email'], ['telegram', 'Telegram'], ['push', 'Push']].map(([key, label]) => (
+              <button key={key} onClick={() => setNotifications({...notifications, [key]: !notifications[key]})}
+                style={{ padding: '.4rem .8rem', borderRadius: 100, border: `1.5px solid ${notifications[key] ? '#000' : 'rgba(0,0,0,.12)'}`, background: notifications[key] ? '#000' : 'transparent', color: notifications[key] ? '#fff' : '#555', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Типы уведомлений</div>
+          {[['sales', 'Отчёты о продажах'], ['stock', 'Критические остатки'], ['payment', 'Оплата тарифа']].map(([key, label]) => (
+            <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: '.82rem', cursor: 'pointer' }}>
+              <input type="checkbox" checked={notifications[key]} onChange={() => setNotifications({...notifications, [key]: !notifications[key]})}
+                style={{ width: 16, height: 16, accentColor: '#000', cursor: 'pointer' }} />
+              {label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 4. Экспорт */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Экспорт и данные</h2>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
+          <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: 'none', background: '#000', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>📥 Экспорт в Excel</button>
+          <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>📥 Экспорт в CSV</button>
+        </div>
+        <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16 }}>
+          <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Безопасность</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔐 История входов</button>
+            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔑 Сменить пароль</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
+        <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
+      </div>
+    </div>
+  );
+}
