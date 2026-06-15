@@ -35,6 +35,7 @@ export default function Accounts() {
   const [trAmt, setTrAmt] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
+  const [viewAcTx, setViewAcTx] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -217,7 +218,7 @@ export default function Accounts() {
                     <tr key={a.id}>
                       <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                          <div>
+                          <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
                             <div className="prod-name">{a.name}</div>
                             <div className="prod-sku">{lb}</div>
                           </div>
@@ -348,6 +349,46 @@ export default function Accounts() {
                 <button type="submit" className="btn btn-account-select">Сохранить</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {viewAcTx && (
+        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setViewAcTx(null)}}}>
+          <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
+            <button className="modal-close" onClick={()=>setViewAcTx(null)}>&times;</button>
+            <h2>{viewAcTx.name}</h2>
+            <div className="sub" style={{marginBottom:'.5rem'}}>История операций по счету</div>
+            <div className="product-table" style={{flex:1,overflowY:'auto'}}>
+              <table>
+                <thead id="colHeaders">
+                  <tr>
+                    <th style={{textAlign:'left',paddingLeft:0,minWidth:'100px'}}>Дата</th>
+                    <th style={{textAlign:'left'}}>Описание</th>
+                    <th style={{width:'80px'}}>Сумма</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(()=>{
+                    var txList = (transactions||[]).filter(t=>t.account_id===viewAcTx.id).sort((a,b)=>(b.date||b.created_at||'').localeCompare(a.date||a.created_at||''));
+                    if (txList.length===0) return <tr><td colSpan="3"><div className="empty-products"><div className="big-icon">📋</div><p>Нет операций по счету</p></div></td></tr>;
+                    return txList.map(t=>{
+                      var amt=Number(t.amount||0);
+                      return (
+                        <tr key={t.id}>
+                          <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{(t.date||t.created_at||'').split('T')[0]}</td>
+                          <td style={{textAlign:'left'}}>
+                            <span className="prod-name">{t.description||'—'}</span>
+                            <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
+                          </td>
+                          <td style={{textAlign:'center',fontWeight:600,color:t.type==='income'?'#16a34a':'#dc2626'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()}₽</td>
+                        </tr>
+                      );
+                    });
+                  })()}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
