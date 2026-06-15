@@ -139,29 +139,39 @@ export default function Shifts() {
           <thead id="colHeaders">
             <tr>
               <th style={{textAlign:'left',paddingLeft:0}}>Дата</th>
+              <th style={{textAlign:'left'}}>Время открытия</th>
+              <th>Смена №</th>
+              <th style={{textAlign:'left'}}>Кассир</th>
               <th>Начальный остаток</th>
-              <th>Доходы</th>
-              <th>Расходы</th>
-              <th>Баланс</th>
+              <th style={{textAlign:'left'}}>Касса</th>
+              <th>Конечный остаток</th>
+              <th>Время закрытия</th>
               <th>Статус</th>
               <th className="actions"></th>
             </tr>
           </thead>
           <tbody>
             {shifts.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
-            ) : shifts.map(s => {
+              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
+            ) : shifts.map((s, idx) => {
               const income = getShiftIncome(s);
               const expense = getShiftExpense(s);
-              const bal = (parseFloat(s.opening_balance) || 0) + income - expense;
               const isOpen = s.status === 'open';
+              const d = new Date(s.opened_at);
+              const dateStr = d.toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric' });
+              const timeOpen = d.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+              const timeClose = s.closed_at ? new Date(s.closed_at).toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '—';
+              const sCloseBal = parseFloat(s.closing_balance)||0;
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{formatDate(s.opened_at)}</td>
+                  <td style={{textAlign:'left',fontSize:'.82rem'}}>{dateStr}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{timeOpen}</td>
+                  <td style={{fontSize:'.82rem'}}>{'#'+(idx+1)}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{user?.email?.split('@')[0] || '—'}</td>
                   <td>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
-                  <td style={{color:'#16a34a',fontWeight:600}}>+{income.toLocaleString()} ₽</td>
-                  <td style={{color:'#dc2626',fontWeight:600}}>−{expense.toLocaleString()} ₽</td>
-                  <td style={{fontWeight:700}}>{bal.toLocaleString()} ₽</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>Основная</td>
+                  <td style={{fontWeight:600}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
+                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{timeClose}</td>
                   <td><span style={{fontSize:'.72rem',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? '🟢 Открыта' : 'Закрыта'}</span></td>
                   <td style={{textAlign:'right'}}>
                     {isOpen && (
