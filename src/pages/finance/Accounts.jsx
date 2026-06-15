@@ -284,7 +284,7 @@ export default function Accounts() {
       )}
 
       {showCorrect && (
-        <div className="modal-overlay active">
+        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowCorrect(false)}}}>
           <div className="modal-box" style={{maxWidth:'450px'}}>
             <button className="modal-close" onClick={()=>setShowCorrect(false)}>&times;</button>
             <h2>Корректировка баланса</h2>
@@ -322,7 +322,7 @@ export default function Accounts() {
       )}
 
       {showInit && (
-        <div className="modal-overlay active">
+        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowInit(false)}}}>
           <div className="modal-box" style={{maxWidth:'500px'}}>
             <button className="modal-close" onClick={()=>setShowInit(false)}>&times;</button>
             <h2>Введите первоначальные остатки</h2>
