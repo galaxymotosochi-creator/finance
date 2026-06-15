@@ -145,16 +145,15 @@ export default function Accounts() {
   var saveInit = async (e) => {
     e.preventDefault();
     try {
-      for (var type of Object.keys(initAmts)) {
-        var amt = parseFloat(initAmts[type])||0;
+      for (var acId of Object.keys(initAmts)) {
+        var amt = parseFloat(initAmts[acId])||0;
         if (amt > 0) {
-          await supabase.from('accounts').update({balance:amt}).eq('type',type).eq('user_id',user.id);
+          await supabase.from('accounts').update({balance:amt}).eq('id',acId);
         }
       }
       setShowInit(false); setInitAmts({});
       await fetchAccounts();
     } catch(err) {alert(err.message);}
-
   };
 
   var sorted = [...accounts].sort((a,b)=>{if(isSys(a)&&!isSys(b))return -1;if(!isSys(a)&&isSys(b))return 1;return 0;});
@@ -334,8 +333,8 @@ export default function Accounts() {
                   <div key={a.id} className="form-group">
                     <label>{a.name}</label>
                     <input type="number" placeholder="0" min="0" step="0.01"
-                      value={initAmts[a.type]||""}
-                      onChange={function(e){var v=parseFloat(e.target.value)||0;setInitAmts(p=>{var r=Object.assign({},p);r[a.type]=v;return r;})}} />
+                      value={initAmts[a.id]||""}
+                      onChange={function(e){var v=parseFloat(e.target.value)||0;setInitAmts(p=>{var r=Object.assign({},p);r[a.id]=v;return r;})}} />
                   </div>
                 );
               })}
