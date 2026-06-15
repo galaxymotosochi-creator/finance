@@ -598,7 +598,7 @@ export default function Products() {
                       dd.style.left = Math.max(8, r.right - 140) + 'px';
                       dd.style.top = (spaceBelow > 150 ? r.bottom + 4 : r.top - 4 - 120) + 'px';
                     }}>⋯</button>
-                    <div className="prod-dropdown" style={{display:'none',position:'fixed',zIndex:9999,minWidth:'140px',padding:'.3rem 0',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.5rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.15)'}}>
+                    <div className="prod-dropdown" style={{display:'none',position:'fixed',zIndex:300,minWidth:'140px',padding:'.3rem 0',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.5rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.15)'}}>
                       <button onClick={() => copyP(p.id)}>Копировать</button>
                       {p.hidden ? (
                         <button onClick={() => unhide(p.id)}>Восстановить</button>
