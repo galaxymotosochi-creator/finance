@@ -483,8 +483,8 @@ export default function Products() {
             {exportOpen && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="export-dd-title" style={{fontSize:'.72rem',color:'var(--muted)',padding:'.25rem .5rem',marginBottom:'.15rem',textAlign:'left'}}>Скачать</div>
-                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)'}}>📋 Шаблон для импорта</div>
-                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)'}}>📤 Выгрузить товары</div>
+                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📋 Шаблон для импорта</div>
+                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📤 Выгрузить товары</div>
               </div>
             )}
           </div>
