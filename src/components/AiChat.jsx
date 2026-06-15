@@ -126,7 +126,7 @@ export default function AiChat() {
       {open && (
         <div style={{
           position: 'fixed', bottom: '72px', right: '20px', zIndex: 998,
-          width: '340px', maxHeight: '600px',
+          width: '340px', height: '600px',
           background: '#fff', border: '1px solid #e5e7eb',
           borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,.12)',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -141,7 +141,7 @@ export default function AiChat() {
           </div>
 
           {/* Сообщения */}
-          <div ref={listRef} style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', lineHeight: 1.5 }}>
+          <div ref={listRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', lineHeight: 1.5 }}>
             {messages.map((m, i) => (
               <div key={i} style={{
                 maxWidth: '85%', padding: '6px 10px', borderRadius: '8px',
