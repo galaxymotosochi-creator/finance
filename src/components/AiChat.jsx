@@ -237,7 +237,7 @@ export default function AiChat() {
             ))}
             {loading && (
               <div style={{ maxWidth: '85%', padding: '6px 10px', borderRadius: '8px', background: '#f5f5f5', color: '#999', alignSelf: 'flex-start' }}>
-                ⏳ Думаю...
+                ✏️ Печатает...
               </div>
             )}
           </div>
