@@ -24,7 +24,7 @@ export default function Accounts() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
-  const [modalType, setModalType] = useState('cash');
+  const [modalType, setModalType] = useState('custom');
   const [modalBalance, setModalBalance] = useState('0');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
@@ -118,7 +118,7 @@ export default function Accounts() {
         if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib}).select();
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom',balance:ib}).select();
         if (ins.error) { alert(ins.error.message); return; }
       }
       await fetchAccounts();
@@ -267,14 +267,6 @@ export default function Accounts() {
                 <label>Название</label>
                 <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
               </div>
-              {!editingId && (
-                <div className="form-group">
-                  <label>Тип</label>
-                  <select value={modalType} onChange={e=>setModalType(e.target.value)}>
-                    {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
-                  </select>
-                </div>
-              )}
               {!editingId && (
                 <div className="form-group">
                   <label>Начальный остаток (₽)</label>
