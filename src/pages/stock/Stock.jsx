@@ -173,36 +173,26 @@ export default function Stock() {
     <>
       {toast && <div className="toast toast-success">{toast}</div>}
 
-      <div className="stock-toolbar" style={{paddingBottom:0,marginBottom:'1.5rem'}}>
+      <div className="page-header">
         <div>
-          <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
-            <h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Складские остатки</h1>
-            <span className="stock-count">{items.length}</span>
-          </div>
-          <div className="sub" style={{marginBottom:0}}>Учет количества и фактического наличия товаров</div>
+          <h1>Складские остатки</h1>
+          <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:'.3rem'}}>
-          <button className="stock-icon-btn">📊</button>
-          <button className="stock-icon-btn">📥</button>
-          <button className="stock-icon-btn">🖨</button>
-          <button className="btn btn-outline" onClick={openInitialStock} style={{marginLeft:'.3rem'}}>
-            Ввести начальные остатки
-          </button>
+        <div className="page-actions">
+          <button className="btn-mint" onClick={openInitialStock}>+ Ввести начальные остатки</button>
         </div>
       </div>
-
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-
-      <div className="stock-filterbar" style={{borderTop:'none',borderBottom:'none',paddingTop:0,paddingBottom:0}}>
-        <div className="stock-search">
-          <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
-          <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
+        <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.3rem',width:'30%',minWidth:'180px',maxWidth:'400px',border:'1px solid var(--border)',borderRadius:'6px',padding:'7px .5rem',background:'var(--white)'}}>
+          <span style={{fontSize:'.75rem',color:'var(--muted)',lineHeight:1}}>🔍</span>
+          <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
+            style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
-        <div className="stock-filter-links">
-          <span className="stock-filter-link">Поставщик</span>
-          <span className="stock-filter-link">Счет</span>
-          <span className="stock-filter-link">Категории</span>
-          <span className="stock-filter-link stock-filter-add">+ Фильтр</span>
+        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto'}}>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Категории</span>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Счет</span>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}>+ Фильтр</span>
         </div>
       </div>
 
@@ -254,7 +244,7 @@ export default function Stock() {
                   <td style={{textAlign:'center'}}>{costPrice.toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <span className="editable-price"
-                      style={{cursor:'pointer',color:'var(--primary)',fontWeight:500,borderBottom:'1px dashed var(--primary)',paddingBottom:'1px'}}
+                      style={{cursor:'pointer',color:'#555',fontWeight:500,borderBottom:'1px dashed #999',paddingBottom:'1px'}}
                       onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
                   </td>
                   <td style={{textAlign:'center'}}>
