@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -109,6 +110,8 @@ export default function Products() {
   const [colsOpen, setColsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [catFilter, setCatFilter] = useState('');
+  const fileInputRef = useRef(null);
+  const [importing, setImporting] = useState(false);
 
   const migrateLocalData = useCallback(async () => {
     const local = JSON.parse(localStorage.getItem('products88') || '[]');
@@ -303,6 +306,72 @@ export default function Products() {
     XLSX.writeFile(wb, 'Товары.xlsx');
   };
 
+  const importExcel = (file) => {
+    if (!file) return;
+    setImporting(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        if (json.length === 0) { showToast('❌ Файл пуст'); setImporting(false); return; }
+
+        const COL_MAP = {
+          'название': 'name', 'наименование': 'name', 'товар': 'name',
+          'тип': 'type', 'категория': 'category',
+          'цена': 'price', 'стоимость': 'price',
+          'единица': 'unit', 'ед': 'unit', 'ед.изм': 'unit', 'ед. изм': 'unit', 'ед изм': 'unit',
+          'артикул': 'sku', 'код': 'sku',
+          'штрихкод': 'barcode', 'штрих код': 'barcode', 'штрих-код': 'barcode',
+          'описание': 'description', 'desc': 'description',
+          'вес': 'weight',
+          'себестоимость': 'cost', 'закуп': 'cost',
+        };
+
+        const headers = Object.keys(json[0]);
+        const colMap = {};
+        headers.forEach(h => {
+          const key = h.toLowerCase().trim().replace(/\s+/g, ' ');
+          colMap[h] = COL_MAP[key] || null;
+        });
+
+        let added = 0, errors = 0;
+        for (const row of json) {
+          try {
+            const name = (row[headers.find(h => (colMap[h]||'')==='name')] || '').toString().trim();
+            if (!name) { errors++; continue; }
+
+            const typeStr = (row[headers.find(h => (colMap[h]||'')==='type')] || 'товар').toString().toLowerCase();
+            const type = typeStr.includes('услуг') ? 'service' : 'product';
+
+            const cat = (row[headers.find(h => (colMap[h]||'')==='category')] || '').toString().trim();
+            const price = parseFloat(row[headers.find(h => (colMap[h]||'')==='price')]) || 0;
+            const unit = (row[headers.find(h => (colMap[h]||'')==='unit')] || '').toString().trim();
+            const sku = (row[headers.find(h => (colMap[h]||'')==='sku')] || '').toString().trim();
+            const barcode = (row[headers.find(h => (colMap[h]||'')==='barcode')] || '').toString().trim();
+            const description = (row[headers.find(h => (colMap[h]||'')==='description')] || '').toString().trim();
+            const weight = parseFloat(row[headers.find(h => (colMap[h]||'')==='weight')]) || 0;
+
+            const { error } = await supabase.from('products').insert({
+              id: Date.now() + added, user_id: user.id,
+              name, type, cat: cat || null, price, unit: unit || 'шт',
+              sku: sku || null, barcode: barcode || genBarcode(),
+              weight, weight_unit: 'кг', description, hidden: false
+            });
+            if (error) { errors++; } else { added++; }
+          } catch (e) { errors++; }
+        }
+
+        showToast(`✅ Загружено ${added} позиций${errors > 0 ? `, ${errors} с ошибками` : ''}`);
+        if (added > 0) load();
+      } catch (e) { showToast('❌ Ошибка при чтении файла'); }
+      setImporting(false);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   // Filter products
   let filtered = products;
   const q = search.toLowerCase().trim();
@@ -398,8 +467,10 @@ export default function Products() {
               </div>
             )}
           </div>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,opacity:importing?0.5:1}}
+            onClick={()=>{if(!importing){fileInputRef.current.click()}}}>{importing ? '⏳ Загрузка...' : '📥 Загрузить'}</span>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"var(--primary)",cursor:"pointer",borderRight:"none",lineHeight:1}}
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
               <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
@@ -639,6 +710,8 @@ export default function Products() {
           {toast}
         </div>
       )}
+      <input ref={fileInputRef} type="file" accept=".xlsx,.xls" style={{display:'none'}}
+        onChange={e=>{const f=e.target.files?.[0];if(f){importExcel(f)}e.target.value=''}} />
     </>
   );
 }
