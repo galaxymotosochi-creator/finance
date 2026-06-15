@@ -29,6 +29,10 @@ export default function Accounts() {
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
   const [showCorrect, setShowCorrect] = useState(false);
+  const [showTransfer, setShowTransfer] = useState(false);
+  const [trFrom, setTrFrom] = useState('');
+  const [trTo, setTrTo] = useState('');
+  const [trAmt, setTrAmt] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
   const [toast, setToast] = useState(null);
@@ -180,6 +184,8 @@ export default function Accounts() {
             onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
             onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
+            onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
         </div>
       </div>
 
@@ -340,6 +346,39 @@ export default function Accounts() {
               })}
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">Сохранить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showTransfer && (
+        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowTransfer(false)}}}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
+            <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
+            <h2>Перевод между счетами</h2>
+            <div className="sub" style={{marginBottom:'1rem'}}>Перемещение средств между счетами</div>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод на '+toAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод с '+fromAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
+              <div className="form-group">
+                <label>Откуда</label>
+                <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
+                  <option value="">— выберите —</option>
+                  {accounts.filter(a=>a.id!==trTo).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Куда</label>
+                <select value={trTo} onChange={e=>setTrTo(e.target.value)} required>
+                  <option value="">— выберите —</option>
+                  {accounts.filter(a=>a.id!==trFrom).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Сумма (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-account-select">Перевести</button>
               </div>
             </form>
           </div>
