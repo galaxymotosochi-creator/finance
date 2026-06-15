@@ -27,7 +27,8 @@ const FUNC_MAP = {
     });
     return error ? `Ошибка: ${error.message}` : `✅ Товар «${args.name}» добавлен`;
   },
-  createCategory: async (args, user) => {
+  // Создать категорию товаров
+  createStockCategory: async (args, user) => {
     const { error } = await supabase.from('stock_categories').insert({
       user_id: user.id, name: args.name, type: 'product',
     });
