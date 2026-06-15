@@ -122,7 +122,7 @@ export default function AiChat() {
 
       {open && (
         <div style={{
-          position: 'fixed', bottom: '88px', right: '24px', zIndex: 998,
+          position: 'fixed', bottom: '96px', right: '24px', zIndex: 998,
           width: '340px', height: '600px',
           background: '#fff', border: '1px solid #e5e7eb',
           borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,.12)',
