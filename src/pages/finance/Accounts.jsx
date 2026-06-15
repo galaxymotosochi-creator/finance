@@ -40,7 +40,7 @@ export default function Accounts() {
 
   useEffect(() => {
     if (toast) {
-      const t = setTimeout(() => setToast(null), 7000);
+      const t = setTimeout(() => setToast(null), 3000);
       return () => clearTimeout(t);
     }
   }, [toast]);
@@ -103,7 +103,7 @@ export default function Accounts() {
 
   var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setShowModal(true); };
   var openEdit = (ac) => {
-    if (hasAct(ac)) return alert('Нельзя редактировать счет — на нем есть движения или начальный остаток');
+    if (hasAct(ac)) return setToast('⚠️ Нельзя редактировать счет — на нем есть движения');
     setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setShowModal(true);
   };
 
@@ -170,7 +170,7 @@ export default function Accounts() {
    if (loading || !initDone) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
    return (
     <>
-      {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
+      {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
       <div className="page-header">
         <div><h1>Финансовые счета</h1><div className="sub">Управление счетами и учет остатков</div></div>
         <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
