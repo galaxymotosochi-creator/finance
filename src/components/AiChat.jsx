@@ -106,20 +106,20 @@ export default function AiChat() {
       <button onClick={() => setOpen(!open)}
         style={{
           position: 'fixed', bottom: '20px', right: '20px', zIndex: 999,
-          width: '44px', height: '44px', borderRadius: '50%',
+          width: '88px', height: '88px', borderRadius: '50%',
           background: '#000', color: '#fff', border: 'none',
-          fontSize: '1.2rem', cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,.15)',
+          fontSize: '1.4rem', fontWeight:700, cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,.15)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'inherit',
+          fontFamily: 'inherit', letterSpacing:'.05em',
         }}>
-        {open ? '✕' : '🤖'}
+        {open ? '✕' : 'AI'}
       </button>
 
       {/* Модалка чата */}
       {open && (
         <div style={{
           position: 'fixed', bottom: '72px', right: '20px', zIndex: 998,
-          width: '340px', maxHeight: '480px',
+          width: '340px', maxHeight: '600px',
           background: '#fff', border: '1px solid #e5e7eb',
           borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,.12)',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
