@@ -300,8 +300,8 @@ export default function Accounts() {
                 <div className="form-group">
                   <label>Тип</label>
                   <select value={corType} onChange={e=>setCorType(e.target.value)}>
-                    <option value="income">➕ Приход</option>
-                    <option value="expense">➖ Расход</option>
+                    <option value="income">Приход</option>
+                    <option value="expense">Расход</option>
                   </select>
                 </div>
                 <div className="form-group">
