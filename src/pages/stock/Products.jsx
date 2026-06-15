@@ -141,7 +141,7 @@ export default function Products() {
   const load = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (data) setProductsState(data.filter(p => !p.hidden));
+    if (data) setProductsState(data);
   }, [user]);
 
   useEffect(() => { if (user) { migrateLocalData().then(() => load()); } }, [user, load, migrateLocalData]);
@@ -406,6 +406,7 @@ export default function Products() {
   const q = search.toLowerCase().trim();
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
+  filtered = filtered.sort((a, b) => (a.hidden ? 1 : 0) - (b.hidden ? 1 : 0));
 
   const costPrice = (p) => costMap[p.id] || 0;
 
@@ -544,7 +545,7 @@ export default function Products() {
       </div>
 
       {/* Таблица */}
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'hidden'}}>
+      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'visible'}}>
         <table>
           <thead id="colHeaders">
             <tr>
@@ -569,7 +570,7 @@ export default function Products() {
                 </td>
               </tr>
             ) : filtered.map(p => (
-              <tr key={p.id}>
+              <tr key={p.id} style={p.hidden ? {opacity:0.35,transition:'opacity .2s'} : {}}>
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
@@ -590,7 +591,11 @@ export default function Products() {
                     }}>⋯</button>
                     <div className="prod-dropdown">
                       <button onClick={() => copyP(p.id)}>Копировать</button>
-                      <button onClick={() => hide(p.id)}>Скрыть</button>
+                      {p.hidden ? (
+                        <button onClick={() => unhide(p.id)}>Восстановить</button>
+                      ) : (
+                        <button onClick={() => hide(p.id)}>Скрыть</button>
+                      )}
                       <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
