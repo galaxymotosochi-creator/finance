@@ -354,25 +354,28 @@ export default function Transactions() {
       )}
       {showActionSelect && (
         <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowActionSelect(false)}}}>
-          <div className="modal-box" style={{maxWidth:'460px'}}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={()=>setShowActionSelect(false)}>&times;</button>
             <h2>Что вы хотите сделать?</h2>
             <div className="sub" style={{marginBottom:'1rem'}}>Выберите тип операции</div>
-            <div style={{display:'flex',flexDirection:'column',gap:'.6rem'}}>
-              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
-                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
-                <span style={{fontSize:'2rem',lineHeight:1}}>➖</span>
-                <div><div style={{fontWeight:600}}>Добавить расход</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Списание средств</div></div>
+            <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+              <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
+                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <div><div style={{fontWeight:600}}>Добавить расход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Списание средств</div></div>
               </button>
-              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setEditingId(null);setShowIncome(true)}}
-                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
-                <span style={{fontSize:'2rem',lineHeight:1}}>➕</span>
-                <div><div style={{fontWeight:600}}>Добавить доход</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Поступление средств</div></div>
+              <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowIncome(true)}}
+                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <div><div style={{fontWeight:600}}>Добавить доход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Поступление средств</div></div>
               </button>
-              <button className="btn-mint" onClick={function(){setShowActionSelect(false);setShowTransfer(true);setTrFrom('');setTrTo('');setTrAmt('')}}
-                style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'1rem 1.25rem',borderRadius:'12px',border:'1px solid var(--border)',background:'#fff',cursor:'pointer',fontSize:'1rem',fontFamily:'var(--font)',fontWeight:600,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .12s'}}>
-                <span style={{fontSize:'2rem',lineHeight:1}}>🔄</span>
-                <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.78rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
+              <button onClick={function(){setShowActionSelect(false);setShowTransfer(true);setTrFrom('');setTrTo('');setTrAmt('')}}
+                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
               </button>
             </div>
           </div>
