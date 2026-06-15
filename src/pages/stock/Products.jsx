@@ -292,15 +292,19 @@ export default function Products() {
   };
 
   const exportExcel = () => {
-    const data = products.map(p => ({
+    const items = products || [];
+    if (items.length === 0) { showToast('❌ Нет товаров для выгрузки'); return; }
+    const data = items.map(p => ({
       'Название': p.name,
+      'Тип': p.type === 'service' ? 'Услуга' : 'Товар',
       'Категория': CAT_LABELS[p.cat] || p.cat || '',
       'Цена': p.price,
-      'Ед. измерения': p.unit || '',
-      'Артикул': p.sku || ''
+      'Ед. изм.': p.unit || 'шт',
+      'Артикул': p.sku || '',
+      'Себестоимость': p.costPrice || '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{wch:30},{wch:15},{wch:12},{wch:12},{wch:15}];
+    ws['!cols'] = [{wch:35},{wch:10},{wch:15},{wch:12},{wch:10},{wch:15},{wch:12}];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Товары');
     XLSX.writeFile(wb, 'Товары.xlsx');
