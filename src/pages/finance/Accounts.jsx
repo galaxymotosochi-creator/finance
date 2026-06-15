@@ -265,7 +265,7 @@ export default function Accounts() {
                 <div className="form-group">
                   <label>Тип</label>
                   <select value={modalType} onChange={e=>setModalType(e.target.value)}>
-                    {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.icon} {t.label}</option>)}
+                    {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                   </select>
                 </div>
               )}
@@ -293,7 +293,7 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{m?m.icon:''} {a.name}</option>})}
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{''} {a.name}</option>})}
                 </select>
               </div>
               <div className="form-row">
