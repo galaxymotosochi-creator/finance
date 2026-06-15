@@ -587,7 +587,7 @@ export default function Products() {
                       e.stopPropagation();
                       const dd = e.currentTarget.nextElementSibling;
                       document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                      dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                      dd.classList.toggle('open');var _c=e.currentTarget.closest('.product-table');if(_c){var _b=e.currentTarget.getBoundingClientRect();var _cb=_c.getBoundingClientRect();if(_cb.bottom-_b.bottom<100)dd.classList.add('up');else dd.classList.remove('up');}
                     }}>⋯</button>
                     <div className="prod-dropdown">
                       <button onClick={() => copyP(p.id)}>Копировать</button>
