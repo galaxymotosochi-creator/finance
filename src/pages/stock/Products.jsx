@@ -452,7 +452,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
             {catOpen && (
-              <div className="cat-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="cat-dd-actions">
                   <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
                   <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
@@ -481,7 +481,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setExportOpen(!exportOpen);setCatOpen(false);setColsOpen(false)}}>📥 Скачать</span>
             {exportOpen && (
-              <div className="export-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+              <div className="export-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="export-dd-title" style={{fontSize:'.72rem',color:'var(--muted)',padding:'.25rem .5rem',marginBottom:'.15rem',textAlign:'left'}}>Скачать</div>
                 <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📋 Шаблон для импорта</div>
                 <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📤 Выгрузить товары</div>
@@ -494,7 +494,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
-              <div className="cols-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
+              <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                 <div className="cols-title">Отображать столбцы</div>
                 <div className="cols-list">
                   {ALL_COLUMNS.filter(c => !c.always).map(c => {
@@ -659,62 +659,62 @@ export default function Products() {
       {/* Корзина модалка */}
       {showTrash && (
         <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowTrash(false); }}>
-          <div className="modal-box">
+          <div className="modal-box" style={{maxWidth:'460px',display:'flex',flexDirection:'column'}}>
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.5rem'}}>
               <h2>Корзина</h2>
-              <button onClick={() => setShowTrash(false)} style={{background:'none',border:'none',fontSize:'1.2rem',cursor:'pointer',color:'var(--muted)'}}>✕</button>
+              <button onClick={() => setShowTrash(false)} style={{background:'none',border:'none',fontSize:'1.2rem',cursor:'pointer',color:'var(--muted)',lineHeight:1}}>✕</button>
             </div>
-            <div className="sub" style={{marginBottom:'1.5rem'}}>Товары хранятся в корзине в течение 30 дней после удаления</div>
-            <div className="product-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th style={{width:'45%'}}>Товар</th>
-                    <th style={{width:'20%'}}>Категория</th>
-                    <th style={{width:'35%'}}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(() => {
-                    const trash = getTrash();
-                    if (!trash.length) {
-                      return (
-                        <tr><td colSpan="3"><div className="empty-products"><div className="big-icon">🗑️</div><p>В корзине пока ничего нет</p></div></td></tr>
-                      );
-                    }
-                    return trash.map(p => {
-                      const daysLeft = Math.max(0, 30 - Math.floor((Date.now() - p.deletedAt) / 86400000));
-                      return (
-                        <tr key={p.id}>
-                          <td>
-                            <div className="prod-name">{p.name}</div>
-                            <div className="prod-sku">{p.sku || '—'}</div>
-                          </td>
-                          <td style={{fontSize:'.78rem',color:'var(--muted)'}}>осталось {daysLeft} дн.</td>
-                          <td style={{textAlign:'right'}}>
-                            <button className="act-btn" onClick={() => {
-                              let list = getProducts();
-                              let trash = getTrash();
-                              const idx = trash.findIndex(x => x.id === p.id);
-                              if (idx > -1) {
-                                const item = { ...trash[idx], hidden: false };
-                                delete item.deletedAt;
-                                list.push(item);
-                                trash.splice(idx, 1);
-                                setProducts(list);
-                                setTrash(trash);
-                                load();
-                                showToast('🔄 Товар восстановлен');
-                              }
-                            }} style={{color:'var(--primary)'}}>Восстановить</button>
-                          </td>
-                        </tr>
-                      );
-                    });
-                  })()}
-                </tbody>
-              </table>
-            </div>
+            <div className="sub" style={{marginBottom:'1rem'}}>Товары хранятся в корзине в течение 30 дней после удаления</div>
+            {(() => {
+              const trash = getTrash();
+              if (!trash.length) {
+                return <div className="empty-products"><div className="big-icon">🗑️</div><p>В корзине пока ничего нет</p></div>;
+              }
+              return (
+                <div className="product-table" style={{maxHeight:'280px',overflowY:'auto'}}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style={{width:'50%',textAlign:'left',paddingLeft:0}}>Товар</th>
+                        <th style={{width:'25%'}}>Статус</th>
+                        <th style={{width:'25%'}}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {trash.map(p => {
+                        const daysLeft = Math.max(0, 30 - Math.floor((Date.now() - p.deletedAt) / 86400000));
+                        return (
+                          <tr key={p.id}>
+                            <td>
+                              <div className="prod-name">{p.name}</div>
+                              <div className="prod-sku">{p.sku || '—'}</div>
+                            </td>
+                            <td style={{fontSize:'.75rem',color:'var(--muted)'}}>ещё {daysLeft} дн.</td>
+                            <td style={{textAlign:'right'}}>
+                              <button className="act-btn" onClick={() => {
+                                let list = getProducts();
+                                let trash = getTrash();
+                                const idx = trash.findIndex(x => x.id === p.id);
+                                if (idx > -1) {
+                                  const item = { ...trash[idx], hidden: false };
+                                  delete item.deletedAt;
+                                  list.push(item);
+                                  trash.splice(idx, 1);
+                                  setProducts(list);
+                                  setTrash(trash);
+                                  load();
+                                  showToast('🔄 Товар восстановлен');
+                                }
+                              }} style={{color:'var(--primary)',background:'transparent',border:'none',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'var(--font)',padding:'.25rem .5rem',borderRadius:'var(--radius)'}}>Восстановить</button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
