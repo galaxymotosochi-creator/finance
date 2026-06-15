@@ -376,7 +376,7 @@ export default function Accounts() {
                       var amt=Number(t.amount||0);
                       return (
                         <tr key={t.id}>
-                          <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{(t.date||t.created_at||'').split('T')[0]}</td>
+                          <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{((t.date||t.created_at||'').split('T')[0]||'').split('-').reverse().join('.')}</td>
                           <td style={{textAlign:'left'}}>
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
