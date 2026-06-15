@@ -219,7 +219,9 @@ export default function Subscription() {
               textDecoration:'underline',cursor:'pointer',fontFamily:'inherit',padding:'4px 8px',
             }}>Нет, отписаться</button>
           </div>
-        
+        </div>
+      )}
+
       {/* Switch plan confirmation */}
       {switchPlan && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}
@@ -245,7 +247,5 @@ export default function Subscription() {
         </div>
       )}
 </div>
-      )}
-    </div>
   );
 }
