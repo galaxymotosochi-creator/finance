@@ -184,7 +184,7 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'1rem',padding:'1rem 1.25rem',marginBottom:'1rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.04)'}}>
+          <div style={{background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'1rem',padding:'1rem 1.25rem',marginBottom:'1rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.04)'}}>
             <div style={{fontSize:'1.8rem',fontWeight:700,color:'#111'}}>{total.toLocaleString()}₽</div>
             <div style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.15rem'}}>Управление счетами и учет остатков</div>
           </div>
@@ -192,7 +192,7 @@ export default function Accounts() {
             var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
             var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
             return (
-              <div key={a.id} style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.85rem',padding:'.85rem',marginBottom:'.5rem',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}}>
+              <div key={a.id} style={{background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.85rem',padding:'.85rem',marginBottom:'.5rem',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.35rem'}}>
                   <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
                     <span style={{fontSize:'1.5rem'}}>{ic}</span>

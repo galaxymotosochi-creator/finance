@@ -432,7 +432,7 @@ export default function Salary() {
               </div>
               {accs.map(a => (
                 <div key={a.id} onClick={()=>confirmPay(a.id)}
-                  style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',border:'1.5px solid var(--border)',borderRadius:'.85rem',marginBottom:'.35rem',cursor:'pointer',background:'var(--white)'}}>
+                  style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',border:'1.5px solid var(--border)',borderRadius:'.85rem',marginBottom:'.35rem',cursor:'pointer',background:'var(--body-bg)'}}>
                   <div style={{fontSize:'1.2rem',marginRight:'.65rem'}}>🏦</div>
                   <div style={{flex:1}}>
                     <div style={{fontWeight:600,fontSize:'.85rem'}}>{a.name}</div>

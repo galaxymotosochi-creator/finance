@@ -235,7 +235,7 @@ export default function Transactions() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--white)"}}>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
           <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
@@ -245,7 +245,7 @@ export default function Transactions() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,whiteSpace:'nowrap'}}
               onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
-              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
                 {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>(
                   <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
                     style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:period===p.key?'var(--primary)':'var(--body-color)',fontWeight:period===p.key?600:400,background:period===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
@@ -272,7 +272,7 @@ export default function Transactions() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
-              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
                   Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
                 </div>
@@ -541,7 +541,7 @@ export default function Transactions() {
                 var sel = selectedAcc === a.id;
                 var ic = accIcons[a.type] || '🏦';
                 return (
-                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--white)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--body-bg)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--primary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     <span style={{fontSize:"1rem"}}>{ic}</span>
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>

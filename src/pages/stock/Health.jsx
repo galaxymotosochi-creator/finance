@@ -263,7 +263,7 @@ export default function Health() {
               : h.status===HEALTH.warning?'#f59e0b':'#16a34a';
             return (
               <div key={h.id} style={{border:'1.5px solid #eee',borderRadius:'14px',padding:'16px',
-                background:'var(--white)',position:'relative',
+                background:'var(--body-bg)',position:'relative',
                 boxShadow:'0 1px 3px rgba(0,0,0,.04)',borderLeft:`3px solid ${col}`,
                 transition:'box-shadow .15s'}}
                 onMouseEnter={e=>e.currentTarget.style.boxShadow='0 3px 10px rgba(0,0,0,.08)'}

@@ -442,7 +442,7 @@ export default function Products() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--white)"}}>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
           <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e=>setSearch(e.target.value)}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
@@ -452,7 +452,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
             {catOpen && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+              <div className="cat-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="cat-dd-actions">
                   <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
                   <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
@@ -481,7 +481,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setExportOpen(!exportOpen);setCatOpen(false);setColsOpen(false)}}>📥 Скачать</span>
             {exportOpen && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+              <div className="export-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="export-dd-title" style={{fontSize:'.72rem',color:'var(--muted)',padding:'.25rem .5rem',marginBottom:'.15rem',textAlign:'left'}}>Скачать</div>
                 <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📋 Шаблон для импорта</div>
                 <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📤 Выгрузить товары</div>
@@ -494,7 +494,7 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
+              <div className="cols-dropdown" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                 <div className="cols-title">Отображать столбцы</div>
                 <div className="cols-list">
                   {ALL_COLUMNS.filter(c => !c.always).map(c => {
