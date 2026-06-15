@@ -325,8 +325,8 @@ export default function Products() {
     const ws = XLSX.utils.json_to_sheet(template);
     ws['!cols'] = [{wch:35},{wch:10},{wch:15},{wch:12},{wch:10},{wch:15},{wch:15},{wch:30},{wch:10}];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Шаблон');
-    XLSX.writeFile(wb, 'Шаблон_импорта.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, 'Шаблон товаров');
+    XLSX.writeFile(wb, 'Шаблон товаров.xlsx');
   };
 
   const importExcel = (file) => {
