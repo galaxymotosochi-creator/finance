@@ -22,6 +22,12 @@ const ALL_COLUMNS = [
   { id:'cost', label:'Себестоимость', def:true },
   { id:'price', label:'Цена', def:true },
   { id:'markup', label:'Наценка', def:true },
+  // Дополнительные (не включены по умолчанию)
+  { id:'unit', label:'Ед. измерения' },
+  { id:'sku', label:'Артикул' },
+  { id:'barcode', label:'Штрихкод' },
+  { id:'weight', label:'Вес' },
+  { id:'description', label:'Описание' },
 ];
 
 const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
@@ -73,8 +79,8 @@ const getCols = () => {
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
-const COL_ORDER = ['name','type','category','cost','price','markup'];
-const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка' };
+const COL_ORDER = ['name','type','category','cost','price','markup','unit','sku','barcode','weight','description'];
+const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', description:'Описание' };
 
 export default function Products() {
   const { user } = useAuth();
@@ -424,6 +430,15 @@ export default function Products() {
         const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : 'var(--muted)';
         return `<span style="color:${color};font-weight:600;font-size:.8rem">${mk > 0 ? '+' : ''}${mk}%</span>`;
       }
+      case 'unit': return `<span style="color:var(--body-color)">${p.unit || '—'}</span>`;
+      case 'sku': return `<span style="font-size:.78rem;color:var(--body-color)">${p.sku || '—'}</span>`;
+      case 'barcode': return `<span style="font-size:.78rem;color:var(--body-color)">${p.barcode || '—'}</span>`;
+      case 'weight': {
+        if (p.type==='service') return '<span style="color:var(--muted)">—</span>';
+        const w = parseFloat(p.weight) || 0;
+        return `<span>${w > 0 ? w + (p.weightUnit||p.weight_unit||'кг') : '—'}</span>`;
+      }
+      case 'description': return `<span style="color:var(--muted);font-size:.75rem">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
       default: return '—';
     }
   };
@@ -495,9 +510,21 @@ export default function Products() {
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
               <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
-                <div className="cols-title">Отображать столбцы</div>
+                <div className="cols-title">Основные столбцы</div>
                 <div className="cols-list">
-                  {ALL_COLUMNS.filter(c => !c.always).map(c => {
+                  {ALL_COLUMNS.filter(c => !c.always && c.def).map(c => {
+                    const checked = activeCols.has(c.id);
+                    return (
+                      <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
+                        <span className={`cb${checked ? ' checked' : ''}`}>✓</span>
+                        <span>{c.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="cols-title" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>Дополнительные</div>
+                <div className="cols-list">
+                  {ALL_COLUMNS.filter(c => !c.always && !c.def).map(c => {
                     const checked = activeCols.has(c.id);
                     return (
                       <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
