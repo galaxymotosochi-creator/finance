@@ -113,11 +113,16 @@ export default function AiChat() {
           const colors = { critical: '#dc2626', warning: '#f59e0b', info: '#16a34a' };
           setNotifDot(colors[topLevel]);
           setNotifCount(notifs.length);
-          setMessages(prev => [...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color })), ...prev]);
+          setMessages(prev => [...prev, ...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color }))]);
         }
       } catch (e) {}
     })();
   }, [user]);
+
+  // Сбрасываем уведомления при открытии чата (прочитано)
+  useEffect(() => {
+    if (open) { setNotifDot(null); setNotifCount(0); }
+  }, [open]);
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
@@ -179,7 +184,7 @@ export default function AiChat() {
           animation: notifDot ? 'pulse-ai 2s infinite' : 'none',
           position: 'relative',
         }}>
-        {open ? '✕' : '📩'}
+        {open ? '✕' : <svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'><rect x='2' y='4' width='20' height='16' rx='2'/><path d='M22 4L12 13 2 4'/></svg>}
         {!open && notifDot && (
           <>
             <span style={{
