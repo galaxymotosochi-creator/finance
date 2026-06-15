@@ -442,6 +442,16 @@ body {
 .cat-dd-item .cb { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: .6rem; color: transparent; flex-shrink: 0; transition: all var(--transition); }
 .cat-dd-item .cb.checked { background: var(--secondary); border-color: var(--secondary); color: #fff; }
 
+.cols-title { font-size: .72rem; color: var(--muted); padding: .25rem .35rem; margin-bottom: .15rem; border-bottom: 1px solid var(--border); }
+.cols-list { max-height: 180px; overflow-y: auto; }
+.cols-item { display: flex; align-items: center; gap: .35rem; padding: .25rem .35rem; border-radius: var(--radius-sm); cursor: pointer; font-size: .75rem; color: var(--body-color); }
+.cols-item:hover { background: var(--secondary-light); }
+.cols-item .cb { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: .6rem; color: transparent; flex-shrink: 0; transition: all var(--transition); }
+.cols-item .cb.checked { background: var(--secondary); border-color: var(--secondary); color: #fff; }
+.cols-footer { border-top: 1px solid var(--border); padding: .35rem .35rem .15rem; margin-top: .25rem; }
+.cols-reset { font-size: .68rem; color: var(--secondary); cursor: pointer; padding: .15rem .25rem; border-radius: var(--radius-sm); }
+.cols-reset:hover { background: var(--secondary-light); }
+
 .export-dd-title { font-size: .7rem; color: var(--muted); text-align: center; margin-bottom: .35rem; }
 .export-dd-actions { display: flex; gap: .35rem; justify-content: center; }
 .export-dd-btn { padding: .25rem .6rem; font-size: .75rem; border-radius: var(--radius-pill); cursor: pointer; background: var(--primary); color: var(--primary-text); font-family: var(--font); transition: all var(--transition); }
