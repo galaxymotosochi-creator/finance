@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 - ADD_INCOME — добавить доход. Параметры: amount (сумма), description (описание), date (дата, опционально)
 - ADD_EXPENSE — добавить расход. Параметры: amount (сумма), description (описание), date (дата, опционально)
 - ADD_PRODUCT — добавить товар. Параметры: name (название), price (цена), type (product/service, опционально), unit (ед.изм, опционально)
-- ADD_CATEGORY — добавить категорию товаров. Параметры: name (название)
+- ADD_CATEGORY — добавить категорию товаров или услуг. Параметры: name (название), type (product/service, опционально, по умолчанию product)
 - GET_REPORT — получить отчёт. Параметры: period (today/week/month/all)
 
 После действия напиши короткий ответ пользователю.

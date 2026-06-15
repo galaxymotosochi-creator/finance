@@ -28,7 +28,7 @@ const ACTION_MAP = {
   },
   ADD_CATEGORY: async (p, user) => {
     const { error } = await supabase.from('stock_categories').insert({
-      id: Date.now(), user_id: user.id, name: p.name, type: 'product',
+      id: Date.now(), user_id: user.id, name: p.name, type: p.type || 'product',
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
   },
