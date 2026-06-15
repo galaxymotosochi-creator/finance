@@ -21,7 +21,7 @@ const ACTION_MAP = {
   },
   ADD_PRODUCT: async (p, user) => {
     const { error } = await supabase.from('products').insert({
-      user_id: user.id, name: p.name, price: parseFloat(p.price),
+      id: Date.now(), user_id: user.id, name: p.name, price: parseFloat(p.price),
       type: p.type || 'product', unit: p.unit || 'шт', hidden: false,
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
