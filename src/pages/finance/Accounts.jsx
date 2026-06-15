@@ -175,10 +175,12 @@ export default function Accounts() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="stock-filterbar" style={{border:'none',paddingTop:0}}>
-        <div className="stock-filter-links" style={{marginLeft:0}}>
-          <span className="stock-filter-link" onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
-          <span className="stock-filter-link" onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
+        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem'}}>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+            onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
+            onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
         </div>
       </div>
 
@@ -210,7 +212,6 @@ export default function Accounts() {
                     <tr key={a.id}>
                       <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                          <span style={{fontSize:'1rem'}}>{ic}</span>
                           <div>
                             <div className="prod-name">{a.name}</div>
                             <div className="prod-sku">{lb}</div>
@@ -331,7 +332,7 @@ export default function Accounts() {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
                 return (
                   <div key={a.id} className="form-group">
-                    <label>{ic} {a.name} ({lb})</label>
+                    <label>{a.name}</label>
                     <input type="number" placeholder="0" min="0" step="0.01"
                       value={initAmts[a.type]||""}
                       onChange={function(e){var v=parseFloat(e.target.value)||0;setInitAmts(p=>{var r=Object.assign({},p);r[a.type]=v;return r;})}} />
