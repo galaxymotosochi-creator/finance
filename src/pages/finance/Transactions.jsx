@@ -327,7 +327,7 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem', textAlign: 'center' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button className="act-btn prod-edit-btn" onClick={function(){editTx(tx)}}>Ред.</button>
-                    <div className="prod-more-wrap">
+                    <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){
                         e.stopPropagation();
                         var el = e.currentTarget.nextElementSibling;
