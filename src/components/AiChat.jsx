@@ -111,12 +111,13 @@ export default function AiChat() {
       {/* Кнопка чата */}
       <button onClick={() => setOpen(!open)}
         style={{
-          position: 'fixed', bottom: '20px', right: '20px', zIndex: 999,
-          width: '88px', height: '88px', borderRadius: '50%',
+          position: 'fixed', bottom: '24px', right: '24px', zIndex: 999,
+          width: '56px', height: '56px', borderRadius: '50%',
           background: '#000', color: '#fff', border: 'none',
-          fontSize: '1.4rem', fontWeight:700, cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,.15)',
+          fontSize: '1rem', fontWeight:700, cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,.15)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'inherit', letterSpacing:'.05em',
+          animation:'pulse-ai 2s infinite',
         }}>
         {open ? '✕' : 'AI'}
       </button>
