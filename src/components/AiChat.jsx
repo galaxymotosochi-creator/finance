@@ -27,6 +27,12 @@ const FUNC_MAP = {
     });
     return error ? `Ошибка: ${error.message}` : `✅ Товар «${args.name}» добавлен`;
   },
+  createCategory: async (args, user) => {
+    const { error } = await supabase.from('stock_categories').insert({
+      user_id: user.id, name: args.name, type: 'product',
+    });
+    return error ? `Ошибка: ${error.message}` : `✅ Категория «${args.name}» создана`;
+  },
   getReport: async (args, user) => {
     const days = { today: 1, week: 7, month: 30, all: 9999 };
     const d = days[args.period] || 30;

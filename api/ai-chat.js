@@ -47,6 +47,17 @@ const FUNCTIONS = [
     },
   },
   {
+    name: 'createCategory',
+    description: 'Создать новую категорию товаров',
+    parameters: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Название категории' },
+      },
+      required: ['name'],
+    },
+  },
+  {
     name: 'getReport',
     description: 'Получить финансовый отчёт за период (доходы, расходы, прибыль)',
     parameters: {
