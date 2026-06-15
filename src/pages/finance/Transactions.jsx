@@ -270,14 +270,14 @@ export default function Transactions() {
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
-              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
+              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>📥 Скачать</span>
             {showDownload && (
               <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.45rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',textAlign:'center',marginBottom:'.35rem'}}>
                   Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>. Измените даты чтобы выбрать другой период.
                 </div>
                 <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
-                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} className="btn-account-select" style={{padding:'.25rem .6rem',fontSize:'.75rem',fontWeight:600,borderRadius:0}}>Скачать</span>
+                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}} className="btn-account-select" style={{padding:'.25rem .6rem',fontSize:'.75rem',fontWeight:600,borderRadius:0}}>📥 Скачать</span>
                   <span onClick={()=>{setShowDownload(false);setShowPeriod(true)}} style={{padding:'.25rem .6rem',fontSize:'.78rem',borderRadius:'5px',cursor:'pointer',background:'transparent',border:'1px solid var(--border)',color:'var(--muted)',fontFamily:'var(--font)'}}>Изменить даты</span>
                 </div>
               </div>
