@@ -302,8 +302,9 @@ body {
 
 /* ======== TABLE HEADERS ======== */
 .product-table table { width: 100%; border-collapse: collapse; font-size: .82rem; min-width: 700px; }
-.product-table { scrollbar-width: none; }
-.product-table::-webkit-scrollbar { display: none; }
+/* Скрыть полосу скролла везде, но скролл оставить */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
 .product-table th {
   text-align: center; padding: .5rem .4rem; color: var(--muted);
   font-weight: 500; font-size: .68rem; text-transform: uppercase;
