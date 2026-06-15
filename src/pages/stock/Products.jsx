@@ -250,13 +250,17 @@ export default function Products() {
     load();
   };
 
-  const copyP = (id) => {
-    let list = getProducts();
-    const p = list.find(x => x.id === id);
-    if (!p) return;
-    list.push({ ...p, id: Date.now(), hidden: false });
-    setProducts(list);
-    load();
+  const copyP = async (id) => {
+    const { data } = await supabase.from('products').select('*').eq('id', id).single();
+    if (!data) return showToast('❌ Ошибка копирования');
+    const { error } = await supabase.from('products').insert({
+      name: data.name, type: data.type, cat: data.cat,
+      price: data.price, unit: data.unit, sku: data.sku,
+      barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
+      description: data.description, user_id: user.id, hidden: false
+    });
+    if (error) return showToast('❌ Ошибка: ' + error.message);
+    await load();
     showToast('📋 Товар скопирован');
   };
 
