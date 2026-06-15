@@ -94,6 +94,11 @@ export default function AiChat() {
       }
 
       setMessages(p => [...p, { role: 'assistant', text: reply }]);
+
+      // Автообновление страницы через 1.5 сек после действия
+      if (data.action && data.action !== 'GET_REPORT') {
+        setTimeout(() => window.location.reload(), 2000);
+      }
     } catch (err) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка соединения с сервером' }]);
     }
