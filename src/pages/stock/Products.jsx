@@ -306,6 +306,25 @@ export default function Products() {
     XLSX.writeFile(wb, 'Товары.xlsx');
   };
 
+  const exportTemplate = () => {
+    const template = [{
+      'Название': '',
+      'Тип': 'товар',
+      'Категория': '',
+      'Цена': '',
+      'Ед. изм.': 'шт',
+      'Артикул': '',
+      'Штрихкод': '',
+      'Описание': '',
+      'Вес (кг)': '',
+    }];
+    const ws = XLSX.utils.json_to_sheet(template);
+    ws['!cols'] = [{wch:35},{wch:10},{wch:15},{wch:12},{wch:10},{wch:15},{wch:15},{wch:30},{wch:10}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Шаблон');
+    XLSX.writeFile(wb, 'Шаблон_импорта.xlsx');
+  };
+
   const importExcel = (file) => {
     if (!file) return;
     setImporting(true);
@@ -458,12 +477,10 @@ export default function Products() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setExportOpen(!exportOpen);setCatOpen(false);setColsOpen(false)}}>📥 Скачать</span>
             {exportOpen && (
-              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'170px',padding:'.45rem',zIndex:100}}>
-                <div className="export-dd-title">Вы хотите скачать товары в Excel?</div>
-                <div className="export-dd-actions">
-                  <span className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}}>Да</span>
-                  <span className="export-dd-btn export-dd-cancel" onClick={()=>setExportOpen(false)}>Нет</span>
-                </div>
+              <div style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--white)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+                <div className="export-dd-title" style={{fontSize:'.72rem',color:'var(--muted)',padding:'.25rem .5rem',marginBottom:'.15rem',textAlign:'left'}}>Скачать</div>
+                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)'}}>📋 Шаблон для импорта</div>
+                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)'}}>📤 Выгрузить товары</div>
               </div>
             )}
           </div>
