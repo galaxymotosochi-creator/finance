@@ -86,19 +86,22 @@ export default function Sidebar() {
     <>
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
         <div className="sidebar-inner">
-          <div className="sidebar-user">
+          <div className="sidebar-user" style={{background:'#000',padding:collapsed?'0':'8px 14px',display:'flex',alignItems:'center',gap:'7px',minHeight:collapsed?'40px':'auto'}}>
             <div className="sidebar-toggle"
               onClick={() => {
                 if (window.innerWidth <= 768) { setMobileOpen(!mobileOpen); }
                 else { setCollapsed(!collapsed); }
               }}
-            >
+              style={{color:'rgba(255,255,255,.6)',fontSize:'.9rem',cursor:'pointer',lineHeight:1,background:'transparent',border:'none',padding:collapsed?'0':'4px 0',fontFamily:'inherit',width:collapsed?'56px':'auto',textAlign:collapsed?'center':'left',flexShrink:0}}>
               {collapsed || mobileOpen ? '☰' : '✕'}
             </div>
             {!collapsed && (
-              <div className="sidebar-user-info">
-                <div className="sidebar-user-email">Finance</div>
-              </div>
+              <>
+                <span className="sidebar-dots" style={{width:5,height:5,borderRadius:'50%',background:'#ff6052'}}/>
+                <span className="sidebar-dots" style={{width:5,height:5,borderRadius:'50%',background:'#ffbd2e'}}/>
+                <span className="sidebar-dots" style={{width:5,height:5,borderRadius:'50%',background:'#28c93f'}}/>
+                <span style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,.7)',letterSpacing:'.03em',marginLeft:'4px',flex:1}}>FINANCE</span>
+              </>
             )}
           </div>
           <nav className="sidebar-nav">
