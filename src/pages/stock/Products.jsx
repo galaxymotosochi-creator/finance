@@ -170,8 +170,8 @@ export default function Products() {
       if (!e.target.closest('.cat-wrapper')) setCatOpen(false);
       if (!e.target.closest('.cols-wrapper')) setColsOpen(false);
       if (!e.target.closest('.export-wrapper')) setExportOpen(false);
-      if (!e.target.closest('.prod-more-wrap') && !e.target.closest('.prod-dropdown')) {
-        document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.display = 'none'; });
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
       }
     };
     document.addEventListener('click', handler);
@@ -549,7 +549,7 @@ export default function Products() {
       </div>
 
       {/* Таблица */}
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'visible'}}>
+      <div className="product-table" style={{overflow:'visible'}}>
         <table>
           <thead id="colHeaders">
             <tr>
@@ -586,19 +586,15 @@ export default function Products() {
                 })}
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={() => openEdit(p)}>Ред.</button>
-                  <div style={{display:'inline-block'}} className="prod-more-wrap">
+                  <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
                       e.stopPropagation();
-                      document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
                       const dd = e.currentTarget.nextElementSibling;
-                      const r = e.currentTarget.getBoundingClientRect();
-                      const spaceBelow = window.innerHeight - r.bottom;
-                      dd.style.display = 'block';
-                      dd.style.position = 'fixed';
-                      dd.style.left = Math.max(8, r.right - 140) + 'px';
-                      dd.style.top = (spaceBelow > 150 ? r.bottom + 4 : r.top - 4 - 120) + 'px';
+                      document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+                      dd.classList.toggle('open');
+                      var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                     }}>⋯</button>
-                    <div className="prod-dropdown" style={{display:'none',position:'fixed',zIndex:300,minWidth:'140px',padding:'.3rem 0',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.5rem',boxShadow:'0 .25rem .75rem rgba(0,0,0,.15)'}}>
+                    <div className="prod-dropdown">
                       <button onClick={() => copyP(p.id)}>Копировать</button>
                       {p.hidden ? (
                         <button onClick={() => unhide(p.id)}>Восстановить</button>
