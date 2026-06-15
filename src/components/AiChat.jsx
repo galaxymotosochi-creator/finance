@@ -61,11 +61,12 @@ export default function AiChat() {
   const [loading, setLoading] = useState(false);
   const [notifDot, setNotifDot] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
+  const [notifLoaded, setNotifLoaded] = useState(false);
   const listRef = useRef(null);
 
-  // Генерируем уведомления на клиенте
+  // Генерируем уведомления на клиенте (один раз)
   useEffect(() => {
-    if (!user) return;
+    if (!user || notifLoaded) return;
     (async () => {
       try {
         const now = new Date();
@@ -115,9 +116,10 @@ export default function AiChat() {
           setNotifCount(notifs.length);
           setMessages(prev => [...prev, ...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color }))]);
         }
-      } catch (e) {}
+        setNotifLoaded(true);
+      } catch (e) { setNotifLoaded(true); }
     })();
-  }, [user]);
+  }, [user, notifLoaded]);
 
   // Сбрасываем уведомления при открытии чата (прочитано)
   useEffect(() => {
@@ -184,7 +186,7 @@ export default function AiChat() {
           animation: notifDot ? 'pulse-ai 2s infinite' : 'none',
           position: 'relative',
         }}>
-        {open ? '✕' : <svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'><rect x='2' y='4' width='20' height='16' rx='2'/><path d='M22 4L12 13 2 4'/></svg>}
+        {open ? '✕' : (notifDot ? <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round'><rect x='2' y='4' width='20' height='16' rx='2'/><path d='M22 4L12 13 2 4'/></svg> : 'AI')}
         {!open && notifDot && (
           <>
             <span style={{
