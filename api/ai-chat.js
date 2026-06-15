@@ -1,108 +1,59 @@
-// AI Chat API — прокси к DeepSeek
-// Для Function Calling: AI может добавлять расходы/доходы/товары и анализировать данные
+// AI Chat API — прокси к DeepSeek с упрощённым подходом
+// AI отвечает текстом, клиент парсит команды
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 const API_KEY = process.env.DEEPSEEK_API_KEY;
-
-// Описание доступных функций для AI
-const FUNCTIONS = [
-  {
-    name: 'addIncome',
-    description: 'Добавить доход (поступление средств)',
-    parameters: {
-      type: 'object',
-      properties: {
-        amount: { type: 'number', description: 'Сумма дохода в рублях' },
-        description: { type: 'string', description: 'Описание/название дохода' },
-        date: { type: 'string', description: 'Дата в формате YYYY-MM-DD' },
-      },
-      required: ['amount', 'description'],
-    },
-  },
-  {
-    name: 'addExpense',
-    description: 'Добавить расход (списание средств)',
-    parameters: {
-      type: 'object',
-      properties: {
-        amount: { type: 'number', description: 'Сумма расхода в рублях' },
-        description: { type: 'string', description: 'Описание/название расхода' },
-        date: { type: 'string', description: 'Дата в формате YYYY-MM-DD' },
-      },
-      required: ['amount', 'description'],
-    },
-  },
-  {
-    name: 'addProduct',
-    description: 'Добавить товар или услугу в каталог',
-    parameters: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Название товара или услуги' },
-        price: { type: 'number', description: 'Цена продажи в рублях' },
-        type: { type: 'string', enum: ['product', 'service'], description: 'Тип: товар или услуга' },
-        unit: { type: 'string', description: 'Единица измерения (шт, кг, час и т.д.)' },
-      },
-      required: ['name', 'price'],
-    },
-  },
-  {
-    name: 'createStockCategory',
-    description: 'Создать категорию для товаров на складе (например "Скутеры", "Запчасти", "Экипировка")',
-    parameters: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Название категории' },
-      },
-      required: ['name'],
-    },
-  },
-  {
-    name: 'getReport',
-    description: 'Получить финансовый отчёт за период (доходы, расходы, прибыль)',
-    parameters: {
-      type: 'object',
-      properties: {
-        period: { type: 'string', enum: ['today', 'week', 'month', 'all'], description: 'Период отчёта' },
-      },
-      required: ['period'],
-    },
-  },
-];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message, context } = req.body;
+  const { message, history } = req.body;
   if (!message) {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  const systemPrompt = `Ты — AI-ассистент для системы учёта Finance для бизнеса.
+  const systemPrompt = `Ты — AI-ассистент для системы учёта Finance. Твоя задача — помогать пользователю.
 
-У программы есть разделы:
-1. Товары и склад — категории товаров (для группировки товаров, например «Скутеры», «Запчасти»)
-2. Финансы — доходы и расходы (деньги), финансовые категории (для группировки доходов/расходов)
-3. Клиенты, Сотрудники, Настройки
+Ты можешь выполнять действия. Для этого отвечай в формате:
 
-Если пользователь просит «добавить категорию» — уточни, это категория для ТОВАРОВ (склад) или для ДОХОДОВ/РАСХОДОВ (финансы).
-По умолчанию, если не указано — создавай категорию товаров.
+[ДЕЙСТВИЕ:название]
+параметр1: значение1
+параметр2: значение2
+[/ДЕЙСТВИЕ]
 
-Отвечай кратко и по делу на русском языке.
-Используй function calling для выполнения действий.
-Не выдумывай данные — если данных нет, скажи что их нет.`;
+Доступные действия:
+- ADD_INCOME — добавить доход. Параметры: amount (сумма), description (описание), date (дата, опционально)
+- ADD_EXPENSE — добавить расход. Параметры: amount (сумма), description (описание), date (дата, опционально)
+- ADD_PRODUCT — добавить товар. Параметры: name (название), price (цена), type (product/service, опционально), unit (ед.изм, опционально)
+- ADD_CATEGORY — добавить категорию товаров. Параметры: name (название)
+- GET_REPORT — получить отчёт. Параметры: period (today/week/month/all)
+
+После действия напиши короткий ответ пользователю.
+
+Пример:
+Пользователь: добавь расход 5000 на запчасти
+Ты:
+[ДЕЙСТВИЕ:ADD_EXPENSE]
+amount: 5000
+description: запчасти
+[/ДЕЙСТВИЕ]
+✅ Расход 5 000₽ на запчасти добавлен
+
+Если пользователь пишет не по делу — вежливо скажи что ты умеешь делать.
+Не выдумывай данные. Если нужна информация — скажи что данных нет.`;
 
   try {
     const payload = {
       model: 'deepseek-chat',
       messages: [
         { role: 'system', content: systemPrompt },
+        ...(history || []).map(m => ({ role: m.role, content: m.text })),
         { role: 'user', content: message },
       ],
-      functions: FUNCTIONS,
-      function_call: 'auto',
+      temperature: 0.1,
+      max_tokens: 800,
     };
 
     const response = await fetch(DEEPSEEK_URL, {
@@ -120,24 +71,28 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const choice = data.choices?.[0];
-    
-    if (choice?.finish_reason === 'function_call') {
-      const fn = choice.message.function_call;
-      return res.json({
-        type: 'function_call',
-        function: fn.name,
-        arguments: JSON.parse(fn.arguments || '{}'),
-        reply: null,
+    const reply = data.choices?.[0]?.message?.content || '...';
+
+    // Парсим действие из ответа
+    const actionMatch = reply.match(/\[ДЕЙСТВИЕ:(\w+)\]\n([\s\S]*?)\[\/ДЕЙСТВИЕ\]/);
+    let action = null;
+    let params = {};
+
+    if (actionMatch) {
+      action = actionMatch[1];
+      const paramLines = actionMatch[2].trim().split('\n');
+      paramLines.forEach(line => {
+        const [key, ...vals] = line.split(':');
+        if (key && vals.length) {
+          params[key.trim()] = vals.join(':').trim();
+        }
       });
     }
 
-    return res.json({
-      type: 'reply',
-      function: null,
-      arguments: null,
-      reply: choice?.message?.content || '...',
-    });
+    // Чистый ответ без блоков действий
+    const cleanReply = reply.replace(/\[ДЕЙСТВИЕ:[\s\S]*?\[\/ДЕЙСТВИЕ\]\n*/g, '').trim() || 'Готово!';
+
+    return res.json({ action, params, reply: cleanReply });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
