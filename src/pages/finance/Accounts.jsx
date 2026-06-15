@@ -53,12 +53,10 @@ export default function Accounts() {
     var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
     if (!d.data) return;
     var cl = d.data;
-    var need = {cash:!cl.some(a=>a.type==='cash'), card:!cl.some(a=>a.type==='card'), transfer:!cl.some(a=>a.type==='transfer')};
-    if (user && (need.cash||need.card||need.transfer)) {
+    var need = {cash:!cl.some(a=>a.type==='cash')};
+    if (user && need.cash) {
       var cr = [];
       if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0});
-      if (need.card) cr.push({user_id:user.id,name:'Оплата картой',type:'card',balance:0});
-      if (need.transfer) cr.push({user_id:user.id,name:'Перевод',type:'transfer',balance:0});
       if (cr.length > 0) {
         var r = await supabase.from('accounts').insert(cr).select();
         if (r.data) {
@@ -212,7 +210,7 @@ export default function Accounts() {
                 {sorted.length === 0 ? (
                   <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
                 ) : sorted.map(a => {
-                  var m=ACC_TYPES.find(t=>t.type===a.type), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
+                  var m=ACC_TYPES.find(t=>t.type===a.type), lb=m?m.label:a.type;
                   var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
                   return (
                     <tr key={a.id}>
