@@ -157,8 +157,9 @@ export default function Registers({ fullscreen }) {
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="🔍 Найти товар..."
-            style={{flex:1,border:'1px solid #e5e5e5',borderRadius:'10px',padding:'9px 12px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fafafa'}} />
+            placeholder="🔍 Поиск"
+            style={{flex:1,border:'none',borderRadius:'10px',padding:'9px 14px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}} />
+          <button style={{padding:'9px 16px',border:'none',borderRadius:'10px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+ Товар</button>
         </div>
 
         {/* Категории */}
