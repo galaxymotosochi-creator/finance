@@ -23,6 +23,10 @@ export default function Registers({ fullscreen }) {
   const [addCat, setAddCat] = useState('');
   const [addPrice, setAddPrice] = useState('');
   const [addUnit, setAddUnit] = useState('');
+  const [showPay, setShowPay] = useState(false);
+  const [paySplit, setPaySplit] = useState(false);
+  const [payUnpaid, setPayUnpaid] = useState(false);
+  const [splitAmts, setSplitAmts] = useState({});
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
@@ -74,15 +78,53 @@ export default function Registers({ fullscreen }) {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
 
-  const sell = async () => {
-    if (!cart.length || !payMode) return;
+  const openPay = () => {
+    if (!cart.length) return;
+    setPayMode(null);
+    setPaySplit(false);
+    setPayUnpaid(false);
+    setSplitAmts({});
+    setShowPay(true);
+  };
+
+  const processPay = async () => {
+    if (!cart.length) return;
     const date = new Date().toISOString().split('T')[0];
+    
+    if (payUnpaid) {
+      // Неоплаченный чек — одна транзакция без счёта
+      const { error } = await supabase.from('transactions').insert(
+        cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, status: 'unpaid' }))
+      );
+      if (error) return setToast('Ошибка: ' + error.message);
+      setCart([]); setShowPay(false);
+      return setToast('✅ Чек сохранён (не оплачен)');
+    }
+
+    if (paySplit) {
+      // Раздельная оплата
+      const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
+      if (entries.length === 0) return setToast('⚠️ Укажите суммы для оплаты');
+      const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
+      if (Math.abs(sum - total) > 0.01) return setToast('⚠️ Сумма оплаты не совпадает с итогом');
+      for (const [acId, amt] of entries) {
+        const { error } = await supabase.from('transactions').insert(
+          cart.map(i => ({ user_id: user.id, type: 'income', amount: (i.price * i.qty) * (parseFloat(amt) / total), description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: acId, status: 'paid' }))
+        );
+        if (error) return setToast('Ошибка: ' + error.message);
+      }
+      setCart([]); setShowPay(false); setPayMode(null);
+      return setToast('✅ Оплачено с нескольких счетов');
+    }
+
+    // Обычная оплата на один счёт
+    if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
     const { error } = await supabase.from('transactions').insert(
-      cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: selectedAc?.id || null }))
+      cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: selectedAc?.id || null, status: 'paid' }))
     );
     if (error) return setToast('Ошибка: ' + error.message);
-    setCart([]); setPayMode(null);
+    setCart([]); setShowPay(false); setPayMode(null);
     setToast('Продано на ' + total.toLocaleString() + ' руб');
   };
 
@@ -171,7 +213,7 @@ export default function Registers({ fullscreen }) {
                 }}>{a.name}</button>
               ))}
             </div>
-            <button onClick={sell} disabled={!payMode} style={{
+            <button onClick={openPay} disabled={!cart.length} style={{
               width:'100%', padding:'13px', borderRadius:'100px', border:'none',
               background:'#000', color:'#fff', fontSize:'14px', fontWeight:700,
               cursor:'pointer', fontFamily:'inherit', opacity: payMode ? 1 : 0.3,
@@ -264,6 +306,94 @@ export default function Registers({ fullscreen }) {
                 <button type="submit" className="btn btn-account-select">Добавить</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Модалка оплаты */}
+      {showPay && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
+          <div className="modal-box">
+            <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
+            <h2>Оплата чека</h2>
+
+            {/* Список товаров */}
+            <div style={{margin:'0 0 12px',fontSize:'.82rem',color:'var(--muted)'}}>
+              {cart.map((item, i) => (
+                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'3px 0'}}>
+                  <span>{item.name} ×{item.qty}</span>
+                  <span style={{fontWeight:600}}>{(item.price * item.qty).toLocaleString()} ₽</span>
+                </div>
+              ))}
+              <div style={{borderTop:'1px solid #eee',marginTop:'6px',paddingTop:'6px',display:'flex',justifyContent:'space-between',fontSize:'1rem',fontWeight:800}}>
+                <span>ИТОГО:</span>
+                <span>{total.toLocaleString()} ₽</span>
+              </div>
+            </div>
+
+            {/* Выбор счёта */}
+            <div style={{marginBottom:'12px'}}>
+              <label style={{fontSize:'.82rem',fontWeight:600,color:'var(--muted)',marginBottom:'6px',display:'block'}}>Способ оплаты</label>
+              <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+                {accounts.map(a => (
+                  <button key={a.id} onClick={() => setPayMode(a.id)} style={{
+                    padding:'8px 14px', borderRadius:'8px', border:'1.5px solid #eee',
+                    background: payMode === a.id ? '#000' : '#fff',
+                    color: payMode === a.id ? '#fff' : '#555',
+                    fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',
+                  }}>{a.name}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Ползунок «Разделить на счета» */}
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
+              <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
+                <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
+                <span style={{position:'absolute',inset:0,background:paySplit?'#000':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+                  <span style={{position:'absolute',top:'2px',left:paySplit?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
+                </span>
+              </label>
+              <span style={{fontSize:'13px',fontWeight:500}}>Разделить на счета</span>
+            </div>
+
+            {paySplit && (
+              <div style={{marginBottom:'12px'}}>
+                {accounts.map(a => {
+                  const amt = parseFloat(splitAmts[a.id]) || 0;
+                  const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
+                  return (
+                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
+                      <span style={{fontSize:'12px',minWidth:'80px',fontWeight:500}}>{a.name}</span>
+                      <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
+                        value={splitAmts[a.id] || ''} 
+                        onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
+                        style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'6px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                      <span style={{fontSize:'12px',color:'var(--muted)',minWidth:'40px',textAlign:'right'}}>₽</span>
+                    </div>
+                  );
+                })}
+                <div style={{fontSize:'12px',fontWeight:600,textAlign:'right',marginTop:'4px',color: Math.abs(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)) < 0.01 ? '#16a34a' : '#dc2626'}}>
+                  Остаток: {(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} ₽
+                </div>
+              </div>
+            )}
+
+            {/* Ползунок «Не оплачивать» */}
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
+              <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
+                <input type="checkbox" checked={payUnpaid} onChange={e => { setPayUnpaid(e.target.checked); if (e.target.checked) { setPaySplit(false); setSplitAmts({}); }} } style={{opacity:0,width:0,height:0}} />
+                <span style={{position:'absolute',inset:0,background:payUnpaid?'#dc2626':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+                  <span style={{position:'absolute',top:'2px',left:payUnpaid?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
+                </span>
+              </label>
+              <span style={{fontSize:'13px',fontWeight:500}}>Не оплачивать сейчас (долг)</span>
+            </div>
+
+            <div className="modal-actions">
+              <button type="button" className="btn btn-outline" onClick={() => setShowPay(false)}>Отмена</button>
+              <button type="button" className="btn btn-account-select" onClick={processPay}>{payUnpaid ? 'Сохранить чек' : 'Пробить чек'}</button>
+            </div>
           </div>
         </div>
       )}
