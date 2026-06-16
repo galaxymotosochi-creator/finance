@@ -79,16 +79,15 @@ export default function Positions() {
     try {
       const obj = {
         user_id: user.id, name: fName.trim(),
-        pay_type: fPayType,
         salary: fPayType === 'fixed' ? parseFloat(fSalary)||0 : 0,
         bonus_type: fBonusType,
         bonus_value: parseFloat(fBonusValue)||0,
         permissions: fPermissions,
       };
       if (editId) {
-        await supabase.from('position_templates').update(obj).eq('id', editId);
+        try { await supabase.from('position_templates').update({...obj, pay_type: fPayType}).eq('id', editId); } catch(e) { await supabase.from('position_templates').update(obj).eq('id', editId); }
       } else {
-        await supabase.from('position_templates').insert(obj);
+        try { await supabase.from('position_templates').insert({...obj, pay_type: fPayType}); } catch(e) { await supabase.from('position_templates').insert(obj); }
       }
       await load();
       setShow(false);
