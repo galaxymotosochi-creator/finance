@@ -187,8 +187,8 @@ export default function Registers({ fullscreen }) {
           <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ffbd2e',display:'inline-block'}}></span>
           <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
-          <span style={{fontSize:'11px',color:'#888'}}>{activeShift?.cashier_name || userName}</span>
-          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'20px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1}}>⚙</span>
+          <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
+          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
         </div>
 
         {/* Список товаров в чеке */}
