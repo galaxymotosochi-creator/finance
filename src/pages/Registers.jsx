@@ -467,7 +467,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowActions(false); }}>
           <div className="modal-box" style={{maxWidth:'340px'}}>
             <button className="modal-close" onClick={() => setShowActions(false)}>&times;</button>
-            <h2 style={{textAlign:'center'}}>⚙ Действия</h2>
+            <h2 style={{textAlign:'center',fontSize:'0'}}></h2>
             <div style={{display:'flex',flexDirection:'column',gap:'8px',marginTop:'16px'}}>
               <button onClick={async () => {
                 setShowActions(false);
