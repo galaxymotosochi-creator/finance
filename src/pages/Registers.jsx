@@ -98,15 +98,13 @@ export default function Registers({ fullscreen }) {
 
       {/* Левая панель — чек */}
       <div style={{width:'280px',minWidth:'280px',display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',height:'100%'}}>
-        {/* Шапка с кассиром */}
-        <div style={{display:'flex',alignItems:'center',gap:'10px',padding:'14px',borderBottom:'1px solid #eee'}}>
-          <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'#000',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:700,flexShrink:0}}>
-            {(activeShift?.cashier_name || userName).charAt(0)}
-          </div>
-          <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:'13px',fontWeight:600}}>{activeShift?.cashier_name || userName}</div>
-            <div style={{fontSize:'10px',color:'#16a34a',fontWeight:500}}>● Смена открыта</div>
-          </div>
+        {/* Шапка в стиле Apple */}
+        <div style={{background:'#fafafa',padding:'6px 16px',display:'flex',alignItems:'center',gap:'6px',borderBottom:'1px solid #f0f0f0'}}>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#ff6052',display:'inline-block'}}></span>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#ffbd2e',display:'inline-block'}}></span>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
+          <span style={{fontSize:'10px',fontWeight:600,color:'#999',marginLeft:'6px',flex:1,textTransform:'uppercase',letterSpacing:'.05em'}}>Касса</span>
+          <span style={{fontSize:'9px',color:'#ccc'}}>{activeShift?.cashier_name || userName}</span>
         </div>
 
         {/* Список товаров в чеке */}
