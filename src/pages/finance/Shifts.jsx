@@ -9,6 +9,7 @@ export default function Shifts() {
   const [loading, setLoading] = useState(true);
   const [showOpen, setShowOpen] = useState(false);
   const [openBal, setOpenBal] = useState('0');
+  const [cashierName, setCashierName] = useState('');
   const [showClose, setShowClose] = useState(null);
   const [closeBal, setCloseBal] = useState('');
   const [closeNote, setCloseNote] = useState('');
@@ -51,10 +52,10 @@ export default function Shifts() {
   const openShift = async () => {
     const bal = parseFloat(openBal) || 0;
     const { error } = await supabase.from('shifts').insert({
-      user_id: user.id, opening_balance: bal, status: 'open',
+      user_id: user.id, opening_balance: bal, status: 'open', cashier_name: cashierName.trim() || null,
     });
     if (error) return showToast('❌ ' + error.message);
-    setShowOpen(false); setOpenBal('0');
+    setShowOpen(false); setOpenBal('0'); setCashierName('');
     const { data } = await supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false });
     if (data) setShifts(data);
     showToast('✅ Смена открыта');
@@ -86,8 +87,7 @@ export default function Shifts() {
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
-  const totalIncome = shifts.reduce((s, sh) => s + getShiftIncome(sh), 0);
-  const totalExpense = shifts.reduce((s, sh) => s + getShiftExpense(sh), 0);
+
 
   return (
     <>
@@ -103,9 +103,7 @@ export default function Shifts() {
           <div className="sub">Контроль работы касс и выручки</div>
         </div>
         <div className="page-actions">
-          {!activeShift ? (
-            <button className="btn-mint" onClick={() => setShowOpen(true)}>+ Открыть смену</button>
-          ) : (
+          {activeShift && (
             <button className="btn-mint" onClick={() => { setCloseBal(''); setCloseNote(''); setShowClose(activeShift); }}
               style={{background:'#dc2626',color:'#fff'}}>✕ Закрыть смену</button>
           )}
@@ -113,28 +111,10 @@ export default function Shifts() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      {/* Метрики */}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px',marginBottom:'16px'}}>
-        <div style={{background:'#ffdd2d',borderRadius:'14px',padding:'14px 18px'}}>
-          <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.54)',marginBottom:'4px'}}>Всего смен</div>
-          <div style={{fontSize:'1.15rem',fontWeight:800,color:'#000'}}>{shifts.length}</div>
-        </div>
-        <div style={{background:'#f0fdf4',borderRadius:'14px',padding:'14px 18px'}}>
-          <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.54)',marginBottom:'4px'}}>Выручка</div>
-          <div style={{fontSize:'1.15rem',fontWeight:800,color:'#16a34a'}}>+{totalIncome.toLocaleString()} ₽</div>
-        </div>
-        <div style={{background:'#fef2f2',borderRadius:'14px',padding:'14px 18px'}}>
-          <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.54)',marginBottom:'4px'}}>Расходы</div>
-          <div style={{fontSize:'1.15rem',fontWeight:800,color:'#dc2626'}}>−{totalExpense.toLocaleString()} ₽</div>
-        </div>
-        <div style={{background:'#f5f5f5',borderRadius:'14px',padding:'14px 18px'}}>
-          <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.54)',marginBottom:'4px'}}>Активная смена</div>
-          <div style={{fontSize:'1.15rem',fontWeight:800,color:'#000'}}>{activeShift ? '🟢 Открыта' : '⛔ Нет'}</div>
-        </div>
-      </div>
+
 
       {/* Таблица */}
-      <div className="product-table">
+      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'visible'}}>
         <table>
           <thead id="colHeaders">
             <tr>
@@ -167,12 +147,12 @@ export default function Shifts() {
                   <td style={{textAlign:'left',fontSize:'.82rem'}}>{dateStr}</td>
                   <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{timeOpen}</td>
                   <td style={{fontSize:'.82rem'}}>{'#'+(idx+1)}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{user?.email?.split('@')[0] || '—'}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{s.cashier_name || '—'}</td>
                   <td>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
                   <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>Основная</td>
                   <td style={{fontWeight:600}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{timeClose}</td>
-                  <td><span style={{fontSize:'.72rem',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? '🟢 Открыта' : 'Закрыта'}</span></td>
+                  <td><span style={{fontSize:'.72rem',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
                   <td style={{textAlign:'right'}}>
                     {isOpen && (
                       <button className="act-btn prod-edit-btn" onClick={() => { setCloseBal(''); setCloseNote(''); setShowClose(s); }}>Закрыть</button>
@@ -194,8 +174,12 @@ export default function Shifts() {
             <div className="sub">Укажите остаток в кассе на момент открытия</div>
             <form onSubmit={e => { e.preventDefault(); openShift(); }}>
               <div className="form-group">
+                <label>Имя кассира</label>
+                <input type="text" placeholder="Иван Иванов" value={cashierName} onChange={e => setCashierName(e.target.value)} />
+              </div>
+              <div className="form-group">
                 <label>Остаток в кассе (₽)</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)} autoFocus />
+                <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)} />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">Открыть смену</button>
