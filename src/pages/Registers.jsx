@@ -360,7 +360,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2 style={{marginBottom:'16px'}}>Оплата чека <span style={{fontSize:'13px',color:'#999',fontWeight:400}}>№{shiftTx.length + 1 || 1}</span></h2>
+            <h2 style={{marginBottom:'16px'}}>Оплата чека <span>№{shiftTx.length + 1 || 1}</span></h2>
 
             {/* Список товаров */}
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'16px'}}>
