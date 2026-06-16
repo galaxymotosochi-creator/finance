@@ -14,6 +14,7 @@ export default function Registers({ fullscreen }) {
   const [payMode, setPayMode] = useState(null);
   const [activeShift, setActiveShift] = useState(null);
   const [showOpenShift, setShowOpenShift] = useState(false);
+  const [accounts, setAccounts] = useState([]);
   const [openShiftCashier, setOpenShiftCashier] = useState('');
   const [openShiftBal, setOpenShiftBal] = useState('0');
 
@@ -22,13 +23,15 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
+        supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
       ]);
       if (pRes.data) setProducts(pRes.data.filter(p => !p.hidden));
       if (cRes.data) setCategories(cRes.data.filter(c => c.type === 'product'));
+      if (aRes.data) setAccounts(aRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
       setLoading(false);
@@ -68,8 +71,9 @@ export default function Registers({ fullscreen }) {
   const sell = async () => {
     if (!cart.length || !payMode) return;
     const date = new Date().toISOString().split('T')[0];
+    const selectedAc = accounts.find(a => a.id === payMode);
     const { error } = await supabase.from('transactions').insert(
-      cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date }))
+      cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: selectedAc?.id || null }))
     );
     if (error) return setToast('Ошибка: ' + error.message);
     setCart([]); setPayMode(null);
@@ -133,15 +137,15 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'12px',color:'#999'}}>ИТОГО</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
             </div>
-            <div style={{display:'flex',gap:'6px'}}>
-              {[['Наличные','cash'],['Карта','card']].map(([l,m]) => (
-                <button key={l} onClick={() => setPayMode(m)} style={{
+            <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+              {accounts.map(a => (
+                <button key={a.id} onClick={() => setPayMode(a.id)} style={{
                   flex:1, padding:'10px', borderRadius:'8px', border:'1.5px solid #eee',
-                  background: payMode === m ? '#000' : '#fff',
-                  color: payMode === m ? '#fff' : '#555',
+                  background: payMode === a.id ? '#000' : '#fff',
+                  color: payMode === a.id ? '#fff' : '#555',
                   fontSize:'11px', fontWeight:600, cursor:'pointer', textAlign:'center',
-                  fontFamily:'inherit',
-                }}>{l}</button>
+                  fontFamily:'inherit', whiteSpace:'nowrap', minWidth:0,
+                }}>{a.name}</button>
               ))}
             </div>
             <button onClick={sell} disabled={!payMode} style={{
