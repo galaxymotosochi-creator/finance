@@ -358,25 +358,25 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2>Оплата чека <span style={{fontSize:'13px',color:'#999',fontWeight:400}}>№{shiftTx.length + 1 || 1}</span></h2>
+            <h2 style={{marginBottom:'16px'}}>Оплата чека <span style={{fontSize:'13px',color:'#999',fontWeight:400}}>№{shiftTx.length + 1 || 1}</span></h2>
 
             {/* Список товаров */}
-            <div style={{margin:'0 0 12px',fontSize:'.82rem',color:'var(--muted)'}}>
+            <div style={{margin:'0 0 16px',fontSize:'13px'}}>
               {cart.map((item, i) => (
-                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'3px 0'}}>
-                  <span>{item.name} ×{item.qty}</span>
-                  <span style={{fontWeight:600}}>{(item.price * item.qty).toLocaleString()} ₽</span>
+                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'13px'}}>
+                  <span style={{color:'#555'}}>{item.name} ×{item.qty}</span>
+                  <span style={{fontWeight:600,color:'#111'}}>{(item.price * item.qty).toLocaleString()} ₽</span>
                 </div>
               ))}
-              <div style={{borderTop:'1px solid #eee',marginTop:'6px',paddingTop:'6px',display:'flex',justifyContent:'space-between',fontSize:'1rem',fontWeight:800}}>
+              <div style={{borderTop:'1px solid #eee',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',fontSize:'14px',fontWeight:700}}>
                 <span>ИТОГО:</span>
-                <span>{total.toLocaleString()} ₽</span>
+                <span style={{color:'#111'}}>{total.toLocaleString()} ₽</span>
               </div>
             </div>
 
             {/* Выбор счёта */}
-            <div style={{marginBottom:'12px'}}>
-              <label style={{fontSize:'.82rem',fontWeight:600,color:'var(--muted)',marginBottom:'6px',display:'block'}}>Способ оплаты</label>
+            <div style={{marginBottom:'14px'}}>
+              <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'8px'}}>Способ оплаты</label>
               <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
                 {accounts.map(a => (
                   <button key={a.id} onClick={() => setPayMode(a.id)} style={{
@@ -390,24 +390,24 @@ export default function Registers({ fullscreen }) {
             </div>
 
             {/* Ползунок «Разделить на счета» */}
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
               <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
                 <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
                 <span style={{position:'absolute',inset:0,background:paySplit?'#000':'#ddd',borderRadius:'100px',transition:'.2s'}}>
                   <span style={{position:'absolute',top:'2px',left:paySplit?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
                 </span>
               </label>
-              <span style={{fontSize:'13px',fontWeight:500}}>Разделить на счета</span>
+              <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Разделить на счета</span>
             </div>
 
             {paySplit && (
-              <div style={{marginBottom:'12px'}}>
+              <div style={{marginBottom:'14px'}}>
                 {accounts.map(a => {
                   const amt = parseFloat(splitAmts[a.id]) || 0;
                   const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                   return (
                     <div key={a.id} style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'6px'}}>
-                      <span style={{fontSize:'12px',minWidth:'70px',fontWeight:500,flexShrink:0}}>{a.name}</span>
+                      <span style={{fontSize:'12px',minWidth:'70px',fontWeight:500,flexShrink:0,color:'#555'}}>{a.name}</span>
                       <div style={{position:'relative',flex:1}}>
                         <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
                           value={splitAmts[a.id] || ''} 
@@ -425,14 +425,14 @@ export default function Registers({ fullscreen }) {
             )}
 
             {/* Ползунок «Не оплачивать» */}
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
               <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
                 <input type="checkbox" checked={payUnpaid} onChange={e => { setPayUnpaid(e.target.checked); if (e.target.checked) { setPaySplit(false); setSplitAmts({}); }} } style={{opacity:0,width:0,height:0}} />
                 <span style={{position:'absolute',inset:0,background:payUnpaid?'#dc2626':'#ddd',borderRadius:'100px',transition:'.2s'}}>
                   <span style={{position:'absolute',top:'2px',left:payUnpaid?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
                 </span>
               </label>
-              <span style={{fontSize:'13px',fontWeight:500}}>Не оплачивать сейчас (долг)</span>
+              <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
             </div>
 
             <div className="modal-actions">
