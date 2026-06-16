@@ -218,8 +218,9 @@ export default function Registers({ fullscreen }) {
             </div>
             <button onClick={openPay} disabled={!cart.length} style={{
               width:'100%', padding:'13px', borderRadius:'100px', border:'none',
-              background:'#000', color:'#fff', fontSize:'14px', fontWeight:700,
-              cursor:'pointer', fontFamily:'inherit', opacity: payMode ? 1 : 0.3,
+              background: cart.length ? '#000' : '#ddd',
+              color:'#fff', fontSize:'14px', fontWeight:700,
+              cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
             }}>Продажа</button>
           </div>
       </div>
@@ -230,7 +231,7 @@ export default function Registers({ fullscreen }) {
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="🔍 Поиск"
-            style={{flex:1,border:'1px solid #eee',borderRadius:'10px',padding:'9px 14px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxShadow:'0 1px 4px rgba(0,0,0,.05)'}} />
+            style={{flex:1,border:'1px solid #eee',borderRadius:'10px',padding:'9px 14px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}} />
           <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'9px 16px',border:'none',borderRadius:'10px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+ Добавить позицию</button>
         </div>
 
