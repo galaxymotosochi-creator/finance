@@ -226,7 +226,7 @@ export default function Registers({ fullscreen }) {
       </div>
 
       {/* Правая панель — товары */}
-      <div style={{display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
+      <div style={{display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:'300px'}}>
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
