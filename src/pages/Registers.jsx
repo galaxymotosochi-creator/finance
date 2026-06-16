@@ -226,7 +226,7 @@ export default function Registers({ fullscreen }) {
       </div>
 
       {/* Правая панель — товары */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',padding:'16px'}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',padding:'16px',minWidth:0}}>
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -254,12 +254,12 @@ export default function Registers({ fullscreen }) {
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start',minHeight:0}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
             <div key={p.id} onClick={() => addToCart(p)}
-              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)'}}
+              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%'}}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3}}>{p.name}</div>
