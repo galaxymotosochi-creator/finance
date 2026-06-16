@@ -185,7 +185,7 @@ export default function Registers({ fullscreen }) {
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
             <div key={p.id} onClick={() => addToCart(p)}
-              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',gap:'4px',boxShadow:'0 1px 3px rgba(0,0,0,.03)'}}
+              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',gap:'4px',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)'}}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3}}>{p.name}</div>
