@@ -27,6 +27,10 @@ export default function Registers({ fullscreen }) {
   const [paySplit, setPaySplit] = useState(false);
   const [payUnpaid, setPayUnpaid] = useState(false);
   const [splitAmts, setSplitAmts] = useState({});
+  const [showActions, setShowActions] = useState(false);
+  const [showCloseShift, setShowCloseShift] = useState(false);
+  const [closeFactBal, setCloseFactBal] = useState('');
+  const [shiftTx, setShiftTx] = useState([]);
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
@@ -175,6 +179,7 @@ export default function Registers({ fullscreen }) {
           <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
           <span style={{fontSize:'10px',fontWeight:600,color:'#999',marginLeft:'6px',flex:1,textTransform:'uppercase',letterSpacing:'.05em'}}>Касса</span>
           <span style={{fontSize:'9px',color:'#ccc'}}>{activeShift?.cashier_name || userName}</span>
+          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'13px',cursor:'pointer',color:'#ccc',padding:'2px',userSelect:'none'}}>⚙</span>
         </div>
 
         {/* Список товаров в чеке */}
@@ -410,6 +415,146 @@ export default function Registers({ fullscreen }) {
               <div className="form-group"><label>Остаток денег на начало дня (руб)</label><input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus /></div>
               <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Меню действий */}
+      {showActions && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowActions(false); }}>
+          <div className="modal-box" style={{maxWidth:'340px'}}>
+            <button className="modal-close" onClick={() => setShowActions(false)}>&times;</button>
+            <h2 style={{textAlign:'center'}}>⚙ Действия</h2>
+            <div style={{display:'flex',flexDirection:'column',gap:'8px',marginTop:'16px'}}>
+              <button onClick={async () => {
+                setShowActions(false);
+                const start = new Date(activeShift.opened_at);
+                const now = new Date();
+                const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
+                setShiftTx(data || []);
+                setShowCloseShift(true);
+              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>🔒 Закрыть смену</button>
+              <button onClick={async () => {
+                setShowActions(false);
+                const start = new Date(activeShift.opened_at);
+                const now = new Date();
+                const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
+                setShiftTx(data || []);
+              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>📋 Чеки за смену</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Чеки за смену */}
+      {shiftTx.length > 0 && !showCloseShift && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setShiftTx([]); } }}>
+          <div className="modal-box" style={{maxWidth:'460px',display:'flex',flexDirection:'column',maxHeight:'80vh'}}>
+            <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
+            <h2>📋 Чеки за смену</h2>
+            <div className="sub" style={{marginBottom:'12px'}}>Все операции с момента открытия смены</div>
+            <div style={{overflowY:'auto',flex:1}}>
+              {shiftTx.map((t, i) => (
+                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid #f5f5f5',fontSize:'13px'}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.description}</div>
+                    <div style={{fontSize:'11px',color:'#999'}}>{new Date(t.created_at).toLocaleString('ru-RU', {hour:'2-digit',minute:'2-digit'})} · {t.status === 'unpaid' ? '🔴 Не оплачен' : '✅ Оплачен'}</div>
+                  </div>
+                  <span style={{fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626',whiteSpace:'nowrap'}}>{t.type === 'income' ? '+' : '-'}{(t.amount || 0).toLocaleString()} ₽</span>
+                </div>
+              ))}
+            </div>
+            <div style={{borderTop:'1px solid #eee',paddingTop:'10px',marginTop:'8px',display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'15px'}}>
+              <span>Итого доход:</span>
+              <span style={{color:'#16a34a'}}>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'15px'}}>
+              <span>Итого расход:</span>
+              <span style={{color:'#dc2626'}}>−{shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+            </div>
+            <div className="modal-actions" style={{marginTop:'12px'}}>
+              <button className="btn btn-outline" onClick={() => setShiftTx([])}>Закрыть</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Закрытие смены */}
+      {showCloseShift && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowCloseShift(false); }}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
+            <button className="modal-close" onClick={() => setShowCloseShift(false)}>&times;</button>
+            <h2>🔒 Закрытие смены</h2>
+            <div className="sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
+            
+            <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'12px'}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}>
+                <span style={{color:'var(--muted)'}}>Начальный остаток</span>
+                <b>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</b>
+              </div>
+              <div style={{borderTop:'1px solid #eee',margin:'6px 0'}}></div>
+              <div style={{fontWeight:600,marginBottom:'4px'}}>Доходы по счетам:</div>
+              {(() => {
+                const byAc = {};
+                shiftTx.filter(t => t.type === 'income').forEach(t => {
+                  const key = t.account_id || 'unknown';
+                  byAc[key] = (byAc[key] || 0) + (parseFloat(t.amount) || 0);
+                });
+                const acMap = {};
+                accounts.forEach(a => { acMap[a.id] = a.name; });
+                return Object.entries(byAc).map(([acId, amt]) => (
+                  <div key={acId} style={{display:'flex',justifyContent:'space-between',padding:'2px 0',fontSize:'12px'}}>
+                    <span>{acMap[acId] || 'Без счёта'}</span>
+                    <span style={{color:'#16a34a'}}>+{amt.toLocaleString()} ₽</span>
+                  </div>
+                ));
+              })()}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'2px 0',fontSize:'12px',fontWeight:600}}>
+                <span>Расходы</span>
+                <span style={{color:'#dc2626'}}>−{shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+              </div>
+              <div style={{borderTop:'1px solid #eee',margin:'6px 0'}}></div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'15px',fontWeight:800}}>
+                <span>Расчётный остаток</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Фактический остаток в кассе (₽)</label>
+              <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
+            </div>
+            {closeFactBal && (() => {
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+              const fact = parseFloat(closeFactBal) || 0;
+              const diff = fact - calcBal;
+              if (Math.abs(diff) < 0.01) {
+                return <div style={{textAlign:'center',padding:'6px',background:'#f0fdf4',borderRadius:'8px',color:'#16a34a',fontWeight:600,fontSize:'13px',marginBottom:'8px'}}>✅ Касса сходится</div>;
+              } else {
+                return <div style={{textAlign:'center',padding:'6px',background:'#fef2f2',borderRadius:'8px',color:'#dc2626',fontWeight:600,fontSize:'13px',marginBottom:'8px'}}>⚠️ Расхождение: {diff > 0 ? 'излишек' : 'недостача'} {Math.abs(diff).toLocaleString()} ₽</div>;
+              }
+            })()}
+
+            <div className="modal-actions">
+              <button type="button" className="btn btn-outline" onClick={() => setShowCloseShift(false)}>Отмена</button>
+              <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
+                const fact = parseFloat(closeFactBal);
+                if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                const { error } = await supabase.from('shifts').update({
+                  closed_at: new Date().toISOString(),
+                  closing_balance: fact,
+                  status: 'closed',
+                }).eq('id', activeShift.id);
+                if (error) return setToast('❌ ' + error.message);
+                setShowCloseShift(false); setCloseFactBal(''); setShiftTx([]);
+                setActiveShift(null);
+                setShowOpenShift(true);
+                setOpenShiftCashier(userName);
+                setOpenShiftBal('0');
+                setToast('✅ Смена закрыта' + (Math.abs(fact - calcBal) > 0.01 ? ' (расхождение ' + (fact - calcBal > 0 ? 'излишек' : 'недостача') + ' ' + Math.abs(fact - calcBal).toLocaleString() + ' ₽)' : ''));
+              }}>Закрыть смену</button>
+            </div>
           </div>
         </div>
       )}
