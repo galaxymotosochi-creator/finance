@@ -440,27 +440,52 @@ export default function Registers({ fullscreen }) {
       {/* Чеки за смену */}
       {shiftTx.length > 0 && !showCloseShift && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setShiftTx([]); } }}>
-          <div className="modal-box" style={{maxWidth:'460px',display:'flex',flexDirection:'column',maxHeight:'80vh'}}>
-            <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
-            <h2>📋 Чеки за смену</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Все операции с момента открытия смены</div>
-            <div style={{overflowY:'auto',flex:1}}>
-              {shiftTx.map((t, i) => (
-                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid #f5f5f5',fontSize:'13px'}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.description}</div>
-                    <div style={{fontSize:'11px',color:'#999'}}>{new Date(t.created_at).toLocaleString('ru-RU', {hour:'2-digit',minute:'2-digit'})} · {t.status === 'unpaid' ? '🔴 Не оплачен' : '✅ Оплачен'}</div>
-                  </div>
-                  <span style={{fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626',whiteSpace:'nowrap'}}>{t.type === 'income' ? '+' : '-'}{(t.amount || 0).toLocaleString()} ₽</span>
-                </div>
-              ))}
+          <div className="modal-box" style={{maxWidth:'520px',display:'flex',flexDirection:'column',maxHeight:'80vh',padding:0}}>
+            <div style={{padding:'24px 24px 0'}}>
+              <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
+              <h2 style={{marginBottom:'4px'}}>Чеки за смену</h2>
+              <div className="sub" style={{marginBottom:'16px'}}>Все операции с момента открытия смены</div>
             </div>
-            <div style={{borderTop:'1px solid #eee',paddingTop:'10px',marginTop:'8px',display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'15px'}}>
-              <span>Итого:</span>
-              <span style={{color:'#16a34a'}}>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+            <div style={{overflowY:'auto',flex:1,padding:'0 24px'}}>
+              <table style={{width:'100%',borderCollapse:'collapse',fontSize:'13px'}}>
+                <thead>
+                  <tr style={{borderBottom:'1px solid #eee'}}>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Чек</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Товар</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Время</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Способ</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Статус</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'right'}}>Сумма</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shiftTx.map((t, i) => {
+                    const ac = accounts.find(a => a.id === t.account_id);
+                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+                    return (
+                      <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
+                        <td style={{padding:'10px 10px',fontWeight:600}}>{i + 1}</td>
+                        <td style={{padding:'10px 10px'}}>{t.description}</td>
+                        <td style={{padding:'10px 10px',color:'#999'}}>{time}</td>
+                        <td style={{padding:'10px 10px'}}>{ac?.name || '—'}</td>
+                        <td style={{padding:'10px 10px'}}>
+                          <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'unpaid' ? '#fef2f2' : '#f0fdf4',color: t.status === 'unpaid' ? '#dc2626' : '#16a34a'}}>{t.status === 'unpaid' ? 'Долг' : 'Оплачен'}</span>
+                        </td>
+                        <td style={{padding:'10px 10px',textAlign:'right',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-            <div className="modal-actions" style={{marginTop:'12px'}}>
-              <button className="btn btn-outline" onClick={() => setShiftTx([])}>Закрыть</button>
+            <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'14px'}}>
+              <span>Итого</span>
+              <span style={{color:'#16a34a'}}>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()}</span>
+            </div>
+            <div style={{padding:'0 24px 20px'}}>
+              <div className="modal-actions">
+                <button className="btn btn-outline" onClick={() => setShiftTx([])}>Закрыть</button>
+              </div>
             </div>
           </div>
         </div>
