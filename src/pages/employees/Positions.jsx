@@ -234,26 +234,30 @@ export default function Positions() {
                 <label>Название должности</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Тип оплаты</label>
-                  <select value={fPayType} onChange={e => setFPayType(e.target.value)}>
-                    <option value="fixed">Фиксированная</option>
-                    <option value="piecework">Сдельная</option>
-                    <option value="percent">Процентная</option>
-                  </select>
-                </div>
-                {fPayType === 'fixed' && (
+              <div style={{display:'flex',gap:'10px'}}>
+                <div style={{flex:1}}>
                   <div className="form-group">
-                    <label>Сумма (₽)</label>
+                    <label>Тип оплаты</label>
+                    <select value={fPayType} onChange={e => setFPayType(e.target.value)}>
+                      <option value="fixed">Фиксир.</option>
+                      <option value="piecework">Сдельная</option>
+                      <option value="percent">Процентная</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{flex:1,display: fPayType === 'fixed' ? 'block' : 'none'}}>
+                  <div className="form-group">
+                    <label>Сумма (руб)</label>
                     <input type="number" value={fSalary} onChange={e=>setFSalary(e.target.value)} placeholder="50000" min="0" />
                   </div>
-                )}
-                <div className="form-group">
-                  <label>Тип бонуса</label>
-                  <select value={fBonusType} onChange={e=>setFBonusType(e.target.value)}>
-                    {BONUS_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                  </select>
+                </div>
+                <div style={{flex:1}}>
+                  <div className="form-group">
+                    <label>Тип бонуса</label>
+                    <select value={fBonusType} onChange={e=>setFBonusType(e.target.value)}>
+                      {BONUS_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  </div>
                 </div>
               </div>
               {fBonusType !== 'none' && (
