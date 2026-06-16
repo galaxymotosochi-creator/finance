@@ -465,12 +465,8 @@ export default function Registers({ fullscreen }) {
               ))}
             </div>
             <div style={{borderTop:'1px solid #eee',paddingTop:'10px',marginTop:'8px',display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'15px'}}>
-              <span>Итого доход:</span>
+              <span>Итого:</span>
               <span style={{color:'#16a34a'}}>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'15px'}}>
-              <span>Итого расход:</span>
-              <span style={{color:'#dc2626'}}>−{shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
             <div className="modal-actions" style={{marginTop:'12px'}}>
               <button className="btn btn-outline" onClick={() => setShiftTx([])}>Закрыть</button>
@@ -509,14 +505,10 @@ export default function Registers({ fullscreen }) {
                   </div>
                 ));
               })()}
-              <div style={{display:'flex',justifyContent:'space-between',padding:'2px 0',fontSize:'12px',fontWeight:600}}>
-                <span>Расходы</span>
-                <span style={{color:'#dc2626'}}>−{shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
-              </div>
               <div style={{borderTop:'1px solid #eee',margin:'6px 0'}}></div>
               <div style={{display:'flex',justifyContent:'space-between',fontSize:'15px',fontWeight:800}}>
                 <span>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
             </div>
 
@@ -525,7 +517,7 @@ export default function Registers({ fullscreen }) {
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {
-              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
@@ -540,7 +532,7 @@ export default function Registers({ fullscreen }) {
               <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
                 const fact = parseFloat(closeFactBal);
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
-                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) - shiftTx.filter(t => t.type !== 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
                 const { error } = await supabase.from('shifts').update({
                   closed_at: new Date().toISOString(),
                   closing_balance: fact,
