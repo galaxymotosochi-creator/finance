@@ -8,10 +8,7 @@ export default function Settings() {
   const { user } = useAuth();
   const [toast, setToast] = useState(null);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
-  const [company, setCompany] = useState(() => {
-    const saved = localStorage.getItem('companyLogo');
-    return { name: '', address: '', regNumber: '', phone: '', email: '', logo: saved || null };
-  });
+  const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
   const [currency, setCurrency] = useState('RUB');
