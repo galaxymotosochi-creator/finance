@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Settings() {
   const n = useNavigate();
+  const { user } = useAuth();
+  const [toast, setToast] = useState(null);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
@@ -32,6 +37,9 @@ export default function Settings() {
 
   return (
     <div style={{ fontFamily: "'Inter',sans-serif", color: '#111' }}>
+      {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
+      )}
       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
       <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 24 }}>Компания, локализация, уведомления и данные</p>
 
@@ -138,19 +146,18 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* 4. Экспорт */}
+      {/* 4. Безопасность */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Экспорт и данные</h2>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-          <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: 'none', background: '#000', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>📥 Экспорт в Excel</button>
-          <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>📥 Экспорт в CSV</button>
-        </div>
-        <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16 }}>
-          <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Безопасность</div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔐 История входов</button>
-            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔑 Сменить пароль</button>
-          </div>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>Безопасность</h2>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button onClick={() => setToast('Функция будет доступна в следующем обновлении')}
+            style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>История входов</button>
+          <button onClick={async () => {
+            const { error } = await supabase.auth.resetPasswordForEmail(user?.email || '', { redirectTo: window.location.origin });
+            if (error) return setToast('Ошибка: ' + error.message);
+            setToast('✅ Письмо для сброса пароля отправлено на почту');
+          }}
+            style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Сменить пароль</button>
         </div>
       </div>
 
