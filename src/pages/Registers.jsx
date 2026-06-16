@@ -49,7 +49,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
       ]);
-      if (pRes.data) setProducts(pRes.data.filter(p => !p.hidden));
+      if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
       if (sRes.data) setActiveShift(sRes.data);
@@ -154,7 +154,7 @@ export default function Registers({ fullscreen }) {
     setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc('');
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
-    if (data) setProducts(data.filter(p => !p.hidden));
+    if (data) setProducts(data);
     setToast('✅ Товар добавлен!');
   };
 
