@@ -188,7 +188,7 @@ export default function Registers({ fullscreen }) {
           <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'11px',color:'#888'}}>{activeShift?.cashier_name || userName}</span>
-          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'20px',cursor:'pointer',color:'#999',padding:'2px',userSelect:'none',lineHeight:1}}>⚙</span>
+          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'20px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1}}>⚙</span>
         </div>
 
         {/* Список товаров в чеке */}
@@ -198,7 +198,7 @@ export default function Registers({ fullscreen }) {
           ) : cart.map((item, i) => (
             <div key={item.id} style={{display:'flex',alignItems:'center',padding:'10px 14px',borderBottom:'1px solid #f5f5f5',gap:'6px'}}>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:'13px',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
+                <div style={{fontSize:'13px',fontWeight:500}}>{item.name}</div>
               </div>
               <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
                 <button onClick={() => updateQty(item.id, -1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>−</button>
