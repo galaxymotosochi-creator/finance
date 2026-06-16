@@ -129,8 +129,7 @@ export default function Registers({ fullscreen }) {
         </div>
 
         {/* Итого и оплата */}
-        {cart.length > 0 && (
-          <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
+        <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontSize:'12px',color:'#999'}}>ИТОГО</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
@@ -152,7 +151,6 @@ export default function Registers({ fullscreen }) {
               cursor:'pointer', fontFamily:'inherit', opacity: payMode ? 1 : 0.3,
             }}>Продажа</button>
           </div>
-        )}
       </div>
 
       {/* Правая панель — товары */}
