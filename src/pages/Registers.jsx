@@ -361,16 +361,17 @@ export default function Registers({ fullscreen }) {
             <h2 style={{marginBottom:'16px'}}>Оплата чека <span style={{fontSize:'13px',color:'#999',fontWeight:400}}>№{shiftTx.length + 1 || 1}</span></h2>
 
             {/* Список товаров */}
-            <div style={{margin:'0 0 16px',fontSize:'13px'}}>
+            <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'16px'}}>
               {cart.map((item, i) => (
-                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'13px'}}>
+                <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
                   <span style={{color:'#555'}}>{item.name} ×{item.qty}</span>
                   <span style={{fontWeight:600,color:'#111'}}>{(item.price * item.qty).toLocaleString()} ₽</span>
                 </div>
               ))}
-              <div style={{borderTop:'1px solid #eee',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',fontSize:'14px',fontWeight:700}}>
+              <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
+              <div style={{display:'flex',justifyContent:'space-between',fontWeight:800}}>
                 <span>ИТОГО:</span>
-                <span style={{color:'#111'}}>{total.toLocaleString()} ₽</span>
+                <span>{total.toLocaleString()} ₽</span>
               </div>
             </div>
 
