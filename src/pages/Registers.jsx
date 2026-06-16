@@ -23,6 +23,12 @@ export default function Registers({ fullscreen }) {
   const [addCat, setAddCat] = useState('');
   const [addPrice, setAddPrice] = useState('');
   const [addUnit, setAddUnit] = useState('');
+  const [addType, setAddType] = useState('product');
+  const [addSku, setAddSku] = useState('');
+  const [addBarcode, setAddBarcode] = useState('');
+  const [addWeight, setAddWeight] = useState('0');
+  const [addWeightUnit, setAddWeightUnit] = useState('кг');
+  const [addDesc, setAddDesc] = useState('');
   const [showPay, setShowPay] = useState(false);
   const [paySplit, setPaySplit] = useState(false);
   const [payUnpaid, setPayUnpaid] = useState(false);
@@ -138,11 +144,14 @@ export default function Registers({ fullscreen }) {
     const price = parseFloat(addPrice) || 0;
     const { error } = await supabase.from('products').insert({
       name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
-      type: 'product', user_id: user.id, hidden: false,
+      type: addType, sku: addSku.trim(), barcode: addBarcode.trim(),
+      weight: parseFloat(addWeight) || 0, weight_unit: addWeightUnit,
+      description: addDesc, user_id: user.id, hidden: false,
     });
     if (error) return setToast('❌ ' + error.message);
     setShowAdd(false);
-    setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit('');
+    setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product');
+    setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc('');
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
     if (data) setProducts(data.filter(p => !p.hidden));
@@ -222,7 +231,7 @@ export default function Registers({ fullscreen }) {
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="🔍 Поиск"
             style={{flex:1,border:'1px solid #eee',borderRadius:'10px',padding:'9px 14px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxShadow:'0 1px 4px rgba(0,0,0,.05)'}} />
-          <button style={{padding:'9px 16px',border:'none',borderRadius:'10px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+ Товар</button>
+          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'9px 16px',border:'none',borderRadius:'10px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+ Добавить позицию</button>
         </div>
 
         {/* Категории */}
@@ -265,7 +274,7 @@ export default function Registers({ fullscreen }) {
       {/* Модалка добавления товара */}
       {showAdd && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowAdd(false); }}>
-          <div className="modal-box" style={{maxWidth:'380px'}}>
+          <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={() => setShowAdd(false)}>&times;</button>
             <h2>Добавить позицию</h2>
             <div className="sub">Новый товар появится в каталоге и разделе «Каталог позиций»</div>
@@ -274,12 +283,21 @@ export default function Registers({ fullscreen }) {
                 <label>Название</label>
                 <input type="text" value={addName} onChange={e => setAddName(e.target.value)} required placeholder="Например: свечи зажигания" />
               </div>
-              <div className="form-group">
-                <label>Категория</label>
-                <select value={addCat} onChange={e => setAddCat(e.target.value)}>
-                  <option value="">— без категории —</option>
-                  {allCats.filter(c => c.type === 'product').map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                </select>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Категория</label>
+                  <select value={addCat} onChange={e => setAddCat(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {allCats.filter(c => c.type === 'product').map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Тип</label>
+                  <select value={addType} onChange={e => setAddType(e.target.value)}>
+                    <option value="product">Товар</option>
+                    <option value="service">Услуга</option>
+                  </select>
+                </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -289,12 +307,42 @@ export default function Registers({ fullscreen }) {
                 <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={addUnit} onChange={e => setAddUnit(e.target.value)}>
+                    <option value="">— выберите —</option>
                     <option value="шт">шт</option>
                     <option value="кг">кг</option>
                     <option value="л">л</option>
                     <option value="усл">усл</option>
                   </select>
                 </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Артикул</label>
+                  <input type="text" value={addSku} onChange={e => setAddSku(e.target.value)} placeholder="ART-001" />
+                </div>
+                {addType !== 'service' && <div className="form-group">
+                  <label>Штрихкод</label>
+                  <input type="text" value={addBarcode} onChange={e => setAddBarcode(e.target.value)} placeholder="4600000000000" />
+                </div>}
+                {addType === 'service' && <div className="form-group"></div>}
+              </div>
+              {addType !== 'service' && <div className="form-row">
+                <div className="form-group">
+                  <label>Вес</label>
+                  <input type="number" min="0" step="0.01" value={addWeight} onChange={e => setAddWeight(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Ед. веса</label>
+                  <select value={addWeightUnit} onChange={e => setAddWeightUnit(e.target.value)}>
+                    <option value="г">г</option>
+                    <option value="кг">кг</option>
+                    <option value="т">т</option>
+                  </select>
+                </div>
+              </div>}
+              <div className="form-group">
+                <label>Описание</label>
+                <textarea rows="2" value={addDesc} onChange={e => setAddDesc(e.target.value)} placeholder="Дополнительная информация..." />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">Добавить</button>
