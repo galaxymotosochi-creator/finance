@@ -113,12 +113,12 @@ export default function Shifts() {
         <table>
           <thead id="colHeaders">
             <tr>
-              <th style={{textAlign:'left',paddingLeft:0}}>Дата</th>
-              <th style={{textAlign:'left'}}>Время открытия</th>
+              <th style={{textAlign:'left'}}>Дата</th>
+              <th>Время открытия</th>
               <th>Смена №</th>
-              <th style={{textAlign:'left'}}>Кассир</th>
+              <th>Кассир</th>
               <th>Начальный остаток</th>
-              <th style={{textAlign:'left'}}>Касса</th>
+              <th>Касса</th>
               <th>Конечный остаток</th>
               <th>Время закрытия</th>
               <th>Статус</th>
@@ -139,11 +139,11 @@ export default function Shifts() {
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',fontSize:'.82rem'}}>{dateStr}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{timeOpen}</td>
+                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{timeOpen}</td>
                   <td style={{fontSize:'.82rem'}}>{'#'+(idx+1)}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>{s.cashier_name || '—'}</td>
+                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{s.cashier_name || '—'}</td>
                   <td>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'var(--muted)'}}>Основная</td>
+                  <td style={{fontSize:'.78rem',color:'var(--muted)'}}>Основная</td>
                   <td style={{fontWeight:600}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{timeClose}</td>
                   <td><span style={{fontSize:'.72rem',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
