@@ -8,7 +8,10 @@ export default function Settings() {
   const { user } = useAuth();
   const [toast, setToast] = useState(null);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
-  const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
+  const [company, setCompany] = useState(() => {
+    const saved = localStorage.getItem('companyLogo');
+    return { name: '', address: '', regNumber: '', phone: '', email: '', logo: saved || null };
+  });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
   const [currency, setCurrency] = useState('RUB');
@@ -119,7 +122,27 @@ export default function Settings() {
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
               className='sett-input' style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
-            <button style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Загрузить логотип</button>
+            <input type="file" accept="image/*" id="logoInput" style={{display:'none'}} onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  const dataUrl = ev.target.result;
+                  localStorage.setItem('companyLogo', dataUrl);
+                  setCompany({...company, logo: dataUrl});
+                  setToast('✅ Логотип загружен');
+                };
+                reader.readAsDataURL(file);
+              }} />
+              {company.logo && (
+                <img src={company.logo} alt="logo" style={{width:28,height:28,borderRadius:6,objectFit:'cover',flexShrink:0}} />
+              )}
+              <button onClick={() => document.getElementById('logoInput').click()} 
+                style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{company.logo ? 'Заменить' : 'Загрузить логотип'}</button>
+              {company.logo && (
+                <button onClick={() => { localStorage.removeItem('companyLogo'); setCompany({...company, logo: null}); }} 
+                  style={{ padding: '.5rem .7rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', color:'#999' }}>✕</button>
+              )}
           </div>
         </div>
       </div>
