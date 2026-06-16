@@ -14,6 +14,22 @@ export default function Settings() {
   const [currency, setCurrency] = useState('RUB');
   const [tz, setTz] = useState('Europe/Moscow');
   const [tzSearch, setTzSearch] = useState('Москва');
+  
+  // Load saved settings on mount
+  useEffect(() => {
+    const savedCompany = localStorage.getItem('settings_company');
+    if (savedCompany) setCompany(prev => ({...prev, ...JSON.parse(savedCompany)}));
+    const savedCountry = localStorage.getItem('settings_country');
+    if (savedCountry) setCountry(savedCountry);
+    const savedLang = localStorage.getItem('settings_lang');
+    if (savedLang) setLang(savedLang);
+    const savedCurrency = localStorage.getItem('settings_currency');
+    if (savedCurrency) setCurrency(savedCurrency);
+    const savedTz = localStorage.getItem('settings_tz');
+    if (savedTz) { setTz(savedTz); }
+    const savedNotifs = localStorage.getItem('settings_notifications');
+    if (savedNotifs) setNotifications(JSON.parse(savedNotifs));
+  }, []);
   const [tzDrop, setTzDrop] = useState(false);
   const cityTz = {
     'Москва':'Europe/Moscow','Санкт-Петербург':'Europe/Moscow','Новосибирск':'Asia/Novosibirsk',
@@ -199,7 +215,15 @@ export default function Settings() {
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
-        <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
+        <button onClick={() => {
+            localStorage.setItem('settings_company', JSON.stringify(company));
+            localStorage.setItem('settings_country', country);
+            localStorage.setItem('settings_lang', lang);
+            localStorage.setItem('settings_currency', currency);
+            localStorage.setItem('settings_tz', tz);
+            localStorage.setItem('settings_notifications', JSON.stringify(notifications));
+            setToast('✅ Настройки сохранены');
+          }} style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
     </div>
   );
