@@ -551,3 +551,10 @@ body {
 .emp-rule-add { font-size: .75rem; color: var(--secondary); background: none; border: 1px dashed var(--secondary); border-radius: var(--radius-sm); padding: .25rem .6rem; cursor: pointer; margin-bottom: .5rem; font-family: var(--font); }
 .emp-rule-add:hover { background: var(--secondary-light); }
 .emp-rule-pct-label { font-size: .75rem; color: var(--muted); min-width: 14px; }
+
+/* Глобальный фокус на полях ввода */
+input:focus, select:focus, textarea:focus {
+  border-color: var(--secondary) !important;
+  box-shadow: 0 0 0 3px rgba(66, 139, 249, .15) !important;
+  outline: none;
+}

@@ -53,10 +53,7 @@ export default function Settings() {
 
   return (
     <div style={{ fontFamily: "'Inter',sans-serif", color: '#111' }}>
-      <style>{`
-        .sett-input:focus, .sett-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(11,197,234,.25); border-color: #0bc5ea; }
-        .sett-input, .sett-select { transition: box-shadow .15s, border-color .15s; }
-      `}</style>
+      
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
       )}
@@ -70,21 +67,21 @@ export default function Settings() {
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Страна</label>
             <select value={country} onChange={e => { setCountry(e.target.value); setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB'); }}
-              className='sett-select' style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {countries.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Язык интерфейса</label>
             <select value={lang} onChange={e => setLang(e.target.value)}
-              className='sett-select' style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {['Русский', 'Казахский', 'Английский'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Валюта по умолчанию</label>
             <select value={currency} onChange={e => setCurrency(e.target.value)}
-              className='sett-select' style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {['RUB', 'KZT', 'BYN', 'AMD', 'UZS', 'KGS'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
@@ -95,7 +92,7 @@ export default function Settings() {
                 onChange={e => { setTzSearch(e.target.value); setTzDrop(true); }}
                 onFocus={() => setTzDrop(true)}
                 onBlur={() => setTimeout(() => setTzDrop(false), 200)}
-                className='sett-input' className='sett-input' style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               {tzDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:10,boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:180,overflowY:'auto',marginTop:2}}>
                   {Object.entries(cityTz).filter(([city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).map(([city, zone]) => (
@@ -126,7 +123,7 @@ export default function Settings() {
             <div key={i}>
               <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
               <input value={val} onChange={e => setter(e.target.value)} placeholder={label}
-                className='sett-input' className='sett-input' style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             </div>
           ))}
         </div>
@@ -134,7 +131,7 @@ export default function Settings() {
           <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Email для счетов</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
-              className='sett-input' style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
+              style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
             <input type="file" accept="image/*" id="logoInput" style={{display:'none'}} onChange={async e => {
                 const file = e.target.files[0];
                 if (!file) return;
