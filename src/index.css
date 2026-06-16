@@ -552,6 +552,14 @@ body {
 .emp-rule-add:hover { background: var(--secondary-light); }
 .emp-rule-pct-label { font-size: .75rem; color: var(--muted); min-width: 14px; }
 
+/* Таблицы: первый столбец влево, остальные по центру */
+.product-table table td,
+.main .content table td { text-align: center; }
+.product-table table td:first-child,
+.main .content table td:first-child { text-align: left; }
+.product-table table th:first-child,
+.main .content table th:first-child { text-align: left; }
+
 /* Глобальный фокус на полях ввода */
 input:focus, select:focus, textarea:focus {
   border-color: var(--secondary) !important;
