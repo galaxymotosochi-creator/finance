@@ -101,41 +101,63 @@ export default function Registers({ fullscreen }) {
     if (!cart.length) return;
     const date = new Date().toISOString().split('T')[0];
     
+    // Получаем или создаём категорию «Доход от продаж»
+    let saleCatId = null;
+    const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();
+    if (cats) {
+      saleCatId = cats.id;
+    } else {
+      const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Доход от продаж', type: 'income' }).select('id').single();
+      if (newCat) saleCatId = newCat.id;
+    }
+
+    // Номер чека
+    const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+    const receiptNum = (count || 0) + 1;
+
     if (payUnpaid) {
-      // Неоплаченный чек — одна транзакция без счёта
-      const { error } = await supabase.from('transactions').insert(
-        cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, status: 'unpaid' }))
-      );
+      // Неоплаченный чек — одна транзакция на весь чек без счёта
+      const { error } = await supabase.from('transactions').insert({
+        user_id: user.id, type: 'income', amount: total,
+        description: 'Продажа по чеку №' + receiptNum,
+        date, status: 'unpaid', category_id: saleCatId,
+      });
       if (error) return setToast('Ошибка: ' + error.message);
       setCart([]); setShowPay(false);
-      return setToast('✅ Чек сохранён (не оплачен)');
+      return setToast('✅ Чек №' + receiptNum + ' сохранён (не оплачен)');
     }
 
     if (paySplit) {
-      // Раздельная оплата
+      // Раздельная оплата — по одной транзакции на каждую часть
       const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
       if (entries.length === 0) return setToast('⚠️ Укажите суммы для оплаты');
       const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
       if (Math.abs(sum - total) > 0.01) return setToast('⚠️ Сумма оплаты не совпадает с итогом');
+      let part = 1;
       for (const [acId, amt] of entries) {
-        const { error } = await supabase.from('transactions').insert(
-          cart.map(i => ({ user_id: user.id, type: 'income', amount: (i.price * i.qty) * (parseFloat(amt) / total), description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: acId, status: 'paid' }))
-        );
+        const { error } = await supabase.from('transactions').insert({
+          user_id: user.id, type: 'income', amount: parseFloat(amt),
+          description: 'Продажа по чеку №' + receiptNum + ' (Часть ' + part + ')',
+          date, account_id: acId, status: 'paid', category_id: saleCatId,
+        });
         if (error) return setToast('Ошибка: ' + error.message);
+        part++;
       }
       setCart([]); setShowPay(false); setPayMode(null);
-      return setToast('✅ Оплачено с нескольких счетов');
+      return setToast('✅ Чек №' + receiptNum + ' — оплачено с нескольких счетов');
     }
 
-    // Обычная оплата на один счёт
+    // Обычная оплата на один счёт — одна транзакция на весь чек
     if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
-    const { error } = await supabase.from('transactions').insert(
-      cart.map(i => ({ user_id: user.id, type: 'income', amount: i.price * i.qty, description: i.name + (i.qty > 1 ? ' (' + i.qty + ' шт)' : ''), date, account_id: selectedAc?.id || null, status: 'paid' }))
-    );
+    const { error } = await supabase.from('transactions').insert({
+      user_id: user.id, type: 'income', amount: total,
+      description: 'Продажа по чеку №' + receiptNum,
+      date, account_id: selectedAc?.id || null, status: 'paid', category_id: saleCatId,
+    });
     if (error) return setToast('Ошибка: ' + error.message);
     setCart([]); setShowPay(false); setPayMode(null);
-    setToast('Продано на ' + total.toLocaleString() + ' руб');
+    setToast('✅ Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽');
   };
 
   const saveProduct = async (e) => {
@@ -360,7 +382,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2 style={{marginBottom:'16px'}}>Оплата чека <span>№{shiftTx.length + 1 || 1}</span></h2>
+            <h2 style={{marginBottom:'16px'}}>Оплата чека <span>№{(shiftTx.length || 0) + 1}</span></h2>
 
             {/* Список товаров */}
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'16px'}}>
