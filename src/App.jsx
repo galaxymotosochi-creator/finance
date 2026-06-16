@@ -34,6 +34,7 @@ import Loyalty from './pages/clients/Loyalty';
 import Positions from './pages/employees/Positions';
 import Employees from './pages/employees/Employees';
 import Timesheet from './pages/employees/Timesheet';
+import RegistersPage from './pages/Registers';
 
 function AppRoutes() {
   return (
@@ -47,7 +48,7 @@ function AppRoutes() {
       <Route path="/variant/3" element={<Variant3 />} />
       <Route path="/variant/4" element={<Variant4 />} />
       <Route path="/variant/5" element={<Variant5 />} />
-      <Route path="/registers" element={<ProtectedRoute><AppLayout><div>Касса</div></AppLayout></ProtectedRoute>} />
+      <Route path="/registers" element={<ProtectedRoute><AppLayout><RegistersPage /></AppLayout></ProtectedRoute>} />
 
       {/* Finance */}
       <Route path="/finance/pnl" element={<ProtectedRoute><AppLayout><PnL /></AppLayout></ProtectedRoute>} />
