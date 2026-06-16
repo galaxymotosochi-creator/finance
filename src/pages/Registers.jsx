@@ -172,7 +172,7 @@ export default function Registers({ fullscreen }) {
 
   return (
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
-      <div style={{display:'grid',gridTemplateColumns:'280px 1fr',flex:1,background:'#fff',borderRadius:'24px',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
+      <div style={{display:'grid',gridTemplateColumns:'280px 1fr',flex:1,flexShrink:0,background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
