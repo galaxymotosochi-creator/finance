@@ -309,7 +309,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2>Оплата чека</h2>
+            <h2>Оплата чека <span style={{fontSize:'13px',color:'#999',fontWeight:400}}>№{shiftTx.length + 1 || 1}</span></h2>
 
             {/* Список товаров */}
             <div style={{margin:'0 0 12px',fontSize:'.82rem',color:'var(--muted)'}}>
@@ -334,7 +334,7 @@ export default function Registers({ fullscreen }) {
                     padding:'8px 14px', borderRadius:'8px', border:'1.5px solid #eee',
                     background: payMode === a.id ? '#000' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
-                    fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',
+                    fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:0
                   }}>{a.name}</button>
                 ))}
               </div>
@@ -357,13 +357,15 @@ export default function Registers({ fullscreen }) {
                   const amt = parseFloat(splitAmts[a.id]) || 0;
                   const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                   return (
-                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
-                      <span style={{fontSize:'12px',minWidth:'80px',fontWeight:500}}>{a.name}</span>
-                      <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
-                        value={splitAmts[a.id] || ''} 
-                        onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
-                        style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'6px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
-                      <span style={{fontSize:'12px',color:'var(--muted)',minWidth:'40px',textAlign:'right'}}>₽</span>
+                    <div key={a.id} style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'6px'}}>
+                      <span style={{fontSize:'12px',minWidth:'70px',fontWeight:500,flexShrink:0}}>{a.name}</span>
+                      <div style={{position:'relative',flex:1}}>
+                        <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
+                          value={splitAmts[a.id] || ''} 
+                          onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
+                          style={{width:'100%',border:'1px solid #eee',borderRadius:'6px',padding:'6px 24px 6px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+                        <span style={{position:'absolute',right:'8px',top:'50%',transform:'translateY(-50%)',fontSize:'12px',color:'#999'}}>₽</span>
+                      </div>
                     </div>
                   );
                 })}
