@@ -527,8 +527,8 @@ export default function Registers({ fullscreen }) {
                 </tbody>
               </table>
             </div>
-            <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',justifyContent:'space-between',fontWeight:800,fontSize:'14px'}}>
-              <span>Итого</span>
+            <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
+              <span>Итого:</span>
               <span style={{color:'#16a34a'}}>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()}</span>
             </div>
             <div style={{padding:'0 24px 20px'}}>
