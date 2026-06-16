@@ -470,7 +470,13 @@ export default function Registers({ fullscreen }) {
                     style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
                   <span style={{fontSize:'13px',color:'#888'}}>₽ из {total.toLocaleString()} ₽</span>
                 </div>
-                <div style={{marginBottom:'12px'}}>
+                {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total && (
+                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Чек оплачен полностью</div>
+                )}
+              </div>
+            )}
+            
+            <div style={{marginBottom:'12px'}}>
               <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
               <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
                 <div style={{position:'relative',flex:1}}>
@@ -503,13 +509,6 @@ export default function Registers({ fullscreen }) {
                 </div>
               )}
             </div>
-                {payAmount && parseFloat(payAmount) >= total && (
-                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>
-                    Чек оплачен полностью
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Ползунок «Разделить на счета» */}
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
