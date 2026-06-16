@@ -16,6 +16,8 @@ export default function Registers({ fullscreen }) {
   const [activeShift, setActiveShift] = useState(null);
   const [showOpenShift, setShowOpenShift] = useState(false);
   const [accounts, setAccounts] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [selectedClient, setSelectedClient] = useState('');
   const [openShiftCashier, setOpenShiftCashier] = useState('');
   const [openShiftBal, setOpenShiftBal] = useState('0');
   const [showAdd, setShowAdd] = useState(false);
@@ -44,15 +46,17 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
+      if (clRes && clRes.data) setClients(clRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
       setLoading(false);
@@ -154,6 +158,10 @@ export default function Registers({ fullscreen }) {
     const selectedAc = accounts.find(a => a.id === payMode);
     const paidAmt = payAmount ? parseFloat(payAmount) : total;
     
+    if (paidAmt > 0 && paidAmt < total && !selectedClient) {
+      return setToast('⚠️ Выберите клиента для записи долга');
+    }
+    
     if (paidAmt > 0) {
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
@@ -163,14 +171,24 @@ export default function Registers({ fullscreen }) {
       if (error) return setToast('Ошибка: ' + error.message);
     }
     
-    // Долг на остаток
+    // Долг на остаток — записываем клиенту
     if (paidAmt > 0 && paidAmt < total) {
+      const remain = total - paidAmt;
+      // Транзакция долга (не влияет на Cash Flow)
       const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: total - paidAmt,
+        user_id: user.id, type: 'income', amount: remain,
         description: 'Долг по чеку №' + receiptNum,
         date, status: 'debt', category_id: saleCatId,
       });
       if (error) return setToast('Ошибка: ' + error.message);
+      
+      // Обновляем долг клиента
+      if (selectedClient) {
+        const client = clients.find(c => c.id === selectedClient);
+        const curDebt = parseFloat(client?.debt) || 0;
+        const { error: debtErr } = await supabase.from('clients').update({debt: curDebt - remain}).eq('id', selectedClient);
+        if (debtErr) console.error('Ошибка обновления долга клиента:', debtErr);
+      }
     }
     
     setCart([]); setShowPay(false); setPayMode(null);
@@ -448,8 +466,14 @@ export default function Registers({ fullscreen }) {
                   <span style={{fontSize:'13px',color:'#888'}}>₽ из {total.toLocaleString()} ₽</span>
                 </div>
                 {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
-                  <div style={{fontSize:'11px',color:'#dc2626',marginTop:'4px'}}>
-                    Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг
+                  <div style={{marginTop:'6px',background:'#fff3cd',borderRadius:'8px',padding:'8px 10px',fontSize:'12px'}}>
+                    <div style={{fontWeight:600,color:'#92400e',marginBottom:'6px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг</div>
+                    <label style={{fontSize:'11px',fontWeight:600,color:'#92400e',display:'block',marginBottom:'4px'}}>Выберите клиента для записи долга</label>
+                    <select value={selectedClient} onChange={e => setSelectedClient(e.target.value)}
+                      style={{width:'100%',border:'1px solid #f59e0b',borderRadius:'6px',padding:'6px 10px',fontSize:'12px',outline:'none',fontFamily:'inherit',background:'#fff'}}>
+                      <option value="">— выберите клиента —</option>
+                      {clients.map(c => <option key={c.id} value={c.id}>{c.name} {c.phone ? '· '+c.phone : ''}</option>)}
+                    </select>
                   </div>
                 )}
                 {payAmount && parseFloat(payAmount) >= total && (

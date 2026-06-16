@@ -12,12 +12,15 @@ export default function Clients() {
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [accounts, setAccounts] = useState([]);
 
   const [fName, setFName] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fEmail, setFEmail] = useState('');
   const [fBirthday, setFBirthday] = useState('');
   const [fComment, setFComment] = useState('');
+  const [debtPayAmt, setDebtPayAmt] = useState('');
+  const [debtPayAc, setDebtPayAc] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -27,6 +30,7 @@ export default function Clients() {
       if (data) setClientsState(data);
     } catch (e) { /* таблица еще не создана */ }
     setSalesState(getSales());
+    try { const { data: a } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('name'); if (a) setAccounts(a); } catch(e) {}
     setLoading(false);
   };
 
@@ -151,12 +155,13 @@ export default function Clients() {
               <th>Покупок</th>
               <th>Ср. чек</th>
               <th>Сумма</th>
+              <th>Долг</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
@@ -181,6 +186,7 @@ export default function Clients() {
                   <td>{st.checks > 0 ? st.checks : '—'}</td>
                   <td>{avg > 0 ? avg.toLocaleString()+'₽' : '—'}</td>
                   <td style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+'₽' : '—'}</td>
+                  <td style={{color: c.debt && c.debt < 0 ? '#dc2626' : '#999',fontWeight: c.debt && c.debt < 0 ? 700 : 400}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -236,6 +242,40 @@ export default function Clients() {
               {editId && (
                 <div style={{marginBottom:'.5rem'}}>
                   <button type="button" className="btn btn-outline" onClick={() => remove(editId)} style={{color:'#dc3545',borderColor:'#dc3545',width:'100%'}}>Удалить клиента</button>
+                </div>
+              )}
+              {editId && c.debt && c.debt < 0 && (
+                <div style={{marginBottom:'.5rem',borderTop:'1px solid #eee',paddingTop:'.5rem'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',marginBottom:'.5rem'}}>
+                    <span style={{color:'#dc2626',fontWeight:600}}>Текущий долг</span>
+                    <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(c.debt).toLocaleString()} ₽</span>
+                  </div>
+                  <div style={{display:'flex',gap:'.35rem'}}>
+                    <input type="number" min="0" step="0.01" placeholder="Сумма" value={debtPayAmt}
+                      onChange={e => setDebtPayAmt(e.target.value)}
+                      style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                    <select value={debtPayAc} onChange={e => setDebtPayAc(e.target.value)}
+                      style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff'}}>
+                      <option value="">Счёт</option>
+                      {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                    </select>
+                    <button type="button" className="btn btn-primary" style={{fontSize:'12px',padding:'8px 12px',whiteSpace:'nowrap'}}
+                      onClick={async () => {
+                        const amt = parseFloat(debtPayAmt);
+                        if (!amt || amt <= 0) return alert('Введите сумму');
+                        if (!debtPayAc) return alert('Выберите счёт');
+                        const newDebt = Math.min(0, (parseFloat(c.debt) || 0) + amt);
+                        await supabase.from('clients').update({debt: newDebt}).eq('id', editId);
+                        await supabase.from('transactions').insert({
+                          user_id: user.id, type: 'income', amount: amt,
+                          description: 'Погашение долга от ' + c.name,
+                          date: new Date().toISOString().split('T')[0],
+                          account_id: debtPayAc, status: 'paid'
+                        });
+                        setDebtPayAmt(''); setDebtPayAc('');
+                        await load();
+                      }}>Погасить</button>
+                  </div>
                 </div>
               )}
               <div className="modal-actions">
