@@ -262,8 +262,8 @@ export default function Registers({ fullscreen }) {
               style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%'}}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
-              {p.cat && <div style={{fontSize:'10px',color:'#999',flexShrink:0}}>{p.cat}</div>}
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3,minHeight:'34px'}}>{p.name}</div>
+              {p.cat && <div style={{fontSize:'10px',color:'#999',flexShrink:0}}>{p.cat}</div>}
               <div style={{fontSize:'16px',fontWeight:800,color:'#000',marginTop:'auto',flexShrink:0}}>{(p.price||0).toLocaleString()} ₽</div>
             </div>
           ))}
