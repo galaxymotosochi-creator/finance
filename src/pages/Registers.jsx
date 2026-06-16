@@ -207,17 +207,6 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'12px',color:'#999'}}>ИТОГО:</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
             </div>
-            <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-              {accounts.map(a => (
-                <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                  flex:1, padding:'10px', borderRadius:'8px', border:'1.5px solid #eee',
-                  background: payMode === a.id ? '#000' : '#fff',
-                  color: payMode === a.id ? '#fff' : '#555',
-                  fontSize:'11px', fontWeight:600, cursor:'pointer', textAlign:'center',
-                  fontFamily:'inherit', whiteSpace:'nowrap', minWidth:0,
-                }}>{a.name}</button>
-              ))}
-            </div>
             <button onClick={openPay} disabled={!cart.length} style={{
               width:'100%', padding:'13px', borderRadius:'100px', border:'none',
               background:'#000', color:'#fff', fontSize:'14px', fontWeight:700,
