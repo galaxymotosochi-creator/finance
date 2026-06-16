@@ -102,12 +102,7 @@ export default function Shifts() {
           <h1>Кассовые смены</h1>
           <div className="sub">Контроль работы касс и выручки</div>
         </div>
-        <div className="page-actions">
-          {activeShift && (
-            <button className="btn-mint" onClick={() => { setCloseBal(''); setCloseNote(''); setShowClose(activeShift); }}
-              style={{background:'#dc2626',color:'#fff'}}>✕ Закрыть смену</button>
-          )}
-        </div>
+
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
@@ -127,12 +122,11 @@ export default function Shifts() {
               <th>Конечный остаток</th>
               <th>Время закрытия</th>
               <th>Статус</th>
-              <th className="actions"></th>
             </tr>
           </thead>
           <tbody>
             {shifts.length === 0 ? (
-              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
+              <tr><td colSpan="9"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
             ) : shifts.map((s, idx) => {
               const income = getShiftIncome(s);
               const expense = getShiftExpense(s);
@@ -153,11 +147,6 @@ export default function Shifts() {
                   <td style={{fontWeight:600}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{fontSize:'.78rem',color:'var(--muted)'}}>{timeClose}</td>
                   <td><span style={{fontSize:'.72rem',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
-                  <td style={{textAlign:'right'}}>
-                    {isOpen && (
-                      <button className="act-btn prod-edit-btn" onClick={() => { setCloseBal(''); setCloseNote(''); setShowClose(s); }}>Закрыть</button>
-                    )}
-                  </td>
                 </tr>
               );
             })}
