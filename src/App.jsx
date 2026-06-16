@@ -36,6 +36,16 @@ import Employees from './pages/employees/Employees';
 import Timesheet from './pages/employees/Timesheet';
 import RegistersPage from './pages/Registers';
 
+function FullKassa() {
+  return (
+    <div style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f5f5f7'}}>
+      <div style={{flex:1,overflow:'hidden'}}>
+        <RegistersPage fullscreen />
+      </div>
+    </div>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -49,6 +59,7 @@ function AppRoutes() {
       <Route path="/variant/4" element={<Variant4 />} />
       <Route path="/variant/5" element={<Variant5 />} />
       <Route path="/registers" element={<ProtectedRoute><AppLayout><RegistersPage /></AppLayout></ProtectedRoute>} />
+      <Route path="/kassa" element={<ProtectedRoute><FullKassa /></ProtectedRoute>} />
 
       {/* Finance */}
       <Route path="/finance/pnl" element={<ProtectedRoute><AppLayout><PnL /></AppLayout></ProtectedRoute>} />
