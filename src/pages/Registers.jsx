@@ -182,10 +182,10 @@ export default function Registers({ fullscreen }) {
       {/* Левая панель — чек */}
       <div style={{width:'280px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
         {/* Шапка Вариант 3 — плашка с тенью */}
-        <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'8px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
-          <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ff6052',display:'inline-block'}}></span>
-          <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ffbd2e',display:'inline-block'}}></span>
-          <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
+        <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
+          <span style={{width:'14px',height:'14px',borderRadius:'50%',background:'#ff6052',display:'inline-block'}}></span>
+          <span style={{width:'14px',height:'14px',borderRadius:'50%',background:'#ffbd2e',display:'inline-block'}}></span>
+          <span style={{width:'14px',height:'14px',borderRadius:'50%',background:'#28c93f',display:'inline-block'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
