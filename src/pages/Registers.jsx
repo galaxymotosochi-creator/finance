@@ -172,7 +172,7 @@ export default function Registers({ fullscreen }) {
 
   return (
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
-      <div style={{display:'grid',gridTemplateColumns:'280px 1fr',flex:1,flexShrink:0,background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
+      <div style={{display:'flex',flex:1,flexShrink:0,width:'100%',background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
@@ -180,7 +180,7 @@ export default function Registers({ fullscreen }) {
       )}
 
       {/* Левая панель — чек */}
-      <div style={{display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
+      <div style={{width:'280px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
         {/* Шапка Вариант 3 — плашка с тенью */}
         <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'8px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
           <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ff6052',display:'inline-block'}}></span>
@@ -226,7 +226,7 @@ export default function Registers({ fullscreen }) {
       </div>
 
       {/* Правая панель — товары */}
-      <div style={{display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
