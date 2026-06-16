@@ -451,11 +451,11 @@ export default function Registers({ fullscreen }) {
                 <thead>
                   <tr style={{borderBottom:'1px solid #eee'}}>
                     <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Чек</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Товар</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Время</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Способ</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Статус</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'right'}}>Сумма</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Товар</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Время</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Способ</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Статус</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -464,14 +464,14 @@ export default function Registers({ fullscreen }) {
                     const time = new Date(t.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
                     return (
                       <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
-                        <td style={{padding:'10px 10px',fontWeight:600}}>{i + 1}</td>
-                        <td style={{padding:'10px 10px'}}>{t.description}</td>
-                        <td style={{padding:'10px 10px',color:'#999'}}>{time}</td>
-                        <td style={{padding:'10px 10px'}}>{ac?.name || '—'}</td>
-                        <td style={{padding:'10px 10px'}}>
+                        <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{i + 1}</td>
+                        <td style={{padding:'10px 10px',textAlign:'center'}}>{t.description}</td>
+                        <td style={{padding:'10px 10px',color:'#999',textAlign:'center'}}>{time}</td>
+                        <td style={{padding:'10px 10px',textAlign:'center'}}>{ac?.name || '—'}</td>
+                        <td style={{padding:'10px 10px',textAlign:'center'}}>
                           <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'unpaid' ? '#fef2f2' : '#f0fdf4',color: t.status === 'unpaid' ? '#dc2626' : '#16a34a'}}>{t.status === 'unpaid' ? 'Долг' : 'Оплачен'}</span>
                         </td>
-                        <td style={{padding:'10px 10px',textAlign:'right',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
+                        <td style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
                       </tr>
                     );
                   })}
