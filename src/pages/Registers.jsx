@@ -136,13 +136,13 @@ export default function Registers() {
                     background: payMode === 'cash' ? '#f0fdf4' : 'transparent',
                     color: payMode === 'cash' ? '#16a34a' : '#555',
                     fontSize:'.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit',
-                  }}>💵 Наличные</button>
+                  }}>Наличные</button>
                   <button onClick={() => setPayMode('card')} style={{
                     flex:1, padding:'7px 0', borderRadius:'8px', border:'1.5px solid var(--border)',
                     background: payMode === 'card' ? '#e0f2fe' : 'transparent',
                     color: payMode === 'card' ? '#0369a1' : '#555',
                     fontSize:'.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit',
-                  }}>💳 Карта</button>
+                  }}>Карта</button>
                 </div>
                 <button onClick={sell} style={{
                   width:'100%', padding:'10px 0', borderRadius:'100px', border:'none',
