@@ -545,16 +545,15 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowCloseShift(false); }}>
           <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={() => setShowCloseShift(false)}>&times;</button>
-            <h2>🔒 Закрытие смены</h2>
+            <h2>Закрытие смены</h2>
             <div className="sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
             
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'12px'}}>
               <div style={{display:'flex',justifyContent:'space-between'}}>
-                <span style={{color:'var(--muted)'}}>Начальный остаток</span>
-                <b>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</b>
+                <span>Начальный остаток</span>
+                <span>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</span>
               </div>
-              <div style={{borderTop:'1px solid #eee',margin:'6px 0'}}></div>
-              <div style={{fontWeight:600,marginBottom:'4px'}}>Доходы по счетам:</div>
+              <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               {(() => {
                 const byAc = {};
                 shiftTx.filter(t => t.type === 'income').forEach(t => {
@@ -564,14 +563,14 @@ export default function Registers({ fullscreen }) {
                 const acMap = {};
                 accounts.forEach(a => { acMap[a.id] = a.name; });
                 return Object.entries(byAc).map(([acId, amt]) => (
-                  <div key={acId} style={{display:'flex',justifyContent:'space-between',padding:'2px 0',fontSize:'12px'}}>
+                  <div key={acId} style={{display:'flex',justifyContent:'space-between',padding:'2px 0'}}>
                     <span>{acMap[acId] || 'Без счёта'}</span>
-                    <span style={{color:'#16a34a'}}>+{amt.toLocaleString()} ₽</span>
+                    <span>+{amt.toLocaleString()} ₽</span>
                   </div>
                 ));
               })()}
-              <div style={{borderTop:'1px solid #eee',margin:'6px 0'}}></div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'15px',fontWeight:800}}>
+              <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
+              <div style={{display:'flex',justifyContent:'space-between',fontWeight:800}}>
                 <span>Расчётный остаток</span>
                 <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
