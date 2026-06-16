@@ -38,7 +38,7 @@ export default function Register() {
       <div className="login-wrapper">
         <div className="login-card" style={{textAlign:'center'}}>
           <div style={{fontSize:'2.5rem',marginBottom:'.75rem'}}>📧</div>
-          <h1 style={{fontSize:'1.3rem',fontWeight:700,marginBottom:8,letterSpacing:'-.03em'}}>Письмо отправлено</h1>
+          <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:8,letterSpacing:'-.03em'}}>Письмо отправлено</h1>
           <p style={{fontSize:'.85rem',color:'rgba(0,0,0,.54)',lineHeight:1.4,marginBottom:8}}>
             Проверьте почту <strong>{email}</strong> и перейдите по ссылке в письме, чтобы подтвердить аккаунт.
           </p>
@@ -57,7 +57,7 @@ export default function Register() {
     <div className="login-wrapper">
       <div className="login-card">
         <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.34)',marginBottom:4,textAlign:'center'}}>FINANCE</div>
-        <h1 style={{fontSize:'1.3rem',fontWeight:700,textAlign:'center',marginBottom:4,letterSpacing:'-.03em'}}>Создать аккаунт</h1>
+        <h1 style={{fontSize:'1.2rem',fontWeight:700,textAlign:'center',marginBottom:4,letterSpacing:'-.03em'}}>Создать аккаунт</h1>
         <p style={{fontSize:.8,color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:20}}>Бесплатно, без привязки карты</p>
         <form onSubmit={handleSubmit}>
           <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required autoFocus />

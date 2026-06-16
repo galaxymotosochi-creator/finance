@@ -106,7 +106,7 @@ export default function Categories() {
       {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
       <div className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Финансовые категории</h1>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>Финансовые категории</h1>
           <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
         <div className="page-actions">

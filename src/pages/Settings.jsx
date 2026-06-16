@@ -57,12 +57,12 @@ export default function Settings() {
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
       )}
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
+      <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
       <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 24 }}>Компания, локализация, уведомления и данные</p>
 
       {/* 1. Локализация */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Локализация и стандарты</h2>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Локализация и стандарты</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Страна</label>
@@ -113,7 +113,7 @@ export default function Settings() {
 
       {/* 2. Профиль */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Профиль компании</h2>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Профиль компании</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
           {[['Название компании', company.name, v => setCompany({...company, name: v})],
             ['Юридический адрес', company.address, v => setCompany({...company, address: v})],
@@ -171,7 +171,7 @@ export default function Settings() {
 
       {/* 3. Уведомления */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>Уведомления и связь</h2>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>Уведомления и связь</h2>
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Канал уведомлений</div>
           <div style={{ display: 'flex', gap: 8 }}>

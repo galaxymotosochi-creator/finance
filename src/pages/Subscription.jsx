@@ -31,7 +31,7 @@ export default function Subscription() {
 
   return (
     <div style={{fontFamily:"'Inter',sans-serif",color:"#111",padding:"0 0 40px"}}>
-      <h1 style={{fontSize:"1.3rem",fontWeight:700,marginBottom:4,letterSpacing:"-.02em"}}>Управление подпиской</h1>
+      <h1 style={{fontSize:"1.2rem",fontWeight:700,marginBottom:4,letterSpacing:"-.02em"}}>Управление подпиской</h1>
       <p style={{fontSize:".82rem",color:"rgba(0,0,0,.54)",marginBottom:24}}>Ваш тариф и способы оплаты</p>
 
       {/* Статус */}
@@ -64,7 +64,7 @@ export default function Subscription() {
       </div>
 
       {/* Тарифы */}
-      <h2 style={{fontSize:"1.1rem",fontWeight:700,marginBottom:4,letterSpacing:"-.02em"}}>Сменить тариф</h2>
+      <h2 style={{fontSize:"1.15rem",fontWeight:700,marginBottom:4,letterSpacing:"-.02em"}}>Сменить тариф</h2>
       <p style={{fontSize:".82rem",color:"rgba(0,0,0,.54)",marginBottom:16}}>Выберите подходящий план</p>
 
       <div style={{display:"flex",gap:8,marginBottom:20}}>
@@ -133,7 +133,7 @@ export default function Subscription() {
       {/* Карты */}
       <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:20,marginBottom:16}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-          <h2 style={{fontSize:"1.1rem",fontWeight:700,letterSpacing:"-.02em"}}>Способы оплаты</h2>
+          <h2 style={{fontSize:"1.15rem",fontWeight:700,letterSpacing:"-.02em"}}>Способы оплаты</h2>
           <button style={{
             padding:"6px 14px",borderRadius:100,border:"none",background:"#000",color:"#fff",
             fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
@@ -182,7 +182,7 @@ export default function Subscription() {
           onClick={()=>setShowCancelModal(false)}>
           <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:360,textAlign:"center"}} onClick={e=>e.stopPropagation()}>
           <div style={{fontSize:'2rem',marginBottom:12,textAlign:'center'}}>💔</div>
-          <h2 style={{fontSize:"1.1rem",fontWeight:700,textAlign:'center',marginBottom:8}}>Отменить автопродление?</h2>
+          <h2 style={{fontSize:"1.15rem",fontWeight:700,textAlign:'center',marginBottom:8}}>Отменить автопродление?</h2>
           <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:'center',marginBottom:20,lineHeight:1.4}}>
             После отмены ваш тариф «{currentPlan.name}» будет активен до {currentPlan.until}, после чего подписка перейдёт на бесплатный тариф.
           </p>
@@ -206,7 +206,7 @@ export default function Subscription() {
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}>
           <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:360,textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,.12)'}}>
             <div style={{fontSize:'2.5rem',marginBottom:12}}>🎁</div>
-            <h2 style={{fontSize:"1.1rem",fontWeight:700,marginBottom:8}}>Мы хотим вас удержать!</h2>
+            <h2 style={{fontSize:"1.15rem",fontWeight:700,marginBottom:8}}>Мы хотим вас удержать!</h2>
             <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",marginBottom:16,lineHeight:1.4}}>
               Дарим вам персональную скидку <strong style={{color:'#16a34a'}}>10%</strong> на текущий тариф на следующие 3 месяца. Остаётесь?
             </p>
@@ -227,7 +227,7 @@ export default function Subscription() {
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}
           onClick={()=>setSwitchPlan(null)}>
           <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.12)"}} onClick={e=>e.stopPropagation()}>
-            <h2 style={{fontSize:"1.1rem",fontWeight:700,textAlign:"center",marginBottom:8}}>Смена тарифа</h2>
+            <h2 style={{fontSize:"1.15rem",fontWeight:700,textAlign:"center",marginBottom:8}}>Смена тарифа</h2>
             <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:4,lineHeight:1.4}}>
               Вы переходите на тариф <strong>{switchPlan.name}</strong>
             </p>
