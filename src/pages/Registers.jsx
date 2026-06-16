@@ -21,6 +21,8 @@ export default function Registers({ fullscreen }) {
   const [showAddClient, setShowAddClient] = useState(false);
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
+  const [clientSearch, setClientSearch] = useState('');
+  const [clientDrop, setClientDrop] = useState(false);
   const [openShiftCashier, setOpenShiftCashier] = useState('');
   const [openShiftBal, setOpenShiftBal] = useState('0');
   const [showAdd, setShowAdd] = useState(false);
@@ -471,12 +473,28 @@ export default function Registers({ fullscreen }) {
                 <div style={{marginBottom:'12px'}}>
               <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
               <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
-                <select value={selectedClient} onChange={e => setSelectedClient(e.target.value)}
-                  style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',color: selectedClient ? '#111' : '#999'}}>
-                  <option value="">— выберите клиента —</option>
-                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}{c.phone ? ' · '+c.phone : ''}</option>)}
-                </select>
-                <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); }} 
+                <div style={{position:'relative',flex:1}}>
+                  <input type="text" placeholder="Поиск по имени или телефону..." 
+                    value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
+                    onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
+                    onFocus={() => setClientDrop(true)}
+                    onBlur={() => setTimeout(() => setClientDrop(false), 200)}
+                    style={{width:'100%',border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxSizing:'border-box'}} />
+                  {clientDrop && (
+                    <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
+                      {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
+                        <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' · '+c.phone : '')); setClientDrop(false); }}
+                          style={{padding:'8px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
+                          onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
+                          onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{c.phone ? ' · '+c.phone : ''}</div>
+                      ))}
+                      {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).length === 0 && (
+                        <div style={{padding:'10px',fontSize:'12px',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setClientSearch(''); }} 
                   style={{padding:'8px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
               </div>
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
