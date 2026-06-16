@@ -134,7 +134,7 @@ export default function Registers({ fullscreen }) {
         {/* Итого и оплата */}
         <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'12px',color:'#999'}}>ИТОГО</span>
+              <span style={{fontSize:'12px',color:'#999'}}>ИТОГО:</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
             </div>
             <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
@@ -157,7 +157,7 @@ export default function Registers({ fullscreen }) {
       </div>
 
       {/* Правая панель — товары */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',padding:'16px',minWidth:0}}>
+      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',padding:'16px',minWidth:0,overflow:'hidden'}}>
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
