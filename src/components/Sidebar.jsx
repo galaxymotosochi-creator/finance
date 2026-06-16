@@ -87,6 +87,10 @@ export default function Sidebar() {
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
         <div className="sidebar-inner">
           <div className="sidebar-user">
+            {(() => {
+              const logo = globalThis.localStorage?.getItem('companyLogo');
+              return logo ? <img src={logo} alt="logo" style={{width:28,height:28,borderRadius:8,objectFit:'cover',marginLeft:collapsed?0:0,marginRight:collapsed?0:0,flexShrink:0}} /> : null;
+            })()}
             <div className="sidebar-toggle"
               onClick={() => {
                 if (window.innerWidth <= 768) { setMobileOpen(!mobileOpen); }
