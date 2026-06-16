@@ -28,6 +28,7 @@ export default function Positions() {
 
   const [fName, setFName] = useState('');
   const [fSalary, setFSalary] = useState('');
+  const [fPayType, setFPayType] = useState('fixed');
   const [fBonusType, setFBonusType] = useState('none');
   const [fBonusValue, setFBonusValue] = useState('');
   const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
@@ -59,13 +60,13 @@ export default function Positions() {
   useEffect(() => { load(); }, [user]);
 
   const openAdd = () => {
-    setEditId(null); setFName(''); setFSalary(''); setFBonusType('none');
+    setEditId(null); setFName(''); setFSalary(''); setFPayType('fixed'); setFBonusType('none');
     setFBonusValue(''); setFPermissions(['clients', 'stock']);
     setShow(true);
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setFName(p.name); setFSalary(String(p.salary||''));
+    setEditId(p.id); setFName(p.name); setFPayType(p.pay_type||'fixed'); setFSalary(String(p.salary||''));
     setFBonusType(p.bonus_type||'none'); setFBonusValue(String(p.bonus_value||''));
     setFPermissions(p.permissions||['clients','stock']);
     setShow(true);
@@ -78,7 +79,8 @@ export default function Positions() {
     try {
       const obj = {
         user_id: user.id, name: fName.trim(),
-        salary: parseFloat(fSalary)||0,
+        pay_type: fPayType,
+        salary: fPayType === 'fixed' ? parseFloat(fSalary)||0 : 0,
         bonus_type: fBonusType,
         bonus_value: parseFloat(fBonusValue)||0,
         permissions: fPermissions,
@@ -234,9 +236,19 @@ export default function Positions() {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Оклад (₽)</label>
-                  <input type="number" value={fSalary} onChange={e=>setFSalary(e.target.value)} placeholder="50000" min="0" />
+                  <label>Тип оплаты</label>
+                  <select value={fPayType} onChange={e => setFPayType(e.target.value)}>
+                    <option value="fixed">Фиксированная</option>
+                    <option value="piecework">Сдельная</option>
+                    <option value="percent">Процентная</option>
+                  </select>
                 </div>
+                {fPayType === 'fixed' && (
+                  <div className="form-group">
+                    <label>Сумма (₽)</label>
+                    <input type="number" value={fSalary} onChange={e=>setFSalary(e.target.value)} placeholder="50000" min="0" />
+                  </div>
+                )}
                 <div className="form-group">
                   <label>Тип бонуса</label>
                   <select value={fBonusType} onChange={e=>setFBonusType(e.target.value)}>

@@ -560,6 +560,13 @@ body {
 .product-table table th:first-child,
 .main .content table th:first-child { text-align: left; }
 
+/* Сетка прав доступа */
+.pos-perms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; margin-bottom: .5rem; }
+.pos-perm-check { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .12s; user-select: none; }
+.pos-perm-check:hover { background: var(--bg-light); }
+.pos-perm-check.checked { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
+.pos-perm-check-icon { font-size: .9rem; }
+
 /* Глобальный фокус на полях ввода */
 input:focus, select:focus, textarea:focus {
   border-color: var(--secondary) !important;
