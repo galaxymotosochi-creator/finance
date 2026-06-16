@@ -143,7 +143,7 @@ export default function Registers({ fullscreen }) {
     if (!addName.trim()) return setToast('⚠️ Введите название');
     const price = parseFloat(addPrice) || 0;
     const { error } = await supabase.from('products').insert({
-      name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
+      id: Date.now(), name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
       type: addType, sku: addSku.trim(), barcode: addBarcode.trim(),
       weight: parseFloat(addWeight) || 0, weight_unit: addWeightUnit,
       description: addDesc, user_id: user.id, hidden: false,
