@@ -492,13 +492,11 @@ export default function Registers({ fullscreen }) {
       {/* Чеки за смену */}
       {shiftTx.length > 0 && !showCloseShift && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setShiftTx([]); } }}>
-          <div className="modal-box" style={{maxWidth:'520px',display:'flex',flexDirection:'column',maxHeight:'80vh',padding:0}}>
-            <div style={{padding:'24px 24px 0'}}>
-              <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
-              <h2 style={{marginBottom:'4px'}}>Чеки за смену</h2>
-              <div className="sub" style={{marginBottom:'16px'}}>Все операции с момента открытия смены</div>
-            </div>
-            <div style={{overflowY:'auto',flex:1,padding:'0 24px'}}>
+          <div className="modal-box" style={{maxWidth:'520px'}}>
+            <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
+            <h2>Чеки за смену</h2>
+            <div className="sub" style={{marginBottom:'12px'}}>Все операции с момента открытия смены</div>
+            <div style={{overflowY:'auto',maxHeight:'50vh'}}>
               <table style={{width:'100%',borderCollapse:'collapse',fontSize:'13px'}}>
                 <thead>
                   <tr style={{borderBottom:'1px solid #eee'}}>
@@ -530,14 +528,12 @@ export default function Registers({ fullscreen }) {
                 </tbody>
               </table>
             </div>
-            <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
+            <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
               <span>Итого:</span>
               <span>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
-            <div style={{padding:'0 24px 20px'}}>
-              <div className="modal-actions">
-                <button className="btn btn-outline" onClick={() => setShiftTx([])}>Закрыть</button>
-              </div>
+            <div className="modal-actions">
+              <button className="btn btn-account-select" onClick={() => setShiftTx([])}>Закрыть</button>
             </div>
           </div>
         </div>
