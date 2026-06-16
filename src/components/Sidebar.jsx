@@ -127,7 +127,7 @@ export default function Sidebar() {
               return (
                 <a key={item.path}
                   className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
-                  onClick={() => item.external ? window.open(item.path, '_blank') : navigate(item.path)} href={item.external ? item.path : undefined} target={item.external ? '_blank' : undefined}>
+                  onClick={() => item.external ? window.open(window.location.origin + '/#/kassa', '_blank') : navigate(item.path)} target={item.external ? '_blank' : undefined}>
                   <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                   {!collapsed && item.label}
                 </a>
