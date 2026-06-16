@@ -18,6 +18,9 @@ export default function Registers({ fullscreen }) {
   const [accounts, setAccounts] = useState([]);
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+  const [showAddClient, setShowAddClient] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
   const [openShiftCashier, setOpenShiftCashier] = useState('');
   const [openShiftBal, setOpenShiftBal] = useState('0');
   const [showAdd, setShowAdd] = useState(false);
@@ -158,8 +161,8 @@ export default function Registers({ fullscreen }) {
     const selectedAc = accounts.find(a => a.id === payMode);
     const paidAmt = payAmount ? parseFloat(payAmount) : total;
     
-    if (paidAmt > 0 && paidAmt < total && !selectedClient) {
-      return setToast('⚠️ Выберите клиента для записи долга');
+    if (!selectedClient) {
+      return setToast('⚠️ Выберите клиента');
     }
     
     if (paidAmt > 0) {
@@ -465,17 +468,23 @@ export default function Registers({ fullscreen }) {
                     style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
                   <span style={{fontSize:'13px',color:'#888'}}>₽ из {total.toLocaleString()} ₽</span>
                 </div>
-                {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
-                  <div style={{marginTop:'6px',background:'#fff3cd',borderRadius:'8px',padding:'8px 10px',fontSize:'12px'}}>
-                    <div style={{fontWeight:600,color:'#92400e',marginBottom:'6px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг</div>
-                    <label style={{fontSize:'11px',fontWeight:600,color:'#92400e',display:'block',marginBottom:'4px'}}>Выберите клиента для записи долга</label>
-                    <select value={selectedClient} onChange={e => setSelectedClient(e.target.value)}
-                      style={{width:'100%',border:'1px solid #f59e0b',borderRadius:'6px',padding:'6px 10px',fontSize:'12px',outline:'none',fontFamily:'inherit',background:'#fff'}}>
-                      <option value="">— выберите клиента —</option>
-                      {clients.map(c => <option key={c.id} value={c.id}>{c.name} {c.phone ? '· '+c.phone : ''}</option>)}
-                    </select>
-                  </div>
-                )}
+                <div style={{marginBottom:'12px'}}>
+              <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
+              <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
+                <select value={selectedClient} onChange={e => setSelectedClient(e.target.value)}
+                  style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',color: selectedClient ? '#111' : '#999'}}>
+                  <option value="">— выберите клиента —</option>
+                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}{c.phone ? ' · '+c.phone : ''}</option>)}
+                </select>
+                <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); }} 
+                  style={{padding:'8px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
+              </div>
+              {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
+                <div style={{fontSize:'11px',color:'#92400e',marginTop:'4px',background:'#fff3cd',padding:'4px 8px',borderRadius:'6px'}}>
+                  Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг
+                </div>
+              )}
+            </div>
                 {payAmount && parseFloat(payAmount) >= total && (
                   <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>
                     Чек оплачен полностью
@@ -532,8 +541,46 @@ export default function Registers({ fullscreen }) {
 
             <div className="modal-actions">
               <button type="button" className="btn btn-outline" onClick={() => setShowPay(false)}>Отмена</button>
-              <button type="button" className="btn btn-account-select" onClick={processPay}>{payUnpaid ? 'Сохранить чек' : 'Пробить чек'}</button>
+              <button type="button" className="btn btn-account-select" onClick={processPay} disabled={!selectedClient} style={{opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить чек' : 'Пробить чек'}</button>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Модалка создания клиента */}
+      {showAddClient && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowAddClient(false); }}>
+          <div className="modal-box" style={{maxWidth:'380px'}}>
+            <button className="modal-close" onClick={() => setShowAddClient(false)}>&times;</button>
+            <h2>Новый клиент</h2>
+            <div className="sub" style={{marginBottom:'12px'}}>Добавьте клиента для привязки к чеку</div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!newClientName.trim()) return setToast('⚠️ Введите имя');
+              const { data, error } = await supabase.from('clients').insert({
+                user_id: user.id, name: newClientName.trim(), phone: newClientPhone.trim(),
+              }).select('id').single();
+              if (error) return setToast('Ошибка: ' + error.message);
+              // Обновляем список клиентов
+              const { data: clData } = await supabase.from('clients').select('*').eq('user_id', user.id).order('name');
+              if (clData) setClients(clData);
+              // Автоматически выбираем нового клиента
+              if (data) setSelectedClient(data.id);
+              setShowAddClient(false);
+              setToast('✅ Клиент добавлен');
+            }}>
+              <div className="form-group">
+                <label>Имя</label>
+                <input type="text" value={newClientName} onChange={e => setNewClientName(e.target.value)} required placeholder="Иван Иванов" autoFocus />
+              </div>
+              <div className="form-group">
+                <label>Телефон</label>
+                <input type="text" value={newClientPhone} onChange={e => setNewClientPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-account-select">Добавить</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
