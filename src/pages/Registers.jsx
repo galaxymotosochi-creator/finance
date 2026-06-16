@@ -146,7 +146,7 @@ export default function Registers({ fullscreen }) {
               ))}
             </div>
             <button onClick={sell} disabled={!payMode} style={{
-              width:'100%', padding:'13px', borderRadius:'8px', border:'none',
+              width:'100%', padding:'13px', borderRadius:'100px', border:'none',
               background:'#000', color:'#fff', fontSize:'14px', fontWeight:700,
               cursor:'pointer', fontFamily:'inherit', opacity: payMode ? 1 : 0.3,
             }}>Продажа</button>
@@ -163,35 +163,35 @@ export default function Registers({ fullscreen }) {
         </div>
 
         {/* Категории */}
-        <div style={{display:'flex',gap:'6px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
+        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
-            padding:'5px 14px', borderRadius:'100px', border:'none', fontSize:'11px',
+            padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'11px',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-            background: catFilter === 'all' ? '#000' : '#f5f5f5',
+            background: catFilter === 'all' ? '#000' : '#e8e8ed',
             color: catFilter === 'all' ? '#fff' : '#666', fontFamily:'inherit',
           }}>Все</button>
           {categories.map(c => (
             <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
-              padding:'5px 14px', borderRadius:'100px', border:'none', fontSize:'11px',
+              padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'11px',
               fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-              background: catFilter === c.name ? '#000' : '#f5f5f5',
+              background: catFilter === c.name ? '#000' : '#e8e8ed',
               color: catFilter === c.name ? '#fff' : '#666', fontFamily:'inherit',
             }}>{c.name}</button>
           ))}
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',alignContent:'start'}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
             <div key={p.id} onClick={() => addToCart(p)}
-              style={{background:'#fafafa',borderRadius:'12px',padding:'14px',cursor:'pointer',transition:'background .1s',display:'flex',flexDirection:'column',gap:'4px',minHeight:'70px'}}
-              onMouseEnter={e => e.currentTarget.style.background='#f0f0f0'}
-              onMouseLeave={e => e.currentTarget.style.background='#fafafa'}>
-              <div style={{fontSize:'12px',fontWeight:500,color:'#555',lineHeight:1.3}}>{p.name}</div>
-              <div style={{fontSize:'15px',fontWeight:800,color:'#000',marginTop:'6px'}}>{(p.price||0).toLocaleString()} ₽</div>
-              {p.cat && <div style={{fontSize:'10px',color:'#999',marginTop:'2px'}}>{p.cat}</div>}
+              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',gap:'4px',boxShadow:'0 1px 3px rgba(0,0,0,.03)'}}
+              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
+              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
+              <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3}}>{p.name}</div>
+              <div style={{fontSize:'16px',fontWeight:800,color:'#000'}}>{(p.price||0).toLocaleString()} ₽</div>
+              {p.cat && <div style={{fontSize:'10px',color:'#999'}}>{p.cat}</div>}
             </div>
           ))}
         </div>
