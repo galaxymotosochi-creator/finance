@@ -375,6 +375,7 @@ body {
   border: 1.5px solid var(--border); border-radius: var(--radius-md);
   outline: none; font-family: var(--font); background: var(--body-bg);
   color: var(--body-color); transition: border-color var(--transition), box-shadow var(--transition);
+  box-sizing: border-box; min-height: 38px;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
   border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(66,139,249,.12);
