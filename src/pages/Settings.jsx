@@ -195,20 +195,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* 4. Безопасность */}
-      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>Безопасность</h2>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button onClick={() => setToast('Функция будет доступна в следующем обновлении')}
-            style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>История входов</button>
-          <button onClick={async () => {
-            const { error } = await supabase.auth.resetPasswordForEmail(user?.email || '', { redirectTo: window.location.origin });
-            if (error) return setToast('Ошибка: ' + error.message);
-            setToast('✅ Письмо для сброса пароля отправлено на почту');
-          }}
-            style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Сменить пароль</button>
-        </div>
-      </div>
+
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
