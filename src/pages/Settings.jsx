@@ -122,17 +122,29 @@ export default function Settings() {
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
               className='sett-input' style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
-            <input type="file" accept="image/*" id="logoInput" style={{display:'none'}} onChange={e => {
+            <input type="file" accept="image/*" id="logoInput" style={{display:'none'}} onChange={async e => {
                 const file = e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  const dataUrl = ev.target.result;
-                  localStorage.setItem('companyLogo', dataUrl);
-                  setCompany({...company, logo: dataUrl});
+                const ext = file.name.split('.').pop();
+                const fileName = user?.id + '/' + Date.now() + '.' + ext;
+                try {
+                  const { error: upErr } = await supabase.storage.from('logos').upload(fileName, file, { upsert: true, contentType: file.type });
+                  if (upErr) throw upErr;
+                  const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(fileName);
+                  localStorage.setItem('companyLogo', publicUrl);
+                  setCompany({...company, logo: publicUrl});
                   setToast('✅ Логотип загружен');
-                };
-                reader.readAsDataURL(file);
+                } catch(err) {
+                  // Fallback: save as base64 if storage fails
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const dataUrl = ev.target.result;
+                    localStorage.setItem('companyLogo', dataUrl);
+                    setCompany({...company, logo: dataUrl});
+                    setToast('✅ Логотип сохранён локально');
+                  };
+                  reader.readAsDataURL(file);
+                }
               }} />
               {company.logo && (
                 <img src={company.logo} alt="logo" style={{width:28,height:28,borderRadius:6,objectFit:'cover',flexShrink:0}} />
