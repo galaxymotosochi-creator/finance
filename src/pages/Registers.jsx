@@ -202,7 +202,7 @@ export default function Registers({ fullscreen }) {
               </div>
               <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
                 <button onClick={() => updateQty(item.id, -1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>−</button>
-                <span style={{fontWeight:600,minWidth:'14px',textAlign:'center',fontSize:'13px'}}>{item.qty}</span>
+                <span style={{fontWeight:600,minWidth:'16px',textAlign:'center',fontSize:'13px',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
                 <button onClick={() => updateQty(item.id, 1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>+</button>
               </div>
               <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} ₽</div>
