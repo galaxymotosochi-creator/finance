@@ -32,6 +32,7 @@ export default function Registers({ fullscreen }) {
   const [showPay, setShowPay] = useState(false);
   const [paySplit, setPaySplit] = useState(false);
   const [payUnpaid, setPayUnpaid] = useState(false);
+  const [payAmount, setPayAmount] = useState('');
   const [splitAmts, setSplitAmts] = useState({});
   const [showActions, setShowActions] = useState(false);
   const [showCloseShift, setShowCloseShift] = useState(false);
@@ -94,6 +95,7 @@ export default function Registers({ fullscreen }) {
     setPaySplit(false);
     setPayUnpaid(false);
     setSplitAmts({});
+    setPayAmount('');
     setShowPay(true);
   };
 
@@ -147,15 +149,35 @@ export default function Registers({ fullscreen }) {
       return setToast('✅ Чек №' + receiptNum + ' — оплачено с нескольких счетов');
     }
 
-    // Обычная оплата на один счёт — одна транзакция на весь чек
+    // Обычная оплата на один счёт — с учётом частичной оплаты
     if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
-    const { error } = await supabase.from('transactions').insert({
-      user_id: user.id, type: 'income', amount: total,
-      description: 'Продажа по чеку №' + receiptNum,
-      date, account_id: selectedAc?.id || null, status: 'paid', category_id: saleCatId,
-    });
-    if (error) return setToast('Ошибка: ' + error.message);
+    const paidAmt = payAmount ? parseFloat(payAmount) : total;
+    
+    if (paidAmt > 0) {
+      const { error } = await supabase.from('transactions').insert({
+        user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
+        description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
+        date, account_id: selectedAc?.id || null, status: 'paid', category_id: saleCatId,
+      });
+      if (error) return setToast('Ошибка: ' + error.message);
+    }
+    
+    // Долг на остаток
+    if (paidAmt > 0 && paidAmt < total) {
+      const { error } = await supabase.from('transactions').insert({
+        user_id: user.id, type: 'income', amount: total - paidAmt,
+        description: 'Долг по чеку №' + receiptNum,
+        date, status: 'debt', category_id: saleCatId,
+      });
+      if (error) return setToast('Ошибка: ' + error.message);
+    }
+    
+    setCart([]); setShowPay(false); setPayMode(null);
+    const msg = paidAmt >= total 
+      ? '✅ Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
+      : '✅ Чек №' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
+    setToast(msg);
     setCart([]); setShowPay(false); setPayMode(null);
     setToast('✅ Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽');
   };
@@ -414,6 +436,30 @@ export default function Registers({ fullscreen }) {
               </div>
             </div>
 
+            {/* Сумма оплаты (для частичной оплаты) */}
+            {payMode && !paySplit && (
+              <div style={{marginBottom:'10px'}}>
+                <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Сумма к оплате</label>
+                <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
+                  <input type="number" min="0" step="0.01" placeholder={total.toString()} 
+                    value={payAmount} 
+                    onChange={e => setPayAmount(e.target.value)}
+                    style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                  <span style={{fontSize:'13px',color:'#888'}}>₽ из {total.toLocaleString()} ₽</span>
+                </div>
+                {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
+                  <div style={{fontSize:'11px',color:'#dc2626',marginTop:'4px'}}>
+                    Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг
+                  </div>
+                )}
+                {payAmount && parseFloat(payAmount) >= total && (
+                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>
+                    Чек оплачен полностью
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Ползунок «Разделить на счета» */}
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
               <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
@@ -541,7 +587,7 @@ export default function Registers({ fullscreen }) {
                         <td style={{padding:'10px 10px',color:'#999',textAlign:'center'}}>{time}</td>
                         <td style={{padding:'10px 10px',textAlign:'center'}}>{ac?.name || '—'}</td>
                         <td style={{padding:'10px 10px',textAlign:'center'}}>
-                          <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'unpaid' ? '#fef2f2' : '#f0fdf4',color: t.status === 'unpaid' ? '#dc2626' : '#16a34a'}}>{t.status === 'unpaid' ? 'Долг' : 'Оплачен'}</span>
+                          <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'debt' ? '#fef2f2' : t.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: t.status === 'debt' ? '#dc2626' : t.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{t.status === 'debt' ? 'Долг' : t.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                         </td>
                         <td style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
                       </tr>
@@ -552,7 +598,7 @@ export default function Registers({ fullscreen }) {
             </div>
             <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
               <span>Итого:</span>
-              <span>+{shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+              <span>+{shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
             <div className="modal-actions">
               <button className="btn btn-account-select" onClick={() => setShiftTx([])}>Закрыть</button>
@@ -577,7 +623,7 @@ export default function Registers({ fullscreen }) {
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               {(() => {
                 const byAc = {};
-                shiftTx.filter(t => t.type === 'income').forEach(t => {
+                shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').forEach(t => {
                   const key = t.account_id || 'unknown';
                   byAc[key] = (byAc[key] || 0) + (parseFloat(t.amount) || 0);
                 });
@@ -593,7 +639,7 @@ export default function Registers({ fullscreen }) {
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:800}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
             </div>
 
@@ -602,7 +648,7 @@ export default function Registers({ fullscreen }) {
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {
-              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
@@ -617,7 +663,7 @@ export default function Registers({ fullscreen }) {
               <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
                 const fact = parseFloat(closeFactBal);
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
-                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
                 const { error } = await supabase.from('shifts').update({
                   closed_at: new Date().toISOString(),
                   closing_balance: fact,
