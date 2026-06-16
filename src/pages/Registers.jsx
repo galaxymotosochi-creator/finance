@@ -263,7 +263,7 @@ export default function Registers({ fullscreen }) {
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3}}>{p.name}</div>
-              {p.cat && <div style={{fontSize:'10px',color:'#999'}}>{p.cat}</div>}
+              {p.cat && <div style={{fontSize:'10px',color:'#999',marginBottom:'2px'}}>{p.cat}</div>}
               <div style={{fontSize:'16px',fontWeight:800,color:'#000',marginTop:'auto'}}>{(p.price||0).toLocaleString()} ₽</div>
             </div>
           ))}
