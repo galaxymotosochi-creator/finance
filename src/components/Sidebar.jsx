@@ -13,7 +13,7 @@ const svgIcons = {
 
 const menu = [
   { label: 'Панель управления', path: '/dashboard', icon: 'dashboard' },
-  { label: 'Касса', path: '/registers', icon: 'registers' },
+  { label: 'Касса', path: '/kassa', icon: 'registers', external: true },
   {
     label: 'Финансы', icon: 'finance', children: [
       { label: 'Движение денег', path: '/finance/transactions' },
@@ -127,7 +127,7 @@ export default function Sidebar() {
               return (
                 <a key={item.path}
                   className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
-                  onClick={() => navigate(item.path)}>
+                  onClick={() => item.external ? window.open(item.path, '_blank') : navigate(item.path)} href={item.external ? item.path : undefined} target={item.external ? '_blank' : undefined}>
                   <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                   {!collapsed && item.label}
                 </a>
