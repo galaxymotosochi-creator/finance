@@ -172,7 +172,7 @@ export default function Registers({ fullscreen }) {
 
   return (
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
-      <div style={{display:'flex',flex:1,background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
+      <div style={{display:'grid',gridTemplateColumns:'280px 1fr',flex:1,background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
@@ -180,7 +180,7 @@ export default function Registers({ fullscreen }) {
       )}
 
       {/* Левая панель — чек */}
-      <div style={{width:'280px',minWidth:'280px',display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',height:'100%'}}>
+      <div style={{display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
         {/* Шапка Вариант 3 — плашка с тенью */}
         <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'8px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
           <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#ff6052',display:'inline-block'}}></span>
@@ -226,7 +226,7 @@ export default function Registers({ fullscreen }) {
       </div>
 
       {/* Правая панель — товары */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',padding:'16px'}}>
+      <div style={{display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%'}}>
         {/* Поиск */}
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -254,12 +254,12 @@ export default function Registers({ fullscreen }) {
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start',minHeight:0}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
             <div key={p.id} onClick={() => addToCart(p)}
-              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)'}}
+              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%'}}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3}}>{p.name}</div>
