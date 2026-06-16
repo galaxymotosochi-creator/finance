@@ -11,15 +11,43 @@ export default function Registers() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [payMode, setPayMode] = useState(null);
+  const [activeShift, setActiveShift] = useState(null);
+  const [showOpenShift, setShowOpenShift] = useState(false);
+  const [openShiftCashier, setOpenShiftCashier] = useState('');
+  const [openShiftBal, setOpenShiftBal] = useState('0');
+
+  // Имя пользователя из аккаунта
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
-      if (data) setProducts(data.filter(p => !p.hidden));
+      const [pRes, sRes] = await Promise.all([
+        supabase.from('products').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
+      ]);
+      if (pRes.data) setProducts(pRes.data.filter(p => !p.hidden));
+      if (sRes.data) {
+        setActiveShift(sRes.data);
+      } else {
+        setOpenShiftCashier(userName);
+        setShowOpenShift(true);
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  const openShift = async () => {
+    const bal = parseFloat(openShiftBal) || 0;
+    const { data, error } = await supabase.from('shifts').insert({
+      user_id: user.id, opening_balance: bal, status: 'open',
+      cashier_name: openShiftCashier.trim() || userName,
+    }).select().single();
+    if (error) return setToast('❌ ' + error.message);
+    if (data) setActiveShift(data);
+    setShowOpenShift(false);
+    setToast('✅ Смена открыта');
+  };
 
   useEffect(() => {
     if (toast) { const t = setTimeout(() => setToast(null), 2000); return () => clearTimeout(t); }
@@ -80,6 +108,14 @@ export default function Registers() {
         <div><h1>Касса</h1><div className="sub">Продажа товаров и услуг</div></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
+
+      {/* Статус смены */}
+      {activeShift && (
+        <div style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.45rem .7rem',background:'#f0fdf4',borderRadius:'8px',marginBottom:'10px',fontSize:'.75rem',color:'#333'}}>
+          <span style={{width:6,height:6,borderRadius:'50%',background:'#16a34a'}} />
+          <span>Смена открыта · {activeShift.cashier_name || '—'} · Остаток {(parseFloat(activeShift.opening_balance)||0).toLocaleString()} ₽</span>
+        </div>
+      )}
 
       <div style={{display:'flex',gap:'16px',alignItems:'stretch'}}>
         {/* Левая панель — ЧЕК */}
@@ -207,6 +243,30 @@ export default function Registers() {
           )}
         </div>
       </div>
+
+      {/* Модалка открытия смены */}
+      {showOpenShift && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
+          <div className="modal-box" style={{maxWidth:'380px'}}>
+            <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
+            <h2>Открытие смены</h2>
+            <div className="sub">Для работы кассы необходимо открыть смену</div>
+            <form onSubmit={e => { e.preventDefault(); openShift(); }}>
+              <div className="form-group">
+                <label>Кассир</label>
+                <input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Остаток денег на начало дня (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-account-select">Открыть смену</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
