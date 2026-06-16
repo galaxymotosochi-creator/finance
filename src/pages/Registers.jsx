@@ -90,7 +90,7 @@ export default function Registers({ fullscreen }) {
 
   return (
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
-      <div style={{background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)',display:'flex',flex:1}}>
+      <div style={{display:'flex',flex:1,background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
@@ -195,21 +195,24 @@ export default function Registers({ fullscreen }) {
           ))}
         </div>
       </div>
-    </div>
 
-    {showOpenShift && (
-      <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
-        <div className="modal-box" style={{maxWidth:'380px'}}>
-          <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
-          <h2>Открытие смены</h2>
-          <div className="sub">Для работы кассы необходимо открыть смену</div>
-          <form onSubmit={e => { e.preventDefault(); openShift(); }}>
-            <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
-            <div className="form-group"><label>Остаток денег на начало дня (руб)</label><input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus /></div>
-            <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
-          </form>
-        </div>
       </div>
-    )}
+
+      {/* Модалка открытия смены */}
+      {showOpenShift && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
+          <div className="modal-box" style={{maxWidth:'380px'}}>
+            <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
+            <h2>Открытие смены</h2>
+            <div className="sub">Для работы кассы необходимо открыть смену</div>
+            <form onSubmit={e => { e.preventDefault(); openShift(); }}>
+              <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
+              <div className="form-group"><label>Остаток денег на начало дня (руб)</label><input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus /></div>
+              <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
