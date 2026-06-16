@@ -549,8 +549,8 @@ export default function Registers({ fullscreen }) {
             <div className="sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
             
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'12px'}}>
-              <div style={{display:'flex',justifyContent:'space-between'}}>
-                <span>Начальный остаток</span>
+              <div style={{display:'flex'}}>
+                <span style={{flex:1}}>Начальный остаток</span>
                 <span>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</span>
               </div>
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
@@ -563,15 +563,15 @@ export default function Registers({ fullscreen }) {
                 const acMap = {};
                 accounts.forEach(a => { acMap[a.id] = a.name; });
                 return Object.entries(byAc).map(([acId, amt]) => (
-                  <div key={acId} style={{display:'flex',justifyContent:'space-between',padding:'2px 0'}}>
-                    <span>{acMap[acId] || 'Без счёта'}</span>
+                  <div key={acId} style={{display:'flex',padding:'2px 0'}}>
+                    <span style={{flex:1}}>{acMap[acId] || 'Без счёта'}</span>
                     <span>+{amt.toLocaleString()} ₽</span>
                   </div>
                 ));
               })()}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
-              <div style={{display:'flex',justifyContent:'space-between',fontWeight:800}}>
-                <span>Расчётный остаток</span>
+              <div style={{display:'flex',fontWeight:800}}>
+                <span style={{flex:1}}>Расчётный остаток</span>
                 <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
             </div>
