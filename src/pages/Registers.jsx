@@ -6,6 +6,7 @@ export default function Registers({ fullscreen }) {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [allCats, setAllCats] = useState([]);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
   const [cart, setCart] = useState([]);
@@ -17,6 +18,11 @@ export default function Registers({ fullscreen }) {
   const [accounts, setAccounts] = useState([]);
   const [openShiftCashier, setOpenShiftCashier] = useState('');
   const [openShiftBal, setOpenShiftBal] = useState('0');
+  const [showAdd, setShowAdd] = useState(false);
+  const [addName, setAddName] = useState('');
+  const [addCat, setAddCat] = useState('');
+  const [addPrice, setAddPrice] = useState('');
+  const [addUnit, setAddUnit] = useState('');
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
@@ -30,7 +36,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
       ]);
       if (pRes.data) setProducts(pRes.data.filter(p => !p.hidden));
-      if (cRes.data) setCategories(cRes.data.filter(c => c.type === 'product'));
+      if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
@@ -78,6 +84,23 @@ export default function Registers({ fullscreen }) {
     if (error) return setToast('Ошибка: ' + error.message);
     setCart([]); setPayMode(null);
     setToast('Продано на ' + total.toLocaleString() + ' руб');
+  };
+
+  const saveProduct = async (e) => {
+    e.preventDefault();
+    if (!addName.trim()) return setToast('⚠️ Введите название');
+    const price = parseFloat(addPrice) || 0;
+    const { error } = await supabase.from('products').insert({
+      name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
+      type: 'product', user_id: user.id, hidden: false,
+    });
+    if (error) return setToast('❌ ' + error.message);
+    setShowAdd(false);
+    setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit('');
+    // Refresh products
+    const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
+    if (data) setProducts(data.filter(p => !p.hidden));
+    setToast('✅ Товар добавлен!');
   };
 
   const openShift = async () => {
@@ -202,6 +225,48 @@ export default function Registers({ fullscreen }) {
       </div>
 
       </div>
+
+      {/* Модалка добавления товара */}
+      {showAdd && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowAdd(false); }}>
+          <div className="modal-box" style={{maxWidth:'380px'}}>
+            <button className="modal-close" onClick={() => setShowAdd(false)}>&times;</button>
+            <h2>Добавить позицию</h2>
+            <div className="sub">Новый товар появится в каталоге и разделе «Каталог позиций»</div>
+            <form onSubmit={saveProduct}>
+              <div className="form-group">
+                <label>Название</label>
+                <input type="text" value={addName} onChange={e => setAddName(e.target.value)} required placeholder="Например: свечи зажигания" />
+              </div>
+              <div className="form-group">
+                <label>Категория</label>
+                <select value={addCat} onChange={e => setAddCat(e.target.value)}>
+                  <option value="">— без категории —</option>
+                  {allCats.filter(c => c.type === 'product').map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Цена продажи (₽)</label>
+                  <input type="number" min="0" step="0.01" value={addPrice} onChange={e => setAddPrice(e.target.value)} placeholder="0" />
+                </div>
+                <div className="form-group">
+                  <label>Ед. измерения</label>
+                  <select value={addUnit} onChange={e => setAddUnit(e.target.value)}>
+                    <option value="шт">шт</option>
+                    <option value="кг">кг</option>
+                    <option value="л">л</option>
+                    <option value="усл">усл</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-account-select">Добавить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Модалка открытия смены */}
       {showOpenShift && (
