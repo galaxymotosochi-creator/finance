@@ -2,6 +2,9 @@ import { useAuth } from '../hooks/useAuth';
 import Sidebar from '../components/Sidebar';
 import AiChat from '../components/AiChat';
 import QuickSale from '../components/QuickSale';
+import QuickSupply from '../components/QuickSupply';
+import QuickIncome from '../components/QuickIncome';
+import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,12 +12,15 @@ export default function AppLayout({ children }) {
   const { user, signOut } = useAuth();
   const n = useNavigate();
   const [showSale, setShowSale] = useState(false);
+  const [showSupply, setShowSupply] = useState(false);
+  const [showIncome, setShowIncome] = useState(false);
+  const [showExpense, setShowExpense] = useState(false);
 
   const actions = [
     { label: 'Продажа', icon: '💳', action: () => setShowSale(true) },
-    { label: 'Поставка', icon: '📦', path: '/stock/products' },
-    { label: 'Доход', icon: '📈', path: '/finance/transactions' },
-    { label: 'Расход', icon: '📤', path: '/finance/transactions' },
+    { label: 'Поставка', icon: '📦', action: () => setShowSupply(true) },
+    { label: 'Доход', icon: '📈', action: () => setShowIncome(true) },
+    { label: 'Расход', icon: '📤', action: () => setShowExpense(true) },
   ];
 
   return (
@@ -47,6 +53,9 @@ export default function AppLayout({ children }) {
       </div>
       
       {showSale && <QuickSale onClose={() => setShowSale(false)} />}
+      {showSupply && <QuickSupply onClose={() => setShowSupply(false)} />}
+      {showIncome && <QuickIncome onClose={() => setShowIncome(false)} />}
+      {showExpense && <QuickExpense onClose={() => setShowExpense(false)} />}
     </>
   );
 }
