@@ -19,6 +19,12 @@ const BONUS_TYPES = [
   { value: 'category', label: 'Зависит от категории' },
 ];
 
+const PAY_TYPE_LABELS = {
+  fixed: 'Фиксированная',
+  piecework: 'Сдельная',
+  percent: 'Процентная',
+};
+
 export default function Positions() {
   const { user } = useAuth();
   const [positions, setPositionsState] = useState([]);
@@ -45,7 +51,6 @@ export default function Positions() {
       ]);
       if (posRes.error) { alert('Ошибка загрузки: ' + posRes.error.message); return; }
       if (posRes.data) setPositionsState(posRes.data);
-      // Считаем сотрудников по должностям
       const counts = {};
       if (empRes.data) {
         empRes.data.forEach(e => {
@@ -108,17 +113,28 @@ export default function Positions() {
     );
   };
 
-  const formatBonus = (p) => {
-    const bt = p.bonus_type;
-    const bv = p.bonus_value;
-    if (bt === 'none' || !bt) return null;
-    if (bt === 'percent') return `${bv}% с продаж`;
-    if (bt === 'fixed') return `${Number(bv).toLocaleString()}₽`;
-    if (bt === 'category') return 'Зависит от категории';
-    return null;
+  const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
+
+  const formatPayType = (p) => {
+    const pt = p.pay_type || 'fixed';
+    const label = PAY_TYPE_LABELS[pt] || pt;
+    return label;
   };
 
-  const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
+  const formatSalary = (p) => {
+    const pt = p.pay_type || 'fixed';
+    if (pt === 'fixed' && p.salary) return Number(p.salary).toLocaleString() + ' ₽';
+    if (pt === 'percent') return (p.salary || 0) + '%';
+    return '—';
+  };
+
+  const formatPermissions = (p) => {
+    if (!p.permissions || p.permissions.length === 0) return 'Нет доступов';
+    return p.permissions.map(permId => {
+      const sec = getSectionMeta(permId);
+      return sec ? sec.icon + ' ' + sec.label : permId;
+    }).join(', ');
+  };
 
   return (
     <>
@@ -135,90 +151,54 @@ export default function Positions() {
 
       {loading ? (
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+      ) : positions.length === 0 ? (
+        <div className="empty-products">
+          <div className="big-icon">👤</div>
+          <p>Список должностей пуст</p>
+          <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую должность, чтобы настроить шаблоны прав доступа</p>
+        </div>
       ) : (
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
-        gap: '1.25rem', padding: '.75rem 0',
-      }}>
-        {positions.length === 0 ? (
-          <div className="empty-products" style={{gridColumn:'1/-1'}}>
-            <div className="big-icon">👤</div>
-            <p>Список должностей пуст</p>
-            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую должность, чтобы настроить шаблоны прав доступа</p>
-          </div>
-        ) : positions.map(p => {
-          const bonus = formatBonus(p);
-          return (
-            <div key={p.id} className="pos-card">
-              {/* Шапка */}
-              <div className="pos-card-header">
-                <div className="pos-card-title">{p.name}</div>
-                <span className="pos-badge">Шаблон</span>
-              </div>
-
-              {/* Финансы */}
-              <div className="pos-card-section">
-                <div className="pos-row">
-                  <span className="pos-icon">👥</span>
-                  <span className="pos-label">
-                    В штате: <strong>{empCount[p.id] || 0} {empCount[p.id] === 1 ? 'человек' : 'человека'}</strong>
-                  </span>
-                </div>
-                <div className="pos-row">
-                  <span className="pos-icon">💰</span>
-                  <span className="pos-label">
-                    Оклад по умолчанию: <strong>{p.salary ? Number(p.salary).toLocaleString() + ' ₽' : '—'}</strong>
-                  </span>
-                </div>
-                {bonus && (
-                  <div className="pos-row">
-                    <span className="pos-icon">🎯</span>
-                    <span className="pos-label">
-                      Бонус за продажи: <strong>{bonus}</strong>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Разделитель */}
-              <div className="pos-divider" />
-
-              {/* Доступы */}
-              <div className="pos-card-section">
-                <div className="pos-perms-label">Группы прав доступа:</div>
-                <div className="pos-perms-tags">
-                  {p.permissions && p.permissions.length > 0 ? (
-                    p.permissions.map(permId => {
-                      const sec = getSectionMeta(permId);
-                      return sec ? (
-                        <span key={permId} className="pos-tag">{sec.icon} {sec.label}</span>
-                      ) : null;
-                    })
-                  ) : (
-                    <span style={{fontSize:'.82rem',color:'var(--muted)'}}>Нет доступов</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Подвал */}
-              <div className="pos-card-footer">
-                <button className="act-btn prod-edit-btn" onClick={() => openEdit(p)}>Ред.</button>
-                <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                  <button className="act-btn prod-more-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    const dd = e.currentTarget.nextElementSibling;
-                    document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                    dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
-                  }}>⋯</button>
-                  <div className="prod-dropdown">
-                    <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+        <div className="product-table">
+          <table>
+            <thead id="colHeaders">
+              <tr>
+                <th style={{textAlign:'left',paddingLeft:0,width:'26%'}}>Название должности</th>
+                <th style={{width:'16%'}}>Тип оплаты</th>
+                <th style={{width:'14%'}}>Сумма</th>
+                <th style={{textAlign:'left',width:'34%'}}>Группы прав доступа</th>
+                <th style={{width:'10%'}}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {positions.map(p => (
+                <tr key={p.id}>
+                  <td style={{textAlign:'left',paddingLeft:0}}>
+                    <span className="prod-name">{p.name}</span>
+                  </td>
+                  <td>{formatPayType(p)}</td>
+                  <td className="num">{formatSalary(p)}</td>
+                  <td style={{textAlign:'left',fontSize:'.8rem',color:'var(--body-color)'}}>
+                    {formatPermissions(p)}
+                  </td>
+                  <td style={{whiteSpace:'nowrap'}}>
+                    <button className="act-btn prod-edit-btn" style={{marginRight:'4px'}} onClick={() => openEdit(p)}>Ред.</button>
+                    <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
+                      <button className="act-btn prod-more-btn" onClick={(e) => {
+                        e.stopPropagation();
+                        const dd = e.currentTarget.nextElementSibling;
+                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+                        dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                      }}>⋯</button>
+                      <div className="prod-dropdown">
+                        <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Модалка */}
