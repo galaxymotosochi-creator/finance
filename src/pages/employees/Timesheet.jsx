@@ -107,8 +107,8 @@ export default function Timesheet() {
     return { hasBonus, hasDeduct, hasSick };
   };
 
-  const openDay = (d) => {
-    const ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  const openDay = (d, dateStr) => {
+    const ds = dateStr || (year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'));
     setShowDay(ds);
     const st = {};
     employees.forEach(emp => {
@@ -130,6 +130,14 @@ export default function Timesheet() {
     } else {
       setDeductRows([emptyRow()]);
     }
+  };
+
+  const openDayByDateStr = (dateStr) => {
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return;
+    setYear(parseInt(parts[0]));
+    setMonth(parseInt(parts[1]) - 1);
+    openDay(parseInt(parts[2]), dateStr);
   };
 
   const getEntry = (empId, dateStr) => entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(dateStr));
@@ -214,6 +222,14 @@ export default function Timesheet() {
     });
     return result;
   }, [entries, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo, tsTypeFilter]);
+
+  const deleteEntry = async (id) => {
+    if (!confirm('Удалить запись?')) return;
+    try {
+      await supabase.from('timesheet_entries').delete().eq('id', id);
+      await load();
+    } catch (err) { alert('Ошибка удаления: ' + err.message); }
+  };
 
   const getEmpName = (id) => employees.find(e => e.id === id)?.name || '—';
 
@@ -336,15 +352,16 @@ export default function Timesheet() {
               <thead id="colHeaders" style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase'}}>
                 <tr>
                   <th style={{textAlign:'left',paddingLeft:0,width:'12%'}}>Дата</th>
-                  <th style={{width:'28%',textAlign:'left'}}>Сотрудник</th>
-                  <th style={{width:'28%',textAlign:'left'}}>Статус</th>
-                  <th style={{width:'16%'}}>Бонус</th>
-                  <th style={{width:'16%'}}>Штраф</th>
+                  <th style={{width:'26%',textAlign:'left'}}>Сотрудник</th>
+                  <th style={{width:'26%',textAlign:'left'}}>Статус</th>
+                  <th style={{width:'15%'}}>Бонус</th>
+                  <th style={{width:'15%'}}>Штраф</th>
+                  <th style={{width:'6%'}}></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
-                  <tr><td colSpan={5} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
+                  <tr><td colSpan={6} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
                     <td style={{textAlign:'left',paddingLeft:0,fontWeight:500,fontSize:'.8rem',whiteSpace:'nowrap'}}>{fmtDate(e.date)}</td>
@@ -355,6 +372,17 @@ export default function Timesheet() {
                     </td>
                     <td style={{fontSize:'.8rem',color:(e.deduct_amount||0)>0?'#dc2626':'inherit',fontWeight:(e.deduct_amount||0)>0?600:400}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+'₽' : '—'}
+                    </td>
+                    <td style={{whiteSpace:'nowrap',padding:'.25rem .2rem'}}>
+                      <button className="act-btn prod-edit-btn" style={{marginRight:'2px',fontSize:'.68rem',padding:'.15rem .35rem'}}
+                        onClick={() => openDayByDateStr(e.date)}>Ред.</button>
+                      <span style={{position:'relative',display:'inline-block'}}>
+                        <button className="act-btn prod-more-btn" style={{fontSize:'.68rem',padding:'.15rem .25rem'}}
+                          onClick={function(ev){ev.stopPropagation();var dd=ev.currentTarget.nextElementSibling;dd&&dd.classList.toggle('open');}}>⋯</button>
+                        <div className="prod-dropdown" style={{right:0,left:'auto'}}>
+                          <button onClick={() => deleteEntry(e.id)} style={{color:'#dc3545',fontSize:'.75rem'}}>Удалить</button>
+                        </div>
+                      </span>
                     </td>
                   </tr>
                 )))}
