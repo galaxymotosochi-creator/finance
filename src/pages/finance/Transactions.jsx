@@ -230,7 +230,7 @@ export default function Transactions() {
           <div className="sub">Доходы, расходы и перемещения</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={function(){setShowActionSelect(true)}} style={{background:'var(--secondary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',padding:'.5rem .8rem',fontWeight:'600',fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Операция</button>
+          <button className="btn-mint" onClick={function(){setShowActionSelect(true)}} style={{background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',padding:'.5rem .8rem',fontWeight:'600',fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Операция</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
