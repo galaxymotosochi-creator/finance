@@ -37,11 +37,22 @@ export default function Settings() {
       try {
         const { data } = await supabase
           .from('user_profiles')
-          .select('last_name, first_name, patronymic')
+          .select('last_name, first_name, patronymic, settings')
           .eq('user_id', user.id)
           .maybeSingle();
-        if (data && (data.first_name || data.last_name)) {
-          setOwner({ lastName: data.last_name || '', firstName: data.first_name || '', patronymic: data.patronymic || '' });
+        if (data) {
+          if (data.first_name || data.last_name) {
+            setOwner({ lastName: data.last_name || '', firstName: data.first_name || '', patronymic: data.patronymic || '' });
+          }
+          if (data.settings) {
+            const s = data.settings;
+            if (s.company) setCompany(s.company);
+            if (s.country) setCountry(s.country);
+            if (s.lang) setLang(s.lang);
+            if (s.currency) setCurrency(s.currency);
+            if (s.timezone) setTz(s.timezone);
+            if (s.notifications) setNotifications(s.notifications);
+          }
         }
       } catch(e) { /* Таблица может отсутствовать */ }
     })();

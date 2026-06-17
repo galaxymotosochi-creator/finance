@@ -1,10 +1,11 @@
--- Таблица профилей пользователей (ФИО владельца аккаунта)
+-- Таблица профилей и настроек пользователя
 CREATE TABLE IF NOT EXISTS user_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   last_name TEXT DEFAULT '',
   first_name TEXT DEFAULT '',
   patronymic TEXT DEFAULT '',
+  settings JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
