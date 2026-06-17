@@ -168,7 +168,7 @@ export default function Salary() {
   const openEdit = (s) => {
     setEditId(s.id); setFEmpId(s.employee_id||'');
     setFPeriodFrom(s.period_from||''); setFPeriodTo(s.period_to||'');
-    setFBaseSalary(s.base_salary||0); setFSalaryType(s.salary_type||'fixed');
+    setFBaseSalary(s.base_salary||0); setFSalaryType('fixed');
     setFSalaryTotal(s.base_salary||0); setFDays(s.days_worked||0);
     setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
     setFDate(s.date||new Date().toISOString().split('T')[0]);
@@ -196,7 +196,7 @@ export default function Salary() {
         amount: grandTotal, status: fStatus, pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
         deduct_amount: checkedDeductTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })),
-        salary_type: fSalaryType, paid_at: fStatus === 'paid' ? fDate : null,
+        paid_at: fStatus === 'paid' ? fDate : null,
       };
       if (editId) { await supabase.from('salary').update(obj).eq('id', editId); }
       else { await supabase.from('salary').insert(obj); }
