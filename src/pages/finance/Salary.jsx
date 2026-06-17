@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
 const STATUS_COLORS = {accrued:'#2563eb',paid:'#16a34a',cancelled:'#dc2626'};
-const SALARY_TYPES = [{value:'fixed',label:'Фиксированный оклад'},{value:'piecework',label:'Сдельная'},{value:'percent',label:'Процентная'}];
+const SALARY_TYPES = [{value:'fixed',label:'Фиксированный оклад'},{value:'piecework',label:'Сдельная'}];
 
 function daysInMonth(y,m){return new Date(y,m,0).getDate()}
 
@@ -309,7 +309,7 @@ export default function Salary() {
                 <div style={{display:'flex',gap:'.35rem',alignItems:'flex-start'}}>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Оклад (мес.)</div>
-                    <input type="number" value={fBaseSalary} onChange={e=>setFBaseSalary(parseFloat(e.target.value)||0)}
+                    <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)}
                       style={{width:'100%',padding:'.3rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'3px'}}>Подтягивается из должности</div>
                   </div>
@@ -321,7 +321,7 @@ export default function Salary() {
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>За период</div>
-                    <input type="text" value={fSalaryTotal.toLocaleString()+'₽'} disabled
+                    <input type="text" value={fSalaryTotal.toLocaleString()+' ₽'} disabled
                       style={{width:'100%',padding:'.3rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export default function Salary() {
               <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden'}}>
                 <div style={{padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <span style={{fontSize:'.78rem',fontWeight:600,color:'#16a34a'}}>Премии из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()}₽</span>
+                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()} ₽</span>
                 </div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsBonuses.length === 0 ? (
@@ -340,8 +340,8 @@ export default function Salary() {
                     <>
                       <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
-                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
-                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
+                          <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
+                          <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
                           <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>За что</th>
                         </tr></thead>
                         <tbody>
@@ -353,8 +353,8 @@ export default function Salary() {
                                   {bonusChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
+                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.bonus_comment||'—'}</td>
                             </tr>
                           ))}
@@ -370,7 +370,7 @@ export default function Salary() {
               <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden'}}>
                 <div style={{padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <span style={{fontSize:'.78rem',fontWeight:600,color:'#dc2626'}}>Штрафы из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()}₽</span>
+                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()} ₽</span>
                 </div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsDeducts.length === 0 ? (
@@ -379,8 +379,8 @@ export default function Salary() {
                     <>
                       <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
-                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
-                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
+                          <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
+                          <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
                           <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>За что</th>
                         </tr></thead>
                         <tbody>
@@ -392,8 +392,8 @@ export default function Salary() {
                                   {deductChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600}}>-{Number(e.deduct_amount).toLocaleString()}₽</td>
+                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.deduct_comment||'—'}</td>
                             </tr>
                           ))}
@@ -418,9 +418,9 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(fSalaryTotal>0?'Оклад '+fSalaryTotal.toLocaleString()+'₽':'')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+'₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
+                  {(fSalaryTotal>0?'Оклад '+fSalaryTotal.toLocaleString()+' ₽':'')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+' ₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
                 </div>
-                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()}₽</div>
+                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} ₽</div>
               </div>
 
               {/* Кнопки */}
@@ -432,7 +432,7 @@ export default function Salary() {
                 </select>
                 <button type="submit"
                   style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
-                  Начислить {grandTotal.toLocaleString()}₽
+                  Начислить {grandTotal.toLocaleString()} ₽
                 </button>
               </div>
 
