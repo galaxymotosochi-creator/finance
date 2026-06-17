@@ -249,20 +249,33 @@ export default function Timesheet() {
               <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsPeriod!=='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
                 onClick={e=>{e.stopPropagation();setTsShowPeriod(!tsShowPeriod);}}>{tsPeriodLabel}</span>
               {tsShowPeriod && (
-                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
-                  {PERIOD_OPTS.map(p => (
-                    <div key={p.key} onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false)}}
-                      style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:tsPeriod===p.key?'var(--primary)':'var(--body-color)',fontWeight:tsPeriod===p.key?600:400,background:tsPeriod===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
-                  ))}
-                  <div style={{borderTop:'1px solid var(--border)',marginTop:'.25rem',paddingTop:'.25rem'}}>
-                    <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem'}}>Свой период</div>
+                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
+                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
+                    <span className="cat-dd-action" onClick={()=>{setTsPeriod('all');setTsPeriodLabel('Все время');}}>Очистить</span>
+                  </div>
+                  <div style={{maxHeight:'200px',overflowY:'auto'}}>
+                    {PERIOD_OPTS.map(p => {
+                      const isActive = tsPeriod === p.key;
+                      return (
+                        <div key={p.key} className="cat-dd-item" onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false)}}
+                          style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.8rem',color:isActive?'var(--secondary)':'var(--body-color)',fontWeight:isActive?600:400,background:isActive?'var(--secondary-light)':'transparent'}}>
+                          <span className={'cb' + (isActive ? ' checked' : '')} style={{width:'16px',height:'16px',border:'1.5px solid var(--border)',borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:isActive?'#fff':'transparent',flexShrink:0,background:isActive?'var(--secondary)':'transparent',borderColor:isActive?'var(--secondary)':'var(--border)'}}>
+                            {isActive ? '✓' : ''}
+                          </span>
+                          {p.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{borderTop:'1px solid var(--border)',marginTop:'.35rem',paddingTop:'.35rem'}}>
+                    <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem',marginBottom:'.25rem'}}>Свой период</div>
                     <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
-                      <input type="date" value={tsPeriodFrom} onChange={e=>setTsPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)'}} />
-                      <input type="date" value={tsPeriodTo} onChange={e=>setTsPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)'}} />
+                      <input type="date" value={tsPeriodFrom} onChange={e=>setTsPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
+                      <input type="date" value={tsPeriodTo} onChange={e=>setTsPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
                     </div>
                     <div style={{padding:'.25rem .5rem'}}>
                       <button onClick={()=>{if(!tsPeriodFrom||!tsPeriodTo)return alert('Выберите обе даты');setTsPeriod('custom');setTsPeriodLabel(fmtShort(tsPeriodFrom)+' — '+fmtShort(tsPeriodTo));setTsShowPeriod(false)}}
-                        style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
+                        style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--secondary)',color:'#fff',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
                     </div>
                   </div>
                 </div>
