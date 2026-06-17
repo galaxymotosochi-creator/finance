@@ -354,15 +354,15 @@ export default function Salary() {
                         <tbody>
                           {tsBonuses.map(e => (
                             <tr key={e.id}>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
                                 <span onClick={()=>toggleBonus(e.id)}
                                   style={{width:'16px',height:'16px',border:'1.5px solid '+(bonusChecks[e.id]?'#16a34a':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:bonusChecks[e.id]?'#16a34a':'transparent',color:'#fff'}}>
                                   {bonusChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem'}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.bonus_comment||'—'}</td>
+                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--body-color)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{fmtDate(e.date)}</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{e.bonus_comment||'—'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -393,15 +393,15 @@ export default function Salary() {
                         <tbody>
                           {tsDeducts.map(e => (
                             <tr key={e.id}>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
                                 <span onClick={()=>toggleDeduct(e.id)}
                                   style={{width:'16px',height:'16px',border:'1.5px solid '+(deductChecks[e.id]?'#dc2626':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:deductChecks[e.id]?'#dc2626':'transparent',color:'#fff'}}>
                                   {deductChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600,fontSize:'.72rem'}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.deduct_comment||'—'}</td>
+                              <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--body-color)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{fmtDate(e.date)}</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{e.deduct_comment||'—'}</td>
                             </tr>
                           ))}
                         </tbody>
