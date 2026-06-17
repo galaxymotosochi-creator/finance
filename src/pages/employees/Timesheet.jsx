@@ -234,7 +234,7 @@ export default function Timesheet() {
   const getEmpName = (id) => employees.find(e => e.id === id)?.name || '—';
 
   return (
-    <>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       <div className="page-header">
         <div>
           <h1>Табель</h1>
@@ -246,7 +246,7 @@ export default function Timesheet() {
       {loading ? (
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
-        <>
+        <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
           {/* КАЛЕНДАРЬ */}
           <div className="promo-calendar-wrap">
             <div className="promo-cal-header">
@@ -347,7 +347,7 @@ export default function Timesheet() {
           </div>
 
           {/* ТАБЛИЦА */}
-          <div className="product-table">
+          <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
             <table>
               <thead id="colHeaders" style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase'}}>
                 <tr>
@@ -392,7 +392,7 @@ export default function Timesheet() {
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       )}
 
       {/* МОДАЛКА ДНЯ */}
@@ -543,6 +543,6 @@ export default function Timesheet() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
