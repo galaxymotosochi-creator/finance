@@ -412,7 +412,8 @@ body {
 
 /* ======== CALENDAR ======== */
 .promo-calendar-wrap { background: var(--body-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .75rem; margin-bottom: .75rem; box-shadow: var(--shadow-sm); }
-.promo-cal-grid .day { padding: .4rem .2rem; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); color: var(--body-color); }
+.promo-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.promo-cal-grid .day { padding: .4rem .2rem; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); color: var(--body-color); font-size: .82rem; }
 .promo-cal-grid .day:hover { background: var(--primary-light); }
 .promo-cal-grid .wd { font-size: .62rem; color: var(--muted); font-weight: 600; padding-bottom: .35rem; text-transform: uppercase; }
 .promo-cal-nav:hover { background: var(--primary); color: #000; border-color: var(--primary); }
@@ -540,6 +541,11 @@ body {
 .promo-menu-item { padding: .35rem .5rem; font-size: .75rem; cursor: pointer; border-radius: var(--radius-sm); font-family: var(--font); color: var(--body-color); }
 .promo-menu-item:hover { background: var(--secondary-light); }
 .promo-cal-grid .day { padding: .4rem .2rem; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); color: var(--body-color); }
+.promo-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.promo-cal-month { font-size: .95rem; font-weight: 600; }
+.promo-cal-nav { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--body-bg); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; color: var(--body-color); transition: all var(--transition); }
+.promo-cal-grid .day.today { background: var(--primary); color: #000; font-weight: 700; }
+.promo-cal-legend { display: flex; gap: .75rem; font-size: .72rem; color: var(--muted); align-items: center; }
 
 /* ======== ADD RULE DROPDOWN ======== */
 .emp-add-rule-dd { position: absolute; z-index: 50; top: 100%; left: 0; right: 0; margin-top: 4px; background: var(--body-bg); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); max-height: 260px; overflow: hidden; display: flex; flex-direction: column; }
