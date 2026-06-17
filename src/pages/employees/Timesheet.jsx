@@ -3,15 +3,16 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 const STATUS_OPTS = [
-  { value: 'present', icon: '✅', label: 'Работал' },
-  { value: 'sick', icon: '🏥', label: 'Больничный' },
-  { value: 'vacation', icon: '🏖', label: 'Отпуск' },
-  { value: 'absent', icon: '❌', label: 'Прогул' },
-  { value: 'remote', icon: '🏠', label: 'Удаленка' },
+  { value: 'present', label: 'Работал' },
+  { value: 'sick', label: 'Больничный' },
+  { value: 'vacation', label: 'Отпуск' },
+  { value: 'absent', label: 'Прогул' },
+  { value: 'remote', label: 'Удаленка' },
 ];
 
-const STATUS_ICONS = { present:'✅', sick:'🏥', vacation:'🏖', absent:'❌', remote:'🏠' };
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+const emptyRow = () => ({ empId: '', amount: '', comment: '' });
 
 export default function Timesheet() {
   const { user } = useAuth();
@@ -20,12 +21,11 @@ export default function Timesheet() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth());
   const [loading, setLoading] = useState(true);
-  const [showDay, setShowDay] = useState(null); // date string YYYY-MM-DD
-  const [editEmp, setEditEmp] = useState(null);
+  const [showDay, setShowDay] = useState(null);
   const [saving, setSaving] = useState(false);
   const [localStatuses, setLocalStatuses] = useState({});
-  const [newBonus, setNewBonus] = useState({empId:'',amount:'',comment:''});
-  const [newDeduct, setNewDeduct] = useState({empId:'',amount:'',comment:''});
+  const [bonusRows, setBonusRows] = useState([emptyRow()]);
+  const [deductRows, setDeductRows] = useState([emptyRow()]);
 
   const load = async () => {
     setLoading(true);
@@ -69,37 +69,29 @@ export default function Timesheet() {
   const openDay = (d) => {
     const ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
     setShowDay(ds);
-    setEditEmp(null);
-    // Инициализируем статусы
     const st = {};
     employees.forEach(emp => {
       const entry = getEntry(emp.id, ds);
       st[emp.id] = entry ? entry.status : 'present';
     });
     setLocalStatuses(st);
-    setNewBonus({empId:'',amount:'',comment:''});
-    setNewDeduct({empId:'',amount:'',comment:''});
+
+    const dayEntries = entries.filter(e => e.date && e.date.startsWith(ds));
+    const bonusEntries = dayEntries.filter(e => (e.bonus_amount || 0) > 0);
+    const deductEntries = dayEntries.filter(e => (e.deduct_amount || 0) > 0);
+    if (bonusEntries.length > 0) {
+      setBonusRows(bonusEntries.map(e => ({ empId: e.employee_id, amount: String(e.bonus_amount||''), comment: e.bonus_comment||'' })));
+    } else {
+      setBonusRows([emptyRow()]);
+    }
+    if (deductEntries.length > 0) {
+      setDeductRows(deductEntries.map(e => ({ empId: e.employee_id, amount: String(e.deduct_amount||''), comment: e.deduct_comment||'' })));
+    } else {
+      setDeductRows([emptyRow()]);
+    }
   };
 
   const getEntry = (empId, dateStr) => entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(dateStr));
-
-  const saveEntry = async (empId, field, val) => {
-    if (!user || !showDay) return;
-    setSaving(true);
-    try {
-      const existing = getEntry(empId, showDay);
-      if (existing) {
-        await supabase.from('timesheet_entries').update({ [field]: val }).eq('id', existing.id);
-      } else {
-        await supabase.from('timesheet_entries').insert({
-          user_id: user.id, employee_id: empId, date: showDay,
-          [field]: val,
-        });
-      }
-      await load();
-    } catch (e) { alert('Ошибка: ' + e.message); }
-    setSaving(false);
-  };
 
   const isToday = (d) => d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
   const fmtDate = (ds) => { if (!ds) return ''; const p = ds.split('-'); return p.length === 3 ? p[2] + '.' + p[1] : ds; };
@@ -107,9 +99,35 @@ export default function Timesheet() {
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
+  const updateBonusRow = (idx, field, val) => {
+    setBonusRows(prev => {
+      const next = prev.map((r, i) => i === idx ? { ...r, [field]: val } : r);
+      if (field === 'empId' && val && idx === next.length - 1) {
+        next.push(emptyRow());
+      }
+      return next;
+    });
+  };
+
+  const updateDeductRow = (idx, field, val) => {
+    setDeductRows(prev => {
+      const next = prev.map((r, i) => i === idx ? { ...r, [field]: val } : r);
+      if (field === 'empId' && val && idx === next.length - 1) {
+        next.push(emptyRow());
+      }
+      return next;
+    });
+  };
+
+  const totalBonuses = () => {
+    return bonusRows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  };
+
+  const totalDeducts = () => {
+    return deductRows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  };
+
   const dayEntries = showDay ? entries.filter(e => e.date && e.date.startsWith(showDay)) : [];
-  const dayBonuses = dayEntries.filter(e => (e.bonus_amount || 0) > 0);
-  const dayDeducts = dayEntries.filter(e => (e.deduct_amount || 0) > 0);
 
   return (
     <>
@@ -125,14 +143,12 @@ export default function Timesheet() {
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
         <div className="promo-calendar-wrap">
-          {/* Навигация по месяцам */}
           <div className="promo-cal-header">
             <button className="promo-cal-nav" onClick={prevMonth}>‹</button>
             <div className="promo-cal-month">{MONTHS[month]} {year}</div>
             <button className="promo-cal-nav" onClick={nextMonth}>›</button>
           </div>
 
-          {/* Сетка */}
           <div className="promo-cal-grid">
             {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd">{w}</div>)}
             {days.map((d, i) => {
@@ -153,7 +169,6 @@ export default function Timesheet() {
             })}
           </div>
 
-          {/* Легенда */}
           <div className="promo-cal-legend" style={{marginTop:'.5rem'}}>
             <span><span className="promo-dot active" /> Бонус</span>
             <span><span className="promo-dot planned" /> Больничный</span>
@@ -165,80 +180,122 @@ export default function Timesheet() {
       {/* МОДАЛКА ДНЯ */}
       {showDay && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowDay(null); }}>
-          <div className="modal-box" style={{maxWidth:'520px'}}>
+          <div className="modal-box" style={{maxWidth:'560px'}}>
             <button className="modal-close" onClick={() => setShowDay(null)}>&times;</button>
-            <h2>🗓 {fmtDate(showDay)}</h2>
+            <h2>{fmtDate(showDay)}</h2>
             <div className="sub">Статусы сотрудников и события дня</div>
 
             {/* Статусы сотрудников */}
-            <div className="emp-section-label">Статус сотрудников</div>
-            {employees.map(emp => (
-              <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.35rem'}}>
-                <span style={{fontSize:'.82rem',minWidth:'120px',fontWeight:500}}>{emp.name}</span>
-                <select className="emp-rule-select" value={localStatuses[emp.id]||'present'}
-                  onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}
-                  style={{flex:1}}>
-                  {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.icon} {s.label}</option>)}
-                </select>
+            <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f8f9fa',borderBottom:'1px solid var(--border)'}}>
+                <span style={{fontSize:'.82rem',fontWeight:600}}>Статусы сотрудников</span>
+                <span style={{fontSize:'.6rem',color:'var(--muted)'}}>▼</span>
               </div>
-            ))}
+              <div style={{padding:'.5rem .65rem'}}>
+                {employees.map(emp => (
+                  <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.35rem'}}>
+                    <span style={{fontSize:'.82rem',minWidth:'120px',fontWeight:500}}>{emp.name}</span>
+                    <select style={{flex:1,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}
+                      value={localStatuses[emp.id]||'present'}
+                      onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}>
+                      {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Бонусы */}
-            <div className="emp-section-label">Бонусы</div>
-            {(function(){
-              const de = showDay ? entries.filter(e => e.date && e.date.startsWith(showDay) && (e.bonus_amount||0)>0) : [];
-              return de.map(e => (
-                <div key={e.id} className="emp-rule-line" style={{marginBottom:'.25rem'}}>
-                  <span style={{fontSize:'.82rem',fontWeight:500}}>{employees.find(em => em.id === e.employee_id)?.name||'—'}</span>
-                  <span style={{fontSize:'.8rem',color:'var(--muted)',flex:1}}>{e.bonus_comment||''}</span>
-                  <span style={{fontWeight:600,color:'#16a34a'}}>+{Number(e.bonus_amount).toLocaleString()}₽</span>
-                </div>
-              ));
-            })()}
-            <div className="form-row">
-              <div className="form-group">
-                <select value={newBonus.empId} onChange={e => setNewBonus({...newBonus, empId: e.target.value})}>
-                  <option value="">— Сотрудник —</option>
-                  {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
-                </select>
+            <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0'}}>
+                <span style={{fontSize:'.82rem',fontWeight:600,color:'#16a34a'}}>Бонусы</span>
+                <span style={{fontSize:'.6rem',color:'#16a34a'}}>▼</span>
               </div>
-              <div className="form-group"><input type="number" value={newBonus.amount} onChange={e => setNewBonus({...newBonus, amount: e.target.value})} placeholder="Сумма" min="0" /></div>
-              <div className="form-group"><input type="text" value={newBonus.comment} onChange={e => setNewBonus({...newBonus, comment: e.target.value})} placeholder="За что" /></div>
+              <div style={{padding:'.5rem .65rem'}}>
+                {bonusRows.map((row, idx) => {
+                  const isLast = idx === bonusRows.length - 1;
+                  const hasValue = row.empId && row.amount;
+                  return (
+                    <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
+                      <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
+                        borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}}
+                        value={row.empId}
+                        onChange={e => updateBonusRow(idx, 'empId', e.target.value)}>
+                        <option value="">Сотрудник</option>
+                        {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                      </select>
+                      <input type="number" value={row.amount}
+                        onChange={e => updateBonusRow(idx, 'amount', e.target.value)}
+                        placeholder="Сумма"
+                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
+                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
+                      <input type="text" value={row.comment}
+                        onChange={e => updateBonusRow(idx, 'comment', e.target.value)}
+                        placeholder="За что"
+                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
+                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
+                      {hasValue && (
+                        <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>
+                          +{Number(row.amount).toLocaleString()}₽
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+                <div style={{fontSize:'.68rem',color:'var(--muted)',marginTop:'2px'}}>Выберите сотрудника — появится новая строка</div>
+              </div>
             </div>
 
             {/* Штрафы */}
-            <div className="emp-section-label">Штрафы</div>
-            {(function(){
-              const de = showDay ? entries.filter(e => e.date && e.date.startsWith(showDay) && (e.deduct_amount||0)>0) : [];
-              return de.map(e => (
-                <div key={e.id} className="emp-rule-line" style={{marginBottom:'.25rem'}}>
-                  <span style={{fontSize:'.82rem',fontWeight:500}}>{employees.find(em => em.id === e.employee_id)?.name||'—'}</span>
-                  <span style={{fontSize:'.8rem',color:'var(--muted)',flex:1}}>{e.deduct_comment||''}</span>
-                  <span style={{fontWeight:600,color:'#dc2626'}}>−{Number(e.deduct_amount).toLocaleString()}₽</span>
-                </div>
-              ));
-            })()}
-            <div className="form-row">
-              <div className="form-group">
-                <select value={newDeduct.empId} onChange={e => setNewDeduct({...newDeduct, empId: e.target.value})}>
-                  <option value="">— Сотрудник —</option>
-                  {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
-                </select>
+            <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca'}}>
+                <span style={{fontSize:'.82rem',fontWeight:600,color:'#dc2626'}}>Штрафы</span>
+                <span style={{fontSize:'.6rem',color:'#dc2626'}}>▼</span>
               </div>
-              <div className="form-group"><input type="number" value={newDeduct.amount} onChange={e => setNewDeduct({...newDeduct, amount: e.target.value})} placeholder="Сумма" min="0" /></div>
-              <div className="form-group"><input type="text" value={newDeduct.comment} onChange={e => setNewDeduct({...newDeduct, comment: e.target.value})} placeholder="За что" /></div>
+              <div style={{padding:'.5rem .65rem'}}>
+                {deductRows.map((row, idx) => {
+                  const isLast = idx === deductRows.length - 1;
+                  const hasValue = row.empId && row.amount;
+                  return (
+                    <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
+                      <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
+                        borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}}
+                        value={row.empId}
+                        onChange={e => updateDeductRow(idx, 'empId', e.target.value)}>
+                        <option value="">Сотрудник</option>
+                        {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                      </select>
+                      <input type="number" value={row.amount}
+                        onChange={e => updateDeductRow(idx, 'amount', e.target.value)}
+                        placeholder="Сумма"
+                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
+                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
+                      <input type="text" value={row.comment}
+                        onChange={e => updateDeductRow(idx, 'comment', e.target.value)}
+                        placeholder="За что"
+                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
+                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
+                      {hasValue && (
+                        <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>
+                          -{Number(row.amount).toLocaleString()}₽
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+                <div style={{fontSize:'.68rem',color:'var(--muted)',marginTop:'2px'}}>Выберите сотрудника — появится новая строка</div>
+              </div>
             </div>
 
             {/* Итого */}
             {(function(){
-              const de = showDay ? entries.filter(e => e.date && e.date.startsWith(showDay)) : [];
-              const db = de.filter(e => (e.bonus_amount||0) > 0);
-              const dd = de.filter(e => (e.deduct_amount||0) > 0);
-              if (db.length === 0 && dd.length === 0) return null;
+              const tb = totalBonuses();
+              const td = totalDeducts();
+              if (tb === 0 && td === 0) return null;
               return (
-                <div style={{marginTop:'.75rem',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'.65rem',display:'flex',justifyContent:'space-between',fontSize:'.85rem'}}>
-                  <span>Бонусов: <b style={{color:'#16a34a'}}>{db.reduce((s,e)=>s+Number(e.bonus_amount||0),0).toLocaleString()}₽</b></span>
-                  <span>Штрафов: <b style={{color:'#dc2626'}}>{dd.reduce((s,e)=>s+Number(e.deduct_amount||0),0).toLocaleString()}₽</b></span>
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px',fontSize:'.85rem',marginBottom:'.75rem'}}>
+                  <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()}₽</b></span>
+                  <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()}₽</b></span>
                 </div>
               );
             })()}
@@ -247,6 +304,7 @@ export default function Timesheet() {
               <button type="button" className="btn btn-primary" onClick={async () => {
                 setSaving(true);
                 try {
+                  // Сохраняем статусы
                   for (const empId of Object.keys(localStatuses)) {
                     const entry = entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(showDay));
                     if (entry) {
@@ -255,20 +313,24 @@ export default function Timesheet() {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] });
                     }
                   }
-                  if (newBonus.empId && newBonus.amount) {
-                    const entry = entries.find(e => e.employee_id === newBonus.empId && e.date && e.date.startsWith(showDay));
-                    if (entry) {
-                      await supabase.from('timesheet_entries').update({ bonus_amount: (entry.bonus_amount||0)+parseFloat(newBonus.amount), bonus_comment: entry.bonus_comment ? entry.bonus_comment+'; '+newBonus.comment : newBonus.comment }).eq('id', entry.id);
+                  // Сохраняем бонусы (все строки с выбранным сотрудником и суммой)
+                  for (const row of bonusRows) {
+                    if (!row.empId || !row.amount) continue;
+                    const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.bonus_amount||0) > 0);
+                    if (existing) {
+                      await supabase.from('timesheet_entries').update({ bonus_amount: (existing.bonus_amount||0)+parseFloat(row.amount), bonus_comment: existing.bonus_comment ? existing.bonus_comment+'; '+row.comment : row.comment }).eq('id', existing.id);
                     } else {
-                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: newBonus.empId, date: showDay, status: 'present', bonus_amount: parseFloat(newBonus.amount), bonus_comment: newBonus.comment });
+                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', bonus_amount: parseFloat(row.amount), bonus_comment: row.comment });
                     }
                   }
-                  if (newDeduct.empId && newDeduct.amount) {
-                    const entry = entries.find(e => e.employee_id === newDeduct.empId && e.date && e.date.startsWith(showDay));
-                    if (entry) {
-                      await supabase.from('timesheet_entries').update({ deduct_amount: (entry.deduct_amount||0)+parseFloat(newDeduct.amount), deduct_comment: entry.deduct_comment ? entry.deduct_comment+'; '+newDeduct.comment : newDeduct.comment }).eq('id', entry.id);
+                  // Сохраняем штрафы
+                  for (const row of deductRows) {
+                    if (!row.empId || !row.amount) continue;
+                    const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.deduct_amount||0) > 0);
+                    if (existing) {
+                      await supabase.from('timesheet_entries').update({ deduct_amount: (existing.deduct_amount||0)+parseFloat(row.amount), deduct_comment: existing.deduct_comment ? existing.deduct_comment+'; '+row.comment : row.comment }).eq('id', existing.id);
                     } else {
-                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: newDeduct.empId, date: showDay, status: 'present', deduct_amount: parseFloat(newDeduct.amount), deduct_comment: newDeduct.comment });
+                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', deduct_amount: parseFloat(row.amount), deduct_comment: row.comment });
                     }
                   }
                   await load();
@@ -276,7 +338,7 @@ export default function Timesheet() {
                 } catch (err) { alert('Ошибка: ' + err.message); }
                 setSaving(false);
               }} disabled={saving}>
-                {saving ? 'Сохранение...' : '💾 Сохранить'}
+                {saving ? 'Сохранение...' : 'Сохранить'}
               </button>
             </div>
           </div>
@@ -285,4 +347,3 @@ export default function Timesheet() {
     </>
   );
 }
-
