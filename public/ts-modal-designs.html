@@ -391,7 +391,20 @@ h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem;text-align:center}
       </div>
       <div style="padding:.5rem .65rem">
         <div class="bd-line" style="padding:.2rem 0"><span class="name">Максим К.</span><span class="comm">Отличная работа</span><span class="amt plus">+5 000₽</span></div>
-        <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+        <!-- Строка 1 (заполнена) -->
+        <div class="f-row" style="margin-bottom:6px">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white)"><option>— Сотрудник —</option><option selected>Максим К.</option></select>
+          <input type="number" value="5000" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <input type="text" value="Отличная работа" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <span style="color:var(--green);font-weight:600;font-size:.82rem;min-width:50px;text-align:right">+5 000₽</span>
+        </div>
+        <!-- Строка 2 (новая пустая — появляется после выбора сотрудника) -->
+        <div class="f-row" style="opacity:.7">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none;background:var(--white);color:var(--muted)"><option>— Сотрудник —</option></select>
+          <input type="number" placeholder="Сумма" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none">
+          <input type="text" placeholder="За что" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none">
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px">⬆ Выберите сотрудника — появится новая строка</div>
       </div>
     </div>
 
@@ -401,7 +414,13 @@ h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem;text-align:center}
         <span style="font-size:.6rem;color:var(--red)">▼</span>
       </div>
       <div style="padding:.5rem .65rem">
-        <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+        <!-- Единственная строка — пустая, ниже появится новая -->
+        <div class="f-row">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white)"><option>— Сотрудник —</option></select>
+          <input type="number" placeholder="Сумма" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <input type="text" placeholder="За что" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px">⬆ Выберите сотрудника — появится новая строка</div>
       </div>
     </div>
 
