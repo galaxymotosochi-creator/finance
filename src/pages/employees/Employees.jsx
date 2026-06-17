@@ -250,34 +250,15 @@ export default function Employees() {
                 </div>
               </div>
 
-              <div className="pos-perms-grid" style={{marginBottom:'.75rem'}}>
-                {ALL_SECTIONS.map(s => (
-                  <div key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
-                    onClick={() => togglePerm(s.id)} role="button" tabIndex={0}
-                    onKeyDown={e => { if(e.key==='Enter'||e.key===' ') { e.preventDefault(); togglePerm(s.id); } }}>
-                    <span className="pos-perm-check-icon">{s.icon}</span>
-                    <span>{s.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {fPermissions.includes('registers') && (
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Пин-код кассы</label>
-                    <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
-                      <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} style={{width:'100px'}} />
-                      <button type="button" className="btn btn-outline" onClick={genPin} style={{fontSize:'.78rem',padding:'.3rem .6rem'}}>🎲 Сгенерировать</button>
-                    </div>
+              <div className="form-group">
+                  <label>Пин-код кассы</label>
+                  <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
+                    <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} style={{width:'100px'}} />
+                    <button type="button" className="btn btn-outline" onClick={genPin} style={{fontSize:'.78rem',padding:'.3rem .6rem'}}>🎲 Сгенерировать</button>
                   </div>
                 </div>
-              )}
 
-              <div className="emp-section-label" style={{marginTop:'.75rem'}}>Выдать доступ</div>
-              <p className="sub" style={{fontSize:'.78rem',marginBottom:'.5rem'}}>Сотруднику на e-mail придет ссылка-приглашение для входа в систему.</p>
-              <button type="button" className="btn btn-primary" style={{borderRadius:'6px'}} onClick={() => alert('Функция будет доступна позже')}>
-                ✉️ Выдать доступ
-              </button>
+
 
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
