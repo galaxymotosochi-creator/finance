@@ -433,7 +433,7 @@ export default function Salary() {
               {/* Кнопки */}
               <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
                 <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
-                  style={{padding:'.3rem .5rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
+                  style={{padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
                   <option value="pending">Начислено</option>
                   <option value="paid">Выплачено</option>
                 </select>
