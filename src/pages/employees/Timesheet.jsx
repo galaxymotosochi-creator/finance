@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -10,9 +10,20 @@ const STATUS_OPTS = [
   { value: 'remote', label: 'Удаленка' },
 ];
 
+const STATUS_MAP = Object.fromEntries(STATUS_OPTS.map(s => [s.value, s.label]));
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 
 const emptyRow = () => ({ empId: '', amount: '', comment: '' });
+
+const PERIOD_OPTS = [
+  { key: 'all', label: 'Все время' },
+  { key: 'today', label: 'Сегодня' },
+  { key: 'yesterday', label: 'Вчера' },
+  { key: 'week', label: 'Эта неделя' },
+  { key: 'month', label: 'Этот месяц' },
+];
+
+const fmtShort = (ds) => { if (!ds) return ''; const p = ds.split('-'); return p.length === 3 ? p[2] + '.' + p[1] : ds; };
 
 export default function Timesheet() {
   const { user } = useAuth();
@@ -26,6 +37,14 @@ export default function Timesheet() {
   const [localStatuses, setLocalStatuses] = useState({});
   const [bonusRows, setBonusRows] = useState([emptyRow()]);
   const [deductRows, setDeductRows] = useState([emptyRow()]);
+
+  // Фильтры таблицы
+  const [tsPeriod, setTsPeriod] = useState('all');
+  const [tsPeriodLabel, setTsPeriodLabel] = useState('Все время');
+  const [tsShowPeriod, setTsShowPeriod] = useState(false);
+  const [tsPeriodFrom, setTsPeriodFrom] = useState('');
+  const [tsPeriodTo, setTsPeriodTo] = useState('');
+  const [tsEmpFilter, setTsEmpFilter] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -127,7 +146,48 @@ export default function Timesheet() {
     return deductRows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
   };
 
-  const dayEntries = showDay ? entries.filter(e => e.date && e.date.startsWith(showDay)) : [];
+  // Фильтрация записей для таблицы
+  const filteredEntries = useMemo(() => {
+    let result = [...entries];
+    if (tsEmpFilter) {
+      result = result.filter(e => e.employee_id === tsEmpFilter);
+    }
+    if (tsPeriod && tsPeriod !== 'all') {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth();
+      const d = now.getDate();
+      let from = null, to = null;
+      if (tsPeriod === 'today') {
+        from = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        to = from;
+      } else if (tsPeriod === 'yesterday') {
+        const yd = new Date(now); yd.setDate(d - 1);
+        from = `${yd.getFullYear()}-${String(yd.getMonth()+1).padStart(2,'0')}-${String(yd.getDate()).padStart(2,'0')}`;
+        to = from;
+      } else if (tsPeriod === 'week') {
+        const wd = new Date(now); wd.setDate(d - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+        from = `${wd.getFullYear()}-${String(wd.getMonth()+1).padStart(2,'0')}-${String(wd.getDate()).padStart(2,'0')}`;
+        to = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      } else if (tsPeriod === 'month') {
+        from = `${y}-${String(m+1).padStart(2,'0')}-01`;
+        to = `${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y,m+1,0).getDate()).padStart(2,'0')}`;
+      } else if (tsPeriod === 'custom' && tsPeriodFrom && tsPeriodTo) {
+        from = tsPeriodFrom; to = tsPeriodTo;
+      }
+      if (from) {
+        result = result.filter(e => e.date && e.date >= from && e.date <= to);
+      }
+    }
+    result.sort((a, b) => {
+      if (a.date < b.date) return 1;
+      if (a.date > b.date) return -1;
+      return 0;
+    });
+    return result;
+  }, [entries, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo]);
+
+  const getEmpName = (id) => employees.find(e => e.id === id)?.name || '—';
 
   return (
     <>
@@ -142,39 +202,105 @@ export default function Timesheet() {
       {loading ? (
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
-        <div className="promo-calendar-wrap">
-          <div className="promo-cal-header">
-            <button className="promo-cal-nav" onClick={prevMonth}>‹</button>
-            <div className="promo-cal-month">{MONTHS[month]} {year}</div>
-            <button className="promo-cal-nav" onClick={nextMonth}>›</button>
+        <>
+          {/* КАЛЕНДАРЬ */}
+          <div className="promo-calendar-wrap">
+            <div className="promo-cal-header">
+              <button className="promo-cal-nav" onClick={prevMonth}>‹</button>
+              <div className="promo-cal-month">{MONTHS[month]} {year}</div>
+              <button className="promo-cal-nav" onClick={nextMonth}>›</button>
+            </div>
+            <div className="promo-cal-grid">
+              {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd">{w}</div>)}
+              {days.map((d, i) => {
+                if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
+                const stat = getDayStat(d);
+                return (
+                  <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}>
+                    {d}
+                    <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
+                      {stat.hasBonus && <span className="promo-dot active" />}
+                      {stat.hasSick && <span className="promo-dot planned" />}
+                      {stat.hasDeduct && <span className="promo-dot ended" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="promo-cal-legend" style={{marginTop:'.5rem'}}>
+              <span><span className="promo-dot active" /> Бонус</span>
+              <span><span className="promo-dot planned" /> Больничный</span>
+              <span><span className="promo-dot ended" /> Штраф</span>
+            </div>
           </div>
 
-          <div className="promo-cal-grid">
-            {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd">{w}</div>)}
-            {days.map((d, i) => {
-              if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
-              const stat = getDayStat(d);
-              return (
-                <div key={d}
-                  className={'day' + (isToday(d) ? ' today' : '')}
-                  onClick={() => openDay(d)}>
-                  {d}
-                  <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
-                    {stat.hasBonus && <span className="promo-dot active" />}
-                    {stat.hasSick && <span className="promo-dot planned" />}
-                    {stat.hasDeduct && <span className="promo-dot ended" />}
+          {/* ФИЛЬТРЫ */}
+          <div className="stock-filterbar" style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem 0',flexWrap:'wrap',marginBottom:'.5rem'}}>
+            {/* Период */}
+            <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsPeriod!=='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
+                onClick={e=>{e.stopPropagation();setTsShowPeriod(!tsShowPeriod);}}>{tsPeriodLabel}</span>
+              {tsShowPeriod && (
+                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
+                  {PERIOD_OPTS.map(p => (
+                    <div key={p.key} onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false)}}
+                      style={{padding:'.3rem .5rem',fontSize:'.8rem',cursor:'pointer',borderRadius:'4px',color:tsPeriod===p.key?'var(--primary)':'var(--body-color)',fontWeight:tsPeriod===p.key?600:400,background:tsPeriod===p.key?'var(--primary-light)':'transparent'}}>{p.label}</div>
+                  ))}
+                  <div style={{borderTop:'1px solid var(--border)',marginTop:'.25rem',paddingTop:'.25rem'}}>
+                    <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem'}}>Свой период</div>
+                    <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
+                      <input type="date" value={tsPeriodFrom} onChange={e=>setTsPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)'}} />
+                      <input type="date" value={tsPeriodTo} onChange={e=>setTsPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)'}} />
+                    </div>
+                    <div style={{padding:'.25rem .5rem'}}>
+                      <button onClick={()=>{if(!tsPeriodFrom||!tsPeriodTo)return alert('Выберите обе даты');setTsPeriod('custom');setTsPeriodLabel(fmtShort(tsPeriodFrom)+' — '+fmtShort(tsPeriodTo));setTsShowPeriod(false)}}
+                        style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+              )}
+            </div>
+            {/* Сотрудник */}
+            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:!tsEmpFilter?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+  onClick={()=>setTsEmpFilter(tsEmpFilter ? '' : 'all')}>Все</span>
+{employees.map(emp => (
+  <span key={emp.id} className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter===emp.id?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+    onClick={()=>setTsEmpFilter(tsEmpFilter===emp.id ? '' : emp.id)}>{emp.name}</span>
+))}
           </div>
 
-          <div className="promo-cal-legend" style={{marginTop:'.5rem'}}>
-            <span><span className="promo-dot active" /> Бонус</span>
-            <span><span className="promo-dot planned" /> Больничный</span>
-            <span><span className="promo-dot ended" /> Штраф</span>
+          {/* ТАБЛИЦА */}
+          <div className="product-table">
+            <table>
+              <thead id="colHeaders" style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase'}}>
+                <tr>
+                  <th style={{textAlign:'left',paddingLeft:0,width:'22%'}}>Дата</th>
+                  <th style={{width:'20%'}}>Сотрудник</th>
+                  <th style={{width:'26%'}}>Статус</th>
+                  <th style={{width:'16%'}}>Бонус</th>
+                  <th style={{width:'16%'}}>Штраф</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEntries.length === 0 ? (
+                  <tr><td colSpan={5} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
+                ) : (filteredEntries.map(e => (
+                  <tr key={e.id}>
+                    <td style={{textAlign:'left',paddingLeft:0,fontWeight:500,fontSize:'.8rem'}}>{fmtDate(e.date)}</td>
+                    <td style={{fontSize:'.8rem'}}>{getEmpName(e.employee_id)}</td>
+                    <td style={{fontSize:'.8rem'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
+                    <td style={{fontSize:'.8rem',color:(e.bonus_amount||0)>0?'#16a34a':'inherit',fontWeight:(e.bonus_amount||0)>0?600:400}}>
+                      {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+'₽' : '—'}
+                    </td>
+                    <td style={{fontSize:'.8rem',color:(e.deduct_amount||0)>0?'#dc2626':'inherit',fontWeight:(e.deduct_amount||0)>0?600:400}}>
+                      {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+'₽' : '—'}
+                    </td>
+                  </tr>
+                )))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </>
       )}
 
       {/* МОДАЛКА ДНЯ */}
@@ -185,7 +311,6 @@ export default function Timesheet() {
             <h2>{fmtDate(showDay)}</h2>
             <div className="sub">Статусы сотрудников и события дня</div>
 
-            {/* Статусы сотрудников */}
             <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f8f9fa',borderBottom:'1px solid var(--border)'}}>
                 <span style={{fontSize:'.82rem',fontWeight:600}}>Статусы сотрудников</span>
@@ -205,7 +330,6 @@ export default function Timesheet() {
               </div>
             </div>
 
-            {/* Бонусы */}
             <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0'}}>
                 <span style={{fontSize:'.82rem',fontWeight:600,color:'#16a34a'}}>Бонусы</span>
@@ -218,27 +342,16 @@ export default function Timesheet() {
                   return (
                     <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
                       <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
-                        borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}}
-                        value={row.empId}
-                        onChange={e => updateBonusRow(idx, 'empId', e.target.value)}>
+                        borderStyle:isLast&&!row.empId?'dashed':'solid'}}
+                        value={row.empId} onChange={e=>updateBonusRow(idx,'empId',e.target.value)}>
                         <option value="">Сотрудник</option>
-                        {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                        {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
-                      <input type="number" value={row.amount}
-                        onChange={e => updateBonusRow(idx, 'amount', e.target.value)}
-                        placeholder="Сумма"
-                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
-                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
-                      <input type="text" value={row.comment}
-                        onChange={e => updateBonusRow(idx, 'comment', e.target.value)}
-                        placeholder="За что"
-                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
-                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
-                      {hasValue && (
-                        <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>
-                          +{Number(row.amount).toLocaleString()}₽
-                        </span>
-                      )}
+                      <input type="number" value={row.amount} onChange={e=>updateBonusRow(idx,'amount',e.target.value)} placeholder="Сумма"
+                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      <input type="text" value={row.comment} onChange={e=>updateBonusRow(idx,'comment',e.target.value)} placeholder="За что"
+                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()}₽</span>}
                     </div>
                   );
                 })}
@@ -246,7 +359,6 @@ export default function Timesheet() {
               </div>
             </div>
 
-            {/* Штрафы */}
             <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca'}}>
                 <span style={{fontSize:'.82rem',fontWeight:600,color:'#dc2626'}}>Штрафы</span>
@@ -259,27 +371,16 @@ export default function Timesheet() {
                   return (
                     <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
                       <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
-                        borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}}
-                        value={row.empId}
-                        onChange={e => updateDeductRow(idx, 'empId', e.target.value)}>
+                        borderStyle:isLast&&!row.empId?'dashed':'solid'}}
+                        value={row.empId} onChange={e=>updateDeductRow(idx,'empId',e.target.value)}>
                         <option value="">Сотрудник</option>
-                        {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                        {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
-                      <input type="number" value={row.amount}
-                        onChange={e => updateDeductRow(idx, 'amount', e.target.value)}
-                        placeholder="Сумма"
-                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
-                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
-                      <input type="text" value={row.comment}
-                        onChange={e => updateDeductRow(idx, 'comment', e.target.value)}
-                        placeholder="За что"
-                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',
-                          borderStyle: isLast && !row.empId ? 'dashed' : 'solid'}} />
-                      {hasValue && (
-                        <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>
-                          -{Number(row.amount).toLocaleString()}₽
-                        </span>
-                      )}
+                      <input type="number" value={row.amount} onChange={e=>updateDeductRow(idx,'amount',e.target.value)} placeholder="Сумма"
+                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      <input type="text" value={row.comment} onChange={e=>updateDeductRow(idx,'comment',e.target.value)} placeholder="За что"
+                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()}₽</span>}
                     </div>
                   );
                 })}
@@ -287,7 +388,6 @@ export default function Timesheet() {
               </div>
             </div>
 
-            {/* Итого */}
             {(function(){
               const tb = totalBonuses();
               const td = totalDeducts();
@@ -304,7 +404,6 @@ export default function Timesheet() {
               <button type="button" className="btn btn-primary" onClick={async () => {
                 setSaving(true);
                 try {
-                  // Сохраняем статусы
                   for (const empId of Object.keys(localStatuses)) {
                     const entry = entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(showDay));
                     if (entry) {
@@ -313,22 +412,20 @@ export default function Timesheet() {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] });
                     }
                   }
-                  // Сохраняем бонусы (все строки с выбранным сотрудником и суммой)
                   for (const row of bonusRows) {
                     if (!row.empId || !row.amount) continue;
                     const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.bonus_amount||0) > 0);
                     if (existing) {
-                      await supabase.from('timesheet_entries').update({ bonus_amount: (existing.bonus_amount||0)+parseFloat(row.amount), bonus_comment: existing.bonus_comment ? existing.bonus_comment+'; '+row.comment : row.comment }).eq('id', existing.id);
+                      await supabase.from('timesheet_entries').update({ bonus_amount: (existing.bonus_amount||0)+parseFloat(row.amount), bonus_comment: existing.bonus_comment?existing.bonus_comment+'; '+row.comment:row.comment }).eq('id', existing.id);
                     } else {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', bonus_amount: parseFloat(row.amount), bonus_comment: row.comment });
                     }
                   }
-                  // Сохраняем штрафы
                   for (const row of deductRows) {
                     if (!row.empId || !row.amount) continue;
                     const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.deduct_amount||0) > 0);
                     if (existing) {
-                      await supabase.from('timesheet_entries').update({ deduct_amount: (existing.deduct_amount||0)+parseFloat(row.amount), deduct_comment: existing.deduct_comment ? existing.deduct_comment+'; '+row.comment : row.comment }).eq('id', existing.id);
+                      await supabase.from('timesheet_entries').update({ deduct_amount: (existing.deduct_amount||0)+parseFloat(row.amount), deduct_comment: existing.deduct_comment?existing.deduct_comment+'; '+row.comment:row.comment }).eq('id', existing.id);
                     } else {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', deduct_amount: parseFloat(row.amount), deduct_comment: row.comment });
                     }
