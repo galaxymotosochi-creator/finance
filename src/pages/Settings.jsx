@@ -32,6 +32,19 @@ export default function Settings() {
     if (savedNotifs) setNotifications(JSON.parse(savedNotifs));
     const savedOwner = localStorage.getItem('settings_owner');
     if (savedOwner) setOwner(JSON.parse(savedOwner));
+    // Загружаем из Supabase (перетирает localStorage)
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('last_name, first_name, patronymic')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (data && (data.first_name || data.last_name)) {
+          setOwner({ lastName: data.last_name || '', firstName: data.first_name || '', patronymic: data.patronymic || '' });
+        }
+      } catch(e) {}
+    })();
   }, []);
   const [tzDrop, setTzDrop] = useState(false);
   const cityTz = {
@@ -231,6 +244,14 @@ export default function Settings() {
             localStorage.setItem('settings_tz', tz);
             localStorage.setItem('settings_notifications', JSON.stringify(notifications));
             localStorage.setItem('settings_owner', JSON.stringify(owner));
+            try {
+              const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();
+              if (existing) {
+                await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic }).eq('user_id', user.id);
+              } else {
+                await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic });
+              }
+            } catch(e) {}
             setToast('✅ Настройки сохранены');
           }} style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
