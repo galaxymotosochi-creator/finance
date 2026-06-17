@@ -95,6 +95,7 @@ export default function Transactions() {
   const profit = incomeTotal - expenseTotal;
   const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
+  const balanceTotal = accs.reduce((s, a) => s + (parseFloat(a.balance || a.initial_balance || 0)), 0);
 
   const seed = async () => {
     try {
@@ -301,22 +302,34 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', margin: '.75rem 0' }}>
-          <div style={{ flex: 1, minWidth: '120px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '10px', padding: '.65rem .75rem' }}>
-            <div style={{ fontSize: '.65rem', color: '#166534', fontWeight: 600, textTransform: 'uppercase' }}>ВЫРУЧКА</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#14532d', marginTop: '.1rem' }}>{incomeTotal.toLocaleString()}₽</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', margin: '.75rem 0' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+            <div style={{ height: '3px', background: '#4caf50' }}></div>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Выручка</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: profit < 0 && 'Выручка' === 'Прибыль' ? '#dc2626' : '#111' }}>{incomeTotal.toLocaleString()} ₽</div>
+            </div>
           </div>
-          <div style={{ flex: 1, minWidth: '120px', background: '#fce7f3', border: '1px solid #f9a8d4', borderRadius: '10px', padding: '.65rem .75rem' }}>
-            <div style={{ fontSize: '.65rem', color: '#9d174d', fontWeight: 600, textTransform: 'uppercase' }}>РАСХОДЫ</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#831843', marginTop: '.1rem' }}>{expenseTotal.toLocaleString()}₽</div>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+            <div style={{ height: '3px', background: '#e53935' }}></div>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Расходы</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{expenseTotal.toLocaleString()} ₽</div>
+            </div>
           </div>
-          <div style={{ flex: 1, minWidth: '120px', background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: '10px', padding: '.65rem .75rem' }}>
-            <div style={{ fontSize: '.65rem', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase' }}>ПРИБЫЛЬ</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e3a8a', marginTop: '.1rem' }}>{profit.toLocaleString()}₽</div>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+            <div style={{ height: '3px', background: '#ff9800' }}></div>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Прибыль</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: profit < 0 ? '#dc2626' : '#111' }}>{profit.toLocaleString()} ₽</div>
+            </div>
           </div>
-          <div style={{ flex: 1, minWidth: '120px', background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '10px', padding: '.65rem .75rem' }}>
-            <div style={{ fontSize: '.65rem', color: '#92400e', fontWeight: 600, textTransform: 'uppercase' }}>СРЕДНИЙ ЧЕК</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#78350f', marginTop: '.1rem' }}>{avgCheck.toLocaleString()}₽</div>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+            <div style={{ height: '3px', background: '#1e88e5' }}></div>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Баланс счетов</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111' }}>{balanceTotal.toLocaleString()} ₽</div>
+            </div>
           </div>
         </div>
       )}
