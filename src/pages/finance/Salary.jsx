@@ -70,6 +70,8 @@ export default function Salary() {
   const [bonusChecks, setBonusChecks] = useState({});
   const [deductChecks, setDeductChecks] = useState({});
   const [tsLoaded, setTsLoaded] = useState(false);
+  const [salarySplitMode, setSalarySplitMode] = useState(false);
+  const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
 
   const load = async () => {
     setLoading(true);
@@ -210,19 +212,31 @@ export default function Salary() {
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
-  const confirmPay = async (accId) => {
+  const confirmPay = async (accId, splitAmts) => {
     try {
       const { data: rows } = await supabase.from('salary').select('*').eq('id', pendingPayId);
       if (!rows || !rows.length) return;
       const s = rows[0];
-      await supabase.from('transactions').insert({
-        user_id: user.id, account_id: accId,
-        type: 'expense', amount: s.amount,
-        description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
-        date: fDate,
-      });
+      if (splitAmts && Object.keys(splitAmts).length > 0) {
+        for (const [aid, amt] of Object.entries(splitAmts)) {
+          if (amt <= 0) continue;
+          await supabase.from('transactions').insert({
+            user_id: user.id, account_id: aid,
+            type: 'expense', amount: amt,
+            description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
+            date: fDate,
+          });
+        }
+      } else {
+        await supabase.from('transactions').insert({
+          user_id: user.id, account_id: accId,
+          type: 'expense', amount: s.amount,
+          description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
+          date: fDate,
+        });
+      }
       await supabase.from('salary').update({ status: 'paid', paid_at: fDate }).eq('id', pendingPayId);
-      await load(); setShowAcc(false); setPendingPayId(null);
+      await load(); setShowAcc(false); setPendingPayId(null); setSalarySplitMode(false); setSalarySplitAmounts({});
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
 
@@ -333,6 +347,10 @@ export default function Salary() {
                       style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
                   </div>
                 </div>
+              {salarySplitMode && (
+                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
+                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
+              )}
               </div>
 
               {/* Премии из табеля */}
@@ -372,6 +390,10 @@ export default function Salary() {
                     </>
                   )}
                 </div>
+              {salarySplitMode && (
+                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
+                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
+              )}
               </div>
 
               {/* Штрафы из табеля */}
@@ -411,6 +433,10 @@ export default function Salary() {
                     </>
                   )}
                 </div>
+              {salarySplitMode && (
+                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
+                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
+              )}
               </div>
 
               {/* Долг */}
