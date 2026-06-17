@@ -46,7 +46,17 @@ export default function Registers({ fullscreen }) {
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
+  const getOwnerName = () => {
+    try {
+      const saved = localStorage.getItem('settings_owner');
+      if (saved) {
+        const o = JSON.parse(saved);
+        if (o.firstName || o.lastName) return [o.lastName, o.firstName, o.patronymic].filter(Boolean).join(' ');
+      }
+    } catch(e) {}
+    return null;
+  };
+  const userName = getOwnerName() || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
   useEffect(() => {
     if (!user) return;

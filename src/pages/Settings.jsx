@@ -14,6 +14,7 @@ export default function Settings() {
   const [currency, setCurrency] = useState('RUB');
   const [tz, setTz] = useState('Europe/Moscow');
   const [tzSearch, setTzSearch] = useState('Москва');
+  const [owner, setOwner] = useState({ lastName: '', firstName: '', patronymic: '' });
   
   // Load saved settings on mount
   useEffect(() => {
@@ -29,6 +30,8 @@ export default function Settings() {
     if (savedTz) { setTz(savedTz); }
     const savedNotifs = localStorage.getItem('settings_notifications');
     if (savedNotifs) setNotifications(JSON.parse(savedNotifs));
+    const savedOwner = localStorage.getItem('settings_owner');
+    if (savedOwner) setOwner(JSON.parse(savedOwner));
   }, []);
   const [tzDrop, setTzDrop] = useState(false);
   const cityTz = {
@@ -60,7 +63,28 @@ export default function Settings() {
       <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
       <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 24 }}>Компания, локализация, уведомления и данные</p>
 
-      {/* 1. Локализация */}
+      {/* 1. Владелец аккаунта */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Владелец аккаунта</h2>
+        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#f8f9fa', borderRadius: 10, fontSize: '.82rem', color: 'var(--muted)' }}>
+          Электронная почта: <b style={{color:'#111'}}>{user?.email || '—'}</b>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px 16px' }}>
+          {[
+            ['Фамилия', owner.lastName, v => setOwner({...owner, lastName: v})],
+            ['Имя', owner.firstName, v => setOwner({...owner, firstName: v})],
+            ['Отчество', owner.patronymic, v => setOwner({...owner, patronymic: v})],
+          ].map(([label, val, setter], i) => (
+            <div key={i}>
+              <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
+              <input value={val} onChange={e => setter(e.target.value)} placeholder={label}
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. Локализация */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Локализация и стандарты</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
@@ -111,7 +135,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* 2. Профиль */}
+      {/* 3. Профиль */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Профиль компании</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
@@ -169,7 +193,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* 3. Уведомления */}
+      {/* 4. Уведомления */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>Уведомления и связь</h2>
         <div style={{ marginBottom: 12 }}>
@@ -206,6 +230,7 @@ export default function Settings() {
             localStorage.setItem('settings_currency', currency);
             localStorage.setItem('settings_tz', tz);
             localStorage.setItem('settings_notifications', JSON.stringify(notifications));
+            localStorage.setItem('settings_owner', JSON.stringify(owner));
             setToast('✅ Настройки сохранены');
           }} style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
