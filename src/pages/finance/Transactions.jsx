@@ -246,7 +246,7 @@ export default function Transactions() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:period!=='all'?600:400,color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,whiteSpace:'nowrap'}}
               onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
-              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',border:"1px solid var(--border)",boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'190px',padding:'.35rem',zIndex:100}}>
                 <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
                     <span style={{fontSize:'.7rem',color:'var(--secondary)',cursor:'pointer',padding:'.2rem .35rem',borderRadius:'4px'}}
                       onClick={()=>{setPeriod('all');setPeriodLabel('Все время');}}>Очистить</span>
@@ -285,7 +285,7 @@ export default function Transactions() {
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
-              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.35rem',zIndex:100}}>
+              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',border:"1px solid var(--border)",boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.35rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',marginBottom:'.5rem',padding:'0 .25rem'}}>
                   Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>.
                 </div>
@@ -303,28 +303,28 @@ export default function Transactions() {
 
       {!loading && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', margin: '.75rem 0' }}>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#4caf50' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Выручка</div>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{incomeTotal.toLocaleString()} ₽</div>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#e53935' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Расходы</div>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{expenseTotal.toLocaleString()} ₽</div>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#ff9800' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Прибыль</div>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: profit < 0 ? '#dc2626' : '#111' }}>{profit.toLocaleString()} ₽</div>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#1e88e5' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Баланс счетов</div>
