@@ -254,8 +254,8 @@ export default function Salary() {
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
             ) : list.map(s => (
               <tr key={s.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem',cursor:'pointer',color:'var(--primary)'}} onClick={()=>{}}>{s.employee_name||'—'}</div></td>
-                <td style={{fontSize:'.82rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td><div className="prod-name" style={{fontSize:'.85rem',fontWeight:500}} onClick={()=>{}}>{s.employee_name||'—'}</div></td>
+                <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td>{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
                 <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+'₽':'—'}</td>
                 <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+'₽':'—'}</td>
@@ -263,10 +263,11 @@ export default function Salary() {
                 <td><span className="prod-cat" style={{background:STATUS_COLORS[s.status]+'20',color:STATUS_COLORS[s.status]}}>{STATUS_LABELS[s.status]||s.status}</span></td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={()=>openEdit(s)}>Ред.</button>
+                  {(s.status==='pending'||s.status==='accrued')&&<button onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
+                    style={{padding:'.2rem .45rem',fontSize:'.7rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',fontWeight:600,marginRight:'2px'}}>Выплатить</button>}
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
                     <div className="prod-dropdown">
-                      {(s.status==='pending'||s.status==='accrued')&&<button onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}} style={{color:'#16a34a'}}>Выплатить</button>}
                       <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
