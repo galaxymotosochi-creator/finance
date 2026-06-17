@@ -169,7 +169,8 @@ export default function Accounts() {
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
    if (loading || !initDone) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
    return (
-    <>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
+      <div style={{flexShrink:0}}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
       <div className="page-header">
         <div><h1>Финансовые счета</h1><div className="sub">Управление счетами и учет остатков</div></div>
@@ -187,6 +188,8 @@ export default function Accounts() {
             onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
         </div>
       </div>
+        </div>
+      </div>
 
       {!loading && initDone && (
         <>
@@ -194,7 +197,8 @@ export default function Accounts() {
             <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс</div>
           </div>
-          <div className="product-table">
+    
+      <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
             <table>
               <thead id="colHeaders">
                 <tr>
@@ -428,6 +432,6 @@ export default function Accounts() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
