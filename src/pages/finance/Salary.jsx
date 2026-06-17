@@ -462,11 +462,21 @@ export default function Salary() {
                 {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
                 {accsList.map(a => (
                   <div key={a.id} onClick={()=>confirmPay(a.id)}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem'}}>
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem',transition:'background .12s,border-color .12s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
+                    onMouseLeave={e=>{e.currentTarget.style.background='var(--body-bg)';e.currentTarget.style.borderColor='var(--border)'}}>
                     <span style={{fontWeight:500}}>{a.name}</span>
                     <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
                   </div>
                 ))}
+                {accsList.length > 1 && (
+                  <div onClick={()=>alert('Разделение выплаты будет доступно в следующей версии')}
+                    style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed var(--secondary)',fontSize:'.78rem',color:'var(--secondary)',fontWeight:600,transition:'background .12s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    + Разделить
+                  </div>
+                )}
               </div>
             </div>
           </div>
