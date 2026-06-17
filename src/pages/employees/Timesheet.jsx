@@ -248,7 +248,6 @@ export default function Timesheet() {
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
                       {stat.hasBonus && <span className="promo-dot active" />}
-                      {stat.hasSick && <span className="promo-dot planned" />}
                       {stat.hasDeduct && <span className="promo-dot ended" />}
                     </div>
                   </div>
@@ -256,9 +255,8 @@ export default function Timesheet() {
               })}
             </div>
             <div className="promo-cal-legend" style={{marginTop:'.5rem'}}>
-              <span><span className="promo-dot active" /> Бонус</span>
-              <span><span className="promo-dot planned" /> Больничный</span>
-              <span><span className="promo-dot ended" /> Штраф</span>
+              <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a',verticalAlign:'middle',marginRight:'4px'}} /> Бонус</span>
+              <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626',verticalAlign:'middle',marginRight:'4px'}} /> Штраф</span>
             </div>
           </div>
 
