@@ -113,7 +113,7 @@ export default function Shifts() {
         <table>
           <thead id="colHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left',paddingLeft:0}}>Дата</th>
               <th style={{textAlign:'center'}}>Время открытия</th>
               <th style={{textAlign:'center'}}>Смена №</th>
               <th style={{textAlign:'center'}}>Кассир</th>
@@ -138,7 +138,7 @@ export default function Shifts() {
               const sCloseBal = parseFloat(s.closing_balance)||0;
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left',fontSize:'.82rem'}}>{dateStr}</td>
+                  <td style={{textAlign:'left',fontSize:'.82rem',paddingLeft:0}}>{dateStr}</td>
                   <td style={{textAlign:'center',fontSize:'.78rem',color:'var(--muted)'}}>{timeOpen}</td>
                   <td style={{textAlign:'center',fontSize:'.82rem'}}>{'#'+(idx+1)}</td>
                   <td style={{textAlign:'center',fontSize:'.78rem',color:'var(--muted)'}}>{s.cashier_name || '—'}</td>
