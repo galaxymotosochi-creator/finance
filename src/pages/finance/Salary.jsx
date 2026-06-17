@@ -345,7 +345,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет премий за этот период'}</div>
                   ) : (
                     <>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
@@ -384,7 +384,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет штрафов за этот период'}</div>
                   ) : (
                     <>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
