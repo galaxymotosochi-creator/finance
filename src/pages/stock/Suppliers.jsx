@@ -122,7 +122,7 @@ export default function Suppliers() {
                   <td style={{fontSize:'.82rem'}}>{s.phone||'—'}</td>
                   <td><span className="prod-cat">{icon} {label}</span></td>
                   <td>{supplyCount}</td>
-                  <td><span className="num">{totalSum.toLocaleString()}₽</span></td>
+                  <td><span className="num">{totalSum.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(s)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">

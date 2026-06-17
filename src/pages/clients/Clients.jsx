@@ -184,8 +184,8 @@ export default function Clients() {
                     ) : '—'}
                   </td>
                   <td>{st.checks > 0 ? st.checks : '—'}</td>
-                  <td>{avg > 0 ? avg.toLocaleString()+'₽' : '—'}</td>
-                  <td style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+'₽' : '—'}</td>
+                  <td>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{color: c.debt && c.debt < 0 ? '#dc2626' : '#999',fontWeight: c.debt && c.debt < 0 ? 700 : 400}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>

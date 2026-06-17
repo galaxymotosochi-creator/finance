@@ -173,7 +173,7 @@ export default function Inventory() {
                     <td><input type="number" value={it.actual} min="0" onChange={e => updateItem(doc.id, idx, e.target.value)}
                       style={{width:'70px',textAlign:'center',padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
                     <td><span className="num" style={{color:diff>0?'#16a34a':(diff<0?'#dc2626':'var(--muted)')}}>{diff>0?'+':''}{diff}</span></td>
-                    <td><span className="num" style={{color:diffSum>0?'#16a34a':(diffSum<0?'#dc2626':'var(--muted)')}}>{diffSum>0?'+':''}{diffSum.toLocaleString()}₽</span></td>
+                    <td><span className="num" style={{color:diffSum>0?'#16a34a':(diffSum<0?'#dc2626':'var(--muted)')}}>{diffSum>0?'+':''}{diffSum.toLocaleString()} ₽</span></td>
                   </tr>
                 );
               })}
@@ -202,16 +202,16 @@ export default function Inventory() {
                     <tbody>{di.map((it,i)=>{const d=it.actual-it.expected;const ds=d*it.cost;
                       return <tr key={i}><td style={{padding:'.3rem',textAlign:'left'}}>{it.name}</td>
                       <td style={{padding:'.3rem',color:d>0?'#16a34a':'#dc2626'}}>{d>0?'+':''}{d} шт</td>
-                      <td style={{padding:'.3rem',color:ds>0?'#16a34a':'#dc2626'}}>{ds>0?'+':''}{ds.toLocaleString()}₽</td></tr>;
+                      <td style={{padding:'.3rem',color:ds>0?'#16a34a':'#dc2626'}}>{ds>0?'+':''}{ds.toLocaleString()} ₽</td></tr>;
                     })}</tbody></table>}
                   <div style={{display:'flex',flexDirection:'column',gap:'.35rem',fontSize:'.85rem',marginTop:'.75rem',paddingTop:'.5rem',borderTop:'1px solid var(--border)'}}>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Недостача:</span><span style={{color:'#dc2626'}}>{t.shortage.toLocaleString()}₽</span></div>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Излишек:</span><span style={{color:'#16a34a'}}>{t.surplus.toLocaleString()}₽</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Недостача:</span><span style={{color:'#dc2626'}}>{t.shortage.toLocaleString()} ₽</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Излишек:</span><span style={{color:'#16a34a'}}>{t.surplus.toLocaleString()} ₽</span></div>
                     <div style={{display:'flex',justifyContent:'space-between',fontWeight:600,borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
-                      <span>Результат:</span><span style={{color:t.result>0?'#16a34a':(t.result<0?'#dc2626':'')}}>{t.result>0?'+':''}{t.result.toLocaleString()}₽</span>
+                      <span>Результат:</span><span style={{color:t.result>0?'#16a34a':(t.result<0?'#dc2626':'')}}>{t.result>0?'+':''}{t.result.toLocaleString()} ₽</span>
                     </div>
-                    <div style={{display:'flex',justifyContent:'space-between',marginTop:'.25rem'}}><span style={{color:'var(--muted)'}}>Склад ДО:</span><span>{t.totalBefore.toLocaleString()}₽</span></div>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Склад ПОСЛЕ:</span><span>{t.totalAfter.toLocaleString()}₽</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginTop:'.25rem'}}><span style={{color:'var(--muted)'}}>Склад ДО:</span><span>{t.totalBefore.toLocaleString()} ₽</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Склад ПОСЛЕ:</span><span>{t.totalAfter.toLocaleString()} ₽</span></div>
                   </div>
                   <div className="modal-actions" style={{marginTop:'1rem'}}><button className="btn btn-primary" onClick={confirmResult}>Подтвердить</button></div>
                 </>);
@@ -262,7 +262,7 @@ export default function Inventory() {
                       <td><span className="num">{it.expected}</span></td>
                       <td><span className="num">{it.actual}</span></td>
                       <td><span className="num" style={{color:d>0?'#16a34a':(d<0?'#dc2626':'var(--muted)')}}>{d>0?'+':''}{d}</span></td>
-                      <td><span className="num" style={{color:ds>0?'#16a34a':(ds<0?'#dc2626':'var(--muted)')}}>{ds>0?'+':''}{ds.toLocaleString()}₽</span></td>
+                      <td><span className="num" style={{color:ds>0?'#16a34a':(ds<0?'#dc2626':'var(--muted)')}}>{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
                     </tr>;
                   })}
                 </tbody>
@@ -294,7 +294,7 @@ export default function Inventory() {
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
                   <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{inv.date||'—'}</td>
                   <td><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td><span className="num" style={{color:inv.totals.result>0?'#16a34a':(inv.totals.result<0?'#dc2626':'var(--muted)')}}>{inv.totals.result>0?'+':''}{inv.totals.result.toLocaleString()}₽</span></td>
+                  <td><span className="num" style={{color:inv.totals.result>0?'#16a34a':(inv.totals.result<0?'#dc2626':'var(--muted)')}}>{inv.totals.result>0?'+':''}{inv.totals.result.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => view(inv.id)}>Открыть</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">

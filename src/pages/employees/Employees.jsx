@@ -189,7 +189,7 @@ export default function Employees() {
                   <td style={{fontSize:'.82rem'}}>{emp.phone || '—'}</td>
                   <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{emp.email || '—'}</td>
                   <td style={{fontSize:'.82rem'}}>{fmtDate(emp.hire_date)}</td>
-                  <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+'₽' : '—'}</td>
+                  <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
                   <td style={{fontSize:'.8rem'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(emp)}>Ред.</button>

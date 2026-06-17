@@ -368,10 +368,10 @@ export default function Timesheet() {
                     <td style={{fontSize:'.8rem',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
                     <td style={{fontSize:'.8rem',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
                     <td style={{fontSize:'.8rem',color:(e.bonus_amount||0)>0?'#16a34a':'inherit',fontWeight:(e.bonus_amount||0)>0?600:400}}>
-                      {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+'₽' : '—'}
+                      {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
                     <td style={{fontSize:'.8rem',color:(e.deduct_amount||0)>0?'#dc2626':'inherit',fontWeight:(e.deduct_amount||0)>0?600:400}}>
-                      {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+'₽' : '—'}
+                      {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                       <button className="act-btn prod-edit-btn" onClick={() => openDayByDateStr(e.date)}>Ред.</button>
@@ -443,7 +443,7 @@ export default function Timesheet() {
                         style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateBonusRow(idx,'comment',e.target.value)} placeholder="За что"
                         style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()}₽</span>}
+                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()} ₽</span>}
                     </div>
                   );
                 })}
@@ -472,7 +472,7 @@ export default function Timesheet() {
                         style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateDeductRow(idx,'comment',e.target.value)} placeholder="За что"
                         style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()}₽</span>}
+                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()} ₽</span>}
                     </div>
                   );
                 })}
@@ -486,8 +486,8 @@ export default function Timesheet() {
               if (tb === 0 && td === 0) return null;
               return (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px',fontSize:'.85rem',marginBottom:'.75rem'}}>
-                  <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()}₽</b></span>
-                  <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()}₽</b></span>
+                  <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()} ₽</b></span>
+                  <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()} ₽</b></span>
                 </div>
               );
             })()}

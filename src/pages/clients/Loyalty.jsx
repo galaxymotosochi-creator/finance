@@ -89,7 +89,7 @@ export default function Loyalty() {
         user_id: user.id, name: fName.trim(), type: fType,
         discount: parseFloat(fDiscount)||0, condition: parseFloat(fCondition)||0,
         icon: fIcon,
-        description: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+'₽':'')),
+        description: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+' ₽':'')),
         color:'#1983dd', bg:'#eaf5ff'
       };
       if (editId) {
@@ -159,7 +159,7 @@ export default function Loyalty() {
                 <span className="loy-card-badge" style={{background:p.bg,color:p.color}}>{badge}</span>
                 <div className="loy-card-stat">
                   <span>💰 {p.discount ? p.discount+'%' : '—'}</span>
-                  {p.condition ? <span>📋 от {p.condition.toLocaleString()}₽</span> : null}
+                  {p.condition ? <span>📋 от {p.condition.toLocaleString()} ₽</span> : null}
                 </div>
               </div>
             );
@@ -208,7 +208,7 @@ export default function Loyalty() {
             </div>
             <div className="loy-detail-grid">
               <div className="loy-detail-item"><div className="lbl">Скидка</div><div className="val">{current.discount ? current.discount+'%' : '—'}</div></div>
-              <div className="loy-detail-item"><div className="lbl">Условие</div><div className="val">{current.condition ? 'от '+current.condition.toLocaleString()+'₽' : 'Без условий'}</div></div>
+              <div className="loy-detail-item"><div className="lbl">Условие</div><div className="val">{current.condition ? 'от '+current.condition.toLocaleString()+' ₽' : 'Без условий'}</div></div>
               <div className="loy-detail-item"><div className="lbl">Клиентов</div><div className="val">0</div></div>
               <div className="loy-detail-item"><div className="lbl">Выручка</div><div className="val">0₽</div></div>
             </div>

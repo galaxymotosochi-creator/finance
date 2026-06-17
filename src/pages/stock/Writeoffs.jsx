@@ -102,7 +102,7 @@ export default function Writeoffs() {
               <tr key={w.id}>
                 <td><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
                 <td>{w.quantity}</td>
-                <td><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()}₽</span></td>
+                <td><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
                 <td><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>

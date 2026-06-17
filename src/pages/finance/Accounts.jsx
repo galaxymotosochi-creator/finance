@@ -222,10 +222,10 @@ export default function Accounts() {
                           </div>
                         </div>
                       </td>
-                      <td>{in0.toLocaleString()}₽</td>
-                      <td style={{color:'#16a34a',fontWeight:600}}>+{mv.i.toLocaleString()}₽</td>
-                      <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()}₽</td>
-                      <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()}₽</td>
+                      <td>{in0.toLocaleString()} ₽</td>
+                      <td style={{color:'#16a34a',fontWeight:600}}>+{mv.i.toLocaleString()} ₽</td>
+                      <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()} ₽</td>
+                      <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right'}}>
                         <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
                         {!isSys(a) && (
@@ -241,10 +241,10 @@ export default function Accounts() {
                 {sorted.length > 0 && (
                   <tr className="total-row">
                     <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
-                    <td style={{textAlign:'center',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()}₽</td>
+                    <td style={{textAlign:'center',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} ₽</td>
                     <td></td>
                     <td></td>
-                    <td style={{textAlign:'center',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()}₽</td>
+                    <td style={{textAlign:'center',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} ₽</td>
                     <td></td>
                   </tr>
                 )}
@@ -371,7 +371,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
                           </td>
-                          <td style={{textAlign:'center',fontWeight:600,color:t.type==='income'?'#16a34a':'#dc2626'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()}₽</td>
+                          <td style={{textAlign:'center',fontWeight:600,color:t.type==='income'?'#16a34a':'#dc2626'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
                         </tr>
                       );
                     });

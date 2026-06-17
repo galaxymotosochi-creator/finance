@@ -348,7 +348,7 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem .5rem .5rem 0', fontWeight: 500, whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? tx.date.split("-").reverse().join(".") : "—"}</td>
                   <td style={{ padding: '.5rem', fontWeight: 500 }}>{tx.description || '—'}</td>
                   <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', textAlign: 'center', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
-                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()}₽
+                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
                   </td>
                   <td style={{ padding: '.5rem', fontWeight: 500, textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'center' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
@@ -432,14 +432,14 @@ export default function Transactions() {
                 <label>С какого счета</label>
                 <select value={trFrom} onChange={function(e){setTrFrom(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()}₽)</option>})}
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} ₽)</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>На какой счет</label>
                 <select value={trTo} onChange={function(e){setTrTo(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()}₽)</option>})}
+                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} ₽)</option>})}
                 </select>
               </div>
               <div className="form-group">

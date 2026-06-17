@@ -291,10 +291,10 @@ export default function Salary() {
               <tr key={s.id}>
                 <td><div className="prod-name" style={{fontSize:'.85rem',fontWeight:500}} onClick={()=>{}}>{s.employee_name||'—'}</div></td>
                 <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td>{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
-                <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+'₽':'—'}</td>
-                <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+'₽':'—'}</td>
-                <td style={{fontWeight:600}}>{Number(s.amount).toLocaleString()}₽</td>
+                <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{fontWeight:600}}>{Number(s.amount).toLocaleString()} ₽</td>
                 <td>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',fontWeight:600,whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
@@ -401,7 +401,7 @@ export default function Salary() {
                                 </span>
                               </td>
                               <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--body-color)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>+{Number(e.bonus_amount).toLocaleString()} ₽</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{e.bonus_comment||'—'}</td>
                             </tr>
                           ))}
@@ -464,8 +464,8 @@ export default function Salary() {
               {existingDebt !== 0 && (
                 <div style={{background:'#fffbeb',border:'1px solid #f59e0b',borderRadius:'10px',padding:'.5rem .65rem',fontSize:'.78rem',display:'flex',gap:'.5rem',alignItems:'center'}}>
                   <span style={{color:'#f59e0b',fontWeight:700}}>⚠</span>
-                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()}₽</b>
-                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()}₽</span>
+                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()} ₽</b>
+                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()} ₽</span>
                   </span>
                 </div>
               )}

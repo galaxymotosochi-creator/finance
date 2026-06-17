@@ -47,7 +47,7 @@ const ACTION_MAP = {
     const expense = txs.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
     const profit = income - expense;
     const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
-    return `📊 Отчёт за ${periodLabel}:\n• Доходы: +${income.toLocaleString()}₽\n• Расходы: −${expense.toLocaleString()}₽\n• Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()}₽`;
+    return `📊 Отчёт за ${periodLabel}:\n• Доходы: +${income.toLocaleString()} ₽\n• Расходы: −${expense.toLocaleString()} ₽\n• Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`;
   },
   GET_TIMESHEET_STATS: async (p, user) => {
     try {
@@ -108,9 +108,9 @@ const ACTION_MAP = {
         let text = `🎯 Бонусы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '🎯 Бонусов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `• ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()}₽\n`;
+          text += `• ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()} ₽\n`;
         });
-        text += `\nИтого: +${totalBonus.toLocaleString()}₽`;
+        text += `\nИтого: +${totalBonus.toLocaleString()} ₽`;
         return text;
       }
 
@@ -125,9 +125,9 @@ const ACTION_MAP = {
         let text = `⚠️ Штрафы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '⚠️ Штрафов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `• ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()}₽\n`;
+          text += `• ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()} ₽\n`;
         });
-        text += `\nИтого: -${totalDeduct.toLocaleString()}₽`;
+        text += `\nИтого: -${totalDeduct.toLocaleString()} ₽`;
         return text;
       }
 
@@ -159,9 +159,9 @@ const ACTION_MAP = {
       });
       let text = `📊 Табель с ${from} по ${to}:\n`;
       Object.entries(empStats).forEach(([name, s]) => {
-        text += `• ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()}₽, штрафы -${s.deduct.toLocaleString()}₽\n`;
+        text += `• ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()} ₽, штрафы -${s.deduct.toLocaleString()} ₽\n`;
       });
-      text += `\n📌 Всего: +${totalBonus.toLocaleString()}₽ бонусов, -${totalDeduct.toLocaleString()}₽ штрафов, ${workedDays} рабочих дней`;
+      text += `\n📌 Всего: +${totalBonus.toLocaleString()} ₽ бонусов, -${totalDeduct.toLocaleString()} ₽ штрафов, ${workedDays} рабочих дней`;
       return text;
     } catch (err) {
       return '❌ Ошибка загрузки табеля: ' + err.message;
