@@ -44,7 +44,8 @@ export default function Timesheet() {
   const [tsShowPeriod, setTsShowPeriod] = useState(false);
   const [tsPeriodFrom, setTsPeriodFrom] = useState('');
   const [tsPeriodTo, setTsPeriodTo] = useState('');
-  const [tsEmpFilter, setTsEmpFilter] = useState('');
+  const [tsEmpFilter, setTsEmpFilter] = useState([]);
+  const [tsShowEmp, setTsShowEmp] = useState(false);
   const [tsTypeFilter, setTsTypeFilter] = useState('all');
 
   const load = async () => {
@@ -150,8 +151,8 @@ export default function Timesheet() {
   // Фильтрация записей для таблицы
   const filteredEntries = useMemo(() => {
     let result = [...entries];
-    if (tsEmpFilter) {
-      result = result.filter(e => e.employee_id === tsEmpFilter);
+    if (tsEmpFilter.length > 0) {
+      result = result.filter(e => tsEmpFilter.includes(e.employee_id));
     }
     // Фильтр по типу (бонусы/штрафы)
     if (tsTypeFilter === 'bonus') {
@@ -273,12 +274,29 @@ export default function Timesheet() {
             <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='deduct'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
               onClick={()=>setTsTypeFilter(tsTypeFilter==='deduct'?'all':'deduct')}>Штрафы</span>
             {/* Сотрудник */}
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:!tsEmpFilter?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-  onClick={()=>setTsEmpFilter(tsEmpFilter ? '' : 'all')}>Все</span>
-{employees.map(emp => (
-  <span key={emp.id} className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter===emp.id?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-    onClick={()=>setTsEmpFilter(tsEmpFilter===emp.id ? '' : emp.id)}>{emp.name}</span>
-))}
+            <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter.length>0?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
+                onClick={e=>{e.stopPropagation();setTsShowEmp(!tsShowEmp);}}>{tsEmpFilter.length>0 ? 'Сотр. '+tsEmpFilter.length : 'Сотрудник'}</span>
+              {tsShowEmp && (
+                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
+                    <span className="cat-dd-action" onClick={()=>{setTsEmpFilter([]);}}>Очистить</span>
+                  </div>
+                  <div style={{maxHeight:'180px',overflowY:'auto'}}>
+                    {employees.map(emp => (
+                      <div key={emp.id} className="cat-dd-item" onClick={()=>{
+                        setTsEmpFilter(prev => prev.includes(emp.id) ? prev.filter(e => e !== emp.id) : [...prev, emp.id]);
+                      }}>
+                        <span className={'cb' + (tsEmpFilter.includes(emp.id) ? ' checked' : '')} style={{width:'16px',height:'16px',border:'1.5px solid var(--border)',borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:tsEmpFilter.includes(emp.id)?'#fff':'transparent',flexShrink:0}}>
+                          {tsEmpFilter.includes(emp.id) ? '✓' : ''}
+                        </span>
+                        {emp.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ТАБЛИЦА */}
