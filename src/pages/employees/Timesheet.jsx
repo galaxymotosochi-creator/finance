@@ -263,8 +263,8 @@ export default function Timesheet() {
                   <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}>
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
-                      {stat.hasBonus && <span className="promo-dot active" />}
-                      {stat.hasDeduct && <span className="promo-dot ended" />}
+                      {stat.hasBonus && <span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a'}} />}
+                      {stat.hasDeduct && <span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626',marginLeft:'2px'}} />}
                     </div>
                   </div>
                 );
