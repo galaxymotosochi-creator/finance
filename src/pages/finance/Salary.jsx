@@ -212,11 +212,32 @@ export default function Salary() {
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
+  const getAccountBalance = (a) => parseFloat(a.balance || a.initial_balance || 0);
+
   const confirmPay = async (accId, splitAmts) => {
     try {
       const { data: rows } = await supabase.from('salary').select('*').eq('id', pendingPayId);
       if (!rows || !rows.length) return;
       const s = rows[0];
+
+      // Проверка баланса
+      if (splitAmts && Object.keys(splitAmts).length > 0) {
+        for (const [aid, amt] of Object.entries(splitAmts)) {
+          if (amt <= 0) continue;
+          const acct = accs.find(a => a.id === aid);
+          const balance = acct ? getAccountBalance(acct) : 0;
+          if (balance < amt) {
+            return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + balance.toLocaleString() + ' ₽, нужно: ' + amt.toLocaleString() + ' ₽');
+          }
+        }
+      } else {
+        const acct = accs.find(a => a.id === accId);
+        const balance = acct ? getAccountBalance(acct) : 0;
+        if (balance < s.amount) {
+          return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + balance.toLocaleString() + ' ₽, нужно: ' + Number(s.amount).toLocaleString() + ' ₽');
+        }
+      }
+
       if (splitAmts && Object.keys(splitAmts).length > 0) {
         for (const [aid, amt] of Object.entries(splitAmts)) {
           if (amt <= 0) continue;
