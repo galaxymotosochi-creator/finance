@@ -10,8 +10,8 @@ const HEALTH_BG = { critical: '#fef2f2', warning: '#fffbeb', healthy: '#f0fdf4' 
 export default function Health() {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
   const [suppliesCache, setSuppliesCache] = useState([]);
+  const [writeoffs, setWriteoffs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [period, setPeriod] = useState(30);
@@ -21,30 +21,32 @@ export default function Health() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [prodRes, txRes, supRes] = await Promise.all([
+      const [prodRes, supRes, woRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
         supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('writeoffs').select('*').eq('user_id', user.id),
       ]);
       if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden));
-      if (txRes.data) setTransactions(txRes.data);
       const supplies = [];
       (supRes.data || []).forEach(sp => { (sp.items || []).forEach(it => { supplies.push(it); }); });
       setSuppliesCache(supplies);
+      setWriteoffs(woRes.data || []);
       setLoading(false);
     })();
   }, [user]);
 
-  // Build stock map
+  // Build stock map (supplies + initial stock - writeoffs)
   const stockMap = useMemo(() => {
     const map = {};
+    // Supplies (приход)
     suppliesCache.forEach(sp => {
       if (!map[sp.prodId]) map[sp.prodId] = { qty: 0, cost: 0 };
       map[sp.prodId].qty += sp.qty || 0;
       map[sp.prodId].cost += (sp.cost || 0) * (sp.qty || 0);
     });
+    // Initial stock
     try {
-      const initial = JSON.parse(localStorage.getItem('***'));
+      const initial = JSON.parse(localStorage.getItem('initialStock88'));
       if (initial && initial.done && initial.items) {
         Object.keys(initial.items).forEach(id => {
           const q = parseInt(initial.items[id]) || 0;
@@ -57,39 +59,42 @@ export default function Health() {
         });
       }
     } catch (e) {}
+    // Write-offs (расход)
+    writeoffs.forEach(wo => {
+      const pid = wo.product_id;
+      if (pid) {
+        if (!map[pid]) map[pid] = { qty: 0, cost: 0 };
+        map[pid].qty -= wo.quantity || 0;
+        if (map[pid].qty < 0) map[pid].qty = 0;
+      }
+    });
     return map;
-  }, [suppliesCache]);
+  }, [suppliesCache, writeoffs]);
 
-  // Sales velocity per product per day
+  // Sales velocity per product per day (based on write-offs = real расход товара)
   const salesVelocity = useMemo(() => {
     const velocity = {};
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - period);
-    const periodTx = transactions.filter(tx =>
-      new Date(tx.date || tx.created_at) >= cutoff && tx.type === 'income'
+    const periodWo = writeoffs.filter(wo =>
+      new Date(wo.date || wo.created_at) >= cutoff
     );
-    periodTx.forEach(tx => {
-      const desc = (tx.description || '').toLowerCase();
-      products.forEach(p => {
-        if (desc.includes(p.name.toLowerCase())) {
-          if (!velocity[p.id]) velocity[p.id] = { qty: 0, revenue: 0, count: 0 };
-          velocity[p.id].qty += 1;
-          velocity[p.id].revenue += Number(tx.amount) || 0;
-          velocity[p.id].count += 1;
-        }
-      });
+    periodWo.forEach(wo => {
+      const pid = wo.product_id;
+      if (!pid) return;
+      if (!velocity[pid]) velocity[pid] = { qty: 0, count: 0 };
+      velocity[pid].qty += wo.quantity || 0;
+      velocity[pid].count += 1;
     });
     const result = {};
     Object.keys(velocity).forEach(id => {
       result[id] = {
         dailyQty: velocity[id].qty / period,
-        dailyRevenue: velocity[id].revenue / period,
         totalQty: velocity[id].qty,
-        totalRevenue: velocity[id].revenue,
       };
     });
     return result;
-  }, [transactions, products, period]);
+  }, [writeoffs, period]);
 
   const healthData = useMemo(() => {
     return products
@@ -105,13 +110,14 @@ export default function Health() {
         const dailySales = sv ? (sv.dailyQty * simTraffic / 100) : 0;
         const daysLeft = dailySales > 0 ? Math.round(qty / dailySales) : 999;
         const sumValue = costPrice * qty;
+        const totalSold = sv ? sv.totalQty : 0;
 
         let status = HEALTH.healthy;
         if (daysLeft <= 7) status = HEALTH.critical;
         else if (daysLeft <= 30) status = HEALTH.warning;
 
         const tags = [];
-        if (sv && sv.totalQty >= 3) tags.push({ type: 'magnet', label: 'Магнит', icon: '🧲' });
+        if (totalSold >= 3) tags.push({ type: 'magnet', label: 'Магнит', icon: '🧲' });
         if (markupPct > 50) tags.push({ type: 'anchor', label: 'Якорь', icon: '⚓' });
 
         const isSlow = daysLeft > 60;
