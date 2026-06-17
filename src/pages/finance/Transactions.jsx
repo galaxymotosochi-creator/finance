@@ -565,7 +565,7 @@ export default function Transactions() {
           <div className="modal-box" style={{maxWidth:"400px"}}>
             <button className="modal-close" onClick={function(){setShowAccSelect(false);setPendingTx(null)}}>&times;</button>
             <h2>{pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"}</h2>
-            <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}</div>
+            <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}</div>
             <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
               {accs.map(function(a){
                 var sel = selectedAcc === a.id;
@@ -598,7 +598,7 @@ export default function Transactions() {
             </div>}
             <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex"}}>
               <button onClick={function(){confirmTx()}}
-                style={{width:"100%",padding:".45rem 1rem",fontSize:".8rem",fontWeight:600,borderRadius:"100px",border:"none",cursor:"pointer",background:"var(--secondary)",color:"#fff",fontFamily:"var(--font)"}}>
+                style={{padding:".45rem 1.2rem",fontSize:".8rem",fontWeight:600,borderRadius:"100px",border:"none",cursor:"pointer",background:"var(--primary)",color:"var(--primary-text)",fontFamily:"var(--font)",display:"block",margin:"0 auto"}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
               </button>
             </div>
