@@ -236,7 +236,7 @@ export default function Settings() {
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
-        <button onClick={() => {
+        <button onClick={async () => {
             localStorage.setItem('settings_company', JSON.stringify(company));
             localStorage.setItem('settings_country', country);
             localStorage.setItem('settings_lang', lang);
