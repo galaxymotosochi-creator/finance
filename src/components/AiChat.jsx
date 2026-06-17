@@ -49,13 +49,131 @@ const ACTION_MAP = {
     const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
     return `📊 Отчёт за ${periodLabel}:\n• Доходы: +${income.toLocaleString()}₽\n• Расходы: −${expense.toLocaleString()}₽\n• Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()}₽`;
   },
+  GET_TIMESHEET_STATS: async (p, user) => {
+    try {
+      let { data: employees } = await supabase
+        .from('employees')
+        .select('id, name')
+        .eq('user_id', user.id);
+      if (!employees) employees = [];
+
+      // Ищем сотрудника по имени (частичное совпадение)
+      const empName = (p.employee_name || '').toLowerCase().trim();
+      let empIds = [];
+      if (empName) {
+        const found = employees.filter(e => e.name.toLowerCase().includes(empName));
+        empIds = found.map(e => e.id);
+        if (empIds.length === 0) return `👤 Сотрудник "${p.employee_name}" не найден`;
+      }
+
+      // Период
+      const from = p.period_from || new Date(Date.now() - 30*86400000).toISOString().split('T')[0];
+      const to = p.period_to || new Date().toISOString().split('T')[0];
+
+      let query = supabase
+        .from('timesheet_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('date', from)
+        .lte('date', to);
+
+      if (empIds.length > 0) {
+        query = query.in('employee_id', empIds);
+      }
+
+      const { data: entries } = await query.order('date', { ascending: true });
+
+      if (!entries || entries.length === 0) {
+        return '📭 Нет записей в табеле за указанный период';
+      }
+
+      // Собираем статистику
+      const totalBonus = entries.reduce((s, e) => s + Number(e.bonus_amount || 0), 0);
+      const totalDeduct = entries.reduce((s, e) => s + Number(e.deduct_amount || 0), 0);
+      const workedDays = entries.filter(e => e.status === 'present' || e.status === 'remote').length;
+      const sickDays = entries.filter(e => e.status === 'sick').length;
+      const vacationDays = entries.filter(e => e.status === 'vacation').length;
+      const absentDays = entries.filter(e => e.status === 'absent').length;
+
+      const statType = (p.stat_type || '').toLowerCase();
+
+      if (statType === 'bonus') {
+        const empStats = {};
+        entries.filter(e => (e.bonus_amount||0)>0).forEach(e => {
+          const name = employees.find(em => em.id === e.employee_id)?.name || '—';
+          if (!empStats[name]) empStats[name] = { count: 0, sum: 0 };
+          empStats[name].count++;
+          empStats[name].sum += Number(e.bonus_amount);
+        });
+        let text = `🎯 Бонусы с ${from} по ${to}:\n`;
+        if (Object.keys(empStats).length === 0) return '🎯 Бонусов за этот период нет';
+        Object.entries(empStats).forEach(([name, s]) => {
+          text += `• ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()}₽\n`;
+        });
+        text += `\nИтого: +${totalBonus.toLocaleString()}₽`;
+        return text;
+      }
+
+      if (statType === 'deduct') {
+        const empStats = {};
+        entries.filter(e => (e.deduct_amount||0)>0).forEach(e => {
+          const name = employees.find(em => em.id === e.employee_id)?.name || '—';
+          if (!empStats[name]) empStats[name] = { count: 0, sum: 0 };
+          empStats[name].count++;
+          empStats[name].sum += Number(e.deduct_amount);
+        });
+        let text = `⚠️ Штрафы с ${from} по ${to}:\n`;
+        if (Object.keys(empStats).length === 0) return '⚠️ Штрафов за этот период нет';
+        Object.entries(empStats).forEach(([name, s]) => {
+          text += `• ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()}₽\n`;
+        });
+        text += `\nИтого: -${totalDeduct.toLocaleString()}₽`;
+        return text;
+      }
+
+      if (statType === 'worked' || statType === 'отработал' || statType === 'дней') {
+        const empStats = {};
+        entries.forEach(e => {
+          const name = employees.find(em => em.id === e.employee_id)?.name || '—';
+          if (!empStats[name]) empStats[name] = { worked: 0, sick: 0, vacation: 0, absent: 0 };
+          if (e.status === 'present' || e.status === 'remote') empStats[name].worked++;
+          else if (e.status === 'sick') empStats[name].sick++;
+          else if (e.status === 'vacation') empStats[name].vacation++;
+          else if (e.status === 'absent') empStats[name].absent++;
+        });
+        let text = `📅 Статистика с ${from} по ${to}:\n`;
+        Object.entries(empStats).forEach(([name, s]) => {
+          text += `• ${name}: ${s.worked} рабочих дн., ${s.sick} больн., ${s.vacation} отпуск, ${s.absent} прогул\n`;
+        });
+        return text;
+      }
+
+      // По умолчанию — полная сводка
+      const empStats = {};
+      entries.forEach(e => {
+        const name = employees.find(em => em.id === e.employee_id)?.name || '—';
+        if (!empStats[name]) empStats[name] = { worked: 0, bonus: 0, deduct: 0 };
+        if (e.status === 'present' || e.status === 'remote') empStats[name].worked++;
+        empStats[name].bonus += Number(e.bonus_amount || 0);
+        empStats[name].deduct += Number(e.deduct_amount || 0);
+      });
+      let text = `📊 Табель с ${from} по ${to}:\n`;
+      Object.entries(empStats).forEach(([name, s]) => {
+        text += `• ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()}₽, штрафы -${s.deduct.toLocaleString()}₽\n`;
+      });
+      text += `\n📌 Всего: +${totalBonus.toLocaleString()}₽ бонусов, -${totalDeduct.toLocaleString()}₽ штрафов, ${workedDays} рабочих дней`;
+      return text;
+    } catch (err) {
+      return '❌ Ошибка загрузки табеля: ' + err.message;
+    }
+  },
 };
 
 export default function AiChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Я AI-помощник. Могу:\n• Добавить расход/доход\n• Создать товар/категорию\n• Сделать отчёт\n\nНапример: "добавь расход 5000 на запчасти"', isNotification: false },
+    { role: 'assistant', text: '👋 Привет! Я AI-помощник. Могу:\n• Добавить расход/доход\n• Создать товар/категорию\n• Сделать отчёт\n• Показать статистику табеля\n\nНапример:\n"добавь расход 5000 на запчасти"\n"сколько штрафов у Шаманской с 12 по 16 июня"\n"сколько дней отработала Анна"', isNotification: false },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

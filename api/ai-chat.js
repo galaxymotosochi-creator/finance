@@ -35,6 +35,14 @@ export default async function handler(req, res) {
 - ADD_PRODUCT — добавить товар. Параметры: name (название), price (цена), type (product/service, опционально), unit (ед.изм, опционально)
 - ADD_CATEGORY — добавить категорию товаров или услуг. Параметры: name (название), type (product/service, опционально, по умолчанию product)
 - GET_REPORT — получить отчёт. Параметры: period (today/week/month/all)
+- GET_TIMESHEET_STATS — получить статистику из табеля рабочего времени. Параметры: employee_name (имя сотрудника, можно частично), period_from (дата начала, YYYY-MM-DD), period_to (дата конца, YYYY-MM-DD), stat_type (bonus/deduct/worked — для конкретного типа).
+
+Ты можешь отвечать на вопросы по табелю:
+• «Сколько штрафов у сотрудника Иванова за неделю?» — используй GET_TIMESHEET_STATS с employee_name и stat_type=deduct
+• «Сколько бонусов получил Петров с 1 по 15 июня?» — используй GET_TIMESHEET_STATS с employee_name, period_from, period_to, stat_type=bonus
+• «Сколько дней отработала Анна за май?» — используй GET_TIMESHEET_STATS с employee_name, stat_type=worked
+• Если не указан тип — покажи полную сводку по табелю за период
+• Даты пользователь может указать в свободной форме или без года — интерпретируй правильно
 
 Если пользователь пишет не по делу — вежливо скажи что ты умеешь делать.
 Не выдумывай данные. Если нужна информация — скажи что данных нет.`;
