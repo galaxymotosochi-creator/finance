@@ -462,7 +462,7 @@ export default function Salary() {
                 {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
                 {accsList.map(a => (
                   <div key={a.id} onClick={()=>confirmPay(a.id)}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'var(--radius)',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem'}}>
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem'}}>
                     <span style={{fontWeight:500}}>{a.name}</span>
                     <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
                   </div>
