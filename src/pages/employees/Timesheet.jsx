@@ -268,8 +268,6 @@ export default function Timesheet() {
               )}
             </div>
             {/* Тип */}
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-              onClick={()=>setTsTypeFilter('all')}>Все</span>
             <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='bonus'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
               onClick={()=>setTsTypeFilter(tsTypeFilter==='bonus'?'all':'bonus')}>Бонусы</span>
             <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='deduct'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
