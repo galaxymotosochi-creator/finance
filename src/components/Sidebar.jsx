@@ -63,7 +63,11 @@ const menu = [
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [expanded, setExpanded] = React.useState('Финансы');
+  const [expanded, setExpanded] = React.useState(() => {
+    const path = location.pathname;
+    const found = menu.find(m => m.children && m.children.some(c => path === c.path));
+    return found ? found.label : 'Финансы';
+  });
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -79,7 +83,9 @@ export default function Sidebar() {
 
   const isActive = (path) => {
     if (path === '/dashboard') return location.pathname === '/dashboard' || location.hash === '#/dashboard';
-    return location.pathname.startsWith(path);
+    if (path === '/kassa') return location.hash === '#/kassa';
+    // Точное совпадение (не startsWith, чтобы \/clients не перекрывал \/clients\/loyalty)
+    return location.pathname === path;
   };
 
   return (
