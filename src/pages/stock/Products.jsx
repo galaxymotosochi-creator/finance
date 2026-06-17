@@ -6,6 +6,28 @@ import { useAuth } from '../../hooks/useAuth';
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
 const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд'];
+const scanBarcode = () => {
+    if (!navigator.mediaDevices || !window.BarcodeDetector) {
+      alert('Сканирование недоступно в этом браузере');
+      return;
+    }
+    var v=document.createElement('video');v.setAttribute('playsinline','');v.setAttribute('autoplay','');
+    v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.6)';
+    var c=document.createElement('div');c.textContent='✖';
+    c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
+    document.body.appendChild(v);document.body.appendChild(c);var s=null;var si=null;
+    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();c.remove()};
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(st){
+      s=st;v.srcObject=st;v.play();
+      si=setInterval(function(){
+        if(!s)return;
+        try{var bd=new BarcodeDetector({formats:['qr_code','ean_13','ean_8','code_128','code_39','upc_a','upc_e','codabar']});
+        bd.detect(v).then(function(bc){if(bc.length>0){setFBarcode(bc[0].rawValue);cl()}}).catch(function(){})}catch(e){}
+      },1500);
+    }).catch(function(){alert('Нет доступа к камере');cl()});
+    c.onclick=cl;
+  };
+
 const genBarcode = () => {
   let s = '';
   for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
@@ -660,8 +682,14 @@ export default function Products() {
                   <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
                 </div>
                 {fType !== 'service' && <div className="form-group">
-                  <label>Штрихкод <span className="badge-pill" style={{cursor:'pointer'}} onClick={() => setFBarcode(genBarcode())}>сгенерировать</span></label>
-                  <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
+                  <label>Штрихкод</label>
+                  <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
+                    <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
+                    <span onClick={() => setFBarcode(genBarcode())} title="Сгенерировать"
+                      style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.72rem',fontFamily:'var(--font)',background:'#f8f9fa',whiteSpace:'nowrap',fontWeight:500}}>сгенерировать</span>
+                    <span onClick={scanBarcode} title="Сканировать штрихкод через камеру"
+                      style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.75rem',fontFamily:'var(--font)',background:'#f8f9fa'}}>📷</span>
+                  </div>
                 </div>}
                 {fType === 'service' && <div className="form-group"></div>}
               </div>
