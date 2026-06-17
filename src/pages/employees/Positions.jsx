@@ -22,7 +22,7 @@ const BONUS_TYPES = [
 const PAY_TYPE_LABELS = {
   fixed: 'Фиксированная',
   piecework: 'Сдельная',
-  percent: 'Процентная',
+  percent: 'За смену',
 };
 
 export default function Positions() {
@@ -124,7 +124,7 @@ export default function Positions() {
   const formatSalary = (p) => {
     const pt = p.pay_type || 'fixed';
     if (pt === 'fixed' && p.salary) return Number(p.salary).toLocaleString() + ' ₽';
-    if (pt === 'percent') return (p.salary || 0) + '%';
+    if (pt === 'percent') return (p.salary || 0).toLocaleString() + ' ₽/смена';
     return '—';
   };
 
@@ -220,7 +220,7 @@ export default function Positions() {
                     <select value={fPayType} onChange={e => setFPayType(e.target.value)}>
                       <option value="fixed">Фиксир.</option>
                       <option value="piecework">Сдельная</option>
-                      <option value="percent">Процентная</option>
+                      <option value="percent">За смену</option>
                     </select>
                   </div>
                 </div>

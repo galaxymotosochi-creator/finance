@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
 const STATUS_COLORS = {accrued:'#2563eb',paid:'#16a34a',cancelled:'#dc2626'};
-const SALARY_TYPES = [{value:'fixed',label:'Фиксированный оклад'},{value:'piecework',label:'Сдельная'}];
+const SALARY_TYPES = [{value:'fixed',label:'Фиксированный оклад'},{value:'shift',label:'За смену'},{value:'piecework',label:'Сдельная'}];
 
 function daysInMonth(y,m){return new Date(y,m,0).getDate()}
 
@@ -126,10 +126,17 @@ export default function Salary() {
 
   // Пересчет
   useEffect(() => {
-    const sal = calcProportionalSalary(fBaseSalary, fPeriodFrom, fPeriodTo);
-    setFSalaryTotal(sal);
+    if (fSalaryType === 'fixed') {
+      const sal = calcProportionalSalary(fBaseSalary, fPeriodFrom, fPeriodTo);
+      setFSalaryTotal(sal);
+    } else if (fSalaryType === 'shift') {
+      const days = calcDays(fPeriodFrom, fPeriodTo);
+      setFSalaryTotal(fBaseSalary * days);
+    } else {
+      setFSalaryTotal(fBaseSalary || 0);
+    }
     setFDays(calcDays(fPeriodFrom, fPeriodTo));
-  }, [fBaseSalary, fPeriodFrom, fPeriodTo]);
+  }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalaryType]);
 
   // Долг
   useEffect(() => {
@@ -308,10 +315,10 @@ export default function Salary() {
                 </div>
                 <div style={{display:'flex',gap:'.35rem',alignItems:'flex-start'}}>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Оклад (мес.)</div>
+                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>{fSalaryType === 'shift' ? 'Ставка за смену (₽)' : 'Оклад (мес.)'}</div>
                     <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)}
                       style={{width:'100%',padding:'.3rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
-                    <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'3px'}}>Подтягивается из должности</div>
+                    <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'3px'}}>{fSalaryType === 'shift' ? 'Умножается на количество смен' : 'Подтягивается из должности'}</div>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Отработано</div>
@@ -418,7 +425,7 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(fSalaryTotal>0?'Оклад '+fSalaryTotal.toLocaleString()+' ₽':'')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+' ₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
+                  {(fSalaryTotal>0?(fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽':')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+' ₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
                 </div>
                 <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} ₽</div>
               </div>
