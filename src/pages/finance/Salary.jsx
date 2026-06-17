@@ -486,7 +486,7 @@ export default function Salary() {
               <div className="sub">Выберите счет для выплаты</div>
               <div style={{display:'flex',flexDirection:'column',gap:'.35rem',marginTop:'.25rem'}}>
                 {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
-                {accsList.map(a => (
+                {!salarySplitMode ? accsList.map(a => (
                   <div key={a.id} onClick={()=>confirmPay(a.id)}
                     style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem',transition:'background .12s,border-color .12s'}}
                     onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
@@ -494,8 +494,25 @@ export default function Salary() {
                     <span style={{fontWeight:500}}>{a.name}</span>
                     <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
                   </div>
+                )) : accsList.map(a => (
+                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
+                    <span style={{flex:1,fontSize:'.8rem',fontWeight:500}}>{a.name}</span>
+                    <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
+                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+                  </div>
                 ))}
-
+                {accsList.length > 1 && (
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed var(--secondary)',fontSize:'.78rem',color:'var(--secondary)',fontWeight:600,transition:'background .12s',marginTop:'.15rem'}}
+                    onClick={()=>{if(!salarySplitMode){var amt=Math.round((grandTotal||0)/accsList.length);var total=grandTotal||0;var sa={};accsList.forEach(function(a,i){sa[a.id]=i<accsList.length-1?amt:total-amt*(accsList.length-1)});setSalarySplitAmounts(sa)};setSalarySplitMode(!salarySplitMode)}}
+                    onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    {salarySplitMode ? '+Разделить' : '+Разделить'}
+                  </div>
+                )}
+                {salarySplitMode && (
+                  <button onClick={()=>confirmPay(null, salarySplitAmounts)}
+                    style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.15rem'}}>Подтвердить разделение</button>
+                )}
               </div>
             </div>
           </div>
