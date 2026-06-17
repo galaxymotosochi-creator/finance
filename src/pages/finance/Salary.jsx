@@ -293,12 +293,12 @@ export default function Salary() {
               <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
               <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                 <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required
-                  style={{flex:3,minWidth:'180px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
+                  style={{flex:3,minWidth:'180px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
                   <option value="">— выберите —</option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
                 <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required
-                  style={{flex:1,minWidth:'115px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
+                  style={{flex:1,minWidth:'115px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
                 <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required
                   style={{flex:1,minWidth:'115px',padding:'.3rem .4rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
               </div>
@@ -317,19 +317,19 @@ export default function Salary() {
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>{fSalaryType === 'shift' ? 'Ставка за смену (₽)' : 'Оклад (мес.)'}</div>
                     <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)}
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
+                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'3px'}}>{fSalaryType === 'shift' ? 'Умножается на количество смен' : 'Подтягивается из должности'}</div>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Отработано</div>
-                    <div style={{padding:'.35rem .5rem',fontSize:'.78rem',fontWeight:600,background:'#f8f9fa',borderRadius:'8px',border:'1.5px solid var(--border)'}}>
+                    <div style={{padding:'.35rem .5rem',fontSize:'.78rem',fontWeight:600,lineHeight:'1.3',boxSizing:'border-box',background:'#f8f9fa',borderRadius:'8px',border:'1.5px solid var(--border)'}}>
                       {fDays} дн. / {calcDays(fPeriodFrom,fPeriodTo)||'?'} дн.
                     </div>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>За период</div>
                     <input type="text" value={fSalaryTotal.toLocaleString()+' ₽'} disabled
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
+                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
                   </div>
                 </div>
               </div>
@@ -433,7 +433,7 @@ export default function Salary() {
               {/* Кнопки */}
               <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
                 <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
-                  style={{padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
+                  style={{padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
                   <option value="pending">Начислено</option>
                   <option value="paid">Выплачено</option>
                 </select>
