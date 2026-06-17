@@ -3,269 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>10 дизайнов — Начислить зарплату</title>
+<title>Начислить зарплату — доработанный вариант</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--font:'Inter',sans-serif;--body-bg:#f5f5f7;--white:#fff;--border:rgba(0,16,36,.1);--muted:rgba(0,0,0,.5);--radius:12px;--yellow:#ffdd2d;--green:#16a34a;--red:#dc2626;--blue:#428bf9;--orange:#f59e0b}
+:root{--font:'Inter',sans-serif;--body-bg:#f5f5f7;--white:#fff;--border:rgba(0,16,36,.1);--muted:rgba(0,0,0,.5);--radius:12px;--green:#16a34a;--red:#dc2626;--blue:#428bf9;--orange:#f59e0b}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--body-bg);color:#111;padding:2rem 1rem}
-h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem;text-align:center}
-.sub{font-size:.82rem;color:var(--muted);text-align:center;margin-bottom:2rem}
-.gallery{display:flex;flex-direction:column;gap:2.5rem;max-width:800px;margin:0 auto}
-.var{padding:1.5rem;background:var(--white);border-radius:var(--radius)}
-.var-num{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
-.var-title{font-size:.9rem;font-weight:600;margin-bottom:.5rem}
-.m-t{display:flex;flex-direction:column;gap:.85rem}
-.m-h{font-size:1rem;font-weight:700}
-.m-sub{font-size:.78rem;color:var(--muted)}
-.s-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
-.f-row{display:flex;gap:.5rem;flex-wrap:wrap}
-.f-row input,.f-row select{flex:1;min-width:80px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white);color:#111}
-.f-row input:focus,.f-row select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #428bf926}
-.total-line{display:flex;justify-content:space-between;padding:.5rem .65rem;background:#f8f9fa;border-radius:10px;font-size:.82rem;margin-top:.25rem}
-.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;border-radius:100px;border:none;cursor:pointer;font-family:var(--font)}
-.btn-blue{background:var(--blue);color:#fff}
+.container{max-width:600px;margin:0 auto}
+.card{background:var(--white);border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.card-h{padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.card-h h2{font-size:1rem;font-weight:700}
+.card-h .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.card-body{padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.75rem}
+.title-sm{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.flex{display:flex;gap:.5rem;flex-wrap:wrap}
+.flex-1{flex:1}
+.w-full{width:100%}
+input,select{padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white);color:#111}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #428bf926}
+input[disabled]{background:#f8f9fa;color:#999}
+.cb{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;cursor:pointer;transition:all .12s;color:transparent}
+.cb.checked{background:var(--blue);border-color:var(--blue);color:#fff}
+.sm-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.sm-table th{padding:.3rem .35rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:.7rem;text-align:left}
+.sm-table td{padding:.3rem .35rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.total-bar{display:flex;justify-content:space-between;align-items:center;padding:.65rem .75rem;background:#f8f9fa;border-radius:10px;margin-top:.25rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.45rem 1rem;font-size:.8rem;font-weight:600;border-radius:100px;border:none;cursor:pointer;font-family:var(--font)}
+.btn-primary{background:var(--blue);color:#fff}
+.warn-box{background:#fffbeb;border:1px solid var(--orange);border-radius:10px;padding:.5rem .65rem;font-size:.78rem;display:flex;gap:.5rem;align-items:center}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:.2rem .5rem;font-size:.72rem;border-radius:100px;cursor:pointer;font-weight:500}
+.tag-active{background:var(--blue);color:#fff}
+.tag-inactive{background:#f1f3f5;color:var(--muted)}
 </style>
 </head>
 <body>
 
-<h1>💰 Начислить зарплату</h1>
-<p class="sub">10 вариантов дизайна модалки</p>
+<div class="container">
 
-<div class="gallery">
+<div class="card">
+<div class="card-h">
+<h2>Начислить зарплату</h2>
+<div class="sub">Выберите сотрудника и период — премии и штрафы подтянутся из табеля</div>
+</div>
+<div class="card-body">
 
-<!-- V1 -->
-<div class="var">
-<div class="var-num">Вариант 1</div>
-<div class="var-title">Аккордеон — секции в рамках</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="m-sub">Сотрудник, период, расчет</div>
-<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden">
-<div style="padding:.5rem .65rem;background:#f8f9fa;border-bottom:1px solid var(--border);font-size:.82rem;font-weight:600">Сотрудник и период ▼</div>
-<div style="padding:.65rem">
-<select style="width:100%;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;margin-bottom:.5rem"><option selected>Максим К. — 50 000₽</option><option>Анна С. — 35 000₽</option></select>
-<div style="display:flex;gap:.5rem"><input type="date" value="2026-06-01" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none" /><input type="date" value="2026-06-30" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none" /></div>
-</div></div>
+<!-- Сотрудник и период -->
+<div>
+<div class="title-sm">Сотрудник и период</div>
+<div class="flex">
+<select class="flex-1" style="min-width:180px">
+<option>— выберите —</option>
+<option selected>Максим К. — Менеджер</option>
+<option>Анна С. — Кассир</option>
+</select>
+<input type="date" value="2026-06-01" class="flex-1" />
+<input type="date" value="2026-06-30" class="flex-1" />
+</div>
+</div>
+
+<!-- Расчет -->
+<div style="background:#f8f9fa;border-radius:12px;padding:.75rem">
+<div class="title-sm" style="margin-bottom:.5rem">Расчет</div>
+
+<!-- Тип оплаты тегами -->
+<div class="flex" style="margin-bottom:.65rem">
+<span class="tag tag-active">Фиксированный оклад</span>
+<span class="tag tag-inactive">Сдельная</span>
+<span class="tag tag-inactive">Процентная</span>
+</div>
+
+<!-- Строка расчета -->
+<div class="flex">
+<div class="flex-1">
+<div style="font-size:.68rem;color:var(--muted);margin-bottom:4px">Оклад (мес.)</div>
+<input type="number" value="50000" class="w-full" style="padding:.3rem .5rem" />
+</div>
+<div class="flex-1">
+<div style="font-size:.68rem;color:var(--muted);margin-bottom:4px">Отработано</div>
+<div style="padding:.3rem .5rem;font-size:.82rem;font-weight:600;background:transparent">22 дня из 30</div>
+</div>
+<div class="flex-1">
+<div style="font-size:.68rem;color:var(--muted);margin-bottom:4px">Сумма за период</div>
+<input type="text" value="50 000₽" disabled class="w-full" />
+</div>
+</div>
+</div>
+
+<!-- Табель: премии за этот период -->
 <div style="border:1px solid #bbf7d0;border-radius:12px;overflow:hidden">
-<div style="padding:.5rem .65rem;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:.82rem;font-weight:600;color:var(--green)">Расчет ▼</div>
-<div style="padding:.65rem">
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="% с продаж" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи (₽)" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-<div style="font-size:.68rem;color:var(--muted);margin-top:.25rem">30 дней = 50 000₽</div>
-</div></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
-<div style="border:1px solid #bbf7d0;border-radius:12px;overflow:hidden"><div style="padding:.5rem .65rem;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:.78rem;font-weight:600;color:var(--green)">Премия</div><div style="padding:.5rem .65rem"><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" /><input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><div style="font-size:.65rem;color:var(--muted);margin-top:4px">+ Добавить</div></div></div>
-<div style="border:1px solid #fecaca;border-radius:12px;overflow:hidden"><div style="padding:.5rem .65rem;background:#fef2f2;border-bottom:1px solid #fecaca;font-size:.78rem;font-weight:600;color:var(--red)">Вычеты</div><div style="padding:.5rem .65rem"><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" /><input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><div style="font-size:.65rem;color:var(--muted);margin-top:4px">+ Добавить</div></div></div>
+<div style="padding:.5rem .65rem;background:#f0fdf4;border-bottom:1px solid #bbf7d0;display:flex;align-items:center;justify-content:space-between">
+<span style="font-size:.78rem;font-weight:600;color:var(--green)">Премии из табеля</span>
+<span style="font-size:.68rem;color:var(--green)">5 000₽</span>
 </div>
-<div style="background:#fffbeb;border:1px solid var(--orange);border-radius:10px;padding:.5rem .65rem;font-size:.78rem">⚠ Невыплаченных: <b>50 000₽</b></div>
-<div class="total-line"><span>Оклад 50 000 + Комиссия 15 000</span><span style="font-weight:700;font-size:1.1rem;color:var(--blue)">65 000₽</span></div>
-<div style="display:flex;gap:.5rem"><select style="flex:1;padding:.35rem .5rem;font-size:.78rem;border:1.5px solid var(--border);border-radius:8px;outline:none;font-family:var(--font)"><option>Зарплата</option><option>Аванс</option><option>Бонус</option></select><button class="btn btn-blue" style="flex:1">Начислить</button></div>
-</div>
-</div>
-
-<!-- V2 -->
-<div class="var">
-<div class="var-num">Вариант 2</div>
-<div class="var-title">Две колонки</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="m-sub">Сотрудник и период</div>
-<div class="f-row"><select style="flex:2"><option selected>Максим К. — 50 000₽</option></select><input type="date" value="2026-06-01" style="flex:1" /><input type="date" value="2026-06-30" style="flex:1" /></div>
-<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:.65rem">
-<div style="background:#f8f9fa;border-radius:12px;padding:.65rem">
-<div class="s-label">Расчет</div>
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-<div style="font-size:.68rem;color:var(--muted);margin-top:.25rem">30 дней · 50 000₽</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:.35rem">
-<div style="background:#f0fdf4;border-radius:12px;padding:.5rem;flex:1"><div style="font-size:.72rem;font-weight:600;color:var(--green);margin-bottom:.25rem">Премия</div><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" /><input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /></div>
-<div style="background:#fef2f2;border-radius:12px;padding:.5rem;flex:1"><div style="font-size:.72rem;font-weight:600;color:var(--red);margin-bottom:.25rem">Вычеты</div><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" /><input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /></div>
-</div>
-</div>
-<div style="background:#fffbeb;border-radius:10px;padding:.5rem .65rem;font-size:.78rem">⚠ Невыплаченных: 50 000₽</div>
-<div class="total-line"><span>Оклад 50 000 + Комиссия 15 000</span><span style="font-weight:700;color:var(--blue);font-size:1.05rem">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить зарплату</button>
-</div>
-</div>
-
-</div>
-</body>
-</html>
-
-<!-- V3 -->
-<div class="var">
-<div class="var-num">Вариант 3</div>
-<div class="var-title">Табы — переключение между разделами</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="f-row"><select style="flex:2"><option selected>Максим К. — 50 000₽</option></select><input type="date" value="2026-06-01" style="flex:1" /><input type="date" value="2026-06-30" style="flex:1" /></div>
-<div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:.65rem">
-<span style="padding:.35rem .6rem;font-size:.78rem;font-weight:600;background:var(--blue);color:#fff;border-radius:8px 8px 0 0;cursor:default">Расчет</span>
-<span style="padding:.35rem .6rem;font-size:.78rem;color:var(--muted);cursor:default">Премия</span>
-<span style="padding:.35rem .6rem;font-size:.78rem;color:var(--muted);cursor:default">Вычеты</span>
-</div>
-<div style="min-height:140px">
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-<div style="font-size:.7rem;color:var(--muted);margin-top:.25rem">30 дней = 50 000₽</div>
-</div>
-<div class="total-line"><span>Оклад 50 000 + Комиссия 15 000</span><span style="font-weight:700;color:var(--blue);font-size:1.05rem">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить</button>
-</div>
-</div>
-
-<!-- V4 -->
-<div class="var">
-<div class="var-num">Вариант 4</div>
-<div class="var-title">Карточка сотрудника сверху + итог снизу</div>
-<div class="m-t">
-<div style="display:flex;align-items:center;gap:.5rem;padding:.65rem;background:#f8f9fa;border-radius:12px;margin-bottom:.5rem">
-<div style="width:36px;height:36px;border-radius:10px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700">М</div>
-<div><div style="font-size:.85rem;font-weight:600">Максим К.</div><div style="font-size:.7rem;color:var(--muted)">Менеджер · Оклад 50 000₽</div></div>
-</div>
-<div class="f-row"><input type="date" value="2026-06-01" /><input type="date" value="2026-06-30" /></div>
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row" style="margin-bottom:.5rem"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-<div class="f-row" style="gap:.35rem"><input type="number" placeholder="Премия" style="border-color:#bbf7d0" /><input type="number" placeholder="Вычет" style="border-color:#fecaca" /></div>
-<div style="background:#fffbeb;border-radius:10px;padding:.35rem .5rem;font-size:.72rem;color:var(--orange)">⚠ Долг 50 000₽</div>
-<div class="total-line"><span>Итого к начислению</span><span style="font-weight:700;font-size:1.1rem;color:var(--blue)">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить</button>
-</div>
-</div>
-
-<!-- V5 -->
-<div class="var">
-<div class="var-num">Вариант 5</div>
-<div class="var-title">Компактный — всё в одной строке</div>
-<div class="m-t">
-<div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap">
-<select style="flex:1;min-width:140px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:8px;outline:none;font-family:var(--font)"><option selected>Максим К.</option></select>
-<input type="date" value="2026-06-01" style="flex:1;min-width:100px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:8px;outline:none;font-family:var(--font)" />
-<input type="date" value="2026-06-30" style="flex:1;min-width:100px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:8px;outline:none;font-family:var(--font)" />
-</div>
-<div style="display:flex;gap:.35rem;flex-wrap:wrap">
-<input type="number" value="50000" placeholder="Оклад" style="flex:1;min-width:70px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" />
-<input type="number" value="300000" placeholder="Продажи" style="flex:1;min-width:70px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" />
-<input type="text" value="Комиссия 15 000" disabled style="flex:1;min-width:90px;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font);background:#f0f0f0" />
-</div>
-<div style="display:flex;gap:.35rem;flex-wrap:wrap">
-<input type="number" placeholder="Премия" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #bbf7d0;border-radius:6px;outline:none;font-family:var(--font)" />
-<input type="number" placeholder="Вычет" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #fecaca;border-radius:6px;outline:none;font-family:var(--font)" />
-</div>
-<div style="display:flex;align-items:center;justify-content:space-between;padding:.35rem .5rem;background:#f8f9fa;border-radius:8px">
-<span style="font-size:.72rem;color:var(--muted)">Итого</span>
-<span style="font-weight:700;color:var(--blue)">65 000₽</span>
-<button class="btn btn-blue" style="padding:.25rem .7rem;font-size:.72rem">Начислить</button>
-</div>
-</div>
-</div>
-
-<!-- V6 -->
-<div class="var">
-<div class="var-num">Вариант 6</div>
-<div class="var-title">Табличный — поля как строки таблицы</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="m-sub">Заполните данные и нажмите начислить</div>
-<table style="width:100%;border-collapse:collapse;font-size:.78rem">
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Сотрудник</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border)"><select style="width:100%;padding:.3rem .4rem;font-size:.75rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)"><option selected>Максим К. — 50 000₽</option></select></td></tr>
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Период</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);display:flex;gap:.35rem"><input type="date" value="2026-06-01" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><input type="date" value="2026-06-30" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" /></td></tr>
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Оклад</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border)"><input type="number" value="50000" style="width:100%;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><div style="font-size:.68rem;color:var(--muted);margin-top:2px">30 дней = 50 000₽</div></td></tr>
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Комиссия</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border)"><div class="f-row" style="gap:.35rem"><input type="number" value="5" placeholder="%" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><input type="number" value="300000" placeholder="Продажи" style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font)" /><input type="text" value="15 000₽" disabled style="flex:0.5;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:6px;outline:none;font-family:var(--font);background:#f0f0f0" /></div></td></tr>
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Премия</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border)"><input type="number" placeholder="Сумма" style="width:calc(50% - 4px);padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #bbf7d0;border-radius:6px;outline:none;font-family:var(--font);margin-right:4px" /><input type="text" placeholder="За что" style="width:calc(50% - 4px);padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #bbf7d0;border-radius:6px;outline:none;font-family:var(--font)" /></td></tr>
-<tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Вычеты</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border)"><input type="number" placeholder="Сумма" style="width:calc(50% - 4px);padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #fecaca;border-radius:6px;outline:none;font-family:var(--font);margin-right:4px" /><input type="text" placeholder="За что" style="width:calc(50% - 4px);padding:.3rem .4rem;font-size:.72rem;border:1.5px dashed #fecaca;border-radius:6px;outline:none;font-family:var(--font)" /></td></tr>
+<div style="padding:.5rem .65rem">
+<table class="sm-table">
+<thead><tr><th style="width:30px"></th><th>Дата</th><th>Сумма</th><th>За что</th></tr></thead>
+<tbody>
+<tr><td><span class="cb checked" style="cursor:default">✓</span></td><td>15.06</td><td style="color:var(--green);font-weight:600">+3 000₽</td><td>Отличная работа</td></tr>
+<tr><td><span class="cb checked" style="cursor:default">✓</span></td><td>20.06</td><td style="color:var(--green);font-weight:600">+2 000₽</td><td>Перевыполнение плана</td></tr>
+</tbody>
 </table>
-<div class="total-line"><span>Оклад 50 000 + Комиссия 15 000</span><span style="font-weight:700;color:var(--blue);font-size:1.05rem">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить</button>
+<div style="font-size:.68rem;color:var(--muted);margin-top:4px">Снимите галочку, чтобы не включать премию в эту выплату</div>
 </div>
 </div>
 
-<!-- V7 -->
-<div class="var">
-<div class="var-num">Вариант 7</div>
-<div class="var-title">Цветные блоки с иконками</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="m-sub">Максим К. · Менеджер</div>
-<div class="f-row"><input type="date" value="2026-06-01" /><input type="date" value="2026-06-30" /></div>
-<div style="background:linear-gradient(135deg,#f0fdf4,#fff);border-radius:14px;padding:.65rem;border:1px solid #bbf7d0">
-<div style="display:flex;align-items:center;gap:.35rem;margin-bottom:.5rem"><span style="width:24px;height:24px;border-radius:6px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:.7rem">💰</span><span style="font-size:.78rem;font-weight:600">Расчет</span></div>
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
+<!-- Табель: штрафы за этот период -->
+<div style="border:1px solid #fecaca;border-radius:12px;overflow:hidden">
+<div style="padding:.5rem .65rem;background:#fef2f2;border-bottom:1px solid #fecaca;display:flex;align-items:center;justify-content:space-between">
+<span style="font-size:.78rem;font-weight:600;color:var(--red)">Штрафы из табеля</span>
+<span style="font-size:.68rem;color:var(--red)">-1 500₽</span>
 </div>
+<div style="padding:.5rem .65rem">
+<table class="sm-table">
+<thead><tr><th style="width:30px"></th><th>Дата</th><th>Сумма</th><th>За что</th></tr></thead>
+<tbody>
+<tr><td><span class="cb checked" style="cursor:default">✓</span></td><td>12.06</td><td style="color:var(--red);font-weight:600">-1 500₽</td><td>Опоздание</td></tr>
+</tbody>
+</table>
+<div style="font-size:.68rem;color:var(--muted);margin-top:4px">Снимите галочку, чтобы отложить вычет</div>
+</div>
+</div>
+
+<!-- Возможность добавить свою премию/вычет -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
-<div style="background:linear-gradient(135deg,#f0fdf4,#fff);border-radius:12px;padding:.5rem;border:1px solid #bbf7d0"><div style="font-size:.72rem;font-weight:600;color:var(--green);margin-bottom:.35rem">🎯 Премия</div><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /></div>
-<div style="background:linear-gradient(135deg,#fef2f2,#fff);border-radius:12px;padding:.5rem;border:1px solid #fecaca"><div style="font-size:.72rem;font-weight:600;color:var(--red);margin-bottom:.35rem">⚠️ Вычеты</div><input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" /></div>
+<div style="border:1.5px dashed #bbf7d0;border-radius:10px;padding:.5rem">
+<div style="font-size:.72rem;font-weight:500;color:var(--green);margin-bottom:.25rem">+ Добавить премию</div>
+<input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" />
+<input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" />
 </div>
-<div class="total-line"><span>50 000 + 15 000</span><span style="font-weight:700;color:var(--blue);font-size:1.1rem;font-size:1.1rem">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить</button>
-</div>
-</div>
-
-<!-- V8 -->
-<div class="var">
-<div class="var-num">Вариант 8</div>
-<div class="var-title">Теговый — статусы/типы как теги</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="f-row"><select style="flex:2"><option selected>Максим К. — 50 000₽</option></select><input type="date" value="2026-06-01" style="flex:1" /><input type="date" value="2026-06-30" style="flex:1" /></div>
-<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.35rem">
-<span style="padding:.2rem .5rem;font-size:.72rem;background:var(--blue);color:#fff;border-radius:100px;cursor:default;font-weight:500">Зарплата</span>
-<span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">Аванс</span>
-<span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">Бонус</span>
-</div>
-<div style="padding:.5rem;background:#f8f9fa;border-radius:10px;margin-bottom:.35rem">
-<div style="font-size:.72rem;color:var(--muted);margin-bottom:.25rem">Расчет</div>
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-</div>
-<div class="f-row" style="gap:.35rem"><input type="number" placeholder="Премия" style="border-color:#bbf7d0" /><input type="number" placeholder="Вычет" style="border-color:#fecaca" /></div>
-<div style="background:#fffbeb;border-radius:10px;padding:.35rem .5rem;font-size:.72rem">⚠ Долг 50 000₽</div>
-<div class="total-line"><span>Итого к начислению</span><span style="font-weight:700;color:var(--blue);font-size:1.05rem">65 000₽</span></div>
-<div style="display:flex;gap:.5rem"><select style="flex:1;padding:.3rem .4rem;font-size:.72rem;border:1.5px solid var(--border);border-radius:8px;outline:none;font-family:var(--font)"><option>Начислено</option><option>Выплачено</option></select><button class="btn btn-blue" style="flex:1">Сохранить</button></div>
+<div style="border:1.5px dashed #fecaca;border-radius:10px;padding:.5rem">
+<div style="font-size:.72rem;font-weight:500;color:var(--red);margin-bottom:.25rem">+ Добавить вычет</div>
+<input type="number" placeholder="Сумма" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font);margin-bottom:4px" />
+<input type="text" placeholder="За что" style="width:100%;padding:.25rem .4rem;font-size:.72rem;border:1.5px dashed var(--border);border-radius:6px;outline:none;font-family:var(--font)" />
 </div>
 </div>
 
-<!-- V9 -->
-<div class="var">
-<div class="var-num">Вариант 9</div>
-<div class="var-title">Минималистичный — только тонкие линии</div>
-<div class="m-t" style="gap:.5rem">
-<div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--border)">
-<div style="font-size:.95rem;font-weight:600">Начислить зарплату</div>
-</div>
-<div class="f-row"><select style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0"><option selected>Максим К. — 50 000₽</option></select><input type="date" value="2026-06-01" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0;font-family:var(--font)" /><input type="date" value="2026-06-30" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0;font-family:var(--font)" /></div>
-<div class="f-row"><input type="number" value="50000" placeholder="Оклад" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0" /><input type="number" value="5" placeholder="%" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0" /><input type="text" value="15 000₽" disabled style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.25rem 0;background:transparent" /></div>
-<div class="f-row"><input type="text" placeholder="Премия (сумма, за что)" style="border:none;border-bottom:1.5px dashed #bbf7d0;border-radius:0;padding:.25rem 0" /><input type="text" placeholder="Вычет (сумма, за что)" style="border:none;border-bottom:1.5px dashed #fecaca;border-radius:0;padding:.25rem 0" /></div>
-<div style="display:flex;justify-content:space-between;padding:.35rem .5rem;font-size:.85rem"><span>Итого</span><span style="font-weight:700;color:var(--blue)">65 000₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить</button>
-</div>
+<!-- Долг -->
+<div class="warn-box">
+<span style="color:var(--orange);font-weight:700">⚠</span>
+<span>У сотрудника невыплаченных: <b>50 000₽</b></span>
 </div>
 
-<!-- V10 -->
-<div class="var">
-<div class="var-num">Вариант 10</div>
-<div class="var-title">Интегрированный с табелем — подтягивает премии/штрафы</div>
-<div class="m-t">
-<div class="m-h">Начислить зарплату</div>
-<div class="m-sub">Автоматически подтянуты данные из табеля</div>
-<div class="f-row"><select><option selected>Максим К.</option></select><input type="date" value="2026-06-01" /><input type="date" value="2026-06-30" /></div>
-<div style="background:#f0fdf4;border-radius:10px;padding:.5rem .65rem">
-<div style="font-size:.72rem;font-weight:600;color:var(--green);margin-bottom:.35rem">Подтянуто из табеля</div>
-<div style="display:flex;justify-content:space-between;font-size:.78rem"><span>Отработано дней</span><span><b>22</b> из 30</span></div>
-<div style="display:flex;justify-content:space-between;font-size:.78rem"><span>Премии (бонусы)</span><span style="color:var(--green);font-weight:600">+5 000₽</span></div>
-<div style="display:flex;justify-content:space-between;font-size:.78rm"><span>Штрафы</span><span style="color:var(--red);font-weight:600">-1 500₽</span></div>
+<!-- Итого -->
+<div class="total-bar">
+<div><div style="font-size:.72rem;color:var(--muted)">Оклад 50 000 + Премия 5 000 — Штраф 1 500</div></div>
+<div style="font-size:1.2rem;font-weight:700;color:var(--blue)">53 500₽</div>
 </div>
-<div class="f-row" style="margin-bottom:.35rem"><input type="number" value="50000" placeholder="Оклад" /><input type="number" value="5" placeholder="%" /></div>
-<div class="f-row"><input type="number" value="300000" placeholder="Продажи" /><input type="text" value="15 000₽" disabled style="background:#f0f0f0" /></div>
-<div class="total-line"><div><div style="font-size:.68rem;color:var(--muted)">Оклад 50 000 + Комиссия 15 000 + Бонус 5 000 - Штраф 1 500</div></div><span style="font-weight:700;color:var(--blue);font-size:1.1rem">68 500₽</span></div>
-<button class="btn btn-blue" style="width:100%;justify-content:center">Начислить зарплату</button>
+
+<!-- Действия -->
+<div class="flex">
+<select style="flex:1"><option>Начислено</option><option>Выплачено</option></select>
+<button class="btn btn-primary" style="flex:2">Начислить 53 500₽</button>
+</div>
+
 </div>
 </div>
 
 </div>
+
 </body>
 </html>
