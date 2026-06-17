@@ -469,14 +469,7 @@ export default function Salary() {
                     <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
                   </div>
                 ))}
-                {accsList.length > 1 && (
-                  <div onClick={()=>alert('Разделение выплаты будет доступно в следующей версии')}
-                    style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed var(--secondary)',fontSize:'.78rem',color:'var(--secondary)',fontWeight:600,transition:'background .12s'}}
-                    onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    + Разделить
-                  </div>
-                )}
+
               </div>
             </div>
           </div>

@@ -572,20 +572,21 @@ export default function Transactions() {
               if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;var sa={};accs.forEach(function(a,i){sa[a.id]=i<accs.length-1?amt:total-amt*(accs.length-1)});setSplitAmounts(sa)}
               setSplitMode(!splitMode)
             }}>{splitMode ? "+ Разделить" : "+ Разделить"}</div>
-            {splitMode && accs.map(function(a){
-              var ic = accIcons[a.type] || '🏦';
-              return (
-                <div key={a.id} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".35rem 0"}}>
-                  <span style={{fontSize:"1rem",width:"24px",textAlign:"center"}}>{ic}</span>
-                  <span style={{flex:1,fontSize:".8rem"}}>{a.name}</span>
-                  <input type="number" value={splitAmounts[a.id]||""} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r=Object.assign({},p);r[a.id]=v;return r})}}
-                    style={{width:"100px",padding:".35rem .4rem",fontSize:".8rem",border:"1px solid var(--border)",borderRadius:"5px",outline:"none",textAlign:"center",fontFamily:"var(--font)"}} />
-                </div>
-              );
-            })}
-            <div className="modal-actions" style={{marginTop:".5rem",borderTop:"none",paddingTop:0}}>
-              <button className="btn btn-account-select" onClick={function(){confirmTx()}} style={{width:"100%"}}>
-                {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + "₽"}
+            {splitMode && <div style={{padding:".5rem 0",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:".35rem"}}>
+              {accs.map(function(a){
+                return (
+                  <div key={a.id} style={{display:"flex",alignItems:"center",gap:".5rem"}}>
+                    <span style={{flex:1,fontSize:".8rem",fontWeight:500}}>{a.name}</span>
+                    <input type="number" value={splitAmounts[a.id]||""} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r=Object.assign({},p);r[a.id]=v;return r})}}
+                      style={{width:"100px",padding:".35rem .5rem",fontSize:".78rem",border:"1.5px solid var(--border)",borderRadius:"8px",outline:"none",textAlign:"right",fontFamily:"var(--font)"}} />
+                  </div>
+                );
+              })}
+            </div>}
+            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex"}}>
+              <button onClick={function(){confirmTx()}}
+                style={{width:"100%",padding:".45rem 1rem",fontSize:".8rem",fontWeight:600,borderRadius:"100px",border:"none",cursor:"pointer",background:"var(--secondary)",color:"#fff",fontFamily:"var(--font)"}}>
+                {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
               </button>
             </div>
           </div>
