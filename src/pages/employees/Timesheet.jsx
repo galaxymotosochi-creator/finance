@@ -65,6 +65,26 @@ export default function Timesheet() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Закрытие дропдаунов при клике вне
+  useEffect(() => {
+    const handler = () => {
+      setTsShowPeriod(false);
+      setTsShowEmp(false);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
+  // При открытии одного дропдауна закрывать другой
+  const togglePeriod = (val) => {
+    setTsShowPeriod(val);
+    if (val) setTsShowEmp(false);
+  };
+  const toggleEmp = (val) => {
+    setTsShowEmp(val);
+    if (val) setTsShowPeriod(false);
+  };
+
   const firstD = new Date(year, month, 1).getDay();
   const offset = firstD === 0 ? 6 : firstD - 1;
   const daysInM = new Date(year, month + 1, 0).getDate();
@@ -247,7 +267,7 @@ export default function Timesheet() {
             {/* Период */}
             <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
               <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsPeriod!=='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
-                onClick={e=>{e.stopPropagation();setTsShowPeriod(!tsShowPeriod);}}>{tsPeriodLabel}</span>
+                onClick={e=>{e.stopPropagation();togglePeriod(!tsShowPeriod);}}>{tsPeriodLabel}</span>
               {tsShowPeriod && (
                 <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                   <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
@@ -289,7 +309,7 @@ export default function Timesheet() {
             {/* Сотрудник */}
             <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
               <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter.length>0?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
-                onClick={e=>{e.stopPropagation();setTsShowEmp(!tsShowEmp);}}>{tsEmpFilter.length>0 ? 'Сотр. '+tsEmpFilter.length : 'Сотрудник'}</span>
+                onClick={e=>{e.stopPropagation();toggleEmp(!tsShowEmp);}}>{tsEmpFilter.length>0 ? 'Сотр. '+tsEmpFilter.length : 'Сотрудник'}</span>
               {tsShowEmp && (
                 <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                   <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
