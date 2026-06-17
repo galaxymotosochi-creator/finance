@@ -575,7 +575,7 @@ export default function Transactions() {
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--secondary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--secondary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b})()}₽</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b.toLocaleString()})()} ₽</span>
                   </div>
                 );
               })}
