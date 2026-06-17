@@ -32,7 +32,7 @@ export default function Settings() {
     if (savedNotifs) setNotifications(JSON.parse(savedNotifs));
     const savedOwner = localStorage.getItem('settings_owner');
     if (savedOwner) setOwner(JSON.parse(savedOwner));
-    // Загружаем из Supabase (перетирает localStorage)
+    // Загружаем из Supabase
     (async () => {
       try {
         const { data } = await supabase
@@ -43,7 +43,7 @@ export default function Settings() {
         if (data && (data.first_name || data.last_name)) {
           setOwner({ lastName: data.last_name || '', firstName: data.first_name || '', patronymic: data.patronymic || '' });
         }
-      } catch(e) {}
+      } catch(e) { /* Таблица может отсутствовать */ }
     })();
   }, []);
   const [tzDrop, setTzDrop] = useState(false);
