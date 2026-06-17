@@ -4,28 +4,20 @@ import { useAuth } from '../../hooks/useAuth';
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
 const STATUS_COLORS = {accrued:'#2563eb',paid:'#16a34a',cancelled:'#dc2626'};
+const SALARY_TYPES = [{value:'fixed',label:'Фиксированный оклад'},{value:'piecework',label:'Сдельная'},{value:'percent',label:'Процентная'}];
 
 function daysInMonth(y,m){return new Date(y,m,0).getDate()}
-function dayOfYear(d){return Math.floor((d-new Date(d.getFullYear(),0,0))/(1000*60*60*24))}
 
-// Считает пропорцию оклада за период
 function calcProportionalSalary(monthlySalary, from, to){
   if(!monthlySalary||!from||!to) return 0;
   var f=new Date(from), t=new Date(to);
   if(f>t) return 0;
-
-  // Если с 1-го по последний день месяца → полный оклад
   var lastDay = new Date(t.getFullYear(), t.getMonth()+1, 0);
   if(f.getDate()===1 && t.getTime()===lastDay.getTime()) return Math.round(monthlySalary);
-
-  // Если одинаковые числа и разница ровно 1 месяц → полный оклад
-  // например 17.05 → 17.06, 01.05 → 01.06
   if(f.getDate()===t.getDate()){
     var monthsDiff = (t.getFullYear()-f.getFullYear())*12 + t.getMonth()-f.getMonth();
     if(monthsDiff === 1) return Math.round(monthlySalary);
   }
-
-  // Иначе — пропорциональный расчет по дням
   var total=0;
   var cur=new Date(f);
   while(cur<=t){
@@ -35,21 +27,19 @@ function calcProportionalSalary(monthlySalary, from, to){
     var monthStart=(cur.getTime()===f.getTime())?f:new Date(y,m,1);
     var daysInM=daysInMonth(y,m+1);
     var daysWorked=Math.round((monthEnd-monthStart)/(1000*60*60*24))+1;
-    if(daysWorked===daysInM){
-      total+=monthlySalary;
-    } else {
-      total+=monthlySalary/daysInM*daysWorked;
-    }
+    if(daysWorked===daysInM) total+=monthlySalary;
+    else total+=monthlySalary/daysInM*daysWorked;
     cur=new Date(y,m+1,1);
   }
   return Math.round(total);
 }
 
-// Считает общие календарные дни в периоде
 function calcDays(from,to){
   if(!from||!to) return 0;
   return Math.round((new Date(to)-new Date(from))/(1000*60*60*24))+1;
 }
+
+const fmtDate = (ds) => { if(!ds) return ''; var p=ds.split('-'); return p.length===3?p[2]+'.'+p[1]:ds; };
 
 export default function Salary() {
   const { user } = useAuth();
@@ -61,24 +51,25 @@ export default function Salary() {
   const [editId, setEditId] = useState(null);
   const [showAcc, setShowAcc] = useState(false);
   const [pendingPayId, setPendingPayId] = useState(null);
-  const [detailEmpId, setDetailEmpId] = useState(null);
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
   const [fPeriodFrom, setFPeriodFrom] = useState('');
   const [fPeriodTo, setFPeriodTo] = useState('');
   const [fBaseSalary, setFBaseSalary] = useState(0);
-  const [fCommissionPct, setFCommissionPct] = useState(0);
-  const [fSalesTotal, setFSalesTotal] = useState('');
-  const [fCommissionAmt, setFCommissionAmt] = useState(0);
+  const [fSalaryType, setFSalaryType] = useState('fixed');
   const [fSalaryTotal, setFSalaryTotal] = useState(0);
-  const [fBonuses, setFBonuses] = useState([]); // [{amount, comment}]
-  const [fDeductions, setFDeductions] = useState([]); // [{amount, comment}]
+  const [fDays, setFDays] = useState(0);
   const [fPayType, setFPayType] = useState('salary');
   const [existingDebt, setExistingDebt] = useState(0);
   const [fStatus, setFStatus] = useState('pending');
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
-  const [fDays, setFDays] = useState(0);
+
+  // Timesheet data
+  const [tsEntries, setTsEntries] = useState([]);
+  const [bonusChecks, setBonusChecks] = useState({});
+  const [deductChecks, setDeductChecks] = useState({});
+  const [tsLoaded, setTsLoaded] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -99,31 +90,48 @@ export default function Salary() {
 
   useEffect(() => { load(); }, [user]);
 
-  // При выборе сотрудника — подтянуть данные
+  // Загрузка табеля при выборе сотрудника + периода
+  useEffect(() => {
+    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setTsEntries([]); setBonusChecks({}); setDeductChecks({}); setTsLoaded(false); return; }
+    (async () => {
+      setTsLoaded(false);
+      try {
+        const { data } = await supabase
+          .from('timesheet_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('employee_id', fEmpId)
+          .gte('date', fPeriodFrom)
+          .lte('date', fPeriodTo);
+        const entries = data || [];
+        setTsEntries(entries);
+        const bc = {}; const dc = {};
+        entries.forEach(e => {
+          if ((e.bonus_amount||0) > 0) bc[e.id] = true;
+          if ((e.deduct_amount||0) > 0) dc[e.id] = true;
+        });
+        setBonusChecks(bc);
+        setDeductChecks(dc);
+        setTsLoaded(true);
+      } catch(e) { setTsLoaded(true); }
+    })();
+  }, [fEmpId, fPeriodFrom, fPeriodTo, user]);
+
+  // Подтянуть оклад из сотрудника
   useEffect(() => {
     if (!fEmpId) return;
     const emp = employees.find(e => e.id === fEmpId);
-    if (emp) {
-      setFBaseSalary(emp.base_salary || 0);
-      // Ищем правило all+product или all+service для commission %
-      const rules = emp.bonus_rules || [];
-      const allRule = rules.find(r => r.scope === 'all');
-      setFCommissionPct(allRule ? allRule.rate : 0);
-    }
+    if (emp) setFBaseSalary(emp.base_salary || 0);
   }, [fEmpId, employees]);
 
-  // Пересчет при изменении периода, оклада, комиссии
+  // Пересчет
   useEffect(() => {
-    if (fPayType !== 'salary') { setFSalaryTotal(0); setFCommissionAmt(0); setFDays(0); return; }
     const sal = calcProportionalSalary(fBaseSalary, fPeriodFrom, fPeriodTo);
     setFSalaryTotal(sal);
     setFDays(calcDays(fPeriodFrom, fPeriodTo));
+  }, [fBaseSalary, fPeriodFrom, fPeriodTo]);
 
-    const sales = parseFloat(fSalesTotal) || 0;
-    setFCommissionAmt(Math.round(sales * fCommissionPct / 100));
-  }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalesTotal, fCommissionPct, fPayType]);
-
-  // Считаем долг сотрудника при выборе
+  // Долг
   useEffect(() => {
     if (!fEmpId) return;
     const debt = list
@@ -136,31 +144,32 @@ export default function Salary() {
     setExistingDebt(debt);
   }, [fEmpId, list]);
 
-  const bonusTotal = fBonuses.reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
-  const deductTotal = fDeductions.reduce((s,i) => s + (parseFloat(i.amount)||0), 0);
-  const grandTotal = fSalaryTotal + fCommissionAmt + bonusTotal - deductTotal;
+  const tsBonuses = tsEntries.filter(e => (e.bonus_amount||0) > 0);
+  const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
+  const checkedBonusTotal = tsBonuses.filter(e => bonusChecks[e.id]).reduce((s,e) => s + Number(e.bonus_amount||0), 0);
+  const checkedDeductTotal = tsDeducts.filter(e => deductChecks[e.id]).reduce((s,e) => s + Number(e.deduct_amount||0), 0);
+  const grandTotal = fSalaryTotal + checkedBonusTotal - checkedDeductTotal;
 
   const openAdd = () => {
-    console.log('openAdd called');
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
-    setFBaseSalary(0); setFCommissionPct(0); setFSalesTotal('');
-    setFCommissionAmt(0); setFSalaryTotal(0); setFBonuses([]); setFDeductions([]);
-    setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]); setFDays(0); setExistingDebt(0);
+    setFBaseSalary(0); setFSalaryType('fixed'); setFSalaryTotal(0); setFDays(0);
+    setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
+    setExistingDebt(0); setTsEntries([]); setBonusChecks({}); setDeductChecks({});
     setShow(true);
   };
 
   const openEdit = (s) => {
     setEditId(s.id); setFEmpId(s.employee_id||'');
     setFPeriodFrom(s.period_from||''); setFPeriodTo(s.period_to||'');
-    setFBaseSalary(s.base_salary||0); setFCommissionPct(s.commission_percent||0);
-    setFSalesTotal(String(s.sales_total||'')); setFCommissionAmt(s.commission_amount||0);
-    setFSalaryTotal(s.base_salary||0);
-    // Восстанавливаем массивы из JSONB или из старых полей
-    if(s.bonus_items && Array.isArray(s.bonus_items)) setFBonuses(s.bonus_items);
-    else setFBonuses(s.bonus_amount ? [{amount: s.bonus_amount, comment: s.bonus_comment||''}] : []);
-    if(s.deduct_items && Array.isArray(s.deduct_items)) setFDeductions(s.deduct_items);
-    else setFDeductions(s.deduct_amount ? [{amount: s.deduct_amount, comment: s.deduct_comment||''}] : []); setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
-    setFDate(s.date||new Date().toISOString().split('T')[0]); setFDays(s.days_worked||0);
+    setFBaseSalary(s.base_salary||0); setFSalaryType(s.salary_type||'fixed');
+    setFSalaryTotal(s.base_salary||0); setFDays(s.days_worked||0);
+    setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
+    setFDate(s.date||new Date().toISOString().split('T')[0]);
+    // Восстанавливаем checked из bonus_items/deduct_items
+    const bc = {}; const dc = {};
+    if (s.bonus_items && Array.isArray(s.bonus_items)) s.bonus_items.forEach(i => { if (i.tsEntryId) bc[i.tsEntryId] = true; });
+    if (s.deduct_items && Array.isArray(s.deduct_items)) s.deduct_items.forEach(i => { if (i.tsEntryId) dc[i.tsEntryId] = true; });
+    setBonusChecks(bc); setDeductChecks(dc);
     setShow(true);
   };
 
@@ -171,34 +180,19 @@ export default function Salary() {
     if (!user) return alert('Ошибка: пользователь не авторизован');
     const emp = employees.find(e => e.id === fEmpId);
     try {
+      const takeBonus = tsBonuses.filter(e => bonusChecks[e.id]);
+      const takeDeduct = tsDeducts.filter(e => deductChecks[e.id]);
       const obj = {
-        user_id: user.id,
-        employee_id: fEmpId,
-        employee_name: emp ? emp.name : 'Сотрудник',
-        period_from: fPeriodFrom,
-        period_to: fPeriodTo,
-        period_start: fPeriodFrom,
-        period_end: fPeriodTo,
-        base_salary: fBaseSalary,
-        commission_percent: fCommissionPct,
-        sales_total: parseFloat(fSalesTotal)||0,
-        commission_amount: fCommissionAmt,
-        bonus_amount: bonusTotal,
-        bonus_comment: fBonuses.map(i => (i.comment||'') + ': ' + (parseFloat(i.amount)||0).toLocaleString()+'₽').join('; '),
-        bonus_items: fBonuses,
-        deduct_amount: deductTotal,
-        deduct_comment: fDeductions.map(i => (i.comment||'') + ': ' + (parseFloat(i.amount)||0).toLocaleString()+'₽').join('; '),
-        deduct_items: fDeductions,
-        days_worked: fDays,
-        amount: grandTotal,
-        status: fStatus,
-        paid_at: fStatus === 'paid' ? fDate : null,
+        user_id: user.id, employee_id: fEmpId, employee_name: emp ? emp.name : 'Сотрудник',
+        period_from: fPeriodFrom, period_to: fPeriodTo, period_start: fPeriodFrom, period_end: fPeriodTo,
+        base_salary: fBaseSalary, days_worked: fDays,
+        amount: grandTotal, status: fStatus, pay_type: fPayType,
+        bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
+        deduct_amount: checkedDeductTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })),
+        salary_type: fSalaryType, paid_at: fStatus === 'paid' ? fDate : null,
       };
-      if (editId) {
-        await supabase.from('salary').update(obj).eq('id', editId);
-      } else {
-        await supabase.from('salary').insert(obj);
-      }
+      if (editId) { await supabase.from('salary').update(obj).eq('id', editId); }
+      else { await supabase.from('salary').insert(obj); }
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -212,7 +206,7 @@ export default function Salary() {
   const confirmPay = async (accId) => {
     try {
       const { data: rows } = await supabase.from('salary').select('*').eq('id', pendingPayId);
-      if (!rows || rows.length === 0) return;
+      if (!rows || !rows.length) return;
       const s = rows[0];
       await supabase.from('transactions').insert({
         user_id: user.id, account_id: accId,
@@ -221,46 +215,41 @@ export default function Salary() {
         date: fDate,
       });
       await supabase.from('salary').update({ status: 'paid', paid_at: fDate }).eq('id', pendingPayId);
-      await load();
-      setShowAcc(false); setPendingPayId(null);
+      await load(); setShowAcc(false); setPendingPayId(null);
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
 
-  const fmtD = (d) => { if(!d) return '—'; const p=d.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0].slice(2):d; };
+  const toggleBonus = (id) => setBonusChecks(prev => ({...prev, [id]: !prev[id]}));
+  const toggleDeduct = (id) => setDeductChecks(prev => ({...prev, [id]: !prev[id]}));
+
+  const fmtD = (d) => { if(!d) return '—'; var p=d.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0].slice(2):d; };
 
   return (
     <>
       <div className="page-header">
-        <div><h1>Учет зарплаты</h1><div className="sub">Расчет начислений, бонусов и выплат команде</div></div>
-        <div className="page-actions"><button className="btn-mint" onClick={()=>{console.log('click');openAdd()}}>+ Начислить</button></div>
+        <div><h1>Учет зарплаты</h1><div className="sub">Расчет начислений с привязкой к табелю</div></div>
+        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+      <div className="product-table" style={{overflowX:'auto'}}>
         <table>
           <thead id="salaryColHeaders"><tr>
-            <th>Сотрудник</th><th>Тип</th><th>Период</th><th>Оклад</th><th>Продажи</th>
-            <th>%</th><th>Комиссия</th><th>Премия</th><th>Вычеты</th>
-            <th>Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
+            <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
+            <th>Вычеты</th><th>Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
           </tr></thead>
           <tbody id="salaryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">💼</div><p>История начислений пуста</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Проведите первое начисление оклада или бонусов команде</p></div></td></tr>
-            ) : list.map(s => {
-              const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
-              return (
+              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">💼</div><p>История начислений пуста</p>
+                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
+            ) : list.map(s => (
               <tr key={s.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem',cursor:'pointer',color:'var(--primary)'}} onClick={()=>setDetailEmpId(s.employee_id)}>{s.employee_name||'—'}</div></td>
-                <td style={{fontSize:'.78rem'}}><span className="prod-cat" style={{background: (s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></td>
+                <td><div className="prod-name" style={{fontSize:'.85rem',cursor:'pointer',color:'var(--primary)'}} onClick={()=>{}}>{s.employee_name||'—'}</div></td>
                 <td style={{fontSize:'.82rem'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td>{s.base_salary?s.base_salary.toLocaleString()+'₽':'—'}</td>
-                <td>{s.sales_total?s.sales_total.toLocaleString()+'₽':'—'}</td>
-                <td>{s.commission_percent?s.commission_percent+'%':'—'}</td>
-                <td>{s.commission_amount?s.commission_amount.toLocaleString()+'₽':'—'}</td>
                 <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+'₽':'—'}</td>
                 <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+'₽':'—'}</td>
                 <td style={{fontWeight:600}}>{Number(s.amount).toLocaleString()}₽</td>
@@ -276,8 +265,7 @@ export default function Salary() {
                   </div>
                 </td>
               </tr>
-            );
-          })}
+            ))}
           </tbody>
         </table>
       </div>
@@ -286,130 +274,168 @@ export default function Salary() {
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
       {show && (
         <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box" style={{maxWidth:'580px'}}>
+          <div className="modal-box" style={{maxWidth:'560px',padding:0,overflow:'hidden',borderRadius:'16px'}}>
             <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId?'Редактировать':'Начислить зарплату'}</h2>
-            <div className="sub">Выберите сотрудника и период</div>
-            <form onSubmit={save}>
+            <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid var(--border)'}}>
+              <h2>{editId?'Редактировать':'Начислить зарплату'}</h2>
+              <div className="sub" style={{margin:0,marginTop:'2px'}}>Выберите сотрудника и период</div>
+            </div>
+            <form onSubmit={save} style={{padding:'1rem 1.25rem',display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
-              {/* Сотрудник */}
-              <div className="form-group">
-                <label>Сотрудник</label>
-                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required>
+              {/* Сотрудник + период */}
+              <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
+              <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
+                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required
+                  style={{flex:3,minWidth:'180px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
                   <option value="">— выберите —</option>
-                  {employees.map(e=><option key={e.id} value={e.id}>{e.name} {e.base_salary ? '— '+e.base_salary.toLocaleString()+'₽' : ''}</option>)}
+                  {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
-              </div>
-
-              {/* Период */}
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Начало периода</label>
-                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label>Конец периода</label>
-                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required />
-                </div>
+                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required
+                  style={{flex:1,minWidth:'115px',padding:'.3rem .4rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
+                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required
+                  style={{flex:1,minWidth:'115px',padding:'.3rem .4rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
               </div>
 
               {/* Расчет */}
-              <div className="emp-section-label">Расчет</div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Оклад (мес.)</label>
-                  <input type="number" value={fBaseSalary} onChange={e=>setFBaseSalary(parseFloat(e.target.value)||0)} min="0" />
-                  {fDays>0&&<div className="emp-hint">{fDays} дн. = {fSalaryTotal.toLocaleString()}₽</div>}
+              <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'.75rem'}}>
+                <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'.5rem'}}>Расчет</div>
+                <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap',marginBottom:'.65rem'}}>
+                  {SALARY_TYPES.map(t => (
+                    <span key={t.value} onClick={()=>setFSalaryType(t.value)}
+                      style={{display:'inline-flex',alignItems:'center',gap:'4px',padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'100px',cursor:'pointer',fontWeight:500,
+                        background:fSalaryType===t.value?'var(--primary)':'#f1f3f5',color:fSalaryType===t.value?'#000':'var(--muted)'}}>{t.label}</span>
+                  ))}
                 </div>
-                <div className="form-group">
-                  <label>% с продаж</label>
-                  <input type="number" value={fCommissionPct} onChange={e=>setFCommissionPct(parseFloat(e.target.value)||0)} min="0" max="100" />
+                <div style={{display:'flex',gap:'.35rem',alignItems:'flex-start'}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Оклад (мес.)</div>
+                    <input type="number" value={fBaseSalary} onChange={e=>setFBaseSalary(parseFloat(e.target.value)||0)}
+                      style={{width:'100%',padding:'.3rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
+                    <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'3px'}}>Подтягивается из должности</div>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Отработано</div>
+                    <div style={{padding:'.3rem .5rem',fontSize:'.82rem',fontWeight:600,background:'#f8f9fa',borderRadius:'8px',border:'1.5px solid var(--border)'}}>
+                      {fDays} дн. / {calcDays(fPeriodFrom,fPeriodTo)||'?'} дн.
+                    </div>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>За период</div>
+                    <input type="text" value={fSalaryTotal.toLocaleString()+'₽'} disabled
+                      style={{width:'100%',padding:'.3rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
+                  </div>
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Продажи за период (₽)</label>
-                  <input type="number" value={fSalesTotal} onChange={e=>setFSalesTotal(e.target.value)} min="0" placeholder="0" />
+
+              {/* Премии из табеля */}
+              <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#16a34a'}}>Премии из табеля</span>
+                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()}₽</span>
                 </div>
-                <div className="form-group">
-                  <label>Комиссия</label>
-                  <input type="text" value={fCommissionAmt.toLocaleString()+'₽'} disabled style={{background:'#f8f9fa'}} />
+                <div style={{padding:'.5rem .65rem'}}>
+                  {tsBonuses.length === 0 ? (
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет премий за этот период'}</div>
+                  ) : (
+                    <>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
+                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>За что</th>
+                        </tr></thead>
+                        <tbody>
+                          {tsBonuses.map(e => (
+                            <tr key={e.id}>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                                <span onClick={()=>toggleBonus(e.id)}
+                                  style={{width:'16px',height:'16px',border:'1.5px solid '+(bonusChecks[e.id]?'#16a34a':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:bonusChecks[e.id]?'#16a34a':'transparent',color:'#fff'}}>
+                                  {bonusChecks[e.id] ? '✓' : ''}
+                                </span>
+                              </td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.bonus_comment||'—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Снимите галочку — премия останется на будущее</div>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Премия */}
-              <div className="emp-section-label">Премия</div>
-              {fBonuses.map((item, i) => (
-                <div key={i} className="form-row" style={{alignItems:'center'}}>
-                  <div className="form-group">
-                    <label>Сумма (₽)</label>
-                    <input type="number" value={item.amount} onChange={e=>{const n=[...fBonuses]; n[i]={...n[i],amount:e.target.value}; setFBonuses(n)}} placeholder="0" min="0" />
-                  </div>
-                  <div className="form-group">
-                    <label>Примечание</label>
-                    <input type="text" value={item.comment} onChange={e=>{const n=[...fBonuses]; n[i]={...n[i],comment:e.target.value}; setFBonuses(n)}} placeholder="За что" />
-                  </div>
-                  <button type="button" className="emp-row-rm" onClick={()=>setFBonuses(fBonuses.filter((_,j)=>j!==i))} style={{marginTop:'1.2rem'}}>✕</button>
+              {/* Штрафы из табеля */}
+              <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#dc2626'}}>Штрафы из табеля</span>
+                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()}₽</span>
                 </div>
-              ))}
-              <button type="button" className="emp-rule-add" onClick={()=>setFBonuses([...fBonuses,{amount:'',comment:''}])}>+ Добавить премию</button>
-
-              {/* Вычеты */}
-              <div className="emp-section-label" style={{marginTop:'.75rem'}}>Вычеты</div>
-              {fDeductions.map((item, i) => (
-                <div key={i} className="form-row" style={{alignItems:'center'}}>
-                  <div className="form-group">
-                    <label>Сумма (₽)</label>
-                    <input type="number" value={item.amount} onChange={e=>{const n=[...fDeductions]; n[i]={...n[i],amount:e.target.value}; setFDeductions(n)}} placeholder="0" min="0" />
-                  </div>
-                  <div className="form-group">
-                    <label>Примечание</label>
-                    <input type="text" value={item.comment} onChange={e=>{const n=[...fDeductions]; n[i]={...n[i],comment:e.target.value}; setFDeductions(n)}} placeholder="За что" />
-                  </div>
-                  <button type="button" className="emp-row-rm" onClick={()=>setFDeductions(fDeductions.filter((_,j)=>j!==i))} style={{marginTop:'1.2rem'}}>✕</button>
+                <div style={{padding:'.5rem .65rem'}}>
+                  {tsDeducts.length === 0 ? (
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет штрафов за этот период'}</div>
+                  ) : (
+                    <>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
+                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Сумма</th>
+                          <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>За что</th>
+                        </tr></thead>
+                        <tbody>
+                          {tsDeducts.map(e => (
+                            <tr key={e.id}>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                                <span onClick={()=>toggleDeduct(e.id)}
+                                  style={{width:'16px',height:'16px',border:'1.5px solid '+(deductChecks[e.id]?'#dc2626':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:deductChecks[e.id]?'#dc2626':'transparent',color:'#fff'}}>
+                                  {deductChecks[e.id] ? '✓' : ''}
+                                </span>
+                              </td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600}}>-{Number(e.deduct_amount).toLocaleString()}₽</td>
+                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.deduct_comment||'—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Снимите галочку — штраф останется на будущее</div>
+                    </>
+                  )}
                 </div>
-              ))}
-              <button type="button" className="emp-rule-add" onClick={()=>setFDeductions([...fDeductions,{amount:'',comment:''}])}>+ Добавить вычет</button>
-
-              <div className="form-group">
-                <label>Статус</label>
-                <select value={fPayType} onChange={e=>setFPayType(e.target.value)}>
-                  <option value="salary">Зарплата</option>
-                  <option value="advance">Аванс</option>
-                  <option value="bonus">Бонус</option>
-                </select>
               </div>
 
+              {/* Долг */}
               {existingDebt !== 0 && (
-                <div style={{background:'#fef3c7',border:'1px solid #f59e0b',borderRadius:'.75rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
-                  <span>⚠️</span>
-                  <span>
-                    <b>У сотрудника {(existingDebt>0)?'невыплаченных':'переплата'}: {Math.abs(existingDebt).toLocaleString()}₽</b>
-                    {fPayType === 'salary' && existingDebt > 0 && (
-                      <span> — после начисления долг будет {(existingDebt + grandTotal).toLocaleString()}₽</span>
-                    )}
+                <div style={{background:'#fffbeb',border:'1px solid #f59e0b',borderRadius:'10px',padding:'.5rem .65rem',fontSize:'.78rem',display:'flex',gap:'.5rem',alignItems:'center'}}>
+                  <span style={{color:'#f59e0b',fontWeight:700}}>⚠</span>
+                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()}₽</b>
+                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()}₽</span>
                   </span>
                 </div>
               )}
 
-              <div className="form-group">
-                <label>Статус</label>
-                <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
+              {/* Итого */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
+                <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
+                  {(fSalaryTotal>0?'Оклад '+fSalaryTotal.toLocaleString()+'₽':'')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+'₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
+                </div>
+                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()}₽</div>
+              </div>
+
+              {/* Кнопки */}
+              <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
+                <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
+                  style={{padding:'.3rem .5rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
                   <option value="pending">Начислено</option>
                   <option value="paid">Выплачено</option>
                 </select>
+                <button type="submit"
+                  style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
+                  Начислить {grandTotal.toLocaleString()}₽
+                </button>
               </div>
 
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.75rem',padding:'.75rem',background:'#f8f9fa',borderRadius:'.75rem'}}>
-                <div>
-                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Оклад {fSalaryTotal.toLocaleString()}₽ + Комиссия {fCommissionAmt.toLocaleString()}₽ + Премия {bonusTotal.toLocaleString()}₽ — Вычеты {deductTotal.toLocaleString()}₽</div>
-                </div>
-                <div style={{fontSize:'1.2rem',fontWeight:700,color:'var(--primary)'}}>{grandTotal.toLocaleString()}₽</div>
-              </div>
-
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Начислить'}</button>
-              </div>
             </form>
           </div>
         </div>
@@ -417,83 +443,23 @@ export default function Salary() {
 
       {/* МОДАЛКА ВЫБОРА СЧЕТА */}
       {showAcc && (()=>{
-        const item = list.find(x => x.id === pendingPayId);
-        if (!item) return null;
+        const accsList = accs.filter(a => a.type !== 'credit');
         return (
-          <div className="modal-overlay active">
-            <div className="modal-box" style={{maxWidth:'450px'}}>
+          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowAcc(false);setPendingPayId(null)}}}>
+            <div className="modal-box" style={{maxWidth:'400px'}}>
               <button className="modal-close" onClick={()=>{setShowAcc(false);setPendingPayId(null)}}>&times;</button>
-              <h2>💳 Выплата зарплаты</h2>
-              <div className="sub" style={{marginBottom:'.5rem'}}>
-                {item.employee_name||'Сотрудник'} — <b>{Number(item.amount).toLocaleString()}₽</b>
-              </div>
-              <div style={{marginBottom:'1rem',fontSize:'.82rem',color:'var(--muted)'}}>
-                Выберите счет для списания
-              </div>
-              {accs.map(a => (
-                <div key={a.id} onClick={()=>confirmPay(a.id)}
-                  style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',border:'1.5px solid var(--border)',borderRadius:'.85rem',marginBottom:'.35rem',cursor:'pointer',background:'var(--body-bg)'}}>
-                  <div style={{fontSize:'1.2rem',marginRight:'.65rem'}}>🏦</div>
-                  <div style={{flex:1}}>
-                    <div style={{fontWeight:600,fontSize:'.85rem'}}>{a.name}</div>
-                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{a.type||''}</div>
+              <h2>Выплата зарплаты</h2>
+              <div className="sub">Выберите счет для выплаты</div>
+              <div style={{display:'flex',flexDirection:'column',gap:'.35rem',marginTop:'.25rem'}}>
+                {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
+                {accsList.map(a => (
+                  <div key={a.id} onClick={()=>confirmPay(a.id)}
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'var(--radius)',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem'}}>
+                    <span style={{fontWeight:500}}>{a.name}</span>
+                    <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
                   </div>
-                  <span style={{fontWeight:600,fontSize:'.85rem',color:'#dc2626'}}>Списать</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* МОДАЛКА ДЕТАЛЕЙ СОТРУДНИКА */}
-      {detailEmpId && (()=>{
-        const emp = employees.find(e => e.id === detailEmpId);
-        const empRecords = list.filter(s => s.employee_id === detailEmpId);
-        const ptLabels = {salary:'Зарплата',advance:'Аванс',bonus:'Бонус'};
-        const STL = {pending:'⏳',paid:'✅',accrued:'⏳',cancelled:'❌'};
-        const nac = empRecords.filter(s => s.pay_type==='salary' && s.status!=='cancelled').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
-        const paid = empRecords.filter(s => s.status==='paid').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
-        const adv = empRecords.filter(s => s.pay_type==='advance').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
-        const bonus = empRecords.filter(s => s.pay_type==='bonus'&&s.status!=='cancelled').reduce((sum,s)=>sum+(Number(s.amount)||0),0);
-        const debt = nac - paid - adv;
-        return (
-          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active')setDetailEmpId(null)}}>
-            <div className="modal-box" style={{maxWidth:'500px'}}>
-              <button className="modal-close" onClick={()=>setDetailEmpId(null)}>&times;</button>
-              <h2>👤 {emp ? emp.name : 'Сотрудник'}</h2>
-              <div className="sub">История начислений и выплат</div>
-
-              {/* Сводка */}
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.5rem',marginBottom:'1rem'}}>
-                <div className="emp-detail-stat"><span className="lbl">Начислено</span><span className="val">{nac.toLocaleString()}₽</span></div>
-                <div className="emp-detail-stat"><span className="lbl">Выплачено</span><span className="val" style={{color:'#16a34a'}}>{paid.toLocaleString()}₽</span></div>
-                <div className="emp-detail-stat"><span className="lbl">Авансы</span><span className="val">{adv.toLocaleString()}₽</span></div>
-                <div className="emp-detail-stat"><span className="lbl">Бонусы</span><span className="val" style={{color:'var(--primary)'}}>{bonus.toLocaleString()}₽</span></div>
-                <div className="emp-detail-stat" style={{gridColumn:'1/-1'}}>
-                  <span className="lbl">Долг</span>
-                  <span className="val" style={{color:debt>0?'#dc2626':'#16a34a',fontWeight:700}}>{debt>0?debt.toLocaleString()+'₽':'✅'} </span>
-                </div>
+                ))}
               </div>
-
-              {/* История */}
-              <div className="emp-section-label">История</div>
-              {empRecords.length === 0 ? (
-                <div style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей</div>
-              ) : (
-                <div style={{display:'flex',flexDirection:'column',gap:'.25rem'}}>
-                  {empRecords.map(s => (
-                    <div key={s.id} className="emp-detail-row">
-                      <span className="emp-detail-status">{STL[s.status]||'⏳'}</span>
-                      <span className="emp-detail-type"><span className="prod-cat" style={{background:(s.pay_type==='advance'?'#fef3c7':s.pay_type==='bonus'?'#eaf5ff':'#f1f3f5'),color:(s.pay_type==='advance'?'#92400e':s.pay_type==='bonus'?'var(--primary)':'var(--muted)')}}>{ptLabels[s.pay_type]||'Зарплата'}</span></span>
-                      <span className="emp-detail-date">{s.period_from?fmtD(s.period_from):(s.created_at?fmtD(s.created_at.split('T')[0]):'—')}</span>
-                      <span className="emp-detail-amount" style={{color:(s.pay_type==='advance'||s.status==='paid')?'#dc2626':(s.pay_type==='bonus'?'var(--primary)':'')}}>
-                        {(s.status==='paid'||s.pay_type==='advance'?'−':'+')}{Number(s.amount).toLocaleString()}₽
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         );
