@@ -229,7 +229,7 @@ export default function Transactions() {
           <div className="sub">Доходы, расходы и перемещения</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={function(){setShowActionSelect(true)}} style={{background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',padding:'.5rem .8rem',fontWeight:'600',fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Операция</button>
+          <button className="btn-mint" onClick={function(){setShowActionSelect(true)}} style={{background:'var(--secondary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',padding:'.5rem .8rem',fontWeight:'600',fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Операция</button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
@@ -375,19 +375,19 @@ export default function Transactions() {
             <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
               <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
                 style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div><div style={{fontWeight:600}}>Добавить расход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Списание средств</div></div>
               </button>
               <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowIncome(true)}}
                 style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div><div style={{fontWeight:600}}>Добавить доход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Поступление средств</div></div>
               </button>
               <button onClick={function(){setShowActionSelect(false);setShowTransfer(true);setTrFrom('');setTrTo('');setTrAmt('')}}
                 style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--primary-light)'}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
               </button>
@@ -558,20 +558,20 @@ export default function Transactions() {
                 var sel = selectedAcc === a.id;
                 var ic = accIcons[a.type] || '🏦';
                 return (
-                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:"var(--radius)",background:sel?"var(--primary-light)":"var(--body-bg)",border:"1.5px solid "+(sel?"var(--primary)":"var(--border)")}}>
-                    <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--primary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
-                    <span style={{fontSize:"1rem"}}>{ic}</span>
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:".6rem",background:sel?"var(--secondary-light)":"var(--body-bg)",border:"1.5px solid "+(sel?"var(--secondary)":"var(--border)")}}>
+                    <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--secondary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
+                    
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--primary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b})()}₽</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"var(--secondary)"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b})()}₽</span>
                   </div>
                 );
               })}
               {accs.length === 0 && <div style={{textAlign:"center",padding:"1rem",color:"var(--muted)",fontSize:".85rem"}}>Нет счетов. Добавьте в разделе Счета</div>}
             </div>
-            <div className="sub" style={{marginBottom:".75rem",cursor:"pointer",fontSize:".82rem",color:"var(--primary)"}} onClick={function(){
+            <div className="sub" style={{marginBottom:".75rem",cursor:"pointer",fontSize:".82rem",color:"var(--secondary)"}} onClick={function(){
               if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;var sa={};accs.forEach(function(a,i){sa[a.id]=i<accs.length-1?amt:total-amt*(accs.length-1)});setSplitAmounts(sa)}
               setSplitMode(!splitMode)
-            }}>{splitMode ? "➖ Разделить" : "➕ Разделить"}</div>
+            }}>{splitMode ? "Без разделения" : "Разделить выплату"}</div>
             {splitMode && accs.map(function(a){
               var ic = accIcons[a.type] || '🏦';
               return (
