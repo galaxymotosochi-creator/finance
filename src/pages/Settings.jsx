@@ -191,7 +191,7 @@ export default function Settings() {
                   const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(fileName);
                   localStorage.setItem('companyLogo', publicUrl);
                   setCompany({...company, logo: publicUrl});
-                  setToast('✅ Логотип загружен');
+                  setToast('Логотип загружен');
                 } catch(err) {
                   // Fallback: save as base64 if storage fails
                   const reader = new FileReader();
@@ -199,7 +199,7 @@ export default function Settings() {
                     const dataUrl = ev.target.result;
                     localStorage.setItem('companyLogo', dataUrl);
                     setCompany({...company, logo: dataUrl});
-                    setToast('✅ Логотип сохранён локально');
+                    setToast('Логотип сохранён локально');
                   };
                   reader.readAsDataURL(file);
                 }
@@ -263,7 +263,7 @@ export default function Settings() {
                 await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic });
               }
             } catch(e) {}
-            setToast('✅ Настройки сохранены');
+            setToast('Настройки сохранены');
           }} style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
     </div>
