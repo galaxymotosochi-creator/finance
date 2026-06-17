@@ -346,7 +346,7 @@ export default function Salary() {
                   ) : (
                     <>
                       <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
-                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
+                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
                           <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>За что</th>
@@ -361,7 +361,7 @@ export default function Salary() {
                                 </span>
                               </td>
                               <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem'}}>+{Number(e.bonus_amount).toLocaleString()}₽</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.bonus_comment||'—'}</td>
                             </tr>
                           ))}
@@ -385,7 +385,7 @@ export default function Salary() {
                   ) : (
                     <>
                       <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem'}}>
-                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}></th>
+                        <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
                           <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>За что</th>
@@ -400,7 +400,7 @@ export default function Salary() {
                                 </span>
                               </td>
                               <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600,fontSize:'.72rem'}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem',color:'var(--muted)'}}>{e.deduct_comment||'—'}</td>
                             </tr>
                           ))}
