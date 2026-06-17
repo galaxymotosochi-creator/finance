@@ -137,7 +137,7 @@ export default function Positions() {
   };
 
   return (
-    <>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       <div className="page-header">
         <div>
           <h1>Должности</h1>
@@ -158,7 +158,7 @@ export default function Positions() {
           <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую должность, чтобы настроить шаблоны прав доступа</p>
         </div>
       ) : (
-        <div className="product-table">
+        <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
           <table>
             <thead id="colHeaders">
               <tr>
@@ -269,6 +269,6 @@ export default function Positions() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
