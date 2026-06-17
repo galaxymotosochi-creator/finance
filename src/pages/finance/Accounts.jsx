@@ -214,7 +214,7 @@ export default function Accounts() {
                   var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
                   return (
                     <tr key={a.id}>
-                      <td style={{textAlign:'left'}}>
+                      <td style={{textAlign:'center'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
                             <div className="prod-name">{a.name}</div>
@@ -354,7 +354,7 @@ export default function Accounts() {
                 <thead id="colHeaders">
                   <tr>
                     <th style={{textAlign:'left',paddingLeft:0,minWidth:'100px'}}>Дата</th>
-                    <th style={{textAlign:'left'}}>Описание</th>
+                    <th style={{textAlign:'center'}}>Описание</th>
                     <th style={{width:'80px'}}>Сумма</th>
                   </tr>
                 </thead>
