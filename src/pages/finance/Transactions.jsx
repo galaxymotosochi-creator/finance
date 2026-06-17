@@ -307,7 +307,7 @@ export default function Transactions() {
             <div style={{ height: '3px', background: '#4caf50' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Выручка</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: profit < 0 && 'Выручка' === 'Прибыль' ? '#dc2626' : '#111' }}>{incomeTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{incomeTotal.toLocaleString()} ₽</div>
             </div>
           </div>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
