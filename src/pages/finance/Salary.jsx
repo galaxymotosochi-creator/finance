@@ -513,7 +513,7 @@ export default function Salary() {
                     onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
                     onMouseLeave={e=>{e.currentTarget.style.background='var(--body-bg)';e.currentTarget.style.borderColor='var(--border)'}}>
                     <span style={{fontWeight:500}}>{a.name}</span>
-                    <span style={{marginLeft:'auto',color:'var(--muted)'}}>{Number(a.balance||0).toLocaleString()}₽</span>
+                    <span style={{marginLeft:'auto',color:'#111'}}>{Number(a.balance||0).toLocaleString()} ₽</span>
                   </div>
                 )) : accsList.map(a => (
                   <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
@@ -532,7 +532,7 @@ export default function Salary() {
                 )}
                 {salarySplitMode && (
                   <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                    style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.15rem'}}>Подтвердить разделение</button>
+                    style={{padding:'.45rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--primary)',color:'var(--primary-text)',fontFamily:'var(--font)',display:'block',margin:'.15rem auto 0'}}>Подтвердить разделение</button>
                 )}
               </div>
             </div>
