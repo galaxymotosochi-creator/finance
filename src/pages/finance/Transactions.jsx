@@ -571,7 +571,7 @@ export default function Transactions() {
             <div className="sub" style={{marginBottom:".75rem",cursor:"pointer",fontSize:".82rem",color:"var(--secondary)"}} onClick={function(){
               if(!splitMode){var amt=pendingTx?Math.round((pendingTx.amount||0)/3):0;var total=pendingTx?pendingTx.amount:0;var sa={};accs.forEach(function(a,i){sa[a.id]=i<accs.length-1?amt:total-amt*(accs.length-1)});setSplitAmounts(sa)}
               setSplitMode(!splitMode)
-            }}>{splitMode ? "Без разделения" : "Разделить выплату"}</div>
+            }}>{splitMode ? "+ Разделить" : "+ Разделить"}</div>
             {splitMode && accs.map(function(a){
               var ic = accIcons[a.type] || '🏦';
               return (
