@@ -3,119 +3,183 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>5 стилей плашек — Движение денег</title>
+<title>10 стилей плашек — Движение денег</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#f5f5f7;padding:2rem 1rem;color:#111}
-h1{font-size:1.2rem;font-weight:700;text-align:center;margin-bottom:2rem}
-.section{margin-bottom:2.5rem}
-.section-title{font-size:.75rem;font-weight:600;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.75rem;text-align:center}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:800px;margin:0 auto;padding:0 1rem}
-
-/* ===== V1 — Классика Т-Банк ===== */
-.v1 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.v1 .label{font-size:.65rem;font-weight:500;color:rgba(0,0,0,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
-.v1 .value{font-size:1.15rem;font-weight:700;margin-bottom:2px}
-.v1 .sub{font-size:.6rem;color:rgba(0,0,0,.35)}
-.v1 .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;margin-bottom:8px}
-.v1 .i-revenue{background:#e8f5e9;color:#2e7d32}
-.v1 .i-expense{background:#fbe9e7;color:#c62828}
-.v1 .i-profit{background:#fff3e0;color:#e65100}
-.v1 .i-balance{background:#e3f2fd;color:#1565c0}
-
-/* ===== V2 — Минимализм ===== */
-.v2 .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.v2 .top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.v2 .icon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0}
-.v2 .label{font-size:.62rem;font-weight:500;color:rgba(0,0,0,.5)}
-.v2 .value{font-size:1.05rem;font-weight:700}
-.v2 .bar{height:3px;border-radius:2px;margin-top:6px;width:100%}
-
-/* ===== V3 — Карточки с цветной полосой сверху ===== */
-.v3 .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.v3 .stripe{height:3px}
-.v3 .body{padding:12px 14px}
-.v3 .label{font-size:.62rem;font-weight:500;color:rgba(0,0,0,.45);margin-bottom:4px}
-.v3 .value{font-size:1.1rem;font-weight:700}
-.v3 .icon{font-size:.75rem;margin-bottom:4px}
-
-/* ===== V4 — С иконками в кругах ===== */
-.v4 .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center}
-.v4 .icon-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;margin:0 auto 8px}
-.v4 .label{font-size:.62rem;font-weight:500;color:rgba(0,0,0,.45);margin-bottom:4px}
-.v4 .value{font-size:1.1rem;font-weight:700}
-
-/* ===== V5 — Лаконичный ===== */
-.v5 .card{background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.v5 .row{display:flex;align-items:center;justify-content:space-between}
-.v5 .label{font-size:.62rem;font-weight:500;color:rgba(0,0,0,.45)}
-.v5 .value{font-size:.95rem;font-weight:700;text-align:right}
-.v5 .icon{font-size:.7rem;margin-right:4px}
-
+h1{font-size:1.15rem;font-weight:700;text-align:center;margin-bottom:2rem;max-width:800px;margin-left:auto;margin-right:auto}
+.section{margin-bottom:2.5rem;max-width:800px;margin-left:auto;margin-right:auto}
+.stitle{font-size:.72rem;font-weight:600;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.75rem;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 .5rem}
 </style>
 </head>
 <body>
 
-<h1>💰 5 стилей плашек «Движение денег»</h1>
+<h1>💰 10 стилей плашек «Движение денег»</h1>
 
-<!-- V1 -->
-<div class="section">
-<div class="section-title">Вариант 1 — Классика Т-Банк</div>
+<style>
+/* V1 */
+.v1 .card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.v1 .ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;margin-bottom:7px}
+.v1 .lb{font-size:.6rem;font-weight:500;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.v1 .vl{font-size:1.1rem;font-weight:700}
+.v1 .sb{font-size:.58rem;color:rgba(0,0,0,.3);margin-top:3px}
+</style>
+<div class="section"><div class="stitle">Вариант 1 — Классика Т-Банк</div>
 <div class="grid v1">
-<div class="card"><div class="icon i-revenue">💰</div><div class="label">Выручка</div><div class="value">2 500 ₽</div><div class="sub">+12% к прошлому периоду</div></div>
-<div class="card"><div class="icon i-expense">📤</div><div class="label">Расходы</div><div class="value">7 500 ₽</div><div class="sub">−5% к прошлому периоду</div></div>
-<div class="card"><div class="icon i-profit">📊</div><div class="label">Прибыль</div><div class="value" style="color:#c62828">−5 000 ₽</div><div class="sub">Нулевая прибыль</div></div>
-<div class="card"><div class="icon i-balance">🏦</div><div class="label">Баланс счетов</div><div class="value" style="color:#1565c0">128 000 ₽</div><div class="sub">4 счета</div></div>
-</div>
-</div>
+<div class="card"><div class="ico" style="background:#e8f5e9;color:#2e7d32">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div><div class="sb">+12% к прошлому</div></div>
+<div class="card"><div class="ico" style="background:#fbe9e7;color:#c62828">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div><div class="sb">−5% к прошлому</div></div>
+<div class="card"><div class="ico" style="background:#fff3e0;color:#e65100">📊</div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div><div class="sb">Убыток</div></div>
+<div class="card"><div class="ico" style="background:#e3f2fd;color:#1565c0">🏦</div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div><div class="sb">4 счета</div></div>
+</div></div>
 
-<!-- V2 -->
-<div class="section">
-<div class="section-title">Вариант 2 — Минимализм с индикатором</div>
+<style>
+/* V2 — Минимализм с прогрессом */
+.v2 .card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.v2 .rw{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.v2 .ico{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.55rem;flex-shrink:0}
+.v2 .lb{font-size:.58rem;font-weight:500;color:rgba(0,0,0,.5)}
+.v2 .vl{font-size:1rem;font-weight:700}
+.v2 .bar{height:3px;border-radius:2px;margin-top:5px}
+</style>
+<div class="section"><div class="stitle">Вариант 2 — Минимализм с индикатором</div>
 <div class="grid v2">
-<div class="card"><div class="top"><div class="icon" style="background:#e8f5e9;color:#2e7d32">💰</div><div class="label">Выручка</div></div><div class="value">2 500 ₽</div><div class="bar" style="background:#4caf50;width:25%"></div></div>
-<div class="card"><div class="top"><div class="icon" style="background:#fbe9e7;color:#c62828">📤</div><div class="label">Расходы</div></div><div class="value">7 500 ₽</div><div class="bar" style="background:#e53935;width:75%"></div></div>
-<div class="card"><div class="top"><div class="icon" style="background:#fff3e0;color:#e65100">📊</div><div class="label">Прибыль</div></div><div class="value" style="color:#c62828">−5 000 ₽</div><div class="bar" style="background:#ff9800;width:0%"></div></div>
-<div class="card"><div class="top"><div class="icon" style="background:#e3f2fd;color:#1565c0">🏦</div><div class="label">Баланс</div></div><div class="value" style="color:#1565c0">128 000 ₽</div><div class="bar" style="background:#1e88e5;width:100%"></div></div>
-</div>
-</div>
+<div class="card"><div class="rw"><div class="ico" style="background:#e8f5e9;color:#2e7d32">💰</div><div class="lb">Выручка</div></div><div class="vl">2 500 ₽</div><div class="bar" style="background:#4caf50;width:25%"></div></div>
+<div class="card"><div class="rw"><div class="ico" style="background:#fbe9e7;color:#c62828">📤</div><div class="lb">Расходы</div></div><div class="vl">7 500 ₽</div><div class="bar" style="background:#e53935;width:75%"></div></div>
+<div class="card"><div class="rw"><div class="ico" style="background:#fff3e0;color:#e65100">📊</div><div class="lb">Прибыль</div></div><div class="vl" style="color:#c62828">−5 000 ₽</div><div class="bar" style="background:#ff9800;width:0%"></div></div>
+<div class="card"><div class="rw"><div class="ico" style="background:#e3f2fd;color:#1565c0">🏦</div><div class="lb">Баланс</div></div><div class="vl" style="color:#1565c0">128 000 ₽</div><div class="bar" style="background:#1e88e5;width:100%"></div></div>
+</div></div>
 
-<!-- V3 -->
-<div class="section">
-<div class="section-title">Вариант 3 — Цветная полоса сверху</div>
+<style>
+/* V3 */
+.v3 .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.v3 .st{height:3px}
+.v3 .bd{padding:11px 13px}
+.v3 .ico{font-size:.7rem;margin-bottom:3px}
+.v3 .lb{font-size:.58rem;font-weight:500;color:rgba(0,0,0,.45);margin-bottom:3px}
+.v3 .vl{font-size:1.05rem;font-weight:700}
+</style>
+<div class="section"><div class="stitle">Вариант 3 — Цветная полоса сверху</div>
 <div class="grid v3">
-<div class="card"><div class="stripe" style="background:#4caf50"></div><div class="body"><div class="icon">💰</div><div class="label">Выручка</div><div class="value">2 500 ₽</div></div></div>
-<div class="card"><div class="stripe" style="background:#e53935"></div><div class="body"><div class="icon">📤</div><div class="label">Расходы</div><div class="value">7 500 ₽</div></div></div>
-<div class="card"><div class="stripe" style="background:#ff9800"></div><div class="body"><div class="icon">📊</div><div class="label">Прибыль</div><div class="value" style="color:#c62828">−5 000 ₽</div></div></div>
-<div class="card"><div class="stripe" style="background:#1e88e5"></div><div class="body"><div class="icon">🏦</div><div class="label">Баланс</div><div class="value" style="color:#1565c0">128 000 ₽</div></div></div>
-</div>
-</div>
+<div class="card"><div class="st" style="background:#4caf50"></div><div class="bd"><div class="ico">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div></div>
+<div class="card"><div class="st" style="background:#e53935"></div><div class="bd"><div class="ico">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div></div>
+<div class="card"><div class="st" style="background:#ff9800"></div><div class="bd"><div class="ico">📊</div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div></div></div>
+<div class="card"><div class="st" style="background:#1e88e5"></div><div class="bd"><div class="ico">🏦</div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div></div></div>
+</div></div>
 
-<!-- V4 -->
-<div class="section">
-<div class="section-title">Вариант 4 — Крупные иконки в кругах</div>
+<style>
+/* V4 */
+.v4 .card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center}
+.v4 .cr{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;margin:0 auto 7px}
+.v4 .lb{font-size:.58rem;font-weight:500;color:rgba(0,0,0,.45);margin-bottom:3px}
+.v4 .vl{font-size:1.05rem;font-weight:700}
+</style>
+<div class="section"><div class="stitle">Вариант 4 — Иконки в кругах</div>
 <div class="grid v4">
-<div class="card"><div class="icon-circle" style="background:#e8f5e9">💰</div><div class="label">Выручка</div><div class="value">2 500 ₽</div></div>
-<div class="card"><div class="icon-circle" style="background:#fbe9e7">📤</div><div class="label">Расходы</div><div class="value">7 500 ₽</div></div>
-<div class="card"><div class="icon-circle" style="background:#fff3e0">📊</div><div class="label">Прибыль</div><div class="value" style="color:#c62828">−5 000 ₽</div></div>
-<div class="card"><div class="icon-circle" style="background:#e3f2fd">🏦</div><div class="label">Баланс счетов</div><div class="value" style="color:#1565c0">128 000 ₽</div></div>
-</div>
-</div>
+<div class="card"><div class="cr" style="background:#e8f5e9">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div>
+<div class="card"><div class="cr" style="background:#fbe9e7">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div>
+<div class="card"><div class="cr" style="background:#fff3e0">📊</div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div></div>
+<div class="card"><div class="cr" style="background:#e3f2fd">🏦</div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div></div>
+</div></div>
 
-<!-- V5 -->
-<div class="section">
-<div class="section-title">Вариант 5 — Лаконичный в строку</div>
+<style>
+/* V5 */
+.v5 .card{background:#fff;border-radius:10px;padding:10px 12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.v5 .rw{display:flex;align-items:center;justify-content:space-between}
+.v5 .lb{font-size:.58rem;font-weight:500;color:rgba(0,0,0,.45)}
+.v5 .vl{font-size:.9rem;font-weight:700}
+</style>
+<div class="section"><div class="stitle">Вариант 5 — Лаконичный</div>
 <div class="grid v5">
-<div class="card"><div class="row"><span class="label">💰 Выручка</span><span class="value">2 500 ₽</span></div></div>
-<div class="card"><div class="row"><span class="label">📤 Расходы</span><span class="value">7 500 ₽</span></div></div>
-<div class="card"><div class="row"><span class="label">📊 Прибыль</span><span class="value" style="color:#c62828">−5 000 ₽</span></div></div>
-<div class="card"><div class="row"><span class="label">🏦 Баланс</span><span class="value" style="color:#1565c0">128 000 ₽</span></div></div>
-</div>
-</div>
+<div class="card"><div class="rw"><span class="lb">💰 Выручка</span><span class="vl">2 500 ₽</span></div></div>
+<div class="card"><div class="rw"><span class="lb">📤 Расходы</span><span class="vl">7 500 ₽</span></div></div>
+<div class="card"><div class="rw"><span class="lb">📊 Прибыль</span><span class="vl" style="color:#c62828">−5 000 ₽</span></div></div>
+<div class="card"><div class="rw"><span class="lb">🏦 Баланс</span><span class="vl" style="color:#1565c0">128 000 ₽</span></div></div>
+</div></div>
+
+<style>
+/* V6 — Стеклянные (Glassmorphism) */
+.v6 .card{background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.8);box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.v6 .ico{font-size:.8rem;margin-bottom:6px}
+.v6 .lb{font-size:.6rem;font-weight:500;color:rgba(0,0,0,.4);text-transform:uppercase;margin-bottom:3px}
+.v6 .vl{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.v6 .ch{font-size:.6rem;font-weight:600;margin-top:2px}
+</style>
+<div class="section"><div class="stitle">Вариант 6 — Glassmorphism (стекло)</div>
+<div class="grid v6">
+<div class="card"><div class="ico">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div><div class="ch" style="color:#4caf50">↑ 12%</div></div>
+<div class="card"><div class="ico">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div><div class="ch" style="color:#e53935">↓ 5%</div></div>
+<div class="card"><div class="ico">📊</div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div><div class="ch" style="color:#ff9800">Убыток</div></div>
+<div class="card"><div class="ico">🏦</div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div><div class="ch" style="color:#1565c0">4 счета</div></div>
+</div></div>
+
+<style>
+/* V7 — Карточки с тенью */
+.v7 .card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 25px rgba(0,0,0,.06),0 2px 6px rgba(0,0,0,.04)}
+.v7 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.v7 .ico{font-size:.75rem}
+.v7 .lb{font-size:.6rem;font-weight:500;color:rgba(0,0,0,.4)}
+.v7 .vl{font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
+.v7 .delta{font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:20px}
+</style>
+<div class="section"><div class="stitle">Вариант 7 — Крупные тени, дельта</div>
+<div class="grid v7">
+<div class="card"><div class="top"><span class="ico">💰</span><span class="delta" style="background:#e8f5e9;color:#2e7d32">+12%</span></div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div>
+<div class="card"><div class="top"><span class="ico">📤</span><span class="delta" style="background:#fbe9e7;color:#c62828">−5%</span></div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div>
+<div class="card"><div class="top"><span class="ico">📊</span><span class="delta" style="background:#fff3e0;color:#e65100">−5 000</span></div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div></div>
+<div class="card"><div class="top"><span class="ico">🏦</span><span class="delta" style="background:#e3f2fd;color:#1565c0">4 сч.</span></div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div></div>
+</div></div>
+
+<style>
+/* V8 — Плашки с фоном */
+.v8 .card{border-radius:16px;padding:14px;color:#fff}
+.v8 .lb{font-size:.6rem;font-weight:500;opacity:.7;text-transform:uppercase;margin-bottom:3px}
+.v8 .vl{font-size:1.1rem;font-weight:700}
+.v8 .ico{font-size:.75rem;margin-bottom:5px;opacity:.9}
+</style>
+<div class="section"><div class="stitle">Вариант 8 — Цветной фон</div>
+<div class="grid v8">
+<div class="card" style="background:linear-gradient(135deg,#43a047,#66bb6a)"><div class="ico">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div>
+<div class="card" style="background:linear-gradient(135deg,#e53935,#ef5350)"><div class="ico">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div>
+<div class="card" style="background:linear-gradient(135deg,#fb8c00,#ffa726)"><div class="ico">📊</div><div class="lb">Прибыль</div><div class="vl">−5 000 ₽</div></div>
+<div class="card" style="background:linear-gradient(135deg,#1e88e5,#42a5f5)"><div class="ico">🏦</div><div class="lb">Баланс</div><div class="vl">128 000 ₽</div></div>
+</div></div>
+
+<style>
+/* V9 — Компактные, без иконок */
+.v9 .card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:2px}
+.v9 .lb{font-size:.58rem;font-weight:500;color:rgba(0,0,0,.4)}
+.v9 .vl{font-size:1.05rem;font-weight:700}
+.v9 .accent-line{width:20px;height:2px;border-radius:2px;margin-bottom:4px}
+</style>
+<div class="section"><div class="stitle">Вариант 9 — Компактные с цветной линией</div>
+<div class="grid v9">
+<div class="card"><div class="accent-line" style="background:#4caf50"></div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div>
+<div class="card"><div class="accent-line" style="background:#e53935"></div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div>
+<div class="card"><div class="accent-line" style="background:#ff9800"></div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div></div>
+<div class="card"><div class="accent-line" style="background:#1e88e5"></div><div class="lb">Баланс счетов</div><div class="vl" style="color:#1565c0">128 000 ₽</div></div>
+</div></div>
+
+<style>
+/* V10 — С разделителем */
+.v10{display:flex;gap:0;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.v10 .card{flex:1;padding:14px;text-align:center;position:relative}
+.v10 .card+.card:before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:#eee}
+.v10 .ico{font-size:.7rem;margin-bottom:4px}
+.v10 .lb{font-size:.55rem;font-weight:500;color:rgba(0,0,0,.4);text-transform:uppercase;margin-bottom:2px}
+.v10 .vl{font-size:.9rem;font-weight:700}
+</style>
+<div class="section"><div class="stitle">Вариант 10 — Единая карточка с разделителями</div>
+<div class="v10" style="max-width:800px;margin:0 auto">
+<div class="card"><div class="ico">💰</div><div class="lb">Выручка</div><div class="vl">2 500 ₽</div></div>
+<div class="card"><div class="ico">📤</div><div class="lb">Расходы</div><div class="vl">7 500 ₽</div></div>
+<div class="card"><div class="ico">📊</div><div class="lb">Прибыль</div><div class="vl" style="color:#c62828">−5 000 ₽</div></div>
+<div class="card"><div class="ico">🏦</div><div class="lb">Баланс</div><div class="vl" style="color:#1565c0">128 000 ₽</div></div>
+</div></div>
 
 <div style="max-width:800px;margin:2rem auto;text-align:center;font-size:.82rem;color:rgba(0,0,0,.45)">
-Вместо «Средний чек» теперь «Баланс счетов»
+10 вариантов · Везде «Средний чек» заменён на «Баланс счетов»
 </div>
 
 </body>
