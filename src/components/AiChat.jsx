@@ -182,62 +182,6 @@ export default function AiChat() {
   const notifLoaded = useRef(false);
   const listRef = useRef(null);
 
-  // Генерируем уведомления на клиенте (один раз)
-  useEffect(() => {
-    if (!user || notifLoaded.current) return;
-    (async () => {
-      try {
-        const now = new Date();
-        const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
-        const monthAgo = new Date(now); monthAgo.setDate(monthAgo.getDate() - 30);
-
-        const [txRes, prodRes] = await Promise.all([
-          supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
-          supabase.from('products').select('*').eq('user_id', user.id),
-        ]);
-
-        const transactions = txRes.data || [];
-        const products = prodRes.data || [];
-
-        const weekTx = transactions.filter(t => t.date && new Date(t.date) >= weekAgo);
-        const monthTx = transactions.filter(t => t.date && new Date(t.date) >= monthAgo);
-
-        const weekIncome = weekTx.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-        const weekExpense = weekTx.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-        const monthIncome = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-        const monthExpense = monthTx.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-
-        const notifs = [];
-
-        if (weekExpense > weekIncome && weekExpense > 0)
-          notifs.push({ level: 'critical', title: '📉 Убыток за неделю', text: 'Доходы ' + weekIncome.toLocaleString() + '₽, расходы ' + weekExpense.toLocaleString() + '₽', color: '#dc2626' });
-
-        const monthProfit = monthIncome - monthExpense;
-        if (monthProfit > 0)
-          notifs.push({ level: 'info', title: '📈 Прибыль за месяц', text: '+' + monthProfit.toLocaleString() + '₽ при доходах ' + monthIncome.toLocaleString() + '₽', color: '#16a34a' });
-        else if (monthProfit < 0 && monthTx.length > 0)
-          notifs.push({ level: 'critical', title: '📉 Убыток за месяц', text: '−' + Math.abs(monthProfit).toLocaleString() + '₽', color: '#dc2626' });
-
-        if (weekIncome > 0 && weekExpense > 0) {
-          const ratio = Math.round(weekExpense / weekIncome * 100);
-          if (ratio > 70)
-            notifs.push({ level: 'warning', title: '⚠️ Высокие расходы', text: ratio + '% доходов уходит на расходы', color: '#f59e0b' });
-        }
-
-        if (weekTx.length === 0 && transactions.length > 5)
-          notifs.push({ level: 'warning', title: '📭 Нет операций за неделю', text: 'За 7 дней не было ни одной операции', color: '#f59e0b' });
-
-        if (notifs.length > 0) {
-          const topLevel = ['critical', 'warning', 'info'].find(l => notifs.some(n => n.level === l));
-          const colors = { critical: '#dc2626', warning: '#f59e0b', info: '#16a34a' };
-          setNotifDot(colors[topLevel]);
-          setNotifCount(notifs.length);
-          setMessages(prev => [...prev, ...notifs.map(n => ({ role: 'assistant', text: n.title + '\n' + n.text, isNotification: true, color: n.color }))]);
-        }
-        notifLoaded.current = true;
-      } catch (e) { notifLoaded.current = true; }
-    })();
-  }, [user]);
 
   // Сбрасываем уведомления при открытии чата (прочитано)
   useEffect(() => {
