@@ -449,8 +449,9 @@ export default function Products() {
   };
 
   return (
-    <>
-      <div className="page-header">
+    <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
+      <div style={{flexShrink:0}}>
+        <div className="page-header">
         <div>
           <h1>Каталог позиций</h1>
           <div className="sub">Единый каталог товаров, услуг и цен вашей компании</div>
@@ -548,8 +549,9 @@ export default function Products() {
         </div>
       </div>
 
+      </div>
       {/* Таблица */}
-      <div className="product-table" style={{overflow:'visible'}}>
+      <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
         <table>
           <thead id="colHeaders">
             <tr>
@@ -770,6 +772,6 @@ export default function Products() {
       )}
       <input ref={fileInputRef} type="file" accept=".xlsx,.xls" style={{display:'none'}}
         onChange={e=>{const f=e.target.files?.[0];if(f){importExcel(f)}e.target.value=''}} />
-    </>
+    </div>
   );
 }
