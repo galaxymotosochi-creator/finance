@@ -425,7 +425,7 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(fSalaryTotal>0?(fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽':')+(checkedBonusTotal>0?(fSalaryTotal?' + ':'')+'Премии '+checkedBonusTotal.toLocaleString()+' ₽':'')+(checkedDeductTotal>0?' − Штрафы '+checkedDeductTotal.toLocaleString()+'₽':'')}
+                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(parts.length===3)return parts[0]+' + '+parts[1]+' − '+parts[2];if(parts.length===2&&parts[1].includes('Штраф'))return parts[0]+' − '+parts[1];return parts.join(' + ');})()}
                 </div>
                 <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} ₽</div>
               </div>
