@@ -56,7 +56,25 @@ export default function Registers({ fullscreen }) {
     } catch(e) {}
     return null;
   };
-  const userName = getOwnerName() || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
+  // Асинхронно загружаем ФИО из Supabase при монтировании
+  const [ownerName, setOwnerName] = useState(null);
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('last_name, first_name, patronymic')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (data && (data.first_name || data.last_name)) {
+          setOwnerName([data.last_name, data.first_name, data.patronymic].filter(Boolean).join(' '));
+        }
+      } catch(e) {}
+    })();
+  }, [user]);
+  const localName = getOwnerName();
+  const userName = ownerName || localName || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
 
   useEffect(() => {
     if (!user) return;
