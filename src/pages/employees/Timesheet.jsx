@@ -277,7 +277,7 @@ export default function Timesheet() {
           </div>
 
           {/* ФИЛЬТРЫ */}
-          <div className="stock-filterbar" style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem 0',flexWrap:'wrap',marginBottom:'.5rem'}}>
+          <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',marginBottom:'.5rem'}}>
             {/* Период */}
             <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
               <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsPeriod!=='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
