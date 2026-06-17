@@ -250,13 +250,21 @@ export default function Employees() {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-row">
+                <div className="form-group">
                   <label>Пин-код кассы</label>
-                  <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
-                    <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} style={{width:'100px'}} />
-                    <button type="button" className="btn btn-outline" onClick={genPin} style={{fontSize:'.78rem',padding:'.3rem .6rem'}}>🎲 Сгенерировать</button>
+                  <div style={{display:'flex',gap:'.5rem'}}>
+                    <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} style={{width:'120px'}} />
+                    <button type="button" className="btn btn-outline" onClick={genPin} style={{flex:1,fontSize:'.78rem'}}>🎲 Сгенерировать</button>
                   </div>
                 </div>
+                <div className="form-group">
+                  <label style={{opacity:0}}>.</label>
+                  <button type="button" className="btn btn-primary" style={{background:'#ffdd2d',color:'#000',border:'none',width:'100%',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontWeight:600,padding:'.5rem .65rem',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',cursor:'pointer'}} onClick={() => alert('Функция будет доступна позже')}>
+                    <span>✉️</span> Выдать доступ
+                  </button>
+                </div>
+              </div>
 
 
 
