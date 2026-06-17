@@ -373,16 +373,19 @@ export default function Timesheet() {
                     <td style={{fontSize:'.8rem',color:(e.deduct_amount||0)>0?'#dc2626':'inherit',fontWeight:(e.deduct_amount||0)>0?600:400}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+'₽' : '—'}
                     </td>
-                    <td style={{whiteSpace:'nowrap',padding:'.25rem .2rem'}}>
-                      <button className="act-btn prod-edit-btn" style={{marginRight:'2px',fontSize:'.68rem',padding:'.15rem .35rem'}}
-                        onClick={() => openDayByDateStr(e.date)}>Ред.</button>
-                      <span style={{position:'relative',display:'inline-block'}}>
-                        <button className="act-btn prod-more-btn" style={{fontSize:'.68rem',padding:'.15rem .25rem'}}
-                          onClick={function(ev){ev.stopPropagation();var dd=ev.currentTarget.nextElementSibling;dd&&dd.classList.toggle('open');}}>⋯</button>
-                        <div className="prod-dropdown" style={{right:0,left:'auto'}}>
-                          <button onClick={() => deleteEntry(e.id)} style={{color:'#dc3545',fontSize:'.75rem'}}>Удалить</button>
+                    <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
+                      <button className="act-btn prod-edit-btn" onClick={() => openDayByDateStr(e.date)}>Ред.</button>
+                      <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
+                        <button className="act-btn prod-more-btn" onClick={(ev) => {
+                          ev.stopPropagation();
+                          var dd=ev.currentTarget.nextElementSibling;
+                          document.querySelectorAll('.prod-dropdown.open').forEach(function(d){if(d!==dd)d.classList.remove('open');});
+                          dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                        }}>⋯</button>
+                        <div className="prod-dropdown">
+                          <button onClick={() => deleteEntry(e.id)} style={{color:'#dc3545'}}>Удалить</button>
                         </div>
-                      </span>
+                      </div>
                     </td>
                   </tr>
                 )))}
