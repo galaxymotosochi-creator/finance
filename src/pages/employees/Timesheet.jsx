@@ -322,7 +322,7 @@ export default function Timesheet() {
               onClick={()=>setTsTypeFilter(tsTypeFilter==='deduct'?'all':'deduct')}>Штрафы</span>
             {/* Сотрудник */}
             <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter.length>0?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
+              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter.length>0?600:400,color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1,whiteSpace:'nowrap'}}
                 onClick={e=>{e.stopPropagation();toggleEmp(!tsShowEmp);}}>{tsEmpFilter.length>0 ? 'Сотр. '+tsEmpFilter.length : 'Сотрудник'}</span>
               {tsShowEmp && (
                 <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
