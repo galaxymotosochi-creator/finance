@@ -337,9 +337,9 @@ export default function Timesheet() {
             <table>
               <thead id="colHeaders" style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase'}}>
                 <tr>
-                  <th style={{textAlign:'left',paddingLeft:0,width:'22%'}}>Дата</th>
-                  <th style={{width:'20%'}}>Сотрудник</th>
-                  <th style={{width:'26%'}}>Статус</th>
+                  <th style={{textAlign:'left',paddingLeft:0,width:'12%'}}>Дата</th>
+                  <th style={{width:'28%',textAlign:'left'}}>Сотрудник</th>
+                  <th style={{width:'28%',textAlign:'left'}}>Статус</th>
                   <th style={{width:'16%'}}>Бонус</th>
                   <th style={{width:'16%'}}>Штраф</th>
                 </tr>
@@ -349,9 +349,9 @@ export default function Timesheet() {
                   <tr><td colSpan={5} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',paddingLeft:0,fontWeight:500,fontSize:'.8rem'}}>{fmtDate(e.date)}</td>
-                    <td style={{fontSize:'.8rem'}}>{getEmpName(e.employee_id)}</td>
-                    <td style={{fontSize:'.8rem'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
+                    <td style={{textAlign:'left',paddingLeft:0,fontWeight:500,fontSize:'.8rem',whiteSpace:'nowrap'}}>{fmtDate(e.date)}</td>
+                    <td style={{fontSize:'.8rem',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
+                    <td style={{fontSize:'.8rem',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
                     <td style={{fontSize:'.8rem',color:(e.bonus_amount||0)>0?'#16a34a':'inherit',fontWeight:(e.bonus_amount||0)>0?600:400}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+'₽' : '—'}
                     </td>
@@ -475,20 +475,30 @@ export default function Timesheet() {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] });
                     }
                   }
+                  // Сохраняем бонусы
                   for (const row of bonusRows) {
                     if (!row.empId || !row.amount) continue;
-                    const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.bonus_amount||0) > 0);
-                    if (existing) {
-                      await supabase.from('timesheet_entries').update({ bonus_amount: (existing.bonus_amount||0)+parseFloat(row.amount), bonus_comment: existing.bonus_comment?existing.bonus_comment+'; '+row.comment:row.comment }).eq('id', existing.id);
+                    const { data: exBonus } = await supabase
+                      .from('timesheet_entries')
+                      .select('id,bonus_amount,bonus_comment')
+                      .eq('user_id',user.id).eq('employee_id',row.empId).eq('date',showDay)
+                      .maybeSingle();
+                    if (exBonus) {
+                      await supabase.from('timesheet_entries').update({ bonus_amount: (exBonus.bonus_amount||0)+parseFloat(row.amount), bonus_comment: exBonus.bonus_comment?exBonus.bonus_comment+'; '+row.comment:row.comment }).eq('id', exBonus.id);
                     } else {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', bonus_amount: parseFloat(row.amount), bonus_comment: row.comment });
                     }
                   }
+                  // Сохраняем штрафы
                   for (const row of deductRows) {
                     if (!row.empId || !row.amount) continue;
-                    const existing = entries.find(e => e.employee_id === row.empId && e.date && e.date.startsWith(showDay) && (e.deduct_amount||0) > 0);
-                    if (existing) {
-                      await supabase.from('timesheet_entries').update({ deduct_amount: (existing.deduct_amount||0)+parseFloat(row.amount), deduct_comment: existing.deduct_comment?existing.deduct_comment+'; '+row.comment:row.comment }).eq('id', existing.id);
+                    const { data: exDeduct } = await supabase
+                      .from('timesheet_entries')
+                      .select('id,deduct_amount,deduct_comment')
+                      .eq('user_id',user.id).eq('employee_id',row.empId).eq('date',showDay)
+                      .maybeSingle();
+                    if (exDeduct) {
+                      await supabase.from('timesheet_entries').update({ deduct_amount: (exDeduct.deduct_amount||0)+parseFloat(row.amount), deduct_comment: exDeduct.deduct_comment?exDeduct.deduct_comment+'; '+row.comment:row.comment }).eq('id', exDeduct.id);
                     } else {
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', deduct_amount: parseFloat(row.amount), deduct_comment: row.comment });
                     }
