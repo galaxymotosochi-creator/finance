@@ -95,7 +95,7 @@ export default function Transactions() {
   const profit = incomeTotal - expenseTotal;
   const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
-  const balanceTotal = accs.reduce((s, a) => s + (parseFloat(a.balance || a.initial_balance || 0)), 0);
+  const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
 
   const seed = async () => {
     try {
