@@ -45,6 +45,7 @@ export default function Timesheet() {
   const [tsPeriodFrom, setTsPeriodFrom] = useState('');
   const [tsPeriodTo, setTsPeriodTo] = useState('');
   const [tsEmpFilter, setTsEmpFilter] = useState('');
+  const [tsTypeFilter, setTsTypeFilter] = useState('all');
 
   const load = async () => {
     setLoading(true);
@@ -152,6 +153,12 @@ export default function Timesheet() {
     if (tsEmpFilter) {
       result = result.filter(e => e.employee_id === tsEmpFilter);
     }
+    // Фильтр по типу (бонусы/штрафы)
+    if (tsTypeFilter === 'bonus') {
+      result = result.filter(e => (e.bonus_amount || 0) > 0);
+    } else if (tsTypeFilter === 'deduct') {
+      result = result.filter(e => (e.deduct_amount || 0) > 0);
+    }
     if (tsPeriod && tsPeriod !== 'all') {
       const now = new Date();
       const y = now.getFullYear();
@@ -185,7 +192,7 @@ export default function Timesheet() {
       return 0;
     });
     return result;
-  }, [entries, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo]);
+  }, [entries, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo, tsTypeFilter]);
 
   const getEmpName = (id) => employees.find(e => e.id === id)?.name || '—';
 
@@ -260,6 +267,13 @@ export default function Timesheet() {
                 </div>
               )}
             </div>
+            {/* Тип */}
+            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+              onClick={()=>setTsTypeFilter('all')}>Все</span>
+            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='bonus'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+              onClick={()=>setTsTypeFilter(tsTypeFilter==='bonus'?'all':'bonus')}>Бонусы</span>
+            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='deduct'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+              onClick={()=>setTsTypeFilter(tsTypeFilter==='deduct'?'all':'deduct')}>Штрафы</span>
             {/* Сотрудник */}
             <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:!tsEmpFilter?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
   onClick={()=>setTsEmpFilter(tsEmpFilter ? '' : 'all')}>Все</span>
