@@ -244,11 +244,11 @@ export default function Clients() {
                   <button type="button" className="btn btn-outline" onClick={() => remove(editId)} style={{color:'#dc3545',borderColor:'#dc3545',width:'100%'}}>Удалить клиента</button>
                 </div>
               )}
-              {editId && c.debt && c.debt < 0 && (
+{(()=>{var editClient = clients.find(function(x){return x.id === editId;}); if(!editClient || !editClient.debt || editClient.debt >= 0) return null; return (
                 <div style={{marginBottom:'.5rem',borderTop:'1px solid #eee',paddingTop:'.5rem'}}>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',marginBottom:'.5rem'}}>
                     <span style={{color:'#dc2626',fontWeight:600}}>Текущий долг</span>
-                    <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(c.debt).toLocaleString()} ₽</span>
+                    <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(editClient.debt).toLocaleString()} ₽</span>
                   </div>
                   <div style={{display:'flex',gap:'.35rem'}}>
                     <input type="number" min="0" step="0.01" placeholder="Сумма" value={debtPayAmt}
@@ -264,11 +264,12 @@ export default function Clients() {
                         const amt = parseFloat(debtPayAmt);
                         if (!amt || amt <= 0) return alert('Введите сумму');
                         if (!debtPayAc) return alert('Выберите счёт');
-                        const newDebt = Math.min(0, (parseFloat(c.debt) || 0) + amt);
+                        var ec = clients.find(function(x){return x.id === editId;});
+                        const newDebt = Math.min(0, (parseFloat(ec?.debt) || 0) + amt);
                         await supabase.from('clients').update({debt: newDebt}).eq('id', editId);
                         await supabase.from('transactions').insert({
                           user_id: user.id, type: 'income', amount: amt,
-                          description: 'Погашение долга от ' + c.name,
+                          description: 'Погашение долга от ' + (ec?.name || ''),
                           date: new Date().toISOString().split('T')[0],
                           account_id: debtPayAc, status: 'paid'
                         });
@@ -277,7 +278,7 @@ export default function Clients() {
                       }}>Погасить</button>
                   </div>
                 </div>
-              )}
+              )()})}
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
