@@ -272,16 +272,16 @@ export default function Accounts() {
                 <label>Название</label>
                 <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
               </div>
-              {!editingId && (<>
-                <div className="form-group">
-                  <label>Комментарий</label>
-                  <input type="text" placeholder="Например: основная касса в магазине" value={modalDesc} onChange={e=>setModalDesc(e.target.value)} />
-                </div>
+              <div className="form-group">
+                <label>Комментарий</label>
+                <input type="text" placeholder="Например: основная касса в магазине" value={modalDesc} onChange={e=>setModalDesc(e.target.value)} />
+              </div>
+              {!editingId && (
                 <div className="form-group">
                   <label>Начальный остаток (₽)</label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
                 </div>
-              </>)}
+              )}
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Добавить'}</button>
               </div>
