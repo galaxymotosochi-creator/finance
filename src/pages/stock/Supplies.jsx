@@ -328,7 +328,13 @@ const load = async () => {
                   })}} title="Сканировать штрихкод" 
                     style={{fontSize:'16px',cursor:'pointer',padding:'1px 6px',background:'#fff',border:'1.5px solid #eee',borderRadius:'6px',lineHeight:1,display:'inline-flex',alignItems:'center'}}>📷</span>
                 </div>
-                <div style={{maxHeight:'200px',overflowY:'auto',marginBottom:'8px'}}>
+                <div style={{display:'flex',gap:'.35rem',padding:'.3rem .5rem .2rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px'}}>
+                  <span style={{flex:3}}>Товар</span>
+                  <span style={{flex:1,textAlign:'center'}}>Кол-во</span>
+                  <span style={{flex:1,textAlign:'right'}}>Сумма</span>
+                  <span style={{width:'1rem'}}></span>
+                </div>
+                <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}>Товары не добавлены</div>
                   ) : fItems.map((it,idx)=>(
