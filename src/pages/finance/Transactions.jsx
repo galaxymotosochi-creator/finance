@@ -426,8 +426,8 @@ export default function Transactions() {
                   if (newCat) trCatId = newCat.id;
                 }
                 await supabase.from('transactions').insert([
-                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId},
-                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод с '+fr.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
+                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод со счета '+fr.name,date:new Date().toISOString().split('T')[0],category_id:trCatId},
+                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод на счет '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
                 ]);
                 setShowTransfer(false); setTrAmt(''); await refresh();
               } catch(err) {alert(err.message);}

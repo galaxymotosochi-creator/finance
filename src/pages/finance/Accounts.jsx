@@ -402,7 +402,7 @@ export default function Accounts() {
             <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
             <h2>Перевод между счетами</h2>
             <div className="sub" style={{marginBottom:'1rem'}}>Перемещение средств между счетами</div>
-            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод на '+toAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод с '+fromAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Откуда</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
@@ -480,8 +480,8 @@ export default function Accounts() {
                   }
                   // Расход с Кассы + доход на выбранный счёт
                   await supabase.from('transactions').insert([
-                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация на ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId},
-                    {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация с кассы',date:new Date().toISOString().split('T')[0],category_id:colCatId}
+                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация со счета Касса',date:new Date().toISOString().split('T')[0],category_id:colCatId},
+                    {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация на счет ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId}
                   ]);
                   setShowCollection(false);
                   await fetchTx();
