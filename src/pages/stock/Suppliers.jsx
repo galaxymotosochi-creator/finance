@@ -15,7 +15,7 @@ export default function Suppliers() {
   const [fName, setFName] = useState('');
   const [fContact, setFContact] = useState('');
   const [fPhone, setFPhone] = useState('');
-  const [fMethod, setFMethod] = useState('telegram');
+  const [fMethod, setFMethod] = useState('');
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -45,13 +45,13 @@ export default function Suppliers() {
 
   const openAdd = () => {
     setEditId(null);
-    setFName(''); setFContact(''); setFPhone(''); setFMethod('telegram');
+    setFName(''); setFContact(''); setFPhone(''); setFMethod('');
     setShowModal(true);
   };
 
   const openEdit = (s) => {
     setEditId(s.id); setFName(s.name); setFContact(s.contact||'');
-    setFPhone(s.phone||''); setFMethod(s.contact_method||'telegram');
+    setFPhone(s.phone||''); setFMethod(s.contact_method||'');
     setShowModal(true);
   };
 
@@ -170,6 +170,7 @@ export default function Suppliers() {
                 <div className="form-group">
                   <label>Способ связи</label>
                   <select value={fMethod} onChange={e=>setFMethod(e.target.value)}>
+                    <option value="">— нет —</option>
                     <option value="telegram">📱 Telegram</option>
                     <option value="whatsapp">💬 WhatsApp</option>
                     <option value="max">🧑‍💼 MAX</option>
