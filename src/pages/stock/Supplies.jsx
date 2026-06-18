@@ -294,85 +294,94 @@ const load = async () => {
         );
       })()}
 
-      {/* Модалка поставки */}
+      {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
       {showModal && (
         <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&(setShowModal(false),setFItems([]))}>
-          <div className="modal-box" style={{maxWidth:'650px'}}>
+          <div className="modal-box">
             <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([])}}>&times;</button>
-            <h2>{editId?'Редактировать поставку':'Новая поставка'}</h2>
-            <div className="sub">Добавление товаров на склад</div>
+            <div style={{marginBottom:'14px'}}>
+              <div style={{fontSize:'1.1rem',fontWeight:700,marginBottom:'2px'}}>{editId?'Редактировать поставку':'Новая поставка'}</div>
+              <div style={{fontSize:'.78rem',color:'#999'}}>Добавление товаров на склад</div>
+            </div>
             <form onSubmit={save}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Поставщик</label>
-                  <select value={fSupName} onChange={e=>setFSupName(e.target.value)}>
-                    <option value="">— выберите поставщика —</option>
-                    {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>№ накладной</label>
-                  <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
-                </div>
+              {/* Поставщик — крупно */}
+              <div style={{marginBottom:'12px'}}>
+                <label style={{fontSize:'.78rem',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Поставщик</label>
+                <select value={fSupName} onChange={e=>setFSupName(e.target.value)}
+                  style={{width:'100%',padding:'10px 12px',fontSize:'.9rem',fontWeight:600,border:'1.5px solid #e0e0e0',borderRadius:'10px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
+                  <option value="">— выберите поставщика —</option>
+                  {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}
+                </select>
               </div>
-              <div style={{border:'1px solid var(--border)',borderRadius:'8px',padding:'.75rem',marginBottom:'.5rem',background:'var(--body-bg)'}}>
-                <div style={{fontSize:'.78rem',fontWeight:600,color:'var(--muted)',marginBottom:'.5rem'}}>Товары в поставке</div>
-                <div style={{maxHeight:'250px',overflowY:'auto',marginBottom:'.65rem'}}>
+              {/* Накладная */}
+              <div style={{marginBottom:'12px'}}>
+                <label style={{fontSize:'.78rem',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>№ накладной</label>
+                <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" 
+                  style={{width:'100%',padding:'9px 12px',fontSize:'.85rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}} />
+              </div>
+              {/* Товары */}
+              <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
+                <div style={{fontSize:'.72rem',fontWeight:600,color:'#999',marginBottom:'8px',textTransform:'uppercase',letterSpacing:'.3px'}}>Товары в поставке</div>
+                <div style={{maxHeight:'200px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
-                    <div style={{textAlign:'center',padding:'.5rem',color:'var(--muted)',fontSize:'.8rem'}}>Товары не добавлены</div>
+                    <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}>Товары не добавлены</div>
                   ) : fItems.map((it,idx)=>(
-                    <div key={idx} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderBottom:'1px solid var(--border)',fontSize:'.85rem'}}>
+                    <div key={idx} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.85rem'}}>
                       <span style={{flex:3,fontWeight:500}}>{it.name}</span>
-                      <span style={{flex:1,textAlign:'center'}}>{it.qty} шт</span>
+                      <span style={{flex:1,textAlign:'center',color:'#888'}}>{it.qty} шт</span>
                       <span style={{flex:1,textAlign:'right',fontWeight:500}}>{(it.qty*it.cost).toFixed(2)}₽</span>
                       <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem'}}>✕</button>
                     </div>
                   ))}
                 </div>
-                <div style={{display:'flex',gap:'.35rem'}}>
+                <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                   <span onClick={function(){scanBarcode(function(bc){
                     var found=products.find(function(p){return p.barcode===bc;});
                     if(found){setFAddProd(String(found.id));setToast('Найден: '+found.name)}else setToast('Штрихкод '+bc+' не найден');
-                  })}} title="Сканировать штрихкод" style={{fontSize:'16px',cursor:'pointer',padding:'.25rem',lineHeight:1}}>📷</span>
-                  <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}}>
+                  })}} title="Сканировать штрихкод" 
+                    style={{fontSize:'18px',cursor:'pointer',padding:'.25rem .35rem',background:'#fff',border:'1.5px solid #eee',borderRadius:'8px',lineHeight:1,display:'flex',alignItems:'center'}}>📷</span>
+                  <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,fontSize:'.82rem',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
                     <option value="">— выберите товар —</option>
                     {products.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
-                  <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Количество" min="1" step="any"
-                    style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}} />
+                  <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Кол-во" min="1" step="any"
+                    style={{width:'70px',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'center'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} placeholder="Цена" min="0" step="0.01"
-                    style={{flex:1,fontSize:'.82rem',padding:'.35rem',border:'1px solid var(--border)',borderRadius:'5px',fontFamily:'var(--font)'}} />
-                </div>
-                <div style={{display:'flex',justifyContent:'flex-end',marginTop:'.35rem'}}>
-                  <button type="button" onClick={addItem} style={{padding:'.35rem .7rem',fontSize:'.75rem',background:'var(--primary)',color:'var(--primary-text)',border:'none',borderRadius:'100px',cursor:'pointer',fontFamily:'var(--font)',fontWeight:'600'}}>+ Добавить</button>
+                    style={{width:'80px',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'right'}} />
+                  <button type="button" onClick={addItem} style={{padding:'.4rem .6rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'8px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Статус</label>
-                  <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
+              {/* Итого */}
+              {fItems.length > 0 && (
+                <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontWeight:700,fontSize:'.85rem'}}>
+                  <span>Итого: {fItems.length} товаров</span>
+                  <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toFixed(2)} ₽</span>
+                </div>
+              )}
+              {/* Статус + Оплата */}
+              <div style={{display:'flex',gap:'10px',marginTop:'8px'}}>
+                <div style={{flex:1,marginBottom:'10px'}}>
+                  <label style={{fontSize:'.72rem',fontWeight:600,color:'#888',display:'block',marginBottom:'2px'}}>Статус</label>
+                  <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
+                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
                     <option value="ordered">Заказано</option>
                     <option value="transit">В пути</option>
                     <option value="received">Оприходовано</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Оплачено (₽)</label>
-                  <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01" />
+                <div style={{flex:1,marginBottom:'10px'}}>
+                  <label style={{fontSize:'.72rem',fontWeight:600,color:'#888',display:'block',marginBottom:'2px'}}>Оплачено (₽)</label>
+                  <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01"
+                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}} />
                 </div>
               </div>
-              <div style={{textAlign:'right',fontSize:'.85rem',fontWeight:600,paddingTop:'.35rem'}}>
-                {fItems.length > 0 && `Итого: ${fItems.length} товаров = ${fItems.reduce((a,it)=>a+it.qty*it.cost,0).toFixed(2)}₽`}
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-primary" style={{width:'100%'}}>Провести</button>
+              <div style={{textAlign:'center',marginTop:'10px'}}>
+                <button type="submit" style={{width:'100%',padding:'10px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести</button>
               </div>
             </form>
           </div>
         </div>
-      )}
-
-      {/* Модалка оплаты */}
+      )}{/* Модалка оплаты */}
       {showPay && (() => {
         const s = supplies.find(x => x.id === showPay);
         if (!s) return null;
