@@ -41,32 +41,37 @@ export default function Supplies() {
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 1500); };
 
   var scanBarcode = function(onResult){
-    if (!navigator.mediaDevices) { alert('Камера недоступна'); return; }
-    var v=document.createElement('video');v.setAttribute('playsinline','');v.setAttribute('autoplay','');
-    v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;object-fit:cover';
+  if (!navigator.mediaDevices) { setToast && setToast('Камера недоступна'); return; }
+  import('quagga').then(function(mod){
+    var Quagga = mod.default || mod;
+    var w=document.createElement('div');
+    w.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center';
+    var v=document.createElement('div');v.id='qv';
+    v.style.cssText='position:relative;width:100%;max-width:500px;aspect-ratio:4/3;overflow:hidden;border-radius:12px';
     var f=document.createElement('div');
-    f.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;width:240px;height:120px;border:2px solid rgba(255,255,255,.6);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
+    f.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:260px;height:100px;border:2px solid rgba(255,255,255,.5);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
     var i=document.createElement('input');i.type='text';i.placeholder='';
-    i.style.cssText='position:fixed;bottom:30px;left:50%;transform:translate(-50%,0);z-index:10000;width:80%;max-width:360px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
+    i.style.cssText='width:80%;max-width:360px;margin-top:16px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
     var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
-    c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
+    c.style.cssText='position:fixed;top:20px;right:20px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
     var beep=function(){try{var ac=new AudioContext();var g=ac.createGain();g.connect(ac.destination);g.gain.value=.15;var o=ac.createOscillator();o.type='sine';o.frequency.value=1200;o.connect(g);o.start();setTimeout(function(){o.stop();ac.close()},100)}catch(e){}};
-    document.body.appendChild(v);document.body.appendChild(f);document.body.appendChild(i);document.body.appendChild(c);var s=null;var si=null;
+    v.appendChild(f);w.appendChild(v);w.appendChild(i);document.body.appendChild(w);document.body.appendChild(c);
+    var q=null;
     var done=function(val){if(val){beep();if(onResult)onResult(val)}cl()};
-    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();f.remove();i.remove();c.remove()};
-    i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){done(i.value.trim())}};
-    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(st){
-      s=st;v.srcObject=st;v.play();
-      if(window.BarcodeDetector){try{
-        si=setInterval(function(){if(!s)return;
-          new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e']}).detect(v).then(function(bc){if(bc.length>0)done(bc[0].rawValue)}).catch(function(){})
-        },800);
-      }catch(e){}}
-    }).catch(function(){alert('Нет доступа к камере');cl()});
-    c.onclick=cl;
-  };
+    var cl=function(){if(q){q.stop();q=null}w.remove();c.remove()};
+    i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){done(i.value.trim())}};c.onclick=cl;
+    Quagga.init({
+      inputStream:{name:'Live',type:'LiveStream',target:v,targetSize:1,constraints:{width:640,height:480,facingMode:'environment'}},
+      decoder:{readers:['ean_reader','ean_8_reader','code_128_reader','code_39_reader','upc_reader','upc_e_reader']},
+      locate:true
+    },function(err){if(err){setToast && setToast('Ошибка камеры');return}
+      q=Quagga;Quagga.start();
+      Quagga.onDetected(function(data){if(data&&data.codeResult&&data.codeResult.code){done(data.codeResult.code)}});
+    });
+  }).catch(function(){setToast && setToast('Ошибка загрузки сканера')});
+};
 
-  const load = async () => {
+const load = async () => {
     setLoading(true);
     const [supRes, prodRes, suppRes] = await Promise.all([
       supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
