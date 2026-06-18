@@ -24,7 +24,7 @@ export default function QuickIncome({ onClose }) {
       description: desc.trim() || 'Доход',
       date, account_id: payMode, status: 'paid',
     });
-    if (error) return setToast('❌ ' + error.message);
+    if (error) return setToast('' + error.message);
     onClose();
   };
 

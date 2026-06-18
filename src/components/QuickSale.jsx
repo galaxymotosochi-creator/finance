@@ -104,7 +104,7 @@ export default function QuickSale({ onClose }) {
         description: 'Продажа по чеку №' + receiptNum,
         date, status: 'unpaid', category_id: saleCatId,
       });
-      if (error) return setToast('❌ ' + error.message);
+      if (error) return setToast('' + error.message);
       onClose();
       return;
     }

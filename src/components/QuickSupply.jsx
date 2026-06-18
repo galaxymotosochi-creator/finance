@@ -43,7 +43,7 @@ export default function QuickSupply({ onClose }) {
       total: items.reduce((s, i) => s + i.cost * i.qty, 0),
       account_id: payMode, date: new Date().toISOString().split('T')[0],
     });
-    if (error) return setToast('❌ ' + error.message);
+    if (error) return setToast('' + error.message);
     onClose();
   };
 

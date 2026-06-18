@@ -226,7 +226,7 @@ export default function Registers({ fullscreen }) {
       });
       if (error) return setToast('Ошибка: ' + error.message);
       setCart([]); setShowPay(false);
-      return setToast('✅ Чек №' + receiptNum + ' сохранён (не оплачен)');
+      return setToast('Чек №' + receiptNum + ' сохранён (не оплачен)');
     }
 
     if (paySplit) {
@@ -246,7 +246,7 @@ export default function Registers({ fullscreen }) {
         part++;
       }
       setCart([]); setShowPay(false); setPayMode(null);
-      return setToast('✅ Чек №' + receiptNum + ' — оплачено с нескольких счетов');
+      return setToast('Чек №' + receiptNum + ' — оплачено с нескольких счетов');
     }
 
     // Обычная оплата на один счёт — с учётом частичной оплаты
@@ -294,8 +294,8 @@ export default function Registers({ fullscreen }) {
     
     setCart([]); setShowPay(false); setPayMode(null);
     const msg = paidAmt >= total 
-      ? '✅ Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
-      : '✅ Чек №' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
+      ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
+      : 'Чек №' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
     setToast(msg);
   };
 
@@ -309,14 +309,14 @@ export default function Registers({ fullscreen }) {
       weight: parseFloat(addWeight) || 0, weight_unit: addWeightUnit,
       description: addDesc, user_id: user.id, hidden: false,
     });
-    if (error) return setToast('❌ ' + error.message);
+    if (error) return setToast('' + error.message);
     setShowAdd(false);
     setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product');
     setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc('');
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
     if (data) setProducts(data);
-    setToast('✅ Товар добавлен!');
+    setToast('Товар добавлен!');
   };
 
   const openShift = async () => {
@@ -716,7 +716,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
               var { data, error } = await supabase.from('clients').insert({
                 user_id: user.id, name: newClientName.trim(), phone: newClientPhone.trim(),
               }).select();
-              if (error) return setToast('❌ ' + error.message);
+              if (error) return setToast('' + error.message);
               // Обновляем список клиентов
               var clData = await supabase.from('clients').select('*').eq('user_id', user.id).order('name');
               if (clData.data) setClients(clData.data);
@@ -913,13 +913,13 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
                   closing_balance: fact,
                   status: 'closed',
                 }).eq('id', activeShift.id);
-                if (error) return setToast('❌ ' + error.message);
+                if (error) return setToast('' + error.message);
                 setShowCloseShift(false); setCloseFactBal(''); setShiftTx([]);
                 setActiveShift(null);
                 setShowOpenShift(true);
                 setOpenShiftCashier(userName);
                 setOpenShiftBal('0');
-                setToast('✅ Смена закрыта' + (Math.abs(fact - calcBal) > 0.01 ? ' (расхождение ' + (fact - calcBal > 0 ? 'излишек' : 'недостача') + ' ' + Math.abs(fact - calcBal).toLocaleString() + ' ₽)' : ''));
+                setToast('Смена закрыта' + (Math.abs(fact - calcBal) > 0.01 ? ' (расхождение ' + (fact - calcBal > 0 ? 'излишек' : 'недостача') + ' ' + Math.abs(fact - calcBal).toLocaleString() + ' ₽)' : ''));
               }}>Закрыть смену</button>
             </div>
           </div>

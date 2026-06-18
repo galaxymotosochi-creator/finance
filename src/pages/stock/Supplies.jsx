@@ -140,7 +140,7 @@ const load = async () => {
       await supabase.from('supplies').update(obj).eq('id', editId);
     } else { await supabase.from('supplies').insert({ ...obj, id: Date.now() }); }
     await load(); setShowModal(false);
-    showToast('✅ Поставка проведена');
+    showToast('Поставка проведена');
   };
 
   const cycleStatus = async (id) => {

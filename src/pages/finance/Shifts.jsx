@@ -65,11 +65,11 @@ export default function Shifts() {
     const { error } = await supabase.from('shifts').insert({
       user_id: user.id, opening_balance: bal, status: 'open', cashier_name: cashierName.trim() || null,
     });
-    if (error) return showToast('❌ ' + error.message);
+    if (error) return showToast('' + error.message);
     setShowOpen(false); setOpenBal('0'); setCashierName('');
     const { data } = await supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false });
     if (data) setShifts(data);
-    showToast('✅ Смена открыта');
+    showToast('Смена открыта');
   };
 
   const closeShift = async () => {
@@ -79,11 +79,11 @@ export default function Shifts() {
     const { error } = await supabase.from('shifts').update({
       closed_at: new Date().toISOString(), closing_balance: bal, status: 'closed',
     }).eq('id', showClose.id);
-    if (error) return showToast('❌ ' + error.message);
+    if (error) return showToast('' + error.message);
     setShowClose(null); setCloseBal(''); setCloseNote('');
     const { data } = await supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false });
     if (data) setShifts(data);
-    showToast('✅ Смена закрыта');
+    showToast('Смена закрыта');
   };
 
   const showToast = (msg) => {

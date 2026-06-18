@@ -212,7 +212,7 @@ export default function Products() {
   }, []);
 
   const showToast = (msg) => {
-    setToast(msg || '✅ Товар успешно добавлен!');
+    setToast(msg || 'Товар успешно добавлен!');
     setTimeout(() => setToast(null), 1500);
   };
 
@@ -285,14 +285,14 @@ export default function Products() {
 
   const copyP = async (id) => {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
-    if (!data) return showToast('❌ Ошибка копирования');
+    if (!data) return showToast('Ошибка копирования');
     const { error } = await supabase.from('products').insert({
       id: Date.now(), name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
       description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false
     });
-    if (error) return showToast('❌ Ошибка: ' + error.message);
+    if (error) return showToast('Ошибка: ' + error.message);
     await load();
     showToast('📋 Товар скопирован');
   };
@@ -336,7 +336,7 @@ export default function Products() {
 
   const exportExcel = () => {
     const items = products || [];
-    if (items.length === 0) { showToast('❌ Нет товаров для выгрузки'); return; }
+    if (items.length === 0) { showToast('Нет товаров для выгрузки'); return; }
     const data = items.map(p => ({
       'Название': p.name,
       'Тип': p.type === 'service' ? 'Услуга' : 'Товар',
@@ -382,7 +382,7 @@ export default function Products() {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-        if (json.length === 0) { showToast('❌ Файл пуст'); setImporting(false); return; }
+        if (json.length === 0) { showToast('Файл пуст'); setImporting(false); return; }
 
         const COL_MAP = {
           'название': 'name', 'наименование': 'name', 'товар': 'name',
@@ -430,9 +430,9 @@ export default function Products() {
           } catch (e) { errors++; }
         }
 
-        showToast(`✅ Загружено ${added} позиций${errors > 0 ? `, ${errors} с ошибками` : ''}`);
+        showToast(`Загружено ${added} позиций${errors > 0 ? `, ${errors} с ошибками` : ''}`);
         if (added > 0) load();
-      } catch (e) { showToast('❌ Ошибка при чтении файла'); }
+      } catch (e) { showToast('Ошибка при чтении файла'); }
       setImporting(false);
     };
     reader.readAsArrayBuffer(file);
