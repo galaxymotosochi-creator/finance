@@ -429,16 +429,20 @@ export default function Registers({ fullscreen }) {
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
-            <div key={p.id} onClick={() => addToCart(p)}
-              style={{background:'#fff',borderRadius:'14px',padding:'14px',cursor:'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid #eee',boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%'}}
-              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)' } }
+            <div key={p.id} onClick={function(){var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos)addToCart(p)}}
+              style={{background: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#fafafa':'#fff',borderRadius:'14px',padding:'14px',cursor:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?'default':'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid '+( (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#f0f0f0':'#eee' ),boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%',opacity:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?.5:1}}
+              onMouseEnter={e => { var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'}} }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
-              <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3,minHeight:'40px'}}>{p.name}</div>
+              <div style={{fontSize:'13px',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3,minHeight:'40px'}}>{p.name}</div>
               <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
-                {p.cat && <div style={{fontSize:'10px',color:'#999'}}>{p.cat}</div>}
+                {p.cat && <div style={{fontSize:'10px',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'#999'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
-                <span style={{fontSize:'16px',fontWeight:800,color:'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
-                <span style={{fontSize:'10px',fontWeight:500,color: (stockMap[p.id]||0) <= 0 ? '#dc2626' : '#16a34a'}}>остаток: {stockMap[p.id] || 0}</span>
+                <span style={{fontSize:'16px',fontWeight:800,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
+                {(p.type!=='service'&&(stockMap[p.id]||0)<=0) ? (
+                  <span style={{fontSize:'9px',fontWeight:600,color:'#dc2626'}}>нет в наличии</span>
+                ) : (
+                  <span style={{fontSize:'10px',fontWeight:500,color:'#16a34a'}}>остаток: {stockMap[p.id] || 0}</span>
+                )}
               </div>
               </div>
             </div>
