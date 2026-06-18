@@ -444,9 +444,7 @@ export default function Registers({ fullscreen }) {
                 {p.cat && <div style={{fontSize:'10px',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'#999'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
                 <span style={{fontSize:'16px',fontWeight:800,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
-                {(p.type!=='service'&&(stockMap[p.id]||0)<=0) ? (
-                  <span style={{fontSize:'9px',fontWeight:600,color:'#dc2626'}}>нет в наличии</span>
-                ) : (
+                {(p.type!=='service'&&(stockMap[p.id]||0)<=0) ? null : (
                   <span style={{fontSize:'10px',fontWeight:500,color:'#16a34a'}}>остаток: {stockMap[p.id] || 0}</span>
                 )}
               </div>
