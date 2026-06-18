@@ -141,7 +141,7 @@ export default function Registers({ fullscreen }) {
     setPaySplit(false);
     setPayUnpaid(false);
     setSplitAmts({});
-    setPayAmount('');
+    setPayAmount(String(Math.round(total)));
     setShowPay(true);
   };
 
