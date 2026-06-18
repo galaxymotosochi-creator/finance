@@ -234,7 +234,7 @@ export default function Stock() {
               return (
                 <tr key={p.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{fontWeight:400}}>{p.name}</span>
+                    <span style={{fontWeight:500}}>{p.name}</span>
                     {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
                   </td>
                   <td style={{textAlign:'center',fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
