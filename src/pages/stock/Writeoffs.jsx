@@ -100,10 +100,10 @@ export default function Writeoffs() {
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
             ) : list.map(w => (
               <tr key={w.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
-                <td>{w.quantity}</td>
-                <td><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
-                <td><span className="prod-cat">{w.reason||'—'}</span></td>
+                <td style={{whiteSpace:'nowrap'}}><div className="prod-name" style={{fontSize:'.85rem'}}>{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
+                <td style={{whiteSpace:'nowrap'}}>{w.quantity}</td>
+                <td style={{whiteSpace:'nowrap'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
+                <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={() => {

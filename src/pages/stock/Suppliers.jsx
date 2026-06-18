@@ -117,8 +117,8 @@ export default function Suppliers() {
               const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
               return (
                 <tr key={s.id}>
-                  <td><div className="prod-name" style={{fontSize:'.85rem'}}>{s.name}</div></td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{s.contact||'—'}</td>
+                  <td style={{whiteSpace:'nowrap'}}><div className="prod-name" style={{fontSize:'.85rem'}}>{s.name}</div></td>
+                  <td style={{fontSize:'.82rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{s.contact||'—'}</td>
                   <td style={{fontSize:'.82rem'}}>{s.phone||'—'}</td>
                   <td><span className="prod-cat">{icon} {label}</span></td>
                   <td>{supplyCount}</td>
