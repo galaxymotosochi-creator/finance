@@ -651,15 +651,15 @@ export default function Registers({ fullscreen }) {
             <form onSubmit={async (e) => {
               e.preventDefault();
               if (!newClientName.trim()) return setToast('⚠️ Введите имя');
-              const { data, error } = await supabase.from('clients').insert({
+              var { data, error } = await supabase.from('clients').insert({
                 user_id: user.id, name: newClientName.trim(), phone: newClientPhone.trim(),
-              }).select('id').single();
-              if (error) return setToast('Ошибка: ' + error.message);
+              }).select();
+              if (error) return setToast('❌ ' + error.message);
               // Обновляем список клиентов
-              const { data: clData } = await supabase.from('clients').select('*').eq('user_id', user.id).order('name');
-              if (clData) setClients(clData);
+              var clData = await supabase.from('clients').select('*').eq('user_id', user.id).order('name');
+              if (clData.data) setClients(clData.data);
               // Автоматически выбираем нового клиента
-              if (data) setSelectedClient(data.id);
+              if (data && data.length > 0) setSelectedClient(data[0].id);
               setShowAddClient(false);
               setToast('✅ Клиент добавлен');
             }}>
