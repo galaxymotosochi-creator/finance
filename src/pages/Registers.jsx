@@ -625,9 +625,9 @@ export default function Registers({ fullscreen }) {
 
             <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px',display:'flex',gap:'8px',justifyContent:'center'}}>
               <button type="button" onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:total,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setShowPay(false);setToast('✅ Чек отложен')}}
-                style={{padding:'.5rem 1rem',borderRadius:'100px',border:'1.5px solid #f97316',background:'#fff',color:'#f97316',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>⏸️ Отложить</button>
+                style={{padding:'.5rem 1.2rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Отложить</button>
               <button type="button" onClick={processPay} disabled={!selectedClient}
-                style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.85rem',fontWeight:600,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
+                style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
