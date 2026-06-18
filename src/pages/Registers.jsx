@@ -502,22 +502,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2 style={{marginBottom:'16px'}}>Оплата чека <span>№{(shiftTx.length || 0) + 1}</span></h2>
-
-            {/* Список товаров */}
-            <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'16px'}}>
-              {cart.map((item, i) => (
-                <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{color:'#555'}}>{item.name} ×{item.qty}</span>
-                  <span style={{fontWeight:600,color:'#111'}}>{(item.price * item.qty).toLocaleString()} ₽</span>
-                </div>
-              ))}
-              <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
-              <div style={{display:'flex',justifyContent:'space-between',fontWeight:800}}>
-                <span>ИТОГО:</span>
-                <span>{total.toLocaleString()} ₽</span>
-              </div>
-            </div>
+            <h2 style={{marginBottom:'16px'}}>Чек №{(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
 
             {/* Выбор счёта */}
             <div style={{marginBottom:'14px'}}>
@@ -525,28 +510,28 @@ export default function Registers({ fullscreen }) {
               <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
                 {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
                   <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                    padding:'8px 14px', borderRadius:'8px', border:'1.5px solid #eee',
-                    background: payMode === a.id ? '#000' : '#fff',
+                    flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
+                    background: payMode === a.id ? '#111' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
-                    fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:0
-                  }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
+                    fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:'60px'
+                  }}>{a.type === 'cash_register' ? '💵 Наличные' : a.name}</button>
                 ))}
               </div>
             </div>
 
-            {/* Сумма оплаты (для частичной оплаты) */}
+            {/* Сумма оплаты */}
             {payMode && !paySplit && (
               <div style={{marginBottom:'10px'}}>
-                <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Сумма к оплате</label>
+                <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Сумма</label>
                 <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
                   <input type="number" min="0" step="0.01" placeholder={total.toString()} 
                     value={payAmount} 
                     onChange={e => setPayAmount(e.target.value)}
-                    style={{width:'50%',border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                    style={{width:'50%',border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                  {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total && (
+                    <span style={{fontSize:'11px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#f0fdf4',color:'#16a34a'}}>✓ Оплачено</span>
+                  )}
                 </div>
-                {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total && (
-                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Чек оплачен полностью</div>
-                )}
                 {payAmount && parseFloat(payAmount) > total && (
                   <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</div>
                 )}
@@ -633,9 +618,9 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
             </div>
 
-            <div className="modal-actions">
-              <button type="button" className="btn btn-outline" onClick={() => setShowPay(false)}>Отмена</button>
-              <button type="button" className="btn btn-account-select" onClick={processPay} disabled={!selectedClient} style={{opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить чек' : 'Пробить чек'}</button>
+            <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px'}}>
+              <button type="button" onClick={processPay} disabled={!selectedClient}
+                style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.85rem',fontWeight:600,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
