@@ -6,25 +6,34 @@ import { useAuth } from '../../hooks/useAuth';
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
 const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд'];
-const scanBarcode = () => {
+const scanBarcode = (onResult) => {
     if (!navigator.mediaDevices) { alert('Камера недоступна в этом браузере'); return; }
     var v=document.createElement('video');v.setAttribute('playsinline','');v.setAttribute('autoplay','');
-    v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.6)';
-    var i=document.createElement('input');i.type='text';i.placeholder='Введите код с экрана...';
+    v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;object-fit:cover';
+    // Рамка для штрихкода
+    var f=document.createElement('div');
+    f.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;width:240px;height:120px;border:2px solid rgba(255,255,255,.6);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
+    // Поле ввода
+    var i=document.createElement('input');i.type='text';i.placeholder='Введите или поднесите штрихкод к рамке';
     i.style.cssText='position:fixed;bottom:30px;left:50%;transform:translate(-50%,0);z-index:10000;width:80%;max-width:360px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
     var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
     c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
-    document.body.appendChild(v);document.body.appendChild(i);document.body.appendChild(c);var s=null;var si=null;
-    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();i.remove();c.remove()};
-    i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){setFBarcode(i.value.trim());cl()}};
+    // Звук сканирования (Web Audio)
+    var beep = function(){
+      try{var ac=new AudioContext();var g=ac.createGain();g.connect(ac.destination);g.gain.value=.15;var o=ac.createOscillator();o.type='sine';o.frequency.value=1200;o.connect(g);o.start();setTimeout(function(){o.stop();ac.close()},100)}catch(e){}
+    };
+    document.body.appendChild(v);document.body.appendChild(f);document.body.appendChild(i);document.body.appendChild(c);var s=null;var si=null;
+    var done=function(val){if(val){beep();if(onResult)onResult(val);else if(typeof setFBarcode!=='undefined')setFBarcode(val)}cl()};
+    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();f.remove();i.remove();c.remove()};
+    i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){done(i.value.trim())}};
     navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(st){
       s=st;v.srcObject=st;v.play();
-      // Автораспознавание если BarcodeDetector доступен (Android Chrome)
       if(window.BarcodeDetector){try{
         si=setInterval(function(){if(!s)return;
-          var bd=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e']});
-          bd.detect(v).then(function(bc){if(bc.length>0){setFBarcode(bc[0].rawValue);cl()}}).catch(function(){})
-        },1000);
+          new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e']}).detect(v).then(function(bc){
+            if(bc.length>0){done(bc[0].rawValue)}
+          }).catch(function(){})
+        },800);
       }catch(e){}}
     }).catch(function(){alert('Нет доступа к камере');cl()});
     c.onclick=cl;
@@ -693,7 +702,7 @@ export default function Products() {
                     ) : (
                       <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
                     )}
-                    <span onClick={scanBarcode} title="Сканировать штрихкод через камеру"
+                    <span onClick={function(){scanBarcode(function(v){setFBarcode(v)})}} title="Сканировать штрихкод через камеру"
                       style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.75rem',fontFamily:'var(--font)',background:'#f8f9fa'}}>📷</span>
                   </div>
                 </div>}
