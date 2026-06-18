@@ -36,6 +36,8 @@ export default function Supplies() {
   const [fAddProd, setFAddProd] = useState('');
   const [fAddQty, setFAddQty] = useState('');
   const [fAddCost, setFAddCost] = useState('');
+  const [fAddSearch, setFAddSearch] = useState('');
+  const [fAddDrop, setFAddDrop] = useState(false);
   const [toast, setToast] = useState(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 1500); };
@@ -117,7 +119,7 @@ const load = async () => {
     const cost = parseFloat(fAddCost) || 0;
     const prod = products.find(p => p.id === prodId);
     setFItems(prev => [...prev, { prodId, name: prod ? prod.name : 'Товар', qty, cost }]);
-    setFAddProd(''); setFAddQty(''); setFAddCost('');
+    setFAddProd(''); setFAddQty(''); setFAddCost(''); setFAddSearch('');
   };
 
   const removeItem = (idx) => setFItems(prev => prev.filter((_, i) => i !== idx));
@@ -279,7 +281,7 @@ const load = async () => {
               <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'.2rem 0',fontSize:'.82rem'}}>
                 <span>{it.name}</span>
                 <span>{it.qty} шт x {it.cost.toFixed(2)}</span>
-                <span style={{fontWeight:500}}>{(it.qty*it.cost).toFixed(2)}₽</span>
+                <span style={{fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
               </div>
             ))}
             <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',display:'flex',justifyContent:'space-between',fontWeight:600,fontSize:'.85rem'}}>
@@ -300,8 +302,12 @@ const load = async () => {
           <div className="modal-box">
             <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([])}}>&times;</button>
             <div style={{marginBottom:'14px'}}>
-              <div style={{fontSize:'1.1rem',fontWeight:700,marginBottom:'2px'}}>{editId?'Редактировать поставку':'Новая поставка'}</div>
-              <div style={{fontSize:'.78rem',color:'#999'}}>Добавление товаров на склад</div>
+              <div className="page-header" style={{marginBottom:'12px'}}>
+                <div>
+                  <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0}}>{editId?'Редактировать поставку':'Новая поставка'}</h1>
+                  <div className="sub" style={{marginBottom:0}}>Добавление товаров на склад</div>
+                </div>
+              </div>
             </div>
             <form onSubmit={save}>
               {/* Поставщик — крупно */}
@@ -337,17 +343,34 @@ const load = async () => {
                 <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                   <span onClick={function(){scanBarcode(function(bc){
                     var found=products.find(function(p){return p.barcode===bc;});
-                    if(found){setFAddProd(String(found.id));setToast('Найден: '+found.name)}else setToast('Штрихкод '+bc+' не найден');
+                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
                   })}} title="Сканировать штрихкод" 
                     style={{fontSize:'18px',cursor:'pointer',padding:'.25rem .35rem',background:'#fff',border:'1.5px solid #eee',borderRadius:'8px',lineHeight:1,display:'flex',alignItems:'center'}}>📷</span>
-                  <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,fontSize:'.82rem',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
-                    <option value="">— выберите товар —</option>
-                    {products.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
+                  <div style={{position:'relative',flex:1}}>
+                    <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
+                      onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
+                      placeholder="Поиск товара..."
+                      style={{width:'100%',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',background:'#fff'}} />
+                    {fAddDrop && (
+                      <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
+                        {(fAddSearch ? products.filter(function(p){return p.name.toLowerCase().includes(fAddSearch.toLowerCase())}) : products).map(function(p){
+                          return (
+                            <div key={p.id} onMouseDown={function(){setFAddProd(String(p.id));setFAddSearch(p.name);setFAddDrop(false)}}
+                              style={{padding:'6px 10px',cursor:'pointer',fontSize:'.82rem',borderBottom:'1px solid #f5f5f5'}}
+                              onMouseEnter={function(e){e.currentTarget.style.background='#f5f5f5'}}
+                              onMouseLeave={function(e){e.currentTarget.style.background='#fff'}}>{p.name}</div>
+                          );
+                        })}
+                        {products.filter(function(p){return !fAddSearch || p.name.toLowerCase().includes(fAddSearch.toLowerCase())}).length === 0 && (
+                          <div style={{padding:'8px',fontSize:'.78rem',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Кол-во" min="1" step="any"
-                    style={{width:'70px',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'center'}} />
+                    style={{width:'70px',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'center'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} placeholder="Цена" min="0" step="0.01"
-                    style={{width:'80px',padding:'.4rem .35rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'right'}} />
+                    style={{width:'80px',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'right'}} />
                   <button type="button" onClick={addItem} style={{padding:'.4rem .6rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'8px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
                 </div>
               </div>
@@ -355,7 +378,7 @@ const load = async () => {
               {fItems.length > 0 && (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontWeight:700,fontSize:'.85rem'}}>
                   <span>Итого: {fItems.length} товаров</span>
-                  <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toFixed(2)} ₽</span>
+                  <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span>
                 </div>
               )}
               {/* Статус + Оплата */}
@@ -372,7 +395,7 @@ const load = async () => {
                 <div style={{flex:1,marginBottom:'10px'}}>
                   <label style={{fontSize:'.72rem',fontWeight:600,color:'#888',display:'block',marginBottom:'2px'}}>Оплачено (₽)</label>
                   <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01"
-                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}} />
+                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff',boxSizing:'border-box'}} />
                 </div>
               </div>
               <div style={{textAlign:'center',marginTop:'10px'}}>
