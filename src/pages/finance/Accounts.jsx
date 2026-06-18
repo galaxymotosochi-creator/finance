@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 const ACC_TYPES = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
+  { type: 'cash_register', icon: '🗄️', label: 'Касса' },
   { type: 'card', icon: '💳', label: 'Оплата картой' },
   { type: 'transfer', icon: '🔄', label: 'Перевод' },
   { type: 'checking', icon: '🏦', label: 'Расчетный счет' },
@@ -35,6 +36,9 @@ export default function Accounts() {
   const [trAmt, setTrAmt] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
+  const [showCollection, setShowCollection] = useState(false);
+  const [colAmt, setColAmt] = useState('');
+  const [colTo, setColTo] = useState('');
   const [viewAcTx, setViewAcTx] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -53,10 +57,11 @@ export default function Accounts() {
     var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
     if (!d.data) return;
     var cl = d.data;
-    var need = {cash:!cl.some(a=>a.type==='cash')};
-    if (user && need.cash) {
+    var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
+    if (user) {
       var cr = [];
       if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0});
+      if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0});
       if (cr.length > 0) {
         var r = await supabase.from('accounts').insert(cr).select();
         if (r.data) {
@@ -227,6 +232,7 @@ export default function Accounts() {
                       <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()} ₽</td>
                       <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right'}}>
+                        {a.type==='cash_register' && <button className="act-btn" onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}} style={{fontSize:'.72rem',fontWeight:600,padding:'.15rem .4rem',color:'#e65100',cursor:'pointer',background:'none',border:'none',fontFamily:'inherit'}}>🏦 Инкасс.</button>}
                         <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
                         {!isSys(a) && (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -428,6 +434,72 @@ export default function Accounts() {
           </div>
         </div>
       )}
+
+      {/* Инкассация */}
+      {showCollection && (()=>{
+        var cashRegAc = accounts.find(a => a.type === 'cash_register');
+        var cashRegBal = 0;
+        if (cashRegAc) {
+          cashRegBal = parseFloat(cashRegAc.balance)||0;
+          (transactions||[]).forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
+        }
+        var otherAccs = accounts.filter(function(a){return a.id !== cashRegAc?.id;});
+        return (
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowCollection(false)}}}>
+            <div className="modal-box" style={{maxWidth:'420px'}}>
+              <button className="modal-close" onClick={()=>setShowCollection(false)}>&times;</button>
+              <h2>🏦 Инкассация</h2>
+              <div className="sub" style={{marginBottom:'.75rem'}}>Изъятие наличных из кассы</div>
+              <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
+                <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
+                <span style={{fontWeight:700}}>{cashRegBal.toLocaleString()} ₽</span>
+              </div>
+              <form onSubmit={async function(e){
+                e.preventDefault();
+                var amt = parseFloat(colAmt);
+                if (!amt || amt <= 0) return alert('Введите сумму');
+                if (amt > cashRegBal) return alert('Недостаточно средств в кассе. Баланс: ' + cashRegBal.toLocaleString() + ' ₽');
+                if (!colTo) return alert('Выберите счёт получателя');
+                var toAc = accounts.find(a => a.id === colTo);
+                if (!toAc) return alert('Счёт не найден');
+                try {
+                  // Категория «Инкассация»
+                  var colCatId = null;
+                  var { data: foundCat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Инкассация').maybeSingle();
+                  if (foundCat) colCatId = foundCat.id;
+                  else {
+                    var { data: newCat } = await supabase.from('categories').insert({user_id:user.id,name:'Инкассация',type:'expense'}).select('id').maybeSingle();
+                    if (newCat) colCatId = newCat.id;
+                  }
+                  // Расход с Кассы + доход на выбранный счёт
+                  await supabase.from('transactions').insert([
+                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация на ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId},
+                    {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация с кассы',date:new Date().toISOString().split('T')[0],category_id:colCatId}
+                  ]);
+                  setShowCollection(false);
+                  await fetchTx();
+                } catch(err) {alert(err.message);}
+              }}>
+                <div className="form-group">
+                  <label>Сумма (₽)</label>
+                  <input type="number" placeholder="0" min="0" step="0.01" value={colAmt} onChange={function(e){setColAmt(e.target.value)}} required autoFocus />
+                </div>
+                <div className="form-group">
+                  <label>Куда зачислить</label>
+                  <select value={colTo} onChange={function(e){setColTo(e.target.value)}} required>
+                    <option value="">— выберите счёт —</option>
+                    {otherAccs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                  </select>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
+                  <button type="submit" className="btn btn-account-select" style={{background:'#e65100',color:'#fff'}}>Инкассировать</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

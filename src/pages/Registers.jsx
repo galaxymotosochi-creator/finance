@@ -233,6 +233,11 @@ export default function Registers({ fullscreen }) {
     // Обычная оплата на один счёт — с учётом частичной оплаты
     if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
+    // Наличные → перенаправляем на счёт Касса
+    var targetAc = selectedAc;
+    if (selectedAc && selectedAc.type === 'cash') {
+      targetAc = accounts.find(a => a.type === 'cash_register') || selectedAc;
+    }
     const paidAmt = payAmount ? parseFloat(payAmount) : total;
     
     if (!selectedClient) {
@@ -243,7 +248,7 @@ export default function Registers({ fullscreen }) {
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
         description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
-        date, account_id: selectedAc?.id || null, status: 'paid', category_id: saleCatId,
+        date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
       });
       if (error) return setToast('Ошибка: ' + error.message);
     }
@@ -673,20 +678,34 @@ export default function Registers({ fullscreen }) {
       )}
 
       {/* Модалка открытия смены */}
-      {showOpenShift && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
-          <div className="modal-box" style={{maxWidth:'380px'}}>
-            <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
-            <h2>Открытие смены</h2>
-            <div className="sub">Для работы кассы необходимо открыть смену</div>
-            <form onSubmit={e => { e.preventDefault(); openShift(); }}>
-              <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
-              <div className="form-group"><label>Остаток денег на начало дня (руб)</label><input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus /></div>
-              <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
-            </form>
+      {showOpenShift && (function(){
+        var cashRegAc = accounts.find(function(a){return a.type === 'cash_register';});
+        var cashRegBal = 0;
+        if (cashRegAc) {
+          cashRegBal = parseFloat(cashRegAc.balance) || 0;
+          (shiftTx||[]).forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
+        }
+        if (openShiftBal === '0' && cashRegBal > 0) setTimeout(function(){setOpenShiftBal(String(Math.round(cashRegBal)))}, 50);
+        return (
+          <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
+            <div className="modal-box" style={{maxWidth:'380px'}}>
+              <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
+              <h2>Открытие смены</h2>
+              <div className="sub">Для работы кассы необходимо открыть смену</div>
+              <form onSubmit={e => { e.preventDefault(); openShift(); }}>
+                <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
+                <div className="form-group"><label>Остаток денег на начало дня (руб)</label>
+                  <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
+                    <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus style={{flex:1}} />
+                    {cashRegBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
+                  </div>
+                </div>
+                <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Меню действий */}
       {showActions && (

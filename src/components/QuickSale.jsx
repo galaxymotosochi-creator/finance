@@ -111,13 +111,18 @@ export default function QuickSale({ onClose }) {
 
     if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
+    // Наличные → перенаправляем на счёт Касса
+    var targetAc = selectedAc;
+    if (selectedAc && selectedAc.type === 'cash') {
+      targetAc = accounts.find(a => a.type === 'cash_register') || selectedAc;
+    }
     const paidAmt = payAmount ? parseFloat(payAmount) : total;
 
     if (paidAmt > 0) {
       await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
         description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
-        date, account_id: selectedAc?.id || null, status: 'paid', category_id: saleCatId,
+        date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
       });
     }
 

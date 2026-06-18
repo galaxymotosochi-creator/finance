@@ -6,6 +6,7 @@ export default function Shifts() {
   const { user } = useAuth();
   const [shifts, setShifts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showOpen, setShowOpen] = useState(false);
   const [openBal, setOpenBal] = useState('0');
@@ -15,15 +16,25 @@ export default function Shifts() {
   const [closeNote, setCloseNote] = useState('');
   const [toast, setToast] = useState(null);
 
+  var getCashRegisterBalance = function() {
+    var ac = (accounts||[]).find(function(a){return a.type === 'cash_register';});
+    if (!ac) return 0;
+    var bal = parseFloat(ac.balance) || 0;
+    (transactions||[]).forEach(function(t){if (t.account_id === ac.id) bal += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);});
+    return bal;
+  };
+
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [sRes, tRes] = await Promise.all([
+      const [sRes, tRes, aRes] = await Promise.all([
         supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false }),
         supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
+        supabase.from('accounts').select('*').order('created_at', { ascending: true }),
       ]);
       setShifts(sRes.data || []);
       setTransactions(tRes.data || []);
+      setAccounts(aRes.data || []);
       setLoading(false);
     })();
   }, [user]);
@@ -155,28 +166,36 @@ export default function Shifts() {
       </div>
 
       {/* Модалка открытия */}
-      {showOpen && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpen(false); }}>
-          <div className="modal-box" style={{maxWidth:'380px'}}>
-            <button className="modal-close" onClick={() => setShowOpen(false)}>&times;</button>
-            <h2>Открыть смену</h2>
-            <div className="sub">Укажите остаток в кассе на момент открытия</div>
-            <form onSubmit={e => { e.preventDefault(); openShift(); }}>
-              <div className="form-group">
-                <label>Имя кассира</label>
-                <input type="text" placeholder="Иван Иванов" value={cashierName} onChange={e => setCashierName(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Остаток в кассе (₽)</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)} />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Открыть смену</button>
-              </div>
-            </form>
+      {showOpen && (function(){
+        var cashBal = getCashRegisterBalance();
+        if (openBal === '0' && cashBal > 0) setTimeout(function(){setOpenBal(String(cashBal))}, 50);
+        return (
+          <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpen(false); }}>
+            <div className="modal-box" style={{maxWidth:'380px'}}>
+              <button className="modal-close" onClick={() => setShowOpen(false)}>&times;</button>
+              <h2>Открыть смену</h2>
+              <div className="sub">Укажите остаток в кассе на момент открытия</div>
+              <form onSubmit={e => { e.preventDefault(); openShift(); }}>
+                <div className="form-group">
+                  <label>Имя кассира</label>
+                  <input type="text" placeholder="Иван Иванов" value={cashierName} onChange={e => setCashierName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Остаток в кассе (₽)</label>
+                  <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
+                    <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)}
+                      style={{flex:1}} />
+                    {cashBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {cashBal.toLocaleString()} ₽</span>}
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button type="submit" className="btn btn-account-select">Открыть смену</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Модалка закрытия */}
       {showClose && (
