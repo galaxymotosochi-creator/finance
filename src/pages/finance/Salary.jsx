@@ -264,6 +264,15 @@ export default function Salary() {
   const toggleBonus = (id) => setBonusChecks(prev => ({...prev, [id]: !prev[id]}));
   const toggleDeduct = (id) => setDeductChecks(prev => ({...prev, [id]: !prev[id]}));
 
+  const abbreviateName = (name) => {
+    if (!name) return '—';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length <= 1) return name;
+    const surname = parts[0];
+    const initials = parts.slice(1).map(p => p.charAt(0) + '.').join(' ');
+    return surname + ' ' + initials;
+  };
+
   const fmtD = (d) => { if(!d) return '—'; var p=d.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0].slice(2):d; };
 
   return (
@@ -289,12 +298,12 @@ export default function Salary() {
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
             ) : list.map(s => (
               <tr key={s.id}>
-                <td><div className="prod-name" style={{fontSize:'.85rem',fontWeight:500}} onClick={()=>{}}>{s.employee_name||'—'}</div></td>
+                <td><div className="prod-name" style={{fontSize:'.85rem',fontWeight:500,whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}</div></td>
                 <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
-                <td style={{color:s.bonus_amount>0?'#16a34a':''}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{color:s.deduct_amount>0?'#dc2626':''}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{fontWeight:600}}>{Number(s.amount).toLocaleString()} ₽</td>
+                <td style={{whiteSpace:'nowrap'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td style={{color:s.bonus_amount>0?'#16a34a':'',whiteSpace:'nowrap'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{color:s.deduct_amount>0?'#dc2626':'',whiteSpace:'nowrap'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{fontWeight:600,whiteSpace:'nowrap'}}>{Number(s.amount).toLocaleString()} ₽</td>
                 <td>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',fontWeight:600,whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
