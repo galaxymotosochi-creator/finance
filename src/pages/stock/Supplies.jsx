@@ -56,8 +56,8 @@ export default function Supplies() {
     c.style.cssText='position:fixed;top:20px;right:20px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
     var beep=function(){try{var ac=new AudioContext();var g=ac.createGain();g.connect(ac.destination);g.gain.value=.15;var o=ac.createOscillator();o.type='sine';o.frequency.value=1200;o.connect(g);o.start();setTimeout(function(){o.stop();ac.close()},100)}catch(e){}};
     v.appendChild(f);w.appendChild(v);w.appendChild(i);document.body.appendChild(w);document.body.appendChild(c);
-    var q=null;
-    var done=function(val){if(val){beep();if(onResult)onResult(val)}cl()};
+    var q=null;var lock=false;
+    var done=function(val){if(val&&!lock){lock=true;beep();if(onResult)onResult(val);setTimeout(function(){lock=false},3000)}cl()};
     var cl=function(){if(q){q.stop();q=null}w.remove();c.remove()};
     i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){done(i.value.trim())}};c.onclick=cl;
     Quagga.init({
