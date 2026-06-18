@@ -137,7 +137,7 @@ export default function Registers({ fullscreen }) {
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
       if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { id: p.id, name: p.name, price: p.price || 0, qty: 1, cat: p.cat || '' }];
+      return [...prev, { id: p.id, name: p.name, price: p.price || 0, qty: 1, cat: p.cat || '', free_price: p.free_price || false }];
     });
   };
 
@@ -367,7 +367,13 @@ export default function Registers({ fullscreen }) {
                 <span style={{fontWeight:600,minWidth:'16px',textAlign:'center',fontSize:'13px',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
                 <button onClick={() => updateQty(item.id, 1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>+</button>
               </div>
-              <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} ₽</div>
+              {item.free_price ? (
+                <input type="number" min="0" step="0.01" value={item.price} 
+                  onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
+                  style={{width:'80px',textAlign:'right',border:'1.5px solid #e0e0e0',borderRadius:'6px',padding:'4px 6px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
+              ) : (
+                <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} ₽</div>
+              )}
             </div>
           ))}
         </div>

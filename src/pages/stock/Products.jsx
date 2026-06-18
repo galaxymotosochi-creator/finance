@@ -128,6 +128,7 @@ export default function Products() {
   const [fSku, setFSku] = useState('');
   const [fBarcode, setFBarcode] = useState('');
   const [fType, setFType] = useState('product');
+  const [fFreePrice, setFFreePrice] = useState(false);
   const [fWeight, setFWeight] = useState('0');
   const [fWeightUnit, setFWeightUnit] = useState('кг');
   const [fDesc, setFDesc] = useState('');
@@ -668,6 +669,10 @@ export default function Products() {
                   <label>Цена продажи (₽)</label>
                   <input type="number" min="0" step="0.01" value={fPrice} onChange={e => setFPrice(e.target.value)} placeholder="0" />
                 </div>
+              <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
+                <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
+                Продавать по свободной цене
+              </label>
                 <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
@@ -684,9 +689,11 @@ export default function Products() {
                 {fType !== 'service' && <div className="form-group">
                   <label>Штрихкод</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                    <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
-                    <span onClick={() => setFBarcode(genBarcode())} title="Сгенерировать"
-                      style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.72rem',fontFamily:'var(--font)',background:'#f8f9fa',whiteSpace:'nowrap',fontWeight:500}}>сгенерировать</span>
+                    <div style={{position:'relative',flex:1}}>
+                      <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{width:'100%',paddingRight:fBarcode?'0':'80px'}} />
+                      {!fBarcode && <span onClick={() => setFBarcode(genBarcode())}
+                        style={{position:'absolute',right:'6px',top:'50%',transform:'translateY(-50%)',padding:'.2rem .4rem',borderRadius:'6px',cursor:'pointer',fontSize:'.7rem',background:'#f0f0f0',color:'#888',fontWeight:500,whiteSpace:'nowrap'}}>сгенерировать</span>}
+                    </div>
                     <span onClick={scanBarcode} title="Сканировать штрихкод через камеру"
                       style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.75rem',fontFamily:'var(--font)',background:'#f8f9fa'}}>📷</span>
                   </div>
