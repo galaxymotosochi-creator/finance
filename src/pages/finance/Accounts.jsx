@@ -27,6 +27,7 @@ export default function Accounts() {
   const [modalName, setModalName] = useState('');
   const [modalType, setModalType] = useState('custom');
   const [modalBalance, setModalBalance] = useState('0');
+  const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
   const [showCorrect, setShowCorrect] = useState(false);
@@ -60,8 +61,8 @@ export default function Accounts() {
     var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
     if (user) {
       var cr = [];
-      if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0});
-      if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0});
+      if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Наличные деньги (не через кассу)'});
+      if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0,description:'Наличные продажи через кассу'});
       if (cr.length > 0) {
         var r = await supabase.from('accounts').insert(cr).select();
         if (r.data) {
@@ -106,10 +107,10 @@ export default function Accounts() {
   var isSys = (ac) => systemIds.has(ac?.id);
   var hasAct = (ac) => parseFloat(ac.balance)>0||(transactions||[]).some(t=>t.account_id===ac.id);
 
-  var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setShowModal(true); };
+  var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
   var openEdit = (ac) => {
     if (hasAct(ac)) return setToast('⚠️ Нельзя редактировать счет — на нем есть движения');
-    setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setShowModal(true);
+    setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setModalDesc(ac.description||''); setShowModal(true);
   };
 
   var save = async (e) => {
@@ -117,11 +118,11 @@ export default function Accounts() {
     var ib = parseFloat(modalBalance)||0;
     try {
       if (editingId) {
-        var up = await supabase.from('accounts').update({name:modalName.trim()}).eq('id',editingId);
+        var up = await supabase.from('accounts').update({name:modalName.trim(), description:modalDesc.trim()||''}).eq('id',editingId);
         if (up.error) { alert(up.error.message); return; }
-        setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim()}:a));
+        setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim(), description:modalDesc.trim()||''}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom',balance:ib}).select();
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom',balance:ib, description:modalDesc.trim()||''}).select();
         if (ins.error) { alert(ins.error.message); return; }
       }
       await fetchAccounts();
@@ -223,7 +224,7 @@ export default function Accounts() {
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
                             <div className="prod-name">{a.name}</div>
-                            {lb !== a.name && <div className="prod-sku">{lb}</div>}
+                            <div className="prod-sku">{a.description || lb}</div>
                           </div>
                         </div>
                       </td>
@@ -271,12 +272,16 @@ export default function Accounts() {
                 <label>Название</label>
                 <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
               </div>
-              {!editingId && (
+              {!editingId && (<>
+                <div className="form-group">
+                  <label>Комментарий</label>
+                  <input type="text" placeholder="Например: основная касса в магазине" value={modalDesc} onChange={e=>setModalDesc(e.target.value)} />
+                </div>
                 <div className="form-group">
                   <label>Начальный остаток (₽)</label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
                 </div>
-              )}
+              </>)}
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Добавить'}</button>
               </div>
@@ -354,7 +359,8 @@ export default function Accounts() {
           <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
             <button className="modal-close" onClick={()=>setViewAcTx(null)}>&times;</button>
             <h2>{viewAcTx.name}</h2>
-            <div className="sub" style={{marginBottom:'.5rem'}}>История операций по счету</div>
+            <div className="sub" style={{marginBottom:'.5rem'}}>{viewAcTx.description || (function(){var m=ACC_TYPES.find(t=>t.type===viewAcTx.type);return m?m.label:viewAcTx.type;})()}</div>
+            <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:'.5rem'}}>История операций по счету</div>
             <div className="product-table" style={{flex:1,overflowY:'auto'}}>
               <table>
                 <thead id="colHeaders">
