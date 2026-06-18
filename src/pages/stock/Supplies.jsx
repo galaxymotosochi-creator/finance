@@ -81,8 +81,8 @@ const load = async () => {
       supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('products').select('*').eq('user_id', user.id).order('name'),
       supabase.from('suppliers').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('accounts').select('*'),
-      supabase.from('transactions').select('*').eq('user_id', user.id),
+      supabase.from('accounts').select('*').eq('user_id', user.id),
+      supabase.from('transactions').select('*').eq('user_id', user.id).limit(1000),
       supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at')
     ]);
