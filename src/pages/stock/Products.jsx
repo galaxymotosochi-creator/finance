@@ -671,10 +671,6 @@ export default function Products() {
                   <label>Цена продажи (₽)</label>
                   <input type="number" min="0" step="0.01" value={fPrice} onChange={e => setFPrice(e.target.value)} placeholder="0" />
                 </div>
-              <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
-                <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
-                Продавать по свободной цене
-              </label>
                 <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
@@ -691,11 +687,12 @@ export default function Products() {
                 {fType !== 'service' && <div className="form-group">
                   <label>Штрихкод</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                    <div style={{position:'relative',flex:1}}>
-                      <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{width:'100%',paddingRight:fBarcode?'0':'80px'}} />
-                      {!fBarcode && <span onClick={() => setFBarcode(genBarcode())}
-                        style={{position:'absolute',right:'6px',top:'50%',transform:'translateY(-50%)',padding:'.2rem .4rem',borderRadius:'6px',cursor:'pointer',fontSize:'.7rem',background:'#f0f0f0',color:'#888',fontWeight:500,whiteSpace:'nowrap'}}>сгенерировать</span>}
-                    </div>
+                    {!fBarcode ? (
+                      <span onClick={() => setFBarcode(genBarcode())}
+                        style={{flex:1,padding:'.4rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.78rem',background:'#f8f9fa',color:'#888',fontWeight:500,textAlign:'center',whiteSpace:'nowrap'}}>сгенерировать</span>
+                    ) : (
+                      <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
+                    )}
                     <span onClick={scanBarcode} title="Сканировать штрихкод через камеру"
                       style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.75rem',fontFamily:'var(--font)',background:'#f8f9fa'}}>📷</span>
                   </div>
@@ -716,7 +713,10 @@ export default function Products() {
                   </select>
                 </div>
               </div>}
-
+              <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
+                <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
+                Продавать по свободной цене
+              </label>
               <div className="form-group">
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
