@@ -223,7 +223,7 @@ export default function Accounts() {
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
                             <div className="prod-name">{a.name}</div>
-                            <div className="prod-sku">{lb}</div>
+                            {lb !== a.name && <div className="prod-sku">{lb}</div>}
                           </div>
                         </div>
                       </td>
