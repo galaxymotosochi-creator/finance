@@ -320,7 +320,14 @@ const load = async () => {
                 <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
-                <div style={{fontSize:'.72rem',fontWeight:600,color:'#999',marginBottom:'8px',textTransform:'uppercase',letterSpacing:'.3px'}}>Товары в поставке</div>
+                <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginBottom:'8px'}}>
+                  <span style={{fontSize:'.72rem',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.3px'}}>Товары в поставке</span>
+                  <span onClick={function(){scanBarcode(function(bc){
+                    var found=products.find(function(p){return p.barcode===bc;});
+                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
+                  })}} title="Сканировать штрихкод" 
+                    style={{fontSize:'16px',cursor:'pointer',padding:'1px 6px',background:'#fff',border:'1.5px solid #eee',borderRadius:'6px',lineHeight:1,display:'inline-flex',alignItems:'center'}}>📷</span>
+                </div>
                 <div style={{maxHeight:'200px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}>Товары не добавлены</div>
@@ -334,16 +341,11 @@ const load = async () => {
                   ))}
                 </div>
                 <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                  <span onClick={function(){scanBarcode(function(bc){
-                    var found=products.find(function(p){return p.barcode===bc;});
-                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
-                  })}} title="Сканировать штрихкод" 
-                    style={{fontSize:'18px',cursor:'pointer',padding:'.25rem .35rem',background:'#fff',border:'1.5px solid #eee',borderRadius:'8px',lineHeight:1,display:'flex',alignItems:'center'}}>📷</span>
                   <div style={{position:'relative',flex:1}}>
                     <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
                       onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
                       placeholder="Поиск товара..."
-                      style={{width:'100%',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',boxSizing:'border-box',minHeight:'38px'}} />
+                      style={{width:'100%',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',boxSizing:'border-box',minHeight:'38px',textAlign:'left'}} />
                     {fAddDrop && (
                       <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                         {(fAddSearch ? products.filter(function(p){return p.name.toLowerCase().includes(fAddSearch.toLowerCase())}) : products).map(function(p){
@@ -364,7 +366,7 @@ const load = async () => {
                     style={{width:'70px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} placeholder="Цена" min="0" step="0.01"
                     style={{width:'80px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'right',boxSizing:'border-box',minHeight:'38px'}} />
-                  <button type="button" onClick={addItem} style={{padding:'.4rem .6rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'8px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',minHeight:'38px'}}>+</button>
+                  <button type="button" onClick={addItem} style={{padding:'.3rem .5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',lineHeight:1.2}}>+</button>
                 </div>
               </div>
               {fItems.length > 0 && (
