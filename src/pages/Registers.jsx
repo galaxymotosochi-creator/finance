@@ -502,7 +502,7 @@ export default function Registers({ fullscreen }) {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2 style={{marginBottom:'16px'}}>Чек №{(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
+            <h2 style={{marginBottom:'16px',fontSize:'1.15rem',fontWeight:700}}>Чек №{(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
 
             {/* Выбор счёта */}
             <div style={{marginBottom:'14px'}}>
@@ -645,7 +645,7 @@ export default function Registers({ fullscreen }) {
               // Автоматически выбираем нового клиента
               if (data && data.length > 0) setSelectedClient(data[0].id);
               setShowAddClient(false);
-              setToast('✅ Клиент добавлен');
+              setToast('Клиент добавлен');
             }}>
               <div className="form-group">
                 <label>Имя</label>
