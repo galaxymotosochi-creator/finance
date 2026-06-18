@@ -45,6 +45,9 @@ export default function Registers({ fullscreen }) {
   const [showCloseShift, setShowCloseShift] = useState(false);
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
+  const [heldReceipts, setHeldReceipts] = useState([]);
+  const [showHoldModal, setShowHoldModal] = useState(false);
+  const [heldIndex, setHeldIndex] = useState(0);
 
   const abbreviateName = (name) => {
     if (!name) return name;
@@ -330,6 +333,9 @@ export default function Registers({ fullscreen }) {
           <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
+          {heldReceipts.length > 0 && (
+            <span onClick={()=>{setHeldIndex(0);setShowHoldModal(true)}} style={{fontSize:'10px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:'#fff3cd',color:'#92400e',cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'3px',userSelect:'none'}}>⏸️ <span style={{background:'#92400e',color:'#fff',borderRadius:'50%',width:'14px',height:'14px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'8px',fontWeight:700}}>{heldReceipts.length}</span></span>
+          )}
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
         </div>
 
@@ -617,7 +623,9 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
             </div>
 
-            <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px'}}>
+            <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px',display:'flex',gap:'8px',justifyContent:'center'}}>
+              <button type="button" onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:total,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setShowPay(false);setToast('✅ Чек отложен')}}
+                style={{padding:'.5rem 1rem',borderRadius:'100px',border:'1.5px solid #f97316',background:'#fff',color:'#f97316',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>⏸️ Отложить</button>
               <button type="button" onClick={processPay} disabled={!selectedClient}
                 style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.85rem',fontWeight:600,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
@@ -844,6 +852,70 @@ export default function Registers({ fullscreen }) {
           </div>
         </div>
       )}
+
+      {/* Модалка отложенных чеков — Вариант 4 (карусель) */}
+      {showHoldModal && heldReceipts.length > 0 && (function(){
+        var cur = heldReceipts[heldIndex];
+        if (!cur) return null;
+        return (
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowHoldModal(false)}}}>
+            <div className="modal-box" style={{maxWidth:'380px',maxHeight:'80vh',overflow:'hidden',display:'flex',flexDirection:'column'}}>
+              <button className="modal-close" onClick={function(){setShowHoldModal(false)}}>&times;</button>
+              <div style={{fontWeight:700,fontSize:'13px',marginBottom:'2px',display:'flex',alignItems:'center',gap:'.4rem'}}>
+                ⏸️ Отложенные чеки
+                <span style={{fontSize:'10px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#fff3cd',color:'#92400e'}}>{heldIndex+1}/{heldReceipts.length}</span>
+              </div>
+              <div style={{display:'flex',gap:'3px',marginBottom:'8px'}}>
+                {heldReceipts.map(function(_,i){return <span key={i} style={{width:i===heldIndex?'16px':'6px',height:'6px',borderRadius:i===heldIndex?'100px':'50%',background:i===heldIndex?'#f97316':'#ddd',display:'inline-block',transition:'.2s'}}></span>;})}
+              </div>
+              <div className="sub" style={{marginBottom:'8px'}}>Чек #{cur.id?.toString().slice(-4) || '—'} {cur.clientName ? '· '+cur.clientName : ''}</div>
+              {/* Товары */}
+              <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',fontSize:'12px',lineHeight:'1.7',flex:1,overflowY:'auto',marginBottom:'8px'}}>
+                {(cur.items||[]).map(function(item,i){
+                  return (
+                    <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
+                      <span style={{flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name} ×{item.qty}</span>
+                      <span style={{fontWeight:600,flexShrink:0,marginLeft:'.5rem'}}>{(item.price*item.qty).toLocaleString()} ₽</span>
+                    </div>
+                  );
+                })}
+                <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
+                <div style={{display:'flex',justifyContent:'space-between',fontWeight:700}}>
+                  <span>Итого</span>
+                  <span>{(cur.total||0).toLocaleString()} ₽</span>
+                </div>
+              </div>
+              {/* Кнопки */}
+              <div style={{display:'flex',gap:'6px'}}>
+                <button type="button" onClick={function(){
+                  var newList = heldReceipts.filter(function(_,i){return i!==heldIndex;});
+                  setHeldReceipts(newList);
+                  if (heldIndex >= newList.length) setHeldIndex(Math.max(0, newList.length-1));
+                  if (newList.length === 0) setShowHoldModal(false);
+                  setToast('Чек удалён');
+                }} style={{flex:'.4',padding:'.5rem',borderRadius:'8px',border:'1.5px solid #eee',background:'#fff',color:'#888',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✕ Удалить</button>
+                <button type="button" onClick={function(){
+                  setCart(cur.items || []);
+                  setSelectedClient(cur.client || '');
+                  setClientSearch(cur.clientName || '');
+                  var newList = heldReceipts.filter(function(_,i){return i!==heldIndex;});
+                  setHeldReceipts(newList);
+                  setShowHoldModal(false);
+                }} style={{flex:'0.6',padding:'.5rem',borderRadius:'8px',border:'none',background:'#111',color:'#fff',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>→ Продолжить</button>
+              </div>
+              {/* Навигация */}
+              <div style={{display:'flex',gap:'6px',marginTop:'8px'}}>
+                <button type="button" disabled={heldIndex===0}
+                  onClick={function(){setHeldIndex(function(p){return Math.max(0,p-1)})}}
+                  style={{flex:1,padding:'.35rem',borderRadius:'6px',border:'1.5px solid #eee',background:'#fff',fontSize:'.72rem',fontWeight:600,cursor:heldIndex>0?'pointer':'default',fontFamily:'inherit',opacity:heldIndex>0?1:.3}}>← Назад</button>
+                <button type="button" disabled={heldIndex>=heldReceipts.length-1}
+                  onClick={function(){setHeldIndex(function(p){return Math.min(heldReceipts.length-1,p+1)})}}
+                  style={{flex:1,padding:'.35rem',borderRadius:'6px',border:'1.5px solid #eee',background:'#fff',fontSize:'.72rem',fontWeight:600,cursor:heldIndex<heldReceipts.length-1?'pointer':'default',fontFamily:'inherit',opacity:heldIndex<heldReceipts.length-1?1:.3}}>Вперед →</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
