@@ -333,9 +333,7 @@ export default function Registers({ fullscreen }) {
           <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
-          {heldReceipts.length > 0 && (
-            <span onClick={()=>{setHeldIndex(0);setShowHoldModal(true)}} style={{fontSize:'11px',fontWeight:500,color:'#f97316',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>Отложенные {heldReceipts.length}</span>
-          )}
+
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
         </div>
 
@@ -723,6 +721,9 @@ export default function Registers({ fullscreen }) {
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>📋 Чеки за смену</button>
+              {heldReceipts.length > 0 && (
+                <button onClick={()=>{setShowActions(false);setHeldIndex(0);setShowHoldModal(true)}} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#fff3cd',color:'#92400e',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>⏸ Отложенные чеки ({heldReceipts.length})</button>
+              )}
             </div>
           </div>
         </div>
