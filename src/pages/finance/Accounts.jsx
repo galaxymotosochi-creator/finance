@@ -200,7 +200,7 @@ export default function Accounts() {
             <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс</div>
           </div>
-          <div className="product-table">
+          <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table>
               <thead id="colHeaders">
                 <tr>
