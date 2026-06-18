@@ -21,7 +21,8 @@ const scanBarcode = (onResult) => {
     var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
     c.style.cssText='position:fixed;top:20px;right:20px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
     var beep=function(){try{var ac=new AudioContext();var g=ac.createGain();g.connect(ac.destination);g.gain.value=.15;var o=ac.createOscillator();o.type='sine';o.frequency.value=1200;o.connect(g);o.start();setTimeout(function(){o.stop();ac.close()},100)}catch(e){}};
-    v.appendChild(f);w.appendChild(v);w.appendChild(i);document.body.appendChild(w);document.body.appendChild(c);
+    v.appendChild(f);w.appendChild(v);w.appendChild(i);document.body.appendChild(w);    setTimeout(function(){var c=document.getElementById("qv");if(c){c.querySelectorAll("video").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"});c.querySelectorAll("canvas").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"})}},200);
+document.body.appendChild(c);
     var q=null;var lock=false;
     var done=function(val){if(val&&!lock){lock=true;beep();if(onResult)onResult(val);else if(typeof setFBarcode!=='undefined')setFBarcode(val);setTimeout(function(){lock=false},3000)}cl()};
     var cl=function(){if(q){q.stop();q=null}w.remove();c.remove()};
