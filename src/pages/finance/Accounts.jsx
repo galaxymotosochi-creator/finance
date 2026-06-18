@@ -455,7 +455,7 @@ export default function Accounts() {
           <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowCollection(false)}}}>
             <div className="modal-box" style={{maxWidth:'420px'}}>
               <button className="modal-close" onClick={()=>setShowCollection(false)}>&times;</button>
-              <h2>🏦 Инкассация</h2>
+              <h2>Инкассация</h2>
               <div className="sub" style={{marginBottom:'.75rem'}}>Изъятие наличных из кассы</div>
               <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
                 <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
@@ -500,7 +500,7 @@ export default function Accounts() {
                 </div>
                 <div className="modal-actions">
                   <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
-                  <button type="submit" className="btn btn-account-select" style={{background:'#e65100',color:'#fff'}}>Инкассировать</button>
+                  <button type="submit" style={{padding:'.5rem 1.2rem',fontSize:'.82rem',fontWeight:600,borderRadius:'8px',border:'none',cursor:'pointer',background:'#e65100',color:'#fff',fontFamily:'inherit'}}>Инкассировать</button>
                 </div>
               </form>
             </div>
