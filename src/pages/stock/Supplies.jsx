@@ -377,7 +377,7 @@ const load = async () => {
               </div>
               {fItems.length > 0 && (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontWeight:700,fontSize:'.85rem'}}>
-                  <span>Итого: {fItems.length} товаров</span>
+                  <span>Итого: {fItems.length} {function(n){if(n%10===1&&n%100!==11)return'товар';if(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))return'товара';return'товаров'}(fItems.length)}</span>
                   <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span>
                 </div>
               )}
