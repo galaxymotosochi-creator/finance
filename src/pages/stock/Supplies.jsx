@@ -27,6 +27,7 @@ export default function Supplies() {
   const [editId, setEditId] = useState(null);
   const [viewId, setViewId] = useState(null);
   const [showPay, setShowPay] = useState(false);
+  const [payAccounts, setPayAccounts] = useState([]);
 
   const [fSupName, setFSupName] = useState('');
   const [fInvoice, setFInvoice] = useState('');
@@ -76,14 +77,20 @@ document.body.appendChild(c);
 
 const load = async () => {
     setLoading(true);
-    const [supRes, prodRes, suppRes] = await Promise.all([
+    const [supRes, prodRes, suppRes, accRes, txRes] = await Promise.all([
       supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('products').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('suppliers').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('accounts').select('*'),
+      supabase.from('transactions').select('*').eq('user_id', user.id),
       supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at')
     ]);
     if (supRes.data) setSuppliesState(supRes.data);
     if (prodRes.data) setProducts(prodRes.data);
     if (suppRes.data) setSuppliers(suppRes.data);
+    if (accRes.data) setPayAccounts(accRes.data);
+    if (txRes.data) setPayTxList(txRes.data);
     setLoading(false);
   };
   useEffect(() => { if (user) load(); }, [user]);
@@ -168,14 +175,26 @@ const load = async () => {
   const confirmPay = async (e) => {
     e.preventDefault();
     const amount = parseFloat(document.getElementById('payAmount').value) || 0;
-    const method = document.getElementById('payMethod').value;
+    const acId = document.getElementById('payMethod').value;
     if (amount <= 0) return alert('Введите сумму');
+    if (!acId) return alert('Выберите счет');
     const s = supplies.find(x => x.id === showPay);
     if (!s) return;
+    // Проверяем баланс счета
+    var ac = payAccounts.find(function(a){return a.id === acId;});
+    var bal = parseFloat(ac?.balance)||0;
+    payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
+    if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ₽');
+    // Создаем транзакцию расхода
+    var { error } = await supabase.from('transactions').insert({
+      user_id: user.id, account_id: acId, type: 'expense', amount: amount,
+      description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
+    });
+    if (error) return alert('Ошибка: ' + error.message);
     if (!s.payments) s.payments = [];
-    s.payments.push({ amount, method, date: new Date().toLocaleDateString('ru-RU') });
+    s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     await supabase.from('supplies').update({ paid: (s.paid||0) + amount }).eq('id', showPay); await load(); setShowPay(null);
-    showToast('💳 Оплата проведена');
+    showToast('Оплата проведена');
   };
 
   const totalItems = (s) => (s.items||[s]).length;
@@ -430,11 +449,10 @@ const load = async () => {
                     <input type="number" id="payAmount" defaultValue={debt>0?debt.toFixed(2):''} min="0" step="0.01" required />
                   </div>
                   <div className="form-group">
-                    <label>Способ</label>
+                    <label>Счет списания</label>
                     <select id="payMethod">
-                      <option value="cash">Наличные</option>
-                      <option value="transfer">Безнал</option>
-                      <option value="card">Карта</option>
+                      <option value="">— выберите счет —</option>
+                      {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} ₽)</option>})}
                     </select>
                   </div>
                 </div>
