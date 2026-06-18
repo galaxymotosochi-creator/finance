@@ -867,20 +867,19 @@ export default function Registers({ fullscreen }) {
         if (!cur) return null;
         return (
           <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowHoldModal(false)}}}>
-            <div className="modal-box" style={{maxWidth:'400px',maxHeight:'80vh',display:'flex',flexDirection:'column'}}>
+            <div className="modal-box" style={{maxWidth:'460px',maxHeight:'85vh',display:'flex',flexDirection:'column',gap:'14px'}}>
               <button className="modal-close" onClick={function(){setShowHoldModal(false)}}>&times;</button>
               
               {/* Шапка */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2px'}}>
-                <span style={{fontSize:'15px',fontWeight:700}}>⏸ Чек #{cur.id?.toString().slice(-3) || '—'}</span>
-                <span style={{fontSize:'11px',fontWeight:500,color:'#999',background:'#f5f5f5',padding:'2px 10px',borderRadius:'100px'}}>{heldIndex+1}/{heldReceipts.length}</span>
-              </div>
-              <div style={{fontSize:'12px',color:'#999',marginBottom:'14px',lineHeight:1.5}}>
-                {cur.clientName || ''} {cur.items?.length ? '· '+cur.items.length+' товаров' : ''} · {Number(cur.total||0).toLocaleString()} ₽
+              <div style={{marginBottom:'2px'}}>
+                <span style={{fontSize:'1.2rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
+                <div className="sub" style={{marginBottom:0,fontSize:'.8rem',color:'var(--muted)'}}>
+                  {cur.clientName ? cur.clientName + ' · ' : ''}{cur.items?.length || 0} товаров · {Number(cur.total||0).toLocaleString()} ₽
+                </div>
               </div>
 
               {/* Серая плашка с товарами */}
-              <div style={{background:'#f9f9f9',borderRadius:'12px',padding:'12px',fontSize:'13px',lineHeight:2,flex:1,overflowY:'auto'}}>
+              <div style={{background:'#f9f9f9',borderRadius:'12px',padding:'14px',fontSize:'13px',lineHeight:2,flex:1,overflowY:'auto'}}>
                 {/* Заголовки */}
                 <div style={{display:'flex',fontSize:'10px',fontWeight:600,color:'#aaa',padding:'2px 0 4px',borderBottom:'1px solid #e8e8e8',marginBottom:'2px'}}>
                   <span style={{flex:1}}>Товар</span>
