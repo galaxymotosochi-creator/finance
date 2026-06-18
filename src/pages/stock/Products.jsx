@@ -287,7 +287,7 @@ export default function Products() {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
     if (!data) return showToast('❌ Ошибка копирования');
     const { error } = await supabase.from('products').insert({
-      name: data.name, type: data.type, cat: data.cat,
+      id: Date.now(), name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
       description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false
