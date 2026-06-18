@@ -179,7 +179,7 @@ export default function Registers({ fullscreen }) {
     }
 
     // Номер чека
-    const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+    const { count } = await supabase.from('receipts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
     const receiptNum = (count || 0) + 1;
 
     // Определяем статус чека

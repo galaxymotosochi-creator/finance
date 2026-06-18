@@ -66,7 +66,7 @@ export default function QuickSale({ onClose }) {
       if (newCat) saleCatId = newCat.id;
     }
 
-    const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+    const { count } = await supabase.from('receipts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
     const receiptNum = (count || 0) + 1;
 
     // Определяем статус чека
