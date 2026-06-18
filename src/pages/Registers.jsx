@@ -46,6 +46,15 @@ export default function Registers({ fullscreen }) {
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
 
+  const abbreviateName = (name) => {
+    if (!name) return name;
+    const parts = name.trim().split(/\s+/);
+    if (parts.length <= 1) return name;
+    const surname = parts[0];
+    const initials = parts.slice(1).map(p => p.charAt(0) + '.').join(' ');
+    return surname + ' ' + initials;
+  };
+
   const getOwnerName = () => {
     try {
       const saved = localStorage.getItem('settings_owner');
@@ -74,7 +83,7 @@ export default function Registers({ fullscreen }) {
     })();
   }, [user]);
   const localName = getOwnerName();
-  const userName = ownerName || localName || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Кассир';
+  const userName = abbreviateName(ownerName || localName || user?.user_metadata?.full_name) || user?.email?.split('@')[0] || 'Кассир';
 
   useEffect(() => {
     if (!user) return;
