@@ -224,17 +224,17 @@ export default function Registers({ fullscreen }) {
         description: 'Продажа по чеку №' + receiptNum,
         date, status: 'unpaid', category_id: saleCatId,
       });
-      if (error) return setToast('Ошибка: ' + error.message);
+      setProcessingPay(false); if (error) return setToast('Ошибка: ' + error.message);
       setCart([]); setShowPay(false);
-      return setToast('Чек №' + receiptNum + ' сохранён (не оплачен)');
+      setProcessingPay(false); return setToast('Чек №' + receiptNum + ' сохранён (не оплачен)');
     }
 
     if (paySplit) {
       // Раздельная оплата — по одной транзакции на каждую часть
       const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
-      if (entries.length === 0) return setToast('⚠️ Укажите суммы для оплаты');
+      if (entries.length === 0) { setProcessingPay(false); return setToast('⚠️ Укажите суммы для оплаты'); }
       const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
-      if (Math.abs(sum - total) > 0.01) return setToast('⚠️ Сумма оплаты не совпадает с итогом');
+      if (Math.abs(sum - total) > 0.01) { setProcessingPay(false); return setToast('⚠️ Сумма оплаты не совпадает с итогом'); }
       let part = 1;
       for (const [acId, amt] of entries) {
         const { error } = await supabase.from('transactions').insert({
@@ -242,15 +242,15 @@ export default function Registers({ fullscreen }) {
           description: 'Продажа по чеку №' + receiptNum + ' (Часть ' + part + ')',
           date, account_id: acId, status: 'paid', category_id: saleCatId,
         });
-        if (error) return setToast('Ошибка: ' + error.message);
+        if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
         part++;
       }
       setCart([]); setShowPay(false); setPayMode(null);
-      return setToast('Чек №' + receiptNum + ' — оплачено с нескольких счетов');
+      setProcessingPay(false); return setToast('Чек №' + receiptNum + ' — оплачено с нескольких счетов');
     }
 
     // Обычная оплата на один счёт — с учётом частичной оплаты
-    if (!payMode) return setToast('⚠️ Выберите способ оплаты');
+    if (!payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
     const selectedAc = accounts.find(a => a.id === payMode);
     // Наличные → перенаправляем на счёт Касса
     var targetAc = selectedAc;
@@ -260,7 +260,7 @@ export default function Registers({ fullscreen }) {
     const paidAmt = payAmount ? parseFloat(payAmount) : total;
     
     if (!selectedClient) {
-      return setToast('⚠️ Выберите клиента');
+      setProcessingPay(false); return setToast('⚠️ Выберите клиента');
     }
     
     if (paidAmt > 0) {
@@ -269,7 +269,7 @@ export default function Registers({ fullscreen }) {
         description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
         date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
       });
-      if (error) return setToast('Ошибка: ' + error.message);
+      if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
     }
     
     // Долг на остаток — записываем клиенту
@@ -281,7 +281,7 @@ export default function Registers({ fullscreen }) {
         description: 'Долг по чеку №' + receiptNum,
         date, status: 'debt', category_id: saleCatId,
       });
-      if (error) return setToast('Ошибка: ' + error.message);
+      if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
       
       // Обновляем долг клиента
       if (selectedClient) {
@@ -297,6 +297,7 @@ export default function Registers({ fullscreen }) {
       ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
       : 'Чек №' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
     setToast(msg);
+    setProcessingPay(false);
   };
 
   const saveProduct = async (e) => {
