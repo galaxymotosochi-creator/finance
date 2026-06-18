@@ -102,8 +102,6 @@ export default function Transactions() {
       if (accs.length === 0) {
         await supabase.from('accounts').insert([
           { user_id: user.id, name: 'Наличные', type: 'cash' },
-          { user_id: user.id, name: 'Карта', type: 'card' },
-          { user_id: user.id, name: 'Перевод', type: 'transfer' },
         ]);
       }
       if (cats.length === 0) {
@@ -153,7 +151,7 @@ export default function Transactions() {
     });
     setSelectedAcc('cash');
     setSplitMode(false);
-    setSplitAmounts({ cash: 0, card: 0, transfer: 0 });
+    setSplitAmounts({});
     setShowAccSelect(true);
   };
 
@@ -174,8 +172,6 @@ export default function Transactions() {
         if (accs.length === 0) {
           await supabase.from('accounts').insert([
             { user_id: user.id, name: 'Наличные', type: 'cash' },
-            { user_id: user.id, name: 'Карта', type: 'card' },
-            { user_id: user.id, name: 'Перевод', type: 'transfer' },
           ]);
           var r = await refreshAccounts();
           accs = r || [];
