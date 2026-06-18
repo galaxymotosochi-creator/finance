@@ -234,7 +234,7 @@ export default function Accounts() {
                       <td style={{color:'#16a34a',fontWeight:600}}>+{mv.i.toLocaleString()} ₽</td>
                       <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()} ₽</td>
                       <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
-                      <td style={{textAlign:'right'}}>
+                      <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
                         {!isSys(a) && (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
