@@ -216,11 +216,11 @@ export default function QuickSale({ onClose }) {
           {/* Способ оплаты */}
           <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Способ оплаты</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
-            {accounts.map(a => (
+            {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
                 padding:'6px 12px',borderRadius:'6px',border:'1px solid #eee',fontSize:'11px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
                 background: payMode === a.id ? '#000' : '#fff', color: payMode === a.id ? '#fff' : '#555',
-              }}>{a.name}</button>
+              }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
             ))}
           </div>
 

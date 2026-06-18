@@ -523,13 +523,13 @@ export default function Registers({ fullscreen }) {
             <div style={{marginBottom:'14px'}}>
               <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'8px'}}>Способ оплаты</label>
               <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-                {accounts.map(a => (
+                {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
                   <button key={a.id} onClick={() => setPayMode(a.id)} style={{
                     padding:'8px 14px', borderRadius:'8px', border:'1.5px solid #eee',
                     background: payMode === a.id ? '#000' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
                     fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:0
-                  }}>{a.name}</button>
+                  }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
                 ))}
               </div>
             </div>
@@ -598,12 +598,12 @@ export default function Registers({ fullscreen }) {
 
             {paySplit && (
               <div style={{marginBottom:'14px'}}>
-                {accounts.map(a => {
+                {accounts.filter(function(a){return a.type !== 'cash';}).map(a => {
                   const amt = parseFloat(splitAmts[a.id]) || 0;
                   const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                   return (
                     <div key={a.id} style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'6px'}}>
-                      <span style={{fontSize:'12px',minWidth:'70px',fontWeight:500,flexShrink:0,color:'#555'}}>{a.name}</span>
+                      <span style={{fontSize:'12px',minWidth:'70px',fontWeight:500,flexShrink:0,color:'#555'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                       <div style={{position:'relative',flex:1}}>
                         <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
                           value={splitAmts[a.id] || ''} 
