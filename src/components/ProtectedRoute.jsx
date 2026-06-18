@@ -14,7 +14,6 @@ export default function ProtectedRoute({ children }) {
         fontFamily: 'system-ui, sans-serif',
         color: '#666',
       }}>
-        Загрузка...
       </div>
     );
   }

@@ -100,6 +100,6 @@ function AppRoutes() {
 
 export default function App() {
   const { loading } = useAuth();
-  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}>Загрузка...</div>;
+  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
   return <HashRouter><AppRoutes /></HashRouter>;
 }
