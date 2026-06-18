@@ -602,9 +602,9 @@ export default function Transactions() {
                 );
               })}
             </div>}
-            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex"}}>
+            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end"}}>
               <button onClick={function(){confirmTx()}}
-                style={{padding:".45rem 1.2rem",fontSize:".8rem",fontWeight:600,borderRadius:"100px",border:"none",cursor:"pointer",background:"var(--primary)",color:"var(--primary-text)",fontFamily:"var(--font)",display:"block",margin:"0 auto"}}>
+                style={{padding:".45rem 1.2rem",fontSize:".8rem",fontWeight:600,borderRadius:"100px",border:"none",cursor:"pointer",background:"#111",color:"#fff",fontFamily:"var(--font)"}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
               </button>
             </div>
