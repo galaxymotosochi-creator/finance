@@ -48,6 +48,7 @@ export default function Registers({ fullscreen }) {
   const [heldReceipts, setHeldReceipts] = useState([]);
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [heldIndex, setHeldIndex] = useState(0);
+  const [stockMap, setStockMap] = useState({});
 
   const abbreviateName = (name) => {
     if (!name) return name;
@@ -104,6 +105,21 @@ export default function Registers({ fullscreen }) {
       if (clRes && clRes.data) setClients(clRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
+      // Загружаем остатки склада
+      Promise.all([
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('writeoffs').select('items').eq('user_id', user.id),
+      ]).then(function(rr){
+        var sm = {};
+        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
+          if (!sm[it.prodId]) sm[it.prodId] = 0;
+          sm[it.prodId] += it.qty || 0;
+        });});
+        (rr[1].data||[]).forEach(function(wo){ (wo.items||[]).forEach(function(it){
+          if (sm[it.prodId]) sm[it.prodId] -= it.qty || 0;
+        });});
+        setStockMap(sm);
+      });
       setLoading(false);
     })();
   }, [user]);
@@ -420,7 +436,10 @@ export default function Registers({ fullscreen }) {
               <div style={{fontSize:'13px',fontWeight:600,color:'#222',lineHeight:1.3,minHeight:'40px'}}>{p.name}</div>
               <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
                 {p.cat && <div style={{fontSize:'10px',color:'#999'}}>{p.cat}</div>}
-                <div style={{fontSize:'16px',fontWeight:800,color:'#000'}}>{(p.price||0).toLocaleString()} ₽</div>
+                <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
+                <span style={{fontSize:'16px',fontWeight:800,color:'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
+                <span style={{fontSize:'10px',fontWeight:500,color: (stockMap[p.id]||0) <= 0 ? '#dc2626' : '#16a34a'}}>остаток: {stockMap[p.id] || 0}</span>
+              </div>
               </div>
             </div>
           ))}
