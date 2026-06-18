@@ -542,11 +542,13 @@ export default function Registers({ fullscreen }) {
                   <input type="number" min="0" step="0.01" placeholder={total.toString()} 
                     value={payAmount} 
                     onChange={e => setPayAmount(e.target.value)}
-                    style={{flex:1,border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
-                  <span style={{fontSize:'13px',color:'#888'}}>₽ из {total.toLocaleString()} ₽</span>
+                    style={{width:'50%',border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
                 </div>
                 {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total && (
                   <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Чек оплачен полностью</div>
+                )}
+                {payAmount && parseFloat(payAmount) > total && (
+                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</div>
                 )}
               </div>
             )}
