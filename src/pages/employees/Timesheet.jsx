@@ -293,9 +293,7 @@ export default function Timesheet() {
                       return (
                         <div key={p.key} className="cat-dd-item" onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false)}}
                           style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.8rem',color:isActive?'var(--secondary)':'var(--body-color)',fontWeight:isActive?600:400,background:isActive?'var(--secondary-light)':'transparent'}}>
-                          <span className={'cb' + (isActive ? ' checked' : '')} style={{width:'16px',height:'16px',border:'1.5px solid var(--border)',borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:isActive?'#fff':'transparent',flexShrink:0,background:isActive?'var(--secondary)':'transparent',borderColor:isActive?'var(--secondary)':'var(--border)'}}>
-                            {isActive ? '✓' : ''}
-                          </span>
+                          <input type="checkbox" checked={isActive} onChange={()=>{}} style={{accentColor:'#111',cursor:'pointer',margin:0}} />
                           {p.label}
                         </div>
                       );
@@ -334,9 +332,7 @@ export default function Timesheet() {
                       <div key={emp.id} className="cat-dd-item" onClick={()=>{
                         setTsEmpFilter(prev => prev.includes(emp.id) ? prev.filter(e => e !== emp.id) : [...prev, emp.id]);
                       }}>
-                        <span className={'cb' + (tsEmpFilter.includes(emp.id) ? ' checked' : '')} style={{width:'16px',height:'16px',border:'1.5px solid var(--border)',borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:tsEmpFilter.includes(emp.id)?'#fff':'transparent',flexShrink:0}}>
-                          {tsEmpFilter.includes(emp.id) ? '✓' : ''}
-                        </span>
+                        <input type="checkbox" checked={tsEmpFilter.includes(emp.id)} onChange={()=>{}} style={{accentColor:'#111',cursor:'pointer',margin:0}} />
                         {emp.name}
                       </div>
                     ))}

@@ -519,7 +519,7 @@ export default function Products() {
                     const checked = selectedCats.has(c.name);
                     return (
                       <div key={c.name} className="cat-dd-item" onClick={() => toggleCat(c.name)}>
-                        <span className={`cb${checked ? ' checked' : ''}`}>✓</span>
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
                         <span>{c.name}</span>
                       </div>
                     );
@@ -555,7 +555,7 @@ export default function Products() {
                     const checked = activeCols.has(c.id);
                     return (
                       <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <span className={`cb${checked ? ' checked' : ''}`}>✓</span>
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
                         <span>{c.label}</span>
                       </div>
                     );
@@ -567,7 +567,7 @@ export default function Products() {
                     const checked = activeCols.has(c.id);
                     return (
                       <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <span className={`cb${checked ? ' checked' : ''}`}>✓</span>
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
                         <span>{c.label}</span>
                       </div>
                     );

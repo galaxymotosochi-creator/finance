@@ -252,9 +252,7 @@ export default function Transactions() {
                   return (
                     <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
                       style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.8rem',color:isActive?'var(--secondary)':'var(--body-color)',fontWeight:isActive?600:400,background:isActive?'var(--secondary-light)':'transparent'}}>
-                      <span style={{width:'16px',height:'16px',border:'1.5px solid '+(isActive?'var(--secondary)':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:isActive?'#fff':'transparent',flexShrink:0,background:isActive?'var(--secondary)':'transparent'}}>
-                        {isActive ? '✓' : ''}
-                      </span>
+                      <input type="checkbox" checked={isActive} onChange={()=>{}} style={{accentColor:'#111',cursor:'pointer',margin:0}} />
                       {p.label}
                     </div>
                   );
