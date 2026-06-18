@@ -221,7 +221,7 @@ const load = async () => {
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left'}}>
-                    <div className="prod-name" style={{color:'var(--primary)',cursor:'pointer',borderBottom:'1px dashed var(--primary)',display:'inline-block'}}
+                    <div className="prod-name" style={{cursor:'pointer',borderBottom:'1px dashed var(--border)',display:'inline-block'}}
                       onClick={() => setViewId(prev => prev === s.id ? null : s.id)}>{s.invoice||'—'}</div>
                     <div className="prod-sku">{totalItems(s)} поз.</div>
                   </td>
@@ -410,14 +410,18 @@ const load = async () => {
         const debt = total - paid;
         return (
           <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowPay(null)}>
-            <div className="modal-box" style={{maxWidth:'450px'}}>
+            <div className="modal-box" style={{maxWidth:'420px'}}>
               <button className="modal-close" onClick={()=>setShowPay(null)}>&times;</button>
-              <h2>💳 Оплата {s.invoice||'поставки'}</h2>
-              <div className="sub">{s.supplier_name||''}</div>
-              <div id="payModalInfo" style={{margin:'.5rem 0'}}>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.25rem'}}><span>Сумма накладной:</span><span>{total.toFixed(2)}₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.25rem'}}><span>Уже оплачено:</span><span style={{color:'#16a34a'}}>{paid.toFixed(2)}₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.5rem',fontWeight:600}}><span>Остаток:</span><span style={{color:'#dc2626'}}>{debt.toFixed(2)}₽</span></div>
+              <div className="page-header" style={{marginBottom:'12px'}}>
+                <div>
+                  <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата поставки</h1>
+                  <div className="sub" style={{marginBottom:0}}>{s.invoice||''} {s.supplier_name||''}</div>
+                </div>
+              </div>
+              <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.85rem',lineHeight:2}}>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Сумма накладной:</span><span style={{fontWeight:600}}>{total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Уже оплачено:</span><span style={{color:'#16a34a',fontWeight:600}}>{paid.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontWeight:600}}>Остаток:</span><span style={{color:'#dc2626',fontWeight:700}}>{debt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
               </div>
               <form onSubmit={confirmPay}>
                 <div className="form-row">
@@ -434,8 +438,8 @@ const load = async () => {
                     </select>
                   </div>
                 </div>
-                <div className="modal-actions">
-                  <button type="submit" className="btn btn-primary" style={{width:'100%'}}>Провести оплату</button>
+                <div style={{textAlign:'right',marginTop:'10px'}}>
+                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
                 </div>
               </form>
             </div>
