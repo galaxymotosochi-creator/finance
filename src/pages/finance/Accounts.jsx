@@ -189,6 +189,8 @@ export default function Accounts() {
             onClick={()=>{setInitAmts({});setShowInit(true)}}>Ввести начальные остатки</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
             onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка баланса</span>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#e65100',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
+            onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}}>Инкассировать</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
             onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
         </div>
@@ -233,7 +235,6 @@ export default function Accounts() {
                       <td style={{color:'#dc2626',fontWeight:600}}>−{mv.e.toLocaleString()} ₽</td>
                       <td style={{fontWeight:700,color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right'}}>
-                        {a.type==='cash_register' && <button className="act-btn" onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}} style={{fontSize:'.72rem',fontWeight:600,padding:'.15rem .4rem',color:'#e65100',cursor:'pointer',background:'none',border:'none',fontFamily:'inherit'}}>🏦 Инкасс.</button>}
                         <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
                         {!isSys(a) && (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
