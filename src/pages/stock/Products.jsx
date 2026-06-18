@@ -7,23 +7,25 @@ const CAT_LABELS = { material:'Материалы', tool:'Инструменты
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
 const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд'];
 const scanBarcode = () => {
-    if (!navigator.mediaDevices || !window.BarcodeDetector) {
-      alert('Сканирование недоступно в этом браузере');
-      return;
-    }
+    if (!navigator.mediaDevices) { alert('Камера недоступна в этом браузере'); return; }
     var v=document.createElement('video');v.setAttribute('playsinline','');v.setAttribute('autoplay','');
     v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.6)';
-    var c=document.createElement('div');c.textContent='✖';
-    c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
-    document.body.appendChild(v);document.body.appendChild(c);var s=null;var si=null;
-    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();c.remove()};
+    var i=document.createElement('input');i.type='text';i.placeholder='Введите код с экрана...';
+    i.style.cssText='position:fixed;bottom:30px;left:50%;transform:translate(-50%,0);z-index:10000;width:80%;max-width:360px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
+    var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
+    c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
+    document.body.appendChild(v);document.body.appendChild(i);document.body.appendChild(c);var s=null;var si=null;
+    var cl=function(){if(s){s.getTracks().forEach(function(t){t.stop()});s=null}if(si){clearInterval(si);si=null}v.remove();i.remove();c.remove()};
+    i.onkeydown=function(e){if(e.key==='Enter'&&i.value.trim()){setFBarcode(i.value.trim());cl()}};
     navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(st){
       s=st;v.srcObject=st;v.play();
-      si=setInterval(function(){
-        if(!s)return;
-        try{var bd=new BarcodeDetector({formats:['qr_code','ean_13','ean_8','code_128','code_39','upc_a','upc_e','codabar']});
-        bd.detect(v).then(function(bc){if(bc.length>0){setFBarcode(bc[0].rawValue);cl()}}).catch(function(){})}catch(e){}
-      },1500);
+      // Автораспознавание если BarcodeDetector доступен (Android Chrome)
+      if(window.BarcodeDetector){try{
+        si=setInterval(function(){if(!s)return;
+          var bd=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','upc_a','upc_e']});
+          bd.detect(v).then(function(bc){if(bc.length>0){setFBarcode(bc[0].rawValue);cl()}}).catch(function(){})
+        },1000);
+      }catch(e){}}
     }).catch(function(){alert('Нет доступа к камере');cl()});
     c.onclick=cl;
   };
