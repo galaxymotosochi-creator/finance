@@ -200,7 +200,7 @@ export default function Stock() {
         <table style={{minWidth:'680px'}}>
           <thead id="stockColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>Товар</th>
+              <th style={{textAlign:'left',minWidth:'200px'}}>Товар</th>
               <th>Артикул</th>
               <th>Штрихкод</th>
               <th>Категория</th>
@@ -233,7 +233,7 @@ export default function Stock() {
 
               return (
                 <tr key={p.id}>
-                  <td style={{textAlign:'left'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{fontWeight:400}}>{p.name}</span>
                     {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
                   </td>
