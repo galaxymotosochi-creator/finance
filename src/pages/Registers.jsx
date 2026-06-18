@@ -713,14 +713,14 @@ export default function Registers({ fullscreen }) {
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
                 setShowCloseShift(true);
-              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>🔒 Закрыть смену</button>
+              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
               <button onClick={async () => {
                 setShowActions(false);
                 const start = new Date(activeShift.opened_at);
                 const now = new Date();
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
-              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>📋 Чеки за смену</button>
+              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
               {heldReceipts.length > 0 && (
                 <button onClick={()=>{setShowActions(false);setHeldIndex(0);setShowHoldModal(true)}} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Отложенные чеки ({heldReceipts.length})</button>
               )}
