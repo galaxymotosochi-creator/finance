@@ -362,12 +362,21 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'12px',color:'#999'}}>ИТОГО:</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
             </div>
-            <button onClick={openPay} disabled={!cart.length} style={{
-              width:'100%', padding:'13px', borderRadius:'100px', border:'none',
-              background: cart.length ? '#000' : '#ddd',
-              color:'#fff', fontSize:'14px', fontWeight:700,
-              cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
-            }}>Продажа</button>
+            <div style={{display:'flex',gap:'8px'}}>
+              {cart.length > 0 && (
+                <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:total,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setToast('Чек отложен')}} style={{
+                  flex:1, padding:'13px', borderRadius:'100px', border:'1.5px solid #ddd',
+                  background:'#fff', color:'#555', fontSize:'14px', fontWeight:600,
+                  cursor:'pointer', fontFamily:'inherit',
+                }}>Отложить</button>
+              )}
+              <button onClick={openPay} disabled={!cart.length} style={{
+                flex:1, padding:'13px', borderRadius:'100px', border:'none',
+                background: cart.length ? '#ffdd2d' : '#ddd',
+                color: cart.length ? '#111' : '#fff', fontSize:'14px', fontWeight:700,
+                cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
+              }}>Продажа</button>
+            </div>
           </div>
       </div>
 
@@ -621,9 +630,7 @@ export default function Registers({ fullscreen }) {
               <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
             </div>
 
-            <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px',display:'flex',gap:'8px',justifyContent:'center'}}>
-              <button type="button" onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:total,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setShowPay(false);setToast('✅ Чек отложен')}}
-                style={{padding:'.5rem 1.2rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Отложить</button>
+            <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px'}}>
               <button type="button" onClick={processPay} disabled={!selectedClient}
                 style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
