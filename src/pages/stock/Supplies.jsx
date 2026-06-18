@@ -298,34 +298,27 @@ const load = async () => {
 
       {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
       {showModal && (
-        <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&(setShowModal(false),setFItems([]))}>
+        <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&(setShowModal(false),setFItems([]),setFAddSearch(''))}>
           <div className="modal-box">
-            <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([])}}>&times;</button>
-            <div style={{marginBottom:'14px'}}>
-              <div className="page-header" style={{marginBottom:'12px'}}>
-                <div>
-                  <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0}}>{editId?'Редактировать поставку':'Новая поставка'}</h1>
-                  <div className="sub" style={{marginBottom:0}}>Добавление товаров на склад</div>
-                </div>
+            <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([]);setFAddSearch('')}}>&times;</button>
+            <div className="page-header" style={{marginBottom:'12px'}}>
+              <div>
+                <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0}}>{editId?'Редактировать поставку':'Новая поставка'}</h1>
+                <div className="sub" style={{marginBottom:0}}>Добавление товаров на склад</div>
               </div>
             </div>
             <form onSubmit={save}>
-              {/* Поставщик — крупно */}
-              <div style={{marginBottom:'12px'}}>
-                <label style={{fontSize:'.78rem',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Поставщик</label>
-                <select value={fSupName} onChange={e=>setFSupName(e.target.value)}
-                  style={{width:'100%',padding:'10px 12px',fontSize:'.9rem',fontWeight:600,border:'1.5px solid #e0e0e0',borderRadius:'10px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
+              <div className="form-group">
+                <label>Поставщик</label>
+                <select value={fSupName} onChange={e=>setFSupName(e.target.value)}>
                   <option value="">— выберите поставщика —</option>
                   {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}
                 </select>
               </div>
-              {/* Накладная */}
-              <div style={{marginBottom:'12px'}}>
-                <label style={{fontSize:'.78rem',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>№ накладной</label>
-                <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" 
-                  style={{width:'100%',padding:'9px 12px',fontSize:'.85rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}} />
+              <div className="form-group">
+                <label>№ накладной</label>
+                <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
               </div>
-              {/* Товары */}
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
                 <div style={{fontSize:'.72rem',fontWeight:600,color:'#999',marginBottom:'8px',textTransform:'uppercase',letterSpacing:'.3px'}}>Товары в поставке</div>
                 <div style={{maxHeight:'200px',overflowY:'auto',marginBottom:'8px'}}>
@@ -335,7 +328,7 @@ const load = async () => {
                     <div key={idx} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.85rem'}}>
                       <span style={{flex:3,fontWeight:500}}>{it.name}</span>
                       <span style={{flex:1,textAlign:'center',color:'#888'}}>{it.qty} шт</span>
-                      <span style={{flex:1,textAlign:'right',fontWeight:500}}>{(it.qty*it.cost).toFixed(2)}₽</span>
+                      <span style={{flex:1,textAlign:'right',fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
                       <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem'}}>✕</button>
                     </div>
                   ))}
@@ -350,7 +343,7 @@ const load = async () => {
                     <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
                       onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
                       placeholder="Поиск товара..."
-                      style={{width:'100%',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',background:'#fff'}} />
+                      style={{width:'100%',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',boxSizing:'border-box',minHeight:'38px'}} />
                     {fAddDrop && (
                       <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                         {(fAddSearch ? products.filter(function(p){return p.name.toLowerCase().includes(fAddSearch.toLowerCase())}) : products).map(function(p){
@@ -368,34 +361,30 @@ const load = async () => {
                     )}
                   </div>
                   <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Кол-во" min="1" step="any"
-                    style={{width:'70px',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'center'}} />
+                    style={{width:'70px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} placeholder="Цена" min="0" step="0.01"
-                    style={{width:'80px',padding:'.4rem .5rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.82rem',fontFamily:'inherit',outline:'none',textAlign:'right'}} />
-                  <button type="button" onClick={addItem} style={{padding:'.4rem .6rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'8px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
+                    style={{width:'80px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'right',boxSizing:'border-box',minHeight:'38px'}} />
+                  <button type="button" onClick={addItem} style={{padding:'.4rem .6rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'8px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',minHeight:'38px'}}>+</button>
                 </div>
               </div>
-              {/* Итого */}
               {fItems.length > 0 && (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontWeight:700,fontSize:'.85rem'}}>
                   <span>Итого: {fItems.length} товаров</span>
                   <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span>
                 </div>
               )}
-              {/* Статус + Оплата */}
-              <div style={{display:'flex',gap:'10px',marginTop:'8px'}}>
-                <div style={{flex:1,marginBottom:'10px'}}>
-                  <label style={{fontSize:'.72rem',fontWeight:600,color:'#888',display:'block',marginBottom:'2px'}}>Статус</label>
-                  <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
-                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff'}}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Статус</label>
+                  <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
                     <option value="ordered">Заказано</option>
                     <option value="transit">В пути</option>
                     <option value="received">Оприходовано</option>
                   </select>
                 </div>
-                <div style={{flex:1,marginBottom:'10px'}}>
-                  <label style={{fontSize:'.72rem',fontWeight:600,color:'#888',display:'block',marginBottom:'2px'}}>Оплачено (₽)</label>
-                  <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01"
-                    style={{width:'100%',padding:'8px 10px',fontSize:'.82rem',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontFamily:'inherit',outline:'none',background:'#fff',boxSizing:'border-box'}} />
+                <div className="form-group">
+                  <label>Оплачено (₽)</label>
+                  <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01" />
                 </div>
               </div>
               <div style={{textAlign:'center',marginTop:'10px'}}>
