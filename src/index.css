@@ -313,7 +313,7 @@ body {
 }
 .product-table td { padding: .45rem .4rem; border-bottom: 1px solid var(--border); vertical-align: middle; text-align: center; background: transparent; }
 .product-table td.tr { text-align: right; font-variant-numeric: tabular-nums; }
-.product-table .prod-name { font-weight: 500; color: var(--body-color); text-align: left; font-size: .82rem; }
+.product-table .prod-name { font-weight: 400; color: var(--body-color); text-align: left; font-size: .82rem; }
 .product-table .prod-sku { color: var(--muted); font-size: .7rem; display: block; text-align: left; }
 .product-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
 .product-table .prod-price { font-weight: 600; }
