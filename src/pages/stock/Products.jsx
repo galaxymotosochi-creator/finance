@@ -290,7 +290,7 @@ export default function Products() {
       name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
-      description: data.description, user_id: user.id, hidden: false
+      description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false
     });
     if (error) return showToast('❌ Ошибка: ' + error.message);
     await load();
