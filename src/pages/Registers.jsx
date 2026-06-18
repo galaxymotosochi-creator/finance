@@ -873,9 +873,11 @@ export default function Registers({ fullscreen }) {
               {/* Шапка */}
               <div style={{marginBottom:'2px'}}>
                 <span style={{fontSize:'1.2rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
-                <div className="sub" style={{marginBottom:0,fontSize:'.8rem',color:'var(--muted)'}}>
-                  {cur.clientName ? cur.clientName + ' · ' : ''}{cur.items?.length || 0} товаров · {Number(cur.total||0).toLocaleString()} ₽
-                </div>
+                {cur.clientName ? (
+                  <div className="sub" style={{marginBottom:0,fontSize:'.8rem',color:'var(--muted)'}}>
+                    {cur.clientName} · {cur.items?.length || 0} товаров · {Number(cur.total||0).toLocaleString()} ₽
+                  </div>
+                ) : null}
               </div>
 
               {/* Серая плашка с товарами */}
