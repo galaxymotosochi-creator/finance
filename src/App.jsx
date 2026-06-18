@@ -18,6 +18,7 @@ import Categories from './pages/finance/Categories';
 import Shifts from './pages/finance/Shifts';
 import Salary from './pages/finance/Salary';
 import Accounts from './pages/finance/Accounts';
+import Receipts from './pages/finance/Receipts';
 import Promos from './pages/finance/Promos';
 import Products from './pages/stock/Products';
 import StockCategories from './pages/stock/Categories';
@@ -66,6 +67,7 @@ function AppRoutes() {
       <Route path="/finance/transactions" element={<ProtectedRoute><AppLayout><Transactions /></AppLayout></ProtectedRoute>} />
       <Route path="/finance/categories" element={<ProtectedRoute><AppLayout><Categories /></AppLayout></ProtectedRoute>} />
       <Route path="/finance/shifts" element={<ProtectedRoute><AppLayout><Shifts /></AppLayout></ProtectedRoute>} />
+      <Route path="/finance/receipts" element={<ProtectedRoute><AppLayout><Receipts /></AppLayout></ProtectedRoute>} />
       <Route path="/finance/salary" element={<ProtectedRoute><AppLayout><Salary /></AppLayout></ProtectedRoute>} />
       <Route path="/finance/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
 

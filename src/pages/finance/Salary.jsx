@@ -220,6 +220,18 @@ export default function Salary() {
       if (!rows || !rows.length) return;
       const s = rows[0];
 
+      // Найти или создать категорию «Зарплата»
+      var salaryCatId = null;
+      var { data: foundCats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Зарплата').maybeSingle();
+      if (foundCats) {
+        salaryCatId = foundCats.id;
+      } else {
+        var { data: newCat } = await supabase.from('categories').insert({
+          user_id: user.id, name: 'Зарплата', type: 'expense'
+        }).select('id').maybeSingle();
+        if (newCat) salaryCatId = newCat.id;
+      }
+
       // Проверка баланса
       if (splitAmts && Object.keys(splitAmts).length > 0) {
         for (const [aid, amt] of Object.entries(splitAmts)) {
@@ -245,7 +257,7 @@ export default function Salary() {
             user_id: user.id, account_id: aid,
             type: 'expense', amount: amt,
             description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
-            date: fDate,
+            date: fDate, category_id: salaryCatId,
           });
         }
       } else {
@@ -253,7 +265,7 @@ export default function Salary() {
           user_id: user.id, account_id: accId,
           type: 'expense', amount: s.amount,
           description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
-          date: fDate,
+          date: fDate, category_id: salaryCatId,
         });
       }
       await supabase.from('salary').update({ status: 'paid', paid_at: fDate }).eq('id', pendingPayId);

@@ -421,9 +421,19 @@ export default function Transactions() {
               try {
                 var fr=accs.find(function(a){return a.id===trFrom}), to=accs.find(function(a){return a.id===trTo});
                 if (!fr||!to) {alert('Выберите оба счета');return;}
+                // Найти или создать категорию «Перевод между счетами»
+                var trCatId = null;
+                var { data: foundCat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Перевод между счетами').maybeSingle();
+                if (foundCat) { trCatId = foundCat.id; }
+                else {
+                  var { data: newCat } = await supabase.from('categories').insert({
+                    user_id: user.id, name: 'Перевод между счетами', type: 'income'
+                  }).select('id').maybeSingle();
+                  if (newCat) trCatId = newCat.id;
+                }
                 await supabase.from('transactions').insert([
-                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0]},
-                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод с '+fr.name,date:new Date().toISOString().split('T')[0]}
+                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод на '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId},
+                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод с '+fr.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
                 ]);
                 setShowTransfer(false); setTrAmt(''); await refresh();
               } catch(err) {alert(err.message);}

@@ -200,7 +200,7 @@ export default function Accounts() {
                 <tr>
                   <th style={{textAlign:'left',paddingLeft:0}}>Счет</th>
                   <th>Начальный остаток</th>
-                  <th>Доходы</th>
+                  <th>Поступления</th>
                   <th>Расходы</th>
                   <th>Баланс</th>
                   <th className="actions"></th>

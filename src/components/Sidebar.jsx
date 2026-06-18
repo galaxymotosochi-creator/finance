@@ -19,6 +19,7 @@ const menu = [
       { label: 'Движение денег', path: '/finance/transactions' },
       { label: 'Финансовые счета', path: '/finance/accounts' },
       { label: 'Кассовые смены', path: '/finance/shifts' },
+      { label: 'Чеки', path: '/finance/receipts' },
       { label: 'Учет зарплаты', path: '/finance/salary' },
       { label: 'P&L', path: '/finance/pnl' },
       { label: 'Финансовые категории', path: '/finance/categories' },

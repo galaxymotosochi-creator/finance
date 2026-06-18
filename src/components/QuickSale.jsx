@@ -69,6 +69,35 @@ export default function QuickSale({ onClose }) {
     const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
     const receiptNum = (count || 0) + 1;
 
+    // Определяем статус чека
+    var receiptStatus = 'paid';
+    if (payUnpaid) receiptStatus = 'unpaid';
+    else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total) receiptStatus = 'partially_paid';
+
+    // Создаём чек
+    var clientObj = clients.find(c => c.id === selectedClient);
+    var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
+      user_id: user.id, receipt_number: receiptNum,
+      date, total_amount: total,
+      status: receiptStatus,
+      client_id: selectedClient || null,
+      client_name: clientObj?.name || '',
+      source: 'quick_sale',
+    }).select('id').single();
+    if (newReceipt) {
+      var receiptItems = cart.map(function(item) {
+        return {
+          receipt_id: newReceipt.id, product_id: item.id,
+          product_name: item.name, quantity: item.qty,
+          price: item.price, total: item.price * item.qty,
+        };
+      });
+      var { error: itemsErr } = await supabase.from('receipt_items').insert(receiptItems);
+      if (itemsErr) console.warn('Не удалось сохранить товары чека:', itemsErr.message);
+    } else if (receiptErr) {
+      console.warn('Не удалось создать чек:', receiptErr.message);
+    }
+
     if (payUnpaid) {
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: total,
