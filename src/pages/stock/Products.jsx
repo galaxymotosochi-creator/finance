@@ -694,16 +694,7 @@ export default function Products() {
                 </div>
                 {fType !== 'service' && <div className="form-group">
                   <label>Штрихкод</label>
-                  <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                    {!fBarcode ? (
-                      <span onClick={() => setFBarcode(genBarcode())}
-                        style={{flex:1,padding:'.4rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.78rem',background:'#f8f9fa',color:'#888',fontWeight:500,textAlign:'center',whiteSpace:'nowrap'}}>сгенерировать</span>
-                    ) : (
-                      <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" style={{flex:1}} />
-                    )}
-                    <span onClick={function(){scanBarcode(function(v){setFBarcode(v)})}} title="Сканировать штрихкод через камеру"
-                      style={{padding:'.35rem .5rem',border:'1.5px solid var(--border)',borderRadius:'8px',cursor:'pointer',fontSize:'.75rem',fontFamily:'var(--font)',background:'#f8f9fa'}}>📷</span>
-                  </div>
+                  <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
                 </div>}
                 {fType === 'service' && <div className="form-group"></div>}
               </div>
