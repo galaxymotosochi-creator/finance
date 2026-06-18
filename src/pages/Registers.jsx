@@ -336,7 +336,7 @@ export default function Registers({ fullscreen }) {
     v.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;z-index:9999;border-radius:12px;object-fit:cover';
     var f=document.createElement('div');
     f.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;width:240px;height:120px;border:2px solid rgba(255,255,255,.6);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
-    var i=document.createElement('input');i.type='text';i.placeholder='Поднесите штрихкод к рамке или введите вручную';
+    var i=document.createElement('input');i.type='text';i.placeholder='';
     i.style.cssText='position:fixed;bottom:30px;left:50%;transform:translate(-50%,0);z-index:10000;width:80%;max-width:360px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
     var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
     c.style.cssText='position:fixed;top:16px;right:16px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
