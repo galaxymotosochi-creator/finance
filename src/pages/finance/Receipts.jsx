@@ -117,29 +117,26 @@ export default function Receipts() {
 
       {/* Поиск + фильтры */}
       <div className="search-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '.5rem', width: '100%', flexWrap: 'nowrap' }}>
-        <div className="stock-search" style={{ display: 'flex', alignItems: 'center', gap: '.3rem', width: '30%', minWidth: '180px', maxWidth: '400px', borderRadius: '6px', padding: '7px .5rem', background: 'var(--body-bg)' }}>
+        <div className="stock-search" style={{ display: 'flex', alignItems: 'center', gap: '.3rem', width: '30%', minWidth: '180px', maxWidth: '400px', border: '1.5px solid var(--border)', borderRadius: '6px', padding: '7px .5rem', background: 'var(--body-bg)' }}>
           <span style={{ fontSize: '.75rem', color: 'var(--muted)', lineHeight: 1 }}>🔍</span>
           <input type="text" placeholder="Номер чека, клиент, кассир..." value={search} onChange={e => setSearch(e.target.value)}
             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
         <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
-          <span className="stock-filter-link" data-active={statusFilter === null ? 'true' : undefined}
-            onClick={() => setStatusFilter(null)} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', color: statusFilter === null ? '#111' : 'var(--muted)', fontWeight: statusFilter === null ? 600 : 400 }}>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter(null)} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === null ? '#111' : 'var(--muted)', fontWeight: statusFilter === null ? 600 : 400 }}>
             Все
           </span>
-          <span style={{ color: 'var(--border)', fontSize: '.7rem' }}>|</span>
-          <span className="stock-filter-link" data-active={statusFilter === 'paid' ? 'true' : undefined}
-            onClick={() => setStatusFilter('paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', color: statusFilter === 'paid' ? '#16a34a' : 'var(--muted)', fontWeight: statusFilter === 'paid' ? 600 : 400 }}>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === 'paid' ? '#16a34a' : 'var(--muted)', fontWeight: statusFilter === 'paid' ? 600 : 400 }}>
             Оплачен
           </span>
-          <span style={{ color: 'var(--border)', fontSize: '.7rem' }}>|</span>
-          <span className="stock-filter-link" data-active={statusFilter === 'partially_paid' ? 'true' : undefined}
-            onClick={() => setStatusFilter('partially_paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', color: statusFilter === 'partially_paid' ? '#ea580c' : 'var(--muted)', fontWeight: statusFilter === 'partially_paid' ? 600 : 400 }}>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('partially_paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === 'partially_paid' ? '#ea580c' : 'var(--muted)', fontWeight: statusFilter === 'partially_paid' ? 600 : 400 }}>
             Частично
           </span>
-          <span style={{ color: 'var(--border)', fontSize: '.7rem' }}>|</span>
-          <span className="stock-filter-link" data-active={statusFilter === 'unpaid' ? 'true' : undefined}
-            onClick={() => setStatusFilter('unpaid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', color: statusFilter === 'unpaid' ? '#dc2626' : 'var(--muted)', fontWeight: statusFilter === 'unpaid' ? 600 : 400 }}>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('unpaid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: 'none', color: statusFilter === 'unpaid' ? '#dc2626' : 'var(--muted)', fontWeight: statusFilter === 'unpaid' ? 600 : 400 }}>
             Долги
           </span>
         </div>
