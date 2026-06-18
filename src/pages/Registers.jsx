@@ -334,7 +334,7 @@ export default function Registers({ fullscreen }) {
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
           {heldReceipts.length > 0 && (
-            <span onClick={()=>{setHeldIndex(0);setShowHoldModal(true)}} style={{fontSize:'10px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background:'#fff3cd',color:'#92400e',cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'3px',userSelect:'none'}}>⏸️ <span style={{background:'#92400e',color:'#fff',borderRadius:'50%',width:'14px',height:'14px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'8px',fontWeight:700}}>{heldReceipts.length}</span></span>
+            <span onClick={()=>{setHeldIndex(0);setShowHoldModal(true)}} style={{fontSize:'11px',fontWeight:500,color:'#f97316',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>Отложенные {heldReceipts.length}</span>
           )}
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
         </div>
