@@ -180,39 +180,6 @@ export default function Settings() {
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
               style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
-            <input type="file" accept="image/*" id="logoInput" style={{display:'none'}} onChange={async e => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const ext = file.name.split('.').pop();
-                const fileName = user?.id + '/' + Date.now() + '.' + ext;
-                try {
-                  const { error: upErr } = await supabase.storage.from('logos').upload(fileName, file, { upsert: true, contentType: file.type });
-                  if (upErr) throw upErr;
-                  const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(fileName);
-                  localStorage.setItem('companyLogo', publicUrl);
-                  setCompany({...company, logo: publicUrl});
-                  setToast('Логотип загружен');
-                } catch(err) {
-                  // Fallback: save as base64 if storage fails
-                  const reader = new FileReader();
-                  reader.onload = (ev) => {
-                    const dataUrl = ev.target.result;
-                    localStorage.setItem('companyLogo', dataUrl);
-                    setCompany({...company, logo: dataUrl});
-                    setToast('Логотип сохранён локально');
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }} />
-              {company.logo && (
-                <img src={company.logo} alt="logo" style={{width:28,height:28,borderRadius:6,objectFit:'cover',flexShrink:0}} />
-              )}
-              <button onClick={() => document.getElementById('logoInput').click()} 
-                style={{ padding: '.5rem 1rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{company.logo ? 'Заменить' : 'Загрузить логотип'}</button>
-              {company.logo && (
-                <button onClick={() => { localStorage.removeItem('companyLogo'); setCompany({...company, logo: null}); }} 
-                  style={{ padding: '.5rem .7rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.78rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', color:'#999' }}>✕</button>
-              )}
           </div>
         </div>
       </div>
@@ -256,11 +223,12 @@ export default function Settings() {
             localStorage.setItem('settings_notifications', JSON.stringify(notifications));
             localStorage.setItem('settings_owner', JSON.stringify(owner));
             try {
+              var settingsData = { company, country, lang, currency, timezone: tz, notifications };
               const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();
               if (existing) {
-                await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic }).eq('user_id', user.id);
+                await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData }).eq('user_id', user.id);
               } else {
-                await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic });
+                await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData });
               }
             } catch(e) {}
             setToast('Настройки сохранены');
