@@ -528,9 +528,11 @@ export default function Registers({ fullscreen }) {
                     value={payAmount} 
                     onChange={e => setPayAmount(e.target.value)}
                     style={{width:'50%',border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
-                  {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total && (
+                  {payUnpaid ? (
+                    <span style={{fontSize:'11px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#fef2f2',color:'#dc2626'}}>✕ Долг</span>
+                  ) : (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total) ? (
                     <span style={{fontSize:'11px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#f0fdf4',color:'#16a34a'}}>✓ Оплачено</span>
-                  )}
+                  ) : null}
                 </div>
                 {payAmount && parseFloat(payAmount) > total && (
                   <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</div>
