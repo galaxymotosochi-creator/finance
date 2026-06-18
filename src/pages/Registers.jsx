@@ -337,7 +337,7 @@ export default function Registers({ fullscreen }) {
     var w=document.createElement('div');
     w.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center';
     var v=document.createElement('div');v.id='qv';
-    v.style.cssText='position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:12px';
+    v.style.cssText='position:relative;width:100%;max-width:500px;aspect-ratio:4/3;overflow:hidden;border-radius:12px';
     var f=document.createElement('div');
     f.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:320px;height:130px;border:2px solid rgba(255,255,255,.5);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
     var i=document.createElement('input');i.type='text';i.placeholder='';
