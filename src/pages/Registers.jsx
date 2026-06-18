@@ -514,7 +514,7 @@ export default function Registers({ fullscreen }) {
                     background: payMode === a.id ? '#111' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
                     fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:'60px'
-                  }}>{a.type === 'cash_register' ? '💵 Наличные' : a.name}</button>
+                  }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
                 ))}
               </div>
             </div>
