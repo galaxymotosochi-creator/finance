@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const svgIcons = {
   dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
@@ -64,6 +65,7 @@ const menu = [
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { employeeData, hasPermission } = useAuth();
   const [expanded, setExpanded] = React.useState(() => {
     const path = location.pathname;
     const found = menu.find(m => m.children && m.children.some(c => path === c.path));
@@ -109,7 +111,13 @@ export default function Sidebar() {
             )}
           </div>
           <nav className="sidebar-nav">
-            {menu.map((item) => {
+            {menu.filter(function(item){
+              if (!employeeData) return true;
+              var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Настройки':'settings' };
+              var p = permMap[item.label];
+              if (!p) return true;
+              return hasPermission(p);
+            }).map((item) => {
               if (item.children) {
                 const open = expanded === item.label;
                 const anyChildActive = item.children.some((c) => isActive(c.path));

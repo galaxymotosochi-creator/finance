@@ -261,9 +261,17 @@ export default function Employees() {
                   <label>&nbsp;</label>
                   <button type="button" style={{width:'100%',padding:'.5rem .65rem',borderRadius:'var(--radius-md)',border:'none',background:'#ffdd2d',color:'#000',fontSize:'.82rem',fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px'}} onClick={async () => {
             if (!fEmail.trim()) return alert('Введите email сотрудника');
-            const { error } = await supabase.auth.admin.inviteUserByEmail(fEmail.trim(), { redirectTo: window.location.origin });
-            if (error) return alert('Ошибка: ' + error.message);
-            alert('✅ Приглашение отправлено на ' + fEmail);
+            if (!editId) return alert('Сначала сохраните сотрудника');
+            try {
+              var r = await fetch('/api/invite-user', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({email:fEmail.trim(), employeeId:editId, employeeName:fName.trim()})
+              });
+              var j = await r.json();
+              if (j.error) return alert('Ошибка: ' + j.error);
+              alert('Приглашение отправлено на ' + fEmail);
+            } catch(e) { alert('Ошибка: ' + e.message); }
           }}>
                     <span>✉️</span> Выдать доступ
                   </button>
