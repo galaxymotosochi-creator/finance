@@ -20,10 +20,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Email and employeeId required' });
   }
 
+  const appUrl = process.env.APP_URL || ('https://' + req.headers.host);
+
   try {
     // Отправляем приглашение сотруднику
     const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: 'https://' + req.headers.host + '/#/login',
+      redirectTo: appUrl + '/#/login',
       data: { is_employee: true, employee_id: employeeId, employee_name: employeeName || '' }
     });
 
