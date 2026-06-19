@@ -137,6 +137,16 @@ export default function QuickSale({ onClose }) {
       await supabase.from('clients').update({ debt: curDebt - (total - paidAmt) }).eq('id', selectedClient);
     }
 
+    // Уменьшаем остатки на складе
+    try {
+      var woItems = cart.map(function(item){return {prodId:item.id, name:item.name, qty:item.qty, cost:0};});
+      await supabase.from('writeoffs').insert({
+        id: Date.now(), user_id: user.id, name: 'Продажа (быстрая) по чеку №' + receiptNum,
+        items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),
+        reason: 'Продажа', date: date, created_at: new Date().toISOString()
+      });
+    } catch(e) { console.error('Ошибка списания со склада:', e); }
+
     onClose();
   };
 
