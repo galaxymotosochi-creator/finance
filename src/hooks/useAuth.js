@@ -13,13 +13,7 @@ export function useAuth() {
     const empId = meta.employee_id;
     
     if (!empId) {
-      // Владелец или пользователь без привязки к сотруднику — полный доступ
-      const { data } = await supabase
-        .from('employees')
-        .select('permissions,position_id,name,pin,user_id')
-        .eq('user_id', u.id)
-        .maybeSingle();
-      if (data) { setEmployeeData(data); return; }
+      // Владелец — полный доступ, игнорируем любые записи в employees
       setEmployeeData(null);
       return;
     }
