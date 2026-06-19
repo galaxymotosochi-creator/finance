@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 
 export default function Transactions() {
+  const loc = useLocation();
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
   const { accounts, refreshAccounts } = useAccounts();
@@ -42,6 +44,13 @@ export default function Transactions() {
   const [periodTo, setPeriodTo] = useState('');
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+
+  // Авто-открытие модалки по параметру ?add=income или ?add=expense
+  useEffect(() => {
+    const params = new URLSearchParams(loc.search);
+    if (params.get('add') === 'income') { setShowIncome(true); }
+    if (params.get('add') === 'expense') { setShowExpense(true); }
+  }, [loc.search]);
 
   // Закрытие дропдаунов при клике вне
   useEffect(() => {

@@ -19,9 +19,9 @@ export default function AppLayout({ children }) {
   const actions = [
     { label: 'Продажа', icon: '💳', action: () => setShowSale(true) },
     { label: 'Поставка', icon: '📦', action: () => setShowSupply(true) },
-    { label: 'Доход', icon: '📈', action: () => setShowIncome(true) },
-    { label: 'Расход', icon: '📤', action: () => setShowExpense(true) },
-  ];
+    { label: 'Доход', icon: '📈', action: () => n('/finance/transactions?add=income') },
+    { label: 'Расход', icon: '📤', action: () => n('/finance/transactions?add=expense') },
+  };
 
   return (
     <>
