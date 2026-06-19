@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -19,6 +20,7 @@ function getPayStatus(s) {
 
 export default function Supplies() {
   const { user } = useAuth();
+  const loc = useLocation();
   const [supplies, setSuppliesState] = useState([]);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -41,6 +43,17 @@ export default function Supplies() {
   const [fAddSearch, setFAddSearch] = useState('');
   const [fAddDrop, setFAddDrop] = useState(false);
   const [toast, setToast] = useState(null);
+
+  // Авто-открытие модалки новой поставки
+  useEffect(() => {
+    const params = new URLSearchParams(loc.search);
+    if (params.get('add') === 'supply') {
+      setEditId(null);
+      setFInvoice(''); setFStatus('ordered'); setFPaid('0'); setFItems([]);
+      setFAddProd(''); setFAddQty(''); setFAddCost(''); setFSupName('');
+      setShowModal(true);
+    }
+  }, [loc.search]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 1500); };
 
@@ -356,7 +369,7 @@ const load = async () => {
                 </div>
                 <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
-                    <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}>Товары не добавлены</div>
+                    <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
                   ) : fItems.map((it,idx)=>(
                     <div key={idx} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.85rem'}}>
                       <span style={{flex:3,fontWeight:500}}>{it.name}</span>
