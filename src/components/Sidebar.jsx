@@ -85,10 +85,8 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => {
-    // HashRouter: реальный путь в location.hash (напр. #/finance/transactions)
-    // BrowserRouter: в location.pathname (напр. /finance/transactions)
-    const currentPath = location.hash ? location.hash.slice(1) : location.pathname;
-    return currentPath === path;
+    // HashRouter: location.pathname = путь после # (напр. /finance/transactions)
+    return location.pathname === path;
   };
 
   return (
