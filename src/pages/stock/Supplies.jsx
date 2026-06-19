@@ -28,6 +28,7 @@ export default function Supplies() {
   const [viewId, setViewId] = useState(null);
   const [showPay, setShowPay] = useState(false);
   const [payAccounts, setPayAccounts] = useState([]);
+  const [payTxList, setPayTxList] = useState([]);
 
   const [fSupName, setFSupName] = useState('');
   const [fInvoice, setFInvoice] = useState('');
