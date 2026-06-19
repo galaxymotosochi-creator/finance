@@ -760,9 +760,18 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
         var cashRegBal = 0;
         if (cashRegAc) {
           cashRegBal = parseFloat(cashRegAc.balance) || 0;
-          (shiftTx||[]).forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
         }
-        if (openShiftBal === '0' && cashRegBal > 0) setTimeout(function(){setOpenShiftBal(String(Math.round(cashRegBal)))}, 50);
+        // Считаем баланс кассы по всем транзакциям (если shiftTx пуст)
+        var txData = shiftTx.length > 0 ? shiftTx : null;
+        if (!txData && cashRegAc) {
+          (function(){ supabase.from('transactions').select('amount,type,account_id').eq('account_id',cashRegAc.id).then(function(r){
+            if(r.data) r.data.forEach(function(t){ cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1); });
+            if (openShiftBal === '0' && cashRegBal > 0) setOpenShiftBal(String(Math.round(Math.max(0,cashRegBal))));
+          }); })();
+        } else if (txData && cashRegAc) {
+          txData.forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
+          if (openShiftBal === '0' && cashRegBal > 0) setOpenShiftBal(String(Math.round(Math.max(0,cashRegBal))));
+        }
         return (
           <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpenShift(false); }}>
             <div className="modal-box" style={{maxWidth:'380px'}}>
@@ -771,7 +780,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
               <div className="sub">Для работы кассы необходимо открыть смену</div>
               <form onSubmit={e => { e.preventDefault(); openShift(); }}>
                 <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
-                <div className="form-group"><label>Остаток денег на начало дня (руб)</label>
+                <div className="form-group"><label>Остаток денег на начало дня</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                     <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus style={{flex:1}} />
                     {cashRegBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
