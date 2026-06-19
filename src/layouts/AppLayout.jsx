@@ -21,7 +21,7 @@ export default function AppLayout({ children }) {
     { label: 'Поставка', icon: '📦', action: () => setShowSupply(true) },
     { label: 'Доход', icon: '📈', action: () => n('/finance/transactions?add=income') },
     { label: 'Расход', icon: '📤', action: () => n('/finance/transactions?add=expense') },
-  };
+  ];
 
   return (
     <>
