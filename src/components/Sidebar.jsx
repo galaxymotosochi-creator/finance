@@ -113,6 +113,8 @@ export default function Sidebar() {
           <nav className="sidebar-nav">
             {menu.filter(function(item){
               if (!employeeData) return true;
+              var perms = employeeData.permissions || [];
+              if (!perms || perms.length === 0) return true;
               var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Настройки':'settings' };
               var p = permMap[item.label];
               if (!p) return true;
