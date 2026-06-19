@@ -170,7 +170,7 @@ export default function Employees() {
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table>
           <thead><tr>
-            <th>Сотрудник</th><th>Должность</th><th>Телефон</th><th>E-mail</th>
+            <th style={{whiteSpace:'nowrap'}}>Сотрудник</th><th style={{whiteSpace:'nowrap'}}>Должность</th><th style={{whiteSpace:'nowrap'}}>Телефон</th><th style={{whiteSpace:'nowrap'}}>E-mail</th>
             <th>Принят</th><th>Оклад</th><th>С продаж</th><th style={{width:'110px'}}></th>
           </tr></thead>
           <tbody>
@@ -181,11 +181,11 @@ export default function Employees() {
               const pos = getPosition(emp.position_id);
               return (
                 <tr key={emp.id}>
-                  <td>
+                  <td style={{whiteSpace:'nowrap'}}>
                     <div className="prod-name">{emp.name}</div>
-                    {emp.status === 'inactive' && <span style={{fontSize:'.7rem',color:'#dc3545'}}>Уволен</span>}
+                    {emp.status === 'inactive' && <span style={{fontSize:'.7rem',color:'#dc3545',whiteSpace:'nowrap'}}>Уволен</span>}
                   </td>
-                  <td style={{fontSize:'.82rem'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
                   <td style={{fontSize:'.82rem'}}>{emp.phone || '—'}</td>
                   <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{emp.email || '—'}</td>
                   <td style={{fontSize:'.82rem'}}>{fmtDate(emp.hire_date)}</td>
