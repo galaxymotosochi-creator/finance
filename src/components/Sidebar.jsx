@@ -85,10 +85,10 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => {
-    if (path === '/dashboard') return location.pathname === '/dashboard' || location.hash === '#/dashboard';
-    if (path === '/kassa') return location.hash === '#/kassa';
-    // Точное совпадение (не startsWith, чтобы \/clients не перекрывал \/clients\/loyalty)
-    return location.pathname === path;
+    // HashRouter: реальный путь в location.hash (напр. #/finance/transactions)
+    // BrowserRouter: в location.pathname (напр. /finance/transactions)
+    const currentPath = location.hash ? location.hash.slice(1) : location.pathname;
+    return currentPath === path;
   };
 
   return (
