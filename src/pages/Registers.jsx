@@ -292,6 +292,18 @@ export default function Registers({ fullscreen }) {
       }
     }
     
+    // Уменьшаем остатки на складе (только для оплаченных чеков)
+    if (!payUnpaid) {
+      try {
+        var woItems = cart.map(function(item){return {prodId:item.id, name:item.name, qty:item.qty, cost:0};});
+        await supabase.from('writeoffs').insert({
+          id: Date.now(), user_id: user.id, name: 'Продажа по чеку №' + receiptNum,
+          items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),
+          reason: 'Продажа', date: date, created_at: new Date().toISOString()
+        });
+      } catch(e) { console.error('Ошибка списания со склада:', e); }
+    }
+    
     setCart([]); setShowPay(false); setPayMode(null);
     const msg = paidAmt >= total 
       ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
