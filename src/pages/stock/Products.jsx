@@ -466,17 +466,17 @@ export default function Products() {
         if (cp <= 0) return '<span style="color:var(--muted)">—</span>';
         const mk = Math.round(((p.price || 0) - cp) / cp * 100);
         const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : 'var(--muted)';
-        return `<span style="color:${color};font-weight:600;font-size:.8rem">${mk > 0 ? '+' : ''}${mk}%</span>`;
+        return `<span style="color:${color};font-weight:600">${mk > 0 ? '+' : ''}${mk}%</span>`;
       }
       case 'unit': return `<span style="color:var(--body-color)">${p.unit || '—'}</span>`;
-      case 'sku': return `<span style="font-size:.78rem;color:var(--body-color)">${p.sku || '—'}</span>`;
-      case 'barcode': return `<span style="font-size:.78rem;color:var(--body-color)">${p.barcode || '—'}</span>`;
+      case 'sku': return `<span style="color:var(--body-color)">${p.sku || '—'}</span>`;
+      case 'barcode': return `<span style="color:var(--body-color)">${p.barcode || '—'}</span>`;
       case 'weight': {
         if (p.type==='service') return '<span style="color:var(--muted)">—</span>';
         const w = parseFloat(p.weight) || 0;
         return `<span>${w > 0 ? w + (p.weightUnit||p.weight_unit||'кг') : '—'}</span>`;
       }
-      case 'description': return `<span style="color:var(--muted);font-size:.75rem">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
+      case 'description': return `<span style="color:var(--muted)">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
       default: return '—';
     }
   };
