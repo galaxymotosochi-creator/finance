@@ -187,7 +187,7 @@ export default function Employees() {
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
                   <td>{emp.phone || '—'}</td>
-                  <td style={{color:'var(--muted)'}}>{emp.email || '—'}</td>
+                  <td>{emp.email || '—'}</td>
                   <td>{fmtDate(emp.hire_date)}</td>
                   <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
                   <td>{getRulesSummary(emp)}</td>
