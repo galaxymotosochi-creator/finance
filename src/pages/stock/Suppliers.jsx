@@ -118,11 +118,11 @@ export default function Suppliers() {
               return (
                 <tr key={s.id}>
                   <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
-                  <td style={{whiteSpace:'nowrap'}}>{s.contact||'—'}</td>
-                  <td style={{}}>{s.phone||'—'}</td>
-                  <td><span className="prod-cat">{icon} {label}</span></td>
-                  <td>{supplyCount}</td>
-                  <td><span className="num">{totalSum.toLocaleString()} ₽</span></td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
+                  <td style={{color:'#555'}}>{s.phone||'—'}</td>
+                  <td style={{color:'#555'}}><span className="prod-cat">{icon} {label}</span></td>
+                  <td style={{color:'#555'}}>{supplyCount}</td>
+                  <td style={{color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(s)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
