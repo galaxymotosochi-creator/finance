@@ -166,10 +166,11 @@ export default function QuickSale({ onClose }) {
         <button className="modal-close" onClick={onClose}>&times;</button>
 
         <div style={{padding:'12px 24px 0'}}>
+          </div>
           {/* Клиент */}
-          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
-          <div style={{display:'flex',gap:'6px',marginBottom:'12px'}}>
-            <div style={{position:'relative',flex:1}}>
+          <div className="form-group">
+            <label>Клиент</label>
+            <div style={{position:'relative'}}>
               <input type="text" placeholder="Поиск по имени или телефону..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
                 onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
                 onFocus={() => setClientDrop(true)}
@@ -189,7 +190,7 @@ export default function QuickSale({ onClose }) {
           </div>
 
           {/* Товары */}
-          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Товар или услуга</label>
+          <div className="form-group"><label>Товар или услуга</label>
           <div style={{display:'flex',gap:'6px',marginBottom:'10px'}}>
           <input type="text" placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
             style={{flex:1,border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
