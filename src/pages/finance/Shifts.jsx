@@ -149,13 +149,13 @@ export default function Shifts() {
               const sCloseBal = parseFloat(s.closing_balance)||0;
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left',fontSize:'.82rem',paddingLeft:0}}>{dateStr}</td>
-                  <td style={{textAlign:'center',color:'var(--muted)'}}>{timeOpen}</td>
-                  <td style={{textAlign:'center',fontSize:'.82rem'}}>{'#'+(idx+1)}</td>
-                  <td style={{textAlign:'center',color:'var(--muted)'}}>{s.cashier_name || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555',paddingLeft:0}}>{dateStr}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{timeOpen}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{'#'+(idx+1)}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{s.cashier_name || '—'}</td>
                   <td style={{textAlign:'center'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
-                  <td style={{textAlign:'center',color:'var(--muted)'}}>Основная</td>
-                  <td style={{textAlign:'center',fontWeight:400}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>Основная</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{textAlign:'center',color:'#555'}}>{timeClose}</td>
                   <td style={{textAlign:'center',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
                 </tr>
