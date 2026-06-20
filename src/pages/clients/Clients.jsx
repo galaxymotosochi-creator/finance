@@ -5,7 +5,6 @@ import { useAuth } from '../../hooks/useAuth';
 const getSales = () => JSON.parse(localStorage.getItem('sales88') || '[]');
 
 export default function Clients() {
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
@@ -14,6 +13,7 @@ export default function Clients() {
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [accounts, setAccounts] = useState([]);
 
   const [fName, setFName] = useState('');

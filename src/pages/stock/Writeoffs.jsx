@@ -5,7 +5,6 @@ import { useAuth } from '../../hooks/useAuth';
 const REASONS = ['Списание','Брак','Потеря','Порча','Окончание срока','Инвентаризация','Прочее'];
 
 export default function Writeoffs() {
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
@@ -17,6 +16,7 @@ export default function Writeoffs() {
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
     setLoading(true);

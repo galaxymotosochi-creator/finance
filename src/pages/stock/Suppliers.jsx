@@ -8,7 +8,6 @@ const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
 const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
 
 export default function Suppliers() {
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [suppliers, setSuppliersState] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -19,6 +18,7 @@ export default function Suppliers() {
   const [fMethod, setFMethod] = useState('');
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
     setLoading(true);

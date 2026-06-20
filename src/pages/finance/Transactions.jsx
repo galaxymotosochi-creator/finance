@@ -5,7 +5,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 
 export default function Transactions() {
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const loc = useLocation();
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();

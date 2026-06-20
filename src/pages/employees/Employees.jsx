@@ -16,7 +16,6 @@ const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 
 export default function Employees() {
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [positions, setPositions] = useState([]);
@@ -24,6 +23,7 @@ export default function Employees() {
   const [allProds, setAllProds] = useState([]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState('');
