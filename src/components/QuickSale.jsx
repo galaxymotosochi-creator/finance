@@ -156,17 +156,15 @@ export default function QuickSale({ onClose }) {
     <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') onClose(); }}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:10000}}>{toast}</div>}
       <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column',padding:0}}>
-        <div style={{padding:'20px 24px 0',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #eee',paddingBottom:'12px'}}>
-          <h2 style={{fontSize:'16px',fontWeight:700,margin:0}}>Быстрая продажа</h2>
-          <button onClick={onClose} style={{background:'none',border:'none',fontSize:'20px',cursor:'pointer',color:'#999',padding:'0 4px'}}>×</button>
-        </div>
+        <button className="modal-close" onClick={onClose}>&times;</button>
+          <h2 style={{marginBottom:'16px',fontSize:'1.15rem',fontWeight:700}}>Быстрая продажа — {total.toLocaleString()} ₽</h2>
 
         <div style={{padding:'12px 24px 0'}}>
           {/* Клиент */}
-          <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Клиент</label>
+          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
           <div style={{display:'flex',gap:'6px',marginBottom:'12px'}}>
             <div style={{position:'relative',flex:1}}>
-              <input type="text" placeholder="Поиск клиента..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
+              <input type="text" placeholder="Поиск по имени или телефону..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
                 onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
                 onFocus={() => setClientDrop(true)}
                 onBlur={() => setTimeout(() => setClientDrop(false), 200)}
@@ -185,9 +183,13 @@ export default function QuickSale({ onClose }) {
           </div>
 
           {/* Товары */}
-          <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Товары</label>
-          <input type="text" placeholder="Поиск товара..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{width:'100%',border:'1px solid #eee',borderRadius:'8px',padding:'7px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',marginBottom:'8px',boxSizing:'border-box'}} />
+          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Товар или услуга</label>
+          <div style={{display:'flex',gap:'6px',marginBottom:'10px'}}>
+          <input type="text" placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
+            style={{flex:1,border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+          <button type="button" onClick={() => { var bc = prompt('Введите штрихкод:'); if (bc) { var found = products.find(p => p.barcode === bc.trim()); if (found) { addToCart(found); setToast('Найден: '+found.name); } else setToast('Товар со штрихкодом '+bc+' не найден'); } }}
+            style={{padding:'8px 12px',border:'1.5px solid #e0e0e0',borderRadius:'8px',background:'#fff',cursor:'pointer',fontSize:'13px',fontFamily:'inherit'}}>📷</button>
+        </div>
           
           <div style={{maxHeight:'120px',overflowY:'auto',marginBottom:'8px'}}>
             {(search ? products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : products.slice(0,6)).map(p => (
@@ -224,13 +226,15 @@ export default function QuickSale({ onClose }) {
 
         <div style={{padding:'0 24px 12px'}}>
           {/* Способ оплаты */}
-          <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Способ оплаты</label>
+          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'8px'}}>Способ оплаты</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                padding:'6px 12px',borderRadius:'6px',border:'1px solid #eee',fontSize:'11px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
-                background: payMode === a.id ? '#000' : '#fff', color: payMode === a.id ? '#fff' : '#555',
-              }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
+                    flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
+                    background: payMode === a.id ? '#111' : '#fff',
+                    color: payMode === a.id ? '#fff' : '#555',
+                    fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', minWidth:'60px'
+                  }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
             ))}
           </div>
 
@@ -247,10 +251,39 @@ export default function QuickSale({ onClose }) {
           )}
 
           {/* Не оплачен */}
-          <label style={{display:'flex',alignItems:'center',gap:'8px',fontSize:'12px',cursor:'pointer',marginBottom:'10px',color:'#555'}}>
-            <input type="checkbox" checked={payUnpaid} onChange={e => { setPayUnpaid(e.target.checked); if (e.target.checked) setPayMode(null); }} style={{accentColor:'#dc2626'}} />
-            Не оплачивать
-          </label>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
+            <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
+              <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
+              <span style={{position:'absolute',inset:0,background:paySplit?'#000':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+                <span style={{position:'absolute',top:'2px',left:paySplit?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
+              </span>
+            </label>
+            <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Разделить на счета</span>
+          </div>
+          {paySplit && (
+            <div style={{marginBottom:'14px'}}>
+              {accounts.filter(function(a){return a.type !== 'cash';}).map(a => {
+                const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
+                return (
+                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px',justifyContent:'flex-end'}}>
+                    <span style={{fontSize:'12px',fontWeight:500,color:'#555'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
+                    <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()}
+                      value={splitAmts[a.id] || ''} onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
+                      style={{width:'90px',border:'1.5px solid #eee',borderRadius:'6px',padding:'5px 8px',fontSize:'13px',outline:'none',fontFamily:'inherit',textAlign:'right'}} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
+            <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
+              <input type="checkbox" checked={payUnpaid} onChange={e => { setPayUnpaid(e.target.checked); if (e.target.checked) { setPaySplit(false); setSplitAmts({}); }} } style={{opacity:0,width:0,height:0}} />
+              <span style={{position:'absolute',inset:0,background:payUnpaid?'#dc2626':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+                <span style={{position:'absolute',top:'2px',left:payUnpaid?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
+              </span>
+            </label>
+            <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
+          </div>
         </div>
 
         <div style={{padding:'12px 24px 16px',borderTop:'1px solid #eee',display:'flex',gap:'8px'}}>
