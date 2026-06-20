@@ -261,6 +261,23 @@ export default function Products() {
     setShowRemoveModal(true);
   };
 
+  const confirmRemove = async () => {
+    if (!removeTarget) return;
+    const id = removeTarget;
+    let trash = getTrash();
+    const { data: items } = await supabase.from("products").select("*").eq("id", id);
+    if (items && items[0]) {
+      trash.unshift({ ...items[0], deletedAt: Date.now() });
+      setTrash(trash);
+    }
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) { setShowRemoveModal(false); return alert(error.message); }
+    load();
+    showToast('🗑️ Товар успешно удалён!');
+    setShowRemoveModal(false);
+    setRemoveTarget(null);
+  };
+
   const hide = async (id) => {
     const { error } = await supabase.from('products').update({ hidden: true }).eq('id', id);
     if (error) return alert(error.message);
