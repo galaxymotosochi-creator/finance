@@ -178,6 +178,13 @@ export default function Inventory() {
                   </tr>
                 );
               })}
+              {doc.items.length > 0 && <tr className="total-row">
+                <td style={{fontWeight:600,textAlign:'left',color:'#555'}}>Итого</td>
+                <td></td>
+                <td></td>
+                <td style={{textAlign:'center',fontWeight:700,color:'#555'}}><span className="num">{doc.items.reduce((s,it) => s + (it.actual - it.expected), 0)}</span></td>
+                <td style={{textAlign:'center',fontWeight:700,color:'#555'}}><span className="num">{(doc.totals?.result ?? 0).toLocaleString()} ₽</span></td>
+              </tr>}
               <tr><td colSpan="5" style={{textAlign:'right',padding:'1rem 0'}}>
                 <button className="btn btn-primary" onClick={() => complete(doc.id)} style={{padding:'.6rem 1.5rem',fontSize:'.85rem'}}>Завершить инвентаризацию</button>
               </td></tr>
