@@ -306,10 +306,16 @@ export default function Products() {
     showToast('Товар скопирован');
   };
 
-  const restore = (id) => {
-    let list = getProducts();
-    list = list.map(p => p.id === id ? { ...p, hidden: false } : p);
-    setProducts(list);
+  const restore = async (id) => {
+    let trash = getTrash();
+    const idx = trash.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const item = { ...trash[idx] };
+    delete item.deletedAt;
+    delete item.id;
+    await supabase.from('products').insert({ ...item, user_id: user.id });
+    trash.splice(idx, 1);
+    setTrash(trash);
     load();
     setShowModal(false);
     showToast('Товар восстановлен');
