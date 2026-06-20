@@ -186,11 +186,11 @@ export default function Employees() {
                     {emp.status === 'inactive' && <span style={{fontSize:'.7rem',color:'#dc3545',whiteSpace:'nowrap'}}>Уволен</span>}
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
-                  <td style={{"}}>{emp.phone || '—'}</td>
+                  <td>{emp.phone || '—'}</td>
                   <td style={{color:'var(--muted)'}}>{emp.email || '—'}</td>
-                  <td style={{"}}>{fmtDate(emp.hire_date)}</td>
+                  <td>{fmtDate(emp.hire_date)}</td>
                   <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{fontSize:'.8rem'}}>{getRulesSummary(emp)}</td>
+                  <td>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(emp)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
