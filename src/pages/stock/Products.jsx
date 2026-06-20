@@ -125,6 +125,8 @@ export default function Products() {
   const [mode, setMode] = useState('add');
   const [showTrash, setShowTrash] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState(null);
   const [viewProduct, setViewProduct] = useState(null);
   const [costMap, setCostMap] = useState({});
   const [cats, setCats] = useState([]);
