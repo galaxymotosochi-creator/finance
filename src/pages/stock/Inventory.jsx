@@ -70,7 +70,7 @@ export default function Inventory() {
       prodId: p.id, name: p.name, sku: p.sku || '',
       cat: CAT_LABELS[p.cat] || p.cat || '',
       expected: stockMap[p.id] || 0, actual: stockMap[p.id] || 0,
-      cost: p.costWithVat || p.costNoVat || 0
+      cost: parseFloat(p.costPrice) || 0
     }));
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
     const doc = {
