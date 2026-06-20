@@ -255,7 +255,7 @@ export default function Products() {
     }
     setShowModal(false);
     load();
-    showToast();
+    showToast(editId ? 'Товар успешно сохранён!' : 'Товар успешно добавлен!');
   };
 
   const remove = async (id) => {
