@@ -80,7 +80,7 @@ export default function Categories() {
     }
     await load();
     setShowModal(false);
-    if (!editId) setToast('Категория успешно добавлена');
+    if (!editId) setToast('Категория успешно добавлена!');
   };
 
   const remove = async (id) => {

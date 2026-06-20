@@ -284,6 +284,7 @@ export default function Products() {
     const { error } = await supabase.from('products').update({ hidden: true }).eq('id', id);
     if (error) return alert(error.message);
     load();
+    showToast('Товар успешно скрыт!');
   };
 
   const unhide = async (id) => {
@@ -303,7 +304,7 @@ export default function Products() {
     });
     if (error) return showToast('Ошибка: ' + error.message);
     await load();
-    showToast('Товар скопирован');
+    showToast('Товар успешно скопирован!');
   };
 
   const restore = async (id) => {
@@ -317,7 +318,7 @@ export default function Products() {
     setTrash([...trash]);
     await load();
     setShowModal(false);
-    showToast('Товар восстановлен');
+    showToast('Товар успешно восстановлен!');
   };
 
   const toggleCol = (id) => {
@@ -805,7 +806,7 @@ export default function Products() {
                                   trash.splice(idx, 1);
                                   setTrash([...trash]);
                                   await load();
-                                  showToast('Товар восстановлен');
+                                  showToast('Товар успешно восстановлен!');
                                 }
                               }} style={{color:'var(--primary)',background:'transparent',border:'none',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'var(--font)',padding:'.25rem .5rem',borderRadius:'var(--radius)'}}>Восстановить</button>
                             </td>
