@@ -292,6 +292,7 @@ export default function QuickSale({ onClose }) {
             <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
           </div>
 
+        </div>
         <div style={{padding:'12px 24px 16px',borderTop:'1px solid #eee',display:'flex',gap:'8px'}}>
           <button type="button" className="btn btn-outline" onClick={onClose} style={{flex:1}}>Отмена</button>
           <button type="button" className="btn btn-account-select" onClick={processSale} disabled={!cart.length || !selectedClient}
