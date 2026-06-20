@@ -192,7 +192,7 @@ export default function QuickSale({ onClose }) {
           <div className="form-group"><label>Товар или услуга</label>
           <div style={{display:'flex',gap:'6px',marginBottom:'10px'}}>
           <input type="text" placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{flex:1,padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
+            style={{flex:1,padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box',background:'var(--body-bg)'}} />
           <button type="button" onClick={() => { var bc = prompt('Введите штрихкод:'); if (bc) { var found = products.find(p => p.barcode === bc.trim()); if (found) { addToCart(found); setToast('Найден: '+found.name); } else setToast('Товар со штрихкодом '+bc+' не найден'); } }}
             style={{padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',background:'var(--body-bg)',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',boxSizing:'border-box'}}>📷</button>
         </div>
@@ -248,7 +248,7 @@ export default function QuickSale({ onClose }) {
           {/* Сумма оплаты */}
           {payMode && !payUnpaid && (
             <div style={{marginBottom:'10px'}}>
-              <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Сумма</label>
+              <div className="form-group" style={{marginTop:'.25rem'}}><label>Сумма</label>
               <input type="number" min="0" step="0.01" placeholder={total.toString()} value={payAmount} onChange={e => setPayAmount(e.target.value)}
                 style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
