@@ -456,27 +456,27 @@ export default function Products() {
       case 'category': return `<span class="prod-cat">${CAT_LABELS[p.cat] || p.cat || '—'}</span>`;
       case 'cost': {
         const cp = costPrice(p);
-        if (p.type === 'service') return '<span style="color:var(--muted)">—</span>';
+        if (p.type === 'service') return '<span style="color:#555">—</span>';
         return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + ' ₽' : '—'}</span>`;
       }
       case 'price': return `<span class="prod-price">${(p.price || 0).toLocaleString()} ₽</span>`;
       case 'markup': {
-        if (p.type === 'service') return '<span style="color:var(--muted)">—</span>';
+        if (p.type === 'service') return '<span style="color:#555">—</span>';
         const cp = costPrice(p);
-        if (cp <= 0) return '<span style="color:var(--muted)">—</span>';
+        if (cp <= 0) return '<span style="color:#555">—</span>';
         const mk = Math.round(((p.price || 0) - cp) / cp * 100);
-        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : 'var(--muted)';
+        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : '#555';
         return `<span style="color:${color}">${mk > 0 ? '+' : ''}${mk}%</span>`;
       }
-      case 'unit': return `<span style="color:var(--body-color)">${p.unit || '—'}</span>`;
-      case 'sku': return `<span style="color:var(--body-color)">${p.sku || '—'}</span>`;
-      case 'barcode': return `<span style="color:var(--body-color)">${p.barcode || '—'}</span>`;
+      case 'unit': return `<span style="color:#555">${p.unit || '—'}</span>`;
+      case 'sku': return `<span style="color:#555">${p.sku || '—'}</span>`;
+      case 'barcode': return `<span style="color:#555">${p.barcode || '—'}</span>`;
       case 'weight': {
-        if (p.type==='service') return '<span style="color:var(--muted)">—</span>';
+        if (p.type==='service') return '<span style="color:#555">—</span>';
         const w = parseFloat(p.weight) || 0;
         return `<span>${w > 0 ? w + (p.weightUnit||p.weight_unit||'кг') : '—'}</span>`;
       }
-      case 'description': return `<span style="color:var(--muted)">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
+      case 'description': return `<span style="color:#555">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
       default: return '—';
     }
   };
@@ -519,7 +519,7 @@ export default function Products() {
                     const checked = selectedCats.has(c.name);
                     return (
                       <div key={c.name} className="cat-dd-item" onClick={() => toggleCat(c.name)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
                         <span>{c.name}</span>
                       </div>
                     );
@@ -555,7 +555,7 @@ export default function Products() {
                     const checked = activeCols.has(c.id);
                     return (
                       <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
                         <span>{c.label}</span>
                       </div>
                     );
@@ -567,7 +567,7 @@ export default function Products() {
                     const checked = activeCols.has(c.id);
                     return (
                       <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{accentColor:"#111",cursor:"pointer",margin:0}} />
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
                         <span>{c.label}</span>
                       </div>
                     );
@@ -764,7 +764,7 @@ export default function Products() {
                               <div className="prod-name">{p.name}</div>
                               <div className="prod-sku">{p.sku || '—'}</div>
                             </td>
-                            <td style={{fontSize:'.75rem',color:'var(--muted)'}}>ещё {daysLeft} дн.</td>
+                            <td style={{fontSize:'.75rem',color:'#555'}}>ещё {daysLeft} дн.</td>
                             <td style={{textAlign:'right'}}>
                               <button className="act-btn" onClick={() => {
                                 let list = getProducts();
