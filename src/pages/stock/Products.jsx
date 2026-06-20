@@ -465,7 +465,8 @@ export default function Products() {
         const cp = costPrice(p);
         if (cp <= 0) return '<span style="color:#555">—</span>';
         const mk = Math.round(((p.price || 0) - cp) / cp * 100);
-        return `<span>${mk > 0 ? '+' : ''}${mk}%</span>`;
+        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : '#555';
+        return `<span style="color:${color}">${mk > 0 ? '+' : ''}${mk}%</span>`;
       }
       case 'unit': return `<span style="color:#555">${p.unit || '—'}</span>`;
       case 'sku': return `<span style="color:#555">${p.sku || '—'}</span>`;
