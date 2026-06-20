@@ -310,13 +310,11 @@ export default function Products() {
     let trash = getTrash();
     const idx = trash.findIndex(x => x.id === id);
     if (idx === -1) return;
-    const item = { ...trash[idx] };
-    delete item.deletedAt;
-    delete item.id;
-    await supabase.from('products').insert({ ...item, user_id: user.id });
+    const { deletedAt, ...itemRest } = trash[idx];
+    await supabase.from('products').insert({ ...itemRest, user_id: user.id });
     trash.splice(idx, 1);
-    setTrash(trash);
-    load();
+    setTrash([...trash]);
+    await load();
     setShowModal(false);
     showToast('Товар восстановлен');
   };
@@ -800,13 +798,11 @@ export default function Products() {
                                 let trash = getTrash();
                                 const idx = trash.findIndex(x => x.id === p.id);
                                 if (idx > -1) {
-                                  const item = { ...trash[idx] };
-                                  delete item.deletedAt;
-                                  delete item.id;
-                                  await supabase.from('products').insert({ ...item, user_id: user.id });
+                                  const { deletedAt, ...itemRest } = trash[idx];
+                                  await supabase.from('products').insert({ ...itemRest, user_id: user.id });
                                   trash.splice(idx, 1);
-                                  setTrash(trash);
-                                  load();
+                                  setTrash([...trash]);
+                                  await load();
                                   showToast('Товар восстановлен');
                                 }
                               }} style={{color:'var(--primary)',background:'transparent',border:'none',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'var(--font)',padding:'.25rem .5rem',borderRadius:'var(--radius)'}}>Восстановить</button>
