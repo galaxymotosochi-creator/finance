@@ -360,13 +360,13 @@ export default function Timesheet() {
                   <tr><td colSpan={6} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',paddingLeft:0,fontSize:'.82rem',whiteSpace:'nowrap'}}>{fmtDate(e.date)}</td>
-                    <td style={{fontSize:'.82rem',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
-                    <td style={{fontSize:'.82rem',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
-                    <td style={{fontSize:'.82rem',color:(e.bonus_amount||0)>0?'#16a34a':'inherit'}}>
+                    <td style={{textAlign:'left',paddingLeft:0,color:'#555',whiteSpace:'nowrap'}}>{fmtDate(e.date)}</td>
+                    <td style={{color:'#555',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
+                    <td style={{color:'#555',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
+                    <td style={{color:'#555'}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
-                    <td style={{fontSize:'.82rem',color:(e.deduct_amount||0)>0?'#dc2626':'inherit'}}>
+                    <td style={{color:'#555'}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
