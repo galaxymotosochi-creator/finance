@@ -9,9 +9,9 @@ export default function Categories() {
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
   const [fType, setFType] = useState('product');
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
     setLoading(true);
