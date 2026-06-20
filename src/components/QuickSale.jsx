@@ -192,9 +192,9 @@ export default function QuickSale({ onClose }) {
           <div className="form-group"><label>Товар или услуга</label>
           <div style={{display:'flex',gap:'6px',marginBottom:'10px'}}>
           <input type="text" placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{flex:1,padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box',background:'var(--body-bg)'}} />
+            style={{flex:1,padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box',background:'var(--body-bg)',lineHeight:1.3}} />
           <button type="button" onClick={() => { var bc = prompt('Введите штрихкод:'); if (bc) { var found = products.find(p => p.barcode === bc.trim()); if (found) { addToCart(found); setToast('Найден: '+found.name); } else setToast('Товар со штрихкодом '+bc+' не найден'); } }}
-            style={{padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',background:'var(--body-bg)',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',boxSizing:'border-box'}}>📷</button>
+            style={{padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',background:'var(--body-bg)',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',boxSizing:'border-box',lineHeight:1.3}}>📷</button>
         </div>
           
           <div style={{maxHeight:'120px',overflowY:'auto',marginBottom:'8px'}}>
