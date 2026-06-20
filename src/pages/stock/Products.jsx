@@ -613,7 +613,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}><span className="prod-cat" style={{cursor:'pointer'}}>{p.name}</span></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}><div className="prod-name" style={{cursor:'pointer'}}>{p.name}</div></td>;
                     }
                     return <td key={col} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
