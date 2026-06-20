@@ -315,8 +315,7 @@ body {
 .product-table td.tr { text-align: right; font-variant-numeric: tabular-nums; }
 .product-table .prod-name { font-weight: 400; color: var(--body-color); text-align: left; font-size: .82rem; }
 .product-table .prod-sku { color: var(--muted); display: block; text-align: left; }
-.product-table .prod-cat { padding: .15rem .5rem; border-radius: 20px; background: var(--body-bg); color: #444; display: inline-block; text-align: left; }
-#productTableBody td:first-child .prod-cat { width: 100%; box-sizing: border-box; }
+.product-table .prod-cat { padding: .15rem .35rem; border-radius: 20px; background: var(--body-bg); color: #444; display: inline-block; text-align: left; }
 .product-table .prod-price { font-weight: 600; }
 .product-table .num { text-align: right; }
 
@@ -336,7 +335,7 @@ body {
 #salaryColHeaders th:first-child, #supColHeaders th:first-child, #supplyColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
-#productTableBody td:first-child { text-align: left; }
+#productTableBody td:first-child { text-align: left; padding-left: 0; }
 #dirTableBody td:first-child { text-align: left; padding-left: 0; }
 #catTableBody td:first-child { padding-left: 0; }
 #clientTableBody td:first-child { text-align: left; padding-left: 0; }
