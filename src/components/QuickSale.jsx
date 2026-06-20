@@ -15,6 +15,8 @@ export default function QuickSale({ onClose }) {
   const [payMode, setPayMode] = useState(null);
   const [payAmount, setPayAmount] = useState('');
   const [payUnpaid, setPayUnpaid] = useState(false);
+  const [paySplit, setPaySplit] = useState(false);
+  const [splitAmts, setSplitAmts] = useState({});
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
 
