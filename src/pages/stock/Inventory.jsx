@@ -168,12 +168,12 @@ export default function Inventory() {
                 const diffSum = diff * it.cost;
                 return (
                   <tr key={idx}>
-                    <td style={{textAlign:'left'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'—'}</div></td>
-                    <td><span className="num">{it.expected}</span></td>
+                    <td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'—'}</div></td>
+                    <td style={{color:'#555'}}><span className="num">{it.expected}</span></td>
                     <td><input type="number" value={it.actual} min="0" onChange={e => updateItem(doc.id, idx, e.target.value)}
-                      style={{width:'70px',textAlign:'center',padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
-                    <td><span className="num" style={{color:diff>0?'#16a34a':(diff<0?'#dc2626':'var(--muted)')}}>{diff>0?'+':''}{diff}</span></td>
-                    <td><span className="num" style={{color:diffSum>0?'#16a34a':(diffSum<0?'#dc2626':'var(--muted)')}}>{diffSum>0?'+':''}{diffSum.toLocaleString()} ₽</span></td>
+                      style={{width:'70px',textAlign:'center',padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem',color:'#555'}} /></td>
+                    <td style={{color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
+                    <td style={{color:'#555'}}><span className="num">{diffSum>0?'+':''}{diffSum.toLocaleString()} ₽</span></td>
                   </tr>
                 );
               })}
