@@ -310,8 +310,9 @@ export default function Products() {
     let trash = getTrash();
     const idx = trash.findIndex(x => x.id === id);
     if (idx === -1) return;
-    const { deletedAt, ...itemRest } = trash[idx];
-    await supabase.from('products').insert({ ...itemRest, user_id: user.id });
+    const { deletedAt, id: oldId, ...itemRest } = trash[idx];
+    const { error } = await supabase.from('products').insert({ ...itemRest, user_id: user.id });
+    if (error) { console.error('Restore error:', error); showToast('Ошибка: ' + error.message); return; }
     trash.splice(idx, 1);
     setTrash([...trash]);
     await load();
@@ -798,8 +799,9 @@ export default function Products() {
                                 let trash = getTrash();
                                 const idx = trash.findIndex(x => x.id === p.id);
                                 if (idx > -1) {
-                                  const { deletedAt, ...itemRest } = trash[idx];
-                                  await supabase.from('products').insert({ ...itemRest, user_id: user.id });
+                                  const { deletedAt, id: oldId, ...itemRest } = trash[idx];
+                                  const { error } = await supabase.from('products').insert({ ...itemRest, user_id: user.id });
+                                  if (error) { showToast('Ошибка: ' + error.message); return; }
                                   trash.splice(idx, 1);
                                   setTrash([...trash]);
                                   await load();
