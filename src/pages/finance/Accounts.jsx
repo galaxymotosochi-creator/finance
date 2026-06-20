@@ -200,7 +200,7 @@ export default function Accounts() {
         <>
           <div style={{display:'flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px'}}>
             <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
-            <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс</div>
+            <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс по всем счетам</div>
           </div>
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table>
