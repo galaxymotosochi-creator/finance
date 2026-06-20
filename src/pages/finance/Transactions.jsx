@@ -85,7 +85,8 @@ export default function Transactions() {
   var exportCsv = function(list) {
     var rows = [['Дата','Описание','Тип','Счет','Сумма']];
     list.forEach(function(tx){
-      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',tx.type||'',tx.account_name||'',tx.amount||'']);
+      var typeLabels = {income:'Доход',expense:'Расход',sale:'Продажа'};
+      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',typeLabels[tx.type]||tx.type||'',tx.account_name||'',tx.amount||'']);
     });
     var csv = rows.map(function(r){return r.join(',')}).join('\n');
     var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
