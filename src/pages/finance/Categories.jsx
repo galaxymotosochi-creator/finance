@@ -139,7 +139,7 @@ export default function Categories() {
             {list.map(function (c) {
               return (
                 <tr key={c.id}>
-                  <td><div className="prod-name" style={{ fontSize: '.85rem' }}>{c.name}</div></td>
+                  <td><div className="prod-name" >{c.name}</div></td>
                   <td><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button className="act-btn prod-edit-btn" onClick={function () { openModal(c); }}>Ред.</button>

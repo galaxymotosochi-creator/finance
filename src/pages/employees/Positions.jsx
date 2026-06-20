@@ -177,7 +177,7 @@ export default function Positions() {
                   </td>
                   <td>{formatPayType(p)}</td>
                   <td className="num">{formatSalary(p)}</td>
-                  <td style={{textAlign:'left',fontSize:'.8rem',color:'var(--body-color)'}}>
+                  <td style={{textAlign:'left',color:'var(--body-color)'}}>
                     {formatPermissions(p)}
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>

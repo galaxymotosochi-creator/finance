@@ -164,9 +164,9 @@ export default function Receipts() {
                 style={{ cursor: 'pointer', transition: 'background .1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
-                <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 600, fontSize: '.85rem' }}>#{r.receipt_number}</td>
-                <td style={{ textAlign: 'center', fontSize: '.78rem', color: 'var(--muted)' }}>{formatDate(r.date)}</td>
-                <td style={{ textAlign: 'center', fontWeight: 700, fontSize: '.85rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
+                <td style={{ textAlign: 'center', color: 'var(--muted)' }}>{formatDate(r.date)}</td>
+                <td style={{ textAlign: 'center', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
                 <td style={{ textAlign: 'center' }}>
                   <span style={{
                     fontSize: '.72rem', fontWeight: 600, padding: '2px 8px', borderRadius: '100px',
@@ -174,9 +174,9 @@ export default function Receipts() {
                     color: STATUS_COLORS[r.status] || '#999',
                   }}>{STATUS_LABELS[r.status] || r.status}</span>
                 </td>
-                <td style={{ textAlign: 'center', fontSize: '.78rem', color: 'var(--muted)' }}>{r.client_name || '—'}</td>
-                <td style={{ textAlign: 'center', fontSize: '.78rem', color: 'var(--muted)' }}>{r.cashier_name || '—'}</td>
-                <td style={{ textAlign: 'center', fontSize: '.72rem', color: 'var(--muted)' }}>
+                <td style={{ textAlign: 'center', color: 'var(--muted)' }}>{r.client_name || '—'}</td>
+                <td style={{ textAlign: 'center', color: 'var(--muted)' }}>{r.cashier_name || '—'}</td>
+                <td style={{ textAlign: 'center', color: 'var(--muted)' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
                 </td>
               </tr>
@@ -218,7 +218,7 @@ export default function Receipts() {
                     <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} ₽</span>
                   </div>
                 ))}
-                <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontWeight: 700, fontSize: '.85rem' }}>
+                <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '50px', textAlign: 'center' }}></span>
                   <span style={{ width: '70px', textAlign: 'right' }}></span>

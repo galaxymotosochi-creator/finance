@@ -262,7 +262,7 @@ const load = async () => {
                   <td style={{whiteSpace:'nowrap'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td style={{whiteSpace:'nowrap'}}><span style={{cursor:'pointer',color:supColor}} onClick={() => cycleStatus(s.id)} title="Нажмите чтобы изменить">{supSt}</span></td>
                   <td style={{whiteSpace:'nowrap'}}><span style={{color:payColor}}>{paySt}</span></td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{s.date||'—'}</td>
+                  <td style={{color:'var(--muted)',whiteSpace:'nowrap'}}>{s.date||'—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     {payStatus !== 'paid' && <button className="act-btn prod-edit-btn" onClick={() => setShowPay(s.id)}>Оплатить</button>}
                     <button className="act-btn prod-edit-btn" onClick={() => edit(s.id)}>Ред.</button>

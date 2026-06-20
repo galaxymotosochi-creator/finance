@@ -118,8 +118,8 @@ export default function Suppliers() {
               return (
                 <tr key={s.id}>
                   <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{s.contact||'—'}</td>
-                  <td style={{fontSize:'.82rem'}}>{s.phone||'—'}</td>
+                  <td style={{color:'var(--muted)',whiteSpace:'nowrap'}}>{s.contact||'—'}</td>
+                  <td style={{}}>{s.phone||'—'}</td>
                   <td><span className="prod-cat">{icon} {label}</span></td>
                   <td>{supplyCount}</td>
                   <td><span className="num">{totalSum.toLocaleString()} ₽</span></td>

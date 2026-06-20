@@ -176,7 +176,7 @@ export default function Employees() {
           <tbody>
             {filtered.length === 0 ? (
               <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>Список сотрудников пуст</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
+                    <p style={{color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
             ) : filtered.map(emp => {
               const pos = getPosition(emp.position_id);
               return (
@@ -185,10 +185,10 @@ export default function Employees() {
                     <div className="prod-name">{emp.name}</div>
                     {emp.status === 'inactive' && <span style={{fontSize:'.7rem',color:'#dc3545',whiteSpace:'nowrap'}}>Уволен</span>}
                   </td>
-                  <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
-                  <td style={{fontSize:'.82rem'}}>{emp.phone || '—'}</td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{emp.email || '—'}</td>
-                  <td style={{fontSize:'.82rem'}}>{fmtDate(emp.hire_date)}</td>
+                  <td style={{whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{"}}>{emp.phone || '—'}</td>
+                  <td style={{color:'var(--muted)'}}>{emp.email || '—'}</td>
+                  <td style={{"}}>{fmtDate(emp.hire_date)}</td>
                   <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
                   <td style={{fontSize:'.8rem'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
@@ -259,7 +259,7 @@ export default function Employees() {
                 </div>
                 <div className="form-group">
                   <label>&nbsp;</label>
-                  <button type="button" style={{width:'100%',padding:'.5rem .65rem',borderRadius:'var(--radius-md)',border:'none',background:'#ffdd2d',color:'#000',fontSize:'.82rem',fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px'}} onClick={async () => {
+                  <button type="button" style={{width:'100%',padding:'.5rem .65rem',borderRadius:'var(--radius-md)',border:'none',background:'#ffdd2d',color:'#000',fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px'}} onClick={async () => {
             if (!fEmail.trim()) return alert('Введите email сотрудника');
             if (!editId) return alert('Сначала сохраните сотрудника');
             try {
