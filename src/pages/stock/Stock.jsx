@@ -234,11 +234,11 @@ export default function Stock() {
               return (
                 <tr key={p.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{fontWeight:500}}>{p.name}</span>
+                    <span>{p.name}</span>
                     {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
                   </td>
-                  <td style={{textAlign:'center',fontSize:'.82rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
-                  <td style={{textAlign:'center',fontSize:'.82rem',color:'var(--muted)'}}>{p.barcode || '—'}</td>
+                  <td style={{textAlign:'center',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
+                  <td style={{textAlign:'center',color:'var(--muted)'}}>{p.barcode || '—'}</td>
                   <td style={{textAlign:'center',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
                   <td style={{textAlign:'center'}} className={low ? 'stock-low' : ''}>{qty}</td>
                   <td style={{textAlign:'center'}}>{costPrice.toLocaleString()}</td>
