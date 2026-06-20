@@ -92,19 +92,17 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes, clRes, prRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
-        supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
       if (clRes && clRes.data) setClients(clRes.data);
-      if (prRes?.data) setPromos(prRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
       // Загружаем остатки склада

@@ -24,11 +24,10 @@ export default function QuickSale({ onClose }) {
 
   useEffect(() => {
     (async () => {
-      const [pRes, aRes, clRes, prRes] = await Promise.all([
+      const [pRes, aRes, clRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
-        supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
         supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
       ]);
       if (pRes.data) setProducts(pRes.data);
