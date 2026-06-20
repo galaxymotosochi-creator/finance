@@ -175,18 +175,16 @@ export default function Clients() {
                     </div>
                     <div className="prod-sku">{c.email || ''}{c.comment ? ' • '+c.comment : ''}</div>
                   </td>
-                  <td>{c.phone || '—'}</td>
-                  <td>
+                  <td style={{color:'#555'}}>{c.phone || '—'}</td>
+                  <td style={{color:'#555'}}>
                     {c.birthday ? (
-                      <span style={{color:isBday?'#ec4899':'inherit',fontWeight:isBday?600:'inherit'}}>
-                        {fmtDate(c.birthday)}{isBday && ' 🎉'}
-                      </span>
+                      <span>{fmtDate(c.birthday)}{isBday && ' 🎉'}</span>
                     ) : '—'}
                   </td>
-                  <td>{st.checks > 0 ? st.checks : '—'}</td>
-                  <td>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
-                  <td>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{color: c.debt && c.debt < 0 ? '#dc2626' : '#999'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{color:'#555'}}>{st.checks > 0 ? st.checks : '—'}</td>
+                  <td style={{color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
