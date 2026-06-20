@@ -54,6 +54,15 @@ export default function Receipts() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Close period dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.stock-filter-links > div')) setPeriodOpen(false);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   const openReceipt = async (r) => {
     setSelectedReceipt(r);
     setItemsLoading(true);
@@ -157,10 +166,6 @@ export default function Receipts() {
               </div>
             )}
           </div>
-          <span className="stock-filter-link"
-            onClick={() => setStatusFilter(null)} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === null ? '#111' : 'var(--muted)', fontWeight: statusFilter === null ? 600 : 400 }}>
-            Все
-          </span>
           <span className="stock-filter-link"
             onClick={() => setStatusFilter('paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === 'paid' ? '#16a34a' : 'var(--muted)', fontWeight: statusFilter === 'paid' ? 600 : 400 }}>
             Оплачен
