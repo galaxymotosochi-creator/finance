@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
-const getSales = () => JSON.parse(localStorage.getItem('sales88') || '[]');
+const getSales = async (userId) => { const { data } = await supabase.from('receipts').select('client_id, total_amount, status').eq('user_id', userId).eq('status', 'paid'); return data || []; };
 
 export default function Clients() {
   const { user } = useAuth();
@@ -86,10 +86,10 @@ export default function Clients() {
   // Статистика по каждому клиенту
   const clientStats = {};
   sales.forEach(s => {
-    const cid = s.clientId;
+    const cid = s.client_id;
     if (!cid) return;
     if (!clientStats[cid]) clientStats[cid] = { checks: 0, total: 0 };
-    clientStats[cid].total += s.total || 0;
+    clientStats[cid].total += parseFloat(s.total_amount) || 0;
     clientStats[cid].checks += 1;
   });
 
