@@ -108,7 +108,9 @@ export default function Promos() {
     try {
       if (editId) await supabase.from('promos').update(data).eq('id', editId);
       else await supabase.from('promos').insert(data);
-      setShow(false); setEditId(null); load();
+      setEditId(null);
+      await load();
+      setShow(false);
       setToast(editId ? 'Акция успешно сохранена!' : 'Акция успешно добавлена!');
     } catch (err) { alert(err.message); }
   };
