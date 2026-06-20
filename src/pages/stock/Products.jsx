@@ -213,7 +213,7 @@ export default function Products() {
 
   const showToast = (msg) => {
     setToast(msg || 'Товар успешно добавлен!');
-    setTimeout(() => setToast(null), 1500);
+    setTimeout(() => setToast(null), 3000);
   };
 
   const openAdd = () => {
@@ -257,7 +257,8 @@ export default function Products() {
   };
 
   const remove = async (id) => {
-    if (!confirm('Удалить товар?')) return;
+    setRemoveTarget(id);
+    setShowRemoveModal(true);
     // Move to trash in localStorage for now
     let trash = getTrash();
     const { data: items } = await supabase.from('products').select('*').eq('id', id);
@@ -727,6 +728,21 @@ export default function Products() {
                 <button type="submit" className="btn btn-account-select">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Модалка подтверждения удаления */}
+      {showRemoveModal && (
+        <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') { setShowRemoveModal(false); setRemoveTarget(null); } }}>
+          <div className="modal-box" style={{maxWidth:'400px'}}>
+            <button className="modal-close" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>&times;</button>
+            <h2>Вы действительно хотите удалить товар?</h2>
+            <div className="sub" style={{marginBottom:'1.2rem'}}>Он перенесётся в корзину и будет удалён через 30 дней</div>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-outline" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
+              <button type="button" className="btn btn-primary" onClick={confirmRemove} style={{background:'#dc2626',color:'#fff'}}>Да</button>
+            </div>
           </div>
         </div>
       )}
