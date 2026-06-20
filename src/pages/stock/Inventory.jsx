@@ -87,19 +87,20 @@ export default function Inventory() {
     setEditing(null);
   };
 
-  const updateMeta = async (id, field, value) => {
-    const { data } = await supabase.from('inventory').update({ [field]: value }).eq('id', id).select(); if (data) { setEditing({...editing, [field]: value}); load(); }
+  const updateMeta = (id, field, value) => {
+    setEditing({...editing, [field]: value});
   };
 
-  const updateItem = async (id, idx, actual) => {
+  const updateItem = (id, idx, actual) => {
     const items = [...editing.items]; items[idx] = {...items[idx], actual: parseInt(actual) || 0};
     const updated = { ...editing, items }; recalcTotals(updated);
-    await supabase.from('inventory').update({ items: updated.items, result: JSON.stringify(updated.totals) }).eq('id', id);
-    setEditing(updated); load();
+    setEditing(updated);
   };
 
   const complete = async (id) => {
-    const doc = editing; if (!doc) return; setShowResult(doc);
+    const doc = editing; if (!doc) return;
+    await supabase.from('inventory').update({ items: doc.items, result: JSON.stringify(doc.totals), status: 'completed' }).eq('id', id);
+    setShowResult(doc);
   };
 
   const confirmResult = async () => {
