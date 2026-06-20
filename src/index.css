@@ -335,7 +335,7 @@ body {
 #salaryColHeaders th:first-child, #supColHeaders th:first-child, #supplyColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
-#productTableBody td:first-child { text-align: left; padding-left: .8rem; }
+#productTableBody td:first-child { text-align: left; padding-left: 0; }
 #dirTableBody td:first-child { text-align: left; padding-left: 0; }
 #catTableBody td:first-child { padding-left: 0; }
 #clientTableBody td:first-child { text-align: left; padding-left: 0; }
