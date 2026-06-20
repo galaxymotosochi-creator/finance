@@ -268,7 +268,7 @@ export default function QuickSale({ onClose }) {
               {accounts.filter(function(a){return a.type !== 'cash';}).map(a => {
                 const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                 return (
-                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px',justifyContent:'flex-end'}}>
+                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px',justifyContent:'flex-start'}}>
                     <span style={{fontSize:'12px',fontWeight:500,color:'#555'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                     <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()}
                       value={splitAmts[a.id] || ''} onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
