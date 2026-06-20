@@ -259,17 +259,6 @@ export default function Products() {
   const remove = async (id) => {
     setRemoveTarget(id);
     setShowRemoveModal(true);
-    // Move to trash in localStorage for now
-    let trash = getTrash();
-    const { data: items } = await supabase.from('products').select('*').eq('id', id);
-    if (items && items[0]) {
-      trash.unshift({ ...items[0], deletedAt: Date.now() });
-      setTrash(trash);
-    }
-    const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) return alert(error.message);
-    load();
-    showToast('🗑️ Товар перемещен в корзину');
   };
 
   const hide = async (id) => {
