@@ -226,7 +226,6 @@ export default function QuickSale({ onClose }) {
           )}
         </div>
 
-        <div style={{padding:'0 24px 12px'}}>
           {/* Способ оплаты */}
           <div className="form-group" ><label>Способ оплаты</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
@@ -288,7 +287,6 @@ export default function QuickSale({ onClose }) {
             </label>
             <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
           </div>
-        </div>
 
         <div style={{padding:'12px 24px 16px',borderTop:'1px solid #eee',display:'flex',gap:'8px'}}>
           <button type="button" className="btn btn-outline" onClick={onClose} style={{flex:1}}>Отмена</button>
