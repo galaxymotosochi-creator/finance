@@ -3,12 +3,14 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function Categories() {
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [cats, setCats] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
   const [fType, setFType] = useState('product');
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -78,6 +80,7 @@ export default function Categories() {
     }
     await load();
     setShowModal(false);
+    if (!editId) setToast('Категория успешно добавлена');
   };
 
   const remove = async (id) => {
@@ -171,6 +174,11 @@ export default function Categories() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+      {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
+          {toast}
         </div>
       )}
     </>
