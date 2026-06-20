@@ -201,6 +201,7 @@ export default function Promos() {
               <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>{targetLabel(p)}</div>
             </div>
             <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
+            <button className="act-btn prod-edit-btn" onClick={function(e){e.stopPropagation();openEdit(p)}}>Ред.</button>
             <div className="prod-more-wrap">
               <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open')}}>⋯</button>
               <div className="prod-dropdown">
@@ -224,6 +225,7 @@ export default function Promos() {
                 <div style={{fontSize:'1.1rem',fontWeight:600}}>{p.name}</div>
                 <div style={{fontSize:'.8rem',color:'var(--muted)'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</div>
               </div>
+              <button className="act-btn prod-edit-btn" onClick={function(e){e.stopPropagation();openEdit(p)}}>Ред.</button>
               <div className="prod-more-wrap">
                 <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open')}}>⋯</button>
                 <div className="prod-dropdown">
