@@ -17,8 +17,11 @@ export default function QuickSale({ onClose }) {
   const [payUnpaid, setPayUnpaid] = useState(false);
   const [paySplit, setPaySplit] = useState(false);
   const [splitAmts, setSplitAmts] = useState({});
+  const [paySplit, setPaySplit] = useState(false);
+  const [splitAmts, setSplitAmts] = useState({});
   const [userName, setUserName] = useState('');
   const [toast, setToast] = useState(null);
+  const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -174,7 +177,7 @@ export default function QuickSale({ onClose }) {
                 onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
                 onFocus={() => setClientDrop(true)}
                 onBlur={() => setTimeout(() => setClientDrop(false), 200)}
-                style={{width:'100%',border:'1px solid #eee',borderRadius:'8px',padding:'7px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+                style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
               {clientDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                   {(clientSearch ? clients.filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)) : clients).map(c => (
@@ -198,7 +201,7 @@ export default function QuickSale({ onClose }) {
         </div>
           
           <div style={{maxHeight:'120px',overflowY:'auto',marginBottom:'8px'}}>
-            {(search ? products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : products.slice(0,6)).map(p => (
+            {(search.trim() ? products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : []).map(p => (
               <div key={p.id} onClick={() => addToCart(p)} style={{display:'flex',justifyContent:'space-between',padding:'5px 8px',cursor:'pointer',borderRadius:'6px',fontSize:'13px'}}
                 onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background='transparent'}>
@@ -250,7 +253,7 @@ export default function QuickSale({ onClose }) {
             <div style={{marginBottom:'10px'}}>
               <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Сумма</label>
               <input type="number" min="0" step="0.01" placeholder={total.toString()} value={payAmount} onChange={e => setPayAmount(e.target.value)}
-                style={{width:'100%',border:'1px solid #eee',borderRadius:'8px',padding:'7px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+                style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
                 <div style={{fontSize:'11px',color:'#92400e',marginTop:'3px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — долг</div>
               )}
