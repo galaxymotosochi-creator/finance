@@ -24,7 +24,6 @@ export default function Receipts() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(null);
-  const [statusOpen, setStatusOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [receiptItems, setReceiptItems] = useState([]);
   const [itemsLoading, setItemsLoading] = useState(false);
@@ -124,26 +123,20 @@ export default function Receipts() {
             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
         <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1,whiteSpace:'nowrap'}}
-              onClick={e=>{e.stopPropagation();setStatusOpen(!statusOpen)}}>
-              {statusFilter ? (STATUS_LABELS[statusFilter] || statusFilter) : 'Все'}
-            </span>
-            {statusOpen && (
-              <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
-                {[{key:null,label:'Все'},{key:'paid',label:'Оплачен'},{key:'partially_paid',label:'Частично оплачен'},{key:'unpaid',label:'Не оплачен'}].map(p=>{
-                  const isActive = statusFilter === p.key;
-                  return (
-                    <div key={p.key || 'all'} onClick={()=>{setStatusFilter(p.key);setStatusOpen(false)}}
-                      style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.78rem',color:'#555',background:'transparent'}}>
-                      <input type="checkbox" checked={isActive} onChange={()=>{}} style={{cursor:'pointer',margin:0}} />
-                      {p.label}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter(null)} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === null ? '#111' : 'var(--muted)', fontWeight: statusFilter === null ? 600 : 400 }}>
+            Все
+          </span>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === 'paid' ? '#16a34a' : 'var(--muted)', fontWeight: statusFilter === 'paid' ? 600 : 400 }}>
+            Оплачен
+          </span>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('partially_paid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: '1px solid var(--border)', color: statusFilter === 'partially_paid' ? '#ea580c' : 'var(--muted)', fontWeight: statusFilter === 'partially_paid' ? 600 : 400 }}>
+            Частично
+          </span>
+          <span className="stock-filter-link"
+            onClick={() => setStatusFilter('unpaid')} style={{ cursor: 'pointer', fontSize: '.78rem', padding: '.25rem .35rem', borderRight: 'none', color: statusFilter === 'unpaid' ? '#dc2626' : 'var(--muted)', fontWeight: statusFilter === 'unpaid' ? 600 : 400 }}>
             Долги
           </span>
         </div>
