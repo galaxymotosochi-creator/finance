@@ -26,8 +26,10 @@ const PAY_TYPE_LABELS = {
 };
 
 export default function Positions() {
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [positions, setPositionsState] = useState([]);
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);

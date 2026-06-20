@@ -8,6 +8,7 @@ const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
 const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
 
 export default function Suppliers() {
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [suppliers, setSuppliersState] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -16,6 +17,7 @@ export default function Suppliers() {
   const [fContact, setFContact] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fMethod, setFMethod] = useState('');
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -183,6 +185,12 @@ export default function Suppliers() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+    );
+      {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
+          {toast}
         </div>
       )}
     </>

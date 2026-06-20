@@ -16,11 +16,13 @@ const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 
 export default function Employees() {
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [positions, setPositions] = useState([]);
   const [allCats, setAllCats] = useState([]);
   const [allProds, setAllProds] = useState([]);
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -285,6 +287,11 @@ export default function Employees() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+    {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
+          {toast}
         </div>
       )}
     </>
