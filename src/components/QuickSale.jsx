@@ -17,6 +17,7 @@ export default function QuickSale({ onClose }) {
   const [payUnpaid, setPayUnpaid] = useState(false);
   const [paySplit, setPaySplit] = useState(false);
   const [splitAmts, setSplitAmts] = useState({});
+  const [userName, setUserName] = useState('');
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +31,8 @@ export default function QuickSale({ onClose }) {
       if (pRes.data) setProducts(pRes.data);
       if (aRes.data) setAccounts(aRes.data);
       if (clRes?.data) setClients(clRes.data);
+      const { data: profile } = await supabase.from('user_profiles').select('name').eq('user_id', user.id).maybeSingle();
+      if (profile?.name) setUserName(profile.name);
       setLoading(false);
     })();
   }, [user]);
@@ -84,6 +87,7 @@ export default function QuickSale({ onClose }) {
       status: receiptStatus,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
+      cashier_name: userName || '',
       source: 'quick_sale',
     }).select('id').single();
     if (newReceipt) {
