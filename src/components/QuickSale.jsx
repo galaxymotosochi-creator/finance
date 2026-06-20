@@ -228,10 +228,10 @@ export default function QuickSale({ onClose }) {
 
           {/* Способ оплаты */}
           <div className="form-group" ><label>Способ оплаты</label>
-          <div style={{display:'flex',flexDirection:'column',gap:'4px',marginBottom:'10px'}}>
+          <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                    width:'100%', padding:'8px 10px', borderRadius:'8px', border:'1.5px solid #eee', textAlign:'left',
+                    flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
                     background: payMode === a.id ? '#111' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
                     fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', minWidth:'60px'
@@ -269,7 +269,7 @@ export default function QuickSale({ onClose }) {
                 const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                 return (
                   <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
-                    <span style={{fontSize:'12px',fontWeight:500,color:'#555'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
+                    <span style={{fontSize:'12px',fontWeight:500,color:'#555',minWidth:'130px'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                     <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()}
                       value={splitAmts[a.id] || ''} onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
                       style={{width:'90px',border:'1.5px solid #eee',borderRadius:'6px',padding:'5px 8px',fontSize:'13px',outline:'none',fontFamily:'inherit',textAlign:'right'}} />
