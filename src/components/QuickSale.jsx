@@ -162,7 +162,7 @@ export default function QuickSale({ onClose }) {
     <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') onClose(); }}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:10000}}>{toast}</div>}
       <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
-        <h2 style={{fontSize:'1.15rem',fontWeight:700}}>Быстрая продажа</h2>
+        <h2 style={{fontSize:'1.15rem',fontWeight:700,marginBottom:'.75rem'}}>Быстрая продажа</h2>
         <button className="modal-close" onClick={onClose}>&times;</button>
 
         
