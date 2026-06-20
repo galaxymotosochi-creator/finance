@@ -316,7 +316,7 @@ body {
 .product-table .prod-name { font-weight: 400; color: #555; text-align: left; font-size: .82rem; }
 .product-table .prod-sku { color: #555; display: block; text-align: left; }
 .product-table .prod-cat { color: #555; }
-.product-table .prod-price { font-weight: 600; }
+/* Цена без жирности — будет добавлен акцент позже */
 .product-table .num { text-align: right; }
 
 .product-table .stock-low { color: var(--danger); font-weight: 500; }

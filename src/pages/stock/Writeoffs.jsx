@@ -97,14 +97,14 @@ export default function Writeoffs() {
           <tbody id="writeoffTableBody">
             {list.length === 0 ? (
               <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Список списаний пуст</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
+                    <p style={{color:'#555',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
             ) : list.map(w => (
               <tr key={w.id}>
                 <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
                 <td style={{whiteSpace:'nowrap'}}>{w.quantity}</td>
                 <td style={{whiteSpace:'nowrap'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
                 <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
-                <td style={{fontSize:'.82rem',color:'var(--muted)'}}>{w.date||'—'}</td>
+                <td style={{color:'#555'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={() => {
                     setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));

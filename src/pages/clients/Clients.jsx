@@ -161,7 +161,7 @@ export default function Clients() {
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
@@ -175,8 +175,8 @@ export default function Clients() {
                     </div>
                     <div className="prod-sku">{c.email || ''}{c.comment ? ' • '+c.comment : ''}</div>
                   </td>
-                  <td style={{fontSize:'.82rem'}}>{c.phone || '—'}</td>
-                  <td style={{fontSize:'.82rem',color:'var(--muted)'}}>
+                  <td>{c.phone || '—'}</td>
+                  <td>
                     {c.birthday ? (
                       <span style={{color:isBday?'#ec4899':'inherit',fontWeight:isBday?600:'inherit'}}>
                         {fmtDate(c.birthday)}{isBday && ' 🎉'}
@@ -185,7 +185,7 @@ export default function Clients() {
                   </td>
                   <td>{st.checks > 0 ? st.checks : '—'}</td>
                   <td>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{fontWeight:500}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
+                  <td>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{color: c.debt && c.debt < 0 ? '#dc2626' : '#999'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
