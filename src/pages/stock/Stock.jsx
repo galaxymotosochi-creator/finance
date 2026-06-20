@@ -235,16 +235,16 @@ export default function Stock() {
                 <tr key={p.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span>{p.name}</span>
-                    {low && <span style={{color:'#dc2626',fontSize:'.65rem'}}> ⚠</span>}
+                    {low && <span> ⚠</span>}
                   </td>
-                  <td style={{textAlign:'center',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku || '—'}</td>
-                  <td style={{textAlign:'center',color:'var(--muted)'}}>{p.barcode || '—'}</td>
+                  <td style={{textAlign:'center',color:'#555',fontFamily:'monospace'}}>{p.sku || '—'}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{p.barcode || '—'}</td>
                   <td style={{textAlign:'center',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
                   <td style={{textAlign:'center'}} className={low ? 'stock-low' : ''}>{qty}</td>
                   <td style={{textAlign:'center'}}>{costPrice.toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <span className="editable-price"
-                      style={{cursor:'pointer',color:'#555',fontWeight:500,borderBottom:'1px dashed #999',paddingBottom:'1px'}}
+                      style={{cursor:'pointer',color:'#555',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
                       onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
                   </td>
                   <td style={{textAlign:'center'}}>
