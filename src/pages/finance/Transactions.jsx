@@ -83,10 +83,10 @@ export default function Transactions() {
   const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || tx.type===typeFilter) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   var exportCsv = function(list) {
-    var rows = [['Дата','Описание','Тип','Счет','Сумма']];
+    var rows = [['Дата','Название','Сумма','Счет','Категория']];
     list.forEach(function(tx){
       var typeLabels = {income:'Доход',expense:'Расход',sale:'Продажа'};
-      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',typeLabels[tx.type]||tx.type||'',tx.account_name||'',tx.amount||'']);
+      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',(tx.type==='income'?'+':'-')+Number(tx.amount||0).toLocaleString('ru-RU')+' ₽',tx.account_name||'',tx.categories?.name||'']);
     });
     var csv = rows.map(function(r){return r.join(',')}).join('\n');
     var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
