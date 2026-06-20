@@ -172,12 +172,12 @@ export default function Positions() {
             <tbody>
               {positions.map(p => (
                 <tr key={p.id}>
-                  <td style={{textAlign:'left',paddingLeft:0}}>
+                  <td style={{textAlign:'left',paddingLeft:0,color:'#555'}}>
                     <span className="prod-name">{p.name}</span>
                   </td>
-                  <td>{formatPayType(p)}</td>
-                  <td className="num">{formatSalary(p)}</td>
-                  <td style={{textAlign:'left',color:'var(--body-color)'}}>
+                  <td style={{color:'#555'}}>{formatPayType(p)}</td>
+                  <td className="num" style={{color:'#555'}}>{formatSalary(p)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>
                     {formatPermissions(p)}
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>
