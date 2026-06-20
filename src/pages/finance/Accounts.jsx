@@ -246,16 +246,20 @@ export default function Accounts() {
                     </tr>
                   );
                 })}
-                {sorted.length > 0 && (
+                {sorted.length > 0 && (() => {
+                  const incTot = accounts.reduce((s,a) => { const mv=getMv(a.type); return s + mv.i; }, 0);
+                  const expTot = accounts.reduce((s,a) => { const mv=getMv(a.type); return s + mv.e; }, 0);
+                  return (
                   <tr className="total-row">
                     <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
                     <td style={{textAlign:'center',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} ₽</td>
-                    <td></td>
-                    <td></td>
+                    <td style={{textAlign:'center',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} ₽</td>
+                    <td style={{textAlign:'center',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} ₽</td>
                     <td style={{textAlign:'center',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} ₽</td>
                     <td></td>
                   </tr>
-                )}
+                  );
+                })()}
               </tbody>
             </table>
           </div>
