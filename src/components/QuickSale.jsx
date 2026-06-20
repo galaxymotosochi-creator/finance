@@ -228,7 +228,7 @@ export default function QuickSale({ onClose }) {
 
         <div style={{padding:'0 24px 12px'}}>
           {/* Способ оплаты */}
-          <div className="form-group" style={{marginTop:'.5rem'}}><label>Способ оплаты</label>
+          <div className="form-group" ><label>Способ оплаты</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
