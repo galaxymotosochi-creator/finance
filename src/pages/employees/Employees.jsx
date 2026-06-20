@@ -181,16 +181,16 @@ export default function Employees() {
               const pos = getPosition(emp.position_id);
               return (
                 <tr key={emp.id}>
-                  <td style={{whiteSpace:'nowrap'}}>
-                    <div className="prod-name">{emp.name}</div>
-                    {emp.status === 'inactive' && <span style={{fontSize:'.7rem',color:'#dc3545',whiteSpace:'nowrap'}}>Уволен</span>}
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}>
+                    <div className="prod-name" style={{color:'#555'}}>{emp.name}</div>
+                    {emp.status === 'inactive' && <span>Уволен</span>}
                   </td>
-                  <td style={{whiteSpace:'nowrap'}}>{pos ? pos.name : '—'}</td>
-                  <td>{emp.phone || '—'}</td>
-                  <td>{emp.email || '—'}</td>
-                  <td>{fmtDate(emp.hire_date)}</td>
-                  <td>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
-                  <td>{getRulesSummary(emp)}</td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{color:'#555'}}>{emp.phone || '—'}</td>
+                  <td style={{color:'#555'}}>{emp.email || '—'}</td>
+                  <td style={{color:'#555'}}>{fmtDate(emp.hire_date)}</td>
+                  <td style={{color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{color:'#555'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => openEdit(emp)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
