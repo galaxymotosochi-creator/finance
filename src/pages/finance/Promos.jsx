@@ -38,6 +38,16 @@ export default function Promos() {
   };
   useEffect(() => { if (user) load(); }, [user]);
 
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   const y = cal.getFullYear(), m = cal.getMonth();
   const firstD = new Date(y, m, 1).getDay();
   const daysInM = new Date(y, m + 1, 0).getDate();

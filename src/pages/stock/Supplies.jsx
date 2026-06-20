@@ -46,6 +46,16 @@ export default function Supplies() {
 
   // Авто-открытие модалки новой поставки
   useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
+  useEffect(() => {
     const params = new URLSearchParams(loc.search);
     if (params.get('add') === 'supply') {
       setEditId(null);
@@ -107,9 +117,29 @@ const load = async () => {
     if (txRes.data) setPayTxList(txRes.data);
     setLoading(false);
   };
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   useEffect(() => { if (user) load(); }, [user]);
 
   // Миграция из localStorage
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   useEffect(() => {
     if (!user || supplies.length > 0) return;
     const old = JSON.parse(localStorage.getItem('supplies88') || '[]');
