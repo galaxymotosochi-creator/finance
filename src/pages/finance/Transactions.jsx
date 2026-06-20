@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 
 export default function Transactions() {
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const loc = useLocation();
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
@@ -42,6 +43,7 @@ export default function Transactions() {
   const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
+  const [toast, setToast] = useState(null);
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
 
@@ -613,6 +615,11 @@ export default function Transactions() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
+          {toast}
         </div>
       )}
     </div>
