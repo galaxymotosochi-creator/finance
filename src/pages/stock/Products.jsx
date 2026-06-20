@@ -273,7 +273,7 @@ export default function Products() {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) { setShowRemoveModal(false); return alert(error.message); }
     load();
-    showToast('🗑️ Товар успешно удалён!');
+    showToast('Товар успешно удалён!');
     setShowRemoveModal(false);
     setRemoveTarget(null);
   };
@@ -301,7 +301,7 @@ export default function Products() {
     });
     if (error) return showToast('Ошибка: ' + error.message);
     await load();
-    showToast('📋 Товар скопирован');
+    showToast('Товар скопирован');
   };
 
   const restore = (id) => {
@@ -310,7 +310,7 @@ export default function Products() {
     setProducts(list);
     load();
     setShowModal(false);
-    showToast('🔄 Товар восстановлен');
+    showToast('Товар восстановлен');
   };
 
   const toggleCol = (id) => {
@@ -772,7 +772,7 @@ export default function Products() {
                   <table>
                     <thead>
                       <tr>
-                        <th style={{width:'50%',textAlign:'left',paddingLeft:0}}>Товар</th>
+                        <th style={{width:'50%'}}>Товар</th>
                         <th style={{width:'25%'}}>Статус</th>
                         <th style={{width:'25%'}}></th>
                       </tr>
@@ -782,25 +782,24 @@ export default function Products() {
                         const daysLeft = Math.max(0, 30 - Math.floor((Date.now() - p.deletedAt) / 86400000));
                         return (
                           <tr key={p.id}>
-                            <td>
+                            <td style={{textAlign:'left'}}>
                               <div className="prod-name">{p.name}</div>
                               <div className="prod-sku">{p.sku || '—'}</div>
                             </td>
                             <td style={{fontSize:'.75rem',color:'#555'}}>ещё {daysLeft} дн.</td>
                             <td style={{textAlign:'right'}}>
-                              <button className="act-btn" onClick={() => {
-                                let list = getProducts();
+                              <button className="act-btn" onClick={async () => {
                                 let trash = getTrash();
                                 const idx = trash.findIndex(x => x.id === p.id);
                                 if (idx > -1) {
-                                  const item = { ...trash[idx], hidden: false };
+                                  const item = { ...trash[idx] };
                                   delete item.deletedAt;
-                                  list.push(item);
+                                  delete item.id;
+                                  await supabase.from('products').insert({ ...item, user_id: user.id });
                                   trash.splice(idx, 1);
-                                  setProducts(list);
                                   setTrash(trash);
                                   load();
-                                  showToast('🔄 Товар восстановлен');
+                                  showToast('Товар восстановлен');
                                 }
                               }} style={{color:'var(--primary)',background:'transparent',border:'none',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'var(--font)',padding:'.25rem .5rem',borderRadius:'var(--radius)'}}>Восстановить</button>
                             </td>
@@ -819,11 +818,10 @@ export default function Products() {
       {/* Toast */}
       {toast && (
         <div id="toast" style={{
-          position:'fixed', bottom:'1.5rem', left:'50%', transform:'translateX(-50%)',
+          position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
           background:'#fff', border:'1px solid #e5e7eb', borderRadius:'.75rem',
           padding:'.65rem 1.2rem', fontSize:'.85rem', color:'#333',
-          boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)', zIndex:9999,
-          display:'flex', alignItems:'center', gap:'.5rem'
+          boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)', zIndex:9999
         }}>
           {toast}
         </div>
