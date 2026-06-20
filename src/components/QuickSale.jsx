@@ -228,10 +228,10 @@ export default function QuickSale({ onClose }) {
 
           {/* Способ оплаты */}
           <div className="form-group" ><label>Способ оплаты</label>
-          <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
+          <div style={{display:'flex',flexDirection:'column',gap:'4px',marginBottom:'10px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                    flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
+                    width:'100%', padding:'8px 10px', borderRadius:'8px', border:'1.5px solid #eee', textAlign:'left',
                     background: payMode === a.id ? '#111' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
                     fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', minWidth:'60px'
