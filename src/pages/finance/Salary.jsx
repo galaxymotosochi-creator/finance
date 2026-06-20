@@ -311,15 +311,15 @@ export default function Salary() {
             ) : list.map(s => (
               <tr key={s.id}>
                 <td><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}</div></td>
-                <td style={{fontSize:'.82rem',whiteSpace:'nowrap'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td style={{whiteSpace:'nowrap'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
-                <td style={{color:s.bonus_amount>0?'#16a34a':'',whiteSpace:'nowrap'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{color:s.deduct_amount>0?'#dc2626':'',whiteSpace:'nowrap'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{whiteSpace:'nowrap'}}>{Number(s.amount).toLocaleString()} ₽</td>
-                <td>{(s.status==='pending'||s.status==='accrued')
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} ₽</td>
+                <td style={{color:'#555'}}>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
-                  : <span className="prod-cat" style={{background:STATUS_COLORS[s.status]+'20',color:STATUS_COLORS[s.status]}}>{STATUS_LABELS[s.status]||s.status}</span>}</td>
+                  : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <button className="act-btn prod-edit-btn" onClick={()=>openEdit(s)}>Ред.</button>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">

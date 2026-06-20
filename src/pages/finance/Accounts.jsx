@@ -231,9 +231,9 @@ export default function Accounts() {
                         </div>
                       </td>
                       <td>{in0.toLocaleString()} ₽</td>
-                      <td style={{color:'#16a34a'}}>+{mv.i.toLocaleString()} ₽</td>
-                      <td style={{color:'#dc2626'}}>−{mv.e.toLocaleString()} ₽</td>
-                      <td style={{color:bl>=0?'#16a34a':'#dc2626'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
+                      <td style={{color:'#555'}}>+{mv.i.toLocaleString()} ₽</td>
+                      <td style={{color:'#555'}}>−{mv.e.toLocaleString()} ₽</td>
+                      <td style={{color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
                         {!isSys(a) && (
@@ -384,7 +384,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
                           </td>
-                          <td style={{textAlign:'center',color:t.type==='income'?'#16a34a':'#dc2626'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
+                          <td style={{textAlign:'center',color:'#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
                         </tr>
                       );
                     });

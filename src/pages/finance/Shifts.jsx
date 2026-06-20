@@ -156,8 +156,8 @@ export default function Shifts() {
                   <td style={{textAlign:'center'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
                   <td style={{textAlign:'center',color:'var(--muted)'}}>Основная</td>
                   <td style={{textAlign:'center',fontWeight:400}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
-                  <td style={{textAlign:'center',color:'var(--muted)'}}>{timeClose}</td>
-                  <td style={{textAlign:'center'}}><span style={{fontSize:'.72rem',fontWeight:400,padding:'2px 8px',borderRadius:'100px',background:isOpen?'#f0fdf4':'#f5f5f5',color:isOpen?'#16a34a':'#999'}}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
+                  <td style={{textAlign:'center',color:'#555'}}>{timeClose}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
                 </tr>
               );
             })}
