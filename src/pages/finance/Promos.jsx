@@ -202,7 +202,7 @@ export default function Promos() {
             </div>
             <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
             <div className="prod-more-wrap">
-              <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open')}}>⋯</button>
+              <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
               <div className="prod-dropdown">
                 <button onClick={function(e){e.stopPropagation();openEdit(p)}}>Редактировать</button>
                 <button onClick={function(e){e.stopPropagation();del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
@@ -225,7 +225,7 @@ export default function Promos() {
                 <div style={{fontSize:'.8rem',color:'var(--muted)'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</div>
               </div>
               <div className="prod-more-wrap">
-                <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open')}}>⋯</button>
+                <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
                 <div className="prod-dropdown">
                   <button onClick={function(){openEdit(p)}}>Редактировать</button>
                   <button onClick={function(){del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
