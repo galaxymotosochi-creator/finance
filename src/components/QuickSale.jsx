@@ -257,8 +257,7 @@ export default function QuickSale({ onClose }) {
             </div>
           )}
 
-          {/* Не оплачен */}
-          </div>
+
           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
             <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
               <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
