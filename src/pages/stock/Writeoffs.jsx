@@ -101,8 +101,8 @@ export default function Writeoffs() {
             ) : list.map(w => (
               <tr key={w.id}>
                 <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
-                <td style={{whiteSpace:'nowrap'}}>{w.quantity}</td>
-                <td style={{whiteSpace:'nowrap'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}>{w.quantity}</td>
+                <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
                 <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{color:'#555'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
