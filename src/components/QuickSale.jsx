@@ -232,7 +232,8 @@ export default function QuickSale({ onClose }) {
 
         <div style={{padding:'0 24px 12px'}}>
           {/* Способ оплаты */}
-          <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'8px'}}>Способ оплаты</label>
+          <div className="form-group" style={{marginTop:'.5rem'}}>
+            <label>Способ оплаты</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
@@ -257,6 +258,7 @@ export default function QuickSale({ onClose }) {
           )}
 
           {/* Не оплачен */}
+          </div>
           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
             <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
               <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
