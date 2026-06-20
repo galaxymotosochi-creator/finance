@@ -348,12 +348,12 @@ export default function Transactions() {
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', fontWeight: 500, whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? tx.date.split("-").reverse().join(".") : "—"}</td>
-                  <td style={{ padding: '.5rem', fontWeight: 500 }}>{tx.description || '—'}</td>
-                  <td style={{ padding: '.5rem', fontWeight: 600, whiteSpace: 'nowrap', textAlign: 'center', color: tx.type === 'income' ? '#16a34a' : '#dc2626' }}>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? tx.date.split("-").reverse().join(".") : "—"}</td>
+                  <td style={{ padding: '.5rem', color: '#555' }}>{tx.description || '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'center' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
                   </td>
-                  <td style={{ padding: '.5rem', fontWeight: 500, textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'center' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button className="act-btn prod-edit-btn" onClick={function(){editTx(tx)}}>Ред.</button>
