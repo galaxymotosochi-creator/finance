@@ -19,14 +19,17 @@ export default function QuickSale({ onClose }) {
   const [splitAmts, setSplitAmts] = useState({});
   const [toast, setToast] = useState(null);
   const [userName, setUserName] = useState('');
+  const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [pRes, aRes, clRes] = await Promise.all([
+      const [pRes, aRes, clRes, prRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
+        supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (aRes.data) setAccounts(aRes.data);
@@ -39,13 +42,31 @@ export default function QuickSale({ onClose }) {
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); } }, [toast]);
 
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.final_price || i.price) * i.qty, 0);
+
+  const findPromo = (product) => {
+    const today = new Date().toISOString().split('T')[0];
+    return promos.find(p => {
+      if (p.start_date > today || p.end_date < today) return false;
+      if (!p.conditions || !p.conditions.type) return true;
+      const cond = p.conditions;
+      if (cond.type === 'all') return true;
+      if (cond.type === 'category_products') return product.type !== 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'category_services') return product.type === 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'specific_products' || cond.type === 'specific_services') return cond.productIds && cond.productIds.includes(product.id);
+      return false;
+    });
+  };
 
   const addToCart = (p) => {
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
       if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }];
+      const promo = findPromo(p);
+      const origPrice = p.price || 0;
+      const discountPct = promo ? (promo.discount || 0) : 0;
+      const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct }];
     });
   };
 

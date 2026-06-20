@@ -92,17 +92,19 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes, clRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes, prRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
       if (clRes && clRes.data) setClients(clRes.data);
+      if (prRes?.data) setPromos(prRes.data);
       if (sRes.data) setActiveShift(sRes.data);
       else { setOpenShiftCashier(userName); setShowOpenShift(true); }
       // Загружаем остатки склада
@@ -133,11 +135,29 @@ export default function Registers({ fullscreen }) {
     return items;
   }, [products, search, catFilter]);
 
+  const findPromo = (product) => {
+    const today = new Date().toISOString().split('T')[0];
+    return promos.find(p => {
+      if (p.start_date > today || p.end_date < today) return false;
+      if (!p.conditions || !p.conditions.type) return true;
+      const cond = p.conditions;
+      if (cond.type === 'all') return true;
+      if (cond.type === 'category_products') return product.type !== 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'category_services') return product.type === 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'specific_products' || cond.type === 'specific_services') return cond.productIds && cond.productIds.includes(product.id);
+      return false;
+    });
+  };
+
   const addToCart = (p) => {
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
       if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { id: p.id, name: p.name, price: p.price || 0, qty: 1, cat: p.cat || '', free_price: p.free_price || false }];
+      const promo = findPromo(p);
+      const origPrice = p.price || 0;
+      const discountPct = promo ? (promo.discount || 0) : 0;
+      const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct }];
     });
   };
 
@@ -151,7 +171,7 @@ export default function Registers({ fullscreen }) {
     });
   };
 
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.final_price || i.price) * i.qty, 0);
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
 
   const openPay = () => {
@@ -193,6 +213,7 @@ export default function Registers({ fullscreen }) {
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: total,
+      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0),
       status: receiptStatus,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
@@ -210,7 +231,10 @@ export default function Registers({ fullscreen }) {
         return {
           receipt_id: receiptId, product_id: item.id,
           product_name: item.name, quantity: item.qty,
-          price: item.price, total: item.price * item.qty,
+          price: item.price, total: (item.final_price || item.price) * item.qty,
+          discount_percent: item.discount_percent || 0,
+          discount_amount: ((item.price - (item.final_price || item.price)) * item.qty),
+          promo_id: item.promo_id || null,
         };
       });
       var { error: itemsErr } = await supabase.from('receipt_items').insert(receiptItems);
@@ -418,7 +442,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
                   onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
                   style={{width:'80px',textAlign:'right',border:'1.5px solid #e0e0e0',borderRadius:'6px',padding:'4px 6px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
               ) : (
-                <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} ₽</div>
+                <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
               )}
             </div>
           ))}
