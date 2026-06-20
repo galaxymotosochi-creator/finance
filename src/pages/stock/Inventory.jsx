@@ -83,6 +83,7 @@ export default function Inventory() {
   };
 
   const cancelEdit = async () => {
+    if (showResult) { setShowResult(null); setEditing(null); await load(); return; }
     if (editing) { await supabase.from('inventory').delete().eq('id', editing.id); await load(); }
     setEditing(null);
   };
@@ -105,7 +106,6 @@ export default function Inventory() {
 
   const confirmResult = async () => {
     if (!showResult) return;
-    await supabase.from('inventory').update({ status: 'completed' }).eq('id', showResult.id);
     setShowResult(null); setEditing(null); await load();
   };
 
