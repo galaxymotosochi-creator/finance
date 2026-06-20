@@ -507,10 +507,6 @@ export default function Products() {
               onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
             {catOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
-                <div className="cat-dd-actions">
-                  <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
-                  <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
-                </div>
                 <div className="cat-dd-search">
                   <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
                 </div>
@@ -525,6 +521,10 @@ export default function Products() {
                     );
                   })}
                   {cats.length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
+                </div>
+                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
+                  <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
+                  <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
                 </div>
               </div>
             )}
