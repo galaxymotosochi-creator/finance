@@ -240,19 +240,19 @@ export default function Stock() {
                   <td style={{textAlign:'center',color:'#555',fontFamily:'monospace'}}>{p.sku || '—'}</td>
                   <td style={{textAlign:'center',color:'#555'}}>{p.barcode || '—'}</td>
                   <td style={{textAlign:'center',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
-                  <td style={{textAlign:'center'}} className={low ? 'stock-low' : ''}>{qty}</td>
-                  <td style={{textAlign:'center'}}>{costPrice.toLocaleString()}</td>
-                  <td style={{textAlign:'center'}}>
+                  <td style={{textAlign:'center',color:'#555'}} className={low ? 'stock-low' : ''}>{qty}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{costPrice.toLocaleString()}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>
                     <span className="editable-price"
                       style={{cursor:'pointer',color:'#555',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
                       onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
                   </td>
-                  <td style={{textAlign:'center'}}>
+                  <td style={{textAlign:'center',color:'#555'}}>
                     <span className={`markup-badge${markup >= 0 ? '' : ' neg'}`}>
                       {markup >= 0 ? '+' : ''}{markup.toLocaleString()}{markupPct ? ` (${markupPct}%)` : ''}
                     </span>
                   </td>
-                  <td style={{textAlign:'center'}}>{sumValue.toLocaleString()}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{sumValue.toLocaleString()}</td>
                 </tr>
               );
             })}
