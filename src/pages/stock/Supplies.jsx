@@ -253,16 +253,16 @@ const load = async () => {
               const payColor = PAY_COLORS[payStatus]||'#dc2626';
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left'}}>
+                  <td style={{textAlign:'left',color:'#555'}}>
                     <div className="prod-name" style={{cursor:'pointer',borderBottom:'1px dashed var(--border)',display:'inline-block'}}
                       onClick={() => setViewId(prev => prev === s.id ? null : s.id)}>{s.invoice||'—'}</div>
                     <div className="prod-sku">{totalItems(s)} поз.</div>
                   </td>
                   <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
-                  <td style={{whiteSpace:'nowrap'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
-                  <td style={{whiteSpace:'nowrap'}}><span>{supSt}</span></td>
-                  <td style={{whiteSpace:'nowrap'}}><span>{paySt}</span></td>
-                  <td style={{whiteSpace:'nowrap'}}>{s.date||'—'}</td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}><span>{supSt}</span></td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}><span>{paySt}</span></td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.date||'—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     {payStatus !== 'paid' && <button className="act-btn prod-edit-btn" onClick={() => setShowPay(s.id)}>Оплатить</button>}
                     <button className="act-btn prod-edit-btn" onClick={() => edit(s.id)}>Ред.</button>
