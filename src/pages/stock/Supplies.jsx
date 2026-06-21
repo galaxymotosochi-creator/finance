@@ -264,6 +264,7 @@ const load = async () => {
           <thead id="supplyColHeaders">
             <tr>
               <th>№ накладной</th>
+              <th>Кол-во</th>
               <th>Поставщик</th>
               <th>Сумма</th>
               <th>Поставка</th>
@@ -274,7 +275,7 @@ const load = async () => {
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
+              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.map(s => {
               const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0);
               const payStatus = getPayStatus(s);
@@ -287,8 +288,8 @@ const load = async () => {
                   <td style={{textAlign:'left',color:'#555'}}>
                     <div className="prod-name" style={{cursor:'pointer',borderBottom:'1px dashed var(--border)',display:'inline-block'}}
                       onClick={() => setViewId(prev => prev === s.id ? null : s.id)}>{s.invoice||'—'}</div>
-                    <div className="prod-sku">{totalItems(s)} поз.</div>
                   </td>
+                  <td style={{textAlign:'center',color:'#555'}}>{totalItems(s)}</td>
                   <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
                   <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td style={{whiteSpace:'nowrap'}}>
