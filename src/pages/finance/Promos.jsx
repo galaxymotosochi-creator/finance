@@ -118,14 +118,13 @@ export default function Promos() {
     try {
       if (editId) {
         await supabase.from('promos').update(data).eq('id', editId);
+        setPromos(prev => prev.map(p => p.id === editId ? { ...p, ...data } : p));
       } else {
-        const { data: inserted } = await supabase.from('promos').insert(data).select();
-        if (inserted && inserted.length > 0) {
-          setPromos(prev => [...prev, inserted[0]]);
-        }
+        await supabase.from('promos').insert(data);
       }
       setEditId(null);
       setShow(false);
+      await load();
       setToast(editId ? 'Акция успешно сохранена!' : 'Акция успешно добавлена!');
     } catch (err) { alert(err.message); }
   };
