@@ -117,7 +117,7 @@ export default function Promos() {
         const { error } = await supabase.from('promos').update(data).eq('id', editId);
         if (error) return alert(error.message);
       } else {
-        const { error } = await supabase.from('promos').insert({ ...data, id: Date.now() });
+        const { error } = await supabase.from('promos').insert(data);
         if (error) return alert(error.message);
       }
       setEditId(null);
