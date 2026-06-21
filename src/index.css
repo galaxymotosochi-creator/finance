@@ -499,6 +499,7 @@ body {
 .prod-edit-btn:hover { background: #f5f5f5; }
 .prod-more-btn { font-size: .8rem; font-weight: 600; padding: .2rem .3rem; background: none; border: none; cursor: pointer; font-family: var(--font); color: var(--muted); }
 .prod-more-btn:hover { color: var(--body-color); }
+.prod-more-wrap { display: inline-block; position: relative; }
 .prod-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 2px; background: var(--body-bg); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); z-index: 50; min-width: 130px; padding: .25rem 0; }
 .prod-dropdown.open { display: block; }
 .prod-dropdown button { display: block; width: 100%; text-align: left; padding: .4rem .7rem; font-size: .75rem; font-family: var(--font); border: none; background: none; cursor: pointer; color: var(--body-color); }
