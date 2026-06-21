@@ -731,9 +731,12 @@ export default function Products() {
                   </select>
                 </div>
               </div>}
-              <div className="form-group">
-                <label>Минимальный остаток</label>
-                <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
+              <div className="form-row">
+                <div className="form-group" style={{maxWidth:'250px'}}>
+                  <label>Минимальный остаток</label>
+                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
+                </div>
+                <div className="form-group" style={{border:'none'}}></div>
               </div>
               <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
                 <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} style={{width:'16px',height:'16px',cursor:'pointer',margin:0}} />
