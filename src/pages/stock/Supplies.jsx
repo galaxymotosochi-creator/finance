@@ -304,10 +304,9 @@ const load = async () => {
               const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
               const payColor = PAY_COLORS[payStatus]||'#dc2626';
               return (
-                <tr key={s.id}>
+                <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setViewId(s.id)}} style={{cursor:'pointer'}}>
                   <td style={{textAlign:'left',color:'#555'}}>
-                    <div className="prod-name" style={{cursor:'pointer',borderBottom:'1px dashed var(--border)',display:'inline-block'}}
-                      onClick={() => setViewId(prev => prev === s.id ? null : s.id)}>{s.invoice||'—'}</div>
+                    <div className="prod-name">{s.invoice||'—'}</div>
                   </td>
                   <td style={{textAlign:'center',color:'#555'}}>{totalItems(s)}</td>
                   <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
@@ -355,12 +354,11 @@ const load = async () => {
         const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
         const payColor = PAY_COLORS[payStatus]||'#dc2626';
         return (
-          <div className="promo-detail" style={{marginTop:'.5rem'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.5rem'}}>
-              <div style={{fontSize:'.9rem',fontWeight:600}}>Поставка №{s.invoice||''}</div>
-              <span style={{cursor:'pointer',color:'var(--muted)',fontSize:'1.1rem'}} onClick={() => setViewId(null)}>✕</span>
-            </div>
-            <div style={{marginBottom:'.5rem',fontSize:'.82rem'}}>
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setViewId(null)}}>
+            <div className="modal-box" style={{maxWidth:'480px'}}>
+              <button className="modal-close" onClick={() => setViewId(null)}>&times;</button>
+              <h2>Поставка №{s.invoice||''}</h2>
+              <div className="sub" style={{marginBottom:'.5rem'}}>
               <div><span style={{color:'var(--muted)'}}>Поставщик:</span> {s.supplier_name||'—'}</div>
               <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginBottom:'.25rem'}}><span style={{color:'var(--muted)'}}>Статус поставки:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
               <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{color:'var(--muted)'}}>Статус оплаты:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:payStatus!=='paid'?'pointer':'default'}} onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span></div>
@@ -398,7 +396,9 @@ const load = async () => {
         );
       })()}
 
-      {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
+            </div>
+          </div>
+              {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
       {showModal && (
         <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&(setShowModal(false),setFItems([]),setFAddSearch(''))}>
           <div className="modal-box">
