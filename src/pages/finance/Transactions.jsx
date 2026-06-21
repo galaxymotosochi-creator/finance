@@ -43,6 +43,7 @@ export default function Transactions() {
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
   const [toast, setToast] = useState(null);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
 
@@ -205,7 +206,8 @@ export default function Transactions() {
       setExpAmount('');
       setExpDate(new Date().toISOString().split('T')[0]);
       setExpCategory('');
-      setToast('✅ ' + (isEdit ? 'Транзакция обновлена' : 'Транзакция добавлена'));
+      if (isEdit) { setToast('✅ Сумма успешно изменена!'); }
+      else { setToast('✅ ' + (pendingTx.type === 'income' ? 'Доход' : 'Расход') + ' успешно добавлен!'); }
     } catch (err) { alert(err.message); }
   };
 
@@ -365,7 +367,7 @@ export default function Transactions() {
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={function(){editTx(tx)}}>Редактировать</button>
-                        <button onClick={async function(){await remove(tx.id);setToast('✅ Транзакция удалена')}} style={{color:'#dc3545'}}>Удалить</button>
+                        <button onClick={async function(){await remove(tx.id);setToast('✅ Транзакция успешно удалена!')}} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>
                   </td>
@@ -438,7 +440,7 @@ export default function Transactions() {
                   {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод на счет '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
                 ]);
                 setShowTransfer(false); setTrAmt(''); await refresh();
-                setToast('✅ Перевод выполнен');
+                setToast('✅ Перевод успешно выполнен!');
               } catch(err) {alert(err.message);}
             }}>
               <div className="form-group">
@@ -485,7 +487,7 @@ export default function Transactions() {
                 } else {
                   update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
-                  setToast('✅ Доход обновлён');
+                  setToast('✅ Сумма успешно изменена!');
                 }
               }else{
                 setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
@@ -540,7 +542,7 @@ export default function Transactions() {
                 } else {
                   update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
-                  setToast('✅ Расход обновлён');
+                  setToast('✅ Сумма успешно изменена!');
                 }
               }else{
                 setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
