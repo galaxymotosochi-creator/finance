@@ -349,23 +349,25 @@ export default function Promos() {
                   <div className="form-group">
                     <label>{targetType === 'specific_services' ? 'Поиск услуг' : 'Поиск товаров'}</label>
                     <input type="text" placeholder="Поиск..." value={targetSearch} onChange={e => setTargetSearch(e.target.value)} />
-                    <div style={{maxHeight:'120px',overflowY:'auto',marginTop:'.25rem',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem',outline:'none'}}>
-                      {(targetSearch ? products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')) : []).map(p => {
-                        const checked = targetProducts.includes(p.id);
-                        return (
-                          <div key={p.id} onClick={() => setTargetProducts(prev => checked ? prev.filter(x => x !== p.id) : [...prev, p.id])}
-                            style={{display:'flex',alignItems:'center',gap:'6px',padding:'.3rem .4rem',cursor:'pointer',borderRadius:'4px',fontSize:'.78rem'}}
-                            onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
-                            onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-                            <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:'pointer',margin:0}} />
-                            <span>{p.name}</span>
-                          </div>
-                        );
-                      })}
-                      {targetSearch && (targetSearch ? products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')) : []).length === 0 && (
-                        <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.75rem',textAlign:'center'}}>Ничего не найдено</div>
-                      )}
-                    </div>
+                    {targetSearch && (
+                      <div style={{maxHeight:'120px',overflowY:'auto',marginTop:'.25rem',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem'}}>
+                        {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).map(p => {
+                          const checked = targetProducts.includes(p.id);
+                          return (
+                            <div key={p.id} onClick={() => setTargetProducts(prev => checked ? prev.filter(x => x !== p.id) : [...prev, p.id])}
+                              style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .4rem',cursor:'pointer',borderRadius:'4px',fontSize:'.78rem'}}
+                              onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
+                              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                              <input type="checkbox" checked={checked} onChange={()=>{}} style={{width:'14px',height:'14px',cursor:'pointer',margin:0,flexShrink:0}} />
+                              <span>{p.name}</span>
+                            </div>
+                          );
+                        })}
+                        {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).length === 0 && (
+                          <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.75rem',textAlign:'center'}}>Ничего не найдено</div>
+                        )}
+                      </div>
+                    )}
                     {targetProducts.length > 0 && <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>Выбрано: {targetProducts.length}</div>}
                   </div>
                 )}
