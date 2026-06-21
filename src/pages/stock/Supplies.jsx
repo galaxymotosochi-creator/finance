@@ -357,6 +357,18 @@ const load = async () => {
             <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',display:'flex',justifyContent:'space-between',fontWeight:600,fontSize:'.85rem'}}>
               <span>Итого:</span><span>{total.toFixed(2)}₽</span>
             </div>
+            {(s.payments||[]).length > 0 && (
+              <div style={{marginTop:'.5rem',borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
+                <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',marginBottom:'.25rem'}}>Платежи</div>
+                {(s.payments||[]).map((p,i) => (
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:'.78rem',padding:'.1rem 0'}}>
+                    <span style={{color:'#555'}}>{p.date}</span>
+                    <span style={{color:'#555'}}>{p.method}</span>
+                    <span style={{fontWeight:600,color:'#16a34a'}}>-{Number(p.amount).toLocaleString()} ₽</span>
+                  </div>
+                ))}
+              </div>
+            )}
             {(s.paid||0) < total && (
               <div style={{display:'flex',justifyContent:'space-between',color:'#dc2626',fontSize:'.82rem'}}>
                 <span>Долг:</span><span>{(total-(s.paid||0)).toFixed(2)}₽</span>
