@@ -151,8 +151,11 @@ export default function Registers({ fullscreen }) {
   };
 
   const addToCart = (p) => {
+    const stock = stockMap[p.id] || 0;
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
+      const currentQty = ex ? ex.qty : 0;
+      if (currentQty >= stock && p.type !== 'service') { setToast('На складе только ' + stock + ' шт'); return prev; }
       if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
       const promo = findPromo(p);
       const origPrice = p.price || 0;
