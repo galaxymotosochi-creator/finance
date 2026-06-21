@@ -86,7 +86,7 @@ export default function Stock() {
     }
   }, [toast]);
 
-  let items = products.filter(p => stockMap[p.id] && stockMap[p.id].qty > 0);
+  let items = products.filter(p => p && stockMap[p.id] !== undefined).sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
   const q = search.toLowerCase().trim();
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
 
