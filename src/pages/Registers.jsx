@@ -561,7 +561,6 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
           ))}
         </div>
       </div>
-<<<<<<< Updated upstream
 
       </div>
 
@@ -1088,22 +1087,4 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
       })()}
     </div>
   );
-=======
-    </div>
-    {showOpenShift && (
-      <div className="modal-overlay active" onClick={() => setShowOpenShift(false)}>
-        <div className="modal-box" style={{maxWidth:'380px'}}>
-          <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
-          <h2>Открытие смены</h2>
-          <div className="sub">Для работы кассы необходимо открыть смену</div>
-          <form onSubmit={e => { e.preventDefault(); openShift(); }}>
-            <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
-            <div className="form-group"><label>Остаток денег на начало дня (руб)</label><input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus /></div>
-            <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
-          </form>
-        </div>
-      </div>
-    )}
-  </div>
->>>>>>> Stashed changes
 }
