@@ -28,9 +28,9 @@ export default function Promos() {
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
-    const { data: pData } = await supabase.from('promos').select('*').order('start_date');
-    if (pData) setPromos(pData);
     if (!user) return;
+    const { data: pData } = await supabase.from('promos').select('*').eq('user_id', user.id).order('start_date');
+    if (pData) setPromos(pData);
     const { data: cData } = await supabase.from('stock_categories').select('*').eq('user_id', user.id);
     if (cData) setCategories(cData);
     const { data: prData } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
