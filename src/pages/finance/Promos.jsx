@@ -234,40 +234,62 @@ export default function Promos() {
         const p = promos.find(x => x.id === detail);
         if (!p) return null;
         const s = status(p);
+        const cond = p.conditions || {};
+        let matchedProducts = [];
+        if (cond.type === 'all' || !cond.type) matchedProducts = products;
+        else if (cond.type === 'category_products') matchedProducts = products.filter(x => x.type !== 'service' && x.cat === categories.find(c => c.id === parseInt(cond.catId))?.name);
+        else if (cond.type === 'specific_products') matchedProducts = products.filter(x => cond.productIds && cond.productIds.includes(x.id));
+        else if (cond.type === 'specific_services') matchedProducts = products.filter(x => cond.productIds && cond.productIds.includes(x.id));
+        else if (cond.type === 'category_services') matchedProducts = products.filter(x => x.type === 'service' && x.cat === categories.find(c => c.id === parseInt(cond.catId))?.name);
+        const sc = s === 'active' ? '#16a34a' : s === 'planned' ? '#92400e' : '#9ca3af';
+        const sb = s === 'active' ? '#dcfce7' : s === 'planned' ? '#fef3c7' : '#f1f3f5';
         return (
-          <div className="promo-detail">
-            <div style={{display:'flex',alignItems:'flex-start',gap:'.75rem'}}>
-              <div style={{fontSize:'2.5rem'}}>🔥</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:'1.1rem',fontWeight:600}}>{p.name}</div>
-                <div style={{fontSize:'.8rem',color:'var(--muted)'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</div>
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setDetail(null);setStats(null)}}}>
+            <div className="modal-box" style={{maxWidth:'520px'}}>
+              <button className="modal-close" onClick={function(){setDetail(null);setStats(null)}}>&times;</button>
+              <h2>{p.name}</h2>
+              <div className="sub" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+                <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
+                <span>💰 {p.discount}%</span>
+                <span>📅 {fmtDate(p.start_date)} — {fmtDate(p.end_date)}</span>
+                <span>🎯 {targetLabel(p)}</span>
               </div>
-              <div className="prod-more-wrap">
+              {p.description && <div style={{fontSize:'.82rem',color:'var(--muted)',margin:'0 0 .75rem'}}>{p.description}</div>}
+
+              {stats && (
+                <div style={{display:'flex',gap:'.5rem',marginBottom:'.75rem'}}>
+                  <div style={{flex:1,background:'#f0fdf4',borderRadius:'.5rem',padding:'.5rem .65rem',fontSize:'.78rem'}}>
+                    <div style={{color:'var(--muted)'}}>Применений</div>
+                    <div style={{fontWeight:700,fontSize:'1.1rem'}}>{stats.usageCount}</div>
+                  </div>
+                  <div style={{flex:1,background:'#fef2f2',borderRadius:'.5rem',padding:'.5rem .65rem',fontSize:'.78rem'}}>
+                    <div style={{color:'var(--muted)'}}>Скидка</div>
+                    <div style={{fontWeight:700,fontSize:'1.1rem',color:'#dc2626'}}>-{stats.totalDiscount.toLocaleString()} ₽</div>
+                  </div>
+                </div>
+              )}
+
+              <div style={{fontSize:'.82rem',fontWeight:600,marginBottom:'.35rem'}}>Товары под акцией ({matchedProducts.length})</div>
+              <div style={{maxHeight:'200px',overflowY:'auto',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem'}}>
+                {matchedProducts.length === 0 ? (
+                  <div style={{padding:'.5rem',textAlign:'center',color:'var(--muted)',fontSize:'.78rem'}}>Нет товаров</div>
+                ) : matchedProducts.slice(0,50).map(x => (
+                  <div key={x.id} style={{display:'flex',justifyContent:'space-between',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.78rem'}}>
+                    <span>{x.name}</span>
+                    <span style={{color:'var(--muted)'}}>{x.price ? x.price.toLocaleString()+' ₽' : '—'}</span>
+                  </div>
+                ))}
+                {matchedProducts.length > 50 && <div style={{padding:'.3rem .5rem',textAlign:'center',color:'var(--muted)',fontSize:'.72rem'}}>... и ещё {matchedProducts.length - 50}</div>}
+              </div>
+
+              <div className="prod-more-wrap" style={{position:'absolute',top:'.75rem',right:'3rem'}}>
                 <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
                 <div className="prod-dropdown">
-                  <button onClick={function(){openEdit(p)}}>Редактировать</button>
-                  <button onClick={function(){del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
+                  <button onClick={function(){setDetail(null);setStats(null);openEdit(p)}}>Редактировать</button>
+                  <button onClick={function(){setDetail(null);setStats(null);del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
                 </div>
               </div>
             </div>
-            <div style={{display:'flex',gap:'1.5rem',marginTop:'.75rem',fontSize:'.82rem'}}>
-              <span>💰 Скидка: <strong>{p.discount}%</strong></span>
-              <span>📅 {fmtDate(p.start_date)} — {fmtDate(p.end_date)}</span>
-              <span>🎯 {targetLabel(p)}</span>
-            </div>
-            {p.description && <div style={{fontSize:'.82rem',color:'var(--muted)',marginTop:'.5rem'}}>{p.description}</div>}
-            {stats && stats.usageCount > 0 && (
-              <div style={{marginTop:'.75rem',padding:'.5rem .65rem',background:'#f0fdf4',borderRadius:'.5rem',fontSize:'.78rem'}}>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span>Применений:</span>
-                  <span style={{fontWeight:600}}>{stats.usageCount}</span>
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between',marginTop:'.15rem'}}>
-                  <span>Сумма скидки:</span>
-                  <span style={{fontWeight:600,color:'#dc2626'}}>-{stats.totalDiscount.toLocaleString()} ₽</span>
-                </div>
-              </div>
-            )}
           </div>
         );
       })()}
