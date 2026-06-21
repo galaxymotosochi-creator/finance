@@ -72,6 +72,12 @@ export default function Promos() {
     return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0') === today;
   };
 
+  const fmtDate = (d) => {
+    if (!d) return '—';
+    const parts = d.split('-');
+    return parts.length === 3 ? parts[2] + '.' + parts[1] + '.' + parts[0] : d;
+  };
+
   const openAdd = () => {
     setEditId(null); setName(''); setDiscount(''); setStart(today); setEnd(''); setDesc('');
     setTargetType('all'); setTargetCat(''); setTargetProducts([]); setTargetSearch('');
@@ -209,7 +215,7 @@ export default function Promos() {
             <div style={{fontSize:'2rem'}}>🔥</div>
             <div style={{flex:1}}>
               <div style={{fontWeight:600,fontSize:'.85rem'}}>{p.name}</div>
-              <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{p.start_date} — {p.end_date}</div>
+              <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{fmtDate(p.start_date)} — {fmtDate(p.end_date)}</div>
               <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>{targetLabel(p)}</div>
             </div>
             <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
@@ -246,7 +252,7 @@ export default function Promos() {
             </div>
             <div style={{display:'flex',gap:'1.5rem',marginTop:'.75rem',fontSize:'.82rem'}}>
               <span>💰 Скидка: <strong>{p.discount}%</strong></span>
-              <span>📅 {p.start_date} — {p.end_date}</span>
+              <span>📅 {fmtDate(p.start_date)} — {fmtDate(p.end_date)}</span>
               <span>🎯 {targetLabel(p)}</span>
             </div>
             {p.description && <div style={{fontSize:'.82rem',color:'var(--muted)',marginTop:'.5rem'}}>{p.description}</div>}
