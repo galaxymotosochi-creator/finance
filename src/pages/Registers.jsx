@@ -824,7 +824,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
                 <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
                 <div className="form-group"><label>Остаток денег на начало дня</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                    <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus style={{flex:1}} />
+                    <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus />
                     {cashRegBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
                   </div>
                 </div>
