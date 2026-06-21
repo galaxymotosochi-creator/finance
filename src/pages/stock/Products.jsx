@@ -144,6 +144,7 @@ export default function Products() {
   const [fWeight, setFWeight] = useState('0');
   const [fWeightUnit, setFWeightUnit] = useState('кг');
   const [fDesc, setFDesc] = useState('');
+  const [fMinQty, setFMinQty] = useState('');
   const [fHidden, setFHidden] = useState(false);
 
   // Dropdowns
