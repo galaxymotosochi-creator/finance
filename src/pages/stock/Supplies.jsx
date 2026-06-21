@@ -536,7 +536,7 @@ const load = async () => {
                     </select>
                   </div>
                 </div>
-                <div style={{fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',marginBottom:'.5rem',fontWeight:500,marginTop:'.25rem'}} onClick={function(){setPaySplit(!paySplit);if(!paySplit)setSplitAmts({})}}>{paySplit ? '− Отменить разделение' : '+ Разделить'}</div>
+                <div style={{fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',marginBottom:'.5rem',fontWeight:500,marginTop:'.25rem'}} onClick={function(){setPaySplit(!paySplit);if(!paySplit)setSplitAmts({})}}>+ Разделить</div>
                 {paySplit && <div style={{padding:'.5rem 0',borderTop:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:'.35rem',marginBottom:'.5rem'}}>
                   {payAccounts.map(function(a){
                     return (
