@@ -29,12 +29,9 @@ export default function Promos() {
 
   const load = async () => {
     if (!user) return;
-    const { data: pData } = await supabase.from('promos').select('*').eq('user_id', user.id).order('start_date');
-    if (pData) setPromos(pData);
-    const { data: cData } = await supabase.from('stock_categories').select('*').eq('user_id', user.id);
-    if (cData) setCategories(cData);
-    const { data: prData } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
-    if (prData) setProducts(prData);
+    try { const { data: pData } = await supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'); if (pData) setPromos(pData); } catch(e) {}
+    try { const { data: cData } = await supabase.from('stock_categories').select('*').eq('user_id', user.id); if (cData) setCategories(cData); } catch(e) {}
+    try { const { data: prData } = await supabase.from('products').select('*').eq('user_id', user.id).order('name'); if (prData) setProducts(prData); } catch(e) {}
   };
   useEffect(() => { if (user) load(); }, [user]);
 
@@ -120,11 +117,14 @@ export default function Promos() {
         await supabase.from('promos').update(data).eq('id', editId);
         setPromos(prev => prev.map(p => p.id === editId ? { ...p, ...data } : p));
       } else {
-        await supabase.from('promos').insert(data);
+        const { data: inserted } = await supabase.from('promos').insert(data).select();
+        load();
+        if (inserted && inserted.length > 0) {
+          setPromos(prev => { const exists = prev.find(p => p.id === inserted[0].id); return exists ? prev : [...prev, inserted[0]]; });
+        }
       }
       setEditId(null);
       setShow(false);
-      await load();
       setToast(editId ? 'Акция успешно сохранена!' : 'Акция успешно добавлена!');
     } catch (err) { alert(err.message); }
   };
