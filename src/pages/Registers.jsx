@@ -235,7 +235,7 @@ export default function Registers({ fullscreen }) {
       // Сохраняем товары чека
       var receiptItems = cart.map(function(item) {
         return {
-          receipt_id: receiptId, product_id: item.id,
+          receipt_id: receiptId,
           product_name: item.name, quantity: item.qty,
           price: item.price, total: (item.final_price || item.price) * item.qty,
           discount_percent: item.discount_percent || 0,

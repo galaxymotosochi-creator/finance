@@ -116,7 +116,7 @@ export default function QuickSale({ onClose }) {
     if (newReceipt) {
       var receiptItems = cart.map(function(item) {
         return {
-          receipt_id: newReceipt.id, product_id: item.id,
+          receipt_id: newReceipt.id,
           product_name: item.name, quantity: item.qty,
           price: item.price, total: item.price * item.qty,
         };
