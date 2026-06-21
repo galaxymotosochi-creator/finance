@@ -164,12 +164,13 @@ const load = async () => {
   };
 
   const addItem = () => {
-    const prodId = parseInt(fAddProd);
-    if (!prodId) return alert('Выберите товар');
+    const idStr = fAddProd.trim();
+    if (!idStr) return showToast('Выберите товар');
+    const prod = products.find(p => String(p.id) === idStr);
+    if (!prod) return showToast('Товар не найден');
     const qty = parseFloat(fAddQty) || 1;
     const cost = parseFloat(fAddCost) || 0;
-    const prod = products.find(p => p.id === prodId);
-    setFItems(prev => [...prev, { prodId, name: prod ? prod.name : 'Товар', qty, cost }]);
+    setFItems(prev => [...prev, { prodId: prod.id, name: prod.name, qty, cost }]);
     setFAddProd(''); setFAddQty(''); setFAddCost(''); setFAddSearch('');
   };
 
