@@ -613,7 +613,7 @@ export default function Transactions() {
                 );
               })}
             </div>}
-            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end"}}>
+            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end",width:'100%'}}>
               <button onClick={function(){confirmTx()}}
                 style={{padding:".45rem 1.2rem",fontSize:".8rem",fontWeight:700,borderRadius:"100px",border:"none",cursor:"pointer",background:"#ffdd2d",color:"#111",fontFamily:"var(--font)"}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
