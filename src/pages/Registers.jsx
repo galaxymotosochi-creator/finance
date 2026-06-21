@@ -140,8 +140,8 @@ export default function Registers({ fullscreen }) {
       if (!p.conditions || !p.conditions.type) return true;
       const cond = p.conditions;
       if (cond.type === 'all') return true;
-      if (cond.type === 'category_products') return product.type !== 'service' && String(cond.catId) === String(product.cat_id || product.cat);
-      if (cond.type === 'category_services') return product.type === 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'category_products') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type !== 'service' && cn && cn === product.cat; }
+      if (cond.type === 'category_services') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type === 'service' && cn && cn === product.cat; }
       if (cond.type === 'specific_products' || cond.type === 'specific_services') return cond.productIds && cond.productIds.includes(product.id);
       return false;
     });

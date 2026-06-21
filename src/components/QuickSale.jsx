@@ -17,6 +17,7 @@ export default function QuickSale({ onClose }) {
   const [payUnpaid, setPayUnpaid] = useState(false);
   const [paySplit, setPaySplit] = useState(false);
   const [splitAmts, setSplitAmts] = useState({});
+  const [allCats, setAllCats] = useState([]);
   const [toast, setToast] = useState(null);
   const [userName, setUserName] = useState('');
   const [promos, setPromos] = useState([]);
@@ -24,15 +25,17 @@ export default function QuickSale({ onClose }) {
 
   useEffect(() => {
     (async () => {
-      const [pRes, aRes, clRes] = await Promise.all([
+      const [pRes, aRes, clRes, catRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
+        supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (aRes.data) setAccounts(aRes.data);
       if (clRes?.data) setClients(clRes.data);
+      if (catRes?.data) setAllCats(catRes.data);
       const { data: profile } = await supabase.from('user_profiles').select('name').eq('user_id', user.id).maybeSingle();
       if (profile?.name) setUserName(profile.name);
       setLoading(false);
@@ -50,8 +53,8 @@ export default function QuickSale({ onClose }) {
       if (!p.conditions || !p.conditions.type) return true;
       const cond = p.conditions;
       if (cond.type === 'all') return true;
-      if (cond.type === 'category_products') return product.type !== 'service' && String(cond.catId) === String(product.cat_id || product.cat);
-      if (cond.type === 'category_services') return product.type === 'service' && String(cond.catId) === String(product.cat_id || product.cat);
+      if (cond.type === 'category_products') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type !== 'service' && cn && cn === product.cat; }
+      if (cond.type === 'category_services') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type === 'service' && cn && cn === product.cat; }
       if (cond.type === 'specific_products' || cond.type === 'specific_services') return cond.productIds && cond.productIds.includes(product.id);
       return false;
     });
