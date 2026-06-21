@@ -18,6 +18,7 @@ export default function Settings() {
   
   // Load saved settings on mount
   useEffect(() => {
+    if (!user) return;
     const savedCompany = localStorage.getItem('settings_company');
     if (savedCompany) setCompany(prev => ({...prev, ...JSON.parse(savedCompany)}));
     const savedCountry = localStorage.getItem('settings_country');
@@ -56,7 +57,7 @@ export default function Settings() {
         }
       } catch(e) { /* Таблица может отсутствовать */ }
     })();
-  }, []);
+  }, [user]);
   const [tzDrop, setTzDrop] = useState(false);
   const cityTz = {
     'Москва':'Europe/Moscow','Санкт-Петербург':'Europe/Moscow','Новосибирск':'Asia/Novosibirsk',
