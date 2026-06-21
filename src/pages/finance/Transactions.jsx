@@ -205,6 +205,7 @@ export default function Transactions() {
       setExpAmount('');
       setExpDate(new Date().toISOString().split('T')[0]);
       setExpCategory('');
+      setToast('✅ ' + (isEdit ? 'Транзакция обновлена' : 'Транзакция добавлена'));
     } catch (err) { alert(err.message); }
   };
 
@@ -364,7 +365,7 @@ export default function Transactions() {
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={function(){editTx(tx)}}>Редактировать</button>
-                        <button onClick={function(){remove(tx.id)}} style={{color:'#dc3545'}}>Удалить</button>
+                        <button onClick={async function(){await remove(tx.id);setToast('✅ Транзакция удалена')}} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>
                   </td>
@@ -437,6 +438,7 @@ export default function Transactions() {
                   {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод на счет '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
                 ]);
                 setShowTransfer(false); setTrAmt(''); await refresh();
+                setToast('✅ Перевод выполнен');
               } catch(err) {alert(err.message);}
             }}>
               <div className="form-group">
@@ -483,6 +485,7 @@ export default function Transactions() {
                 } else {
                   update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
+                  setToast('✅ Доход обновлён');
                 }
               }else{
                 setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
@@ -537,6 +540,7 @@ export default function Transactions() {
                 } else {
                   update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
+                  setToast('✅ Расход обновлён');
                 }
               }else{
                 setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
