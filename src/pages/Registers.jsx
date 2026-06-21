@@ -176,6 +176,8 @@ export default function Registers({ fullscreen }) {
   };
 
   const total = cart.reduce((s, i) => s + (i.final_price || i.price) * i.qty, 0);
+  const totalOriginal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
 
   const openPay = () => {
@@ -454,8 +456,20 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
 
         {/* Итого и оплата */}
         <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
+            {discountTotal > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#999'}}>
+                <span>Итого:</span>
+                <span style={{textDecoration:'line-through',color:'#bbb'}}>{totalOriginal.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {discountTotal > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#16a34a'}}>
+                <span>Скидка:</span>
+                <span>-{discountTotal.toLocaleString()} ₽</span>
+              </div>
+            )}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'12px',color:'#999'}}>ИТОГО:</span>
+              <span style={{fontSize:'12px',color:'#999'}}>К оплате:</span>
               <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
             </div>
             <div style={{display:'flex',gap:'8px'}}>
