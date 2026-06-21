@@ -224,10 +224,10 @@ export default function Receipts() {
           <div className="modal-box" style={{ maxWidth: '480px' }}>
             <button className="modal-close" onClick={() => { setSelectedReceipt(null); setReceiptItems([]); }}>&times;</button>
             <h2>Чек #{selectedReceipt.receipt_number}</h2>
-            <div className="sub" style={{ marginBottom: '.5rem' }}>
+            <div className="sub">
               {formatDate(selectedReceipt.date)}
-              {selectedReceipt.cashier_name ? ' · ' + selectedReceipt.cashier_name : ''}
-              {selectedReceipt.client_name ? ' · ' + selectedReceipt.client_name : ''}
+              {selectedReceipt.cashier_name ? ' • Кассир: ' + selectedReceipt.cashier_name : ''}
+              {selectedReceipt.client_name ? ' • Клиент: ' + selectedReceipt.client_name : ''}
             </div>
 
             {/* Позиции */}
