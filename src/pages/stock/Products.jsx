@@ -243,7 +243,7 @@ export default function Products() {
       name: fName.trim(), cat: fCat, price: price, unit: fUnit,
       sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
       weight: parseFloat(fWeight) || 0, weight_unit: fWeightUnit,
-      user_id: user.id, description: fDesc,
+      min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
       hidden: editId ? fHidden : false
     };
     if (editId) {
