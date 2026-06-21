@@ -230,18 +230,15 @@ export default function Stock() {
               const sumValue = costPrice * qty;
               const markup = retailPrice - costPrice;
               const markupPct = costPrice > 0 ? Math.round((markup / costPrice) * 100) : 0;
-              const low = qty <= 5;
-
               return (
                 <tr key={p.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{color:'#555'}}>{p.name}</span>
-                    {low && <span> ⚠</span>}
                   </td>
                   <td style={{textAlign:'center',color:'#555',fontFamily:'monospace'}}>{p.sku || '—'}</td>
                   <td style={{textAlign:'center',color:'#555'}}>{p.barcode || '—'}</td>
                   <td style={{textAlign:'center',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
-                  <td style={{textAlign:'center',color:'#555'}} className={low ? 'stock-low' : ''}>{qty}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>{qty}</td>
                   <td style={{textAlign:'center',color:'#555'}}>
                     {p.min_qty > 0 ? (
                       <span style={{color: qty >= p.min_qty ? '#16a34a' : '#dc2626',fontWeight:500}}>
