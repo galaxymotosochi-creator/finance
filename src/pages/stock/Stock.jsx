@@ -270,7 +270,6 @@ export default function Stock() {
                 <td></td>
                 <td></td>
                 <td></td>
-                <td></td>
                 <td style={{textAlign:'center',fontWeight:700}}>{totalQty}</td>
                 <td></td>
                 <td></td>
