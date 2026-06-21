@@ -332,44 +332,44 @@ export default function Promos() {
                   <option value="specific_products">На конкретные товары</option>
                   <option value="specific_services">На конкретные услуги</option>
                 </select>
-                {(targetType === 'category_products' || targetType === 'category_services') && (
-                  <div className="form-group">
-                    <label>Выберите категорию</label>
-                    <select value={targetCat} onChange={e => setTargetCat(e.target.value)}>
-                      <option value="">— выберите —</option>
-                      {categories.filter(c => c.type === (targetType === 'category_products' ? 'product' : 'service')).map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                {(targetType === 'specific_products' || targetType === 'specific_services') && (
-                  <div className="form-group">
-                    <label>{targetType === 'specific_services' ? 'Поиск услуг' : 'Поиск товаров'}</label>
-                    <input type="text" placeholder="Поиск..." value={targetSearch} onChange={e => setTargetSearch(e.target.value)} />
-                    {targetSearch && (
-                      <div style={{maxHeight:'120px',overflowY:'auto',marginTop:'.25rem',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem'}}>
-                        {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).map(p => {
-                          const checked = targetProducts.includes(p.id);
-                          return (
-                            <div key={p.id} onClick={() => setTargetProducts(prev => checked ? prev.filter(x => x !== p.id) : [...prev, p.id])}
-                              style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .4rem',cursor:'pointer',borderRadius:'4px',fontSize:'.78rem'}}
-                              onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
-                              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-                              <input type="checkbox" checked={checked} onChange={()=>{}} style={{width:'14px',height:'14px',cursor:'pointer',margin:0,flexShrink:0}} />
-                              <span>{p.name}</span>
-                            </div>
-                          );
-                        })}
-                        {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).length === 0 && (
-                          <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.75rem',textAlign:'center'}}>Ничего не найдено</div>
-                        )}
-                      </div>
-                    )}
-                    {targetProducts.length > 0 && <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>Выбрано: {targetProducts.length}</div>}
-                  </div>
-                )}
               </div>
+              {(targetType === 'category_products' || targetType === 'category_services') && (
+                <div className="form-group">
+                  <label>Выберите категорию</label>
+                  <select value={targetCat} onChange={e => setTargetCat(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {categories.filter(c => c.type === (targetType === 'category_products' ? 'product' : 'service')).map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {(targetType === 'specific_products' || targetType === 'specific_services') && (
+                <div className="form-group">
+                  <label>{targetType === 'specific_services' ? 'Поиск услуг' : 'Поиск товаров'}</label>
+                  <input type="text" placeholder="Поиск..." value={targetSearch} onChange={e => setTargetSearch(e.target.value)} />
+                  {targetSearch && (
+                    <div style={{maxHeight:'120px',overflowY:'auto',marginTop:'.25rem',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem'}}>
+                      {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).map(p => {
+                        const checked = targetProducts.includes(p.id);
+                        return (
+                          <div key={p.id} onClick={() => setTargetProducts(prev => checked ? prev.filter(x => x !== p.id) : [...prev, p.id])}
+                            style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.25rem .35rem',cursor:'pointer',borderRadius:'4px',fontSize:'.78rem'}}
+                            onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
+                            onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                            <input type="checkbox" checked={checked} onChange={()=>{}} style={{width:'14px',height:'14px',cursor:'pointer',margin:0,flexShrink:0,display:'block'}} />
+                            <span>{p.name}</span>
+                          </div>
+                        );
+                      })}
+                      {products.filter(p => p.name.toLowerCase().includes(targetSearch.toLowerCase()) && p.type === (targetType === 'specific_products' ? 'product' : 'service')).length === 0 && (
+                        <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.75rem',textAlign:'center'}}>Ничего не найдено</div>
+                      )}
+                    </div>
+                  )}
+                  {targetProducts.length > 0 && <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>Выбрано: {targetProducts.length}</div>}
+                </div>
+              )}
               <div style={{marginBottom:'.75rem'}}>
                 <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>
                 <div style={{display:'flex',alignItems:'center',gap:'.75rem',background:'#f8f9fa',borderRadius:'.75rem',padding:'.75rem'}}>
