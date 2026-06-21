@@ -180,7 +180,7 @@ const load = async () => {
     e.preventDefault();
     if (!fItems.length) return alert('Добавьте хотя бы один товар');
     const total = fItems.reduce((acc, it) => acc + it.qty * it.cost, 0);
-    const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, paid: parseFloat(fPaid) || 0, date: new Date().toISOString().split('T')[0] };
+    const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, paid: 0, date: new Date().toISOString().split('T')[0] };
     if (editId) {
       await supabase.from('supplies').update(obj).eq('id', editId);
     } else { await supabase.from('supplies').insert({ ...obj, id: Date.now() }); }
@@ -472,10 +472,7 @@ const load = async () => {
                     <option value="received">Оприходовано</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Оплачено (₽)</label>
-                  <input type="number" value={fPaid} onChange={e=>setFPaid(e.target.value)} placeholder="0" min="0" step="0.01" />
-                </div>
+
               </div>
               <div style={{textAlign:'right',marginTop:'10px'}}>
                 <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести</button>
