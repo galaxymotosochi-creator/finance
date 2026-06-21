@@ -624,8 +624,8 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
             <h2 style={{marginBottom:'16px',fontSize:'1.15rem',fontWeight:700}}>Чек №{(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
 
             {/* Выбор счёта */}
-            <div style={{marginBottom:'14px'}}>
-              <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'8px'}}>Способ оплаты</label>
+            <div className="form-group">
+              <label>Способ оплаты</label>
               <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
                 {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
                   <button key={a.id} onClick={() => setPayMode(a.id)} style={{
@@ -659,8 +659,8 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
               </div>
             )}
             
-            <div style={{marginBottom:'12px'}}>
-              <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Клиент</label>
+            <div className="form-group">
+              <label>Клиент</label>
               <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
                 <div style={{position:'relative',flex:1}}>
                   <input type="text" placeholder="Поиск по имени или телефону..." 
@@ -668,7 +668,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
                     onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
                     onFocus={() => setClientDrop(true)}
                     onBlur={() => setTimeout(() => setClientDrop(false), 200)}
-                    style={{width:'100%',border:'1px solid #eee',borderRadius:'6px',padding:'8px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxSizing:'border-box'}} />
+                    style={{width:'100%'}} />
                   {clientDrop && (
                     <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
