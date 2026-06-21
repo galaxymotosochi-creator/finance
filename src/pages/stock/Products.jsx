@@ -731,7 +731,7 @@ export default function Products() {
                 </div>
               </div>}
               <div className="form-group">
-                <label>Мин. остаток</label>
+                <label>Минимальный остаток</label>
                 <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0 — не проверять" />
               </div>
               <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
