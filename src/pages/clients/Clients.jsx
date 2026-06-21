@@ -188,7 +188,6 @@ export default function Clients() {
                   <td style={{color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -197,6 +196,7 @@ export default function Clients() {
                         dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => openEdit(c)}>Редактировать</button>
                         <button onClick={() => remove(c.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>

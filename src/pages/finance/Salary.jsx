@@ -321,10 +321,10 @@ export default function Salary() {
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
                   : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                  <button className="act-btn prod-edit-btn" onClick={()=>openEdit(s)}>Ред.</button>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
                     <div className="prod-dropdown">
+                      <button onClick={()=>openEdit(s)}>Редактировать</button>
                       <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>

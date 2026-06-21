@@ -354,7 +354,6 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'center' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <button className="act-btn prod-edit-btn" onClick={function(){editTx(tx)}}>Ред.</button>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){
                         e.stopPropagation();
@@ -364,6 +363,7 @@ export default function Transactions() {
                         setTimeout(function(){document.addEventListener('click',h)}, 10);
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={function(){editTx(tx)}}>Редактировать</button>
                         <button onClick={function(){remove(tx.id)}} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>

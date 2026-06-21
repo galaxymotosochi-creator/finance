@@ -126,7 +126,6 @@ export default function Suppliers() {
                   <td style={{color:'#555'}}>{supplyCount}</td>
                   <td style={{color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <button className="act-btn prod-edit-btn" onClick={() => openEdit(s)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -135,6 +134,7 @@ export default function Suppliers() {
                         dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => openEdit(s)}>Редактировать</button>
                         <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>

@@ -108,11 +108,6 @@ export default function Writeoffs() {
                 <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{color:'#555'}}>{w.date||'—'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                  <button className="act-btn prod-edit-btn" onClick={() => {
-                    setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));
-                    setFReason(w.reason||'Списание'); setFDate(w.date||new Date().toISOString().split('T')[0]);
-                    setShow(true);
-                  }}>Ред.</button>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
                       e.stopPropagation();
@@ -121,6 +116,11 @@ export default function Writeoffs() {
                       dd.classList.toggle('open');
                     }}>⋯</button>
                     <div className="prod-dropdown">
+                      <button onClick={() => {
+                        setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));
+                        setFReason(w.reason||'Списание'); setFDate(w.date||new Date().toISOString().split('T')[0]);
+                        setShow(true);
+                      }}>Редактировать</button>
                       <button onClick={() => remove(w.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>

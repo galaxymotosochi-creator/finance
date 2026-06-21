@@ -635,7 +635,6 @@ export default function Products() {
                   return null;
                 })}
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                  <button className="act-btn prod-edit-btn" onClick={() => openEdit(p)}>Ред.</button>
                   <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
                       e.stopPropagation();
@@ -645,6 +644,7 @@ export default function Products() {
                       var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                     }}>⋯</button>
                     <div className="prod-dropdown">
+                      <button onClick={() => openEdit(p)}>Редактировать</button>
                       <button onClick={() => copyP(p.id)}>Копировать</button>
                       {p.hidden ? (
                         <button onClick={() => unhide(p.id)}>Восстановить</button>

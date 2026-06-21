@@ -295,7 +295,6 @@ const load = async () => {
                   <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.date||'—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     {payStatus !== 'paid' && <button className="act-btn prod-edit-btn" onClick={() => setShowPay(s.id)}>Оплатить</button>}
-                    <button className="act-btn prod-edit-btn" onClick={() => edit(s.id)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -304,6 +303,7 @@ const load = async () => {
                         dd.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => edit(s.id)}>Редактировать</button>
                         <button onClick={() => copy(s.id)}>Копировать</button>
                         <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>

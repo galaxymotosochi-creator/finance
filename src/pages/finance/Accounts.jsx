@@ -235,13 +235,15 @@ export default function Accounts() {
                       <td style={{color:'#555'}}>−{mv.e.toLocaleString()} ₽</td>
                       <td style={{color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                        <button className="act-btn prod-edit-btn" onClick={()=>openEdit(a)}>Ред.</button>
-                        {!isSys(a) && (
+                        {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                             <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
-                            <div className="prod-dropdown"><button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button></div>
+                            <div className="prod-dropdown">
+                              <button onClick={()=>openEdit(a)}>Редактировать</button>
+                              <button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button>
+                            </div>
                           </div>
-                        )}
+                        ) : null}
                       </td>
                     </tr>
                   );

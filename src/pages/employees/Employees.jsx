@@ -194,7 +194,6 @@ export default function Employees() {
                   <td style={{color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
                   <td style={{color:'#555'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <button className="act-btn prod-edit-btn" onClick={() => openEdit(emp)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={e => {
                         e.stopPropagation();
@@ -202,6 +201,7 @@ export default function Employees() {
                         e.currentTarget.nextElementSibling.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => openEdit(emp)}>Редактировать</button>
                         <button onClick={() => remove(emp.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>

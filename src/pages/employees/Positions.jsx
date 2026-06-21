@@ -183,7 +183,6 @@ export default function Positions() {
                     {formatPermissions(p)}
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>
-                    <button className="act-btn prod-edit-btn" style={{marginRight:'4px'}} onClick={() => openEdit(p)}>Ред.</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -192,6 +191,7 @@ export default function Positions() {
                         dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => openEdit(p)}>Редактировать</button>
                         <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>

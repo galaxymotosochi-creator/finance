@@ -370,7 +370,6 @@ export default function Timesheet() {
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                      <button className="act-btn prod-edit-btn" onClick={() => openDayByDateStr(e.date)}>Ред.</button>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                         <button className="act-btn prod-more-btn" onClick={(ev) => {
                           ev.stopPropagation();
@@ -379,6 +378,7 @@ export default function Timesheet() {
                           dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                         }}>⋯</button>
                         <div className="prod-dropdown">
+                          <button onClick={() => openDayByDateStr(e.date)}>Редактировать</button>
                           <button onClick={() => deleteEntry(e.id)} style={{color:'#dc3545'}}>Удалить</button>
                         </div>
                       </div>

@@ -130,7 +130,6 @@ export default function Categories() {
                 <td><div className="prod-name">{c.name}</div></td>
                 <td><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                  <button className="act-btn prod-edit-btn" onClick={() => openEdit(c)}>Ред.</button>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
                       e.stopPropagation();
@@ -139,6 +138,7 @@ export default function Categories() {
                       dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                     }}>⋯</button>
                     <div className="prod-dropdown">
+                      <button onClick={() => openEdit(c)}>Редактировать</button>
                       <button onClick={() => remove(c.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>

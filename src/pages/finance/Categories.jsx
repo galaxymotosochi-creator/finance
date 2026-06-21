@@ -142,10 +142,10 @@ export default function Categories() {
                   <td><div className="prod-name" >{c.name}</div></td>
                   <td><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <button className="act-btn prod-edit-btn" onClick={function () { openModal(c); }}>Ред.</button>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={function () { openModal(c); }}>Редактировать</button>
                         <button onClick={function () { remove(c.id); }} style={{ color: '#dc3545' }}>Удалить</button>
                       </div>
                     </div>
