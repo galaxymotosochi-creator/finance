@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const tables = ['products', 'categories', 'stock_categories', 'transactions', 'accounts',
       'shifts', 'employees', 'position_templates', 'timesheet_entries', 'salary',
       'supplies', 'writeoffs', 'suppliers', 'inventory', 'clients', 'loyalty',
-      'user_profiles', 'initial_stocks'];
+      'user_profiles', 'initial_stocks', 'promos'];
 
     const result = {};
     for (const table of tables) {
