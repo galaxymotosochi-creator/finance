@@ -114,11 +114,11 @@ export default function Promos() {
     };
     try {
       if (editId) {
-        await supabase.from('promos').update(data).eq('id', editId);
-        setPromos(prev => prev.map(p => p.id === editId ? { ...p, ...data } : p));
+        const { error } = await supabase.from('promos').update(data).eq('id', editId);
+        if (error) return alert(error.message);
       } else {
-        const { data: ret } = await supabase.from('promos').insert(data).select();
-        if (ret && ret[0]) setPromos(prev => [...prev, ret[0]]);
+        const { error } = await supabase.from('promos').insert({ ...data, id: Date.now() });
+        if (error) return alert(error.message);
       }
       setEditId(null);
       setShow(false);
