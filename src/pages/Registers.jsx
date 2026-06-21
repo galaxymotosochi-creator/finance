@@ -332,6 +332,21 @@ export default function Registers({ fullscreen }) {
           reason: 'Продажа', date: date, created_at: new Date().toISOString()
         });
       } catch(e) { console.error('Ошибка списания со склада:', e); }
+      // Обновляем stockMap после списания
+      Promise.all([
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('writeoffs').select('items').eq('user_id', user.id),
+      ]).then(function(rr){
+        var sm = {};
+        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
+          if (!sm[it.prodId]) sm[it.prodId] = 0;
+          sm[it.prodId] += it.qty || 0;
+        });});
+        (rr[1].data||[]).forEach(function(wo){ (wo.items||[]).forEach(function(it){
+          if (sm[it.prodId]) sm[it.prodId] -= it.qty || 0;
+        });});
+        setStockMap(sm);
+      });
     }
     
     setCart([]); setShowPay(false); setPayMode(null);
