@@ -31,7 +31,7 @@ export default function Clients() {
       const { data } = await supabase.from('clients').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       if (data) setClientsState(data);
     } catch (e) { /* таблица еще не создана */ }
-    setSalesState(getSales());
+    const salesData = await getSales(user?.id); setSalesState(salesData);
     try { const { data: a } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('name'); if (a) setAccounts(a); } catch(e) {}
     setLoading(false);
   };
