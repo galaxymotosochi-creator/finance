@@ -19,9 +19,11 @@ function buildStockMap(supplies, initial) {
     Object.keys(initial.items).forEach(id => {
       const q = parseInt(initial.items[id]) || 0;
       const c = (initial.costs && parseInt(initial.costs[id])) || 0;
-      if (!map[id]) map[id] = { qty: 0, cost: 0 };
-      map[id].qty += q;
-      map[id].cost += c * q;
+      if (q > 0) {
+        if (!map[id]) map[id] = { qty: 0, cost: 0 };
+        map[id].qty += q;
+        map[id].cost += c * q;
+      }
     });
   }
   return map;
@@ -84,7 +86,7 @@ export default function Stock() {
     }
   }, [toast]);
 
-  let items = products.filter(p => p).sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
+  let items = products.filter(p => p && stockMap[p.id] !== undefined).sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
   const q = search.toLowerCase().trim();
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
 
