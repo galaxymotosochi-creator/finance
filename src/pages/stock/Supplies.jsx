@@ -292,11 +292,11 @@ const load = async () => {
                   <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
                   <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td style={{whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:supColor,background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:"#e8e8e8",cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
                   </td>
                   <td style={{whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:payColor,background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:"#e8e8e8",cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
                   <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.date||'—'}</td>
@@ -341,8 +341,8 @@ const load = async () => {
             </div>
             <div style={{marginBottom:'.5rem',fontSize:'.82rem'}}>
               <div><span style={{color:'var(--muted)'}}>Поставщик:</span> {s.supplier_name||'—'}</div>
-              <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginBottom:'.25rem'}}><span style={{color:'var(--muted)'}}>Статус поставки:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:supColor,background:supColor+'18',cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
-              <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{color:'var(--muted)'}}>Статус оплаты:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:payColor,background:payColor+'18',cursor:payStatus!=='paid'?'pointer':'default'}} onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span></div>
+              <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginBottom:'.25rem'}}><span style={{color:'var(--muted)'}}>Статус поставки:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:"#e8e8e8",cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
+              <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{color:'var(--muted)'}}>Статус оплаты:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:"#e8e8e8",cursor:payStatus!=='paid'?'pointer':'default'}} onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span></div>
               <div><span style={{color:'var(--muted)'}}>Дата:</span> {s.date||'—'}</div>
             </div>
             <div style={{fontSize:'.78rem',fontWeight:600,color:'var(--muted)',paddingTop:'.5rem',borderTop:'1px solid var(--border)'}}>Товары</div>
