@@ -53,6 +53,8 @@ export default function Stock() {
   const [suppliesCache, setSuppliesCache] = useState([]);
   const [initialCache, setInitialCache] = useState(null);
   const [productsFromDB, setProductsFromDB] = useState([]);
+  const [selectedCats, setSelectedCats] = useState(null);
+  const [catOpen, setCatOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -86,7 +88,18 @@ export default function Stock() {
     }
   }, [toast]);
 
-  let items = products.filter(p => p && stockMap[p.id] !== undefined).sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
+  useEffect(() => {
+    const handler = (e) => { if (!e.target.closest('.stock-filter-links') && !e.target.closest('div[style*="position:absolute"]')) setCatOpen(false); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
+  let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort();
+  let items = products.filter(p => p && stockMap[p.id] !== undefined);
+  if (selectedCats && selectedCats.size > 0) {
+    items = items.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || 'Без категории'));
+  }
+  items = items.sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
   const q = search.toLowerCase().trim();
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
 
@@ -189,10 +202,25 @@ export default function Stock() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
-        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto'}}>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Категории</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Счет</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}>+ Фильтр</span>
+        <div style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',position:'relative'}}>
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:selectedCats&&selectedCats.size>0?600:400,color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
+            onClick={e=>{e.stopPropagation();setCatOpen(!catOpen)}}>Категории</span>
+          {catOpen && (
+            <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+              {allCats.map(cat => {
+                const checked = selectedCats && selectedCats.has(cat);
+                return (
+                  <div key={cat} onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}
+                    style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.78rem',color:'#555',background:'transparent'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='#f5f5f5'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <input type="checkbox" checked={!!checked} onChange={()=>{}} style={{accentColor:'var(--secondary)',cursor:'pointer',margin:0}} />
+                    {cat}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
