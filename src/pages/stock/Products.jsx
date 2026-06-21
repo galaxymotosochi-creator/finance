@@ -730,14 +730,18 @@ export default function Products() {
                   </select>
                 </div>
               </div>}
-              <div className="form-group">
-                <label>Минимальный остаток</label>
-                <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0 — не проверять" />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Минимальный остаток</label>
+                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
+                </div>
+                <div className="form-group" style={{display:'flex',alignItems:'flex-end',paddingBottom:'.35rem'}}>
+                  <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,cursor:'pointer',color:'#555'}}>
+                    <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
+                    Продавать по свободной цене
+                  </label>
+                </div>
               </div>
-              <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
-                <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
-                Продавать по свободной цене
-              </label>
               <div className="form-group">
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
