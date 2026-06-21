@@ -305,11 +305,9 @@ export default function Promos() {
                 <label>Название</label>
                 <input type="text" placeholder="Например: Новогодняя распродажа" value={name} onChange={e=>setName(e.target.value)} required />
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Скидка (%)</label>
-                  <input type="number" placeholder="10" min="0" max="100" value={discount} onChange={e=>setDiscount(e.target.value)} />
-                </div>
+              <div className="form-group">
+                <label>Скидка (%)</label>
+                <input type="number" placeholder="10" min="0" max="100" value={discount} onChange={e=>setDiscount(e.target.value)} />
               </div>
               <div className="form-row">
                 <div className="form-group">
