@@ -20,6 +20,8 @@ function getPayStatus(s) {
 
 export default function Supplies() {
   const { user } = useAuth();
+  const [paySplit, setPaySplit] = useState(false);
+  const [splitAmts, setSplitAmts] = useState({});
   const loc = useLocation();
   const [supplies, setSuppliesState] = useState([]);
   const [products, setProducts] = useState([]);
@@ -219,26 +221,44 @@ const load = async () => {
 
   const confirmPay = async (e) => {
     e.preventDefault();
-    const amount = parseFloat(document.getElementById('payAmount').value) || 0;
-    const acId = document.getElementById('payMethod').value;
-    if (amount <= 0) return alert('Введите сумму');
-    if (!acId) return alert('Выберите счет');
     const s = supplies.find(x => x.id === showPay);
     if (!s) return;
-    // Проверяем баланс счета
-    var ac = payAccounts.find(function(a){return a.id === acId;});
-    var bal = parseFloat(ac?.balance)||0;
-    payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
-    if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ₽');
-    // Создаем транзакцию расхода
-    var { error } = await supabase.from('transactions').insert({
-      user_id: user.id, account_id: acId, type: 'expense', amount: amount,
-      description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
-    });
-    if (error) return alert('Ошибка: ' + error.message);
-    if (!s.payments) s.payments = [];
-    s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
-    await supabase.from('supplies').update({ paid: (s.paid||0) + amount }).eq('id', showPay); await load(); setShowPay(null);
+    const total = s.total || (s.items||[]).reduce((sum,it)=>sum+it.qty*it.cost,0) || 0;
+    const paid = s.paid || 0;
+    const debt = total - paid;
+    if (paySplit) {
+      for (const ac of payAccounts) {
+        const amt = parseFloat(splitAmts[ac.id]) || 0;
+        if (amt <= 0) continue;
+        var bal = parseFloat(ac.balance)||0;
+        payTxList.forEach(function(t){if(t.account_id===ac.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
+        if (bal < amt) return alert('Недостаточно средств на '+ac.name+'. Доступно: ' + bal.toLocaleString() + ' ₽');
+        await supabase.from('transactions').insert({
+          user_id: user.id, account_id: ac.id, type: 'expense', amount: amt,
+          description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
+        });
+        if (!s.payments) s.payments = [];
+        s.payments.push({ amount: amt, method: ac.name, date: new Date().toLocaleDateString('ru-RU') });
+      }
+    } else {
+      const amount = parseFloat(document.getElementById('payAmount').value) || 0;
+      const acId = document.getElementById('payMethod').value;
+      if (amount <= 0) return alert('Введите сумму');
+      if (!acId) return alert('Выберите счет');
+      var ac = payAccounts.find(function(a){return a.id === acId;});
+      var bal = parseFloat(ac?.balance)||0;
+      payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
+      if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ₽');
+      await supabase.from('transactions').insert({
+        user_id: user.id, account_id: acId, type: 'expense', amount: amount,
+        description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
+      });
+      if (!s.payments) s.payments = [];
+      s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
+    }
+    const totalPaid = (s.payments||[]).reduce((sum,p) => sum + (parseFloat(p.amount)||0), 0);
+    await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay);
+    await load(); setShowPay(null); setPaySplit(false); setSplitAmts({});
     showToast('Оплата проведена');
   };
 
