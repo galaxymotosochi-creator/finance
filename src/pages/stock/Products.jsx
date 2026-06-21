@@ -222,7 +222,7 @@ export default function Products() {
     setEditId(null); setMode('add'); setFHidden(false);
     setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
-    setFDesc('');
+    setFMinQty(''); setFDesc('');
     setShowModal(true);
   };
 
@@ -231,7 +231,7 @@ export default function Products() {
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
-    setFWeightUnit(p.weightUnit || 'кг'); setFDesc(p.desc || '');
+    setFWeightUnit(p.weightUnit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
     setShowModal(true);
   };
 
@@ -377,6 +377,7 @@ export default function Products() {
       'Ед. изм.': 'шт',
       'Артикул': '',
       'Штрихкод': '',
+      'Мин. остаток': '',
       'Описание': '',
       'Вес (кг)': '',
     }];
@@ -408,6 +409,7 @@ export default function Products() {
           'штрихкод': 'barcode', 'штрих код': 'barcode', 'штрих-код': 'barcode',
           'описание': 'description', 'desc': 'description',
           'вес': 'weight',
+          'мин. остаток': 'min_qty', 'минимальный остаток': 'min_qty',
           'себестоимость': 'cost', 'закуп': 'cost',
         };
 
@@ -434,12 +436,13 @@ export default function Products() {
             const barcode = (row[headers.find(h => (colMap[h]||'')==='barcode')] || '').toString().trim();
             const description = (row[headers.find(h => (colMap[h]||'')==='description')] || '').toString().trim();
             const weight = parseFloat(row[headers.find(h => (colMap[h]||'')==='weight')]) || 0;
+            const min_qty = parseInt(row[headers.find(h => (colMap[h]||'')==='min_qty')]) || 0;
 
             const { error } = await supabase.from('products').insert({
               id: Date.now() + added, user_id: user.id,
               name, type, cat: cat || null, price, unit: unit || 'шт',
               sku: sku || null, barcode: barcode || genBarcode(),
-              weight, weight_unit: 'кг', description, hidden: false
+              weight, weight_unit: 'кг', description, min_qty, hidden: false
             });
             if (error) { errors++; } else { added++; }
           } catch (e) { errors++; }
@@ -727,6 +730,10 @@ export default function Products() {
                   </select>
                 </div>
               </div>}
+              <div className="form-group">
+                <label>Мин. остаток</label>
+                <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0 — не проверять" />
+              </div>
               <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
                 <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} />
                 Продавать по свободной цене

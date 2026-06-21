@@ -205,6 +205,7 @@ export default function Stock() {
               <th>Штрихкод</th>
               <th>Категория</th>
               <th>Остаток</th>
+              <th>Мин. остаток</th>
               <th>Закуп</th>
               <th>Продажа</th>
               <th>Наценка</th>
@@ -214,7 +215,7 @@ export default function Stock() {
           <tbody id="stockTableBody">
             {items.length === 0 ? (
               <tr>
-                <td colSpan="9">
+                <td colSpan="10">
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
                     <p>Товаров на складе нет</p>
@@ -241,6 +242,13 @@ export default function Stock() {
                   <td style={{textAlign:'center',color:'#555'}}>{p.barcode || '—'}</td>
                   <td style={{textAlign:'center',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
                   <td style={{textAlign:'center',color:'#555'}} className={low ? 'stock-low' : ''}>{qty}</td>
+                  <td style={{textAlign:'center',color:'#555'}}>
+                    {p.min_qty > 0 ? (
+                      <span style={{color: qty >= p.min_qty ? '#16a34a' : '#dc2626',fontWeight:500}}>
+                        {qty >= p.min_qty ? '✓ В норме' : '⚠ -' + (p.min_qty - qty) + ' шт'}
+                      </span>
+                    ) : '—'}
+                  </td>
                   <td style={{textAlign:'center',color:'#555'}}>{costPrice.toLocaleString()}</td>
                   <td style={{textAlign:'center',color:'#555'}}>
                     <span className="editable-price"
@@ -262,7 +270,9 @@ export default function Stock() {
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
                 <td style={{textAlign:'center',fontWeight:700}}>{totalQty}</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
