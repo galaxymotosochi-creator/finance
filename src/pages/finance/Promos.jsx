@@ -357,7 +357,7 @@ export default function Promos() {
                             style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.25rem .35rem',cursor:'pointer',borderRadius:'4px',fontSize:'.78rem'}}
                             onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                             onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-                            <input type="checkbox" checked={checked} onChange={()=>{}} style={{width:'14px',height:'14px',cursor:'pointer',margin:0,flexShrink:0,display:'block'}} />
+                            <input type="checkbox" checked={checked} onChange={()=>{}} style={{width:'14px',height:'14px',cursor:'pointer',margin:0,flexShrink:0,display:'block',outline:'none'}} />
                             <span>{p.name}</span>
                           </div>
                         );
