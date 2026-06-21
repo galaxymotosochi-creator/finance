@@ -325,17 +325,15 @@ export default function Promos() {
                 <label>Описание</label>
                 <textarea placeholder="Условия акции, детали, примечания..." rows="2" value={desc} onChange={e=>setDesc(e.target.value)} />
               </div>
-              <div style={{marginBottom:'.75rem'}}>
-                <label style={{fontSize:'.75rem',fontWeight:500,display:'block',marginBottom:'.35rem'}}>Действует на</label>
-                <div style={{display:'flex',flexDirection:'column',gap:'6px',marginBottom:'.5rem'}}>
-                  {[{id:'all',label:'На все позиции'},{id:'category_products',label:'На категорию товаров'},{id:'category_services',label:'На категорию услуг'},{id:'specific_products',label:'На конкретные товары'},{id:'specific_services',label:'На конкретные услуги'}].map(t => (
-                    <label key={t.id} style={{display:'flex',alignItems:'center',gap:'8px',fontSize:'.78rem',cursor:'pointer',color:'#555'}}>
-                      <input type="radio" name="promo_target" checked={targetType === t.id} onChange={() => setTargetType(t.id)}
-                        style={{accentColor:'var(--secondary)'}} />
-                      {t.label}
-                    </label>
-                  ))}
-                </div>
+              <div className="form-group">
+                <label>Действует на</label>
+                <select value={targetType} onChange={e => setTargetType(e.target.value)}>
+                  <option value="all">На все позиции</option>
+                  <option value="category_products">На категорию товаров</option>
+                  <option value="category_services">На категорию услуг</option>
+                  <option value="specific_products">На конкретные товары</option>
+                  <option value="specific_services">На конкретные услуги</option>
+                </select>
                 {(targetType === 'category_products' || targetType === 'category_services') && (
                   <div className="form-group">
                     <label>Выберите категорию</label>
