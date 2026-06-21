@@ -56,7 +56,6 @@ const menu = [
     label: 'Настройки', icon: 'settings', children: [
       { label: 'Общие', path: '/settings' },
       { label: 'Заведения', path: '/settings/venues' },
-      { label: 'Касса', path: '/settings/registers' },
       { label: 'Управление подпиской', path: '/settings/subscription' },
     ],
   },
