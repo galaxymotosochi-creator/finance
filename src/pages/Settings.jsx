@@ -82,7 +82,7 @@ export default function Settings() {
     <div style={{ fontFamily: "'Inter',sans-serif", color: '#111' }}>
       
       {toast && (
-        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius: 'var(--radius-md)',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
       )}
       <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-.02em' }}>Общие настройки</h1>
       <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 24 }}>Компания, локализация, уведомления и данные</p>
@@ -90,7 +90,7 @@ export default function Settings() {
       {/* 1. Владелец аккаунта */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 16 }}>Владелец аккаунта</h2>
-        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#f8f9fa', borderRadius: 10, fontSize: '.82rem', color: 'var(--muted)' }}>
+        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#f8f9fa', borderRadius: 'var(--radius-md)', fontSize: '.82rem', color: 'var(--muted)' }}>
           Электронная почта: <b style={{color:'#111'}}>{user?.email || '—'}</b>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px 16px' }}>
@@ -102,7 +102,7 @@ export default function Settings() {
             <div key={i}>
               <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
               <input value={val} onChange={e => setter(e.target.value)} placeholder={label}
-                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             </div>
           ))}
         </div>
@@ -115,21 +115,21 @@ export default function Settings() {
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Страна</label>
             <select value={country} onChange={e => { setCountry(e.target.value); setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB'); }}
-              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {countries.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Язык интерфейса</label>
             <select value={lang} onChange={e => setLang(e.target.value)}
-              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {['Русский', 'Казахский', 'Английский'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Валюта по умолчанию</label>
             <select value={currency} onChange={e => setCurrency(e.target.value)}
-              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {['RUB', 'KZT', 'BYN', 'AMD', 'UZS', 'KGS'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
@@ -140,9 +140,9 @@ export default function Settings() {
                 onChange={e => { setTzSearch(e.target.value); setTzDrop(true); }}
                 onFocus={() => setTzDrop(true)}
                 onBlur={() => setTimeout(() => setTzDrop(false), 200)}
-                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               {tzDrop && (
-                <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:10,boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:180,overflowY:'auto',marginTop:2}}>
+                <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius: 'var(--radius-md)',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:180,overflowY:'auto',marginTop:2}}>
                   {Object.entries(cityTz).filter(([city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).map(([city, zone]) => (
                     <div key={city} onMouseDown={() => { setTz(zone); setTzSearch(city); setTzDrop(false); }}
                       style={{padding:'7px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5'}}
@@ -171,7 +171,7 @@ export default function Settings() {
             <div key={i}>
               <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>{label}</label>
               <input value={val} onChange={e => setter(e.target.value)} placeholder={label}
-                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             </div>
           ))}
         </div>
@@ -179,7 +179,7 @@ export default function Settings() {
           <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Email для счетов</label>
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={company.email} onChange={e => setCompany({...company, email: e.target.value})} placeholder="email@company.ru"
-              style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 10, outline: 'none', fontFamily: 'inherit' }} />
+              style={{ flex: 1, padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit' }} />
           </div>
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function Settings() {
           <div style={{ display: 'flex', gap: 8 }}>
             {[['email', 'Email'], ['telegram', 'Telegram'], ['push', 'Push']].map(([key, label]) => (
               <button key={key} onClick={() => setNotifications({...notifications, [key]: !notifications[key]})}
-                style={{ padding: '.4rem .8rem', borderRadius: 100, border: `1.5px solid ${notifications[key] ? '#000' : 'rgba(0,0,0,.12)'}`, background: notifications[key] ? '#000' : 'transparent', color: notifications[key] ? '#fff' : '#555', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
+                style={{ padding: '.4rem .8rem', borderRadius: 'var(--radius-pill)', border: `1.5px solid ${notifications[key] ? '#000' : 'rgba(0,0,0,.12)'}`, background: notifications[key] ? '#000' : 'transparent', color: notifications[key] ? '#fff' : '#555', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
                 {label}
               </button>
             ))}
@@ -213,7 +213,7 @@ export default function Settings() {
 
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-        <button style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
+        <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
         <button onClick={async () => {
             localStorage.setItem('settings_company', JSON.stringify(company));
             localStorage.setItem('settings_country', country);
@@ -232,7 +232,7 @@ export default function Settings() {
               }
             } catch(e) {}
             setToast('Настройки сохранены');
-          }} style={{ padding: '.5rem 1.5rem', borderRadius: 100, border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
+          }} style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
     </div>
   );
