@@ -110,7 +110,7 @@ export default function Promos() {
     const data = {
       user_id: user.id, name: name.trim(), discount: parseFloat(discount)||0,
       start_date: start, end_date: end, description: desc.trim() || ('Скидка '+(parseFloat(discount)||0)+'%'),
-      status: 'active'
+      status: 'active', conditions
     };
     try {
       if (editId) {
