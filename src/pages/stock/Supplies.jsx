@@ -242,7 +242,7 @@ const load = async () => {
       }
     } else {
       const amount = parseFloat(document.getElementById('payAmount').value) || 0;
-      const acId = document.getElementById('payMethod').value;
+      const acId = splitAmts._selected;
       if (amount <= 0) return alert('Введите сумму');
       if (!acId) return alert('Выберите счет');
       var ac = payAccounts.find(function(a){return a.id === acId;});
@@ -523,21 +523,40 @@ const load = async () => {
                 <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontWeight:600}}>Остаток:</span><span style={{color:'#dc2626',fontWeight:700}}>{debt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
               </div>
               <form onSubmit={confirmPay}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Сумма (₽)</label>
-                    <input type="number" id="payAmount" defaultValue={debt>0?debt.toFixed(2):''} min="0" step="0.01" required />
-                  </div>
-                  <div className="form-group">
-                    <label>Счет списания</label>
-                    <select id="payMethod">
-                      <option value="">— выберите счет —</option>
-                      {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} ₽)</option>})}
-                    </select>
-                  </div>
+                <div className="form-group">
+                  <label>Сумма (₽)</label>
+                  <input type="number" id="payAmount" defaultValue={debt>0?debt.toFixed(2):''} min="0" step="0.01" required />
                 </div>
-                <div style={{textAlign:'right',marginTop:'10px'}}>
-                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
+                <div style={{fontSize:'.82rem',fontWeight:600,marginBottom:'.5rem'}}>С какого счета списать?</div>
+                <div style={{display:'flex',flexDirection:'column',gap:'.5rem',marginBottom:'.5rem'}}>
+                  {payAccounts.map(function(a){
+                    var sel = splitAmts._selected === a.id;
+                    var bal = parseFloat(a.balance)||0;
+                    payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
+                    return (
+                      <div key={a.id} onClick={function(){if(!paySplit)setSplitAmts({_selected:a.id})}} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#e8f0ff':'var(--body-bg)',border:'1.5px solid '+(sel?'var(--secondary)':'var(--border)')}}>
+                        <div style={{width:'18px',height:'18px',border:'2px solid '+(sel?'var(--secondary)':'var(--border)'),borderRadius:'50%',flexShrink:0,borderWidth:sel?'6px':'2px'}} />
+                        <span style={{flex:1,fontSize:'.85rem',fontWeight:500}}>{a.name}</span>
+                        <span style={{fontSize:'.82rem',fontWeight:600,color:'#111'}}>{bal.toLocaleString()} ₽</span>
+                      </div>
+                    );
+                  })}
+                  {payAccounts.length === 0 && <div style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.85rem'}}>Нет счетов</div>}
+                </div>
+                <div style={{fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',marginBottom:'.5rem',fontWeight:500}} onClick={function(){setPaySplit(!paySplit);if(!paySplit)setSplitAmts({});else setSplitAmts({})}}>{paySplit ? '− Отменить разделение' : '+ Разделить'}</div>
+                {paySplit && <div style={{padding:'.5rem 0',borderTop:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:'.35rem',marginBottom:'.5rem'}}>
+                  {payAccounts.map(function(a){
+                    return (
+                      <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                        <span style={{flex:1,fontSize:'.8rem',fontWeight:500}}>{a.name}</span>
+                        <input type="number" value={splitAmts[a.id]||''} onChange={function(e){setSplitAmts(function(p){return{...p,[a.id]:e.target.value}})}}
+                          style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+                      </div>
+                    );
+                  })}
+                </div>}
+                <div style={{display:'flex',justifyContent:'flex-end'}}>
+                  <button type="submit" style={{padding:'.45rem 1.2rem',fontSize:'.8rem',fontWeight:700,borderRadius:'100px',border:'none',cursor:'pointer',background:'#ffdd2d',color:'#111',fontFamily:'var(--font)'}}>Оплатить {debt.toLocaleString()} ₽</button>
                 </div>
               </form>
             </div>
