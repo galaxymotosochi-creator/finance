@@ -189,10 +189,12 @@ export default function Transactions() {
           accs = r || [];
         }
         var acct = accs.find(a => a?.id === selectedAcc) || accs[0];
-        if (acct) {
-          if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
-          else await add({ ...txData, account_id: acct.id });
+        if (!acct) {
+          alert('Нет доступных счетов. Сначала создайте счёт в разделе "Финансовые счета".');
+          return;
         }
+        if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
+        else await add({ ...txData, account_id: acct.id });
       }
       setShowAccSelect(false);
       setPendingTx(null);
@@ -491,7 +493,7 @@ export default function Transactions() {
                 }
               }else{
                 setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                setSelectedAcc("cash");setSplitMode(false);setSplitAmounts({cash:0,card:0,transfer:0});setShowAccSelect(true);
+                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
               <div className="form-group">

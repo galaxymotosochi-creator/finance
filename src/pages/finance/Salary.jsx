@@ -82,7 +82,7 @@ export default function Salary() {
         supabase.from('employees').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         user ? supabase.from('accounts').select('*') : Promise.resolve({data:[]}),
       ]);
-      if (salRes.error) { alert('Ошибка загрузки: ' + salRes.error.message); return; }
+      if (salRes.error) { alert('Ошибка загрузки: ' + salRes.error.message); setLoading(false); return; }
       if (salRes.data) setList(salRes.data);
       if (empRes.data) setEmployees(empRes.data);
       if (accRes.data) setAccs(accRes.data);
