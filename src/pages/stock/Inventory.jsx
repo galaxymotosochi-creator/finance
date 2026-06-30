@@ -123,115 +123,7 @@ export default function Inventory() {
   };
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
-  // Режим редактирования
-  if (editing) {
-    const doc = editing;
-    return (
-      <>
-        <div className="page-header">
-          <div>
-            <h1>Инвентаризация</h1>
-            <div className="sub">Сверка фактических остатков с учетными</div>
-          </div>
-          <div className="page-actions">
-            <button className="btn btn-outline" onClick={cancelEdit} style={{fontSize:'.8rem'}}>← Назад</button>
-          </div>
-        </div>
-        <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-
-        <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-          <table>
-            <tbody id="inventoryTableBody">
-              <tr>
-                <td colSpan="5" style={{padding:'.5rem 0 1rem 0'}}>
-                  <div style={{display:'flex',gap:'1.5rem',flexWrap:'wrap',alignItems:'center'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                      <span style={{fontSize:'.78rem',color:'var(--muted)'}}>№</span>
-                      <input type="text" value={doc.number} onChange={e => updateMeta(doc.id, 'number', e.target.value)}
-                        style={{padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.9rem',fontWeight:600,maxWidth:'120px'}} />
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                      <span style={{fontSize:'.78rem',color:'var(--muted)'}}>Дата</span>
-                      <input type="date" value={doc.date} onChange={e => updateMeta(doc.id, 'date', e.target.value)}
-                        style={{padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} />
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                      <span style={{fontSize:'.78rem',color:'var(--muted)'}}>Ответственный</span>
-                      <input type="text" value={doc.responsible||''} onChange={e => updateMeta(doc.id, 'responsible', e.target.value)}
-                        placeholder="ФИО" style={{padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem',maxWidth:'200px'}} />
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr><th className="prod-table-th" style={{textAlign:'left'}}>Товар</th><th className="prod-table-th">Учтено</th><th className="prod-table-th">Факт</th><th className="prod-table-th">Разница</th><th className="prod-table-th">Сумма</th></tr>
-              {doc.items.map((it, idx) => {
-                const diff = it.actual - it.expected;
-                const diffSum = diff * it.cost;
-                return (
-                  <tr key={idx}>
-                    <td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'—'}</div></td>
-                    <td style={{color:'#555'}}><span className="num">{it.expected}</span></td>
-                    <td><input type="number" value={it.actual} min="0" onChange={e => updateItem(doc.id, idx, e.target.value)}
-                      style={{width:'70px',textAlign:'center',padding:'.3rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem',color:'#555'}} /></td>
-                    <td style={{color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{color:'#555'}}><span className="num">{diffSum>0?'+':''}{diffSum.toLocaleString()} ₽</span></td>
-                  </tr>
-                );
-              })}
-              {doc.items.length > 0 && <tr className="total-row">
-                <td style={{fontWeight:600,textAlign:'left',color:'#555'}}>Итого</td>
-                <td></td>
-                <td></td>
-                <td style={{textAlign:'center',fontWeight:700,color:'#555'}}><span className="num">{doc.items.reduce((s,it) => s + (it.actual - it.expected), 0)}</span></td>
-                <td style={{textAlign:'center',fontWeight:700,color:'#555'}}><span className="num">{(doc.totals?.result ?? 0).toLocaleString()} ₽</span></td>
-              </tr>}
-              <tr><td colSpan="5" style={{textAlign:'right',padding:'1rem 0'}}>
-                <button className="btn btn-primary" onClick={() => complete(doc.id)} style={{padding:'.6rem 1.5rem',fontSize:'.85rem'}}>Завершить инвентаризацию</button>
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        {showResult && (
-          <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowResult(null)}>
-            <div className="modal-box" style={{maxWidth:'600px'}}>
-              <button className="modal-close" onClick={()=>setShowResult(null)}>&times;</button>
-              <h2>Итог инвентаризации {showResult.number}</h2>
-              <div className="sub">{showResult.date}{showResult.responsible?' • '+showResult.responsible:''}</div>
-              {(()=>{
-                const t=showResult.totals;
-                const di=showResult.items.filter(it=>it.actual!==it.expected);
-                return (<>
-                  {di.length===0?<div style={{textAlign:'center',padding:'2rem',color:'var(--muted)'}}>✅ Расхождений нет</div>
-                  :<table style={{width:'100%',fontSize:'.85rem',borderCollapse:'collapse'}}>
-                    <thead><tr style={{fontSize:'.72rem',color:'var(--muted)',textTransform:'uppercase'}}>
-                      <th style={{textAlign:'left',padding:'.35rem .3rem'}}>Товар</th><th style={{padding:'.35rem .3rem'}}>Кол-во</th><th style={{padding:'.35rem .3rem'}}>Сумма</th>
-                    </tr></thead>
-                    <tbody>{di.map((it,i)=>{const d=it.actual-it.expected;const ds=d*it.cost;
-                      return <tr key={i}><td style={{padding:'.3rem',textAlign:'left'}}>{it.name}</td>
-                      <td style={{padding:'.3rem',color:'#555'}}>{d>0?'+':''}{d} шт</td>
-                      <td style={{padding:'.3rem',color:'#555'}}>{ds>0?'+':''}{ds.toLocaleString()} ₽</td></tr>;
-                    })}</tbody></table>}
-                  <div style={{display:'flex',flexDirection:'column',gap:'.35rem',fontSize:'.85rem',marginTop:'.75rem',paddingTop:'.5rem',borderTop:'1px solid var(--border)'}}>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Недостача:</span><span style={{color:'#dc2626'}}>{t.shortage.toLocaleString()} ₽</span></div>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Излишек:</span><span style={{color:'#16a34a'}}>{t.surplus.toLocaleString()} ₽</span></div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontWeight:600,borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
-                      <span>Результат:</span><span>{(t?.result ?? 0) > 0 ? '+' : ''}{(t?.result ?? 0).toLocaleString()} ₽</span>
-                    </div>
-                    <div style={{display:'flex',justifyContent:'space-between',marginTop:'.25rem'}}><span style={{color:'var(--muted)'}}>Склад ДО:</span><span>{t.totalBefore.toLocaleString()} ₽</span></div>
-                    <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Склад ПОСЛЕ:</span><span>{t.totalAfter.toLocaleString()} ₽</span></div>
-                  </div>
-                  <div className="modal-actions" style={{marginTop:'1rem'}}><button className="btn btn-primary" onClick={confirmResult}>Подтвердить</button></div>
-                </>);
-              })()}
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
-  // Режим просмотра списка
+  // Режим редактирования — рендерится как модалка в основном контенте// Режим просмотра списка
   return (
     <>
       <div className="page-header">
@@ -323,6 +215,37 @@ export default function Inventory() {
           </tbody>
         </table>
       </div>
-    </>
+    
+
+      {editing && <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')cancelEdit()}}>
+        <div className="modal-box" style={{maxWidth:'700px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
+          <button className="modal-close" onClick={cancelEdit}>&times;</button>
+          <h2>Редактирование инвентаризации</h2>
+          <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {editing.date}</div>
+          <div className="product-table" style={{overflowY:'auto',flex:1}}>
+            <table>
+              <thead><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
+              <tbody>
+                {editing.items.map(function(it,idx) {
+                  var diff = it.actual - it.expected;
+                  var ds = diff * it.cost;
+                  return <tr key={idx}><td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
+                    <td style={{color:'#555'}}><span className="num">{it.expected}</span></td>
+                    <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'center',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
+                    <td style={{color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
+                    <td style={{color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="modal-actions" style={{flexShrink:0,marginTop:'.5rem'}}>
+            <button className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
+            <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
+          </div>
+        </div>
+      </div>}
+
+</>
   );
 }
