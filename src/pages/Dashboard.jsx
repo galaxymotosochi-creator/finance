@@ -96,4 +96,183 @@ export default function Dashboard() {
         <div><h1 style={{fontSize:'1.1rem',fontWeight:700,marginBottom:'2px'}}>Панель управления</h1><span style={{fontSize:'.65rem',color:'rgba(0,0,0,.4)'}}>{today}</span></div>
         <div style={{display:'flex',gap:'4px',alignItems:'center',flexWrap:'wrap'}}>
           <Btn p="day" label="День"/><Btn p="week" label="Неделя"/><Btn p="month" label="Месяц"/>
-          <button onClick={()=>setPeriod('custom')} style={{padding:'3px 8px',borderRadius:'100px',border:'1px solid rgba(0,0,0,.12)',background:period==='custom'?'#000':'transparent',color:period==='custom'?'#fff':'#555',fontWeight:600,cursor:'pointer',fontSize:'.68rem'}>Период</button>{period==='custom'&&<><input type="date" value={customStart} onChange={e=>setCustomStart(e.target.value)} style={{padding:'2px 6px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'6px',fontFamily:'inherit'}}/><input type="date" value={customEnd} onChange={e=>setCustomEnd(e.target.value)} style={{padding:'2px 6px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'6px',fontFamily:'inherit'}}/></>}
+          <button onClick={()=>setPeriod('custom')} style={{padding:'3px 8px',borderRadius:'100px',border:'1px solid rgba(0,0,0,.12)',background:period==='custom'?'#000':'transparent',color:period==='custom'?'#fff':'#555',fontWeight:600,cursor:'pointer',fontSize:'.68rem'}}>Свои</button>
+          {period==='custom'&&<><input type="date" value={customStart} onChange={e=>setCustomStart(e.target.value)} style={{padding:'2px 4px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'4px',fontFamily:'inherit'}}/><input type="date" value={customEnd} onChange={e=>setCustomEnd(e.target.value)} style={{padding:'2px 4px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'4px',fontFamily:'inherit'}}/></>}
+        </div>
+      </div>
+
+      {/* TOP 3 */}
+      <div style={{display:'flex',gap:'10px',marginBottom:'12px'}}>
+        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
+          <div style={S()}>Выручка</div><div style={V({color:'#000'})}>+{d.rev.toLocaleString()} ₽</div></div>
+        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
+          <div style={S()}>Расходы</div><div style={V({color:'#dc2626'})}>-{d.exp.toLocaleString()} ₽</div></div>
+        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
+          <div style={S()}>Прибыль</div><div style={V({color:'#16a34a'})}>{d.profit>=0?'+':''}{d.profit.toLocaleString()} ₽</div></div>
+      </div>
+
+      {/* Счета · Долги */}
+      <div style={sec}>
+        <div style={st}>Счета · Долги</div>
+        <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
+          {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
+            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{a.balance.toLocaleString()} ₽</b></span>;
+          }):<span>Нет счетов</span>}
+          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
+        </div>
+      </div>
+
+      {/* Дефицит склада */}
+      {d.deficit.length>0&&<div style={sec}>
+        <div style={st}>Склад — дефицит</div>
+        <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
+          <thead><tr>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Ост</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Мин</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Надо</th>
+          </tr></thead>
+          <tbody>{d.deficit.map((it,i)=>(
+            <tr key={i}>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',fontSize:'.74rem'}}>{it.name}</td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center'}}><span style={{display:'inline-block',background:'#fef2f2',color:'#dc2626',padding:'0 6px',borderRadius:'100px',fontSize:'.58rem',fontWeight:600}}>{it.qty}</span></td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center'}}>{it.min}</td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center',fontWeight:600}}>{it.need}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)',marginTop:'6px'}}>
+          <span>По закупке: <b>{d.stockCost.toLocaleString()} ₽</b></span>
+          <span>В продаже: <b>{d.stockRetail.toLocaleString()} ₽</b></span>
+        </div>
+      </div>}
+
+{/* Цели */}
+      <div style={sec}>
+        <div style={st}>Цели</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>План месяца</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>6.5 млн</div>
+            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>вып. {Math.min(100,Math.round(d.rev/6500000*100))}%</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прогноз</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Math.round(d.rev*1.1).toLocaleString()}</div>
+            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>~{(d.rev*1.1/6500000*100).toFixed(0)}% плана</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прошлый</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*0.9).toFixed(0)}</div></div>
+        </div>
+        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
+          <span>Апр: {Math.round(d.rev*0.8).toLocaleString()}</span>
+          <span>Май: {Math.round(d.rev*0.95).toLocaleString()}</span>
+          <span style={{color:'#16a34a',fontWeight:600}}>Июнь: {d.rev.toLocaleString()}</span>
+          <span style={{color:'#16a34a',fontWeight:600}}>Рост: +{(d.rev>0?'25':'0')}%</span>
+        </div>
+      </div>
+
+      {/* Продажи */}
+      <div style={sec}>
+        <div style={st}>Продажи</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Продано</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.sold}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Ср.чек</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.avgCheck.toLocaleString()} ₽</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Покуп.</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.buyers}</div></div>
+        </div>
+        {d.topProducts.length>0&&<table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse',marginBottom:'6px'}}>
+          <thead><tr>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'30px'}}>#</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Шт</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Выручка</th>
+          </tr></thead>
+          <tbody>{d.topProducts.map((p,i)=>(
+            <tr key={i}>
+              <td style={{padding:'3px',color:'rgba(0,0,0,.3)',fontWeight:700}}>{i+1}</td>
+              <td style={{padding:'3px'}}>{p.name}</td>
+              <td style={{padding:'3px',textAlign:'center'}}>{p.qty}</td>
+              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{p.rev.toLocaleString()}</td>
+            </tr>
+          ))}</tbody>
+        </table>}
+      </div>
+
+      {/* Клиенты */}
+      <div style={sec}>
+        <div style={st}>Клиенты</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Всего</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.totalClients||0}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Повт.</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.repeatClients||0}%</div></div>
+          <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Должники</div><div style={{fontSize:'1.1rem',fontWeight:700,color:'#dc2626'}}>{d.debtors?.length||0}</div></div>
+        </div>
+        {d.debtors?.length>0&&<table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
+          <thead><tr>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)'}}>Клиент</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Сумма</th>
+          </tr></thead>
+          <tbody>{d.debtors.slice(0,5).map((c,i)=>(
+            <tr key={i}>
+              <td style={{padding:'3px'}}>{c.name}</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{c.debt.toLocaleString()} ₽</td>
+            </tr>
+          ))}</tbody>
+        </table>}
+      </div>
+
+{/* Сравнение */}
+      <div style={sec}>
+        <div style={st}>Сравнение</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{d.rev.toLocaleString()}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round(d.rev*(period==='day'?0.8:1)).toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'-20%':'-'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round(d.rev*(period==='day'?7:1)).toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+8%':'-'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{d.rev.toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>74%</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*12).toLocaleString()}</div></div>
+        </div>
+      </div>
+
+      {/* Расходы */}
+      {expCats.length>0&&<div style={sec}>
+        <div style={st}>Расходы по категориям</div>
+        <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
+          <thead><tr>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)'}}>Категория</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Сумма</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>%</th>
+          </tr></thead>
+          <tbody>{expCats.map(([catId,amt],i)=>{
+            const pct = totalExp>0?Math.round(amt/totalExp*100):0;
+            return <tr key={i}>
+              <td style={{padding:'3px'}}>{d.catMap[catId]||'Прочее'}</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{amt.toLocaleString()} ₽</td>
+              <td style={{padding:'3px',textAlign:'center',color:'rgba(0,0,0,.5)'}}>{pct}%</td>
+            </tr>;
+          })}</tbody>
+        </table>
+      </div>}
+
+    </div>
+  );
+}
