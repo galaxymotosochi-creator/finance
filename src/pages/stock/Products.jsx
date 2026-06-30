@@ -533,7 +533,7 @@ export default function Products() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {/* Фильтр по типу */}
-      <div className="nav-tabs" style={{display:'flex',gap:'.25rem',marginBottom:'.35rem'}}>
+      <div className="nav-tabs" style={{display:'flex',gap:'.25rem',marginBottom:'.35rem',justifyContent:'flex-end'}}>
         {['all','product','service','combo'].map(function(t) {
           return (
             <button key={t} onClick={function(){setTypeFilter(t)}}
