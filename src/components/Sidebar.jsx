@@ -134,7 +134,7 @@ export default function Sidebar() {
                 const anyChildActive = item.children.some((c) => isActive(c.path));
                 return (
                   <div className="nav-group" key={item.label}>
-                    <a className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active' : ''}`}
+                    <a className={`nav-parent${open ? ' open' : ''}${anyChildActive || open ? ' active' : ''}`}
                       onClick={() => toggleGroup(item.label)}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                       {!collapsed && item.label}
