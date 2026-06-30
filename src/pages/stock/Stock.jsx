@@ -95,7 +95,7 @@ export default function Stock() {
   }, []);
 
   let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort();
-  let items = products.filter(p => p && stockMap[p.id] !== undefined);
+  let items = products.filter(p => p && !p.hidden);
   if (selectedCats && selectedCats.size > 0) {
     items = items.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || 'Без категории'));
   }
