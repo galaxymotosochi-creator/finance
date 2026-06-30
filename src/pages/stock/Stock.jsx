@@ -270,7 +270,7 @@ export default function Stock() {
                   <td style={{textAlign:'center',color:'#555'}}>
                     {p.min_qty > 0 ? (
                       <span style={{color: qty >= p.min_qty ? '#16a34a' : '#dc2626',fontWeight:500}}>
-                        {qty >= p.min_qty ? '✓ В норме' : '⚠ -' + (p.min_qty - qty) + ' шт'}
+                        {qty >= p.min_qty ? '✓ В норме' : '⚠ ещё ' + (p.min_qty - qty) + ' шт'}
                       </span>
                     ) : '—'}
                   </td>
