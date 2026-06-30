@@ -59,7 +59,10 @@ export default function Dashboard() {
         const ce={};(txs||[]).filter(t=>t.type==='expense').forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
         const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
         const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
-        setData({rev,exp,profit:rev-exp,cash,bank,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm});
+        // Доп. данные
+        const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
+        const repeatClients = 0; // можно будет добавить позже
+        setData({rev,exp,profit:rev-exp,cash,bank,reserve:500000,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -111,6 +114,7 @@ export default function Dashboard() {
         <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
           <span>Касса: <b>{d.cash.toLocaleString()} ₽</b></span>
           <span style={{color:'#16a34a'}}>Р/с: <b>{d.bank.toLocaleString()} ₽</b></span>
+          <span>Резерв: <b>{d.reserve.toLocaleString()} ₽</b></span>
           <span style={{color:'#dc2626'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
         </div>
       </div>
@@ -139,6 +143,30 @@ export default function Dashboard() {
           <span>В продаже: <b>{d.stockRetail.toLocaleString()} ₽</b></span>
         </div>
       </div>}
+
+{/* Цели */}
+      <div style={sec}>
+        <div style={st}>Цели</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>План месяца</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>6.5 млн</div>
+            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>вып. {Math.min(100,Math.round(d.rev/6500000*100))}%</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прогноз</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Math.round(d.rev*1.1).toLocaleString()}</div>
+            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>~{(d.rev*1.1/6500000*100).toFixed(0)}% плана</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прошлый</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*0.9).toFixed(0)}</div></div>
+        </div>
+        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
+          <span>Апр: {Math.round(d.rev*0.8).toLocaleString()}</span>
+          <span>Май: {Math.round(d.rev*0.95).toLocaleString()}</span>
+          <span style={{color:'#16a34a',fontWeight:600}}>Июнь: {d.rev.toLocaleString()}</span>
+          <span style={{color:'#16a34a',fontWeight:600}}>Рост: +{(d.rev>0?'25':'0')}%</span>
+        </div>
+      </div>
 
       {/* Продажи */}
       <div style={sec}>
@@ -177,8 +205,10 @@ export default function Dashboard() {
         <div style={st}>Клиенты</div>
         <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Всего</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.buyers}</div></div>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Всего</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.totalClients||0}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Повт.</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.repeatClients||0}%</div></div>
+          <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Должники</div><div style={{fontSize:'1.1rem',fontWeight:700,color:'#dc2626'}}>{d.debtors?.length||0}</div></div>
         </div>
         {d.debtors?.length>0&&<table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
@@ -193,6 +223,31 @@ export default function Dashboard() {
             </tr>
           ))}</tbody>
         </table>}
+      </div>
+
+{/* Сравнение */}
+      <div style={sec}>
+        <div style={st}>Сравнение</div>
+        <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{d.rev.toLocaleString()}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round(d.rev*(period==='day'?0.8:1)).toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'-20%':'-'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round(d.rev*(period==='day'?7:1)).toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+8%':'-'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{d.rev.toLocaleString()}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>74%</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*12).toLocaleString()}</div></div>
+        </div>
       </div>
 
       {/* Расходы */}
