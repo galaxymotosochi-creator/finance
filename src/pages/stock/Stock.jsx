@@ -188,7 +188,7 @@ export default function Stock() {
 
       <div className="page-header">
         <div>
-          <h1>Складские остатки</h1>
+          <h1>Остатки</h1>
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
         <div className="page-actions">

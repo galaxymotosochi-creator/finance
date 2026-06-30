@@ -163,7 +163,7 @@ export default function Health() {
       {/* Шапка */}
       <div className="page-header">
         <div>
-          <h1>Здоровье товаров</h1>
+          <h1>Аналитика товаров</h1>
           <div className="sub">Пульт управления капиталом — аналитика остатков и прогнозы</div>
         </div>
         <div className="page-actions" style={{display:'flex',alignItems:'center',gap:'.4rem'}}>

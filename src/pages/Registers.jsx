@@ -593,7 +593,7 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
           <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={() => setShowAdd(false)}>&times;</button>
             <h2>Добавить позицию</h2>
-            <div className="sub">Новый товар появится в каталоге и разделе «Каталог позиций»</div>
+            <div className="sub">Новый товар появится в каталоге и разделе «Товары и услуги»</div>
             <form onSubmit={saveProduct}>
               <div className="form-group">
                 <label>Название</label>

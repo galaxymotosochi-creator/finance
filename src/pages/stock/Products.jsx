@@ -523,8 +523,8 @@ export default function Products() {
       <div style={{flexShrink:0}}>
         <div className="page-header">
         <div>
-          <h1>Каталог позиций</h1>
-          <div className="sub">Единый каталог товаров, услуг и цен вашей компании</div>
+          <h1>Товары и услуги</h1>
+          <div className="sub">Каталог товаров, услуг и комбо</div>
         </div>
         <div className="page-actions">
           <button className="btn-mint" onClick={openAdd}>+ Добавить</button>

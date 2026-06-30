@@ -28,10 +28,10 @@ const menu = [
   },
   {
     label: 'Склад', icon: 'stock', children: [
-      { label: 'Каталог позиций', path: '/stock/products' },
-      { label: 'Категории позиций', path: '/stock/categories' },
-      { label: 'Здоровье товаров', path: '/stock/turnover' },
-      { label: 'Складские остатки', path: '/stock/stock' },
+      { label: 'Товары и услуги', path: '/stock/products' },
+      { label: 'Категории', path: '/stock/categories' },
+      { label: 'Аналитика товаров', path: '/stock/turnover' },
+      { label: 'Остатки', path: '/stock/stock' },
       { label: 'Поставки', path: '/stock/supplies' },
       { label: 'Инвентаризация', path: '/stock/inventory' },
       { label: 'Списания', path: '/stock/writeoffs' },
