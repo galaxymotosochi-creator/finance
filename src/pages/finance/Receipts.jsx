@@ -242,7 +242,7 @@ export default function Receipts() {
                         <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
                         <span style={{ width: '50px', textAlign: 'center', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
-                        <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} p</span>
+                        <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} ₽</span>
                       </div>
                       {combo && Array.isArray(combo) && combo.length > 0 && (
                         <div style={{ padding: '0 .75rem .35rem 1.2rem', fontSize: '.72rem', color: '#999' }}>

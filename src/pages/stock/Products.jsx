@@ -147,7 +147,6 @@ export default function Products() {
   const [fMinQty, setFMinQty] = useState('');
   const [fHidden, setFHidden] = useState(false);
   const [fComboItems, setFComboItems] = useState([]);
-  const [fCustomPrice, setFCustomPrice] = useState(false);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
@@ -227,7 +226,7 @@ export default function Products() {
     setEditId(null); setMode('add'); setFHidden(false);
     setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
-    setFMinQty(''); setFDesc(''); setFComboItems([]); setFCustomPrice(false);
+    setFMinQty(''); setFDesc(''); setFComboItems([]);
     setFComboSearch('');
     setShowModal(true);
   };
@@ -238,7 +237,7 @@ export default function Products() {
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
     setFWeightUnit(p.weightUnit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
-    setFComboItems(p.combo_items || []); setFCustomPrice(p.price_custom || false);
+    setFComboItems(p.combo_items || []);
     setFComboSearch('');
     setShowModal(true);
   };
@@ -246,16 +245,14 @@ export default function Products() {
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const calcPrice = fType === 'combo' && !fCustomPrice ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : 0;
-    const price = fType === 'combo' && !fCustomPrice ? calcPrice : (parseFloat(fPrice) || 0);
+    const price = fType === 'combo' ? (parseFloat(fPrice) || fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0)) : (parseFloat(fPrice) || 0);
     const productData = {
       name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
       sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
       weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
       min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
       hidden: editId ? fHidden : false,
-      combo_items: fType === 'combo' ? fComboItems : null,
-      price_custom: fType === 'combo' ? fCustomPrice : false
+      combo_items: fType === 'combo' ? fComboItems : null
     };
     if (editId) {
       const { error } = await supabase.from('products').update(productData).eq('id', editId);
@@ -312,8 +309,7 @@ export default function Products() {
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
       description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false,
-      combo_items: data.combo_items || null,
-      price_custom: data.price_custom || false
+      combo_items: data.combo_items || null
     });
     if (error) return showToast('Ошибка: ' + error.message);
     await load();
@@ -728,14 +724,8 @@ export default function Products() {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Цена{fType === 'combo' ? ' (сумма состава)' : ' продажи (₽)'}</label>
-                  <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                    <input type="number" min="0" step="0.01" value={fType === 'combo' && !fCustomPrice ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : fPrice} onChange={function(e){ if (fType !== 'combo' || fCustomPrice) setFPrice(e.target.value); }} placeholder="0" disabled={fType === 'combo' && !fCustomPrice} style={{flex:1}} />
-                    {fType === 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.2rem',fontSize:'.7rem',whiteSpace:'nowrap',cursor:'pointer',color:'#555',fontWeight:400}}>
-                      <input type="checkbox" checked={fCustomPrice} onChange={function(e){ setFCustomPrice(e.target.checked); if (!e.target.checked) setFPrice(''); }} style={{width:'14px',height:'14px',cursor:'pointer',margin:0}} />
-                      Своя цена
-                    </label>}
-                  </div>
+                  <label>Цена{fType === 'combo' ? ' (по умолчанию сумма состава)' : ' продажи'}</label>
+                  <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
                 </div>
                 <div className="form-group">
                   <label>Ед. измерения</label>
@@ -778,28 +768,30 @@ export default function Products() {
                       placeholder="Поиск товаров/услуг..."
                       style={{flex:1,padding:'.4rem .5rem',fontSize:'.78rem',border:'1px solid var(--border)',borderRadius:'.4rem',outline:'none',fontFamily:'var(--font)',background:'var(--body-bg)'}} />
                   </div>
-                  <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'.35rem'}}>
-                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && (!fComboSearch || p.name.toLowerCase().includes(fComboSearch.toLowerCase()))}).map(function(p) {
+                  {fComboSearch.length > 0 && <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'.35rem',border:'1px solid var(--border)',borderRadius:'.35rem',padding:'.2rem'}}>
+                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && p.name.toLowerCase().includes(fComboSearch.toLowerCase())}).map(function(p) {
                       var inCombo = fComboItems.find(function(i){return i.id === p.id});
                       return (
-                        <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.2rem .35rem',borderRadius:'.3rem',cursor:'pointer',background:inCombo?'var(--primary)':'transparent',color:inCombo?'#000':'inherit'}}
+                        <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.25rem .35rem',borderRadius:'.3rem',cursor:'pointer',background:inCombo?'#f0f0f0':'transparent'}}
                           onClick={function() {
                             if (inCombo) { setFComboItems(fComboItems.filter(function(i){return i.id !== p.id})); }
                             else { setFComboItems([...fComboItems, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }]); }
                           }}>
-                          <span style={{fontSize:'.72rem',fontWeight:inCombo?600:400,flex:1}}>{p.name}</span>
-                          <span style={{fontSize:'.7rem',color:inCombo?'#000':'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()}p</span>
+                          <span style={{fontSize:'.75rem',flex:1}}>{p.name}</span>
+                          <span style={{fontSize:'.7rem',color:'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()} ₽</span>
+                          {inCombo && <span style={{fontSize:'.7rem',marginLeft:'.25rem',color:'var(--primary)',fontWeight:700}}>+</span>}
                         </div>
                       );
                     })}
-                  </div>
+                  </div>}
                   {fComboItems.length > 0 && <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
                     <div style={{fontSize:'.72rem',fontWeight:600,color:'#555',marginBottom:'.25rem'}}>B составе:</div>
                     {fComboItems.map(function(item, idx) {
                       return (
-                        <div key={item.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.2rem .35rem',fontSize:'.75rem'}}>
+                        <div key={item.id} style={{display:'flex',alignItems:'center',padding:'.25rem .35rem',fontSize:'.78rem'}}>
                           <span style={{flex:1}}>{item.name}</span>
-                          <div style={{display:'flex',alignItems:'center',gap:'.15rem'}}>
+                          <span style={{width:'70px',textAlign:'right',color:'#888'}}>{(item.price).toLocaleString()} ₽</span>
+                          <div style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'.35rem'}}>
                             <button type="button" onClick={function() {
                               var next = [...fComboItems];
                               if (next[idx].qty > 1) { next[idx].qty--; setFComboItems(next); }
@@ -810,13 +802,14 @@ export default function Products() {
                               next[idx].qty++; setFComboItems(next);
                             }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
                           </div>
-                          <span style={{color:'#888'}}>{(item.price * item.qty).toLocaleString()}p</span>
-                          <button type="button" onClick={function() { setFComboItems(fComboItems.filter(function(_, i) { return i !== idx; })) }} style={{background:'none',border:'none',cursor:'pointer',color:'#dc2626',fontSize:'.75rem',padding:'.1rem'}}>x</button>
+                          <span style={{width:'75px',textAlign:'right',fontWeight:600}}>{(item.price * item.qty).toLocaleString()} ₽</span>
+                          <button type="button" onClick={function() { setFComboItems(fComboItems.filter(function(_, i) { return i !== idx; })) }} style={{background:'none',border:'none',cursor:'pointer',color:'#dc2626',fontSize:'.8rem',marginLeft:'.25rem',lineHeight:1,padding:'.1rem'}}>x</button>
                         </div>
                       );
                     })}
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.25rem',fontSize:'.78rem'}}>
-                      <span style={{fontWeight:600}}>Cyммa: {fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} p</span>
+                      <span style={{fontWeight:600}}>Итого:</span>
+                      <span style={{fontWeight:700}}>{fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} ₽</span>
                     </div>
                   </div>}
                 </div>
