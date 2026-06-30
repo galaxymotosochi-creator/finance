@@ -438,7 +438,7 @@ document.body.appendChild(c);
   }).catch(function(){setToast && setToast('Ошибка загрузки сканера')});
 };
 
-if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+if (loading) return <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100vh',width:'100%'}}><div style={{fontSize:'3rem',marginBottom:'1rem'}}>⏳</div><div style={{fontSize:'1rem',color:'var(--muted)'}}>Загрузка...</div></div>;
 
   return (
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
