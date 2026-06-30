@@ -93,8 +93,11 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => {
-    // HashRouter: location.pathname = путь после # (напр. /finance/transactions)
-    return location.pathname === path;
+    var p = location.pathname;
+    // Убираем trailing slash для сравнения
+    if (p.endsWith('/')) p = p.slice(0, -1);
+    var cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
+    return p === cleanPath;
   };
 
   return (
