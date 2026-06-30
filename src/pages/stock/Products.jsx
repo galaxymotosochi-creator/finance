@@ -475,7 +475,14 @@ export default function Products() {
   else if (typeFilter === 'combo') filtered = filtered.filter(p => p.type === 'combo');
   filtered = filtered.sort((a, b) => (a.hidden ? 1 : 0) - (b.hidden ? 1 : 0));
 
-  const costPrice = (p) => costMap[p.id] || 0;
+  const costPrice = (p) => {
+    if (p.type === 'combo' && p.combo_items && p.combo_items.length > 0) {
+      return p.combo_items.reduce(function(s, item) {
+        return s + ((costMap[item.id] || 0) * item.qty);
+      }, 0);
+    }
+    return costMap[p.id] || 0;
+  };
 
   const cellHtml = (col, p) => {
     switch(col) {
