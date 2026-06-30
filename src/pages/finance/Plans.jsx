@@ -57,19 +57,19 @@ export default function Plans() {
     const operations = [];
     
     for (const p of plans) {
-      const amount = parseFloat(editValues[p.target_type]) || 0;
+      const amount = parseFloat(String(editValues[p.target_type]).replace(/\s/g,'')) || 0;
       const payload = { user_id: user.id, period, year, month: period === 'month' ? month : null, quarter: period === 'quarter' ? quarter : null, target_type: p.target_type, target_amount: amount };
       
       if (p.id) {
         operations.push(supabase.from('plans').update(payload).eq('id', p.id));
-      } else if (amount > 0) {
-        operations.push(supabase.from('plans').insert({ ...payload, id: Date.now() + Math.random() }));
+      } else {
+        operations.push(supabase.from('plans').insert({ ...payload, id: Date.now() + Math.floor(Math.random() * 99999) }));
       }
     }
     
     await Promise.all(operations);
     setSaving(false);
-    setToast('Планы сохранены');
+    setToast('Планы успешно сохранены!');
     setTimeout(() => setToast(null), 2000);
     load();
   };
