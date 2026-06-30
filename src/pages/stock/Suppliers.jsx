@@ -122,7 +122,7 @@ export default function Suppliers() {
                   <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
                   <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
                   <td style={{color:'#555'}}>{s.phone||'—'}</td>
-                  <td style={{color:'#555'}}><span className="prod-cat">{icon} {label}</span></td>
+                  <td style={{color:'#555'}}><span className="prod-cat">{label}</span></td>
                   <td style={{color:'#555'}}>{supplyCount}</td>
                   <td style={{color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
