@@ -68,6 +68,12 @@ export default function Dashboard() {
   const d = data;
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'300px',color:'#999',fontSize:'.85rem'}}>Загрузка...</div>;
   if (!d) return <div style={{textAlign:'center',padding:'3rem',color:'#999',fontSize:'.85rem'}}>Нет данных</div>;
+  try {
+    // Check for required data
+    if (typeof d.expensesByCat !== 'object') d.expensesByCat = {};
+    if (typeof d.topProducts !== 'object') d.topProducts = [];
+    if (typeof d.debtors !== 'object') d.debtors = [];
+  } catch(e) { return <div style={{textAlign:'center',padding:'3rem',color:'#dc2626',fontSize:'.82rem'}}>Ошибка данных: {e.message}</div>; }
 
   const Btn = ({p,label}) => (<button onClick={()=>setPeriod(p)} style={{padding:'3px 10px',borderRadius:'100px',border:'1px solid rgba(0,0,0,.12)',background:period===p?'#000':'transparent',color:period===p?'#fff':'#555',fontWeight:600,cursor:'pointer',fontFamily:'inherit',fontSize:'.68rem'}}>{label}</button>);
 
