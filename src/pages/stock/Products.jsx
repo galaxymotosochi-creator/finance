@@ -790,7 +790,6 @@ export default function Products() {
                       return (
                         <div key={item.id} style={{display:'flex',alignItems:'center',padding:'.25rem .35rem',fontSize:'.78rem'}}>
                           <span style={{flex:1}}>{item.name}</span>
-                          <span style={{width:'70px',textAlign:'right',color:'#888'}}>{(item.price).toLocaleString()} ₽</span>
                           <div style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'.35rem'}}>
                             <button type="button" onClick={function() {
                               var next = [...fComboItems];
