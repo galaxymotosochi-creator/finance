@@ -60,12 +60,12 @@ export default function Dashboard() {
         const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
         const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
         const ce={};(txs||[]).filter(t=>t.type==='expense').forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
-        const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
+        const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear());const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
         const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
         // Доп. данные
         const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
         const repeatClients = 0; // можно будет добавить позже
-        setData({rev,exp,profit:rev-exp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList});
+        setData({rev,exp,profit:rev-exp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -149,25 +149,20 @@ export default function Dashboard() {
 
 {/* Цели */}
       <div style={sec}>
-        <div style={st}>Цели</div>
+        <div style={st}>Цели на месяц</div>
         <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>План месяца</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>6.5 млн</div>
-            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>вып. {Math.min(100,Math.round(d.rev/6500000*100))}%</div></div>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка план</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.revenue?d.planMap.revenue:0)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прогноз</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Math.round(d.rev*1.1).toLocaleString()}</div>
-            <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.4)'}}>~{(d.rev*1.1/6500000*100).toFixed(0)}% плана</div></div>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Факт</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.rev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.rev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прошлый</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*0.9).toFixed(0)}</div></div>
-        </div>
-        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
-          <span>Апр: {Math.round(d.rev*0.8).toLocaleString()}</span>
-          <span>Май: {Math.round(d.rev*0.95).toLocaleString()}</span>
-          <span style={{color:'#16a34a',fontWeight:600}}>Июнь: {d.rev.toLocaleString()}</span>
-          <span style={{color:'#16a34a',fontWeight:600}}>Рост: +{(d.rev>0?'25':'0')}%</span>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль план</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.profit/d.planMap.profit*100)+'%':''}</div></div>
         </div>
       </div>
 
