@@ -81,6 +81,8 @@ export default function Dashboard() {
   const V = (w) => ({fontSize:'1.15rem',fontWeight:800,...w});
   const sec = {background:'#fff',borderRadius:'14px',padding:'14px',marginBottom:'8px',border:'1px solid rgba(0,0,0,.08)',boxShadow:'0 1px 3px rgba(0,0,0,.04)'};
   const st = {fontSize:'.7rem',fontWeight:700,color:'rgba(0,0,0,.5)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'8px'};
+  const expCats = d.expensesByCat && typeof d.expensesByCat === 'object' ? Object.entries(d.expensesByCat).sort(function(a,b){return b[1]-a[1]}).slice(0,5) : [];
+  const totalExp = expCats.length > 0 ? expCats.reduce(function(s,v){return s+v[1]}, 0) : 0;
 
   return (
     <div style={{fontFamily:"'Inter',sans-serif",padding:'0',color:'#111'}}>
