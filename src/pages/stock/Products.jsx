@@ -146,6 +146,10 @@ export default function Products() {
   const [fDesc, setFDesc] = useState('');
   const [fMinQty, setFMinQty] = useState('');
   const [fHidden, setFHidden] = useState(false);
+  const [fComboItems, setFComboItems] = useState([]);
+  const [fCustomPrice, setFCustomPrice] = useState(false);
+  const [fComboSearch, setFComboSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   // Dropdowns
   const [catOpen, setCatOpen] = useState(false);
@@ -223,7 +227,8 @@ export default function Products() {
     setEditId(null); setMode('add'); setFHidden(false);
     setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
-    setFMinQty(''); setFDesc('');
+    setFMinQty(''); setFDesc(''); setFComboItems([]); setFCustomPrice(false);
+    setFComboSearch('');
     setShowModal(true);
   };
 
@@ -233,19 +238,24 @@ export default function Products() {
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
     setFWeightUnit(p.weightUnit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
+    setFComboItems(p.combo_items || []); setFCustomPrice(p.price_custom || false);
+    setFComboSearch('');
     setShowModal(true);
   };
 
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const price = parseFloat(fPrice) || 0;
+    const calcPrice = fType === 'combo' && !fCustomPrice ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : 0;
+    const price = fType === 'combo' && !fCustomPrice ? calcPrice : (parseFloat(fPrice) || 0);
     const productData = {
-      name: fName.trim(), cat: fCat, price: price, unit: fUnit,
+      name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
       sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
-      weight: parseFloat(fWeight) || 0, weight_unit: fWeightUnit,
+      weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
       min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
-      hidden: editId ? fHidden : false
+      hidden: editId ? fHidden : false,
+      combo_items: fType === 'combo' ? fComboItems : null,
+      price_custom: fType === 'combo' ? fCustomPrice : false
     };
     if (editId) {
       const { error } = await supabase.from('products').update(productData).eq('id', editId);
@@ -301,7 +311,9 @@ export default function Products() {
       id: Date.now(), name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
-      description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false
+      description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false,
+      combo_items: data.combo_items || null,
+      price_custom: data.price_custom || false
     });
     if (error) return showToast('Ошибка: ' + error.message);
     await load();
@@ -462,6 +474,9 @@ export default function Products() {
   const q = search.toLowerCase().trim();
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
+  if (typeFilter === 'product') filtered = filtered.filter(p => p.type === 'product');
+  else if (typeFilter === 'service') filtered = filtered.filter(p => p.type === 'service');
+  else if (typeFilter === 'combo') filtered = filtered.filter(p => p.type === 'combo');
   filtered = filtered.sort((a, b) => (a.hidden ? 1 : 0) - (b.hidden ? 1 : 0));
 
   const costPrice = (p) => costMap[p.id] || 0;
@@ -470,8 +485,8 @@ export default function Products() {
     switch(col) {
       case 'name': return `<div class="prod-name" style="cursor:pointer">${p.name}</div>`;
       case 'type':
-        const isSvc = p.type === 'service';
-        return `<span class="prod-cat">${isSvc ? 'Услуга' : 'Товар'}</span>`;
+        const typeLabel = p.type === 'service' ? 'Услуга' : p.type === 'combo' ? 'Комбо' : 'Товар';
+        return `<span class="prod-cat">${typeLabel}</span>`;
       case 'category': return `<span class="prod-cat">${CAT_LABELS[p.cat] || p.cat || '—'}</span>`;
       case 'cost': {
         const cp = costPrice(p);
@@ -513,6 +528,23 @@ export default function Products() {
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
+
+      {/* Фильтр по типу */}
+      <div className="nav-tabs" style={{display:'flex',gap:'.25rem',marginBottom:'.35rem'}}>
+        {['all','product','service','combo'].map(function(t) {
+          return (
+            <button key={t} onClick={function(){setTypeFilter(t)}}
+              style={{
+                padding:'.2rem .6rem', fontSize:'.75rem', fontFamily:'var(--font)',
+                background: typeFilter === t ? '#111' : 'transparent',
+                color: typeFilter === t ? '#fff' : '#555',
+                border: typeFilter === t ? 'none' : '1px solid var(--border)',
+                borderRadius:'100px', cursor:'pointer', fontWeight: typeFilter === t ? 600 : 400,
+                transition:'all .15s'
+              }}>{t === 'all' ? 'Все' : t === 'product' ? 'Товары' : t === 'service' ? 'Услуги' : 'Комбо'}</button>
+          );
+        })}
+      </div>
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
         <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
@@ -690,13 +722,20 @@ export default function Products() {
                   <select value={fType} onChange={e => setFType(e.target.value)}>
                     <option value="product">Товар</option>
                     <option value="service">Услуга</option>
+                    <option value="combo">Комбо</option>
                   </select>
                 </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Цена продажи (₽)</label>
-                  <input type="number" min="0" step="0.01" value={fPrice} onChange={e => setFPrice(e.target.value)} placeholder="0" />
+                  <label>Цена{fType === 'combo' ? ' (сумма состава)' : ' продажи (₽)'}</label>
+                  <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    <input type="number" min="0" step="0.01" value={fType === 'combo' && !fCustomPrice ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : fPrice} onChange={function(e){ if (fType !== 'combo' || fCustomPrice) setFPrice(e.target.value); }} placeholder="0" disabled={fType === 'combo' && !fCustomPrice} style={{flex:1}} />
+                    {fType === 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.2rem',fontSize:'.7rem',whiteSpace:'nowrap',cursor:'pointer',color:'#555',fontWeight:400}}>
+                      <input type="checkbox" checked={fCustomPrice} onChange={function(e){ setFCustomPrice(e.target.checked); if (!e.target.checked) setFPrice(''); }} style={{width:'14px',height:'14px',cursor:'pointer',margin:0}} />
+                      Своя цена
+                    </label>}
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Ед. измерения</label>
@@ -717,7 +756,7 @@ export default function Products() {
                 </div>}
                 {fType === 'service' && <div className="form-group"></div>}
               </div>
-              {fType !== 'service' && <div className="form-row">
+              {fType !== 'service' && fType !== 'combo' && <div className="form-row">
                 <div className="form-group">
                   <label>Вес</label>
                   <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
@@ -731,6 +770,57 @@ export default function Products() {
                   </select>
                 </div>
               </div>}
+              {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
+                <label>Состав комбо</label>
+                <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
+                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.35rem'}}>
+                    <input type="text" value={fComboSearch} onChange={function(e){setFComboSearch(e.target.value)}}
+                      placeholder="Поиск товаров/услуг..."
+                      style={{flex:1,padding:'.4rem .5rem',fontSize:'.78rem',border:'1px solid var(--border)',borderRadius:'.4rem',outline:'none',fontFamily:'var(--font)',background:'var(--body-bg)'}} />
+                  </div>
+                  <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'.35rem'}}>
+                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && (!fComboSearch || p.name.toLowerCase().includes(fComboSearch.toLowerCase()))}).map(function(p) {
+                      var inCombo = fComboItems.find(function(i){return i.id === p.id});
+                      return (
+                        <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.2rem .35rem',borderRadius:'.3rem',cursor:'pointer',background:inCombo?'var(--primary)':'transparent',color:inCombo?'#000':'inherit'}}
+                          onClick={function() {
+                            if (inCombo) { setFComboItems(fComboItems.filter(function(i){return i.id !== p.id})); }
+                            else { setFComboItems([...fComboItems, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }]); }
+                          }}>
+                          <span style={{fontSize:'.72rem',fontWeight:inCombo?600:400,flex:1}}>{p.name}</span>
+                          <span style={{fontSize:'.7rem',color:inCombo?'#000':'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()}p</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {fComboItems.length > 0 && <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
+                    <div style={{fontSize:'.72rem',fontWeight:600,color:'#555',marginBottom:'.25rem'}}>B составе:</div>
+                    {fComboItems.map(function(item, idx) {
+                      return (
+                        <div key={item.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.2rem .35rem',fontSize:'.75rem'}}>
+                          <span style={{flex:1}}>{item.name}</span>
+                          <div style={{display:'flex',alignItems:'center',gap:'.15rem'}}>
+                            <button type="button" onClick={function() {
+                              var next = [...fComboItems];
+                              if (next[idx].qty > 1) { next[idx].qty--; setFComboItems(next); }
+                            }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>-</button>
+                            <span style={{minWidth:'20px',textAlign:'center',fontWeight:600}}>{item.qty}</span>
+                            <button type="button" onClick={function() {
+                              var next = [...fComboItems];
+                              next[idx].qty++; setFComboItems(next);
+                            }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
+                          </div>
+                          <span style={{color:'#888'}}>{(item.price * item.qty).toLocaleString()}p</span>
+                          <button type="button" onClick={function() { setFComboItems(fComboItems.filter(function(_, i) { return i !== idx; })) }} style={{background:'none',border:'none',cursor:'pointer',color:'#dc2626',fontSize:'.75rem',padding:'.1rem'}}>x</button>
+                        </div>
+                      );
+                    })}
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.25rem',fontSize:'.78rem'}}>
+                      <span style={{fontWeight:600}}>Cyммa: {fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} p</span>
+                    </div>
+                  </div>}
+                </div>
+              </div>}
               <div className="form-row">
                 <div className="form-group" style={{maxWidth:'250px'}}>
                   <label>Минимальный остаток</label>
@@ -738,10 +828,10 @@ export default function Products() {
                 </div>
                 <div className="form-group" style={{border:'none'}}></div>
               </div>
-              <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
-                <input type="checkbox" checked={fFreePrice} onChange={e => setFFreePrice(e.target.checked)} style={{width:'16px',height:'16px',cursor:'pointer',margin:0}} />
+              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
+                <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{width:'16px',height:'16px',cursor:'pointer',margin:0}} />
                 Продавать по свободной цене
-              </label>
+              </label>}
               <div className="form-group">
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />

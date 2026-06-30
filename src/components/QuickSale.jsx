@@ -68,7 +68,8 @@ export default function QuickSale({ onClose }) {
       const origPrice = p.price || 0;
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct }];
+      const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct, ...comboData }];
     });
   };
 
@@ -114,12 +115,17 @@ export default function QuickSale({ onClose }) {
       source: 'quick_sale',
     }).select('id').single();
     if (newReceipt) {
-      var receiptItems = cart.map(function(item) {
-        return {
+      var receiptItems = [];
+      cart.forEach(function(item) {
+        var entry = {
           receipt_id: newReceipt.id,
           product_name: item.name, quantity: item.qty,
-          price: item.price, total: item.price * item.qty,
+          price: item.price, total: (item.final_price || item.price) * item.qty,
         };
+        if (item.combo_items && item.combo_items.length > 0) {
+          entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
+        }
+        receiptItems.push(entry);
       });
       var { error: itemsErr } = await supabase.from('receipt_items').insert(receiptItems);
       if (itemsErr) console.warn('Не удалось сохранить товары чека:', itemsErr.message);
@@ -168,7 +174,19 @@ export default function QuickSale({ onClose }) {
 
     // Уменьшаем остатки на складе
     try {
-      var woItems = cart.map(function(item){return {prodId:item.id, name:item.name, qty:item.qty, cost:0};});
+      var woItems = [];
+      cart.forEach(function(item){
+        if (item.combo_items && item.combo_items.length > 0) {
+          item.combo_items.forEach(function(ci){
+            const prod = products.find(function(p){ return p.id === ci.id; });
+            if (prod && prod.type !== 'service') {
+              woItems.push({prodId:ci.id, name:ci.name, qty:ci.qty * item.qty, cost:0});
+            }
+          });
+        } else {
+          woItems.push({prodId:item.id, name:item.name, qty:item.qty, cost:0});
+        }
+      });
       await supabase.from('writeoffs').insert({
         id: Date.now(), user_id: user.id, name: 'Продажа (быстрая) по чеку №' + receiptNum,
         items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),

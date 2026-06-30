@@ -155,13 +155,14 @@ export default function Registers({ fullscreen }) {
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
       const currentQty = ex ? ex.qty : 0;
-      if (currentQty >= stock && p.type !== 'service') { setToast('На складе только ' + stock + ' шт'); return prev; }
+      if (p.type !== 'combo' && currentQty >= stock && p.type !== 'service') { setToast('На складе только ' + stock + ' шт'); return prev; }
       if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
       const promo = findPromo(p);
       const origPrice = p.price || 0;
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct }];
+      const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct, ...comboData }];
     });
   };
 
@@ -233,8 +234,9 @@ export default function Registers({ fullscreen }) {
     } else {
       receiptId = newReceipt.id;
       // Сохраняем товары чека
-      var receiptItems = cart.map(function(item) {
-        return {
+      var receiptItems = [];
+      cart.forEach(function(item) {
+        var entry = {
           receipt_id: receiptId,
           product_name: item.name, quantity: item.qty,
           price: item.price, total: (item.final_price || item.price) * item.qty,
@@ -242,6 +244,10 @@ export default function Registers({ fullscreen }) {
           discount_amount: ((item.price - (item.final_price || item.price)) * item.qty),
           promo_id: item.promo_id || null,
         };
+        if (item.combo_items && item.combo_items.length > 0) {
+          entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
+        }
+        receiptItems.push(entry);
       });
       var { error: itemsErr } = await supabase.from('receipt_items').insert(receiptItems);
       if (itemsErr) console.warn('Не удалось сохранить товары чека:', itemsErr.message);
@@ -325,7 +331,19 @@ export default function Registers({ fullscreen }) {
     // Уменьшаем остатки на складе (только для оплаченных чеков)
     if (!payUnpaid) {
       try {
-        var woItems = cart.map(function(item){return {prodId:item.id, name:item.name, qty:item.qty, cost:0};});
+        var woItems = [];
+        cart.forEach(function(item){
+          if (item.combo_items && item.combo_items.length > 0) {
+            item.combo_items.forEach(function(ci){
+              var prod = products.find(function(p){ return p.id === ci.id; });
+              if (prod && prod.type !== 'service') {
+                woItems.push({prodId:ci.id, name:ci.name, qty:ci.qty * item.qty, cost:0});
+              }
+            });
+          } else {
+            woItems.push({prodId:item.id, name:item.name, qty:item.qty, cost:0});
+          }
+        });
         await supabase.from('writeoffs').insert({
           id: Date.now(), user_id: user.id, name: 'Продажа по чеку №' + receiptNum,
           items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),
@@ -449,22 +467,27 @@ if (loading) return <div className="empty-products"><div className="big-icon">�
           {cart.length === 0 ? (
             <div style={{textAlign:'center',padding:'2rem 1rem',color:'#bbb',fontSize:'13px'}}>Выберите товары</div>
           ) : cart.map((item, i) => (
-            <div key={item.id} style={{display:'flex',alignItems:'center',padding:'10px 14px',borderBottom:'1px solid #f5f5f5',gap:'6px'}}>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:'13px',fontWeight:500}}>{item.name}</div>
+            <div key={item.id} style={{padding:'10px 14px',borderBottom:'1px solid #f5f5f5'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:'13px',fontWeight:500}}>{item.name}</div>
+                  {item.combo_items && item.combo_items.length > 0 ? (
+                    <div style={{fontSize:'10px',color:'#999',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
+                  ) : null}
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
+                  <button onClick={function(){updateQty(item.id, -1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>-</button>
+                  <span style={{fontWeight:600,minWidth:'16px',textAlign:'center',fontSize:'13px',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
+                  <button onClick={function(){updateQty(item.id, 1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>+</button>
+                </div>
+                {item.free_price ? (
+                  <input type="number" min="0" step="0.01" value={item.price} 
+                    onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
+                    style={{width:'80px',textAlign:'right',border:'1.5px solid #e0e0e0',borderRadius:'6px',padding:'4px 6px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
+                ) : (
+                  <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} p</div>
+                )}
               </div>
-              <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
-                <button onClick={() => updateQty(item.id, -1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>−</button>
-                <span style={{fontWeight:600,minWidth:'16px',textAlign:'center',fontSize:'13px',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>+</button>
-              </div>
-              {item.free_price ? (
-                <input type="number" min="0" step="0.01" value={item.price} 
-                  onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
-                  style={{width:'80px',textAlign:'right',border:'1.5px solid #e0e0e0',borderRadius:'6px',padding:'4px 6px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
-              ) : (
-                <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
-              )}
             </div>
           ))}
         </div>

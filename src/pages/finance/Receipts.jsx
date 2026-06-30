@@ -234,14 +234,26 @@ export default function Receipts() {
                   <span style={{ width: '70px', textAlign: 'right' }}>Цена</span>
                   <span style={{ width: '80px', textAlign: 'right' }}>Сумма</span>
                 </div>
-                {receiptItems.map(item => (
-                  <div key={item.id} style={{ display: 'flex', padding: '.35rem .75rem', fontSize: '.82rem', borderTop: '1px solid #f0f0f0' }}>
-                    <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
-                    <span style={{ width: '50px', textAlign: 'center', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
-                    <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
-                    <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} ₽</span>
-                  </div>
-                ))}
+                {receiptItems.map(function(item) {
+                  var combo = item.combo_items;
+                  return (
+                    <div key={item.id}>
+                      <div style={{ display: 'flex', padding: '.35rem .75rem', fontSize: '.82rem', borderTop: '1px solid #f0f0f0' }}>
+                        <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
+                        <span style={{ width: '50px', textAlign: 'center', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
+                        <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
+                        <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} p</span>
+                      </div>
+                      {combo && Array.isArray(combo) && combo.length > 0 && (
+                        <div style={{ padding: '0 .75rem .35rem 1.2rem', fontSize: '.72rem', color: '#999' }}>
+                          Cocтaв: {combo.map(function(ci, idx) {
+                            return <span key={idx}>{ci.name} x{ci.qty}{idx < combo.length - 1 ? ', ' : ''}</span>;
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })})
                 <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '50px', textAlign: 'center' }}></span>
