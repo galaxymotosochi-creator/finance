@@ -110,7 +110,7 @@ export default function Shifts() {
 
       <div className="page-header">
         <div>
-          <h1>Кассовые смены</h1>
+          <h1>Смены</h1>
           <div className="sub">Контроль работы касс и выручки</div>
         </div>
 

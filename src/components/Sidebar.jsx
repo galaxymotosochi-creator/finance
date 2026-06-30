@@ -17,13 +17,13 @@ const menu = [
   { label: 'Касса', path: '/kassa', icon: 'registers', external: true },
   {
     label: 'Финансы', icon: 'finance', children: [
-      { label: 'Движение денег', path: '/finance/transactions' },
-      { label: 'Финансовые счета', path: '/finance/accounts' },
-      { label: 'Кассовые смены', path: '/finance/shifts' },
+      { label: 'Транзакции', path: '/finance/transactions' },
+      { label: 'Счета', path: '/finance/accounts' },
+      { label: 'Смены', path: '/finance/shifts' },
       { label: 'Чеки', path: '/finance/receipts' },
-      { label: 'Учет зарплаты', path: '/finance/salary' },
+      { label: 'Зарплата', path: '/finance/salary' },
       { label: 'P&L', path: '/finance/pnl' },
-      { label: 'Финансовые категории', path: '/finance/categories' },
+      { label: 'Категории', path: '/finance/categories' },
     ],
   },
   {

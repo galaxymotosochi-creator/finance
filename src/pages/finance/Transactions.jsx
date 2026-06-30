@@ -238,7 +238,7 @@ export default function Transactions() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Движение денег</h1>
+          <h1>Транзакции</h1>
           <div className="sub">Доходы, расходы и перемещения</div>
         </div>
         <div className="page-actions">
