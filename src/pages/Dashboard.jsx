@@ -114,7 +114,7 @@ export default function Dashboard() {
       {/* Счета · Долги */}
       <div style={sec}>
         <div style={st}>Счета · Долги</div>
-        <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
+        <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
           {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
             return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{a.balance.toLocaleString()} ₽</b></span>;
           }):<span>Нет счетов</span>}
