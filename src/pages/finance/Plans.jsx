@@ -45,7 +45,7 @@ export default function Plans() {
     });
     setPlans(plansList);
     const vals = {};
-    plansList.forEach(p => { vals[p.target_type] = String(p.target_amount || ''); });
+    plansList.forEach(p => { vals[p.target_type] = String(p.target_amount); });
     setEditValues(vals);
     setLoading(false);
   };
