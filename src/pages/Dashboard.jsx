@@ -43,8 +43,11 @@ export default function Dashboard() {
 
         let rev=0, exp=0;
         (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&t.status!=='unpaid')rev+=a;else if(t.type==='expense')exp+=a;});
-        const cash = (accts||[]).filter(a=>a.type==='cash_register').reduce((s,a)=>s+(a.balance||0),0);
-        const bank = (accts||[]).filter(a=>!a.type?.startsWith('cash')).reduce((s,a)=>s+(a.balance||0),0);
+        const acctTypes = {'cash_register':'Касса','cash':'Наличные','card':'Карта','checking':'Р/с','bank':'Р/с','reserve':'Резерв','deposit':'Депозит','electronic':'Эл.деньги'};
+        const acctList = (accts||[]).map(a=>({name:a.name||acctTypes[a.type]||a.type||'Счёт',balance:a.balance||0})).filter(a=>a.balance!==0);
+        const cash = acctList.filter(a=>a.name==='Касса').reduce((s,a)=>s+a.balance,0);
+        const bank = acctList.filter(a=>a.name!=='Касса'&&a.name!=='Наличные').reduce((s,a)=>s+a.balance,0);
+        const reserve = acctList.filter(a=>a.name==='Резерв').reduce((s,a)=>s+a.balance,0);
         const sm={};
         (supRaw||[]).forEach(sp=>(sp.items||[]).forEach(it=>{if(!sm[it.prodId])sm[it.prodId]={qty:0,cost:0};sm[it.prodId].qty+=it.qty||0;sm[it.prodId].cost+=(it.cost||0)*(it.qty||0);}));
         (wo||[]).forEach(w=>(w.items||[]).forEach(it=>{if(sm[it.prodId])sm[it.prodId].qty-=it.qty||0;}));
@@ -62,7 +65,7 @@ export default function Dashboard() {
         // Доп. данные
         const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
         const repeatClients = 0; // можно будет добавить позже
-        setData({rev,exp,profit:rev-exp,cash,bank,reserve:500000,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients});
+        setData({rev,exp,profit:rev-exp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -111,11 +114,11 @@ export default function Dashboard() {
       {/* Счета · Долги */}
       <div style={sec}>
         <div style={st}>Счета · Долги</div>
-        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
-          <span>Касса: <b>{d.cash.toLocaleString()} ₽</b></span>
-          <span style={{color:'#16a34a'}}>Р/с: <b>{d.bank.toLocaleString()} ₽</b></span>
-          <span>Резерв: <b>{d.reserve.toLocaleString()} ₽</b></span>
-          <span style={{color:'#dc2626'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
+        <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)'}}>
+          {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
+            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{a.balance.toLocaleString()} ₽</b></span>;
+          }):<span>Нет счетов</span>}
+          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
         </div>
       </div>
 
