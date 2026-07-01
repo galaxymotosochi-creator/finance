@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 • ADD_INCOME, ADD_EXPENSE, ADD_PRODUCT, ADD_CATEGORY
 
 🟢 Действия-ЗАПРОСЫ (только чтение) — выполняй СРАЗУ, без подтверждения:
-• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS
+• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS, GET_SHIFT_INFO, GET_FORECAST
 
 Тип товара или категории (product/service) определяй сам по смыслу:
 - Шлем, Скутер, Масло, Аккумулятор, Запчасть → product (товар)
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 - Отдельный счёт «Касса» (type: cash_register) — на нём учитываются наличные от продаж через кассу
 - Инкассация — изъятие наличных из кассы на другой счёт
 
-Если пользователь спрашивает «сколько в кассе» — покажи баланс счёта «Касса». «На какую кассу идём» = выручка за период — используй GET_REPORT.
+Если пользователь спрашивает «сколько в кассе» — покажи баланс счёта «Касса». «На какую кассу идём в этом месяце» — используй GET_FORECAST (прогноз на основе текущих продаж).
 Если «кто на смене» или «открыта ли касса» — используй GET_SHIFT_INFO — покажет кассира, время смены, продажи за сегодня и наличные в кассе.
 
 Доступные действия:
@@ -57,6 +57,8 @@ export default async function handler(req, res) {
 - GET_DEBTORS — показать список должников. Параметры: нет
 - GET_STOCK — показать остаток товара. Параметры: product_name (название товара)
 - GET_TOP_PRODUCTS — показать топ продаваемых товаров. Параметры: period (today/week/month/all, опционально), limit (количество, опционально, по умолчанию 5)
+- GET_SHIFT_INFO — показать информацию о текущей кассовой смене. Параметры: нет
+- GET_FORECAST — прогноз продаж на месяц. Параметры: нет
 
 Ты можешь отвечать на вопросы по табелю:
 • «Сколько штрафов у сотрудника Иванова за неделю?» — используй GET_TIMESHEET_STATS с employee_name и stat_type=deduct
@@ -70,7 +72,7 @@ export default async function handler(req, res) {
 • «Кто должен?» — используй GET_DEBTORS
 • «Какой отчёт за неделю?» — используй GET_REPORT с period=week
 • «Какая сегодня касса?» — используй GET_SHIFT_INFO
-• «На какую кассу мы идём в этом месяце?» или «касса за месяц» — используй GET_REPORT с period=month и скажи выручку и прибыль
+• «На какую кассу мы идём в этом месяце?» — используй GET_FORECAST (прогноз продаж на месяц)
 
 Ты можешь отвечать на вопросы по складу:
 • «Сколько осталось [товар]?» — используй GET_STOCK с product_name
