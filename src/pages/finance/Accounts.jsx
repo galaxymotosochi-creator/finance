@@ -86,14 +86,14 @@ export default function Accounts() {
 
   useEffect(() => { fetchAccounts(); fetchTx(); }, []);
 
-  var getBal = (type) => {
-    var ac = accounts.find(a=>a.type===type); if (!ac) return 0;
+  var getBal = (ac) => {
+    if (!ac) return 0;
     var b = parseFloat(ac.balance)||0;
     (transactions||[]).forEach(t=>{if(t.account_id===ac.id)b+=Number(t.amount||0)*(t.type==='income'?1:-1);});
     return b;
   };
-  var getMv = (type) => {
-    var ac = accounts.find(a=>a.type===type); if (!ac) return {i:0,e:0};
+  var getMv = (ac) => {
+    if (!ac) return {i:0,e:0};
     var i=0,e=0; (transactions||[]).forEach(t=>{if(t.account_id===ac.id){if(t.type==='income')i+=Number(t.amount||0);else e+=Number(t.amount||0);}});
     return {i,e};
   };
@@ -219,7 +219,7 @@ export default function Accounts() {
                   <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
                 ) : sorted.map(a => {
                   var m=ACC_TYPES.find(t=>t.type===a.type), lb=m?m.label:a.type;
-                  var bl=getBal(a.type), mv=getMv(a.type), in0=parseFloat(a.balance)||0;
+                  var bl=getBal(a), mv=getMv(a), in0=parseFloat(a.balance)||0;
                   return (
                     <tr key={a.id}>
                       <td style={{textAlign:'center'}}>
@@ -249,8 +249,8 @@ export default function Accounts() {
                   );
                 })}
                 {sorted.length > 0 && (() => {
-                  const incTot = accounts.reduce((s,a) => { const mv=getMv(a.type); return s + mv.i; }, 0);
-                  const expTot = accounts.reduce((s,a) => { const mv=getMv(a.type); return s + mv.e; }, 0);
+                  const incTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.i; }, 0);
+                  const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   return (
                   <tr className="total-row">
                     <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
