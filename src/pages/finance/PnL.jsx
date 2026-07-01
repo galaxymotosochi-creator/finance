@@ -104,8 +104,11 @@ export default function PnL() {
         let opTotal = 0;
         (expenses || []).forEach(t => {
           const cat = catMap[t.category_id];
-          if (t.category_id && cat?.type !== 'expense') return;
-          const name = cat ? cat.name : 'Без категории';
+          // Если категория указана, но не найдена или не операционная — пропускаем
+          if (t.category_id) {
+            if (!cat || cat.type !== 'expense') return;
+          }
+          const name = cat ? (cat.name || 'Без названия') : 'Без категории';
           if (!opByCat[name]) opByCat[name] = 0;
           opByCat[name] += t.amount || 0;
           opTotal += t.amount || 0;
