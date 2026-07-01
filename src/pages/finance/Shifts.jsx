@@ -181,7 +181,7 @@ export default function Shifts() {
                   <input type="text" placeholder="Иван Иванов" value={cashierName} onChange={e => setCashierName(e.target.value)} />
                 </div>
                 <div className="form-group">
-                  <label>Остаток в кассе (₽)</label>
+                  <label>Остаток в кассе</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                     <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)}
                       style={{flex:1}} />
@@ -212,7 +212,7 @@ export default function Shifts() {
             </div>
             <form onSubmit={e => { e.preventDefault(); closeShift(); }}>
               <div className="form-group">
-                <label>Фактический остаток (₽)</label>
+                <label>Фактический остаток</label>
                 <input type="number" placeholder="0" step="0.01" value={closeBal} onChange={e => setCloseBal(e.target.value)} autoFocus />
               </div>
               <div className="modal-actions">

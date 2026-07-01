@@ -373,7 +373,7 @@ export default function Salary() {
                 </div>
                 <div style={{display:'flex',gap:'.35rem',alignItems:'flex-start'}}>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>{fSalaryType === 'shift' ? 'Ставка за смену (₽)' : 'Оклад (мес.)'}</div>
+                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>{fSalaryType === 'shift' ? 'Ставка за смену' : 'Оклад'}</div>
                     <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)}
                       style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
                   </div>

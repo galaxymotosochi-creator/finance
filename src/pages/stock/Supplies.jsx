@@ -369,7 +369,7 @@ const load = async () => {
               {items.map((it,i) => (
                 <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'.2rem 0',fontSize:'.82rem'}}>
                   <span>{it.name}</span>
-                  <span>{it.qty} шт x {it.cost.toFixed(2)}</span>
+                  <span>{it.qty} x {it.cost.toFixed(2)}</span>
                   <span style={{fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
                 </div>
               ))}
@@ -525,7 +525,7 @@ const load = async () => {
               <form onSubmit={confirmPay}>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Сумма (₽)</label>
+                    <label>Сумма</label>
                     <input type="number" id="payAmount" defaultValue={debt>0?debt.toFixed(2):''} min="0" step="0.01" required />
                   </div>
                   <div className="form-group">

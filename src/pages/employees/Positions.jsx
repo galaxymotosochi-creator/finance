@@ -243,7 +243,7 @@ export default function Positions() {
               </div>
               {fBonusType !== 'none' && (
                 <div className="form-group">
-                  <label>{fBonusType === 'percent' ? 'Процент от продаж' : fBonusType === 'fixed' ? 'Сумма бонуса (₽)' : 'Описание бонуса'}</label>
+                  <label>{fBonusType === 'percent' ? 'Процент от продаж' : fBonusType === 'fixed' ? 'Сумма бонуса' : 'Описание бонуса'}</label>
                   <input type="text" value={fBonusValue} onChange={e=>setFBonusValue(e.target.value)}
                     placeholder={fBonusType === 'percent' ? '5' : fBonusType === 'fixed' ? '10000' : 'Зависит от категории'} />
                 </div>
