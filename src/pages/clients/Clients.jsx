@@ -157,6 +157,8 @@ export default function Clients() {
           <thead id="clientColHeaders">
             <tr>
               <th>Клиент</th>
+              <th style={{textAlign:'center'}}>Прим. 1</th>
+              <th style={{textAlign:'center'}}>Прим. 2</th>
               <th>Телефон</th>
               <th>ДР</th>
               <th>Покупок</th>
@@ -168,7 +170,7 @@ export default function Clients() {
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
@@ -180,8 +182,10 @@ export default function Clients() {
                       {c.name}
                       {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
                     </div>
-                    <div className="prod-sku">{c.email || ''}{(()=>{try{const j=JSON.parse(c.comment||'{}');const parts=[];if(j.n1)parts.push(j.n1);if(j.n2)parts.push(j.n2);return parts.length?' • '+parts.join(' | '):''}catch(e){return c.comment?' • '+c.comment:''}})()}</div>
+                    <div className="prod-sku">{c.email || ''}</div>
                   </td>
+                  <td style={{color:'#555',textAlign:'center',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
+                  <td style={{color:'#555',textAlign:'center',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
                   <td style={{color:'#555'}}>{c.phone || '—'}</td>
                   <td style={{color:'#555'}}>
                     {c.birthday ? (

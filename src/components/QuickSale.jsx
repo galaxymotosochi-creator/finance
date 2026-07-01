@@ -221,7 +221,7 @@ export default function QuickSale({ onClose }) {
                     <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' · '+c.phone : '')); setClientDrop(false); }}
                       style={{padding:'7px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5'}}
                       onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
-                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{c.phone ? ' · '+c.phone : ''}</div>
+                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' · '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' · '+c.phone : ''}</div>
                   ))}
                 </div>
               )}

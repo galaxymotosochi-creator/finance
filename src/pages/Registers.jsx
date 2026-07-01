@@ -731,7 +731,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                         <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' · '+c.phone : '')); setClientDrop(false); }}
                           style={{padding:'8px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
                           onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
-                          onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{c.phone ? ' · '+c.phone : ''}</div>
+                          onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' · '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' · '+c.phone : ''}</div>
                       ))}
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).length === 0 && (
                         <div style={{padding:'10px',fontSize:'12px',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
