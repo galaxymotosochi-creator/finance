@@ -46,10 +46,13 @@ export default function Dashboard() {
         (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&t.status!=='unpaid')rev+=a;else if(t.type==='expense')exp+=a;});
         // Баланс счетов = начальный остаток + ВСЕ транзакции (без фильтра по дате)
         const txById = {};
+        var txDbg = [];
         (allTx||[]).forEach(t => {
           if (!txById[t.account_id]) txById[t.account_id] = 0;
           txById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
+          if (txDbg.length < 3) txDbg.push({ac:t.account_id,am:t.amount,ty:t.type});
         });
+        console.log('DASH_DEBUG:', JSON.stringify({txAllLen:(allTx||[]).length,txByIdKeys:Object.keys(txById),accts:accts.map(a=>({id:a.id,n:a.name,b:a.balance})),sample:txDbg}));
         const acctList = (accts||[]).map(a => ({
           name: a.name || a.type,
           balance: (parseFloat(a.balance)||0) + (txById[a.id]||0)
