@@ -129,7 +129,7 @@ export default function Plans() {
                     onFocus={e => e.target.style.borderColor = '#000'}
                     onBlur={e => e.target.style.borderColor = '#ddd'}
                   />
-                  <span style={{position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', fontSize:'.72rem', color:'rgba(0,0,0,.4)', pointerEvents:'none'}}>{p.unit}</span>
+
                 </div>
               </div>
             ))}
