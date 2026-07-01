@@ -218,6 +218,23 @@ const ACTION_MAP = {
     sorted.forEach(([name,v],i) => { text += `${i+1}. ${name}: ${v.qty} шт, ${v.rev.toLocaleString()} ₽\n`; });
     return text;
   },
+  GET_SHIFT_INFO: async (p, user) => {
+    const {data:shift} = await supabase.from('shifts').select('*').eq('user_id',user.id).is('closed_at',null).order('opened_at',{ascending:false}).limit(1).maybeSingle();
+    if (!shift) return 'Касса закрыта. Нужно открыть смену';
+    const today = new Date().toISOString().split('T')[0];
+    const {data:txs} = await supabase.from('transactions').select('amount').eq('user_id',user.id).eq('type','income').gte('date',today).not('description','ilike','%Перевод%');
+    const sales = (txs||[]).reduce((s,t) => s + (t.amount||0), 0);
+    const {data:accts} = await supabase.from('accounts').select('id,balance,name').eq('user_id',user.id);
+    const {data:allTx} = await supabase.from('transactions').select('account_id,type,amount').eq('user_id',user.id);
+    const txById = {};
+    (allTx||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
+    const cashAc = (accts||[]).find(a => a.name === 'Касса');
+    const cashBal = cashAc ? (parseFloat(cashAc.balance)||0) + (txById[cashAc.id]||0) : 0;
+    return 'Касса: ' + (shift.cashier_name || '—') + '
+Смена открыта: ' + new Date(shift.opened_at).toLocaleString('ru-RU') + '
+Продажи за сегодня: +' + sales.toLocaleString() + ' ₽
+Наличные в кассе: ' + Math.round(cashBal).toLocaleString() + ' ₽';
+  },
 };
 
 export default function AiChat() {
