@@ -30,7 +30,7 @@ export default function Dashboard() {
       try {
         const dr = getDateRange();
         const [{data:txs},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
-          supabase.from('transactions').select('type,amount,category_id,status').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
+          supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('accounts').select('name,balance,type').eq('user_id',user.id),
           supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false}),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
@@ -43,8 +43,16 @@ export default function Dashboard() {
 
         let rev=0, exp=0;
         (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&t.status!=='unpaid')rev+=a;else if(t.type==='expense')exp+=a;});
-        const acctTypes = {'cash_register':'Касса','cash':'Наличные','card':'Карта','checking':'Р/с','bank':'Р/с','reserve':'Резерв','deposit':'Депозит','electronic':'Эл.деньги'};
-        const acctList = (accts||[]).map(a=>({name:a.name||acctTypes[a.type]||a.type||'Счёт',balance:a.balance||0})).filter(a=>a.balance!==0);
+        // Реальный баланс = начальный остаток + транзакции (как в Accounts)
+        const txById = {};
+        (txs||[]).forEach(t => {
+          if (!txById[t.account_id]) txById[t.account_id] = 0;
+          txById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
+        });
+        const acctList = (accts||[]).map(a => ({
+          name: a.name || a.type,
+          balance: (parseFloat(a.balance)||0) + (txById[a.id]||0)
+        }));
         const cash = acctList.filter(a=>a.name==='Касса').reduce((s,a)=>s+a.balance,0);
         const bank = acctList.filter(a=>a.name!=='Касса'&&a.name!=='Наличные').reduce((s,a)=>s+a.balance,0);
         const reserve = acctList.filter(a=>a.name==='Резерв').reduce((s,a)=>s+a.balance,0);
