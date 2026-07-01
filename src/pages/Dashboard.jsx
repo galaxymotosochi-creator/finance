@@ -29,7 +29,7 @@ export default function Dashboard() {
     (async () => {
       try {
         const dr = getDateRange();
-        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
+        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs},{data:activeShift},{data:lastRecs}] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
           supabase.from('accounts').select('id,name,balance,type').eq('user_id',user.id),
@@ -38,6 +38,8 @@ export default function Dashboard() {
           supabase.from('supplies').select('items').eq('user_id',user.id),
           supabase.from('writeoffs').select('items').eq('user_id',user.id),
           supabase.from('receipts').select('id,total_amount').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
+          supabase.from('shifts').select('*').eq('user_id',user.id).is('closed_at',null).order('opened_at',{ascending:false}).limit(1).maybeSingle(),
+          supabase.from('receipts').select('id,total_amount,client_name,date').eq('user_id',user.id).order('date',{ascending:false}).limit(3),
         ]);
         const rids = (recs||[]).map(r=>r.id);
         const {data:recItems} = rids.length ? (await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id',rids)) : {data:[]};
@@ -108,7 +110,8 @@ export default function Dashboard() {
           }
         });
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
+        const cashBal = acctList.find(a => a.name === 'Касса')?.balance || 0;
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3)});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -164,6 +167,40 @@ export default function Dashboard() {
           <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
         </div>
       </div>
+
+      {/* Касса */}
+      {d.activeShift && (
+        <div style={sec}>
+          <div style={st}>Касса · Смена #{d.activeShift.shift_number || ''}</div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{fontSize:'1.6rem'}}>🗄️</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:'.78rem',fontWeight:600}}>{d.activeShift.cashier_name || 'Кассир'}</div>
+              <div style={{fontSize:'.68rem',color:'rgba(0,0,0,.4)'}}>
+                Открыта {new Date(d.activeShift.opened_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+              </div>
+            </div>
+            <div style={{textAlign:'right'}}>
+              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal).toLocaleString()} ₽</div>
+              <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.35)'}}>в кассе</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Последние чеки */}
+      {d.lastRecs && d.lastRecs.length > 0 && (
+        <div style={sec}>
+          <div style={st}>Последние чеки</div>
+          {d.lastRecs.map((r, i) => (
+            <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'4px 0',fontSize:'.74rem',borderBottom:i < d.lastRecs.length - 1 ? '1px solid #f5f5f5' : 'none'}}>
+              <span style={{fontWeight:500}}>{r.client_name || 'Без имени'}</span>
+              <span style={{color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{r.date}</span>
+              <span style={{fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Дефицит склада */}
       {d.deficit.length>0&&<div style={sec}>
