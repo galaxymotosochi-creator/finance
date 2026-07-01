@@ -96,26 +96,28 @@ export default function PnL() {
           }
         });
 
-        // ID категорий операционных расходов (не закупки)
-        const opCatIds = new Set(
-          (cats || []).filter(c => c.type === 'expense').map(c => c.id)
-        );
-        // Операционные расходы — только с категорией операционного типа
-        const opExpenses = (expenses || []).reduce((s, t) => {
-          if (t.category_id && opCatIds.has(t.category_id)) {
-            return s + (t.amount || 0);
-          }
-          // Если категория не указана — считаем операционным
-          if (!t.category_id) return s + (t.amount || 0);
-          return s;
-        }, 0);
+        // Карта категорий: id → {name, type}
+        const catMap = {};
+        (cats || []).forEach(c => { catMap[c.id] = c; });
+        // Группируем операционные расходы по категориям
+        const opByCat = {};
+        let opTotal = 0;
+        (expenses || []).forEach(t => {
+          const cat = catMap[t.category_id];
+          if (t.category_id && cat?.type !== 'expense') return;
+          const name = cat ? cat.name : 'Без категории';
+          if (!opByCat[name]) opByCat[name] = 0;
+          opByCat[name] += t.amount || 0;
+          opTotal += t.amount || 0;
+        });
+        const opList = Object.entries(opByCat).sort((a, b) => b[1] - a[1]);
 
         // Налог УСН 6%
         const tax = Math.round(salesRev * 0.06);
 
         // Чистая прибыль
         const grossProfit = salesRev - totalCogs;
-        const netProfit = grossProfit - opExpenses - tax;
+        const netProfit = grossProfit - opTotal - tax;
         const profitability = salesRev > 0 ? Math.round(netProfit / salesRev * 100) : 0;
 
         // Товарный запас (по себестоимости) — остатки на складе
@@ -152,7 +154,8 @@ export default function PnL() {
           salesRev,
           totalCogs,
           grossProfit,
-          opExpenses,
+          opList,
+          opTotal,
           tax,
           netProfit,
           profitability,
@@ -226,7 +229,9 @@ export default function PnL() {
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#dc2626' }}></span>
           Расходы
         </div>
-        <Row label="Операционные расходы" value={`−${d.opExpenses.toLocaleString()} ₽`} color="#dc2626" />
+        {d.opList.map(([name, amt], i) => (
+          <Row key={i} label={name} value={`−${amt.toLocaleString()} ₽`} color="#dc2626" />
+        ))}
         <Row label="Налог УСН 6%" value={`−${d.tax.toLocaleString()} ₽`} color="#dc2626" />
       </div>
 
