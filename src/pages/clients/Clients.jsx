@@ -21,6 +21,8 @@ export default function Clients() {
   const [fEmail, setFEmail] = useState('');
   const [fBirthday, setFBirthday] = useState('');
   const [fComment, setFComment] = useState('');
+  const [fNote1, setFNote1] = useState('');
+  const [fNote2, setFNote2] = useState('');
   const [debtPayAmt, setDebtPayAmt] = useState('');
   const [debtPayAc, setDebtPayAc] = useState('');
 
@@ -40,27 +42,30 @@ export default function Clients() {
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
-    setFBirthday(''); setFComment(''); setShow(true);
+    setFBirthday(''); setFComment(''); setFNote1(''); setFNote2(''); setShow(true);
   };
 
   const openEdit = (c) => {
     setEditId(c.id); setFName(c.name); setFPhone(c.phone||'');
-    setFEmail(c.email||''); setFBirthday(c.birthday||''); setFComment(c.comment||''); setShow(true);
+    setFEmail(c.email||''); setFBirthday(c.birthday||''); setFComment(c.comment||'');
+    try { const j = JSON.parse(c.comment||'{}'); setFNote1(j.n1||''); setFNote2(j.n2||''); } catch(e) { setFNote1(c.comment||''); setFNote2(''); }
+    setShow(true);
   };
 
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите имя');
     try {
+      var saveComment = fNote1 || fNote2 ? JSON.stringify({n1:fNote1.trim(), n2:fNote2.trim()}) : (fComment.trim() || null);
       if (editId) {
         await supabase.from('clients').update({
           name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
-          birthday: fBirthday || null, comment: fComment.trim()
+          birthday: fBirthday || null, comment: saveComment
         }).eq('id', editId);
       } else {
         await supabase.from('clients').insert({
           user_id: user.id, name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
-          birthday: fBirthday || null, comment: fComment.trim()
+          birthday: fBirthday || null, comment: saveComment
         });
       }
       await load();
@@ -175,7 +180,7 @@ export default function Clients() {
                       {c.name}
                       {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
                     </div>
-                    <div className="prod-sku">{c.email || ''}{c.comment ? ' • '+c.comment : ''}</div>
+                    <div className="prod-sku">{c.email || ''}{(()=>{try{const j=JSON.parse(c.comment||'{}');const parts=[];if(j.n1)parts.push(j.n1);if(j.n2)parts.push(j.n2);return parts.length?' • '+parts.join(' | '):''}catch(e){return c.comment?' • '+c.comment:''}})()}</div>
                   </td>
                   <td style={{color:'#555'}}>{c.phone || '—'}</td>
                   <td style={{color:'#555'}}>
@@ -235,9 +240,15 @@ export default function Clients() {
                 <label>Дата рождения</label>
                 <input type="date" value={fBirthday} onChange={e=>setFBirthday(e.target.value)} />
               </div>
-              <div className="form-group">
-                <label>Комментарий</label>
-                <textarea value={fComment} onChange={e=>setFComment(e.target.value)} placeholder="Заметки о клиенте..." rows="2" />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Примечание 1</label>
+                  <input type="text" value={fNote1} onChange={e=>setFNote1(e.target.value)} placeholder="Марка скутера, год и т.д." />
+                </div>
+                <div className="form-group">
+                  <label>Примечание 2</label>
+                  <input type="text" value={fNote2} onChange={e=>setFNote2(e.target.value)} placeholder="Номер ПТС, Telegram и т.д." />
+                </div>
               </div>
               {editId && (
                 <div style={{marginBottom:'.5rem'}}>

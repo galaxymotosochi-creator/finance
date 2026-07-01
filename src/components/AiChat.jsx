@@ -234,10 +234,7 @@ const ACTION_MAP = {
     (allTx||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
     const cashAc = (accts||[]).find(a => a.name === 'Касса');
     const cashBal = cashAc ? (parseFloat(cashAc.balance)||0) + (txById[cashAc.id]||0) : 0;
-    return 'Касса: ' + (shift.cashier_name || '—') + '
-Смена открыта: ' + new Date(shift.opened_at).toLocaleString('ru-RU') + '
-Продажи за сегодня: +' + sales.toLocaleString() + ' ₽
-Наличные в кассе: ' + Math.round(cashBal).toLocaleString() + ' ₽';
+    return 'Касса: ' + (shift.cashier_name || '—') + '\nСмена открыта: ' + new Date(shift.opened_at).toLocaleString('ru-RU') + '\nПродажи за сегодня: +' + sales.toLocaleString() + ' ₽\nНаличные в кассе: ' + Math.round(cashBal).toLocaleString() + ' ₽';
   },
 };
 
