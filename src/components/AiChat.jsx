@@ -328,7 +328,7 @@ export default function AiChat() {
           boxShadow: '0 2px 12px rgba(0,0,0,.15)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'inherit',
-          animation: notifDot ? 'pulse-ai 2s infinite' : 'none',
+          animation: 'pulse-ai 2s infinite',
         }}>
         {open ? '✕' : (notifDot ? <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round'><rect x='2' y='4' width='20' height='16' rx='2'/><path d='M22 4L12 13 2 4'/></svg> : 'AI')}
         {!open && notifDot && (
@@ -355,7 +355,7 @@ export default function AiChat() {
       {open && (
         <div style={{
           position: 'fixed', bottom: '96px', right: '24px', zIndex: 998,
-          width: '340px', height: '600px',
+          width: '300px', height: '450px',
           background: '#fff', border: '1px solid #e5e7eb',
           borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,.12)',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -394,7 +394,7 @@ export default function AiChat() {
               disabled={loading}
               style={{
                 flex: 1, border: '1px solid #e0e0e0', borderRadius: '6px',
-                padding: '6px 8px', fontSize: '13px', outline: 'none',
+                padding: '10px 12px', fontSize: '14px', outline: 'none',
                 fontFamily: 'inherit', background: '#fff',
               }} />
             <button onClick={send} disabled={loading || !input.trim()}
