@@ -29,8 +29,9 @@ export default function Dashboard() {
     (async () => {
       try {
         const dr = getDateRange();
-        const [{data:txs},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
+        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
+          supabase.from('transactions').select('account_id,type,amount').eq('user_id',user.id),
           supabase.from('accounts').select('name,balance,type').eq('user_id',user.id),
           supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false}),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
@@ -43,9 +44,9 @@ export default function Dashboard() {
 
         let rev=0, exp=0;
         (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&t.status!=='unpaid')rev+=a;else if(t.type==='expense')exp+=a;});
-        // Реальный баланс = начальный остаток + транзакции (как в Accounts)
+        // Баланс счетов = начальный остаток + ВСЕ транзакции (без фильтра по дате)
         const txById = {};
-        (txs||[]).forEach(t => {
+        (allTx||[]).forEach(t => {
           if (!txById[t.account_id]) txById[t.account_id] = 0;
           txById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
         });
