@@ -62,8 +62,12 @@ const ACTION_MAP = {
       let empIds = [];
       if (empName) {
         const found = employees.filter(e => e.name.toLowerCase().includes(empName));
+        if (found.length > 1) {
+          const names = found.map(e => e.name).join(', ');
+          return `Найдено несколько: ${names}. Уточните фамилию или ФИО`;
+        }
         empIds = found.map(e => e.id);
-        if (empIds.length === 0) return `👤 Сотрудник "${p.employee_name}" не найден`;
+        if (empIds.length === 0) return `Сотрудник "${p.employee_name}" не найден`;
       }
 
       // Период

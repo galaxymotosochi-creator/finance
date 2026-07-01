@@ -61,9 +61,10 @@ export default async function handler(req, res) {
 - GET_FORECAST — прогноз продаж на месяц. Параметры: нет
 
 Ты можешь отвечать на вопросы по табелю:
-• «Сколько штрафов у сотрудника Иванова за неделю?» — используй GET_TIMESHEET_STATS с employee_name и stat_type=deduct
+• «Сколько штрафов у Иванова за неделю?» — используй GET_TIMESHEET_STATS с employee_name и stat_type=deduct
 • «Сколько бонусов получил Петров с 1 по 15 июня?» — используй GET_TIMESHEET_STATS с employee_name, period_from, period_to, stat_type=bonus
-• «Сколько дней отработала Анна за май?» — используй GET_TIMESHEET_STATS с employee_name, stat_type=worked
+• «Сколько дней отработала Иванова Анна за май?» — используй GET_TIMESHEET_STATS с employee_name, stat_type=worked
+• Если имя слишком короткое (только имя без фамилии) — попроси уточнить фамилию, может быть дубль
 • Если не указан тип — покажи полную сводку по табелю за период
 • Даты пользователь может указать в свободной форме или без года — интерпретируй правильно
 
