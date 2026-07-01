@@ -923,7 +923,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   </tr>
                 </thead>
                 <tbody>
-                  {shiftTx.map((t, i) => {
+                  {shiftTx.filter(t => t.type === 'income').map((t, i) => {
                     const ac = accounts.find(a => a.id === t.account_id);
                     const time = new Date(t.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
                     return (
