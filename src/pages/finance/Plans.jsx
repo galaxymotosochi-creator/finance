@@ -124,7 +124,7 @@ export default function Plans() {
                     placeholder="0"
                     style={{
                       width:'130px', padding:'5px 8px', border:'1.5px solid #ddd', borderRadius:'8px',
-                      fontSize:'.8rem', fontFamily:'inherit', textAlign:'right', outline:'none', background:'#fafafa'
+                      fontSize:'.8rem', fontFamily:'inherit', textAlign:'left', outline:'none', background:'#fafafa'
                     }}
                     onFocus={e => e.target.style.borderColor = '#000'}
                     onBlur={e => e.target.style.borderColor = '#ddd'}
