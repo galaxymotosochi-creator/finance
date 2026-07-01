@@ -65,6 +65,28 @@ export default function Dashboard() {
         const sr = (prods||[]).reduce((s,p)=>s+((sm[p.id]?.qty||0)*(p.price||0)),0);
         const sold = (recItems||[]).reduce((s,i)=>s+(i.quantity||0),0);
         const tr = (recs||[]).reduce((s,r)=>s+(r.total_amount||0),0);
+        // Средняя себестоимость единицы из поставок
+        const costPerUnit = {};
+        const costTotals = {};
+        (supRaw||[]).forEach(sp => (sp.items||[]).forEach(it => {
+          if (!costTotals[it.prodId]) costTotals[it.prodId] = {qty:0, cost:0};
+          costTotals[it.prodId].qty += it.qty || 0;
+          costTotals[it.prodId].cost += (it.cost||0) * (it.qty||0);
+        }));
+        for (const [id, v] of Object.entries(costTotals)) {
+          if (v.qty > 0) costPerUnit[id] = v.cost / v.qty;
+        }
+        // Имя товара → id
+        const prodIdMap = {};
+        (prods||[]).forEach(p => { prodIdMap[p.name] = p.id; });
+        // Себестоимость проданного
+        let cogs = 0;
+        (recItems||[]).forEach(item => {
+          const pid = prodIdMap[item.product_name];
+          if (pid && costPerUnit[pid]) {
+            cogs += (item.quantity||0) * costPerUnit[pid];
+          }
+        });
         const ac = sold>0?Math.round(tr/sold):0;
         const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
         const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
@@ -85,7 +107,7 @@ export default function Dashboard() {
             else if (t.type==='expense') monthExp += a;
           }
         });
-        setData({rev,exp,profit:rev-exp,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -123,12 +145,12 @@ export default function Dashboard() {
 
       {/* TOP 3 */}
       <div style={{display:'flex',gap:'10px',marginBottom:'12px'}}>
+        <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
+          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{d.salesRev.toLocaleString()} ₽</div></div>
         <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Выручка</div><div style={V({color:'#000'})}>+{d.rev.toLocaleString()} ₽</div></div>
-        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Расходы</div><div style={V({color:'#dc2626'})}>-{d.exp.toLocaleString()} ₽</div></div>
-        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Прибыль</div><div style={V({color:'#16a34a'})}>{d.profit>=0?'+':''}{d.profit.toLocaleString()} ₽</div></div>
+          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{d.cogs.toLocaleString()} ₽</div></div>
+        <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
+          <div style={S()}>Валовая прибыль</div><div style={V({color:'#16a34a'})}>{d.grossProfit>=0?'+':''}{d.grossProfit.toLocaleString()} ₽</div></div>
       </div>
 
       {/* Счета · Долги */}
