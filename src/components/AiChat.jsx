@@ -167,13 +167,64 @@ const ACTION_MAP = {
       return '❌ Ошибка загрузки табеля: ' + err.message;
     }
   },
+  GET_BALANCE: async (p, user) => {
+    const {data:accts} = await supabase.from('accounts').select('id,name,balance').eq('user_id',user.id);
+    const {data:txs} = await supabase.from('transactions').select('account_id,type,amount').eq('user_id',user.id);
+    if (!accts || accts.length === 0) return '📭 Нет счетов';
+    const txById = {};
+    (txs||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
+    let text = '💰 Баланс счетов:\n';
+    let total = 0;
+    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `• ${a.name}: ${b.toLocaleString()} ₽\n`; total += b; });
+    text += `\n📊 Общий баланс: ${total.toLocaleString()} ₽`;
+    return text;
+  },
+  GET_DEBTORS: async (p, user) => {
+    const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false});
+    if (!clients || clients.length === 0) return '✅ Нет должников';
+    let text = '⚠️ Должники:\n';
+    clients.forEach(c => { text += `• ${c.name}: ${Number(c.debt).toLocaleString()} ₽\n`; });
+    return text;
+  },
+  GET_STOCK: async (p, user) => {
+    const name = (p.product_name||'').toLowerCase().trim();
+    if (!name) return '📦 Укажите название товара';
+    const {data:prods} = await supabase.from('products').select('id,name').eq('user_id',user.id).eq('hidden',false);
+    const found = (prods||[]).filter(p => p.name.toLowerCase().includes(name));
+    if (found.length === 0) return `❌ Товар «${p.product_name}» не найден`;
+    const ids = found.map(p => p.id);
+    const {data:supRaw} = await supabase.from('supplies').select('items').eq('user_id',user.id);
+    const {data:wo} = await supabase.from('writeoffs').select('items').eq('user_id',user.id);
+    const sm = {};
+    (supRaw||[]).forEach(sp => (sp.items||[]).forEach(it => { if (!sm[it.prodId]) sm[it.prodId] = 0; sm[it.prodId] += it.qty||0; }));
+    (wo||[]).forEach(w => (w.items||[]).forEach(it => { if (sm[it.prodId]) sm[it.prodId] -= it.qty||0; }));
+    let text = `📦 Остатки по «${p.product_name}»:\n`;
+    found.forEach(p => { text += `• ${p.name}: ${sm[p.id]||0} шт\n`; });
+    return text;
+  },
+  GET_TOP_PRODUCTS: async (p, user) => {
+    const days = { today: 1, week: 7, month: 30, all: 9999 };
+    const d = days[p.period] || 7;
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - d);
+    const cs = cutoff.toISOString().split('T')[0];
+    const {data:recs} = await supabase.from('receipts').select('id').eq('user_id',user.id).gte('date',cs);
+    const rids = (recs||[]).map(r=>r.id);
+    if (rids.length === 0) return '📭 Нет продаж за этот период';
+    const {data:items} = rids.length ? await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id',rids) : {data:[]};
+    const top = {};
+    (items||[]).forEach(i => { const n = i.product_name||'Товар'; if (!top[n]) top[n] = {qty:0,rev:0}; top[n].qty += i.quantity||0; top[n].rev += i.total||0; });
+    const sorted = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0, parseInt(p.limit)||5);
+    let text = `🏆 Топ ${Math.min(sorted.length, parseInt(p.limit)||5)} товаров:\n`;
+    sorted.forEach(([name,v],i) => { text += `${i+1}. ${name}: ${v.qty} шт, ${v.rev.toLocaleString()} ₽\n`; });
+    return text;
+  },
 };
 
 export default function AiChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Я AI-помощник. Могу:\n• Добавить расход/доход\n• Создать товар/категорию\n• Сделать отчёт\n• Показать статистику табеля\n\nНапример:\n"добавь расход 5000 на запчасти"\n"сколько штрафов у Шаманской с 12 по 16 июня"\n"сколько дней отработала Анна"', isNotification: false },
+    { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n• Добавить расход / доход\n• Баланс счетов / Деньги на счетах\n• Отчёт за день / неделю / месяц\n• Кто должен клиентов\n\n📦 Склад и товары\n• Создать товар / категорию\n• Остатки на складе\n\n👥 Сотрудники\n• Статистика табеля\n• Бонусы / Штрафы\n• Сколько дней отработал\n\n📊 Продажи\n• Что продаётся лучше всего\n• Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
