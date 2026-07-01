@@ -31,7 +31,7 @@ export default function Dashboard() {
         const dr = getDateRange();
         const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
-          supabase.from('transactions').select('account_id,type,amount').eq('user_id',user.id),
+          supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
           supabase.from('accounts').select('name,balance,type').eq('user_id',user.id),
           supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false}),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
@@ -74,7 +74,18 @@ export default function Dashboard() {
         // Доп. данные
         const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
         const repeatClients = 0; // можно будет добавить позже
-        setData({rev,exp,profit:rev-exp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
+        // Факт за текущий месяц для блока Целей
+        const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+        const ms = monthStart.toISOString().split('T')[0];
+        let monthRev=0, monthExp=0;
+        (allTx||[]).forEach(t => {
+          if (t.date && t.date >= ms) {
+            const a = t.amount||0;
+            if (t.type==='income' && t.status!=='unpaid') monthRev += a;
+            else if (t.type==='expense') monthExp += a;
+          }
+        });
+        setData({rev,exp,profit:rev-exp,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -164,14 +175,18 @@ export default function Dashboard() {
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка план</div>
             <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.revenue?d.planMap.revenue:0)).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.rev.toLocaleString()} ₽</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.rev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка факт</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{d.monthRev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.monthRev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
+          <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль план</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} ₽</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.profit/d.planMap.profit*100)+'%':''}</div></div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
+          <div style={{flex:1,background:d.monthProfit>=0?'#f0fdf4':'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
+            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль факт</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{d.monthProfit.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':''}</div></div>
         </div>
       </div>
 
