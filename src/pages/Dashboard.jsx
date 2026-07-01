@@ -107,7 +107,8 @@ export default function Dashboard() {
             else if (t.type==='expense') monthExp += a;
           }
         });
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
+        const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -150,7 +151,7 @@ export default function Dashboard() {
         <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
           <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{d.cogs.toLocaleString()} ₽</div></div>
         <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Валовая прибыль</div><div style={V({color:'#16a34a'})}>{d.grossProfit>=0?'+':''}{d.grossProfit.toLocaleString()} ₽</div></div>
+          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{d.totalCash.toLocaleString()} ₽</div></div>
       </div>
 
       {/* Счета · Долги */}
