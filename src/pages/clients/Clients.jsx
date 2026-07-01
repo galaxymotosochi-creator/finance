@@ -127,23 +127,6 @@ export default function Clients() {
         </div>
       </div>
 
-      {/* Желтая плашка дня рождения */}
-      {birthdayClients.length > 0 && (
-        <div style={{
-          background: 'linear-gradient(135deg,#fef3cd,#fde68a)',
-          border: '1px solid #f59e0b',
-          borderRadius: '8px',
-          padding: '.5rem .75rem',
-          marginBottom: '.5rem',
-          fontSize: '.85rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '.5rem'
-        }}>
-          🎉 <b>День рождения</b> у {birthdayClients.map(c => c.name).join(', ')}! Предложите скидку или поздравьте!
-        </div>
-      )}
-
       {loading ? (
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка клиентов...</p></div>
       ) : (
@@ -167,22 +150,15 @@ export default function Clients() {
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
-              const isBday = c.birthday && c.birthday.slice(5) === todayMD;
               return (
                 <tr key={c.id}>
                   <td>
-                    <div className="prod-name">
-                      {c.name}
-                      {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
-                    </div>
+                    <div className="prod-name">{c.name}</div>
                     <div className="prod-sku">{c.email || ''}{c.comment ? ' • '+c.comment : ''}</div>
                   </td>
                   <td style={{color:'#555'}}>{c.phone || '—'}</td>
-                  <td style={{color:'#555'}}>
-                    {c.birthday ? (
-                      <span>{fmtDate(c.birthday)}{isBday && ' 🎉'}</span>
-                    ) : '—'}
-                  </td>
+                  <td style={{color:'#555'}}>{c.birthday || '—'}</td>
+                  <td style={{color:'#555'}}>{c.comment || '—'}</td>
                   <td style={{color:'#555'}}>{st.checks > 0 ? st.checks : '—'}</td>
                   <td style={{color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
@@ -231,13 +207,15 @@ export default function Clients() {
                   <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="ivan@example.com" />
                 </div>
               </div>
-              <div className="form-group">
-                <label>Дата рождения</label>
-                <input type="date" value={fBirthday} onChange={e=>setFBirthday(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Комментарий</label>
-                <textarea value={fComment} onChange={e=>setFComment(e.target.value)} placeholder="Заметки о клиенте..." rows="2" />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Примечание 1</label>
+                  <input type="text" value={fBirthday} onChange={e=>setFBirthday(e.target.value)} placeholder="Марка скутера, год и т.д." />
+                </div>
+                <div className="form-group">
+                  <label>Примечание 2</label>
+                  <input type="text" value={fComment} onChange={e=>setFComment(e.target.value)} placeholder="Номер ПТС, Телеграм и т.д." />
+                </div>
               </div>
               {editId && (
                 <div style={{marginBottom:'.5rem'}}>
