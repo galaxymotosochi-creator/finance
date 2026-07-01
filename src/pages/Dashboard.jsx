@@ -32,7 +32,7 @@ export default function Dashboard() {
         const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs}] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
-          supabase.from('accounts').select('name,balance,type').eq('user_id',user.id),
+          supabase.from('accounts').select('id,name,balance,type').eq('user_id',user.id),
           supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false}),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
           supabase.from('supplies').select('items').eq('user_id',user.id),
@@ -274,24 +274,26 @@ export default function Dashboard() {
       <div style={sec}>
         <div style={st}>Сравнение</div>
         <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
-          <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+          <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{d.rev.toLocaleString()}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{d.rev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round(d.rev*(period==='day'?0.8:1)).toLocaleString()}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'-20%':'-'}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round(d.rev*(period==='day'?0.8:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'−20%':'—'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round(d.rev*(period==='day'?7:1)).toLocaleString()}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+8%':'-'}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round(d.rev*(period==='day'?7:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+800%':'—'}</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{d.rev.toLocaleString()}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>74%</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center'}}>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{d.rev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
+          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*12).toLocaleString()}</div></div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*12).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
         </div>
       </div>
 
