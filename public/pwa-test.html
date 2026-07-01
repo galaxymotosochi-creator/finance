@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>888.ESTATE — PWA тест</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui;background:#f5f5f7;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;color:#111}
+.card{background:#fff;border-radius:20px;padding:32px;max-width:400px;width:100%;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.logo{font-size:48px;margin-bottom:12px}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.sub{font-size:13px;color:#999;margin-bottom:24px}
+.status{padding:14px;border-radius:12px;margin-bottom:16px;font-size:14px;font-weight:600}
+.offline{background:#fef2f2;color:#dc2626}
+.online{background:#f0fdf4;color:#16a34a}
+.steps{text-align:left;font-size:13px;color:#666;line-height:1.8;margin-bottom:20px}
+.steps b{color:#111}
+.btn{background:#1a1a1a;color:#fff;border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;width:100%}
+.btn:hover{opacity:.9}
+#status-text{font-size:11px;color:#bbb;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">✅</div>
+  <h1>888.ESTATE — PWA</h1>
+  <div class="sub">Тестовая страница</div>
+  <div class="status" id="status">Проверка подключения...</div>
+  <div class="steps">
+    <b>Шаг 1:</b> Добавьте на экран дома<br>
+    <span style="color:#bbb">iPhone: Поделиться → На экран дома<br>Android: ⋮ → Добавить на главный</span><br><br>
+    <b>Шаг 2:</b> ✈️ Включите авиарежим<br><br>
+    <b>Шаг 3:</b> Откройте с экрана дома<br>
+    <span style="color:#bbb">Если страница загрузилась — PWA работает!</span>
+  </div>
+  <button class="btn" onclick="testSW()">Проверить Service Worker</button>
+  <div id="status-text"></div>
+</div>
+<script>
+// Проверка соединения
+function updateStatus() {
+  const el = document.getElementById('status');
+  if (navigator.onLine) {
+    el.className = 'status online';
+    el.textContent = '🟢 Есть интернет';
+  } else {
+    el.className = 'status offline';
+    el.textContent = '🔴 Нет интернета (офлайн)';
+  }
+}
+window.addEventListener('online', updateStatus);
+window.addEventListener('offline', updateStatus);
+updateStatus();
+
+// Проверка Service Worker
+function testSW() {
+  const el = document.getElementById('status-text');
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      if (regs.length > 0) {
+        el.textContent = '✅ Service Worker зарегистрирован (' + regs.length + ')';
+        el.style.color = '#16a34a';
+      } else {
+        el.textContent = '⏳ Регистрирую Service Worker...';
+        navigator.serviceWorker.register('/sw.js').then(function() {
+          el.textContent = '✅ Service Worker зарегистрирован!';
+          el.style.color = '#16a34a';
+        });
+      }
+    });
+  } else {
+    el.textContent = '❌ Браузер не поддерживает PWA';
+    el.style.color = '#dc2626';
+  }
+}
+
+// Регистрируем SW при загрузке
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+</body>
+</html>

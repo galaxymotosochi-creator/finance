@@ -1,61 +1,49 @@
-// Service Worker — офлайн-режим для 888.Finance
+// Service Worker — 888.Finance офлайн-режим
 
-const CACHE_NAME = 'finance-v1';
-const STATIC_URLS = [
-  '/',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-];
+const CACHE = '888-finance-v1';
+const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
-// Устанавливаем — кэшируем статику
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_URLS);
-    })
-  );
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(STATIC)));
   self.skipWaiting();
 });
 
-// Активируем — чистим старые кэши
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
-      );
-    })
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((ks) =>
+      Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+    )
   );
   self.clients.claim();
 });
 
-// Перехватываем запросы
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      // Если есть в кэше — отдаём (быстро, без интернета)
-      if (cached) return cached;
-      // Нет в кэше — грузим из сети
-      return fetch(event.request).then((response) => {
-        // Кэшируем только JS/CSS/шрифты — не API-запросы
-        const url = new URL(event.request.url);
-        if (
-          event.request.destination === 'script' ||
-          event.request.destination === 'style' ||
-          event.request.destination === 'font' ||
-          event.request.destination === 'image' ||
-          url.pathname.endsWith('.js') ||
-          url.pathname.endsWith('.css')
-        ) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => {
-        // Если нет интернета — отдаём заглушку
-        return new Response('Нет подключения к интернету', { status: 503 });
-      });
-    })
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+
+  // Кэшируем статику (JS, CSS, шрифты, иконки)
+  if (
+    url.pathname.startsWith('/assets/') ||
+    url.pathname.startsWith('/icons/') ||
+    url.pathname === '/manifest.json'
+  ) {
+    e.respondWith(
+      caches.match(e.request).then((r) => r || fetch(e.request).then((res) => {
+        const clone = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, clone));
+        return res;
+      }))
+    );
+    return;
+  }
+
+  // Для страницы — сеть, при ошибке кэш
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const clone = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(e.request).then((r) => r || new Response('Нет интернета', { status: 503 })))
   );
 });
