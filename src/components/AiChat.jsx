@@ -47,7 +47,7 @@ const ACTION_MAP = {
     const expense = txs.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
     const profit = income - expense;
     const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
-    return `📊 Отчёт за ${periodLabel}:\n• Доходы: +${income.toLocaleString()} ₽\n• Расходы: −${expense.toLocaleString()} ₽\n• Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`;
+    return `📊 Отчёт за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ₽\n- Расходы: −${expense.toLocaleString()} ₽\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`;
   },
   GET_TIMESHEET_STATS: async (p, user) => {
     try {
@@ -108,7 +108,7 @@ const ACTION_MAP = {
         let text = `🎯 Бонусы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '🎯 Бонусов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `• ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()} ₽\n`;
+          text += `- ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()} ₽\n`;
         });
         text += `\nИтого: +${totalBonus.toLocaleString()} ₽`;
         return text;
@@ -125,7 +125,7 @@ const ACTION_MAP = {
         let text = `⚠️ Штрафы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '⚠️ Штрафов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `• ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()} ₽\n`;
+          text += `- ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()} ₽\n`;
         });
         text += `\nИтого: -${totalDeduct.toLocaleString()} ₽`;
         return text;
@@ -143,7 +143,7 @@ const ACTION_MAP = {
         });
         let text = `📅 Статистика с ${from} по ${to}:\n`;
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `• ${name}: ${s.worked} рабочих дн., ${s.sick} больн., ${s.vacation} отпуск, ${s.absent} прогул\n`;
+          text += `- ${name}: ${s.worked} рабочих дн., ${s.sick} больн., ${s.vacation} отпуск, ${s.absent} прогул\n`;
         });
         return text;
       }
@@ -159,7 +159,7 @@ const ACTION_MAP = {
       });
       let text = `📊 Табель с ${from} по ${to}:\n`;
       Object.entries(empStats).forEach(([name, s]) => {
-        text += `• ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()} ₽, штрафы -${s.deduct.toLocaleString()} ₽\n`;
+        text += `- ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()} ₽, штрафы -${s.deduct.toLocaleString()} ₽\n`;
       });
       text += `\n📌 Всего: +${totalBonus.toLocaleString()} ₽ бонусов, -${totalDeduct.toLocaleString()} ₽ штрафов, ${workedDays} рабочих дней`;
       return text;
@@ -175,7 +175,7 @@ const ACTION_MAP = {
     (txs||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
     let text = '💰 Баланс счетов:\n';
     let total = 0;
-    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `• ${a.name}: ${b.toLocaleString()} ₽\n`; total += b; });
+    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `- ${a.name}: ${b.toLocaleString()} ₽\n`; total += b; });
     text += `\n📊 Общий баланс: ${total.toLocaleString()} ₽`;
     return text;
   },
@@ -183,7 +183,7 @@ const ACTION_MAP = {
     const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false});
     if (!clients || clients.length === 0) return '✅ Нет должников';
     let text = '⚠️ Должники:\n';
-    clients.forEach(c => { text += `• ${c.name}: ${Number(c.debt).toLocaleString()} ₽\n`; });
+    clients.forEach(c => { text += `- ${c.name}: ${Number(c.debt).toLocaleString()} ₽\n`; });
     return text;
   },
   GET_STOCK: async (p, user) => {
@@ -199,7 +199,7 @@ const ACTION_MAP = {
     (supRaw||[]).forEach(sp => (sp.items||[]).forEach(it => { if (!sm[it.prodId]) sm[it.prodId] = 0; sm[it.prodId] += it.qty||0; }));
     (wo||[]).forEach(w => (w.items||[]).forEach(it => { if (sm[it.prodId]) sm[it.prodId] -= it.qty||0; }));
     let text = `📦 Остатки по «${p.product_name}»:\n`;
-    found.forEach(p => { text += `• ${p.name}: ${sm[p.id]||0} шт\n`; });
+    found.forEach(p => { text += `- ${p.name}: ${sm[p.id]||0} шт\n`; });
     return text;
   },
   GET_TOP_PRODUCTS: async (p, user) => {
@@ -224,7 +224,7 @@ export default function AiChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n• Добавить расход / доход\n• Баланс счетов / Деньги на счетах\n• Отчёт за день / неделю / месяц\n• Кто должен клиентов\n\n📦 Склад и товары\n• Создать товар / категорию\n• Остатки на складе\n\n👥 Сотрудники\n• Статистика табеля\n• Бонусы / Штрафы\n• Сколько дней отработал\n\n📊 Продажи\n• Что продаётся лучше всего\n• Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
+    { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n- Добавить расход / доход\n- Баланс счетов / Деньги на счетах\n- Отчёт за день / неделю / месяц\n- Кто должен клиентов\n\n📦 Склад и товары\n- Создать товар / категорию\n- Остатки на складе\n\n👥 Сотрудники\n- Статистика табеля\n- Бонусы / Штрафы\n- Сколько дней отработал\n\n📊 Продажи\n- Что продаётся лучше всего\n- Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
