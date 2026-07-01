@@ -182,6 +182,7 @@ export default function Receipts() {
               <th style={{ textAlign: 'center' }}>Сумма</th>
               <th style={{ textAlign: 'center' }}>Статус</th>
               <th style={{ textAlign: 'center' }}>Клиент</th>
+              <th style={{ textAlign: 'center' }}>Комментарий</th>
               <th style={{ textAlign: 'center' }}>Кассир</th>
               <th style={{ textAlign: 'center' }}>Откуда</th>
             </tr>
@@ -199,6 +200,7 @@ export default function Receipts() {
                 <td style={{ textAlign: 'center', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
                 <td style={{ textAlign: 'center' }}>{STATUS_LABELS[r.status] || r.status}</td>
                 <td style={{ textAlign: 'center' }}>{r.client_name || '—'}</td>
+                <td style={{ textAlign: 'center',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
                 <td style={{ textAlign: 'center' }}>{r.cashier_name || '—'}</td>
                 <td style={{ textAlign: 'center' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
@@ -219,6 +221,7 @@ export default function Receipts() {
               {formatDate(selectedReceipt.date)}
               {selectedReceipt.cashier_name ? ' • Кассир: ' + selectedReceipt.cashier_name : ''}
               {selectedReceipt.client_name ? ' • Клиент: ' + selectedReceipt.client_name : ''}
+              {selectedReceipt.comment ? <div style={{marginTop:'6px',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
             </div>
 
             {/* Позиции */}

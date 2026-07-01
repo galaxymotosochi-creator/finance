@@ -46,6 +46,7 @@ export default function Registers({ fullscreen }) {
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
   const [registerReceipts, setRegisterReceipts] = useState([]);
+  const [receiptComment, setReceiptComment] = useState('');
   const [heldReceipts, setHeldReceipts] = useState([]);
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [heldIndex, setHeldIndex] = useState(0);
@@ -220,7 +221,7 @@ export default function Registers({ fullscreen }) {
     var clientObj = clients.find(c => c.id === selectedClient);
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
-      date, total_amount: total,
+      date, total_amount: total, comment: receiptComment.trim() || null,
       discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0),
       status: receiptStatus,
       client_id: selectedClient || null,
@@ -371,6 +372,7 @@ export default function Registers({ fullscreen }) {
     }
     
     setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
+    setReceiptComment('');
     setCart([]); setShowPay(false); setPayMode(null);
     const msg = paidAmt >= total 
       ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
@@ -747,6 +749,12 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг
                 </div>
               )}
+            </div>
+
+            {/* Комментарий к чеку */}
+            <div className="form-group" style={{marginBottom:'8px'}}>
+              <input type="text" value={receiptComment} onChange={e=>setReceiptComment(e.target.value)} placeholder="Комментарий к чеку (пробег, примечание...)" 
+                style={{width:'100%',padding:'8px 10px',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
             </div>
 
             {/* Ползунок «Разделить на счета» */}
