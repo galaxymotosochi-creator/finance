@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 • ADD_INCOME, ADD_EXPENSE, ADD_PRODUCT, ADD_CATEGORY
 
 🟢 Действия-ЗАПРОСЫ (только чтение) — выполняй СРАЗУ, без подтверждения:
-• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS, GET_SHIFT_INFO, GET_FORECAST
+• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS, GET_SHIFT_INFO, GET_FORECAST, GET_ZERO_STOCK
 
 Тип товара или категории (product/service) определяй сам по смыслу:
 - Шлем, Скутер, Масло, Аккумулятор, Запчасть → product (товар)
@@ -77,6 +77,7 @@ export default async function handler(req, res) {
 
 Ты можешь отвечать на вопросы по складу:
 • «Сколько осталось [товар]?» — используй GET_STOCK с product_name
+• «Какие товары закончились?» или «что с нулевым остатком» — используй GET_ZERO_STOCK
 
 Ты можешь отвечать на вопросы по продажам:
 • «Что продаётся лучше всего?» — используй GET_TOP_PRODUCTS
