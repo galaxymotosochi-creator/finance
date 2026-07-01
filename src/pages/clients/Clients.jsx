@@ -157,8 +157,8 @@ export default function Clients() {
           <thead id="clientColHeaders">
             <tr>
               <th>Клиент</th>
-              <th style={{textAlign:'center'}}>Прим. 1</th>
-              <th style={{textAlign:'center'}}>Прим. 2</th>
+              <th style={{textAlign:'center'}}>Примечание 1</th>
+              <th style={{textAlign:'center'}}>Примечание 2</th>
               <th>Телефон</th>
               <th>ДР</th>
               <th>Покупок</th>
