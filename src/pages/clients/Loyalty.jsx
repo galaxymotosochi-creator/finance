@@ -260,7 +260,7 @@ export default function Loyalty() {
                   <input type="number" value={fDiscount} onChange={e=>setFDiscount(e.target.value)} placeholder="10" min="0" max="100" />
                 </div>
                 <div className="form-group">
-                  <label>Порог</label>
+                  <label>Порог (₽)</label>
                   <input type="number" value={fCondition} onChange={e=>setFCondition(e.target.value)} placeholder="0 — без порога" min="0" />
                 </div>
               </div>

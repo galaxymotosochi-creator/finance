@@ -617,7 +617,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Цена продажи</label>
+                  <label>Цена продажи (₽)</label>
                   <input type="number" min="0" step="0.01" value={addPrice} onChange={e => setAddPrice(e.target.value)} placeholder="0" />
                 </div>
                 <div className="form-group">
@@ -990,7 +990,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             </div>
 
             <div className="form-group">
-              <label>Фактический остаток в кассе</label>
+              <label>Фактический остаток в кассе (₽)</label>
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {

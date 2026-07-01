@@ -304,7 +304,7 @@ export default function Health() {
 
                 {/* Количество */}
                 <div style={{fontSize:'1.1rem',fontWeight:700,marginBottom:'4px'}}>
-                  {h.qty}
+                  {h.qty} <span style={{fontSize:'.7rem',fontWeight:400,color:'var(--muted)'}}>шт</span>
                 </div>
 
                 {/* Прогресс-бар запаса */}
