@@ -22,7 +22,7 @@ const menu = [
       { label: 'Смены', path: '/finance/shifts' },
       { label: 'Чеки', path: '/finance/receipts' },
       { label: 'Зарплата', path: '/finance/salary' },
-      { label: 'P&L', path: '/finance/pnl' },
+      { label: 'Чистая прибыль', path: '/finance/pnl' },
       { label: 'Категории', path: '/finance/categories' },
       { label: 'Планирование', path: '/finance/plans' },
     ],
