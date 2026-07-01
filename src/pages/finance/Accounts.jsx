@@ -55,7 +55,7 @@ export default function Accounts() {
   const [corDesc, setCorDesc] = useState('');
 
   const fetchAccounts = async () => {
-    var d = await supabase.from('accounts').select('*').order('created_at', { ascending: true });
+    var d = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
     if (!d.data) return;
     var cl = d.data;
     var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
@@ -79,7 +79,7 @@ export default function Accounts() {
   };
 
   const fetchTx = async () => {
-    var r = await supabase.from('transactions').select('*').order('created_at', {ascending:false});
+    var r = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', {ascending:false});
     setTransactions(r.data||[]);
     setLoading(false);
   };
