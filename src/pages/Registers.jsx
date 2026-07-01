@@ -45,6 +45,7 @@ export default function Registers({ fullscreen }) {
   const [showCloseShift, setShowCloseShift] = useState(false);
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
+  const [registerReceipts, setRegisterReceipts] = useState([]);
   const [heldReceipts, setHeldReceipts] = useState([]);
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [heldIndex, setHeldIndex] = useState(0);
@@ -261,6 +262,7 @@ export default function Registers({ fullscreen }) {
         date, status: 'unpaid', category_id: saleCatId,
       });
       setProcessingPay(false); if (error) return setToast('Ошибка: ' + error.message);
+      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: 'unpaid', type:'income' }]);
       setCart([]); setShowPay(false);
       setProcessingPay(false); return setToast('Чек №' + receiptNum + ' сохранён (не оплачен)');
     }
@@ -281,6 +283,7 @@ export default function Registers({ fullscreen }) {
         if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
         part++;
       }
+      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: 'paid', type:'income' }]);
       setCart([]); setShowPay(false); setPayMode(null);
       setProcessingPay(false); return setToast('Чек №' + receiptNum + ' — оплачено с нескольких счетов');
     }
@@ -367,6 +370,7 @@ export default function Registers({ fullscreen }) {
       });
     }
     
+    setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
     setCart([]); setShowPay(false); setPayMode(null);
     const msg = paidAmt >= total 
       ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
@@ -904,12 +908,12 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
       )}
 
       {/* Чеки за смену */}
-      {shiftTx.length > 0 && !showCloseShift && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setShiftTx([]); } }}>
+      {registerReceipts.length > 0 && !showCloseShift && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setRegisterReceipts([]); } }}>
           <div className="modal-box" style={{maxWidth:'520px'}}>
-            <button className="modal-close" onClick={() => setShiftTx([])}>&times;</button>
+            <button className="modal-close" onClick={() => setRegisterReceipts([])}>&times;</button>
             <h2>Чеки за смену</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Все операции с момента открытия смены</div>
+            <div className="sub" style={{marginBottom:'12px'}}>Чеки, пробитые через кассу</div>
             <div style={{overflowY:'auto',maxHeight:'50vh'}}>
               <table style={{width:'100%',borderCollapse:'collapse',fontSize:'13px'}}>
                 <thead>
@@ -923,7 +927,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   </tr>
                 </thead>
                 <tbody>
-                  {shiftTx.filter(t => t.type === 'income').map((t, i) => {
+                  {registerReceipts.map((t, i) => {
                     const ac = accounts.find(a => a.id === t.account_id);
                     const time = new Date(t.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
                     return (
@@ -944,10 +948,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             </div>
             <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
               <span>Итого:</span>
-              <span>+{shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+              <span>+{registerReceipts.filter(t => t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
             <div className="modal-actions">
-              <button className="btn btn-account-select" onClick={() => setShiftTx([])}>Закрыть</button>
+              <button className="btn btn-account-select" onClick={() => setRegisterReceipts([])}>Закрыть</button>
             </div>
           </div>
         </div>
