@@ -38,6 +38,7 @@ export default function PnL() {
           { data: supplies },
           { data: products },
           { data: expenses },
+          { data: cats },
           { data: accts },
           { data: allTx },
           { data: writeoffs },
@@ -51,8 +52,9 @@ export default function PnL() {
           supabase.from('supplies').select('items').eq('user_id', user.id),
           supabase.from('products').select('id,name').eq('user_id', user.id).eq('hidden', false),
           // Расходные транзакции за период
-          supabase.from('transactions').select('amount')
+          supabase.from('transactions').select('amount,category_id')
             .eq('user_id', user.id).eq('type', 'expense').gte('date', dr.from).lte('date', dr.to),
+          supabase.from('categories').select('id,type').eq('user_id', user.id),
           supabase.from('accounts').select('id,name,balance').eq('user_id', user.id),
           // Все транзакции для баланса счетов
           supabase.from('transactions').select('account_id,type,amount,date,status')
@@ -94,8 +96,19 @@ export default function PnL() {
           }
         });
 
-        // Операционные расходы за период
-        const opExpenses = (expenses || []).reduce((s, t) => s + (t.amount || 0), 0);
+        // ID категорий операционных расходов (не закупки)
+        const opCatIds = new Set(
+          (cats || []).filter(c => c.type === 'expense').map(c => c.id)
+        );
+        // Операционные расходы — только с категорией операционного типа
+        const opExpenses = (expenses || []).reduce((s, t) => {
+          if (t.category_id && opCatIds.has(t.category_id)) {
+            return s + (t.amount || 0);
+          }
+          // Если категория не указана — считаем операционным
+          if (!t.category_id) return s + (t.amount || 0);
+          return s;
+        }, 0);
 
         // Налог УСН 6%
         const tax = Math.round(salesRev * 0.06);
