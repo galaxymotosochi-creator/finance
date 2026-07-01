@@ -259,15 +259,15 @@ export default function AiChat() {
 
         const sales = (txs||[]).filter(t => t.type==='income'&&!t.description?.startsWith('Перевод')).reduce((s,t)=>s+Number(t.amount||0),0);
         const recCount = (recs||[]).length;
-        let greet = '👋 Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
+        let greet = 'Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
         if (shift?.cashier_name && recCount > 0) {
-          greet += ` Касса работает ☕️\nКассир: ${shift.cashier_name} · ${recs.reduce((s,r)=>s+(r.total_amount||0),0).toLocaleString()} ₽ за сегодня`;
+          greet += `\nКасса: ${shift.cashier_name} · продажи ${recs.reduce((s,r)=>s+(r.total_amount||0),0).toLocaleString()} ₽`;
         } else if (shift?.cashier_name) {
-          greet += ` Смена открыта, кассир ${shift.cashier_name} ⏳`;
+          greet += `\nСмена открыта, кассир ${shift.cashier_name}`;
         } else {
-          greet += '\n☀️ Новый день! Откроем смену?';
+          greet += '\nНовый день! Откроем смену?';
         }
-        setMessages([{ role: 'assistant', text: greet + '\n\nЧем могу помочь? 🙌', isNotification: false }]);
+        setMessages([{ role: 'assistant', text: greet + '\n\nЧем могу помочь?', isNotification: false }]);
       } catch(e) {
         // Оставляем стандартное приветствие
       }
