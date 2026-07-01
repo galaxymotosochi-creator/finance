@@ -104,7 +104,6 @@ export default function Transactions() {
 
   const incomeTotal = txs.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const expenseTotal = txs.filter(t => t && t.type !== 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const profit = incomeTotal - expenseTotal;
   const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
@@ -323,13 +322,7 @@ export default function Transactions() {
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{expenseTotal.toLocaleString()} ₽</div>
             </div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ height: '3px', background: '#ff9800' }}></div>
-            <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Прибыль</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: profit < 0 ? '#dc2626' : '#111' }}>{profit.toLocaleString()} ₽</div>
-            </div>
-          </div>
+
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#1e88e5' }}></div>
             <div style={{ padding: '12px 14px' }}>
