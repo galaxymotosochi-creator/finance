@@ -239,6 +239,41 @@ export default function AiChat() {
     if (open) { setNotifDot(null); setNotifCount(0); }
   }, [open]);
 
+  // Живое приветствие при открытии
+  useEffect(() => {
+    if (!open || !user) return;
+    (async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const [{data:txs},{data:shift},{data:accts},{data:recs},{data:emps}] = await Promise.all([
+          supabase.from('transactions').select('amount,type').eq('user_id',user.id).gte('date',today),
+          supabase.from('shifts').select('cashier_name').eq('user_id',user.id).is('closed_at',null).limit(1).maybeSingle(),
+          supabase.from('accounts').select('name,balance').eq('user_id',user.id),
+          supabase.from('receipts').select('total_amount').eq('user_id',user.id).gte('date',today),
+          supabase.from('employees').select('name').eq('user_id',user.id),
+        ]);
+        // Именинники
+        const now = new Date();
+        const md = now.toISOString().slice(5,10);
+        const bdays = (emps||[]).filter(() => false); // пока отключено
+
+        const sales = (txs||[]).filter(t => t.type==='income'&&!t.description?.startsWith('Перевод')).reduce((s,t)=>s+Number(t.amount||0),0);
+        const recCount = (recs||[]).length;
+        let greet = '👋 Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
+        if (shift?.cashier_name && recCount > 0) {
+          greet += ` Касса работает ☕️\nКассир: ${shift.cashier_name} · ${recs.reduce((s,r)=>s+(r.total_amount||0),0).toLocaleString()} ₽ за сегодня`;
+        } else if (shift?.cashier_name) {
+          greet += ` Смена открыта, кассир ${shift.cashier_name} ⏳`;
+        } else {
+          greet += '\n☀️ Новый день! Откроем смену?';
+        }
+        setMessages([{ role: 'assistant', text: greet + '\n\nЧем могу помочь? 🙌', isNotification: false }]);
+      } catch(e) {
+        // Оставляем стандартное приветствие
+      }
+    })();
+  }, [open, user]);
+
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages]);
