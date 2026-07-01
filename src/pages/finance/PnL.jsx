@@ -112,12 +112,9 @@ export default function PnL() {
         });
         const opList = Object.entries(opByCat).sort((a, b) => b[1] - a[1]);
 
-        // Налог УСН 6%
-        const tax = Math.round(salesRev * 0.06);
-
         // Чистая прибыль
         const grossProfit = salesRev - totalCogs;
-        const netProfit = grossProfit - opTotal - tax;
+        const netProfit = grossProfit - opTotal;
         const profitability = salesRev > 0 ? Math.round(netProfit / salesRev * 100) : 0;
 
         // Товарный запас (по себестоимости) — остатки на складе
@@ -156,7 +153,7 @@ export default function PnL() {
           grossProfit,
           opList,
           opTotal,
-          tax,
+
           netProfit,
           profitability,
           stockValue: totalStockValue,
@@ -232,7 +229,7 @@ export default function PnL() {
         {d.opList.map(([name, amt], i) => (
           <Row key={i} label={name} value={`−${amt.toLocaleString()} ₽`} color="#dc2626" />
         ))}
-        <Row label="Налог УСН 6%" value={`−${d.tax.toLocaleString()} ₽`} color="#dc2626" />
+
       </div>
 
       {/* Итог */}
