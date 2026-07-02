@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 • ADD_INCOME, ADD_EXPENSE, ADD_PRODUCT, ADD_CATEGORY
 
 🟢 Действия-ЗАПРОСЫ (только чтение) — выполняй СРАЗУ, без подтверждения:
-• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS, GET_SHIFT_INFO, GET_FORECAST, GET_ZERO_STOCK
+• GET_REPORT, GET_BALANCE, GET_DEBTORS, GET_STOCK, GET_TOP_PRODUCTS, GET_TIMESHEET_STATS, GET_SHIFT_INFO, GET_FORECAST, GET_ZERO_STOCK, GET_CLIENTS, GET_EMPLOYEES, GET_SUPPLIES, GET_WRITEOFFS, GET_TRANSACTIONS, GET_MONTHLY_SUMMARY, AI_QUERY
 
 Тип товара или категории (product/service) определяй сам по смыслу:
 - Шлем, Скутер, Масло, Аккумулятор, Запчасть → product (товар)
@@ -59,6 +59,45 @@ export default async function handler(req, res) {
 - GET_TOP_PRODUCTS — показать топ продаваемых товаров. Параметры: period (today/week/month/all, опционально), limit (количество, опционально, по умолчанию 5)
 - GET_SHIFT_INFO — показать информацию о текущей кассовой смене. Параметры: нет
 - GET_FORECAST — прогноз продаж на месяц. Параметры: нет
+- GET_ZERO_STOCK — товары с нулевым остатком. Параметры: нет
+- GET_CLIENTS — список клиентов. Параметры: debtors_only (true/false, показать только должников), limit (число)
+- GET_EMPLOYEES — список сотрудников. Параметры: нет
+- GET_SUPPLIES — поставки товаров. Параметры: limit (число, по умолч. 10)
+- GET_WRITEOFFS — списания товаров. Параметры: limit (число, по умолч. 10)
+- GET_TRANSACTIONS — операции (доходы/расходы). Параметры: period (today/week/month), days (число дней), type (income/expense), category, limit
+- GET_MONTHLY_SUMMARY — сводка доходов-расходов по месяцам. Параметры: нет
+
+=== AI_QUERY — УНИВЕРСАЛЬНЫЙ ЗАПРОС ===
+Если подходящей команды нет, используй AI_QUERY — он умеет делать произвольный SELECT-запрос.
+
+Параметры AI_QUERY:
+- table — таблица (обязательно): transactions, accounts, products, stock_categories, clients, employees, shifts, receipts, receipt_items, supplies, writeoffs, suppliers, positions
+- select — какие поля (опционально, по умолчанию *)
+- filter — массив фильтров, каждый в формате "column operator value"
+  Поддерживаются: =, !=, >, <, >=, <=, ~ (ilike/поиск), ilike
+  Пример: filter: debt > 0
+  Пример: filter: name ~ Иванов
+  Несколько фильтров: повторяй строку filter несколько раз
+- order — сортировка, формат "column asc" или "column desc"
+- limit — максимум записей (по умолч. 20)
+
+Примеры AI_QUERY:
+[ДЕЙСТВИЕ:AI_QUERY]
+table: products
+select: name,price,type
+filter: price > 5000
+order: price desc
+limit: 10
+[/ДЕЙСТВИЕ]
+
+[ДЕЙСТВИЕ:AI_QUERY]
+table: transactions
+select: date,amount,type,description
+filter: date >= 2026-06-01
+filter: type = income
+order: date desc
+limit: 15
+[/ДЕЙСТВИЕ]
 
 Ты можешь отвечать на вопросы по табелю:
 • «Сколько штрафов у Иванова за неделю?» — используй GET_TIMESHEET_STATS с employee_name и stat_type=deduct
@@ -82,6 +121,37 @@ export default async function handler(req, res) {
 Ты можешь отвечать на вопросы по продажам:
 • «Что продаётся лучше всего?» — используй GET_TOP_PRODUCTS
 • «Топ товаров за месяц» — используй GET_TOP_PRODUCTS с period=month
+
+Ты можешь отвечать на вопросы по сотрудникам:
+• «Кто работает?» или «список сотрудников» — используй GET_EMPLOYEES
+• «Покажи всех сотрудников» — GET_EMPLOYEES
+
+Ты можешь отвечать на вопросы по клиентам:
+• «Покажи клиентов» — используй GET_CLIENTS
+• «Кто должен?» — используй GET_CLIENTS с debtors_only=true
+• «Должники» — GET_CLIENTS с debtors_only=true
+
+Ты можешь отвечать на вопросы по поставкам:
+• «Последние поставки» — используй GET_SUPPLIES
+• «Какие были поставки?» — GET_SUPPLIES
+
+Ты можешь отвечать на вопросы по списаниям:
+• «Какие были списания?» — используй GET_WRITEOFFS
+
+Ты можешь отвечать на вопросы по операциям:
+• «Покажи последние операции» — используй GET_TRANSACTIONS
+• «Какие расходы за неделю?» — GET_TRANSACTIONS с period=week
+• «Доходы за сегодня» — GET_TRANSACTIONS с period=today type=income
+
+Ты можешь отвечать на вопросы по месяцам:
+• «Сводка по месяцам» — используй GET_MONTHLY_SUMMARY
+
+Если пользователь задаёт вопрос, на который нет готовой команды — используй AI_QUERY.
+Пример: «сколько товаров дороже 10000?» → AI_QUERY с table=products, filter="price > 10000"
+Пример: «покажи чеки за вчера» → AI_QUERY с table=receipts, filter="date = 2026-07-01"
+Пример: «у кого долг больше 50 тысяч?» → AI_QUERY с table=clients, filter="debt > 50000"
+
+AI_QUERY — это твой универсальный инструмент. Если не знаешь какую команду использовать — используй AI_QUERY. Он есть для всего.
 
 Если пользователь пишет не по делу — вежливо скажи что ты умеешь делать.
 Не выдумывай данные. Если нужна информация — скажи что данных нет.
@@ -141,7 +211,15 @@ export default async function handler(req, res) {
       paramLines.forEach(line => {
         const [key, ...vals] = line.split(':');
         if (key && vals.length) {
-          params[key.trim()] = vals.join(':').trim();
+          const k = key.trim();
+          const v = vals.join(':').trim();
+          // Поддерживаем повторяющиеся ключи (превращаем в массив)
+          if (params[k] !== undefined) {
+            if (!Array.isArray(params[k])) params[k] = [params[k]];
+            params[k].push(v);
+          } else {
+            params[k] = v;
+          }
         }
       });
     }

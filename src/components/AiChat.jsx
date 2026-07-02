@@ -236,6 +236,222 @@ const ACTION_MAP = {
     const cashBal = cashAc ? (parseFloat(cashAc.balance)||0) + (txById[cashAc.id]||0) : 0;
     return 'Касса: ' + (shift.cashier_name || '—') + '\nСмена открыта: ' + new Date(shift.opened_at).toLocaleString('ru-RU') + '\nПродажи за сегодня: +' + sales.toLocaleString() + ' ₽\nНаличные в кассе: ' + Math.round(cashBal).toLocaleString() + ' ₽';
   },
+
+  // ===== НОВЫЕ КОМАНДЫ =====
+
+  GET_FORECAST: async (p, user) => {
+    // Прогноз продаж на месяц на основе среднего чека за последние 30 дней
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+    const cs = cutoff.toISOString().split('T')[0];
+    const now = new Date().toISOString().split('T')[0];
+    const {data:recs} = await supabase.from('receipts').select('total_amount').eq('user_id',user.id).gte('date',cs).not('total_amount','is',null);
+    const {data:prev} = await supabase.from('transactions').select('amount').eq('user_id',user.id).eq('type','income').gte('date',cs);
+    const daysElapsed = new Date().getDate();
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const daysLeft = daysInMonth - daysElapsed;
+    if (!recs || recs.length === 0) {
+      if (!prev || prev.length === 0) return 'Нет данных для прогноза. Начните продавать!';
+      const monthIncome = prev.reduce((s,t) => s + Number(t.amount||0), 0);
+      const avgPerDay = monthIncome / daysElapsed;
+      const forecast = Math.round(avgPerDay * daysInMonth);
+      return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ₽\n(на основе ${monthIncome.toLocaleString()} ₽ за ${daysElapsed} дн.)`;
+    }
+    const total = recs.reduce((s,r) => s + Number(r.total_amount||0), 0);
+    const checksPerDay = recs.length / 30;
+    const avgCheck = total / recs.length;
+    const forecast = Math.round(avgCheck * checksPerDay * daysLeft + total);
+    return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ₽\nТекущая выручка: ${total.toLocaleString()} ₽\nСредний чек: ${Math.round(avgCheck).toLocaleString()} ₽`;
+  },
+
+  GET_ZERO_STOCK: async (p, user) => {
+    const {data:prods} = await supabase.from('products').select('id,name').eq('user_id',user.id).eq('hidden',false);
+    if (!prods || prods.length === 0) return '📭 Нет товаров на складе';
+    const ids = prods.map(p => p.id);
+    const {data:supRaw} = await supabase.from('supplies').select('items').eq('user_id',user.id);
+    const {data:wo} = await supabase.from('writeoffs').select('items').eq('user_id',user.id);
+    const sm = {};
+    prods.forEach(p => { sm[p.id] = 0; });
+    (supRaw||[]).forEach(sp => (sp.items||[]).forEach(it => { if (sm[it.prodId] !== undefined) sm[it.prodId] += it.qty||0; }));
+    (wo||[]).forEach(w => (w.items||[]).forEach(it => { if (sm[it.prodId] !== undefined) sm[it.prodId] -= it.qty||0; }));
+    const zero = Object.entries(sm).filter(([,qty]) => qty <= 0);
+    if (zero.length === 0) return '✅ Все товары на складе есть в наличии';
+    const names = {};
+    prods.forEach(p => { names[p.id] = p.name; });
+    let text = `⚠️ Товаров с нулевым остатком: ${zero.length}\n`;
+    zero.forEach(([id,qty]) => { text += `- ${names[id]||'Товар'}: ${qty} шт\n`; });
+    return text;
+  },
+
+  GET_CLIENTS: async (p, user) => {
+    let query = supabase.from('clients').select('name,phone,debt,orders_count,total_spent,note').eq('user_id',user.id);
+    // Фильтр по долгу
+    if (p.debtors_only === 'true' || p.debt_only === 'true' || p.debt === 'true') {
+      query = query.gt('debt', 0).not('debt','is',null);
+    }
+    const {data:clients} = await query.order('name', {ascending: true}).limit(parseInt(p.limit) || 50);
+    if (!clients || clients.length === 0) {
+      if (p.debtors_only === 'true') return '✅ Нет должников';
+      return '📭 Клиенты не найдены';
+    }
+    let text = '👥 Клиенты' + (p.debtors_only === 'true' ? ' (должники)' : '') + ':\n';
+    clients.forEach(c => {
+      text += `- ${c.name}`;
+      if (c.phone) text += ` (${c.phone})`;
+      if (c.debt && Number(c.debt) > 0) text += ` долг: ${Number(c.debt).toLocaleString()} ₽`;
+      if (c.total_spent && Number(c.total_spent) > 0) text += ` всего: ${Number(c.total_spent).toLocaleString()} ₽`;
+      text += '\n';
+    });
+    text += `\nВсего: ${clients.length}`;
+    return text;
+  },
+
+  GET_EMPLOYEES: async (p, user) => {
+    let query = supabase.from('employees').select('name,position,salary_type,salary_value,phone').eq('user_id',user.id).eq('hidden',false);
+    const {data:emps} = await query.order('name');
+    if (!emps || emps.length === 0) return '📭 Нет сотрудников';
+    let text = '👥 Сотрудники:\n';
+    emps.forEach(e => {
+      text += `- ${e.name}${e.position ? ' — '+e.position : ''}`;
+      if (e.salary_value) text += ` (${e.salary_value.toLocaleString()} ₽${e.salary_type==='hourly'?'/час':'/мес'})`;
+      text += '\n';
+    });
+    text += `\nВсего: ${emps.length}`;
+    return text;
+  },
+
+  GET_SUPPLIES: async (p, user) => {
+    const limit = parseInt(p.limit) || 10;
+    const {data:supplies} = await supabase.from('supplies').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(limit);
+    if (!supplies || supplies.length === 0) return '📭 Нет поставок';
+    let text = `📦 Последние поставки (${limit}):\n`;
+    supplies.forEach(s => {
+      const itemsTotal = (s.items||[]).reduce((sum,it) => sum + (it.qty||0), 0);
+      const total = (s.items||[]).reduce((sum,it) => sum + (it.price||0)*(it.qty||0), 0);
+      text += `- ${s.supplier_name || 'Поставщик'} (${new Date(s.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ₽\n`;
+    });
+    return text;
+  },
+
+  GET_WRITEOFFS: async (p, user) => {
+    const limit = parseInt(p.limit) || 10;
+    const {data:wos} = await supabase.from('writeoffs').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(limit);
+    if (!wos || wos.length === 0) return '📭 Нет списаний';
+    let text = `📋 Последние списания (${limit}):\n`;
+    wos.forEach(w => {
+      const itemsTotal = (w.items||[]).reduce((sum,it) => sum + (it.qty||0), 0);
+      const total = (w.items||[]).reduce((sum,it) => sum + (it.price||0)*(it.qty||0), 0);
+      text += `- ${w.reason || 'Причина не указана'} (${new Date(w.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ₽\n`;
+    });
+    return text;
+  },
+
+  GET_TRANSACTIONS: async (p, user) => {
+    const limit = parseInt(p.limit) || 10;
+    const days = parseInt(p.days) || (p.period === 'today' ? 1 : p.period === 'week' ? 7 : p.period === 'month' ? 30 : 30);
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
+    const cs = cutoff.toISOString().split('T')[0];
+    let query = supabase.from('transactions').select('*').eq('user_id',user.id).gte('date',cs);
+    if (p.type === 'income' || p.type === 'expense') query = query.eq('type', p.type);
+    if (p.category) query = query.ilike('category', `%${p.category}%`);
+    const {data:txs} = await query.order('date',{ascending:false}).limit(limit);
+    if (!txs || txs.length === 0) return '📭 Нет операций за выбранный период';
+    const totalIncome = txs.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount||0),0);
+    const totalExpense = txs.filter(t=>t.type!=='income').reduce((s,t)=>s+Number(t.amount||0),0);
+    let text = `💰 Операции за ${days===1?'сегодня':days===7?'неделю':days===30?'месяц':days+' дн.'}:\n`;
+    txs.forEach(t => {
+      const sign = t.type === 'income' ? '+' : '−';
+      text += `- ${sign}${Number(t.amount).toLocaleString()} ₽ — ${(t.description||'без описания').slice(0,40)}\n`;
+    });
+    text += `\nДоход: +${totalIncome.toLocaleString()} ₽\nРасход: −${totalExpense.toLocaleString()} ₽`;
+    return text;
+  },
+
+  GET_MONTHLY_SUMMARY: async (p, user) => {
+    const {data:txs} = await supabase.from('transactions').select('date,type,amount').eq('user_id',user.id).order('date',{ascending:false});
+    if (!txs || txs.length === 0) return '📭 Нет данных для сводки';
+    const months = {};
+    txs.forEach(t => {
+      const m = (t.date||'').slice(0,7);
+      if (!months[m]) months[m] = { income: 0, expense: 0 };
+      if (t.type === 'income') months[m].income += Number(t.amount||0);
+      else months[m].expense += Number(t.amount||0);
+    });
+    const sorted = Object.entries(months).sort((a,b) => b[0].localeCompare(a[0])).slice(0, 6);
+    let text = '📊 Сводка по месяцам:\n';
+    sorted.forEach(([m, v]) => {
+      const profit = v.income - v.expense;
+      const names = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+      const [y,mo] = m.split('-');
+      text += `- ${names[parseInt(mo)-1]} ${y}: +${v.income.toLocaleString()} ₽ / −${v.expense.toLocaleString()} ₽ = ${profit>=0?'+':''}${profit.toLocaleString()} ₽\n`;
+    });
+    return text;
+  },
+
+  // ===== УНИВЕРСАЛЬНЫЙ ЗАПРОС =====
+  // AI сам решает, какие данные нужны, и описывает запрос
+  AI_QUERY: async (p, user) => {
+    const ALLOWED = ['transactions','accounts','products','stock_categories','clients','employees','shifts','receipts','receipt_items','supplies','writeoffs','suppliers','positions','inventory','stock'];    
+    const table = (p.table || '').trim();
+    if (!table) return '❌ Укажите таблицу для запроса';
+    if (!ALLOWED.includes(table)) return '❌ Таблица "'+table+'" не разрешена для запроса';
+
+    try {
+      let query = supabase.from(table).select(p.select || '*').eq('user_id', user.id);
+
+      // Фильтры
+      if (p.filter) {
+        const filters = Array.isArray(p.filter) ? p.filter : [p.filter];
+        filters.forEach(f => {
+          if (typeof f !== 'string') return;
+          // Формат: "column:operator:value" or "column operator value"
+          const parts = f.match(/^([\w_]+)\s*(>=|<=|!=|=|>|<|~|is|ilike)\s*(.+)$/i);
+          if (!parts) return;
+          const [, col, op, val] = parts;
+          const cleanVal = val.trim().replace(/^['"]|['"]$/g, '');
+          switch(op) {
+            case '>=': query = query.gte(col, cleanVal); break;
+            case '<=': query = query.lte(col, cleanVal); break;
+            case '>':  query = query.gt(col, cleanVal); break;
+            case '<':  query = query.lt(col, cleanVal); break;
+            case '!=': query = query.neq(col, cleanVal); break;
+            case '=': case ':': query = query.eq(col, cleanVal); break;
+            case '~': case 'ilike': query = query.ilike(col, `%${cleanVal}%`); break;
+          }
+        });
+      }
+
+      if (p.order) {
+        const parts = p.order.split(' ');
+        query = query.order(parts[0], { ascending: parts[1] === 'asc' });
+      }
+
+      if (p.limit) query = query.limit(parseInt(p.limit));
+
+      const { data, error } = await query;
+      if (error) return '❌ ' + error.message;
+      if (!data || data.length === 0) return '📭 Нет данных по вашему запросу';
+
+      // Форматируем результат
+      const fields = Object.keys(data[0]).filter(k => k !== 'user_id' && k !== 'id');
+      let text = `📋 ${table}: ${data.length} записей\n`;
+      data.slice(0, 15).forEach(row => {
+        text += '- ';
+        const parts = fields.slice(0, 5).map(f => {
+          let v = row[f];
+          if (v === null || v === undefined) return '';
+          if (typeof v === 'object') v = JSON.stringify(v).slice(0, 60);
+          if (f === 'price' || f === 'amount' || f === 'total' || f === 'balance' || f === 'salary_value' || f === 'debt' || f === 'total_spent') v = Number(v).toLocaleString() + ' ₽';
+          if (f === 'date' || f === 'created_at') v = (v||'').slice(0,10);
+          return `${f}: ${v}`;
+        }).filter(Boolean);
+        text += parts.join(', ') + '\n';
+      });
+      if (data.length > 15) text += `... и ещё ${data.length - 15}\n`;
+      return text;
+    } catch (err) {
+      return '❌ Ошибка запроса: ' + err.message;
+    }
+  },
 };
 
 export default function AiChat() {
