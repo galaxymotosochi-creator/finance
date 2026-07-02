@@ -42,6 +42,8 @@ export default function Registers({ fullscreen }) {
   const [payAmount, setPayAmount] = useState('');
   const [splitAmts, setSplitAmts] = useState({});
   const [showActions, setShowActions] = useState(false);
+  const [editingCashier, setEditingCashier] = useState(false);
+  const [displayCashierName, setDisplayCashierName] = useState('');
   const [showCloseShift, setShowCloseShift] = useState(false);
   const [closeFactBal, setCloseFactBal] = useState('');
   const [shiftTx, setShiftTx] = useState([]);
@@ -91,6 +93,7 @@ export default function Registers({ fullscreen }) {
   }, [user]);
   const localName = getOwnerName();
   const userName = abbreviateName(ownerName || localName || user?.user_metadata?.full_name) || user?.email?.split('@')[0] || 'Кассир';
+  const effectiveName = displayCashierName || userName || activeShift?.cashier_name || 'Кассир';
 
   useEffect(() => {
     if (!user) return;
@@ -108,8 +111,17 @@ export default function Registers({ fullscreen }) {
       if (aRes.data) setAccounts(aRes.data);
       if (clRes && clRes.data) setClients(clRes.data);
       if (proRes?.data) setPromos(proRes.data);
-      if (sRes.data) setActiveShift(sRes.data);
-      else { setOpenShiftCashier(userName); setShowOpenShift(true); }
+      if (sRes.data) {
+        setActiveShift(sRes.data);
+        // Синхронизируем имя кассира из настроек
+        if (userName && sRes.data.cashier_name !== userName) {
+          supabase.from('shifts').update({ cashier_name: userName }).eq('id', sRes.data.id).eq('user_id', user.id).then();
+          sRes.data.cashier_name = userName;
+        }
+      } else {
+        setOpenShiftCashier(userName);
+        setShowOpenShift(true);
+      }
       // Загружаем остатки склада
       Promise.all([
         supabase.from('supplies').select('items').eq('user_id', user.id),
@@ -463,7 +475,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
           <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#ffbd2e',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
           <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
           <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
-          <span style={{fontSize:'12px',fontWeight:500,color:'#888'}}>{activeShift?.cashier_name || userName}</span>
+          <span style={{fontSize:'12px',fontWeight:500,color:'#888',cursor:'pointer'}} onClick={() => { if (activeShift) setEditingCashier(true); else setShowOpenShift(true); }} title="Нажмите чтобы изменить">
+            {displayCashierName || activeShift?.cashier_name || userName}
+          </span>
 
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
         </div>
@@ -907,9 +921,36 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
+              <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>👤 Сменить кассира</button>
               {heldReceipts.length > 0 && (
                 <button onClick={()=>{setShowActions(false);setHeldIndex(0);setShowHoldModal(true)}} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Отложенные чеки ({heldReceipts.length})</button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модалка смены кассира */}
+      {editingCashier && (
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setEditingCashier(false); }}>
+          <div className="modal-box" style={{maxWidth:'340px'}}>
+            <button className="modal-close" onClick={() => setEditingCashier(false)}>&times;</button>
+            <h2>Сменить кассира</h2>
+            <div className="sub" style={{marginBottom:'12px'}}>Введите Фамилию и Имя</div>
+            <input type="text" value={displayCashierName || effectiveName || ''} onChange={e => setDisplayCashierName(e.target.value)}
+              placeholder="Фамилия Имя" autoFocus
+              style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+            <div style={{marginTop:'12px',display:'flex',gap:'8px'}}>
+              <button onClick={() => setEditingCashier(false)} style={{flex:1,padding:'10px',borderRadius:'8px',border:'1px solid #ddd',background:'#fff',fontSize:'13px',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+              <button onClick={async () => {
+                const name = displayCashierName.trim() || userName;
+                if (activeShift && name) {
+                  await supabase.from('shifts').update({ cashier_name: name }).eq('id', activeShift.id).eq('user_id', user.id);
+                  setActiveShift({...activeShift, cashier_name: name});
+                }
+                setDisplayCashierName(name);
+                setEditingCashier(false);
+              }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Сохранить</button>
             </div>
           </div>
         </div>
