@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '../hooks/useSubscription';
 
 export default function Subscription() {
   const n = useNavigate();
+  const { subscription, daysLeft, isExpired } = useSubscription();
   const [period, setPeriod] = useState('1m');
   const [autoRenew, setAutoRenew] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -33,6 +35,45 @@ export default function Subscription() {
     <div style={{fontFamily:"'Inter',sans-serif",color:"#111",padding:"0 0 40px"}}>
       <h1 style={{fontSize:"1.2rem",fontWeight:700,marginBottom:4,letterSpacing:"-.02em"}}>Управление подпиской</h1>
       <p style={{fontSize:".82rem",color:"rgba(0,0,0,.54)",marginBottom:24}}>Ваш тариф и способы оплаты</p>
+
+      {/* Баннер триала */}
+      {subscription && subscription.status === 'trial' && !isExpired && (
+        <div style={{
+          border:'1px solid #ffdd2d',borderRadius:16,padding:'16px 20px',
+          background:'#fffbe6',marginBottom:20,
+          display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap',
+        }}>
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <span style={{fontSize:24}}>🎁</span>
+            <div>
+              <div style={{fontSize:14,fontWeight:700,color:'#333',marginBottom:2}}>Бесплатный период</div>
+              <div style={{fontSize:12,color:'rgba(0,0,0,.54)'}}>
+                У вас осталось <strong>{daysLeft}</strong> {daysLeft === 1 ? 'день' : daysLeft < 5 ? 'дня' : 'дней'} бесплатного доступа
+              </div>
+            </div>
+          </div>
+          <button onClick={()=>window.scrollTo({top:document.querySelector('[class*="subscription"]')?.offsetTop||600,behavior:'smooth'})} style={{
+            padding:'8px 20px',borderRadius:100,border:'none',background:'#ffdd2d',
+            fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#000',
+            whiteSpace:'nowrap',
+          }}>Выбрать тариф</button>
+        </div>
+      )}
+
+      {/* Баннер истекшего триала */}
+      {isExpired && (
+        <div style={{
+          border:'1px solid #fecaca',borderRadius:16,padding:'16px 20px',
+          background:'#fef2f2',marginBottom:20,
+          textAlign:'center',
+        }}>
+          <div style={{fontSize:32,marginBottom:8}}>⏰</div>
+          <div style={{fontSize:15,fontWeight:700,color:'#991b1b',marginBottom:4}}>Бесплатный период закончился</div>
+          <p style={{fontSize:13,color:'rgba(0,0,0,.54)',marginBottom:14,lineHeight:1.4}}>
+            Выберите тариф, чтобы продолжить пользоваться AtlasPos
+          </p>
+        </div>
+      )}
 
       {/* Статус */}
       <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:20,marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>

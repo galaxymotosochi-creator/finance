@@ -1,10 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useSubscription } from '../hooks/useSubscription';
 
 export default function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { loading: subLoading, isExpired } = useSubscription();
 
-  if (loading) {
+  if (authLoading || subLoading) {
     return (
       <div style={{
         display: 'flex',
@@ -20,6 +22,10 @@ export default function ProtectedRoute({ children }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (isExpired) {
+    return <Navigate to="/settings/subscription" replace />;
   }
 
   return children;
