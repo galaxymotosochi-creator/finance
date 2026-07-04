@@ -1,12 +1,13 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, skipSubscription }) {
   const { user, loading: authLoading } = useAuth();
   const { loading: subLoading, isExpired } = useSubscription();
+  const location = useLocation();
 
-  if (authLoading || subLoading) {
+  if (authLoading || (subLoading && !skipSubscription)) {
     return (
       <div style={{
         display: 'flex',
@@ -24,7 +25,8 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (isExpired) {
+  // Проверяем подписку только не на странице самой подписки
+  if (!skipSubscription && isExpired) {
     return <Navigate to="/settings/subscription" replace />;
   }
 

@@ -95,7 +95,7 @@ function AppRoutes() {
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/subscription" element={<ProtectedRoute><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
+      <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
