@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Перенаправление...</title>
+</head>
+<body>
+  <script>
+    // Перенаправляем код авторизации в Supabase
+    var params = window.location.search.substring(1);
+    window.location.replace('https://fqnmkynxuaxaljokptwn.supabase.co/auth/v1/callback?' + params);
+  </script>
+</body>
+</html>

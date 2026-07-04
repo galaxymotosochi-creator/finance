@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход через Mail.ru</title>
+  <style>
+    body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f7; }
+    .card { background: #fff; border-radius: 16px; padding: 32px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.06); max-width: 320px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #eee; border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { color: #666; font-size: 14px; }
+    .error { color: #dc2626; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <p>Авторизация через Mail.ru...</p>
+    <div id="error" class="error"></div>
+  </div>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    (async function() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const err = params.get('error');
+
+      if (err) {
+        document.querySelector('.card').innerHTML = '<div class="error">Авторизация не завершена</div>';
+        return;
+      }
+
+      if (!code) {
+        document.querySelector('.card').innerHTML = '<div class="error">Код авторизации не получен</div>';
+        return;
+      }
+
+      try {
+        const res = await fetch('https://fqnmkynxuaxaljokptwn.supabase.co/functions/v1/mailru-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Ошибка сервера');
+        }
+
+        // Устанавливаем сессию в Supabase
+        const supabase = window.supabase.createClient(
+          'https://fqnmkynxuaxaljokptwn.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxbm1reW54dWF4YWxqb2twdHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyOTg2OTAsImV4cCI6MjA2MDg3NDY5MH0.8pvQR1y8YeAKG0hnOyd_YQEL8c73SGJ4eHNq6mUb1pM'
+        );
+
+        await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token
+        });
+
+        window.location.href = '/';
+      } catch (err) {
+        document.getElementById('error').textContent = err.message;
+        document.querySelector('.spinner').style.display = 'none';
+      }
+    })();
+  </script>
+</body>
+</html>
