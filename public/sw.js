@@ -1,4 +1,4 @@
-// Service Worker — 888.Finance офлайн-режим
+// Service Worker — AltasPos офлайн-режим
 
 const CACHE = '888-finance-v1';
 const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];

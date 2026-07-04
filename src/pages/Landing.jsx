@@ -121,7 +121,7 @@ export default function Landing() {
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>FINANCE</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>AltasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid #000",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Войти</button>
         </div>
@@ -187,7 +187,7 @@ export default function Landing() {
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учёте с первых минут</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в Finance</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в AltasPos</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"stretch"}}>
         {[
           {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
@@ -209,7 +209,7 @@ export default function Landing() {
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри Finance: от кассы до чистой прибыли</h2>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри AltasPos: от кассы до чистой прибыли</h2>
         <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — всё работает так, как вы видите</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,alignItems:"stretch"}}>
           {/* Панель управления */}
@@ -304,10 +304,10 @@ export default function Landing() {
               <CompareItem type="bad" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
             </div>
           </div>
-          {/* Карточка 3 — FINANCE */}
+          {/* Карточка 3 — AltasPos */}
           <div style={{border:"2px solid #ffdd2d",borderRadius:16,padding:"24px 28px 28px",background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",marginBottom:12}}>Рекомендуем</div>
-            <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа Finance</h3>
+            <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа AltasPos</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
               <CompareItem type="good" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
               <CompareItem type="good" text="Всё в одной вкладке: живая касса, складской учёт, база клиентов и финансы команды работают в единой связке." />
@@ -321,7 +321,7 @@ export default function Landing() {
       </section>
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
         <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для какого бизнеса создана платформа?</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36,maxWidth:560,margin:"0 auto 36px"}}>Finance адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36,maxWidth:560,margin:"0 auto 36px"}}>AltasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
           {[
             {
@@ -391,12 +391,12 @@ export default function Landing() {
       {/* ===== FAQ ===== */}
       <section style={{maxWidth:700,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Остались вопросы? Отвечаем</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Всё, что нужно знать о старте, безопасности и возможностях платформы Finance</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Всё, что нужно знать о старте, безопасности и возможностях платформы AltasPos</p>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {[ 
-            {q:"Сколько стоит FINANCE?",a:"Мы гибко подходим к ценообразованию в зависимости от масштаба вашей компании. Есть прозрачные тарифы для небольших команд и крупных сетей, а начать можно абсолютно бесплатно."},
+            {q:"Сколько стоит AltasPos?",a:"Мы гибко подходим к ценообразованию в зависимости от масштаба вашей компании. Есть прозрачные тарифы для небольших команд и крупных сетей, а начать можно абсолютно бесплатно."},
             {q:"Можно ли попробовать бесплатно?",a:"Да! Мы предоставляем полноценный тестовый доступ на 14 дней. Вам не нужно привязывать банковскую карту — просто зарегистрируйтесь за 1 минуту и сразу тестируйте все возможности системы."},
-            {q:"Нужно ли устанавливать программу?",a:"Нет, ничего скачивать не нужно. FINANCE — это облачная платформа. Вы можете работать из любого браузера на компьютере, планшете или смартфоне, а данные обновляются в реальном времени."},
+            {q:"Нужно ли устанавливать программу?",a:"Нет, ничего скачивать не нужно. AltasPos — это облачная платформа. Вы можете работать из любого браузера на компьютере, планшете или смартфоне, а данные обновляются в реальном времени."},
             {q:"Мои данные в безопасности?",a:"Абсолютно. Мы используем передовые протоколы шифрования, регулярное резервное копирование и строгую систему разграничения прав доступа. Ваши показатели защищены надежнее, чем в Excel."},
             {q:"Можно ли добавить сотрудников?",a:"Да, вы можете подключать всю команду и гибко настраивать права доступа для каждого. Например, кладовщик будет видеть только склад, но не получит доступ к отчётам о чистой прибыли."},
           ].map((f,i)=>(
@@ -495,7 +495,7 @@ export default function Landing() {
 
       {/* ===== ФУТЕР ===== */}
       <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"20px auto 0",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,color:"rgba(0,0,0,.34)",flexWrap:"wrap",gap:12}}>
-        <span>© 2026 Finance</span>
+        <span>© 2026 AltasPos</span>
         <div style={{display:"flex",gap:16}}>
           <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Политика конфиденциальности</a>
           <a href="/terms" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Пользовательское соглашение</a>

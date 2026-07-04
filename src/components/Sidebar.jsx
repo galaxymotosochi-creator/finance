@@ -116,7 +116,7 @@ export default function Sidebar() {
             </div>
             {!collapsed && (
               <div className="sidebar-user-info">
-                <div className="sidebar-user-email">Finance</div>
+                <div className="sidebar-user-email">AltasPos</div>
               </div>
             )}
           </div>

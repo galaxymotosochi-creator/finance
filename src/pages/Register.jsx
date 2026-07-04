@@ -56,7 +56,7 @@ export default function Register() {
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.34)',marginBottom:4,textAlign:'center'}}>FINANCE</div>
+        <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.34)',marginBottom:4,textAlign:'center'}}>AltasPos</div>
         <h1 style={{fontSize:'1.2rem',fontWeight:700,textAlign:'center',marginBottom:4,letterSpacing:'-.03em'}}>Создать аккаунт</h1>
         <p style={{fontSize:.8,color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:20}}>Бесплатно, без привязки карты</p>
         <form onSubmit={handleSubmit}>

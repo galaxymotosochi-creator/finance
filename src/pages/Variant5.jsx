@@ -4,7 +4,7 @@ export default function Variant5() {
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh"}}>
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",background:"#ffdd2d",padding:"4px 12px",borderRadius:8}}>FINANCE</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",background:"#ffdd2d",padding:"4px 12px",borderRadius:8}}>AltasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid rgba(0,16,36,.12)",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
         </div>
@@ -15,7 +15,7 @@ export default function Variant5() {
             Весь бизнес<br/>в цифрах
           </h1>
           <p style={{fontSize:15,color:"rgba(0,0,0,.54)",lineHeight:1.5,marginBottom:28}}>
-            FINANCE — это не просто учёт. Это единое окно, где сходятся финансы, склад, клиенты и команда.
+            AltasPos — это не просто учёт. Это единое окно, где сходятся финансы, склад, клиенты и команда.
           </p>
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {[
@@ -58,7 +58,7 @@ export default function Variant5() {
         </div>
       </section>
       <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"0 auto",display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(0,0,0,.34)"}}>
-        <span>© 2026 Finance</span>
+        <span>© 2026 AltasPos</span>
         <a onClick={()=>n(-1)} style={{cursor:"pointer",textDecoration:"underline",color:"inherit"}}>Назад</a>
       </footer>
     </div>

@@ -5,7 +5,7 @@ export default function Variant1() {
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",overflow:"hidden"}}>
       {/* Хедер */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>FINANCE</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>AltasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid rgba(0,16,36,.12)",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Регистрация</button>
@@ -75,7 +75,7 @@ export default function Variant1() {
         </div>
       </section>
       <footer style={{borderTop:"1px solid rgba(0,16,36,.12)",padding:"20px 24px",maxWidth:1104,margin:"60px auto 0",display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(0,0,0,.34)"}}>
-        <span>© 2026 Finance</span>
+        <span>© 2026 AltasPos</span>
         <span style={{display:"flex",gap:16}}>
           <a onClick={()=>n(-1)} style={{cursor:"pointer",textDecoration:"underline",color:"inherit"}}>Назад</a>
         </span>
