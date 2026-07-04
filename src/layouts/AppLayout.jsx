@@ -1,4 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
+import { useSubscription } from '../hooks/useSubscription';
 import Sidebar from '../components/Sidebar';
 import AiChat from '../components/AiChat';
 import QuickSale from '../components/QuickSale';
@@ -23,10 +24,44 @@ export default function AppLayout({ children }) {
     { label: 'Расход', icon: '📤', action: () => n('/finance/transactions?add=expense') },
   ];
 
+  const { daysLeft, isExpired, loading: subLoading } = useSubscription();
+
   return (
     <>
       <Sidebar />
       <div className="main">
+        {/* Полоска триала */}
+        {!subLoading && !isExpired && daysLeft !== null && daysLeft <= 14 && (
+          <div style={{
+            height:36,
+            background:'#ffdd2d',
+            display:'flex',
+            alignItems:'center',
+            justifyContent:'center',
+            gap:8,
+            fontSize:12,
+            fontWeight:600,
+            color:'#000',
+            flexShrink:0,
+            position:'sticky',
+            top:0,
+            zIndex:200,
+          }}>
+            <span>🎁 Бесплатный период — осталось <strong>{daysLeft}</strong> {daysLeft === 1 ? 'день' : daysLeft < 5 ? 'дня' : 'дней'}</span>
+            <button onClick={() => n('/settings/subscription')} style={{
+              padding:'4px 14px',
+              borderRadius:100,
+              border:'1.5px solid rgba(0,0,0,.25)',
+              background:'transparent',
+              fontSize:11,
+              fontWeight:600,
+              cursor:'pointer',
+              fontFamily:'inherit',
+              color:'#000',
+              whiteSpace:'nowrap',
+            }}>Выбрать тариф →</button>
+          </div>
+        )}
         <header className="app-header">
           <span className="user-email">{user?.email}</span>
           <button className="logout-btn" onClick={signOut}>Выйти</button>
