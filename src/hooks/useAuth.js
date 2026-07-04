@@ -60,8 +60,9 @@ export function useAuth() {
   };
 
   const signUp = async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
+    const result = await supabase.auth.signUp({ email, password });
+    if (result.error) throw result.error;
+    return result;
   };
 
   const signOut = async () => {
