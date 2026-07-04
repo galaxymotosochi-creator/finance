@@ -34,14 +34,15 @@ export default function AppLayout({ children }) {
         {!subLoading && !isExpired && daysLeft !== null && daysLeft <= 14 && (
           <div style={{
             height:36,
-            background:'#ffdd2d',
+            background:'#fff',
+            borderBottom:'1px solid #eee',
             display:'flex',
             alignItems:'center',
             justifyContent:'center',
             gap:8,
             fontSize:12,
-            fontWeight:600,
-            color:'#000',
+            fontWeight:500,
+            color:'#666',
             flexShrink:0,
             position:'sticky',
             top:0,
@@ -49,15 +50,15 @@ export default function AppLayout({ children }) {
           }}>
             <span>🎁 Бесплатный период — осталось <strong>{daysLeft}</strong> {daysLeft === 1 ? 'день' : daysLeft < 5 ? 'дня' : 'дней'}</span>
             <button onClick={() => n('/settings/subscription')} style={{
-              padding:'4px 14px',
+              padding:'3px 12px',
               borderRadius:100,
-              border:'1.5px solid rgba(0,0,0,.25)',
+              border:'1px solid #ddd',
               background:'transparent',
               fontSize:11,
-              fontWeight:600,
+              fontWeight:500,
               cursor:'pointer',
               fontFamily:'inherit',
-              color:'#000',
+              color:'#555',
               whiteSpace:'nowrap',
             }}>Выбрать тариф →</button>
           </div>
