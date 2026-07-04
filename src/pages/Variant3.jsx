@@ -4,7 +4,7 @@ export default function Variant3() {
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh"}}>
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>AltasPos</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>AtlasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid rgba(0,16,36,.12)",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Регистрация</button>
@@ -58,7 +58,7 @@ export default function Variant3() {
       </section>
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"20px auto 0",display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(0,0,0,.34)"}}>
-        <span>© 2026 AltasPos</span>
+        <span>© 2026 AtlasPos</span>
         <a onClick={()=>n(-1)} style={{cursor:"pointer",textDecoration:"underline",color:"inherit"}}>Назад</a>
       </footer>
     </div>

@@ -4,7 +4,7 @@ export default function Variant4() {
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",background:"#fafafa"}}>
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>AltasPos</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em"}}>AtlasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"none",background:"#000",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff"}}>Войти</button>
         </div>
@@ -14,7 +14,7 @@ export default function Variant4() {
           Бухгалтерия, склад и зарплата<br/>в одной экосистеме
         </h1>
         <p style={{fontSize:16,color:"rgba(0,0,0,.54)",maxWidth:500,margin:"0 auto 28px"}}>
-          Более 100 компаний уже используют AltasPos для учёта своего бизнеса
+          Более 100 компаний уже используют AtlasPos для учёта своего бизнеса
         </p>
         <div style={{display:"flex",gap:10,justifyContent:"center"}}>
           <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Попробовать бесплатно</button>
@@ -54,7 +54,7 @@ export default function Variant4() {
         </div>
       </section>
       <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"0 auto",display:"flex",justifyContent:"space-between",fontSize:12,color:"rgba(0,0,0,.34)"}}>
-        <span>© 2026 AltasPos</span>
+        <span>© 2026 AtlasPos</span>
         <a onClick={()=>n(-1)} style={{cursor:"pointer",textDecoration:"underline",color:"inherit"}}>Назад</a>
       </footer>
     </div>
