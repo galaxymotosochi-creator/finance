@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Касса • V9</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,sans-serif}
+body{background:#f5f5f7;padding:20px;display:flex;justify-content:center}
+.phone{width:834px;height:900px;background:#fff;border-radius:24px;box-shadow:0 8px 60px rgba(0,0,0,.06);overflow:hidden;display:flex;flex-direction:column}
+.top{background:#000;padding:6px 16px;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.5)}
+.body{flex:1;display:flex;overflow:hidden}
+.side{width:280px;min-width:280px;display:flex;flex-direction:column;background:#fff;border-right:1px solid #eee}
+.side-hdr{padding:14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #eee}
+.side-hdr .av{width:32px;height:32px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.side-hdr .info .na{font-size:13px;font-weight:600}
+.side-hdr .info .st{font-size:10px;color:#16a34a;font-weight:500}
+.side-items{flex:1;overflow-y:auto}
+.item{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f5f5f5;gap:6px}
+.item .n{flex:1;font-size:13px;font-weight:500}
+.item .qs{display:flex;align-items:center;gap:4px}
+.item .qs button{width:24px;height:24px;border-radius:6px;border:1px solid #e0e0e0;background:#fff;font-size:14px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center}
+.item .qs span{font-weight:600;min-width:14px;text-align:center;font-size:13px}
+.item .s{font-size:13px;font-weight:700;min-width:60px;text-align:right}
+.side-foot{padding:14px;border-top:1px solid #eee;display:flex;flex-direction:column;gap:10px}
+.main{flex:1;display:flex;flex-direction:column;padding:16px}
+.search input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;margin-bottom:12px;background:#fafafa}
+.cats{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.cats button{padding:5px 14px;border-radius:100px;border:none;font-size:11px;font-weight:500;cursor:pointer;background:#f5f5f5;color:#666;white-space:nowrap;font-family:inherit}
+.cats button.active{background:#000;color:#fff;font-weight:600}
+.g-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:start}
+.card{background:#fafafa;border-radius:12px;padding:14px;cursor:pointer;transition:all .1s}
+.card:hover{background:#f0f0f0}
+.card .n{font-size:12px;font-weight:500;color:#555}
+.card .p{font-size:15px;font-weight:800;color:#000;margin-top:8px}
+.card .ext{font-size:10px;color:#999;margin-top:2px}
+.price-big{font-size:20px;font-weight:800}
+.pay-row{display:flex;gap:6px}
+.pay-row .pbtn{flex:1;padding:10px;border-radius:8px;border:1.5px solid #eee;font-size:11px;font-weight:600;cursor:pointer;text-align:center;background:#fff;color:#555;font-family:inherit}
+.pay-row .pbtn.active{background:#000;border-color:#000;color:#fff}
+.btn-buy{width:100%;padding:12px;border-radius:8px;border:none;background:#000;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+</style>
+</head><body>
+<div class="phone"><div class="top"><span style="width:5px;height:5px;border-radius:50%;background:#ff6052"></span><span style="width:5px;height:5px;border-radius:50%;background:#ffbd2e"></span><span style="width:5px;height:5px;border-radius:50%;background:#28c93f"></span><span style="font-size:10px;font-weight:600;margin-left:6px;flex:1;color:rgba(255,255,255,.5)">V9 · С КАТЕГОРИЯМИ</span></div><div class="body"><div class="side"><div class="side-hdr"><div class="av">А</div><div class="info"><div class="na">Анна</div><div class="st">● Смена открыта</div></div></div><div class="side-items"><div class="item"><div class="n">Скутер Tank X, новый</div><div class="qs"><button>-</button><span>1</span><button>+</button></div><div class="s">149 900</div></div><div class="item"><div class="n">Масло моторное 10W-40</div><div class="qs"><button>-</button><span>2</span><button>+</button></div><div class="s">5 000</div></div><div class="item"><div class="n">Шлем мотоциклетный M</div><div class="qs"><button>-</button><span>1</span><button>+</button></div><div class="s">7 500</div></div></div><div class="side-foot"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#999">ИТОГО</span><span class="price-big">162 400 ₽</span></div><div class="pay-row"><div class="pbtn active">Наличные</div><div class="pbtn">Карта</div></div><button class="btn-buy">Продажа</button></div></div><div class="main"><div class="search"><input placeholder="🔍 Найти товар..."/></div><div class="cats"><button class="active">Все</button><button>Скутеры</button><button>Масла</button><button>Экипировка</button><button>Запчасти</button><button>Аксессуары</button></div><div class="g-grid"><div class="card"><div class="n">Tank X — новый</div><div class="p">149 900 ₽</div><div class="ext">Скутеры</div></div><div class="card"><div class="n">Tank Next — б/у</div><div class="p">72 900 ₽</div><div class="ext">Скутеры</div></div><div class="card"><div class="n">Масло моторное</div><div class="p">2 500 ₽</div><div class="ext">Масла</div></div><div class="card"><div class="n">Шлем открытый</div><div class="p">7 500 ₽</div><div class="ext">Экипировка</div></div><div class="card"><div class="n">Аккумулятор 12V</div><div class="p">3 500 ₽</div><div class="ext">Запчасти</div></div><div class="card"><div class="n">Колодки тормозные</div><div class="p">1 200 ₽</div><div class="ext">Запчасти</div></div><div class="card"><div class="n">Фильтр масляный</div><div class="p">650 ₽</div><div class="ext">Запчасти</div></div><div class="card"><div class="n">Свечи зажигания</div><div class="p">800 ₽</div><div class="ext">Запчасти</div></div><div class="card"><div class="n">Чехол на скутер</div><div class="p">3 900 ₽</div><div class="ext">Аксессуары</div></div></div></div></div></div></body></html>

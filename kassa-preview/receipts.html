@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Чеки за смену · 5 вариантов</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#f5f5f7;padding:32px 16px;color:#111}
+h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
+.sub{text-align:center;font-size:13px;color:#888;margin-bottom:28px}
+.vars{display:flex;flex-direction:column;gap:32px;max-width:500px;margin:0 auto}
+.var-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:6px}
+.v1 .r{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.v1 .num{width:32px;height:32px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.v1 .i{flex:1;min-width:0}
+.v1 .i .t{font-size:13px;font-weight:600}
+.v1 .i .m{font-size:11px;color:#999;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.v1 .tag{font-size:10px;padding:1px 8px;border-radius:100px;font-weight:500}
+.v1 .t1{background:#f5f5f5;color:#888}
+.v1 .tg{background:#f0fdf4;color:#16a34a}
+.v1 .tr{background:#fef2f2;color:#dc2626}
+.v1 .amt{font-size:15px;font-weight:800}
+.v1 .g{color:#16a34a}
+.v1 .r{color:#dc2626}
+.v1 .tot{display:flex;justify-content:space-between;padding:12px 4px 0;font-size:14px;font-weight:800;border-top:1px solid #eee;margin-top:4px}
+.v2 table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.v2 th{padding:10px 12px;font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.04em;background:#fafafa;text-align:left;border-bottom:1px solid #eee}
+.v2 td{padding:10px 12px;font-size:13px;border-bottom:1px solid #f5f5f5}
+.v2 tr:last-child td{border-bottom:none}
+.v2 .bd{font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px}
+.v2 .bp{background:#f0fdf4;color:#16a34a}
+.v2 .bu{background:#fef2f2;color:#dc2626}
+.v2 .tot{display:flex;justify-content:space-between;padding:14px 4px 0;font-size:14px;font-weight:800}
+.v3 .gr{margin-bottom:16px}
+.v3 .gt{font-size:12px;font-weight:700;color:#555;padding:0 4px 6px;border-bottom:1.5px solid #111;margin-bottom:6px;display:flex;justify-content:space-between}
+.v3 .gt span{font-weight:800;color:#111}
+.v3 .r{padding:8px 4px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+.v3 .r:last-child{border-bottom:none}
+.v3 .num{width:26px;height:26px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#555;flex-shrink:0}
+.v3 .i{flex:1;min-width:0}
+.v3 .i .t{font-size:13px;font-weight:500}
+.v3 .i .m{font-size:10px;color:#bbb;margin-top:1px}
+.v3 .amt{font-size:14px;font-weight:700}
+.v3 .tot{display:flex;justify-content:space-between;padding:12px 4px 0;font-size:14px;font-weight:800;border-top:2px solid #111;margin-top:4px}
+.v4 .r{display:flex;align-items:center;gap:14px;padding:14px;background:#fff;border-radius:16px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid #f0f0f0}
+.v4 .si{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.v4 .si.g{background:#f0fdf4;color:#16a34a}
+.v4 .si.r{background:#fef2f2;color:#dc2626}
+.v4 .i{flex:1;min-width:0}
+.v4 .i .num{font-size:15px;font-weight:700}
+.v4 .i .t{font-size:12px;color:#555;margin-top:2px}
+.v4 .i .meta{font-size:11px;color:#999;margin-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+.v4 .i .meta span{background:#f5f5f5;padding:1px 8px;border-radius:100px}
+.v4 .amt{font-size:16px;font-weight:800}
+.v4 .g{color:#16a34a}
+.v4 .r{color:#dc2626}
+.v4 .tot{display:flex;justify-content:space-between;padding:14px 4px 0;font-size:14px;font-weight:800;border-top:1px solid #eee;margin-top:4px}
+.v5 .r{padding:10px 0;border-bottom:1px dashed #e0e0e0;display:flex;gap:10px}
+.v5 .r:last-child{border-bottom:none}
+.v5 .l{flex:1;min-width:0}
+.v5 .l .top{display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap}
+.v5 .l .top .num{font-size:13px;font-weight:700}
+.v5 .l .top .tag{font-size:10px;background:#f5f5f5;padding:1px 8px;border-radius:100px;font-weight:500;color:#888}
+.v5 .l .top .st{font-size:10px;font-weight:600}
+.v5 .l .top .st.p{color:#16a34a}
+.v5 .l .top .st.u{color:#dc2626}
+.v5 .l .d{font-size:12px;color:#555}
+.v5 .rt{font-size:15px;font-weight:800;white-space:nowrap;align-self:center}
+.v5 .tot{display:flex;justify-content:space-between;padding:12px 4px 0;font-size:14px;font-weight:800;border-top:1px solid #e0e0e0;margin-top:4px}
+</style>
+</head><body>
+<h1>Чеки за смену</h1>
+<p class="sub">5 вариантов оформления модалки</p>
+<div class="vars">
+
+<div><div class="var-label">Вариант 1 — Карточки-строки</div>
+<div class="v1">
+<div class="r"><div class="num">1</div><div class="i"><div class="t">Скутер Tank X</div><div class="m"><span>14:23</span><span class="tag t1">Наличные</span><span class="tag tg">Оплачен</span></div></div><div class="amt g">149 900 ₽</div></div>
+<div class="r"><div class="num">2</div><div class="i"><div class="t">Масло моторное (2 шт)</div><div class="m"><span>14:45</span><span class="tag t1">Карта</span><span class="tag tg">Оплачен</span></div></div><div class="amt g">5 000 ₽</div></div>
+<div class="r"><div class="num">3</div><div class="i"><div class="t">Шлем открытый</div><div class="m"><span>15:10</span><span class="tag t1">Наличные</span><span class="tag tr">Долг</span></div></div><div class="amt r">7 500 ₽</div></div>
+<div class="r"><div class="num">4</div><div class="i"><div class="t">Аккумулятор</div><div class="m"><span>15:32</span><span class="tag t1">Расчетный счет</span><span class="tag tg">Оплачен</span></div></div><div class="amt g">3 500 ₽</div></div>
+<div class="tot"><span>Итого</span><span style="color:#16a34a">+165 900 ₽</span></div>
+</div></div>
+
+<div><div class="var-label">Вариант 2 — Таблица</div>
+<div class="v2"><table>
+<thead><tr><th>Чек</th><th>Товар</th><th>Время</th><th>Способ</th><th>Статус</th><th style="text-align:right">Сумма</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Скутер Tank X</td><td>14:23</td><td>Наличные</td><td><span class="bd bp">Оплачен</span></td><td style="text-align:right;font-weight:700;color:#16a34a">149 900</td></tr>
+<tr><td>2</td><td>Масло моторное (2 шт)</td><td>14:45</td><td>Карта</td><td><span class="bd bp">Оплачен</span></td><td style="text-align:right;font-weight:700;color:#16a34a">5 000</td></tr>
+<tr><td>3</td><td>Шлем открытый</td><td>15:10</td><td>Наличные</td><td><span class="bd bu">Долг</span></td><td style="text-align:right;font-weight:700;color:#dc2626">7 500</td></tr>
+<tr><td>4</td><td>Аккумулятор</td><td>15:32</td><td>Расчетный счет</td><td><span class="bd bp">Оплачен</span></td><td style="text-align:right;font-weight:700;color:#16a34a">3 500</td></tr>
+</tbody></table>
+<div class="tot"><span>Итого</span><span style="color:#16a34a">+165 900</span></div>
+</div></div>
+
+<div><div class="var-label">Вариант 3 — По счетам</div>
+<div class="v3">
+<div class="gr"><div class="gt">Наличные <span>157 400</span></div>
+<div class="r"><div class="num">1</div><div class="i"><div class="t">Скутер Tank X</div><div class="m">14:23</div></div><div class="amt">149 900</div></div>
+<div class="r"><div class="num">3</div><div class="i"><div class="t">Шлем открытый</div><div class="m">15:10 · не оплачен</div></div><div class="amt" style="color:#dc2626">7 500</div></div></div>
+<div class="gr"><div class="gt">Карта <span>5 000</span></div>
+<div class="r"><div class="num">2</div><div class="i"><div class="t">Масло моторное (2 шт)</div><div class="m">14:45</div></div><div class="amt">5 000</div></div></div>
+<div class="gr"><div class="gt">Расчетный счет <span>3 500</span></div>
+<div class="r"><div class="num">4</div><div class="i"><div class="t">Аккумулятор</div><div class="m">15:32</div></div><div class="amt">3 500</div></div></div>
+<div class="tot"><span>Итого</span><span style="color:#16a34a">+165 900</span></div>
+</div></div>
+
+<div><div class="var-label">Вариант 4 — Плашки со статусом</div>
+<div class="v4">
+<div class="r"><div class="si g">V</div><div class="i"><div class="num">Чек 1</div><div class="t">Скутер Tank X (1 шт)</div><div class="meta"><span>14:23</span><span>Наличные</span></div></div><div class="amt g">149 900</div></div>
+<div class="r"><div class="si g">V</div><div class="i"><div class="num">Чек 2</div><div class="t">Масло моторное (2 шт)</div><div class="meta"><span>14:45</span><span>Карта</span></div></div><div class="amt g">5 000</div></div>
+<div class="r"><div class="si r">X</div><div class="i"><div class="num">Чек 3</div><div class="t">Шлем открытый (1 шт)</div><div class="meta"><span>15:10</span><span>Наличные</span></div></div><div class="amt r">7 500</div></div>
+<div class="r"><div class="si g">V</div><div class="i"><div class="num">Чек 4</div><div class="t">Аккумулятор (1 шт)</div><div class="meta"><span>15:32</span><span>Расчетный счет</span></div></div><div class="amt g">3 500</div></div>
+<div class="tot"><span>Итого</span><span style="color:#16a34a">+165 900</span></div>
+</div></div>
+
+<div><div class="var-label">Вариант 5 — Компакт-лента</div>
+<div class="v5">
+<div class="r"><div class="l"><div class="top"><span class="num">Чек 1</span><span class="tag">Наличные</span><span class="st p">Оплачен</span></div><div class="d">Скутер Tank X · 14:23</div></div><div class="rt" style="color:#16a34a">149 900</div></div>
+<div class="r"><div class="l"><div class="top"><span class="num">Чек 2</span><span class="tag">Карта</span><span class="st p">Оплачен</span></div><div class="d">Масло моторное (2 шт) · 14:45</div></div><div class="rt" style="color:#16a34a">5 000</div></div>
+<div class="r"><div class="l"><div class="top"><span class="num">Чек 3</span><span class="tag">Наличные</span><span class="st u">Долг</span></div><div class="d">Шлем открытый · 15:10</div></div><div class="rt" style="color:#dc2626">7 500</div></div>
+<div class="r"><div class="l"><div class="top"><span class="num">Чек 4</span><span class="tag">Расчетный счет</span><span class="st p">Оплачен</span></div><div class="d">Аккумулятор · 15:32</div></div><div class="rt" style="color:#16a34a">3 500</div></div>
+<div class="tot"><span>Итого</span><span style="color:#16a34a">+165 900</span></div>
+</div></div>
+
+</div>
+</body>
+</html>

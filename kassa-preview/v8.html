@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Касса • V8</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,sans-serif}
+body{background:#f5f5f7;padding:20px;display:flex;justify-content:center}
+.phone{width:834px;height:900px;background:#f8f8fa;border-radius:24px;box-shadow:0 8px 60px rgba(0,0,0,.06);overflow:hidden;display:flex;flex-direction:column}
+.top{background:#fff;padding:6px 16px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #eee}
+.body{flex:1;display:flex;overflow:hidden;gap:12px;padding:12px}
+.rec{width:310px;min-width:310px;display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:0 1px 6px rgba(0,0,0,.04);padding:0;height:100%}
+.rec-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid #f5f5f5}
+.rec-hdr .lbl{font-size:11px;font-weight:700;color:#999;letter-spacing:.04em}
+.rec-hdr .cnt{font-size:11px;color:#bbb;background:#f5f5f5;padding:2px 8px;border-radius:100px}
+.rec-items{flex:1;overflow-y:auto}
+.rec-item{display:flex;align-items:center;padding:10px 14px;gap:6px}
+.rec-item .thumb{width:32px;height:32px;border-radius:8px;background:#f0f0f0;flex-shrink:0}
+.rec-item .info{flex:1}
+.rec-item .info .n{font-size:13px;font-weight:500}
+.rec-item .info .sub{font-size:10px;color:#999;margin-top:1px}
+.rec-item .q{margin:0 8px}
+.rec-item .q button{width:22px;height:22px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:12px;cursor:pointer;color:#555;display:inline-flex;align-items:center;justify-content:center}
+.rec-item .q span{margin:0 4px;font-weight:600;min-width:12px;display:inline-block;text-align:center}
+.rec-item .s{font-size:13px;font-weight:700;min-width:60px;text-align:right}
+.rec-foot{background:#fff;padding:14px;border-top:1px solid #f5f5f5;display:flex;flex-direction:column;gap:8px;border-radius:0 0 16px 16px}
+.grid{flex:1;display:flex;flex-direction:column;height:100%}
+.g-top{display:flex;gap:8px;margin-bottom:10px}
+.g-top input{flex:1;border:none;border-radius:12px;padding:10px 14px;font-size:13px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);outline:none;font-family:inherit}
+.g-tabs{display:flex;gap:4px;background:#fff;border-radius:12px;padding:3px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.g-tabs button{padding:6px 14px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:#888;font-family:inherit}
+.g-tabs button.active{background:#000;color:#fff;font-weight:600}
+.g-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;align-content:start}
+.card{background:#fff;border-radius:14px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:all .1s}
+.card:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.card .n{font-size:13px;font-weight:600}
+.card .p{font-size:16px;font-weight:800;color:#000;margin-top:4px}
+.card .badge{font-size:9px;color:#fff;background:#000;padding:2px 6px;border-radius:4px;width:fit-content;margin-top:2px}
+.pay-btn{flex:1;padding:10px;border-radius:8px;border:1.5px solid #eee;font-size:11px;font-weight:600;cursor:pointer;text-align:center;background:#fff;color:#555;font-family:inherit}
+.pay-btn.active{background:#000;border-color:#000;color:#fff}
+.buy{width:100%;padding:12px;border-radius:10px;border:none;background:#000;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.buy:disabled{opacity:.3}
+.big-price{font-size:20px;font-weight:800}
+</style>
+</head><body>
+<div class="phone"><div class="top"><span style="width:5px;height:5px;border-radius:50%;background:#ff6052"></span><span style="width:5px;height:5px;border-radius:50%;background:#ffbd2e"></span><span style="width:5px;height:5px;border-radius:50%;background:#28c93f"></span><span style="font-size:10px;font-weight:600;color:#999;margin-left:6px;flex:1">V8 · С КАРТИНКАМИ</span></div><div class="body"><div class="rec"><div class="rec-hdr"><span class="lbl">ЧЕК</span><span class="cnt">3 позиции</span></div><div class="rec-items"><div class="rec-item"><div class="thumb"></div><div class="info"><div class="n">Скутер Tank X</div><div class="sub">новый</div></div><div class="q"><button>-</button><span>1</span><button>+</button></div><div class="s">149 900</div></div><div class="rec-item"><div class="thumb"></div><div class="info"><div class="n">Масло моторное</div><div class="sub">10W-40, 1 л</div></div><div class="q"><button>-</button><span>2</span><button>+</button></div><div class="s">5 000</div></div><div class="rec-item"><div class="thumb"></div><div class="info"><div class="n">Шлем открытый</div><div class="sub">размер M</div></div><div class="q"><button>-</button><span>1</span><button>+</button></div><div class="s">7 500</div></div></div><div class="rec-foot"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#999">Итого</span><span class="big-price">162 400 ₽</span></div><div style="display:flex;gap:6px"><div class="pay-btn active">Наличные</div><div class="pay-btn">Карта</div></div><button class="buy">Продать</button></div></div><div class="grid"><div class="g-top"><input placeholder="Поиск"/><div class="g-tabs"><button class="active">Товары</button><button>Услуги</button></div></div><div class="g-grid"><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Скутер Tank X</div><div class="p">149 900 ₽</div><div class="badge">хит</div></div><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Tank Next</div><div class="p">72 900 ₽</div><div style="font-size:9px;color:#999">б/у</div></div><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Масло моторное</div><div class="p">2 500 ₽</div></div><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Шлем открытый</div><div class="p">7 500 ₽</div></div><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Аккумулятор</div><div class="p">3 500 ₽</div></div><div class="card"><div style="width:100%;height:50px;background:#f5f5f5;border-radius:8px;margin-bottom:4px"></div><div class="n">Колодки</div><div class="p">1 200 ₽</div></div></div></div></div></div></body></html>

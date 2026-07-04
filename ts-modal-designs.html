@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 дизайнов — Табель дня</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font: 'Inter',sans-serif;
+  --body-bg:#f5f5f7;
+  --white:#fff;
+  --border:rgba(0,16,36,.1);
+  --muted:rgba(0,0,0,.5);
+  --radius:12px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --yellow:#ffdd2d;
+  --green:#16a34a;
+  --red:#dc2626;
+  --blue:#428bf9;
+  --orange:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--body-bg);color:#111;padding:2rem 1rem}
+h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem;text-align:center}
+.sub{font-size:.82rem;color:var(--muted);text-align:center;margin-bottom:2rem}
+.gallery{display:flex;flex-direction:column;gap:2.5rem;max-width:800px;margin:0 auto}
+.var{padding:1.5rem;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow)}
+.var-num{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+.var-title{font-size:.9rem;font-weight:600;margin-bottom:.5rem}
+.m-t{display:flex;flex-direction:column;gap:1rem}
+.m-h{font-size:1rem;font-weight:700}
+.m-sub{font-size:.78rem;color:var(--muted)}
+
+/* EMPLOYEE STATUS ITEMS */
+.emp-item{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem}
+.emp-name{font-size:.82rem;font-weight:500;min-width:120px}
+.emp-sel{flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white);color:#111}
+.emp-sel:focus{border-color:var(--blue);box-shadow:0 0 0 3px #428bf926}
+
+/* SECTION LABEL */
+.s-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem;margin-top:.5rem}
+
+/* FORM ROW */
+.f-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.f-row select,.f-row input{flex:1;min-width:80px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white);color:#111}
+.f-row input{min-width:60px}
+.f-row select:focus,.f-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #428bf926}
+
+/* BONUS/DEDUCT LINE */
+.bd-line{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-size:.82rem}
+.bd-line .name{font-weight:500;min-width:120px}
+.bd-line .comm{flex:1;font-size:.78rem;color:var(--muted)}
+.bd-line .amt.plus{font-weight:600;color:var(--green)}
+.bd-line .amt.minus{font-weight:600;color:var(--red)}
+
+/* TOTAL */
+.total-line{display:flex;justify-content:space-between;padding:.5rem .65rem;background:#f8f9fa;border-radius:10px;font-size:.82rem;margin-top:.5rem}
+
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;border-radius:100px;border:none;cursor:pointer;font-family:var(--font)}
+.btn-yellow{background:var(--yellow);color:#000}
+.btn-yellow:hover{opacity:.9}
+</style>
+</head>
+<body>
+
+<h1>📋 Статусы сотрудников и события дня</h1>
+<p class="sub">10 вариантов дизайна модалки &mdash; одинаковые поля, разная подача</p>
+
+<div class="gallery">
+
+<!-- ===== ВАРИАНТ 1 — Секционный ===== -->
+<div class="var">
+  <div class="var-num">Вариант 1</div>
+  <div class="var-title">🗂 Секционный — секции с серыми подложками</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+
+    <div style="background:#f8f9fa;border-radius:12px;padding:.75rem">
+      <div class="s-label">👤 Статус сотрудников</div>
+      <div class="emp-item"><span class="emp-name">Анна С.</span><select class="emp-sel"><option>✅ Работал</option><option>🏥 Больничный</option><option>🏖 Отпуск</option><option>❌ Прогул</option><option>🏠 Удаленка</option></select></div>
+      <div class="emp-item"><span class="emp-name">Максим К.</span><select class="emp-sel"><option>✅ Работал</option><option selected>🏥 Больничный</option><option>🏖 Отпуск</option><option>❌ Прогул</option><option>🏠 Удаленка</option></select></div>
+      <div class="emp-item"><span class="emp-name">Ольга М.</span><select class="emp-sel"><option>✅ Работал</option><option>🏥 Больничный</option><option>🏖 Отпуск</option><option>❌ Прогул</option><option>🏠 Удаленка</option></select></div>
+    </div>
+
+    <div style="background:#f0fdf4;border-radius:12px;padding:.75rem">
+      <div class="s-label" style="color:var(--green)">🎯 Бонусы</div>
+      <div class="bd-line"><span class="name">Максим К.</span><span class="comm">Отличная работа</span><span class="amt plus">+5 000₽</span></div>
+      <div class="f-row">
+        <select><option>— Сотрудник —</option></select>
+        <input type="number" placeholder="Сумма">
+        <input type="text" placeholder="За что">
+      </div>
+    </div>
+
+    <div style="background:#fef2f2;border-radius:12px;padding:.75rem">
+      <div class="s-label" style="color:var(--red)">⚠️ Штрафы</div>
+      <div class="f-row">
+        <select><option>— Сотрудник —</option></select>
+        <input type="number" placeholder="Сумма">
+        <input type="text" placeholder="За что">
+      </div>
+    </div>
+
+    <div class="total-line"><span>Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:.25rem">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 2 — Две колонки ===== -->
+<div class="var">
+  <div class="var-num">Вариант 2</div>
+  <div class="var-title">📐 Две колонки — статусы слева, финансы справа</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div>
+        <div class="s-label">👤 Статусы</div>
+        <div class="emp-item"><span class="emp-name">Анна С.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+        <div class="emp-item"><span class="emp-name">Максим К.</span><select class="emp-sel"><option>🏥 Больничный</option></select></div>
+        <div class="emp-item"><span class="emp-name">Ольга М.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        <div>
+          <div class="s-label" style="color:var(--green)">🎯 Бонусы</div>
+          <div class="bd-line"><span class="name">Максим К.</span><span class="amt plus">+5 000₽</span></div>
+          <div class="f-row" style="flex-direction:column"><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+        </div>
+        <div>
+          <div class="s-label" style="color:var(--red)">⚠️ Штрафы</div>
+          <div class="f-row" style="flex-direction:column"><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+        </div>
+      </div>
+    </div>
+    <div class="total-line"><span>Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 3 — Табы ===== -->
+<div class="var">
+  <div class="var-num">Вариант 3</div>
+  <div class="var-title">📑 Вкладки (Tabs) — переключение между Статусы / Бонусы / Штрафы</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+    <div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:.75rem">
+      <span style="padding:.4rem .7rem;font-size:.78rem;font-weight:600;background:var(--yellow);border-radius:8px 8px 0 0;cursor:default">👤 Статусы</span>
+      <span style="padding:.4rem .7rem;font-size:.78rem;color:var(--muted);cursor:default">🎯 Бонусы</span>
+      <span style="padding:.4rem .7rem;font-size:.78rem;color:var(--muted);cursor:default">⚠️ Штрафы</span>
+    </div>
+    <div style="min-height:160px">
+      <div class="emp-item"><span class="emp-name">Анна С.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+      <div class="emp-item"><span class="emp-name">Максим К.</span><select class="emp-sel"><option selected>🏥 Больничный</option></select></div>
+      <div class="emp-item"><span class="emp-name">Ольга М.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+    </div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:.5rem">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 4 — Карточки сотрудников ===== -->
+<div class="var">
+  <div class="var-num">Вариант 4</div>
+  <div class="var-title">🃏 Карточки — каждый сотрудник в своей мини-карточке</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#f8f9fa;border-radius:10px">
+        <div><span style="font-weight:600;font-size:.82rem">Анна С.</span><span style="font-size:.72rem;color:var(--muted);margin-left:.5rem">Кассир</span></div>
+        <select style="padding:.3rem .5rem;font-size:.75rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none"><option>✅ Работал</option></select>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#f0fdf4;border-radius:10px">
+        <div><span style="font-weight:600;font-size:.82rem">Максим К.</span><span style="font-size:.72rem;color:var(--muted);margin-left:.5rem">Менеджер</span></div>
+        <select style="padding:.3rem .5rem;font-size:.75rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none"><option selected>🏥 Больничный</option></select>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#f8f9fa;border-radius:10px">
+        <div><span style="font-weight:600;font-size:.82rem">Ольга М.</span><span style="font-size:.72rem;color:var(--muted);margin-left:.5rem">Кладовщик</span></div>
+        <select style="padding:.3rem .5rem;font-size:.75rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none"><option>✅ Работал</option></select>
+      </div>
+    </div>
+    <div class="s-label" style="margin-top:.65rem;color:var(--green)">🎯 Бонус</div>
+    <div class="bd-line"><span class="name">Максим К.</span><span class="comm">Отличная работа</span><span class="amt plus">+5 000₽</span></div>
+    <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+    <div class="s-label" style="color:var(--red)">⚠️ Штраф</div>
+    <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+    <div class="total-line"><span>Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:.25rem">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 5 — Компактный ===== -->
+
+<!-- ===== ВАРИАНТ 5 — Компактный ===== -->
+<div class="var">
+  <div class="var-num">Вариант 5</div>
+  <div class="var-title">📏 Компактный — всё на одной строке, минимальный отступ</div>
+  <div class="m-t">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div class="m-h" style="font-size:.9rem">🗓 17.06</div>
+      <button class="btn btn-yellow" style="padding:.3rem .8rem;font-size:.75rem">💾 Сохранить</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:4px;padding:.25rem .5rem;background:#f8f9fa;border-radius:8px;font-size:.75rem"><span style="font-weight:500">Анна С.</span><select style="font-size:.7rem;padding:.15rem .3rem;border:1px solid var(--border);border-radius:6px;font-family:var(--font)"><option>✅</option></select></div>
+      <div style="display:flex;align-items:center;gap:4px;padding:.25rem .5rem;background:#f0fdf4;border-radius:8px;font-size:.75rem"><span style="font-weight:500">Максим К.</span><select style="font-size:.7rem;padding:.15rem .3rem;border:1px solid var(--border);border-radius:6px;font-family:var(--font)"><option selected>🏥</option></select></div>
+      <div style="display:flex;align-items:center;gap:4px;padding:.25rem .5rem;background:#f8f9fa;border-radius:8px;font-size:.75rem"><span style="font-weight:500">Ольга М.</span><select style="font-size:.7rem;padding:.15rem .3rem;border:1px solid var(--border);border-radius:6px;font-family:var(--font)"><option>✅</option></select></div>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:140px">
+        <div class="s-label" style="font-size:.65rem;color:var(--green)">🎯 Бонусы</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px">Максим К.: <b style="color:var(--green)">+5 000₽</b></div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.7rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.7rem;padding:.2rem .4rem;width:60px" placeholder="Сумма"><input style="font-size:.7rem;padding:.2rem .4rem;width:80px" placeholder="За что"></div>
+      </div>
+      <div style="flex:1;min-width:140px">
+        <div class="s-label" style="font-size:.65rem;color:var(--red)">⚠️ Штрафы</div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.7rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.7rem;padding:.2rem .4rem;width:60px" placeholder="Сумма"><input style="font-size:.7rem;padding:.2rem .4rem;width:80px" placeholder="За что"></div>
+      </div>
+    </div>
+    <div class="total-line" style="padding:.35rem .5rem;font-size:.75rem"><span>🎯 5 000₽</span><span>⚠️ 0₽</span></div>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 6 — Табличный ===== -->
+<div class="var">
+  <div class="var-num">Вариант 6</div>
+  <div class="var-title">📊 Табличный — статусы в таблице, бонусы/штрафы цветными блоками</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:.65rem">
+      <thead><tr><th style="text-align:left;padding:.35rem .4rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:.7rem;text-transform:uppercase">Сотрудник</th><th style="text-align:center;padding:.35rem .4rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:.7rem;text-transform:uppercase">Статус</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Анна С.</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);text-align:center"><select class="emp-sel"><option>✅ Работал</option></select></td></tr>
+        <tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Максим К.</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);text-align:center"><select class="emp-sel"><option selected>🏥 Больничный</option></select></td></tr>
+        <tr><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);font-weight:500">Ольга М.</td><td style="padding:.35rem .4rem;border-bottom:1px solid var(--border);text-align:center"><select class="emp-sel"><option>✅ Работал</option></select></td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+      <div style="background:#f0fdf4;border-radius:10px;padding:.5rem">
+        <div style="font-size:.72rem;font-weight:600;color:var(--green);margin-bottom:.25rem">🎯 Бонусы</div>
+        <div style="font-size:.75rem;margin-bottom:4px">Максим К.: <b style="color:var(--green)">+5 000₽</b></div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.72rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="₽"><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="За что"></div>
+      </div>
+      <div style="background:#fef2f2;border-radius:10px;padding:.5rem">
+        <div style="font-size:.72rem;font-weight:600;color:var(--red);margin-bottom:.25rem">⚠️ Штрафы</div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.72rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="₽"><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="За что"></div>
+      </div>
+    </div>
+    <div class="total-line"><span>🎯 Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>⚠️ Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:.25rem">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 7 — Акцентный (цветной с иконками в кружках) ===== -->
+<div class="var">
+  <div class="var-num">Вариант 7</div>
+  <div class="var-title">🎨 Акцентный — цветные заголовки с иконками в кружках</div>
+  <div class="m-t">
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:1.1rem">🗓</div>
+      <div><div style="font-size:1rem;font-weight:700">17 июня</div><div style="font-size:.72rem;color:var(--muted)">Статусы и события дня</div></div>
+    </div>
+    <div style="background:linear-gradient(135deg,#f8f9fa,#fff);border-radius:14px;padding:.75rem;border:1px solid var(--border);margin-bottom:.65rem">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:.5rem">
+        <span style="width:26px;height:26px;border-radius:8px;background:#e8f0ff;display:flex;align-items:center;justify-content:center;font-size:.8rem">👤</span>
+        <span style="font-size:.78rem;font-weight:600">Статусы</span>
+      </div>
+      <div class="emp-item"><span class="emp-name">Анна С.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+      <div class="emp-item"><span class="emp-name">Максим К.</span><select class="emp-sel"><option selected>🏥 Больничный</option></select></div>
+      <div class="emp-item"><span class="emp-name">Ольга М.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+      <div style="background:linear-gradient(135deg,#f0fdf4,#fff);border-radius:14px;padding:.65rem;border:1px solid #bbf7d0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:.35rem">
+          <span style="width:26px;height:26px;border-radius:8px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:.8rem">🎯</span>
+          <span style="font-size:.78rem;font-weight:600;color:var(--green)">Бонусы</span>
+        </div>
+        <div style="font-size:.75rem;margin-bottom:4px">Максим К.: <b style="color:var(--green)">+5 000₽</b></div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.72rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="₽"><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="За что"></div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fef2f2,#fff);border-radius:14px;padding:.65rem;border:1px solid #fecaca">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:.35rem">
+          <span style="width:26px;height:26px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:.8rem">⚠️</span>
+          <span style="font-size:.78rem;font-weight:600;color:var(--red)">Штрафы</span>
+        </div>
+        <div class="f-row" style="gap:4px"><select style="font-size:.72rem;padding:.2rem .4rem"><option>—</option></select><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="₽"><input style="font-size:.72rem;padding:.2rem .4rem" placeholder="За что"></div>
+      </div>
+    </div>
+    <div class="total-line"><span>🎯 Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>⚠️ Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 8 — Теги вместо селектов ===== -->
+<div class="var">
+  <div class="var-num">Вариант 8</div>
+  <div class="var-title">🏷 Теговый — статусы как кликабельные теги, активный выделен</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.65rem">
+      <div>
+        <div style="font-size:.75rem;font-weight:500;margin-bottom:.25rem">Анна С.</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:var(--yellow);border-radius:100px;cursor:default;font-weight:500">✅ Работал</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">🏥 Больничный</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">🏖 Отпуск</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">❌ Прогул</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:500;margin-bottom:.25rem">Максим К.</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">✅ Работал</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:var(--yellow);border-radius:100px;cursor:default;font-weight:500">🏥 Больничный</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">🏖 Отпуск</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:500;margin-bottom:.25rem">Ольга М.</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:var(--yellow);border-radius:100px;cursor:default;font-weight:500">✅ Работал</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">🏖 Отпуск</span>
+          <span style="padding:.2rem .5rem;font-size:.72rem;background:#f1f3f5;border-radius:100px;cursor:default;color:var(--muted)">❌ Прогул</span>
+        </div>
+      </div>
+    </div>
+    <div class="s-label" style="color:var(--green)">🎯 Бонусы</div>
+    <div class="bd-line"><span class="name">Максим К.</span><span class="comm">Отличная работа</span><span class="amt plus">+5 000₽</span></div>
+    <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+    <div class="s-label" style="color:var(--red)">⚠️ Штрафы</div>
+    <div class="f-row"><select><option>— Сотрудник —</option></select><input type="number" placeholder="Сумма"><input type="text" placeholder="За что"></div>
+    <div class="total-line"><span>Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:.25rem">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 9 — Минималистичный ===== -->
+<div class="var">
+  <div class="var-num">Вариант 9</div>
+  <div class="var-title">🌫 Минималистичный — без рамок, всё на тонких разделителях</div>
+  <div class="m-t" style="gap:.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.95rem;font-weight:600">🗓 17 июня 2026</div>
+      <button class="btn btn-yellow" style="padding:.35rem .9rem;font-size:.75rem">💾 Сохранить</button>
+    </div>
+    <div class="s-label" style="margin-top:.25rem;color:#111;opacity:.6">👤 Статусы</div>
+    <div class="emp-item" style="padding:.3rem 0"><span class="emp-name">Анна С.</span><select class="emp-sel" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0"><option>✅ Работал</option></select></div>
+    <div class="emp-item" style="padding:.3rem 0"><span class="emp-name">Максим К.</span><select class="emp-sel" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0"><option selected>🏥 Больничный</option></select></div>
+    <div class="emp-item" style="padding:.3rem 0"><span class="emp-name">Ольга М.</span><select class="emp-sel" style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0"><option>✅ Работал</option></select></div>
+    <div style="height:1px;background:var(--border);margin:.25rem 0"></div>
+    <div style="font-size:.75rem;font-weight:500;color:var(--green);margin-bottom:.25rem">🎯 Бонусы</div>
+    <div style="font-size:.78rem;margin-bottom:.35rem">Максим К. — <b style="color:var(--green)">+5 000₽</b> <span style="color:var(--muted)">Отличная работа</span></div>
+    <div class="f-row" style="gap:6px"><select style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0"><option>—</option></select><input style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0" placeholder="Сумма"><input style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0" placeholder="За что"></div>
+    <div style="height:1px;background:var(--border);margin:.25rem 0"></div>
+    <div style="font-size:.75rem;font-weight:500;color:var(--red);margin-bottom:.25rem">⚠️ Штрафы</div>
+    <div class="f-row" style="gap:6px"><select style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0"><option>—</option></select><input style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0" placeholder="Сумма"><input style="border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:.2rem 0" placeholder="За что"></div>
+    <div style="display:flex;justify-content:space-between;padding:.35rem .5rem;font-size:.8rem;margin-top:.25rem">
+      <span>🎯 <b style="color:var(--green)">5 000₽</b></span>
+      <span>⚠️ <b style="color:var(--red)">0₽</b></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ВАРИАНТ 10 — Аккордеон ===== -->
+<div class="var">
+  <div class="var-num">Вариант 10</div>
+  <div class="var-title">🔽 Аккордеон — секции сворачиваются, заголовки кликабельные</div>
+  <div class="m-t">
+    <div class="m-h">🗓 17.06</div>
+    <div class="m-sub">Статусы сотрудников и события дня</div>
+
+    <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#f8f9fa;cursor:default;border-bottom:1px solid var(--border)">
+        <span style="font-size:.82rem;font-weight:600">👤 Статусы сотрудников</span>
+        <span style="font-size:.6rem;color:var(--muted)">▼</span>
+      </div>
+      <div style="padding:.5rem .65rem">
+        <div class="emp-item"><span class="emp-name">Анна С.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+        <div class="emp-item"><span class="emp-name">Максим К.</span><select class="emp-sel"><option selected>🏥 Больничный</option></select></div>
+        <div class="emp-item"><span class="emp-name">Ольга М.</span><select class="emp-sel"><option>✅ Работал</option></select></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid #bbf7d0;border-radius:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#f0fdf4;cursor:default;border-bottom:1px solid #bbf7d0">
+        <span style="font-size:.82rem;font-weight:600;color:var(--green)">🎯 Бонусы</span>
+        <span style="font-size:.6rem;color:var(--green)">▼</span>
+      </div>
+      <div style="padding:.5rem .65rem">
+        <div class="bd-line" style="padding:.2rem 0"><span class="name">Максим К.</span><span class="comm">Отличная работа</span><span class="amt plus">+5 000₽</span></div>
+        <!-- Строка 1 (заполнена) -->
+        <div class="f-row" style="margin-bottom:6px">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white)"><option>— Сотрудник —</option><option selected>Максим К.</option></select>
+          <input type="number" value="5000" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <input type="text" value="Отличная работа" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <span style="color:var(--green);font-weight:600;font-size:.82rem;min-width:50px;text-align:right">+5 000₽</span>
+        </div>
+        <!-- Строка 2 (новая пустая — появляется после выбора сотрудника) -->
+        <div class="f-row" style="opacity:.7">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none;background:var(--white);color:var(--muted)"><option>— Сотрудник —</option></select>
+          <input type="number" placeholder="Сумма" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none">
+          <input type="text" placeholder="За что" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px dashed var(--border);border-radius:8px;outline:none">
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px">⬆ Выберите сотрудника — появится новая строка</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid #fecaca;border-radius:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;background:#fef2f2;cursor:default;border-bottom:1px solid #fecaca">
+        <span style="font-size:.82rem;font-weight:600;color:var(--red)">⚠️ Штрафы</span>
+        <span style="font-size:.6rem;color:var(--red)">▼</span>
+      </div>
+      <div style="padding:.5rem .65rem">
+        <!-- Единственная строка — пустая, ниже появится новая -->
+        <div class="f-row">
+          <select style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--white)"><option>— Сотрудник —</option></select>
+          <input type="number" placeholder="Сумма" style="width:90px;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+          <input type="text" placeholder="За что" style="flex:1;padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:8px;outline:none">
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px">⬆ Выберите сотрудника — появится новая строка</div>
+      </div>
+    </div>
+
+    <div class="total-line"><span>🎯 Бонусов: <b style="color:var(--green)">5 000₽</b></span><span>⚠️ Штрафов: <b style="color:var(--red)">0₽</b></span></div>
+    <button class="btn btn-yellow" style="width:100%;justify-content:center">💾 Сохранить</button>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
