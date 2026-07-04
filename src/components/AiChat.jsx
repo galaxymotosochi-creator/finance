@@ -495,7 +495,7 @@ export default function AiChat() {
         const recCount = (recs||[]).length;
         let greet = 'Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
         if (shift?.cashier_name && recCount > 0) {
-          greet += `\nКасса: ${shift.cashier_name} · продажи ${recs.reduce((s,r)=>s+(r.total_amount||0),0).toLocaleString()} ₽`;
+          greet += `\nКасса: ${shift.cashier_name} | продажи ${recs.reduce((s,r)=>s+(r.total_amount||0),0).toLocaleString()} ₽`;
         } else if (shift?.cashier_name) {
           greet += `\nСмена открыта, кассир ${shift.cashier_name}`;
         } else {
@@ -520,7 +520,7 @@ export default function AiChat() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/ai-chat', {
+      const res = await fetch('https://fqnmkynxuaxaljokptwn.supabase.co/functions/v1/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

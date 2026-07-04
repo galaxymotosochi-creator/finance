@@ -744,10 +744,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   {clientDrop && (
                     <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
-                        <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' · '+c.phone : '')); setClientDrop(false); }}
+                        <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
                           style={{padding:'8px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
                           onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
-                          onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' · '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' · '+c.phone : ''}</div>
+                          onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>
                       ))}
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).length === 0 && (
                         <div style={{padding:'10px',fontSize:'12px',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
@@ -1095,7 +1095,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <span style={{fontSize:'1.2rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
                 {cur.clientName ? (
                   <div className="sub" style={{marginBottom:0,fontSize:'.8rem',color:'var(--muted)'}}>
-                    {cur.clientName} · {cur.items?.length || 0} товаров · {Number(cur.total||0).toLocaleString()} ₽
+                    {cur.clientName} | {cur.items?.length || 0} товаров | {Number(cur.total||0).toLocaleString()} ₽
                   </div>
                 ) : null}
               </div>

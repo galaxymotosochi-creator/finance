@@ -221,7 +221,7 @@ export default function Health() {
             value:(metrics.criticalCount+metrics.warningCount).toString(),
             color:metrics.criticalCount>0?'#dc2626':'#f59e0b',
             bg:metrics.criticalCount>0?'#fef2f2':'#fffbeb',
-            sub:`${metrics.criticalCount} критических · ${metrics.warningCount} на грани` },
+            sub:`${metrics.criticalCount} критических | ${metrics.warningCount} на грани` },
           { label:'Средний запас',value:metrics.avgDays+' дн',
             color:'#000',bg:'#f5f5f5',
             sub:'хватит при текущих продажах' },
@@ -366,7 +366,7 @@ export default function Health() {
                 {/* Себестоимость */}
                 {h.costPrice>0 && (
                   <div style={{fontSize:'.62rem',color:'var(--muted)',marginTop:'6px'}}>
-                    Себестоимость: {h.costPrice.toLocaleString()} ₽ · Сумма: {h.sumValue.toLocaleString()} ₽
+                    Себестоимость: {h.costPrice.toLocaleString()} ₽ | Сумма: {h.sumValue.toLocaleString()} ₽
                   </div>
                 )}
               </div>

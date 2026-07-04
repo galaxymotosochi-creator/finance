@@ -157,9 +157,9 @@ export default function Dashboard() {
           <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{d.totalCash.toLocaleString()} ₽</div></div>
       </div>
 
-      {/* Счета · Долги */}
+      {/* Счета | Долги */}
       <div style={sec}>
-        <div style={st}>Счета · Долги</div>
+        <div style={st}>Счета | Долги</div>
         <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
           {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
             return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{a.balance.toLocaleString()} ₽</b></span>;
@@ -171,7 +171,7 @@ export default function Dashboard() {
       {/* Касса */}
       {d.activeShift && (
         <div style={sec}>
-          <div style={st}>Касса · Смена #{d.activeShift.shift_number || ''}</div>
+          <div style={st}>Касса | Смена {d.activeShift.shift_number || ''}</div>
           <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
             <div style={{fontSize:'1.6rem'}}>🗄️</div>
             <div style={{flex:1}}>
@@ -192,13 +192,20 @@ export default function Dashboard() {
       {d.lastRecs && d.lastRecs.length > 0 && (
         <div style={sec}>
           <div style={st}>Последние чеки</div>
-          {d.lastRecs.map((r, i) => (
-            <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'4px 0',fontSize:'.74rem',borderBottom:i < d.lastRecs.length - 1 ? '1px solid #f5f5f5' : 'none'}}>
-              <span style={{fontWeight:500}}>{r.client_name || 'Без имени'}</span>
-              <span style={{color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{r.date}</span>
-              <span style={{fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</span>
-            </div>
-          ))}
+          <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
+            <thead><tr>
+              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'50%'}}>Клиент</th>
+              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center',width:'30%'}}>Дата</th>
+              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right',width:'20%'}}>Сумма</th>
+            </tr></thead>
+            <tbody>{d.lastRecs.map((r, i) => (
+              <tr key={i}>
+                <td style={{padding:'3px 3px',fontWeight:500}}>{r.client_name || 'Без имени'}</td>
+                <td style={{padding:'3px 3px',textAlign:'center',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{r.date}</td>
+                <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</td>
+              </tr>
+            ))}</tbody>
+          </table>
         </div>
       )}
 

@@ -218,10 +218,10 @@ export default function QuickSale({ onClose }) {
               {clientDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                   {(clientSearch ? clients.filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)) : clients).map(c => (
-                    <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' · '+c.phone : '')); setClientDrop(false); }}
+                    <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
                       style={{padding:'7px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5'}}
                       onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
-                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' · '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' · '+c.phone : ''}</div>
+                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>
                   ))}
                 </div>
               )}

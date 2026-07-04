@@ -359,7 +359,7 @@ const load = async () => {
               <button className="modal-close" onClick={() => setViewId(null)}>&times;</button>
               <h2>Поставка №{s.invoice||''}</h2>
               <div className="sub" style={{marginBottom:'.5rem'}}>
-                {s.supplier_name ? s.supplier_name + ' · ' : ''}{s.date||''}
+                {s.supplier_name ? s.supplier_name + ' | ' : ''}{s.date||''}
               </div>
               <div style={{display:'flex',gap:'.5rem',marginBottom:'.75rem'}}>
                 <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{fontSize:'.75rem',color:'var(--muted)'}}>Поставка:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
