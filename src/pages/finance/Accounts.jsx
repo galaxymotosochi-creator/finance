@@ -55,32 +55,36 @@ export default function Accounts() {
   const [corDesc, setCorDesc] = useState('');
 
   const fetchAccounts = async () => {
-    var d = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-    if (!d.data) return;
-    var cl = d.data;
-    var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
-    if (user) {
-      var cr = [];
-      if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Наличные деньги (не через кассу)'});
-      if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0,description:'Наличные продажи через кассу'});
-      if (cr.length > 0) {
-        var r = await supabase.from('accounts').insert(cr).select();
-        if (r.data) {
-          cl = cl.concat(r.data);
-          var ids = r.data.map(x => x.id);
-          var prev = JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]');
-          localStorage.setItem(SYSTEM_KEY, JSON.stringify([...prev, ...ids]));
-          setSystemIds(new Set([...prev, ...ids]));
+    try {
+      var d = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+      if (!d.data) return;
+      var cl = d.data;
+      var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
+      if (user) {
+        var cr = [];
+        if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Наличные деньги (не через кассу)'});
+        if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0,description:'Наличные продажи через кассу'});
+        if (cr.length > 0) {
+          var r = await supabase.from('accounts').insert(cr).select();
+          if (r.data) {
+            cl = cl.concat(r.data);
+            var ids = r.data.map(x => x.id);
+            var prev = JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]');
+            localStorage.setItem(SYSTEM_KEY, JSON.stringify([...prev, ...ids]));
+            setSystemIds(new Set([...prev, ...ids]));
+          }
         }
       }
-    }
-    setAccounts(cl);
+      setAccounts(cl);
+    } catch(e) { console.error('Accounts fetch error:', e); }
     setInitDone(true);
   };
 
   const fetchTx = async () => {
-    var r = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', {ascending:false});
-    setTransactions(r.data||[]);
+    try {
+      var r = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', {ascending:false});
+      setTransactions(r.data||[]);
+    } catch(e) { console.error('Tx fetch error:', e); }
     setLoading(false);
   };
 
