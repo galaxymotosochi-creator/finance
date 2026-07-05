@@ -413,9 +413,26 @@ export default function Registers({ fullscreen }) {
     setToast('Товар добавлен!');
   };
 
+  const resizePhoto = (file, maxW=800) => new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = h * maxW / w; w = maxW; }
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      c.toBlob(blob => res(new File([blob], file.name, {type:'image/jpeg'})), 'image/jpeg', 0.7);
+    };
+    img.onerror = rej;
+    img.src = url;
+  });
+
   const uploadPhoto = async (product, file) => {
     if (!file) return;
-    const ext = file.name.split('.').pop();
+    const resized = await resizePhoto(file).catch(() => file);
+    const ext = 'jpg';
     const filePath = `${user.id}/${product.id}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
     if (uploadErr) {
