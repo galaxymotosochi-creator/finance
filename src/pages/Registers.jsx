@@ -148,8 +148,17 @@ export default function Registers({ fullscreen }) {
     let items = products;
     if (catFilter !== 'all') items = items.filter(p => (p.cat || '') === catFilter);
     if (search) { const q = search.toLowerCase(); items = items.filter(p => p.name.toLowerCase().includes(q)); }
-    return items;
-  }, [products, search, catFilter]);
+    // Сортировка: сначала с остатком, потом нулевые, скрытые в конце
+    return [...items].sort((a, b) => {
+      const aHidden = a.hidden ? 1 : 0;
+      const bHidden = b.hidden ? 1 : 0;
+      if (aHidden !== bHidden) return aHidden - bHidden;
+      const aStock = a.type === 'service' ? 1 : ((stockMap[a.id] || 0) > 0 ? 1 : 0);
+      const bStock = b.type === 'service' ? 1 : ((stockMap[b.id] || 0) > 0 ? 1 : 0);
+      if (aStock !== bStock) return bStock - aStock;
+      return a.name?.localeCompare(b.name || '');
+    });
+  }, [products, search, catFilter, stockMap]);
 
   const findPromo = (product) => {
     const today = new Date().toISOString().split('T')[0];
