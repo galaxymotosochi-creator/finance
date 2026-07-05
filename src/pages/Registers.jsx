@@ -418,13 +418,11 @@ export default function Registers({ fullscreen }) {
     const ext = file.name.split('.').pop();
     const filePath = `${user.id}/${product.id}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
-    if (uploadErr && !uploadErr.message?.includes('bucket')) {
-      // Bucket might not exist — try creating it
+    if (uploadErr) {
+      // Может bucket не создан — попробуем
       await supabase.storage.createBucket('product-photos', { public: true }).catch(() => {});
       const retry = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
-      if (retry.error) return setToast('⚠️ Ошибка загрузки: ' + retry.error.message);
-    } else if (uploadErr) {
-      return setToast('⚠️ Ошибка загрузки: ' + uploadErr.message);
+      if (retry.error) return setToast('⚠️ ' + retry.error.message);
     }
     const { data: { publicUrl } } = supabase.storage.from('product-photos').getPublicUrl(filePath);
     const { error: updateErr } = await supabase.from('products').update({ photo_url: publicUrl }).eq('id', product.id);
@@ -432,7 +430,7 @@ export default function Registers({ fullscreen }) {
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
     if (data) setProducts(data);
-    setToast('✅ Фото добавлено');
+    setToast('✅ Фото успешно загружено!');
   };
 
   const openShift = async () => {
