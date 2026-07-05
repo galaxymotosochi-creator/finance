@@ -413,6 +413,28 @@ export default function Registers({ fullscreen }) {
     setToast('Товар добавлен!');
   };
 
+  const uploadPhoto = async (product, file) => {
+    if (!file) return;
+    const ext = file.name.split('.').pop();
+    const filePath = `${user.id}/${product.id}.${ext}`;
+    const { error: uploadErr } = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
+    if (uploadErr && !uploadErr.message?.includes('bucket')) {
+      // Bucket might not exist — try creating it
+      await supabase.storage.createBucket('product-photos', { public: true }).catch(() => {});
+      const retry = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
+      if (retry.error) return setToast('⚠️ Ошибка загрузки: ' + retry.error.message);
+    } else if (uploadErr) {
+      return setToast('⚠️ Ошибка загрузки: ' + uploadErr.message);
+    }
+    const { data: { publicUrl } } = supabase.storage.from('product-photos').getPublicUrl(filePath);
+    const { error: updateErr } = await supabase.from('products').update({ photo_url: publicUrl }).eq('id', product.id);
+    if (updateErr) return setToast('⚠️ Ошибка сохранения: ' + updateErr.message);
+    // Refresh products
+    const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
+    if (data) setProducts(data);
+    setToast('✅ Фото добавлено');
+  };
+
   const openShift = async () => {
     const bal = parseFloat(openShiftBal) || 0;
     const { data, error } = await supabase.from('shifts').insert({
@@ -590,7 +612,17 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               style={{background: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#fafafa':'#fff',borderRadius:'14px',padding:'14px',cursor:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?'default':'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid '+( (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#f0f0f0':'#eee' ),boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%',opacity:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?.5:1}}
               onMouseEnter={e => { var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'}} }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
-              <div style={{fontSize:'13px',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3,minHeight:'40px'}}>{p.name}</div>
+              {/* Фото / иконка загрузки */}
+              <div style={{height:'100px',marginBottom:'8px',borderRadius:'8px',overflow:'hidden',background:'#f9f9f9',display:'flex',alignItems:'center',justifyContent:'center',cursor:p.photo_url?'default':'pointer',position:'relative',border:'1px dashed '+(p.photo_url?'transparent':'#ddd')}}
+                onClick={function(e){e.stopPropagation();if(!p.photo_url){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(ev){var f=ev.target.files[0];if(f){uploadPhoto(p,f)}};inp.click()}}}
+              >
+                {p.photo_url ? (
+                  <img src={p.photo_url} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',borderRadius:'8px'}} />
+                ) : (
+                  <span style={{fontSize:'28px',opacity:0.3}}>📷</span>
+                )}
+              </div>
+              <div style={{fontSize:'12px',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3}}>{p.name}</div>
               <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
                 {p.cat && <div style={{fontSize:'10px',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'#999'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
