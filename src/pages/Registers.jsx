@@ -414,7 +414,7 @@ export default function Registers({ fullscreen }) {
     setToast('Товар добавлен!');
   };
 
-  const resizePhoto = (file, maxW=800) => new Promise((res, rej) => {
+  const resizePhoto = (file, maxW=600) => new Promise((res, rej) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
@@ -423,8 +423,10 @@ export default function Registers({ fullscreen }) {
       if (w > maxW) { h = h * maxW / w; w = maxW; }
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      c.toBlob(blob => res(new File([blob], file.name, {type:'image/jpeg'})), 'image/jpeg', 0.7);
+      c.toBlob(blob => {
+        URL.revokeObjectURL(url);
+        res(new File([blob], file.name, {type:'image/jpeg'}));
+      }, 'image/jpeg', 0.6);
     };
     img.onerror = rej;
     img.src = url;
@@ -433,24 +435,29 @@ export default function Registers({ fullscreen }) {
   const uploadPhoto = async (product, file) => {
     if (!file || uploadingId) return;
     setUploadingId(product.id);
-    const resized = await resizePhoto(file).catch(() => file);
-    const ext = 'jpg';
-    const filePath = `${user.id}/${product.id}.${ext}`;
-    const { error: uploadErr } = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
-    if (uploadErr) {
-      // Может bucket не создан — попробуем
-      await supabase.storage.createBucket('product-photos', { public: true }).catch(() => {});
-      const retry = await supabase.storage.from('product-photos').upload(filePath, file, { upsert: true });
-      if (retry.error) return setToast('⚠️ ' + retry.error.message);
+    try {
+      const resized = await resizePhoto(file).catch(() => null) || file;
+      const ext = 'jpg';
+      const filePath = `${user.id}/${product.id}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from('product-photos').upload(filePath, resized, { upsert: true });
+      if (uploadErr) {
+        // Может bucket не создан — попробуем
+        await supabase.storage.createBucket('product-photos', { public: true }).catch(() => {});
+        const retry = await supabase.storage.from('product-photos').upload(filePath, resized, { upsert: true });
+        if (retry.error) return setToast('⚠️ ' + retry.error.message);
+      }
+      const { data: { publicUrl } } = supabase.storage.from('product-photos').getPublicUrl(filePath);
+      const { error: updateErr } = await supabase.from('products').update({ photo_url: publicUrl }).eq('id', product.id);
+      if (updateErr) return setToast('⚠️ Ошибка сохранения: ' + updateErr.message);
+      // Refresh products
+      const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
+      if (data) setProducts(data);
+      setUploadingId(null);
+      setToast('✅ Фото успешно загружено!');
+    } catch(e) {
+      setUploadingId(null);
+      setToast('⚠️ Ошибка: ' + e.message);
     }
-    const { data: { publicUrl } } = supabase.storage.from('product-photos').getPublicUrl(filePath);
-    const { error: updateErr } = await supabase.from('products').update({ photo_url: publicUrl }).eq('id', product.id);
-    if (updateErr) return setToast('⚠️ Ошибка сохранения: ' + updateErr.message);
-    // Refresh products
-    const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
-    if (data) setProducts(data);
-    setUploadingId(null);
-    setToast('✅ Фото успешно загружено!');
   };
 
   const openShift = async () => {
