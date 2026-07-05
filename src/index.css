@@ -586,3 +586,9 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(66, 139, 249, .15) !important;
   outline: none;
 }
+
+/* Анимация загрузки фото */
+@keyframes loadbar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}

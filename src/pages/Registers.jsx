@@ -54,6 +54,7 @@ export default function Registers({ fullscreen }) {
   const [heldIndex, setHeldIndex] = useState(0);
   const [promos, setPromos] = useState([]);
   const [stockMap, setStockMap] = useState({});
+  const [uploadingId, setUploadingId] = useState(null);
 
   const abbreviateName = (name) => {
     if (!name) return name;
@@ -430,7 +431,8 @@ export default function Registers({ fullscreen }) {
   });
 
   const uploadPhoto = async (product, file) => {
-    if (!file) return;
+    if (!file || uploadingId) return;
+    setUploadingId(product.id);
     const resized = await resizePhoto(file).catch(() => file);
     const ext = 'jpg';
     const filePath = `${user.id}/${product.id}.${ext}`;
@@ -447,6 +449,7 @@ export default function Registers({ fullscreen }) {
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
     if (data) setProducts(data);
+    setUploadingId(null);
     setToast('✅ Фото успешно загружено!');
   };
 
@@ -631,7 +634,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div style={{height:'100px',marginBottom:'8px',borderRadius:'8px',overflow:'hidden',background:'#f9f9f9',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',position:'relative',border:'1px dashed '+(p.photo_url?'transparent':'#ddd')}}
                 onClick={function(e){e.stopPropagation();if(p.photo_url&&!confirm('Заменить фото?'))return;var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(ev){var f=ev.target.files[0];if(f){uploadPhoto(p,f)}};inp.click()}}
               >
-                {p.photo_url ? (
+                {uploadingId === p.id ? (
+                  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'6px'}}>
+                    <div style={{width:'40px',height:'4px',borderRadius:'2px',background:'#e0e0e0',overflow:'hidden'}}>
+                      <div style={{width:'100%',height:'100%',background:'#111',borderRadius:'2px',animation:'loadbar 1.2s infinite'}}></div>
+                    </div>
+                    <span style={{fontSize:'10px',color:'#999'}}>загрузка...</span>
+                  </div>
+                ) : p.photo_url ? (
                   <img src={p.photo_url} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',borderRadius:'8px'}} />
                 ) : (
                   <span style={{fontSize:'28px',opacity:0.3}}>📷</span>
