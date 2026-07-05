@@ -126,11 +126,11 @@ class QueryBuilder {
   constructor(table) {
     this.table = table;
   }
-  select(cols) { return new PostgrestFilter(API_URL + '/rest/v1/' + this.table, {}, 'GET').select(cols); }
-  insert(values) { return new PostgrestFilter(API_URL + '/rest/v1/' + this.table, {}, 'POST', Array.isArray(values) ? values : [values]); }
-  update(values) { return new PostgrestFilter(API_URL + '/rest/v1/' + this.table, {}, 'PATCH', values); }
-  delete() { return new PostgrestFilter(API_URL + '/rest/v1/' + this.table, {}, 'DELETE'); }
-  upsert(values) { return new PostgrestFilter(API_URL + '/rest/v1/' + this.table, {}, 'POST', Array.isArray(values) ? values : [values]); }
+  select(cols) { return new PostgrestFilter(API_URL + '/api/' + this.table, {}, 'GET').select(cols); }
+  insert(values) { return new PostgrestFilter(API_URL + '/api/' + this.table, {}, 'POST', Array.isArray(values) ? values : [values]); }
+  update(values) { return new PostgrestFilter(API_URL + '/api/' + this.table, {}, 'PATCH', values); }
+  delete() { return new PostgrestFilter(API_URL + '/api/' + this.table, {}, 'DELETE'); }
+  upsert(values) { return new PostgrestFilter(API_URL + '/api/' + this.table, {}, 'POST', Array.isArray(values) ? values : [values]); }
 }
 
 const auth = {
