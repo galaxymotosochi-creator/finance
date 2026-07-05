@@ -613,11 +613,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               onMouseEnter={e => { var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'}} }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
               {/* Фото / иконка загрузки */}
-              <div style={{height:'100px',marginBottom:'8px',borderRadius:'8px',overflow:'hidden',background:'#f9f9f9',display:'flex',alignItems:'center',justifyContent:'center',cursor:p.photo_url?'default':'pointer',position:'relative',border:'1px dashed '+(p.photo_url?'transparent':'#ddd')}}
-                onClick={function(e){e.stopPropagation();if(!p.photo_url){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(ev){var f=ev.target.files[0];if(f){uploadPhoto(p,f)}};inp.click()}}}
+              <div style={{height:'100px',marginBottom:'8px',borderRadius:'8px',overflow:'hidden',background:'#f9f9f9',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',position:'relative',border:'1px dashed '+(p.photo_url?'transparent':'#ddd')}}
+                onClick={function(e){e.stopPropagation();var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(ev){var f=ev.target.files[0];if(f){uploadPhoto(p,f)}};inp.click()}}
               >
                 {p.photo_url ? (
-                  <img src={p.photo_url} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',borderRadius:'8px'}} />
+                  <>
+                    <img src={p.photo_url} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',borderRadius:'8px'}} />
+                    <span onClick={function(e){e.stopPropagation();supabase.from('products').update({photo_url:null}).eq('id',p.id).then(function(){var d=supabase.from('products').select('*').eq('user_id',user.id).order('name');d.then(function(r){if(r.data)setProducts(r.data)})})}} style={{position:'absolute',top:'4px',right:'4px',width:'22px',height:'22px',borderRadius:'50%',background:'rgba(0,0,0,.5)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',cursor:'pointer',lineHeight:1,zIndex:2}}>✕</span>
+                  </>
                 ) : (
                   <span style={{fontSize:'28px',opacity:0.3}}>📷</span>
                 )}
