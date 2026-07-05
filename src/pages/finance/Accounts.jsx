@@ -22,6 +22,7 @@ export default function Accounts() {
   const [loading, setLoading] = useState(true);
   const [initDone, setInitDone] = useState(false);
   const [systemIds, setSystemIds] = useState(new Set(JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]')));
+  const [debugAccts, setDebugAccts] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
@@ -57,7 +58,7 @@ export default function Accounts() {
   const fetchAccounts = async () => {
     try {
       var d = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-      if (!d.data) return;
+      if (!d.data) { console.error('Accounts: no data', JSON.stringify(d)); alert('Ошибка загрузки счетов: ' + (d.error?.message || 'нет данных')); return; }
       var cl = d.data;
       var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
       if (user) {
@@ -76,7 +77,8 @@ export default function Accounts() {
         }
       }
       setAccounts(cl);
-    } catch(e) { console.error('Accounts fetch error:', e); }
+      setDebugAccts({count:cl.length, names:cl.map(a=>a.name+' ('+a.type+')')});
+    } catch(e) { console.error('Accounts fetch error:', e); alert('Ошибка: ' + (e.message || e)); }
     setInitDone(true);
   };
 
@@ -206,6 +208,8 @@ export default function Accounts() {
             <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс по всем счетам</div>
           </div>
+          {debugAccts && <div style={{padding:'.5rem',marginBottom:'.5rem',background:'#f0f9ff',borderRadius:'8px',fontSize:'.75rem',color:'#333'}}>📊 Загружено счетов: {debugAccts.count}. Имена: {debugAccts.names.join(', ')}</div>}
+          {!debugAccts && initDone && <div style={{padding:'.5rem',marginBottom:'.5rem',background:'#fff3cd',borderRadius:'8px',fontSize:'.75rem',color:'#856404'}}>⚠️ Счета не загрузились! initDone={String(initDone)} loading={String(loading)} accounts.length={accounts.length}</div>}
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table>
               <thead id="colHeaders">
