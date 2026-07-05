@@ -95,7 +95,11 @@ class PostgrestFilter {
       if (this.method === 'GET') {
         res = await fetch(url, { headers });
         if (!res.ok) return { data: null, error: new Error('HTTP ' + res.status) };
-        return { data: await res.json(), error: null };
+        const json = await res.json();
+        // If the response is a single object wrapped in array or just an object
+        const data = Array.isArray(json) ? json : [json];
+        // For maybeSingle/single: return the first item if limit=1, otherwise the array
+        return { data: this.limitVal === 1 ? (data[0] || null) : data, error: null };
       } else if (this.method === 'POST') {
         headers['Prefer'] = 'return=representation';
         res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(this.body) });
