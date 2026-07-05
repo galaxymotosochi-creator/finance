@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Синхронно читаем сессию из localStorage, чтобы user был сразу
+  const storedSession = (() => { try { const s = localStorage.getItem('atlaspos_session'); return s ? JSON.parse(s) : null; } catch(e) { return null; } })();
+  const [user, setUser] = useState(storedSession?.user || null);
+  const [loading, setLoading] = useState(!storedSession);
   const [employeeData, setEmployeeData] = useState(null);
 
   // Загружаем данные сотрудника по user_id или employee_id из metadata
