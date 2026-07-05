@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -11,6 +11,9 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'atlaspos-jwt-secret-2026';
+
+// Parse int8/bigint as numbers (otherwise pg returns strings)
+types.setTypeParser(20, parseInt);
 
 const pool = new Pool({
   user: 'atlaspos',
