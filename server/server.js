@@ -85,7 +85,8 @@ app.get('/api/auth/me', auth, (req, res) => {
 
 const ALLOWED_TABLES = ['products','categories','accounts','transactions','receipts','receipt_items',
   'shifts','supplies','writeoffs','inventory','suppliers','employees','positions',
-  'timesheet','clients','loyalty','promos','subscriptions','user_profiles', 'users'];
+  'timesheet','timesheet_entries','clients','loyalty','loyalties','promos','subscriptions',
+  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items'];
 
 app.get('/api/:table', auth, async (req, res) => {
   try {
