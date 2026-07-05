@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
@@ -105,5 +105,5 @@ function AppRoutes() {
 export default function App() {
   const { loading } = useAuth();
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
-  return <HashRouter><AppRoutes /></HashRouter>;
+  return <BrowserRouter><AppRoutes /></BrowserRouter>;
 }
