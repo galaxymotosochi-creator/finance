@@ -462,7 +462,7 @@ export default function Registers({ fullscreen }) {
       const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
       if (data) setProducts(data);
       setUploadingId(null);
-      setToast('✅ Фото успешно загружено!');
+      setToast('Фото успешно загружено!');
     } catch(e) {
       setUploadingId(null);
       setToast('⚠️ Ошибка: ' + e.message);
