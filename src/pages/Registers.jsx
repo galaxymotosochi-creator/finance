@@ -638,7 +638,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gridAutoRows:'210px',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
           ) : filtered.map(p => (
