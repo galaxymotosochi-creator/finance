@@ -1,6 +1,6 @@
 // Service Worker — AtlasPos офлайн-режим
 
-const CACHE = '888-finance-v1';
+const CACHE = '888-finance-v2';
 const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -19,6 +19,11 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+
+  // Не трогаем POST, PUT, DELETE и запросы к Supabase
+  if (e.request.method !== 'GET' || url.hostname.includes('supabase.co')) {
+    return;
+  }
 
   // Кэшируем статику (JS, CSS, шрифты, иконки)
   if (
