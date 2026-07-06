@@ -338,20 +338,22 @@ export default function Transactions() {
       {txs.length > 0 ? (
         <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr id="colHeaders">
-              <th>Дата</th><th>Название</th><th>Сумма</th><th>Счет</th><th>Категория</th><th className="actions"></th>
+            <thead><tr id="colHeaders" style={{borderBottom:'1px solid rgba(0,0,0,.12)'}}>
+              <th style={{width:'10%',padding:'.5rem .5rem .5rem 0',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Дата</th><th style={{width:'30%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Название</th><th style={{width:'18%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Сумма</th><th style={{width:'17%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Счет</th><th style={{width:'17%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Категория</th><th style={{width:'8%',padding:'.5rem 0',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'none'}}></th>
             </tr></thead>
             <tbody>
               {filtered.map(tx => (
-                <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#555' }}>{tx.description || '—'}</td>
-                  <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'center' }}>
+                <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid rgba(0,0,0,.06)',transition:'background .1s' }}
+                  onMouseEnter={e=>e.currentTarget.style.background='rgba(0,0,0,.02)'}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}</td>
+                  <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
                   </td>
-                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'center' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
-                  <td style={{ padding: '.5rem', textAlign: 'center' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
+                  <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
+                  <td style={{ textAlign: 'left', whiteSpace: 'nowrap',borderRight:'none' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){
                         e.stopPropagation();

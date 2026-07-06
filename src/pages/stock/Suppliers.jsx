@@ -96,7 +96,7 @@ export default function Suppliers() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table>
+        <table className="data-table">
           <thead id="supColHeaders">
             <tr>
               <th>Название</th>

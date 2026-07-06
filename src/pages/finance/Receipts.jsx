@@ -174,7 +174,7 @@ export default function Receipts() {
 
       {/* Таблица чеков */}
       <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', overflowY: 'visible' }}>
-        <table>
+        <table className="data-table">
           <thead id="colHeaders">
             <tr>
               <th style={{ textAlign: 'left', paddingLeft: 0 }}>№ чека</th>

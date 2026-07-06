@@ -147,7 +147,7 @@ export default function Inventory() {
               <span style={{cursor:'pointer',color:'var(--muted)',fontSize:'1.1rem'}} onClick={() => setViewing(null)}>✕</span>
             </div>
             <div className="product-table" style={{overflowX:'auto'}}>
-              <table>
+              <table className="data-table">
                 <thead><tr>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)',textAlign:'left'}}>Товар</th>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Учтено</th>
@@ -174,7 +174,7 @@ export default function Inventory() {
       })()}
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table>
+        <table className="data-table">
           <thead id="invColHeaders">
             <tr>
               <th>№</th>
@@ -224,7 +224,7 @@ export default function Inventory() {
           <h2>Редактирование инвентаризации</h2>
           <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {fmtDate(editing.date)}</div>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
-            <table>
+            <table className="data-table">
               <thead><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
               <tbody>
                 {editing.items.map(function(it,idx) {

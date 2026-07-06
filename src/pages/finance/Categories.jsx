@@ -116,7 +116,7 @@ export default function Categories() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }}></div>
 
       <div className="product-table" style={{ overflowX: 'auto' }}>
-        <table style={{ minWidth: '500px' }}>
+        <table className="data-table">
           <thead id="dirColHeaders">
             <tr>
               <th>Название</th>

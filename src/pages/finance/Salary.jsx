@@ -299,7 +299,7 @@ export default function Salary() {
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
       <div className="product-table" style={{overflowX:'auto'}}>
-        <table>
+        <table className="data-table">
           <thead id="salaryColHeaders"><tr>
             <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
             <th>Вычеты</th><th>Итого</th><th>Статус</th><th style={{width:'90px'}}></th>

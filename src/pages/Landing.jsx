@@ -141,9 +141,6 @@ export default function Landing() {
           </p>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
             <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
-            <span onClick={()=>n('/variant/1')} style={{fontSize:14,fontWeight:500,cursor:"pointer",fontFamily:"inherit",color:"rgba(0,0,0,.4)",display:"inline-flex",alignItems:"center",gap:6,padding:"4px 0",border:"none",background:"transparent",transition:"color .15s"}}
-              onMouseEnter={e=>e.currentTarget.style.color="#000"}
-              onMouseLeave={e=>e.currentTarget.style.color="rgba(0,0,0,.4)"}>Посмотреть демо-версию <span style={{fontSize:16,transition:"transform .15s"}}>→</span></span>
           </div>
         </div>
         <div>

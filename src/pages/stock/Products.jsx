@@ -639,7 +639,7 @@ export default function Products() {
       </div>
       {/* Таблица */}
       <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
-        <table>
+        <table className="data-table">
           <thead id="colHeaders">
             <tr>
               {COL_ORDER.map(col => {
@@ -877,7 +877,7 @@ export default function Products() {
               }
               return (
                 <div className="product-table" style={{maxHeight:'280px',overflowY:'auto'}}>
-                  <table>
+                  <table className="data-table">
                     <thead>
                       <tr>
                         <th style={{width:'50%'}}>Товар</th>

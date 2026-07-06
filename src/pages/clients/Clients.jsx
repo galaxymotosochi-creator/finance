@@ -153,7 +153,7 @@ export default function Clients() {
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка клиентов...</p></div>
       ) : (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table>
+        <table className="data-table">
           <thead id="clientColHeaders">
             <tr>
               <th>Клиент</th>

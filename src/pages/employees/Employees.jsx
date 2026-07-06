@@ -170,7 +170,7 @@ export default function Employees() {
         <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
       ) : (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table>
+        <table className="data-table">
           <thead><tr>
             <th style={{whiteSpace:'nowrap'}}>Сотрудник</th><th style={{whiteSpace:'nowrap'}}>Должность</th><th style={{whiteSpace:'nowrap'}}>Телефон</th><th style={{whiteSpace:'nowrap'}}>E-mail</th>
             <th>Принят</th><th>Оклад</th><th>С продаж</th><th style={{width:'110px'}}></th>

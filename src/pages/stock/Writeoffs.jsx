@@ -86,7 +86,7 @@ export default function Writeoffs() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table>
+        <table className="data-table">
           <thead id="woColHeaders">
             <tr>
               <th>Товар</th>

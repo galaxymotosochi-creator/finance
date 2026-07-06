@@ -161,7 +161,7 @@ export default function Positions() {
         </div>
       ) : (
         <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
-          <table>
+          <table className="data-table">
             <thead id="colHeaders">
               <tr>
                 <th style={{textAlign:'left',paddingLeft:0,width:'26%'}}>Название должности</th>
