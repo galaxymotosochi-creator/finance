@@ -344,7 +344,7 @@ export default function Transactions() {
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? tx.date.split("-").reverse().join(".") : "—"}</td>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
                   <td style={{ padding: '.5rem', color: '#555' }}>{tx.description || '—'}</td>
                   <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'center' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
