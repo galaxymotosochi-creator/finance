@@ -10,6 +10,7 @@ import Variant4 from './pages/Variant4';
 import Variant5 from './pages/Variant5';
 import Dashboard from './pages/Dashboard';
 import AppLayout from './layouts/AppLayout';
+import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import PnL from './pages/finance/PnL';
@@ -105,5 +106,5 @@ function AppRoutes() {
 export default function App() {
   const { loading } = useAuth();
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
-  return <BrowserRouter><AppRoutes /></BrowserRouter>;
+  return <ErrorBoundary><BrowserRouter><AppRoutes /></BrowserRouter></ErrorBoundary>;
 }

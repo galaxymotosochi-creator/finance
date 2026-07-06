@@ -7,6 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const { AsyncLocalStorage } = require('async_hooks');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -23,9 +24,32 @@ const pool = new Pool({
   database: 'atlaspos',
 });
 
+const rlsStorage = new AsyncLocalStorage();
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// RLS контекст для каждого запроса
+app.use((req, res, next) => {
+  rlsStorage.run({ userId: req.user?.id }, () => next());
+});
+
+// Безопасный query с автоматической установкой RLS контекста
+async function rlsQuery(text, params) {
+  const store = rlsStorage.getStore();
+  const userId = store?.userId;
+  if (userId) {
+    const client = await pool.connect();
+    try {
+      await client.query('SELECT set_config($1, $2, true)', ['app.current_user_id', userId]);
+      return await client.query(text, params);
+    } finally {
+      client.release();
+    }
+  }
+  return pool.query(text, params);
+}
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -105,7 +129,7 @@ app.get('/api/:table', auth, async (req, res) => {
     if (limit) {
       sql += ' LIMIT ' + parseInt(limit);
     }
-    const { rows } = await pool.query(sql, params);
+    const { rows } = await rlsQuery(sql, params);
     res.json(rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -120,7 +144,7 @@ app.post('/api/:table', auth, async (req, res) => {
     if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
     const vals = keys.map(k => body[k]);
     const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
-    const { rows } = await pool.query('INSERT INTO ' + table + ' (' + keys.join(', ') + ') VALUES (' + ph + ') RETURNING *', vals);
+    const { rows } = await rlsQuery('INSERT INTO ' + table + ' (' + keys.join(', ') + ') VALUES (' + ph + ') RETURNING *', vals);
     res.json(rows[0] || rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -133,7 +157,7 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     const keys = Object.keys(data).filter(k => data[k] !== undefined);
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
     const vals = [...keys.map(k => data[k]), id, req.user.id];
-    const { rows } = await pool.query('UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (vals.length - 1) + ' AND user_id = $' + vals.length + ' RETURNING *', vals);
+    const { rows } = await rlsQuery('UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (vals.length - 1) + ' AND user_id = $' + vals.length + ' RETURNING *', vals);
     res.json(rows[0] || {});
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -142,7 +166,7 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
   try {
     const { table, id } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
-    await pool.query('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    await rlsQuery('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
