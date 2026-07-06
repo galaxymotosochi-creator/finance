@@ -120,7 +120,7 @@ export default function Landing() {
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
       {/* ===== ХЕДЕР ===== */}
-      <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1104,margin:"0 auto"}}>
+      <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",width:"100%"}}>
         <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>AtlasPos</span>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid #000",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Войти</button>
@@ -128,7 +128,7 @@ export default function Landing() {
       </header>
 
       {/* ===== HERO С ПРЕВЬЮ ДАШБОРДА ===== */}
-      <section style={{maxWidth:1104,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:"1fr 1.3fr",gap:40,alignItems:"center"}}>
+      <section style={{width:"100%",padding:"40px 24px",display:"grid",gridTemplateColumns:"1fr 1.3fr",gap:40,alignItems:"center"}}>
         <div>
           <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#000",fontSize:13,fontWeight:700,color:"#ffdd2d",marginBottom:20}}>
             Первая программа с AI аналитикой
@@ -185,7 +185,7 @@ export default function Landing() {
       </section>
 
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учёте с первых минут</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в AtlasPos</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"stretch"}}>
@@ -208,7 +208,7 @@ export default function Landing() {
       </div></section>
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
         <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — всё работает так, как вы видите</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,alignItems:"stretch"}}>
@@ -282,7 +282,7 @@ export default function Landing() {
       </section>
 
       {/* ===== КОНТРАСТ СИСТЕМ ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Сравните, как работают привычные методы и наша умная платформа</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20,alignItems:"start"}}>
@@ -352,7 +352,7 @@ export default function Landing() {
       </section>
 
       {/* ===== AI-ПОМОЩНИК ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <div style={{background:"#000",borderRadius:24,padding:"48px 40px",color:"#fff"}}>
           <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:100,background:"rgba(255,255,255,.1)",fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)",marginBottom:16}}>
             AI-аналитика
@@ -406,7 +406,7 @@ export default function Landing() {
       </section>
 
       {/* ===== ТАРИФЫ ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Тарифы</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:24}}>Прозрачные цены для бизнеса любого масштаба</p>
 
@@ -483,7 +483,7 @@ export default function Landing() {
           )})}
         </div>
       </section>{/* ===== ГОТОВЫ НАЧАТЬ? (из варианта 3) ===== */}
-      <section style={{maxWidth:1104,margin:"80px auto",padding:"0 24px"}}>
+      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <div style={{background:"#000",borderRadius:20,padding:"40px 32px",textAlign:"center",color:"#fff"}}>
           <h2 style={{fontSize:22,fontWeight:700,marginBottom:8}}>Готовы начать?</h2>
           <p style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:24,maxWidth:400,margin:"0 auto 24px"}}>
@@ -494,7 +494,7 @@ export default function Landing() {
       </section>
 
       {/* ===== ФУТЕР ===== */}
-      <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1104,margin:"20px auto 0",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,color:"rgba(0,0,0,.34)",flexWrap:"wrap",gap:12}}>
+      <footer style={{borderTop:"1px solid rgba(0,0,0,.08)",padding:"20px 24px",maxWidth:1280,margin:"20px auto 0",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,color:"rgba(0,0,0,.34)",flexWrap:"wrap",gap:12}}>
         <span>© 2026 AtlasPos</span>
         <div style={{display:"flex",gap:16}}>
           <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Политика конфиденциальности</a>
