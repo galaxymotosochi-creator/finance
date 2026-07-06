@@ -150,20 +150,20 @@ export default function Inventory() {
               <table className="data-table">
                 <thead id="colHeaders"><tr>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)',textAlign:'left'}}>Товар</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Учтено</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Факт</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Разница</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Сумма</th>
+                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Учтено</th>
+                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Факт</th>
+                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Разница</th>
+                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Сумма</th>
                 </tr></thead>
                 <tbody>
                   {doc.items.map((it,i)=>{
                     const d=it.actual-it.expected;const ds=d*it.cost;
                     return <tr key={i}>
                       <td style={{textAlign:'left'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'—'}</div></td>
-                      <td><span className="num">{it.expected}</span></td>
-                      <td><span className="num">{it.actual}</span></td>
-                      <td style={{color:'#555'}}><span className="num">{d>0?'+':''}{d}</span></td>
-                      <td style={{color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
+                      <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
+                      <td style={{textAlign:'left'}}><span className="num">{it.actual}</span></td>
+                      <td style={{textAlign:'left',color:'#555'}}><span className="num">{d>0?'+':''}{d}</span></td>
+                      <td style={{textAlign:'left',color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
                     </tr>;
                   })}
                 </tbody>
@@ -177,10 +177,10 @@ export default function Inventory() {
         <table className="data-table">
           <thead id="invColHeaders">
             <tr>
-              <th>№</th>
-              <th>Дата</th>
-              <th>Расхождений</th>
-              <th>Результат</th>
+              <th style={{textAlign:'left'}}>№</th>
+              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left'}}>Расхождений</th>
+              <th style={{textAlign:'left'}}>Результат</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
@@ -193,9 +193,9 @@ export default function Inventory() {
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
-                  <td style={{color:'#555'}}>{fmtDate(inv.date)}</td>
-                  <td><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td style={{color:'#555'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left',color:'#555'}}>{fmtDate(inv.date)}</td>
+                  <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
+                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => view(inv.id)}>Открыть</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -231,10 +231,10 @@ export default function Inventory() {
                   var diff = it.actual - it.expected;
                   var ds = diff * it.cost;
                   return <tr key={idx}><td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
-                    <td style={{color:'#555'}}><span className="num">{it.expected}</span></td>
+                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{it.expected}</span></td>
                     <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
-                    <td style={{color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
+                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
+                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
                   </tr>;
                 })}
               </tbody>

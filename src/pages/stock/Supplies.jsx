@@ -284,14 +284,14 @@ const load = async () => {
         <table className="data-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th>№ накладной</th>
-              <th>Кол-во</th>
-              <th>Поставщик</th>
-              <th>Сумма</th>
-              <th>Поставка</th>
-              <th>Оплата</th>
-              <th>Дата</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>№ накладной</th>
+              <th style={{textAlign:'left'}}>Кол-во</th>
+              <th style={{textAlign:'left'}}>Поставщик</th>
+              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Поставка</th>
+              <th style={{textAlign:'left'}}>Оплата</th>
+              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplyTableBody">
@@ -310,17 +310,17 @@ const load = async () => {
                     <div className="prod-name">{s.invoice||'—'}</div>
                   </td>
                   <td style={{textAlign:'left',color:'#555'}}>{totalItems(s)}</td>
-                  <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
-                  <td style={{whiteSpace:'nowrap'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
                   </td>
-                  <td style={{whiteSpace:'nowrap'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{fmtDate(s.date)}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{fmtDate(s.date)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {

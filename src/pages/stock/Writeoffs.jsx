@@ -49,6 +49,14 @@ export default function Writeoffs() {
     setFDate(new Date().toISOString().split('T')[0]); setShow(true);
   };
 
+  const getStock = async (prodId) => {
+    const { data: supplies } = await supabase.from('supplies').select('items').eq('user_id', user.id);
+    const { data: writeoffs } = await supabase.from('writeoffs').select('quantity,product_id').eq('user_id', user.id);
+    let inQty = 0; (supplies||[]).forEach(s => (s.items||[]).forEach(it => { if (it.prodId == prodId) inQty += it.qty||0; }));
+    let outQty = 0; (writeoffs||[]).forEach(w => { if (w.product_id == prodId) outQty += w.quantity||0; });
+    return inQty - outQty;
+  };
+
   const save = async (e) => {
     e.preventDefault();
     const prodId = parseInt(fProd);
@@ -57,6 +65,14 @@ export default function Writeoffs() {
     if (qty <= 0) return alert('Введите количество');
     const prod = products.find(p => p.id === prodId);
     const cost = prod ? (prod.price || 0) : 0;
+
+    // Проверяем остаток
+    const stock = await getStock(prodId);
+    if (stock < qty) {
+      setToast('На складе ' + stock + ' шт. Не удастся списать больше, чем есть на складе!');
+      return;
+    }
+
     if (editId) {
       await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
     } else {
@@ -89,12 +105,12 @@ export default function Writeoffs() {
         <table className="data-table">
           <thead id="woColHeaders">
             <tr>
-              <th>Товар</th>
-              <th>Кол-во</th>
-              <th>Сумма</th>
-              <th>Причина</th>
-              <th>Дата</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>Товар</th>
+              <th style={{textAlign:'left'}}>Кол-во</th>
+              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Причина</th>
+              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="writeoffTableBody">

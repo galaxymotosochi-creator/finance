@@ -99,13 +99,13 @@ export default function Suppliers() {
         <table className="data-table">
           <thead id="supColHeaders">
             <tr>
-              <th>Название</th>
-              <th>Контакт</th>
-              <th>Телефон</th>
-              <th>Способ связи</th>
-              <th>Поставок</th>
-              <th>Сумма</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Контакт</th>
+              <th style={{textAlign:'left'}}>Телефон</th>
+              <th style={{textAlign:'left'}}>Способ связи</th>
+              <th style={{textAlign:'left'}}>Поставок</th>
+              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplierTableBody">
