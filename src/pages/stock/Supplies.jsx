@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { fmtDate } from '../../lib/dates';
 
 
 const SUPPLY_STATUSES = ['ordered','transit','received'];
@@ -319,7 +320,7 @@ const load = async () => {
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.date||'—'}</td>
+                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{fmtDate(s.date)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
@@ -359,7 +360,7 @@ const load = async () => {
               <button className="modal-close" onClick={() => setViewId(null)}>&times;</button>
               <h2>Поставка №{s.invoice||''}</h2>
               <div className="sub" style={{marginBottom:'.5rem'}}>
-                {s.supplier_name ? s.supplier_name + ' | ' : ''}{s.date||''}
+                {s.supplier_name ? s.supplier_name + ' | ' : ''}{fmtDate(s.date)}
               </div>
               <div style={{display:'flex',gap:'.5rem',marginBottom:'.75rem'}}>
                 <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{fontSize:'.75rem',color:'var(--muted)'}}>Поставка:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
@@ -381,7 +382,7 @@ const load = async () => {
                   <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',marginBottom:'.25rem'}}>Платежи</div>
                   {(s.payments||[]).map((p,i) => (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:'.78rem',padding:'.1rem 0'}}>
-                      <span style={{color:'#555'}}>{p.date}</span>
+                      <span style={{color:'#555'}}>{fmtDate(p.date)}</span>
                       <span style={{color:'#555'}}>{p.method}</span>
                       <span style={{fontWeight:600,color:'#16a34a'}}>-{Number(p.amount).toLocaleString()} ₽</span>
                     </div>

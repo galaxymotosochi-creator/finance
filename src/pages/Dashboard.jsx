@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { fmtDate } from '../lib/dates';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -201,7 +202,7 @@ export default function Dashboard() {
             <tbody>{d.lastRecs.map((r, i) => (
               <tr key={i}>
                 <td style={{padding:'3px 3px',fontWeight:500}}>{r.client_name || 'Без имени'}</td>
-                <td style={{padding:'3px 3px',textAlign:'center',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{r.date}</td>
+                <td style={{padding:'3px 3px',textAlign:'center',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{fmtDate(r.date)}</td>
                 <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</td>
               </tr>
             ))}</tbody>

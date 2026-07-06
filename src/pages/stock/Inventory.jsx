@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { fmtDate } from '../../lib/dates';
 
 
 
@@ -192,7 +193,7 @@ export default function Inventory() {
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
-                  <td style={{color:'#555'}}>{inv.date||'—'}</td>
+                  <td style={{color:'#555'}}>{fmtDate(inv.date)}</td>
                   <td><span className="prod-cat">{diffCount} шт.</span></td>
                   <td style={{color:'#555'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
@@ -221,7 +222,7 @@ export default function Inventory() {
         <div className="modal-box" style={{maxWidth:'700px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
           <button className="modal-close" onClick={cancelEdit}>&times;</button>
           <h2>Редактирование инвентаризации</h2>
-          <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {editing.date}</div>
+          <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {fmtDate(editing.date)}</div>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table>
               <thead><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
