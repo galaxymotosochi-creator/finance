@@ -91,9 +91,9 @@ export default function Receipts() {
     return true;
   });
 
-  const formatDate = (d) => {
+  const fmtDate = (d) => {
     if (!d) return '—';
-    const p = d.split('-');
+    const p = (d.split('T')[0]||'').split('-');
     return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : d;
   };
 
@@ -196,7 +196,7 @@ export default function Receipts() {
                 onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
                 <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
-                <td style={{ textAlign: 'center' }}>{formatDate(r.date)}</td>
+                <td style={{ textAlign: 'center' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'center', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
                 <td style={{ textAlign: 'center' }}>{STATUS_LABELS[r.status] || r.status}</td>
                 <td style={{ textAlign: 'center' }}>{r.client_name || '—'}</td>
@@ -218,7 +218,7 @@ export default function Receipts() {
             <button className="modal-close" onClick={() => { setSelectedReceipt(null); setReceiptItems([]); }}>&times;</button>
             <h2>Чек #{selectedReceipt.receipt_number}</h2>
             <div className="sub">
-              {formatDate(selectedReceipt.date)}
+              {fmtDate(selectedReceipt.date)}
               {selectedReceipt.cashier_name ? ' • Кассир: ' + selectedReceipt.cashier_name : ''}
               {selectedReceipt.client_name ? ' • Клиент: ' + selectedReceipt.client_name : ''}
               {selectedReceipt.comment ? <div style={{marginTop:'6px',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}

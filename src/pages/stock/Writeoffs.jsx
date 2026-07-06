@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { fmtDate } from '../../lib/dates';
 
 const REASONS = ['Списание','Брак','Потеря','Порча','Окончание срока','Инвентаризация','Прочее'];
 
@@ -106,7 +107,7 @@ export default function Writeoffs() {
                 <td style={{whiteSpace:'nowrap',color:'#555'}}>{w.quantity}</td>
                 <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
                 <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
-                <td style={{color:'#555'}}>{w.date||'—'}</td>
+                <td style={{color:'#555'}}>{fmtDate(w.date)}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
