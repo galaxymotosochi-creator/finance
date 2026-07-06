@@ -67,6 +67,21 @@ export default function Register() {
           <button type="submit" disabled={loading}>
             {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
+          <div style={{textAlign:'center',marginTop:'.5rem',color:'var(--muted)',fontSize:'.75rem',lineHeight:1}}>или</div>
+
+          <button
+            type="button"
+            onClick={() => { window.location.href = 'https://oauth.yandex.ru/authorize?response_type=code&client_id=a61e2a767f724e368cbcab159c66a941&redirect_uri=https://atlaspos.ru/receiver.html'; }}
+            style={{
+              width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #000',
+              background:'#000',cursor:'pointer',fontSize:'.85rem',fontWeight:500,
+              color:'#fff',fontFamily:'inherit',display:'flex',alignItems:'center',
+              justifyContent:'center',gap:'6px',marginTop:'.5rem'
+            }}
+          >
+            <span style={{display:'inline-flex',width:'22px',height:'22px',borderRadius:'50%',background:'#fc3f1d',color:'#fff',alignItems:'center',justifyContent:'center',fontSize:'.9rem',fontWeight:700}}>Я</span> Войти с Яндекс ID
+          </button>
+
           <div style={{textAlign:'center',marginTop:12,fontSize:'.78rem',color:'rgba(0,0,0,.54)'}}>
             Уже есть аккаунт?{' '}
             <span onClick={()=>n('/login')} style={{color:'var(--secondary)',textDecoration:'underline',cursor:'pointer'}}>Войти</span>

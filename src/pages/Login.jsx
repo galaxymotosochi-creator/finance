@@ -91,7 +91,7 @@ export default function Login() {
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        <h1>Финансы</h1>
+        <h1>AtlasPos</h1>
         <p className="sub">Учет для бизнеса</p>
 
         {resetSent ? (
@@ -183,13 +183,13 @@ export default function Login() {
               type="button"
               onClick={() => { window.location.href = 'https://oauth.yandex.ru/authorize?response_type=code&client_id=a61e2a767f724e368cbcab159c66a941&redirect_uri=https://atlaspos.ru/receiver.html'; }}
               style={{
-                width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #005FF9',
-                background:'#fff',cursor:'pointer',fontSize:'.85rem',fontWeight:600,
-                color:'#005FF9',fontFamily:'inherit',display:'flex',alignItems:'center',
+                width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #000',
+                background:'#000',cursor:'pointer',fontSize:'.85rem',fontWeight:500,
+                color:'#fff',fontFamily:'inherit',display:'flex',alignItems:'center',
                 justifyContent:'center',gap:'6px',marginTop:'.5rem'
               }}
             >
-              <span style={{fontSize:'1.1rem'}}>Я</span> Войти через Яндекс
+              <span style={{display:'inline-flex',width:'22px',height:'22px',borderRadius:'50%',background:'#fc3f1d',color:'#fff',alignItems:'center',justifyContent:'center',fontSize:'.9rem',fontWeight:700}}>Я</span> Войти с Яндекс ID
             </button>
           </form>
         )}
