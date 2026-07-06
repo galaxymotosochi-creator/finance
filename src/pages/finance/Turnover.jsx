@@ -43,7 +43,7 @@ export default function Turnover() {
           <div className="at-title">&#128640; Топ-ракеты</div>
           <div className="ac-desc">Самые быстро продаваемые товары</div>
           <table className="at-table">
-            <thead><tr><th>#</th><th>Товар</th><th>Продано</th><th>Дней на складе</th><th>Выручка</th></tr></thead>
+            <thead id="colHeaders"><tr><th>#</th><th>Товар</th><th>Продано</th><th>Дней на складе</th><th>Выручка</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -51,7 +51,7 @@ export default function Turnover() {
           <div className="at-title">&#9875; Якоря (неликвиды)</div>
           <div className="ac-desc">Товары без движения более 45 дней</div>
           <table className="at-table">
-            <thead><tr><th>#</th><th>Товар</th><th>Дней на складе</th><th>Себестоимость</th><th>Убыток от хранения</th></tr></thead>
+            <thead id="colHeaders"><tr><th>#</th><th>Товар</th><th>Дней на складе</th><th>Себестоимость</th><th>Убыток от хранения</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>

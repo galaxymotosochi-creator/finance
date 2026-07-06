@@ -202,20 +202,20 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          <div style={{display:'flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px',width:'fit-content'}}>
             <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.78rem',color:'rgba(0,0,0,.5)'}}>Общий баланс по всем счетам</div>
           </div>
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
-            <table>
+            <table className="data-table">
               <thead id="colHeaders">
                 <tr>
-                  <th style={{textAlign:'left',paddingLeft:0}}>Счет</th>
-                  <th>Начальный остаток</th>
-                  <th>Поступления</th>
-                  <th>Расходы</th>
-                  <th>Баланс</th>
-                  <th className="actions"></th>
+                  <th style={{paddingLeft:0}}>Счет</th>
+                  <th style={{textAlign:'left'}}>Начальный остаток</th>
+                  <th style={{textAlign:'left'}}>Поступления</th>
+                  <th style={{textAlign:'left'}}>Расходы</th>
+                  <th style={{textAlign:'left'}}>Баланс</th>
+                  <th className="actions" style={{textAlign:'left'}}></th>
                 </tr>
               </thead>
               <tbody id="dirTableBody">
@@ -226,7 +226,7 @@ export default function Accounts() {
                   var bl=getBal(a), mv=getMv(a), in0=parseFloat(a.balance)||0;
                   return (
                     <tr key={a.id}>
-                      <td style={{textAlign:'center'}}>
+                      <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
                             <div className="prod-name">{a.name}</div>
@@ -234,10 +234,10 @@ export default function Accounts() {
                           </div>
                         </div>
                       </td>
-                      <td>{in0.toLocaleString()} ₽</td>
-                      <td style={{color:'#555'}}>+{mv.i.toLocaleString()} ₽</td>
-                      <td style={{color:'#555'}}>−{mv.e.toLocaleString()} ₽</td>
-                      <td style={{color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left',color:'#555'}}>+{mv.i.toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left',color:'#555'}}>−{mv.e.toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left',color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -258,10 +258,10 @@ export default function Accounts() {
                   return (
                   <tr className="total-row">
                     <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
-                    <td style={{textAlign:'center',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} ₽</td>
-                    <td style={{textAlign:'center',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} ₽</td>
-                    <td style={{textAlign:'center',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} ₽</td>
-                    <td style={{textAlign:'center',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} ₽</td>
+                    <td style={{textAlign:'left',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} ₽</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} ₽</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} ₽</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} ₽</td>
                     <td></td>
                   </tr>
                   );
@@ -373,11 +373,11 @@ export default function Accounts() {
             <div className="sub" style={{marginBottom:'.5rem'}}>{viewAcTx.description || (function(){var m=ACC_TYPES.find(t=>t.type===viewAcTx.type);return m?m.label:viewAcTx.type;})()}</div>
             <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:'.5rem'}}>История операций по счету</div>
             <div className="product-table" style={{flex:1,overflowY:'auto'}}>
-              <table>
+              <table className="data-table">
                 <thead id="colHeaders">
                   <tr>
                     <th style={{textAlign:'left',paddingLeft:0,minWidth:'100px'}}>Дата</th>
-                    <th style={{textAlign:'center'}}>Описание</th>
+                    <th style={{textAlign:'left'}}>Описание</th>
                     <th style={{width:'80px'}}>Сумма</th>
                   </tr>
                 </thead>
@@ -394,7 +394,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
                           </td>
-                          <td style={{textAlign:'center',color:'#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
+                          <td style={{textAlign:'left',color:'#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
                         </tr>
                       );
                     });

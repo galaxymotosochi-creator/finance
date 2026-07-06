@@ -309,7 +309,7 @@ const load = async () => {
                   <td style={{textAlign:'left',color:'#555'}}>
                     <div className="prod-name">{s.invoice||'—'}</div>
                   </td>
-                  <td style={{textAlign:'center',color:'#555'}}>{totalItems(s)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{totalItems(s)}</td>
                   <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
                   <td style={{whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td style={{whiteSpace:'nowrap'}}>

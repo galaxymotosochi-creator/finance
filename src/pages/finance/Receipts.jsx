@@ -178,13 +178,13 @@ export default function Receipts() {
           <thead id="colHeaders">
             <tr>
               <th style={{ textAlign: 'left', paddingLeft: 0 }}>№ чека</th>
-              <th style={{ textAlign: 'center' }}>Дата</th>
-              <th style={{ textAlign: 'center' }}>Сумма</th>
-              <th style={{ textAlign: 'center' }}>Статус</th>
-              <th style={{ textAlign: 'center' }}>Клиент</th>
-              <th style={{ textAlign: 'center' }}>Комментарий</th>
-              <th style={{ textAlign: 'center' }}>Кассир</th>
-              <th style={{ textAlign: 'center' }}>Откуда</th>
+              <th style={{ textAlign: 'left' }}>Дата</th>
+              <th style={{ textAlign: 'left' }}>Сумма</th>
+              <th style={{ textAlign: 'left' }}>Статус</th>
+              <th style={{ textAlign: 'left' }}>Клиент</th>
+              <th style={{ textAlign: 'left' }}>Комментарий</th>
+              <th style={{ textAlign: 'left' }}>Кассир</th>
+              <th style={{ textAlign: 'left' }}>Откуда</th>
             </tr>
           </thead>
           <tbody>
@@ -196,13 +196,13 @@ export default function Receipts() {
                 onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
                 <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
-                <td style={{ textAlign: 'center' }}>{fmtDate(r.date)}</td>
-                <td style={{ textAlign: 'center', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
-                <td style={{ textAlign: 'center' }}>{STATUS_LABELS[r.status] || r.status}</td>
-                <td style={{ textAlign: 'center' }}>{r.client_name || '—'}</td>
-                <td style={{ textAlign: 'center',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
-                <td style={{ textAlign: 'center' }}>{r.cashier_name || '—'}</td>
-                <td style={{ textAlign: 'center' }}>
+                <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
+                <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                <td style={{ textAlign: 'left' }}>{STATUS_LABELS[r.status] || r.status}</td>
+                <td style={{ textAlign: 'left' }}>{r.client_name || '—'}</td>
+                <td style={{ textAlign: 'left',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
+                <td style={{ textAlign: 'left' }}>{r.cashier_name || '—'}</td>
+                <td style={{ textAlign: 'left' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
                 </td>
               </tr>
@@ -226,14 +226,14 @@ export default function Receipts() {
 
             {/* Позиции */}
             {itemsLoading ? (
-              <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Загрузка...</div>
+              <div style={{ textAlign: 'left', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Загрузка...</div>
             ) : receiptItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Нет позиций</div>
+              <div style={{ textAlign: 'left', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Нет позиций</div>
             ) : (
               <div style={{ background: '#f9f9f9', borderRadius: '.5rem', padding: '.5rem 0', marginBottom: '.5rem' }}>
                 <div style={{ display: 'flex', padding: '.35rem .75rem', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px' }}>
                   <span style={{ flex: 1 }}>Товар</span>
-                  <span style={{ width: '50px', textAlign: 'center' }}>Кол-во</span>
+                  <span style={{ width: '50px', textAlign: 'left' }}>Кол-во</span>
                   <span style={{ width: '70px', textAlign: 'right' }}>Цена</span>
                   <span style={{ width: '80px', textAlign: 'right' }}>Сумма</span>
                 </div>
@@ -243,7 +243,7 @@ export default function Receipts() {
                     <div key={item.id}>
                       <div style={{ display: 'flex', padding: '.35rem .75rem', fontSize: '.82rem', borderTop: '1px solid #f0f0f0' }}>
                         <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
-                        <span style={{ width: '50px', textAlign: 'center', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
+                        <span style={{ width: '50px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
                         <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} ₽</span>
                       </div>
@@ -259,7 +259,7 @@ export default function Receipts() {
                 })})
                 <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
-                  <span style={{ width: '50px', textAlign: 'center' }}></span>
+                  <span style={{ width: '50px', textAlign: 'left' }}></span>
                   <span style={{ width: '70px', textAlign: 'right' }}></span>
                   <span style={{ width: '80px', textAlign: 'right' }}>{Number(selectedReceipt.total_amount).toLocaleString()} ₽</span>
                 </div>

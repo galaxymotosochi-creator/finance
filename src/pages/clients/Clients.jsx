@@ -157,8 +157,8 @@ export default function Clients() {
           <thead id="clientColHeaders">
             <tr>
               <th>Клиент</th>
-              <th style={{textAlign:'center'}}>Примечание 1</th>
-              <th style={{textAlign:'center'}}>Примечание 2</th>
+              <th style={{textAlign:'left'}}>Примечание 1</th>
+              <th style={{textAlign:'left'}}>Примечание 2</th>
               <th>Телефон</th>
               <th>ДР</th>
               <th>Покупок</th>
@@ -184,8 +184,8 @@ export default function Clients() {
                     </div>
                     <div className="prod-sku">{c.email || ''}</div>
                   </td>
-                  <td style={{color:'#555',textAlign:'center',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
-                  <td style={{color:'#555',textAlign:'center',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
+                  <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
+                  <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
                   <td style={{color:'#555'}}>{c.phone || '—'}</td>
                   <td style={{color:'#555'}}>
                     {c.birthday ? (

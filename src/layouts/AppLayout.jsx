@@ -17,11 +17,12 @@ export default function AppLayout({ children }) {
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
 
+  <svg id="quick-icons" style="display:none"/>
   const actions = [
-    { label: 'Продажа', icon: '💳', action: () => setShowSale(true) },
-    { label: 'Поставка', icon: '📦', action: () => n('/stock/supplies?add=supply') },
-    { label: 'Доход', icon: '📈', action: () => n('/finance/transactions?add=income') },
-    { label: 'Расход', icon: '📤', action: () => n('/finance/transactions?add=expense') },
+    { label: 'Продажа', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#999"/><circle cx="20" cy="21" r="1" fill="#999"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>', action: () => setShowSale(true) },
+    { label: 'Поставка', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="15" height="10" rx="1.5"/><polyline points="16 7 19 7 21 9 21 12 16 12"/><circle cx="5" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/><circle cx="15" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/></svg>', action: () => n('/stock/supplies?add=supply') },
+    { label: 'Доход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V4"/><path d="M12 20V10"/><path d="M6 20v-6"/></svg>', action: () => n('/finance/transactions?add=income') },
+    { label: 'Расход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 4V20"/><path d="M12 4V14"/><path d="M6 4v10"/></svg>', action: () => n('/finance/transactions?add=expense') },
   ];
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
@@ -67,7 +68,7 @@ export default function AppLayout({ children }) {
           <span className="user-email">{user?.email}</span>
           <button className="logout-btn" onClick={signOut}>Выйти</button>
         </header>
-        <div className="content">
+        <div className="content" style={{paddingBottom:'90px'}}>
           {children}
         </div>
         <AiChat />
@@ -81,8 +82,8 @@ export default function AppLayout({ children }) {
               style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'2px',padding:'8px 14px',borderRadius:'14px',border:'none',background:'transparent',cursor:'pointer',fontFamily:'inherit',transition:'background .12s',minWidth:'56px'}}
               onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
               onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-              <span style={{fontSize:'16px',lineHeight:1}}>{a.icon}</span>
-              <span style={{fontSize:'9px',fontWeight:600,color:'#555',whiteSpace:'nowrap'}}>{a.label}</span>
+              <span style={{display:'inline-flex',lineHeight:1}} dangerouslySetInnerHTML={{__html:a.icon}} />
+              <span style={{fontSize:'11px',fontWeight:600,color:'#555',whiteSpace:'nowrap'}}>{a.label}</span>
             </button>
           ))}
         </div>

@@ -106,12 +106,12 @@ export default function Categories() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table style={{minWidth:'500px'}}>
+        <table className="data-table" style={{minWidth:'500px'}}>
           <thead id="catColHeaders">
             <tr>
-              <th>Название</th>
-              <th>Тип</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Тип</th>
+              <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="catTableBody">
@@ -127,8 +127,8 @@ export default function Categories() {
               </tr>
             ) : cats.map(c => (
               <tr key={c.id}>
-                <td><div className="prod-name">{c.name}</div></td>
-                <td><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
+                <td style={{textAlign:'left'}}><div className="prod-name">{c.name}</div></td>
+                <td style={{textAlign:'left'}}><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {

@@ -10,7 +10,29 @@ export default function Transactions() {
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
   const { accounts, refreshAccounts } = useAccounts();
   const { categories, refreshCategories } = useCategories();
+  const [dataError, setDataError] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [userMap, setUserMap] = useState({});
+
+  // Загружаем ФИО пользователей для колонки Автор
+  useEffect(() => {
+    Promise.all([
+      supabase.from('users').select('id,email'),
+      supabase.from('user_profiles').select('user_id,last_name,first_name,patronymic'),
+    ]).then(([usersRes, profilesRes]) => {
+      const m = {};
+      if (usersRes.data) {
+        usersRes.data.forEach(u => { m[u.id] = u.email?.split('@')[0] || '—'; });
+      }
+      if (profilesRes.data) {
+        profilesRes.data.forEach(p => {
+          const parts = [p.last_name, p.first_name, p.patronymic].filter(Boolean);
+          if (parts.length) m[p.user_id] = parts.join(' ');
+        });
+      }
+      setUserMap(m);
+    });
+  }, []);
   const [origAmount, setOrigAmount] = useState(null);
   const [search, setSearch] = useState('');
   const [showIncome, setShowIncome] = useState(false);
@@ -36,10 +58,8 @@ export default function Transactions() {
   const [trTo, setTrTo] = useState('');
   const [trAmt, setTrAmt] = useState('');
 
-  // Период — сохраняем в localStorage
-  var saved = (function(){try{return JSON.parse(localStorage.getItem('txFilters')||'{}')}catch(e){return {}}})();
-  const [period, setPeriodRaw] = useState(saved.period||'all');
-  const [periodLabel, setPeriodLabelRaw] = useState(saved.periodLabel||'Все время');
+  const [period, setPeriod] = useState('all');
+  const [periodLabel, setPeriodLabel] = useState('Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
   const [toast, setToast] = useState(null);
@@ -54,6 +74,17 @@ export default function Transactions() {
     if (params.get('add') === 'expense') { setShowExpense(true); }
   }, [loc.search]);
 
+  // Проверка ошибок загрузки
+  useEffect(() => {
+    try {
+      if (transactions !== undefined && accounts !== undefined) {
+        setDataError(null);
+      }
+    } catch (e) {
+      setDataError('Не удалось загрузить данные. Проверьте соединение.');
+    }
+  }, [transactions, accounts]);
+
   // Закрытие дропдаунов при клике вне
   useEffect(() => {
     if (!showPeriod && !showDownload) return;
@@ -61,15 +92,8 @@ export default function Transactions() {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, [showPeriod, showDownload]);
-  const [typeFilter, setTypeFilterRaw] = useState(saved.typeFilter||null);
-  var saveFilters = function(p, pl, tf) {
-    try {
-      localStorage.setItem('txFilters', JSON.stringify({period:p||period,periodLabel:pl||periodLabel,typeFilter:tf!==undefined?tf:typeFilter}));
-    } catch(e) {}
-  };
-  var setPeriod = function(p) { setPeriodRaw(p); saveFilters(p, null, null); };
-  var setPeriodLabel = function(l) { setPeriodLabelRaw(l); saveFilters(null, l, null); };
-  var setTypeFilter = function(t) { setTypeFilterRaw(t); saveFilters(null, null, t); };
+  const [typeFilter, setTypeFilterRaw] = useState(null);
+  var setTypeFilter = function(t) { setTypeFilterRaw(t); };
 
   const txs = transactions || [];
   // Фильтр по дате
@@ -102,8 +126,8 @@ export default function Transactions() {
   const accIcons = { cash:'💵', card:'💳', transfer:'🔄', checking:'🏦', bank:'🏛️', electronic:'🌐', reserve:'🔒', deposit:'📜' };
   const cats = categories || [];
 
-  const incomeTotal = txs.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const expenseTotal = txs.filter(t => t && t.type !== 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const incomeTotal = filtered.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
@@ -232,6 +256,14 @@ export default function Transactions() {
   };
   const incomeCats = cats.filter(c => c?.type === 'income');
   const expenseCats = cats.filter(c => c?.type === 'expense' || c?.type === 'supply_expense');
+  if (dataError) return (
+    <div className="empty-products" style={{marginTop:'1rem'}}>
+      <div style={{fontSize:'2rem',marginBottom:'.5rem'}}>⚠️</div>
+      <p>{dataError}</p>
+      <button onClick={()=>{setDataError(null);refresh()}}
+        style={{marginTop:'.75rem',padding:'.5rem 1.2rem',borderRadius:'100px',border:'none',background:'#000',color:'#fff',fontWeight:600,cursor:'pointer',fontSize:'.82rem',fontFamily:'inherit'}}>Повторить</button>
+    </div>
+  );
    if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
    return (
     <div>
@@ -247,8 +279,8 @@ export default function Transactions() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
-          <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)",border:'1px solid var(--border)'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
@@ -307,27 +339,27 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', margin: '.75rem 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', margin: '.75rem 0' }}>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#4caf50' }}></div>
             <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Поступления</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{incomeTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Поступления</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{incomeTotal.toLocaleString()} ₽</div>
             </div>
           </div>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#e53935' }}></div>
             <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Расходы</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111' }}>{expenseTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Расходы</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{expenseTotal.toLocaleString()} ₽</div>
             </div>
           </div>
 
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#1e88e5' }}></div>
             <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.62rem', fontWeight: 500, color: 'rgba(0,0,0,.45)', marginBottom: '4px' }}>Баланс счетов</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111' }}>{balanceTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Баланс счетов</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111', textAlign:'center' }}>{balanceTotal.toLocaleString()} ₽</div>
             </div>
           </div>
         </div>
@@ -338,21 +370,32 @@ export default function Transactions() {
       {txs.length > 0 ? (
         <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
           <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr id="colHeaders" style={{borderBottom:'1px solid rgba(0,0,0,.12)'}}>
-              <th style={{width:'10%',padding:'.5rem .5rem .5rem 0',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Дата</th><th style={{width:'30%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Название</th><th style={{width:'18%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Сумма</th><th style={{width:'17%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Счет</th><th style={{width:'17%',padding:'.5rem',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'1px solid rgba(0,0,0,.08)'}}>Категория</th><th style={{width:'8%',padding:'.5rem 0',fontSize:'.72rem',fontWeight:600,color:'#888',textAlign:'left',borderRight:'none'}}></th>
-            </tr></thead>
+            <thead id="colHeaders">
+              <tr>
+                <th style={{width:'9%',paddingLeft:0,textAlign:'left'}}>Дата</th>
+                <th style={{width:'6%',textAlign:'left'}}>Время</th>
+                <th style={{width:'30%',textAlign:'left'}}>Название</th>
+                <th style={{width:'12%',textAlign:'left'}}>Сумма</th>
+                <th style={{width:'15%',textAlign:'left'}}>Счет</th>
+                <th style={{width:'15%',textAlign:'left'}}>Категория</th>
+                <th style={{width:'10%',textAlign:'left'}}>Автор</th>
+                <th style={{width:'0',padding:0,textAlign:'left'}}></th>
+              </tr>
+            </thead>
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid rgba(0,0,0,.06)',transition:'background .1s' }}
                   onMouseEnter={e=>e.currentTarget.style.background='rgba(0,0,0,.02)'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                   <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[1]||'').slice(0,5) : '—'}</td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}</td>
                   <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
                   </td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
+                  <td style={{ padding: '.5rem', color: '#555', fontSize:'.75rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{userMap[tx.user_id] || '—'}</td>
                   <td style={{ textAlign: 'left', whiteSpace: 'nowrap',borderRight:'none' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){

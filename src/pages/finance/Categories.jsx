@@ -119,8 +119,8 @@ export default function Categories() {
         <table className="data-table">
           <thead id="dirColHeaders">
             <tr>
-              <th>Название</th>
-              <th>Тип категории</th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Тип категории</th>
               <th style={{ width: '130px' }}></th>
             </tr>
           </thead>
@@ -139,8 +139,8 @@ export default function Categories() {
             {list.map(function (c) {
               return (
                 <tr key={c.id}>
-                  <td><div className="prod-name" >{c.name}</div></td>
-                  <td><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
+                  <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
+                  <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>

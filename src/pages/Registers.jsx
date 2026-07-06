@@ -1041,11 +1041,11 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <thead>
                   <tr style={{borderBottom:'1px solid #eee'}}>
                     <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Чек</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Товар</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Время</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Способ</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Статус</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'center'}}>Сумма</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Товар</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Время</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Способ</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Статус</th>
+                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1055,13 +1055,13 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     return (
                       <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
                         <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{i + 1}</td>
-                        <td style={{padding:'10px 10px',textAlign:'center'}}>{t.description}</td>
-                        <td style={{padding:'10px 10px',color:'#999',textAlign:'center'}}>{time}</td>
-                        <td style={{padding:'10px 10px',textAlign:'center'}}>{ac?.name || '—'}</td>
-                        <td style={{padding:'10px 10px',textAlign:'center'}}>
+                        <td style={{padding:'10px 10px',textAlign:'left'}}>{t.description}</td>
+                        <td style={{padding:'10px 10px',color:'#999',textAlign:'left'}}>{time}</td>
+                        <td style={{padding:'10px 10px',textAlign:'left'}}>{ac?.name || '—'}</td>
+                        <td style={{padding:'10px 10px',textAlign:'left'}}>
                           <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'debt' ? '#fef2f2' : t.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: t.status === 'debt' ? '#dc2626' : t.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{t.status === 'debt' ? 'Долг' : t.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                         </td>
-                        <td style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
+                        <td style={{padding:'10px 10px',textAlign:'left',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
                       </tr>
                     );
                   })}

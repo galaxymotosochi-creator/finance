@@ -310,13 +310,13 @@ export default function Salary() {
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
             ) : list.map(s => (
               <tr key={s.id}>
-                <td><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}</div></td>
-                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
-                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} ₽</td>
-                <td style={{color:'#555'}}>{(s.status==='pending'||s.status==='accrued')
+                <td style={{textAlign:'left'}}><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}</div></td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} ₽</td>
+                <td style={{textAlign:'left',color:'#555'}}>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
                   : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
@@ -415,7 +415,7 @@ export default function Salary() {
                         <tbody>
                           {tsBonuses.map(e => (
                             <tr key={e.id}>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
+                              <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
                                 <span onClick={()=>toggleBonus(e.id)}
                                   style={{width:'16px',height:'16px',border:'1.5px solid '+(bonusChecks[e.id]?'#16a34a':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:bonusChecks[e.id]?'#16a34a':'transparent',color:'#fff'}}>
                                   {bonusChecks[e.id] ? '✓' : ''}
@@ -458,7 +458,7 @@ export default function Salary() {
                         <tbody>
                           {tsDeducts.map(e => (
                             <tr key={e.id}>
-                              <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
+                              <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
                                 <span onClick={()=>toggleDeduct(e.id)}
                                   style={{width:'16px',height:'16px',border:'1.5px solid '+(deductChecks[e.id]?'#dc2626':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:deductChecks[e.id]?'#dc2626':'transparent',color:'#fff'}}>
                                   {deductChecks[e.id] ? '✓' : ''}

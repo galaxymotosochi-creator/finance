@@ -148,7 +148,7 @@ export default function Inventory() {
             </div>
             <div className="product-table" style={{overflowX:'auto'}}>
               <table className="data-table">
-                <thead><tr>
+                <thead id="colHeaders"><tr>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)',textAlign:'left'}}>Товар</th>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Учтено</th>
                   <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Факт</th>
@@ -225,14 +225,14 @@ export default function Inventory() {
           <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {fmtDate(editing.date)}</div>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table className="data-table">
-              <thead><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
+              <thead id="colHeaders"><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
               <tbody>
                 {editing.items.map(function(it,idx) {
                   var diff = it.actual - it.expected;
                   var ds = diff * it.cost;
                   return <tr key={idx}><td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
                     <td style={{color:'#555'}}><span className="num">{it.expected}</span></td>
-                    <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'center',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
+                    <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
                     <td style={{color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
                     <td style={{color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
                   </tr>;

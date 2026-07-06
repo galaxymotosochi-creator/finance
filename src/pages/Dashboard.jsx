@@ -196,13 +196,13 @@ export default function Dashboard() {
           <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
             <thead><tr>
               <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'50%'}}>Клиент</th>
-              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center',width:'30%'}}>Дата</th>
+              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'30%'}}>Дата</th>
               <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right',width:'20%'}}>Сумма</th>
             </tr></thead>
             <tbody>{d.lastRecs.map((r, i) => (
               <tr key={i}>
                 <td style={{padding:'3px 3px',fontWeight:500}}>{r.client_name || 'Без имени'}</td>
-                <td style={{padding:'3px 3px',textAlign:'center',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{fmtDate(r.date)}</td>
+                <td style={{padding:'3px 3px',textAlign:'left',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{fmtDate(r.date)}</td>
                 <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</td>
               </tr>
             ))}</tbody>
@@ -216,16 +216,16 @@ export default function Dashboard() {
         <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
           <thead><tr>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Ост</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Мин</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Надо</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Ост</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Мин</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Надо</th>
           </tr></thead>
           <tbody>{d.deficit.map((it,i)=>(
             <tr key={i}>
               <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',fontSize:'.74rem'}}>{it.name}</td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center'}}><span style={{display:'inline-block',background:'#fef2f2',color:'#dc2626',padding:'0 6px',borderRadius:'100px',fontSize:'.58rem',fontWeight:600}}>{it.qty}</span></td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center'}}>{it.min}</td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'center',fontWeight:600}}>{it.need}</td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left'}}><span style={{display:'inline-block',background:'#fef2f2',color:'#dc2626',padding:'0 6px',borderRadius:'100px',fontSize:'.58rem',fontWeight:600}}>{it.qty}</span></td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left'}}>{it.min}</td>
+              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left',fontWeight:600}}>{it.need}</td>
             </tr>
           ))}</tbody>
         </table>
@@ -276,14 +276,14 @@ export default function Dashboard() {
           <thead><tr>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'30px'}}>#</th>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>Шт</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Шт</th>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Выручка</th>
           </tr></thead>
           <tbody>{d.topProducts.map((p,i)=>(
             <tr key={i}>
               <td style={{padding:'3px',color:'rgba(0,0,0,.3)',fontWeight:700}}>{i+1}</td>
               <td style={{padding:'3px'}}>{p.name}</td>
-              <td style={{padding:'3px',textAlign:'center'}}>{p.qty}</td>
+              <td style={{padding:'3px',textAlign:'left'}}>{p.qty}</td>
               <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{p.rev.toLocaleString()}</td>
             </tr>
           ))}</tbody>
@@ -349,14 +349,14 @@ export default function Dashboard() {
           <thead><tr>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)'}}>Категория</th>
             <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Сумма</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'center'}}>%</th>
+            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>%</th>
           </tr></thead>
           <tbody>{expCats.map(([catId,amt],i)=>{
             const pct = totalExp>0?Math.round(amt/totalExp*100):0;
             return <tr key={i}>
               <td style={{padding:'3px'}}>{d.catMap[catId]||'Прочее'}</td>
               <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{amt.toLocaleString()} ₽</td>
-              <td style={{padding:'3px',textAlign:'center',color:'rgba(0,0,0,.5)'}}>{pct}%</td>
+              <td style={{padding:'3px',textAlign:'left',color:'rgba(0,0,0,.5)'}}>{pct}%</td>
             </tr>;
           })}</tbody>
         </table>

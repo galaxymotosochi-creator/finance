@@ -125,14 +125,14 @@ export default function Shifts() {
           <thead id="colHeaders">
             <tr>
               <th style={{textAlign:'left',paddingLeft:0}}>Дата</th>
-              <th style={{textAlign:'center'}}>Время открытия</th>
-              <th style={{textAlign:'center'}}>Смена №</th>
-              <th style={{textAlign:'center'}}>Кассир</th>
-              <th style={{textAlign:'center'}}>Начальный остаток</th>
-              <th style={{textAlign:'center'}}>Касса</th>
-              <th style={{textAlign:'center'}}>Конечный остаток</th>
-              <th style={{textAlign:'center'}}>Время закрытия</th>
-              <th style={{textAlign:'center'}}>Статус</th>
+              <th style={{textAlign:'left'}}>Время открытия</th>
+              <th style={{textAlign:'left'}}>Смена №</th>
+              <th style={{textAlign:'left'}}>Кассир</th>
+              <th style={{textAlign:'left'}}>Начальный остаток</th>
+              <th style={{textAlign:'left'}}>Касса</th>
+              <th style={{textAlign:'left'}}>Конечный остаток</th>
+              <th style={{textAlign:'left'}}>Время закрытия</th>
+              <th style={{textAlign:'left'}}>Статус</th>
             </tr>
           </thead>
           <tbody>
@@ -150,14 +150,14 @@ export default function Shifts() {
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',color:'#555',paddingLeft:0}}>{dateStr}</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{timeOpen}</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{'#'+(idx+1)}</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{s.cashier_name || '—'}</td>
-                  <td style={{textAlign:'center'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
-                  <td style={{textAlign:'center',color:'#555'}}>Основная</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{timeClose}</td>
-                  <td style={{textAlign:'center',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{timeOpen}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{'#'+(idx+1)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{s.cashier_name || '—'}</td>
+                  <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
+                  <td style={{textAlign:'left',color:'#555'}}>Основная</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{timeClose}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
                 </tr>
               );
             })}
