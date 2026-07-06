@@ -147,6 +147,53 @@ app.post('/api/auth/reset-password', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Вход через Mail.ru
+const MAILRU_CLIENT_ID = '791912';
+const MAILRU_SECRET = 'f2f92f57198ae714530004d9373ee6da';
+
+app.post('/api/auth/mailru/login', async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'No code' });
+
+    // Обмениваем code на токен
+    const tokenRes = await fetch('https://oauth.mail.ru/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: MAILRU_CLIENT_ID,
+        client_secret: MAILRU_SECRET,
+        code,
+        grant_type: 'authorization_code',
+        redirect_uri: 'https://atlaspos.ru/login',
+      }),
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.status(400).json({ error: 'Token exchange failed' });
+
+    // Получаем email пользователя
+    const userRes = await fetch('https://oauth.mail.ru/userinfo?access_token=' + tokenData.access_token);
+    const userData = await userRes.json();
+    const email = userData.email;
+    if (!email) return res.status(400).json({ error: 'Email not provided' });
+
+    // Ищем или создаём пользователя
+    let { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    let user;
+    if (!rows.length) {
+      const id = uuidv4();
+      await pool.query('INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, \'\', $3, NOW())',
+        [id, email, userData.name || email.split('@')[0]]);
+      user = { id, email, name: userData.name || email.split('@')[0] };
+    } else {
+      user = { id: rows[0].id, email: rows[0].email, name: rows[0].name };
+    }
+
+    const token = jwt.sign({ user_id: user.id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/auth/me', auth, (req, res) => {
   res.json({ user: { id: req.user.id, email: req.user.email, name: req.user.name } });
 });

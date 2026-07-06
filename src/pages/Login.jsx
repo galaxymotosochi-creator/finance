@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -13,6 +13,39 @@ export default function Login() {
   const [resetLoading, setResetLoading] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [mailruLoading, setMailruLoading] = useState(false);
+
+  // Обработка code от Mail.ru
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      setMailruLoading(true);
+      setError('');
+      window.history.replaceState({}, '', '/login');
+
+      fetch('https://api.atlaspos.ru/api/auth/mailru/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.token) {
+            const session = {
+              access_token: data.token, token_type: 'bearer',
+              user: { id: data.user.id, email: data.user.email, user_metadata: {} },
+            };
+            localStorage.setItem('atlaspos_session', JSON.stringify(session));
+            window.location.href = '/';
+          } else {
+            setError('Ошибка входа через Mail.ru');
+            setMailruLoading(false);
+          }
+        })
+        .catch(() => { setError('Ошибка соединения'); setMailruLoading(false); });
+    }
+  }, []);
 
   if (user) {
     return null;
@@ -143,6 +176,21 @@ export default function Login() {
                 Забыли пароль?
               </button>
             </div>
+
+            <div style={{textAlign:'center',marginTop:'.5rem',color:'var(--muted)',fontSize:'.75rem',lineHeight:1}}>или</div>
+
+            <button
+              type="button"
+              onClick={() => { window.location.href = 'https://oauth.mail.ru/login?client_id=791912&response_type=code&redirect_uri=https://atlaspos.ru/login'; }}
+              style={{
+                width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #005FF9',
+                background:'#fff',cursor:'pointer',fontSize:'.85rem',fontWeight:600,
+                color:'#005FF9',fontFamily:'inherit',display:'flex',alignItems:'center',
+                justifyContent:'center',gap:'6px',marginTop:'.5rem'
+              }}
+            >
+              <span style={{fontSize:'1.1rem'}}>@</span> Войти через Mail.ru
+            </button>
           </form>
         )}
       </div>
