@@ -24,7 +24,7 @@ export default function Login() {
       setError('');
       window.history.replaceState({}, '', '/login');
 
-      fetch('https://api.atlaspos.ru/api/auth/mailru/login', {
+      fetch('https://api.atlaspos.ru/api/auth/yandex/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
@@ -181,7 +181,7 @@ export default function Login() {
 
             <button
               type="button"
-              onClick={() => { window.location.href = 'https://oauth.mail.ru/login?client_id=791912&response_type=code&redirect_uri=https://atlaspos.ru/login'; }}
+              onClick={() => { window.location.href = 'https://oauth.yandex.ru/authorize?response_type=code&client_id=a61e2a767f724e368cbcab159c66a941&redirect_uri=https://atlaspos.ru/receiver.html'; }}
               style={{
                 width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #005FF9',
                 background:'#fff',cursor:'pointer',fontSize:'.85rem',fontWeight:600,
@@ -189,7 +189,7 @@ export default function Login() {
                 justifyContent:'center',gap:'6px',marginTop:'.5rem'
               }}
             >
-              <span style={{fontSize:'1.1rem'}}>@</span> Войти через Mail.ru
+              <span style={{fontSize:'1.1rem'}}>Я</span> Войти через Яндекс
             </button>
           </form>
         )}
