@@ -74,7 +74,7 @@ export default function Promos() {
 
   const fmtDate = (d) => {
     if (!d) return '—';
-    const parts = d.split('-');
+    const parts = (d.split('T')[0]||'').split('-');
     return parts.length === 3 ? parts[2] + '.' + parts[1] + '.' + parts[0] : d;
   };
 

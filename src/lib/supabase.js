@@ -199,7 +199,13 @@ const auth = {
   },
 
   async resetPasswordForEmail(email) {
-    return { data: {}, error: null };
+    try {
+      const res = await fetch(API_URL + '/api/auth/reset-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      return { data: {}, error: null };
+    } catch(e) { return { data: null, error: e }; }
   },
 };
 

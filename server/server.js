@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { AsyncLocalStorage } = require('async_hooks');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,6 +16,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'atlaspos-jwt-secret-2026';
 
 // Parse int8/bigint as numbers (otherwise pg returns strings)
 types.setTypeParser(20, parseInt);
+
+// Настройка почты для отправки писем
+const mailer = nodemailer.createTransport({
+  host: 'smtp.mail.ru',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'atlaspos@mail.ru',
+    pass: 'TlZHlj2zX8kOAzcn15oa',
+  },
+});
 
 const pool = new Pool({
   user: 'atlaspos',
@@ -45,6 +57,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 app.get('/api/health', (req, res) => { res.json({ status: 'ok', time: new Date().toISOString() }); });
+
+// Отправка письма
+async function sendMail(to, subject, html) {
+  try {
+    await mailer.sendMail({ from: 'AtlasPos <atlaspos@mail.ru>', to, subject, html });
+    return true;
+  } catch (e) {
+    console.error('Mail error:', e.message);
+    return false;
+  }
+}
 
 // Обёртка: SET + основной запрос на одном соединении (multi-statement)
 async function q(text, params) {
@@ -94,7 +117,33 @@ app.post('/api/auth/register', async (req, res) => {
     const id = uuidv4();
     await pool.query('INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, $3, $4, NOW())', [id, email, hash, name || '']);
     const token = jwt.sign({ user_id: id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
+    // Отправляем письмо с подтверждением
+    sendMail(email, 'Добро пожаловать в AtlasPos!',
+      '<p>Здравствуйте' + (name ? ', ' + name : '') + '!</p>'
+      + '<p>Вы успешно зарегистрировались в <b>AtlasPos</b>.</p>'
+      + '<p>Ваш email: <b>' + email + '</b></p>'
+      + '<p>Войти можно по ссылке: <a href="https://atlaspos.ru/login">atlaspos.ru/login</a></p>'
+    );
     res.json({ token, user: { id, email, name: name || '' } });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Восстановление пароля — отправка письма
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (!rows.length) return res.json({ ok: true }); // не говорим, есть пользователь или нет
+    // Создаём токен на 1 час
+    const token = jwt.sign({ user_id: rows[0].id, purpose: 'reset' }, JWT_SECRET, { expiresIn: '1h' });
+    const link = 'https://atlaspos.ru/reset-password?token=' + token;
+    await sendMail(email, 'Восстановление пароля AtlasPos',
+      '<p>Вы запросили восстановление пароля.</p>'
+      + '<p>Нажмите на ссылку, чтобы задать новый пароль:</p>'
+      + '<p><a href="' + link + '">' + link + '</a></p>'
+      + '<p>Ссылка действует 1 час.</p>'
+    );
+    res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
