@@ -196,6 +196,58 @@ app.post('/api/auth/yandex/login', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// AI-чат (заглушка, без внешнего AI, пока нет API ключа)
+app.post('/api/ai/chat', auth, async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    if (!message) return res.status(400).json({ error: 'No message' });
+
+    // Простые ответы без AI
+    const msg = message.toLowerCase();
+    let reply = '';
+    let action = null;
+    let params = {};
+
+    if (msg.includes('приход') || msg.includes('доход') || msg.includes('добав') && msg.includes('доход')) {
+      const nums = message.match(/\d[\d\s]*/g);
+      const amount = nums ? parseInt(nums[0].replace(/\s/g,'')) : 0;
+      const desc = message.replace(/доход|приход|добавь|добавить|новый/gi,'').replace(/\d+[\d\s]*/g,'').trim();
+      if (amount > 0) {
+        action = 'ADD_INCOME';
+        params = { amount, description: desc || 'Доход', date: new Date().toISOString().split('T')[0] };
+        reply = '✅ Добавляю доход ' + amount.toLocaleString() + ' ₽' + (desc ? ': ' + desc : '');
+      } else {
+        reply = 'Укажите сумму дохода (например: добавь доход 5000)';
+      }
+    } else if (msg.includes('расход') || msg.includes('трата') || msg.includes('добав') && msg.includes('расход')) {
+      const nums = message.match(/\d[\d\s]*/g);
+      const amount = nums ? parseInt(nums[0].replace(/\s/g,'')) : 0;
+      const desc = message.replace(/расход|трата|добавь|добавить|новый/gi,'').replace(/\d+[\d\s]*/g,'').trim();
+      if (amount > 0) {
+        action = 'ADD_EXPENSE';
+        params = { amount, description: desc || 'Расход', date: new Date().toISOString().split('T')[0] };
+        reply = '✅ Добавляю расход ' + amount.toLocaleString() + ' ₽' + (desc ? ': ' + desc : '');
+      } else {
+        reply = 'Укажите сумму расхода (например: расход 3000 на канцелярию)';
+      }
+    } else if (msg.includes('отчет') || msg.includes('отчёт') || msg.includes('итог') || msg.includes('сводк')) {
+      action = 'GET_REPORT';
+      if (msg.includes('день') || msg.includes('сегодня')) params.period = 'today';
+      else if (msg.includes('недел')) params.period = 'week';
+      else params.period = 'month';
+      reply = '📊 Формирую отчёт за ' + ({today:'сегодня',week:'неделю',month:'месяц'}[params.period]||params.period);
+    } else if (msg.includes('привет') || msg.includes('здравствуй')) {
+      reply = '👋 Привет! Я AI-помощник AtlasPos. Могу помочь с учётом: добавить доход/расход, сформировать отчёт, найти товар. Что нужно сделать?';
+    } else if (msg.includes('помощ') || msg.includes('что ты умеешь')) {
+      reply = '🤖 Я умею:\n• Добавлять доходы (например: "добавь доход 15000 за услугу")\n• Добавлять расходы ("расход 3000 на рекламу")\n• Делать отчёты ("отчёт за месяц")\n• Искать информацию по складу и клиентам\n\nПросто напишите, что нужно сделать!';
+    } else {
+      reply = 'Я не совсем понял запрос. Попробуйте: "добавь доход 5000", "расход 3000", "отчёт за неделю" или "помощь"';
+    }
+
+    res.json({ reply, action, params });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/auth/me', auth, (req, res) => {
   res.json({ user: { id: req.user.id, email: req.user.email, name: req.user.name } });
 });
