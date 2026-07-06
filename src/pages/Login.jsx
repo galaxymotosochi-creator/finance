@@ -15,7 +15,6 @@ export default function Login() {
   const navigate = useNavigate();
 
   if (user) {
-    window.location.hash = '#/';
     return null;
   }
 
@@ -25,7 +24,7 @@ export default function Login() {
     setLoading(true);
     try {
       await signIn(email, password);
-      window.location.hash = '#/';
+      navigate('/');
     } catch (err) {
       setError(err.message === 'Invalid login credentials'
         ? 'Неверный email или пароль'
