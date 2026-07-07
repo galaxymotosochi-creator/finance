@@ -429,7 +429,7 @@ const load = async () => {
                 <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
-                <div style={{display:'flex',gap:'.35rem',padding:'0 0 .15rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
+                <div style={{display:'flex',gap:'.5rem',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
                   <span style={{flex:3,textAlign:'left'}}>Товар</span>
                   <span style={{flex:1,textAlign:'center'}}>Кол-во</span>
                   <span style={{flex:1,textAlign:'right'}}>Сумма</span>
@@ -447,8 +447,8 @@ const load = async () => {
                     </div>
                   ))}
                 </div>
-                <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                  <div style={{position:'relative',flex:1}}>
+                <div style={{display:'flex',gap:'.5rem',alignItems:'center',marginTop:'.15rem'}}>
+                  <div style={{position:'relative',flex:3}}>
                     <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
                       onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
                       placeholder="Поиск товара..."
@@ -470,9 +470,9 @@ const load = async () => {
                     )}
                   </div>
                   <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Кол-во" min="1" step="any"
-                    style={{width:'70px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
+                    style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Цена" min="0" step="0.01"
-                    style={{width:'80px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px'}} />
+                    style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px'}} />
                   <button type="button" onClick={addItem} style={{padding:'.3rem .5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',lineHeight:1.2}}>+</button>
                 </div>
               </div>
