@@ -11,6 +11,9 @@ export default function Settings() {
   const [toast, setToast] = useState(null);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [tab, setTab] = useState('main');
+  const [tgStatus, setTgStatus] = useState('checking'); // checking | disconnected | connected
+  const [tgCode, setTgCode] = useState(null);
+  const [tgLoading, setTgLoading] = useState(false);
   const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
@@ -78,6 +81,37 @@ export default function Settings() {
     'Asia/Omsk':'+6','Asia/Tashkent':'+5','Asia/Samarkand':'+5','Asia/Bishkek':'+6',
     'Asia/Yerevan':'+4'};
   const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
+
+  // Проверка статуса Telegram
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/telegram/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
+      .then(r => r.json())
+      .then(d => setTgStatus(d.connected ? 'connected' : 'disconnected'))
+      .catch(() => setTgStatus('disconnected'));
+  }, [user]);
+
+  const connectTelegram = async () => {
+    setTgLoading(true);
+    try {
+      const r = await fetch('/api/telegram/connect', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      });
+      const d = await r.json();
+      if (d.code) setTgCode(d.code);
+    } catch(e) {}
+    setTgLoading(false);
+  };
+
+  const disconnectTelegram = async () => {
+    await fetch('/api/telegram/disconnect', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+    });
+    setTgStatus('disconnected');
+    setTgCode(null);
+  };
 
   const countries = ['Россия', 'Казахстан', 'Беларусь', 'Армения', 'Узбекистан', 'Кыргызстан'];
   const regLabels = { 'Россия': 'ИНН', 'Казахстан': 'БИН', 'Беларусь': 'УНП', 'Армения': 'ИНН', 'Узбекистан': 'ИНН', 'Кыргызстан': 'ИНН' };
@@ -237,9 +271,41 @@ export default function Settings() {
             </label>
           ))}
         </div>
+
+        {/* Telegram подключение */}
+        <div style={{ marginTop: 16, padding: '14px', background: '#f8f8f8', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ fontSize: '.82rem', fontWeight: 600, marginBottom: 4 }}>Telegram-уведомления</div>
+          <div style={{ fontSize: '.75rem', color: '#888', marginBottom: 10, lineHeight: 1.4 }}>
+            Получайте уведомления о продажах, остатках и событиях прямо в Telegram.
+          </div>
+          {tgStatus === 'connected' ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: '.78rem', color: '#16a34a', fontWeight: 600 }}>✅ Подключено</span>
+              <button onClick={disconnectTelegram}
+                style={{ padding: '.3rem .7rem', borderRadius: '100px', border: '1px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.72rem', color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}>
+                Отключить
+              </button>
+            </div>
+          ) : tgCode ? (
+            <div>
+              <div style={{ fontSize: '.78rem', color: '#555', marginBottom: 6 }}>
+                Напишите боту <strong>@AtlasPos_bot</strong> команду:
+              </div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#000', letterSpacing: 2, textAlign: 'center', padding: '10px', background: '#fff', borderRadius: 10, border: '1.5px dashed #ccc' }}>
+                /start {tgCode}
+              </div>
+              <div style={{ fontSize: '.7rem', color: '#999', marginTop: 6, textAlign: 'center' }}>
+                Код действует 5 минут
+              </div>
+            </div>
+          ) : (
+            <button onClick={connectTelegram} disabled={tgLoading}
+              style={{ padding: '.45rem 1rem', borderRadius: '100px', border: 'none', background: tgLoading ? '#eee' : '#000', color: tgLoading ? '#bbb' : '#fff', fontSize: '.78rem', fontWeight: 600, cursor: tgLoading ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+              {tgLoading ? 'Генерируем...' : 'Подключить Telegram'}
+            </button>
+          )}
+        </div>
       </div>
-
-
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>

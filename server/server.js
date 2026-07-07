@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { AsyncLocalStorage } = require('async_hooks');
+const { sendMessage, handleMessage } = require('./telegram');
 const nodemailer = require('nodemailer');
 
 const app = express();
@@ -316,6 +317,81 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ===== TELEGRAM =====
+// Вебхук от Telegram (входящие сообщения)
+app.post('/api/telegram/webhook', async (req, res) => {
+  try {
+    const result = handleMessage(req.body);
+    if (result && result.type === 'connect' && result.code) {
+      // Проверяем код подключения
+      const code = result.code;
+      const { data } = await pool.query(
+        "SELECT user_id FROM telegram_codes WHERE code = $1 AND expires_at > NOW()",
+        [code]
+      );
+      if (data.rows.length > 0) {
+        const userId = data.rows[0].user_id;
+        // Сохраняем chat_id
+        await pool.query(
+          "INSERT INTO telegram_connections (user_id, chat_id) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET chat_id = $2",
+          [userId, result.chatId]
+        );
+        // Удаляем использованный код
+        await pool.query("DELETE FROM telegram_codes WHERE code = $1", [code]);
+        await sendMessage(result.chatId, '✅ Вы успешно подключили уведомления AtlasPos!');
+        return res.json({ ok: true });
+      } else {
+        await sendMessage(result.chatId, '❌ Неверный или просроченный код. Попробуйте снова в Настройках.');
+        return res.json({ ok: true });
+      }
+    }
+    if (result && result.reply) {
+      await sendMessage(result.chatId, result.reply);
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Telegram webhook error:', e.message);
+    res.json({ ok: true });
+  }
+});
+
+// Сгенерировать код для подключения
+app.post('/api/telegram/connect', auth, async (req, res) => {
+  try {
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    await pool.query(
+      "INSERT INTO telegram_codes (user_id, code, expires_at) VALUES ($1, $2, NOW() + INTERVAL '5 minutes') ON CONFLICT (user_id) DO UPDATE SET code = $2, expires_at = NOW() + INTERVAL '5 minutes'",
+      [req.user.id, code]
+    );
+    res.json({ code, bot: '@AtlasPos_bot' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Проверить статус подключения
+app.get('/api/telegram/status', auth, async (req, res) => {
+  try {
+    const { data } = await pool.query(
+      'SELECT chat_id FROM telegram_connections WHERE user_id = $1',
+      [req.user.id]
+    );
+    res.json({ connected: data.rows.length > 0, chatId: data.rows[0]?.chat_id || null });
+  } catch (e) {
+    res.json({ connected: false });
+  }
+});
+
+// Отвязать Telegram
+app.post('/api/telegram/disconnect', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM telegram_connections WHERE user_id = $1', [req.user.id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ===== PHOTO UPLOAD =====
