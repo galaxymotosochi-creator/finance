@@ -61,6 +61,7 @@ export default function Register() {
   const [productVolume, setProductVolume] = useState('');
   const [currency, setCurrency] = useState('');
   const [hasBranches, setHasBranches] = useState('');
+  const [branchCount, setBranchCount] = useState('');
   const [clientType, setClientType] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -80,6 +81,7 @@ export default function Register() {
     if (step === 3 && !productVolume) { setError('Укажите количество товаров/услуг'); return; }
     if (step === 4 && !currency) { setError('Выберите валюту'); return; }
     if (step === 5 && !hasBranches) { setError('Ответьте на вопрос'); return; }
+    if (step === 5 && hasBranches === 'yes' && !branchCount.trim()) { setError('Укажите количество филиалов'); return; }
     if (step === 6 && !clientType) { setError('Выберите тип клиентов'); return; }
     setError('');
     setFade('out');
@@ -378,7 +380,7 @@ export default function Register() {
             </label>
             <div style={{display:'flex',flexDirection:'column',gap:'4px',marginBottom:'.5rem'}}>
               {BRANCH_OPTIONS.map(b => (
-                <label key={b.id} onClick={() => { setHasBranches(b.id); setError(''); }}
+                <label key={b.id} onClick={() => { setHasBranches(b.id); setError(''); if (b.id === 'no') setBranchCount(''); }}
                   style={{
                     display:'flex',alignItems:'center',gap:'.45rem',
                     padding:'.45rem .65rem',borderRadius:'.5rem',
@@ -397,6 +399,29 @@ export default function Register() {
                 </label>
               ))}
             </div>
+
+            {/* Если выбрали «Да» — показать поле для количества филиалов */}
+            {hasBranches === 'yes' && (
+              <div style={{marginTop:'.5rem',marginBottom:'.5rem'}}>
+                <label style={{
+                  fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
+                  textTransform:'uppercase',letterSpacing:'.02em',display:'block',marginBottom:'.35rem',
+                }}>
+                  Сколько у вас филиалов?
+                </label>
+                <input type="number" min="1" placeholder="Например: 3"
+                  value={branchCount} onChange={e => { setBranchCount(e.target.value); setError(''); }}
+                  autoFocus
+                  style={{
+                    width:'100%', padding:'.65rem .75rem', fontSize:'.82rem',
+                    border:'1.5px solid var(--border)', borderRadius:'var(--radius-md)',
+                    outline:'none', fontFamily:'var(--font)',
+                    transition:'border-color var(--transition)',
+                    color:'var(--body-color)', boxSizing:'border-box',
+                  }} />
+              </div>
+            )}
+
             {error && <p className="error" style={{marginBottom:0}}>{error}</p>}
             <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
               <button onClick={prevStep}
@@ -408,7 +433,7 @@ export default function Register() {
                 }}>
                 Назад
               </button>
-              <div style={{flex:'2'}}><NextBtn disabled={!hasBranches} /></div>
+              <div style={{flex:'2'}}><NextBtn disabled={!hasBranches || (hasBranches === 'yes' && !branchCount.trim())} /></div>
             </div>
           </div>
         )}
