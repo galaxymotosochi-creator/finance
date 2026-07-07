@@ -87,6 +87,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [setupPhase, setSetupPhase] = useState(false); // крутая анимация «настраиваем»
   const { signUp, user } = useAuth();
   const n = useNavigate();
   const [fade, setFade] = useState('in');
@@ -123,6 +124,11 @@ export default function Register() {
     try {
       const { error } = await signUp(email, password);
       if (error) throw error;
+      // Показываем экран «Настраиваем организацию»
+      setSetupPhase(true);
+      // Имитация настройки
+      await new Promise(r => setTimeout(r, 2500));
+      setSetupPhase(false);
       setDone(true);
     } catch (err) {
       setError(err.message === 'User already registered'
@@ -178,6 +184,47 @@ export default function Register() {
       Далее
     </button>
   );
+
+  // Экран «Настраиваем организацию»
+  if (setupPhase) {
+    return (
+      <div style={container}>
+        <div style={card}>
+          {/* Круговой прогресс */}
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'.75rem',padding:'2rem 0'}}>
+            <div style={{position:'relative',width:'100px',height:'100px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg width="100" height="100" viewBox="0 0 100 100" style={{transform:'rotate(-90deg)'}}>
+                {/* Фон */}
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#f0f0f0" strokeWidth="7" />
+                {/* Прогресс — анимированный */}
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#ffdd2d" strokeWidth="7"
+                  strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - 0.28)}`}
+                  style={{transition:'stroke-dashoffset 2s ease-in-out'}} />
+              </svg>
+              <span style={{position:'absolute',fontSize:'1.3rem',fontWeight:700,color:'#111'}}>28%</span>
+            </div>
+            <h2 style={{fontSize:'1.1rem',fontWeight:700,color:'#111',textAlign:'center',margin:0}}>
+              Спасибо за ответы!
+            </h2>
+            <p style={{fontSize:'.85rem',color:'rgba(0,0,0,.54)',textAlign:'center',margin:0,lineHeight:1.4}}>
+              Настраиваем вашу организацию...
+            </p>
+            <div style={{marginTop:'.5rem',display:'flex',gap:'4px'}}>
+              {['#ffdd2d','#f0c000','#d4a800','#b89200','#9a7c00'].map((c,i) => (
+                <div key={i} style={{
+                  width:'6px',height:'6px',borderRadius:'50%',
+                  background: c,
+                  animation: i === 0 ? 'none' : `pulse 1.5s ${i*0.2}s infinite`,
+                }} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <style>{`@keyframes pulse { 0%,100% { opacity: .3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }`}</style>
+      </div>
+    );
+  }
 
   if (done) {
     return (
