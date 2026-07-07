@@ -10,6 +10,12 @@ export default function Settings() {
   const { user } = useAuth();
   const [toast, setToast] = useState(null);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
+  const getToken = () => {
+    try {
+      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+      return s?.access_token || '';
+    } catch(e) { return ''; }
+  };
   const [tab, setTab] = useState('main');
   const [tgStatus, setTgStatus] = useState('checking'); // checking | disconnected | connected
   const [tgCode, setTgCode] = useState(null);
@@ -85,7 +91,7 @@ export default function Settings() {
   // Проверка статуса Telegram
   useEffect(() => {
     if (!user) return;
-    fetch('/api/telegram/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
+    fetch('/api/telegram/status', { headers: { 'Authorization': 'Bearer ' + getToken() } })
       .then(r => r.json())
       .then(d => setTgStatus(d.connected ? 'connected' : 'disconnected'))
       .catch(() => setTgStatus('disconnected'));
