@@ -375,10 +375,14 @@ app.post('/api/telegram/connect', auth, async (req, res) => {
 app.get('/api/telegram/status', auth, async (req, res) => {
   try {
     const { data } = await pool.query(
-      'SELECT chat_id FROM telegram_connections WHERE user_id = $1',
+      'SELECT chat_id, prefs FROM telegram_connections WHERE user_id = $1',
       [req.user.id]
     );
-    res.json({ connected: data.rows.length > 0, chatId: data.rows[0]?.chat_id || null });
+    res.json({
+      connected: data.rows.length > 0,
+      chatId: data.rows[0]?.chat_id || null,
+      prefs: data.rows[0]?.prefs || null,
+    });
   } catch (e) {
     res.json({ connected: false });
   }
@@ -388,6 +392,19 @@ app.get('/api/telegram/status', auth, async (req, res) => {
 app.post('/api/telegram/disconnect', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM telegram_connections WHERE user_id = $1', [req.user.id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Сохранить настройки уведомлений
+app.post('/api/telegram/prefs', auth, async (req, res) => {
+  try {
+    await pool.query(
+      'UPDATE telegram_connections SET prefs = $1 WHERE user_id = $2',
+      [JSON.stringify(req.body), req.user.id]
+    );
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });

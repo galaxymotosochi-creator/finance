@@ -16,10 +16,18 @@ export default function Settings() {
       return s?.access_token || '';
     } catch(e) { return ''; }
   };
+  const TG_PREFS_LIST = [
+    { id: 'sale', label: 'Каждая продажа в кассе' },
+    { id: 'low_stock', label: 'Критические остатки (менее 3 шт)' },
+    { id: 'daily', label: 'Ежедневный отчёт (итог дня)' },
+    { id: 'big_sale', label: 'Крупная продажа (от 10 000 ₽)' },
+  ];
   const [tab, setTab] = useState('main');
   const [tgStatus, setTgStatus] = useState('checking'); // checking | disconnected | connected
   const [tgCode, setTgCode] = useState(null);
   const [tgLoading, setTgLoading] = useState(false);
+  const [tgPrefs, setTgPrefs] = useState({ sale: true, low_stock: true, daily: false, big_sale: false });
+  const [tgToast, setTgToast] = useState(null);
   const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
@@ -93,7 +101,10 @@ export default function Settings() {
     if (!user) return;
     fetch('/api/telegram/status', { headers: { 'Authorization': 'Bearer ' + getToken() } })
       .then(r => r.json())
-      .then(d => setTgStatus(d.connected ? 'connected' : 'disconnected'))
+      .then(d => {
+        setTgStatus(d.connected ? 'connected' : 'disconnected');
+        if (d.prefs) setTgPrefs(d.prefs);
+      })
       .catch(() => setTgStatus('disconnected'));
   }, [user]);
 
@@ -108,6 +119,18 @@ export default function Settings() {
       if (d.code) setTgCode(d.code);
     } catch(e) {}
     setTgLoading(false);
+  };
+
+  const saveTgPrefs = async () => {
+    try {
+      await fetch('/api/telegram/prefs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        body: JSON.stringify(tgPrefs),
+      });
+      setTgToast('Настройки уведомлений сохранены');
+      setTimeout(() => setTgToast(null), 2000);
+    } catch(e) {}
   };
 
   const disconnectTelegram = async () => {
@@ -280,27 +303,48 @@ export default function Settings() {
 
         {/* Telegram подключение */}
         <div style={{ marginTop: 16, padding: '14px', background: '#f8f8f8', borderRadius: 'var(--radius-md)' }}>
+          {tgToast && (
+            <div style={{ fontSize: '.72rem', color: '#16a34a', marginBottom: 8, fontWeight: 500 }}>{tgToast}</div>
+          )}
           <div style={{ fontSize: '.82rem', fontWeight: 600, marginBottom: 4 }}>Telegram-уведомления</div>
-          <div style={{ fontSize: '.75rem', color: '#888', marginBottom: 10, lineHeight: 1.4 }}>
-            Получайте уведомления о продажах, остатках и событиях прямо в Telegram.
-          </div>
+          
+          {tgStatus === 'checking' && (
+            <div style={{ fontSize: '.75rem', color: '#999', padding: '4px 0' }}>Проверка подключения...</div>
+          )}
+
           {tgStatus === 'connected' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: '.78rem', color: '#16a34a', fontWeight: 600 }}>✅ Подключено</span>
-              <button onClick={disconnectTelegram}
-                style={{ padding: '.3rem .7rem', borderRadius: '100px', border: '1px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.72rem', color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}>
-                Отключить
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: '.78rem', color: '#16a34a', fontWeight: 600 }}>✅ Подключено</span>
+                <button onClick={disconnectTelegram}
+                  style={{ padding: '.3rem .7rem', borderRadius: '100px', border: '1px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.72rem', color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Отключить
+                </button>
+              </div>
+
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: '#555', marginBottom: 8 }}>Какие уведомления присылать?</div>
+              {TG_PREFS_LIST.map(p => (
+                <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', fontSize: '.78rem', color: '#555', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={tgPrefs[p.id]}
+                    onChange={() => setTgPrefs({...tgPrefs, [p.id]: !tgPrefs[p.id]})}
+                    style={{ width: 16, height: 16, accentColor: '#000', cursor: 'pointer' }} />
+                  {p.label}
+                </label>
+              ))}
+              <button onClick={saveTgPrefs}
+                style={{ marginTop: 6, padding: '.35rem 1rem', borderRadius: '100px', border: 'none', background: '#000', color: '#fff', fontSize: '.72rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Сохранить
               </button>
             </div>
-          ) : tgCode ? (
+          ) : tgStatus === 'disconnected' && tgCode ? (
             <div>
-              <div style={{ fontSize: '.78rem', color: '#555', marginBottom: 10, lineHeight: 1.6 }}>
+              <div style={{ fontSize: '.75rem', color: '#555', marginBottom: 10, lineHeight: 1.6 }}>
                 <strong>Как подключить:</strong><br />
                 1. Откройте Telegram<br />
                 2. Найдите бота <strong>@AtlasPos_bot</strong><br />
                 3. Нажмите «Начать» или отправьте этот код:
               </div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#000', letterSpacing: 2, textAlign: 'center', padding: '10px', background: '#fff', borderRadius: 10, border: '1.5px dashed #ccc', cursor: 'pointer', userSelect: 'all' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#000', letterSpacing: 2, textAlign: 'center', padding: '10px', background: '#fff', borderRadius: 10, border: '1.5px dashed #ccc', userSelect: 'all' }}>
                 /start {tgCode}
               </div>
               <div style={{ fontSize: '.7rem', color: '#999', marginTop: 8, textAlign: 'center', lineHeight: 1.5 }}>
@@ -308,7 +352,7 @@ export default function Settings() {
                 Бот ответит ✅ и уведомления будут подключены
               </div>
             </div>
-          ) : (
+          ) : tgStatus === 'disconnected' && (
             <button onClick={connectTelegram} disabled={tgLoading}
               style={{ padding: '.45rem 1rem', borderRadius: '100px', border: 'none', background: tgLoading ? '#eee' : '#000', color: tgLoading ? '#bbb' : '#fff', fontSize: '.78rem', fontWeight: 600, cursor: tgLoading ? 'default' : 'pointer', fontFamily: 'inherit' }}>
               {tgLoading ? 'Генерируем...' : 'Подключить Telegram'}
