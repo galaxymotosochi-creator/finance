@@ -588,31 +588,40 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ======== ТАБЛИЦЫ ======== */
-.data-table { width: 100%; border-collapse: collapse; min-width: 650px; }
-.data-table thead th {
+.data-table,
+.at-table { width: 100%; border-collapse: collapse; min-width: 650px; }
+.data-table thead th,
+.at-table thead th {
   padding: .5rem .5rem;
   font-size: .72rem;
   font-weight: 600;
   color: #888;
   text-align: left;
-  border-bottom: 1px solid rgba(0,0,0,.12);
+  border-bottom: 1.5px solid rgba(0,0,0,.12);
   border-right: 1px solid rgba(0,0,0,.08);
 }
-.data-table thead th:last-child { border-right: none; }
-.data-table tbody tr {
+.data-table thead th:last-child,
+.at-table thead th:last-child { border-right: none; }
+.data-table tbody tr,
+.at-table tbody tr {
   font-size: .82rem;
-  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-bottom: 1px solid rgba(0,0,0,.12);
   transition: background .1s;
 }
-.data-table tbody tr:hover { background: rgba(0,0,0,.02); }
-.data-table tbody td {
+.data-table tbody tr:hover,
+.at-table tbody tr:hover { background: rgba(0,0,0,.02); }
+.data-table tbody td,
+.at-table tbody td {
   padding: .5rem;
   color: #555;
   text-align: left;
+  border-bottom: 1px solid rgba(0,0,0,.12);
   border-right: 1px solid rgba(0,0,0,.08);
 }
-.data-table tbody td:last-child { border-right: none; }
-.data-table tbody td:first-child { padding-left: 0; }
+.data-table tbody td:last-child,
+.at-table tbody td:last-child { border-right: none; }
+.data-table tbody td:first-child,
+.at-table tbody td:first-child { padding-left: 0; }
 
 /* Анимация загрузки фото */
 @keyframes loadbar {
