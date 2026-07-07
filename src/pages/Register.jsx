@@ -41,6 +41,11 @@ const CURRENCIES = [
   { id: 'mdl', label: '🇲🇩 Молдавский лей (L)', symbol: 'L' },
 ];
 
+const BRANCH_OPTIONS = [
+  { id: 'yes', label: 'Да' },
+  { id: 'no', label: 'Нет' },
+];
+
 const CLIENT_TYPES = [
   { id: 'b2c', label: 'Только физические лица (b2c)' },
   { id: 'b2b', label: 'Только компании (b2b)' },
@@ -55,6 +60,7 @@ export default function Register() {
   const [revenue, setRevenue] = useState('');
   const [productVolume, setProductVolume] = useState('');
   const [currency, setCurrency] = useState('');
+  const [hasBranches, setHasBranches] = useState('');
   const [clientType, setClientType] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -73,7 +79,8 @@ export default function Register() {
     if (step === 2 && !revenue) { setError('Укажите объём продаж'); return; }
     if (step === 3 && !productVolume) { setError('Укажите количество товаров/услуг'); return; }
     if (step === 4 && !currency) { setError('Выберите валюту'); return; }
-    if (step === 5 && !clientType) { setError('Выберите тип клиентов'); return; }
+    if (step === 5 && !hasBranches) { setError('Ответьте на вопрос'); return; }
+    if (step === 6 && !clientType) { setError('Выберите тип клиентов'); return; }
     setError('');
     setFade('out');
     setTimeout(() => { setStep(s => s + 1); setFade('in'); }, 150);
@@ -179,13 +186,13 @@ export default function Register() {
           AtlasPos
         </div>
         <h1 style={{fontSize:'1.15rem',fontWeight:700,textAlign:'center',marginBottom:2,letterSpacing:'-.03em'}}>
-          {step === 1 ? 'Создать аккаунт' : step === 2 ? 'Объём продаж' : step === 3 ? 'Товары и услуги' : step === 4 ? 'Валюта' : step === 5 ? 'Ваши клиенты' : 'Регистрация'}
+          {step === 1 ? 'Создать аккаунт' : step === 2 ? 'Объём продаж' : step === 3 ? 'Товары и услуги' : step === 4 ? 'Валюта' : step === 5 ? 'Филиалы' : step === 6 ? 'Ваши клиенты' : 'Регистрация'}
         </h1>
         <p style={{fontSize:'.8rem',color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:'1rem'}}>
-          {step === 1 ? 'Расскажите о своём бизнесе' : step === 2 ? 'Сколько продаёте в месяц?' : step === 3 ? 'Сколько товаров/услуг?' : step === 4 ? 'В какой валюте работаете?' : step === 5 ? 'Кто ваши клиенты?' : 'Данные для входа'}
+          {step === 1 ? 'Расскажите о своём бизнесе' : step === 2 ? 'Сколько продаёте в месяц?' : step === 3 ? 'Сколько товаров/услуг?' : step === 4 ? 'В какой валюте работаете?' : step === 5 ? 'У вас есть филиалы?' : step === 6 ? 'Кто ваши клиенты?' : 'Данные для входа'}
         </p>
 
-        <Progress current={step - 1} total={6} />
+        <Progress current={step - 1} total={7} />
 
         {/* Шаг 1: Тип бизнеса */}
         {step === 1 && (
@@ -360,8 +367,54 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 5: Тип клиентов */}
+        {/* Шаг 5: Филиалы */}
         {step === 5 && (
+          <div style={fadeStyle}>
+            <label style={{
+              fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
+              textTransform:'uppercase',letterSpacing:'.02em',display:'block',marginBottom:'.4rem',
+            }}>
+              У вас есть филиалы?
+            </label>
+            <div style={{display:'flex',flexDirection:'column',gap:'4px',marginBottom:'.5rem'}}>
+              {BRANCH_OPTIONS.map(b => (
+                <label key={b.id} onClick={() => { setHasBranches(b.id); setError(''); }}
+                  style={{
+                    display:'flex',alignItems:'center',gap:'.45rem',
+                    padding:'.45rem .65rem',borderRadius:'.5rem',
+                    cursor:'pointer',fontSize:'.78rem',color:'#555',
+                    transition:'all .12s',fontFamily:'inherit',
+                    background: hasBranches === b.id ? '#ffdd2d' : '#f8f8f8',
+                    border: hasBranches === b.id ? '1px solid #ffdd2d' : '1px solid transparent',
+                    fontWeight: hasBranches === b.id ? 600 : 400,
+                  }}>
+                  <span style={{
+                    width:'16px',height:'16px',borderRadius:'50%',
+                    border: hasBranches === b.id ? '5px solid #000' : '2px solid #ccc',
+                    transition:'all .15s',flexShrink:0,
+                  }} />
+                  {b.label}
+                </label>
+              ))}
+            </div>
+            {error && <p className="error" style={{marginBottom:0}}>{error}</p>}
+            <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
+              <button onClick={prevStep}
+                style={{
+                  flex:1, padding:'.7rem', fontSize:'.82rem', fontWeight:600,
+                  border:'1px solid rgba(0,0,0,.12)', borderRadius:'var(--radius-pill)',
+                  cursor:'pointer', background:'transparent', color:'#555',
+                  fontFamily:'inherit', transition:'all .15s',
+                }}>
+                Назад
+              </button>
+              <div style={{flex:'2'}}><NextBtn disabled={!hasBranches} /></div>
+            </div>
+          </div>
+        )}
+
+        {/* Шаг 6: Тип клиентов */}
+        {step === 6 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -406,8 +459,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 6: Email + пароль */}
-        {step === 6 && (
+        {/* Шаг 7: Email + пароль */}
+        {step === 7 && (
           <form onSubmit={handleSubmit} style={fadeStyle}>
             <input type="email" placeholder="Email" value={email}
               onChange={e=>setEmail(e.target.value)} required autoFocus
