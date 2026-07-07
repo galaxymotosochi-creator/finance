@@ -429,20 +429,20 @@ const load = async () => {
                 <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
-                <div style={{display:'flex',gap:'.5rem',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
-                  <span style={{flex:3,textAlign:'left'}}>Товар</span>
-                  <span style={{flex:1,textAlign:'center'}}>Кол-во</span>
-                  <span style={{flex:1,textAlign:'right'}}>Сумма</span>
+                <div style={{display:'flex',gap:'0',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end',borderBottom:'1px solid #e0e0e0'}}>
+                  <span style={{flex:3,textAlign:'left',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Товар</span>
+                  <span style={{flex:1,textAlign:'center',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Кол-во</span>
+                  <span style={{flex:1,textAlign:'right',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Сумма</span>
                   <span style={{width:'1.5rem'}}></span>
                 </div>
                 <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
                   ) : fItems.map((it,idx)=>(
-                    <div key={idx} style={{display:'flex',gap:'.5rem',padding:'.4rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
-                      <span style={{flex:3,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.name}</span>
-                      <span style={{flex:1,textAlign:'center',color:'#888'}}>{it.qty} шт</span>
-                      <span style={{flex:1,textAlign:'right',fontWeight:500,whiteSpace:'nowrap'}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
+                    <div key={idx} style={{display:'flex',gap:'0',padding:'.35rem 0',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
+                      <span style={{flex:3,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{it.name}</span>
+                      <span style={{flex:1,textAlign:'center',color:'#888',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{it.qty} шт</span>
+                      <span style={{flex:1,textAlign:'right',fontWeight:500,whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
                       <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0,flexShrink:0}}>✕</button>
                     </div>
                   ))}
