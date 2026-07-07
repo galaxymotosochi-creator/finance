@@ -25,6 +25,21 @@ export default function Settings() {
   const [tz, setTz] = useState('Europe/Moscow');
   const [tzSearch, setTzSearch] = useState('Москва');
   const [owner, setOwner] = useState({ lastName: '', firstName: '', patronymic: '' });
+  const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
+  const [userAccounts, setUserAccounts] = useState([]);
+  const [acLoading, setAcLoading] = useState(false);
+  const [acExpand, setAcExpand] = useState(false);
+  const [showAcForm, setShowAcForm] = useState(false);
+  const [acName, setAcName] = useState('');
+  const [acType, setAcType] = useState('other');
+  const [acDesc, setAcDesc] = useState('');
+  const [acBalance, setAcBalance] = useState('0');
+  const loadAccounts = async () => {
+    setAcLoading(true);
+    const { data } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+    setUserAccounts(data || []);
+    setAcLoading(false);
+  };
   
   // Load saved settings on mount
   useEffect(() => {
@@ -87,21 +102,7 @@ export default function Settings() {
     'Asia/Krasnoyarsk':'+7','Asia/Irkutsk':'+8','Asia/Vladivostok':'+10',
     'Asia/Omsk':'+6','Asia/Tashkent':'+5','Asia/Samarkand':'+5','Asia/Bishkek':'+6',
     'Asia/Yerevan':'+4'};
-  const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
-  const [userAccounts, setUserAccounts] = useState([]);
-  const [acLoading, setAcLoading] = useState(false);
-  const loadAccounts = async () => {
-    setAcLoading(true);
-    const { data } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-    setUserAccounts(data || []);
-    setAcLoading(false);
-  };
-  const [acExpand, setAcExpand] = useState(false);
-  const [showAcForm, setShowAcForm] = useState(false);
-  const [acName, setAcName] = useState('');
-  const [acType, setAcType] = useState('other');
-  const [acDesc, setAcDesc] = useState('');
-  const [acBalance, setAcBalance] = useState('0');
+
 
   const countries = ['Россия', 'Казахстан', 'Беларусь', 'Армения', 'Узбекистан', 'Кыргызстан'];
   const regLabels = { 'Россия': 'ИНН', 'Казахстан': 'БИН', 'Беларусь': 'УНП', 'Армения': 'ИНН', 'Узбекистан': 'ИНН', 'Кыргызстан': 'ИНН' };
