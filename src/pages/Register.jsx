@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 
 const BUSINESS_TYPES = [
   { id: 'retail', label: 'Магазины / бутики / торговые точки' },
@@ -257,10 +258,10 @@ export default function Register() {
           AtlasPos
         </div>
         <h1 style={{fontSize:'1.15rem',fontWeight:700,textAlign:'center',marginBottom:2,letterSpacing:'-.03em'}}>
-          {step === 1 ? 'Название организации' : step === 2 ? 'Тип бизнеса' : step === 3 ? 'Объём продаж' : step === 4 ? 'Товары и услуги' : step === 5 ? 'Валюта' : step === 6 ? 'Филиалы' : step === 7 ? 'Сотрудники' : step === 8 ? 'Отчёты' : step === 9 ? 'Ваши клиенты' : 'Регистрация'}
+          {step === 1 ? 'Название организации' : step === 2 ? 'Ваши данные' : step === 3 ? 'Тип бизнеса' : step === 4 ? 'Объём продаж' : step === 5 ? 'Товары и услуги' : step === 6 ? 'Валюта' : step === 7 ? 'Филиалы' : step === 8 ? 'Сотрудники' : step === 9 ? 'Отчёты' : step === 10 ? 'Ваши клиенты' : 'Регистрация'}
         </h1>
         <p style={{fontSize:'.8rem',color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:'1rem'}}>
-          {step === 1 ? 'Как называется ваша организация?' : step === 2 ? 'Расскажите о своём бизнесе' : step === 3 ? 'Сколько продаёте в месяц?' : step === 4 ? 'Сколько товаров/услуг?' : step === 5 ? 'В какой валюте работаете?' : step === 6 ? 'У вас есть филиалы?' : step === 7 ? 'Сколько у вас сотрудников?' : step === 8 ? 'Какие отчёты нужны?' : step === 9 ? 'Кто ваши клиенты?' : 'Данные для входа'}
+          {step === 1 ? 'Как называется ваша организация?' : step === 2 ? 'Укажите вашу фамилию, имя, отчество' : step === 3 ? 'Расскажите о своём бизнесе' : step === 4 ? 'Сколько продаёте в месяц?' : step === 5 ? 'Сколько товаров/услуг?' : step === 6 ? 'В какой валюте работаете?' : step === 7 ? 'У вас есть филиалы?' : step === 8 ? 'Сколько у вас сотрудников?' : step === 9 ? 'Какие отчёты нужны?' : step === 10 ? 'Кто ваши клиенты?' : 'Данные для входа'}
         </p>
 
         <Progress current={step - 1} total={10} />
@@ -289,8 +290,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 2: Тип бизнеса */}
-        {step === 2 && (
+        {/* Шаг 3: Тип бизнеса */}
+        {step === 3 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -335,8 +336,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 3: Объём продаж */}
-        {step === 3 && (
+        {/* Шаг 4: Объём продаж */}
+        {step === 4 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -381,8 +382,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 3: Количество товаров/услуг */}
-        {step === 3 && (
+        {/* Шаг 5: Количество товаров/услуг */}
+        {step === 5 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -427,8 +428,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 4: Валюта */}
-        {step === 4 && (
+        {/* Шаг 6: Валюта */}
+        {step === 6 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -473,8 +474,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 5: Филиалы */}
-        {step === 5 && (
+        {/* Шаг 7: Филиалы */}
+        {step === 7 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -542,8 +543,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 6: Сотрудники */}
-        {step === 6 && (
+        {/* Шаг 8: Сотрудники */}
+        {step === 8 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -588,8 +589,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 7: Отчёты (мультивыбор) */}
-        {step === 7 && (
+        {/* Шаг 9: Отчёты (мультивыбор) */}
+        {step === 9 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -650,8 +651,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 8: Тип клиентов */}
-        {step === 8 && (
+        {/* Шаг 10: Тип клиентов */}
+        {step === 10 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -696,8 +697,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 10: Email + пароль */}
-        {step === 10 && (
+        {/* Шаг 11: Email + пароль */}
+        {step === 11 && (
           <form onSubmit={handleSubmit} style={fadeStyle}>
             <input type="email" placeholder="Email" value={email}
               onChange={e=>setEmail(e.target.value)} required autoFocus
