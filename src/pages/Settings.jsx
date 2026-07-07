@@ -3,16 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
-const ACC_TYPES = [
-  { type: 'cash', label: 'Наличные' },
-  { type: 'card', label: 'Банковский счёт' },
-  { type: 'transfer', label: 'Электронный кошелёк' },
-  { type: 'reserve', label: 'Резерв' },
-  { type: 'deposit', label: 'Депозит' },
-  { type: 'checking', label: 'Расчётный счёт' },
-  { type: 'other', label: 'Другое' },
-];
-
 export default function Settings() {
   const n = useNavigate();
   const { user } = useAuth();
@@ -25,21 +15,6 @@ export default function Settings() {
   const [tz, setTz] = useState('Europe/Moscow');
   const [tzSearch, setTzSearch] = useState('Москва');
   const [owner, setOwner] = useState({ lastName: '', firstName: '', patronymic: '' });
-  const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
-  const [userAccounts, setUserAccounts] = useState([]);
-  const [acLoading, setAcLoading] = useState(false);
-  const [acExpand, setAcExpand] = useState(false);
-  const [showAcForm, setShowAcForm] = useState(false);
-  const [acName, setAcName] = useState('');
-  const [acType, setAcType] = useState('other');
-  const [acDesc, setAcDesc] = useState('');
-  const [acBalance, setAcBalance] = useState('0');
-  const loadAccounts = async () => {
-    setAcLoading(true);
-    const { data } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-    setUserAccounts(data || []);
-    setAcLoading(false);
-  };
   
   // Load saved settings on mount
   useEffect(() => {
@@ -83,9 +58,6 @@ export default function Settings() {
       } catch(e) { /* Таблица может отсутствовать */ }
     })();
   }, [user]);
-
-  // Загружаем счета
-  useEffect(() => { if (user && acExpand) loadAccounts(); }, [user, acExpand]);
   const [tzDrop, setTzDrop] = useState(false);
   const cityTz = {
     'Москва':'Europe/Moscow','Санкт-Петербург':'Europe/Moscow','Новосибирск':'Asia/Novosibirsk',
@@ -102,7 +74,7 @@ export default function Settings() {
     'Asia/Krasnoyarsk':'+7','Asia/Irkutsk':'+8','Asia/Vladivostok':'+10',
     'Asia/Omsk':'+6','Asia/Tashkent':'+5','Asia/Samarkand':'+5','Asia/Bishkek':'+6',
     'Asia/Yerevan':'+4'};
-
+  const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
 
   const countries = ['Россия', 'Казахстан', 'Беларусь', 'Армения', 'Узбекистан', 'Кыргызстан'];
   const regLabels = { 'Россия': 'ИНН', 'Казахстан': 'БИН', 'Беларусь': 'УНП', 'Армения': 'ИНН', 'Узбекистан': 'ИНН', 'Кыргызстан': 'ИНН' };
@@ -239,88 +211,7 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Финансовые счета */}
-      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <div onClick={() => setAcExpand(!acExpand)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-          <span style={{ fontSize: '.65rem', color: '#999', transition: 'transform .2s', transform: acExpand ? 'rotate(90deg)' : 'none' }}>▶</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, flex: 1, marginBottom: 0 }}>Финансовые счета</h2>
-          <span style={{ fontSize: '.72rem', color: '#999', background: '#f0f0f0', padding: '.1rem .5rem', borderRadius: 100 }}>{userAccounts?.length || 0}</span>
-        </div>
-        
-        {acExpand && (
-          <div style={{ marginTop: 16 }}>
-            {/* Список счетов */}
-            {(!userAccounts || userAccounts.length === 0) && !acLoading && (
-              <div style={{ padding: '1rem 0', fontSize: '.82rem', color: '#999', textAlign: 'center' }}>Нет счетов. Добавьте первый счёт.</div>
-            )}
-            {acLoading && <div style={{ padding: '1rem 0', fontSize: '.82rem', color: '#999', textAlign: 'center' }}>Загрузка...</div>}
-            {userAccounts && userAccounts.map(a => {
-              const typeLabel = ACC_TYPES.find(t => t.type === a.type)?.label || a.type;
-              return (
-                <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '.5rem .65rem', borderRadius: 10, background: '#f8f8f8', marginBottom: 4 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '.82rem', fontWeight: 600, color: '#111' }}>{a.name}</div>
-                    <div style={{ fontSize: '.7rem', color: '#999' }}>{a.description || typeLabel}</div>
-                  </div>
-                  <div style={{ fontSize: '.82rem', fontWeight: 700, color: '#111', textAlign: 'right' }}>{(parseFloat(a.balance)||0).toLocaleString()} ₽</div>
-                  <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
-                    <button onClick={async () => {
-                      const newName = prompt('Новое название:', a.name);
-                      if (newName && newName !== a.name) await supabase.from('accounts').update({name:newName}).eq('id',a.id);
-                      loadAccounts();
-                    }} style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '.8rem', color: '#999' }}>✎</button>
-                    <button onClick={async () => { if (confirm('Удалить счёт?')) { await supabase.from('accounts').delete().eq('id',a.id); loadAccounts(); } }}
-                      style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '.8rem', color: '#999' }}
-                      onMouseEnter={e => e.currentTarget.style.color='#dc2626'}
-                      onMouseLeave={e => e.currentTarget.style.color='#999'}>✕</button>
-                  </div>
-                </div>
-              );
-            })}
 
-            {/* Кнопка добавить */}
-            {!showAcForm && (
-              <button onClick={() => setShowAcForm(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '.5rem .65rem', borderRadius: 10, border: '1.5px dashed rgba(0,0,0,.12)', background: 'transparent', cursor: 'pointer', fontSize: '.78rem', color: '#666', fontFamily: 'inherit', fontWeight: 500, marginTop: 4 }}>
-                + Добавить счёт
-              </button>
-            )}
-
-            {/* Форма */}
-            {showAcForm && (
-              <div style={{ marginTop: 8, padding: 12, borderRadius: 12, background: '#f8f8f8' }}>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <input type="text" placeholder="Название счёта" value={acName} onChange={e => setAcName(e.target.value)}
-                    style={{ flex: 2, padding: '.5rem .65rem', borderRadius: 8, border: '1.5px solid rgba(0,0,0,.1)', outline: 'none', fontSize: '.78rem', fontFamily: 'inherit' }} />
-                  <select value={acType} onChange={e => setAcType(e.target.value)}
-                    style={{ flex: 1, padding: '.5rem .65rem', borderRadius: 8, border: '1.5px solid rgba(0,0,0,.1)', outline: 'none', fontSize: '.78rem', fontFamily: 'inherit', background: '#fff' }}>
-                    {ACC_TYPES.map(t => <option key={t.type} value={t.type}>{t.label}</option>)}
-                  </select>
-                </div>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <input type="text" placeholder="Описание" value={acDesc} onChange={e => setAcDesc(e.target.value)}
-                    style={{ flex: 1, padding: '.5rem .65rem', borderRadius: 8, border: '1.5px solid rgba(0,0,0,.1)', outline: 'none', fontSize: '.78rem', fontFamily: 'inherit' }} />
-                  <input type="number" placeholder="Начальный баланс" value={acBalance} onChange={e => setAcBalance(e.target.value)}
-                    style={{ width: 140, padding: '.5rem .65rem', borderRadius: 8, border: '1.5px solid rgba(0,0,0,.1)', outline: 'none', fontSize: '.78rem', fontFamily: 'inherit' }} />
-                </div>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                  <button onClick={() => { setShowAcForm(false); setAcName(''); setAcType('other'); setAcDesc(''); setAcBalance('0'); }}
-                    style={{ padding: '.4rem .85rem', borderRadius: 8, fontSize: '.75rem', fontWeight: 600, border: 'none', background: '#eee', color: '#555', cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
-                  <button onClick={async () => {
-                    if (!acName.trim()) return;
-                    await supabase.from('accounts').insert({user_id:user.id,name:acName.trim(),type:acType,description:acDesc.trim(),balance:parseFloat(acBalance)||0});
-                    setShowAcForm(false); setAcName(''); setAcType('other'); setAcDesc(''); setAcBalance('0');
-                    loadAccounts();
-                  }}
-                    style={{ padding: '.4rem .85rem', borderRadius: 8, fontSize: '.75rem', fontWeight: 600, border: 'none', background: '#000', color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>Сохранить</button>
-                </div>
-              </div>
-            )}
-
-
-          </div>
-        )}
-      </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
