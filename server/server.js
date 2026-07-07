@@ -327,12 +327,12 @@ app.post('/api/telegram/webhook', async (req, res) => {
     if (result && result.type === 'connect' && result.code) {
       // Проверяем код подключения
       const code = result.code;
-      const { data } = await pool.query(
+      const codeResult = await pool.query(
         "SELECT user_id FROM telegram_codes WHERE code = $1 AND expires_at > NOW()",
         [code]
       );
-      if (data.rows.length > 0) {
-        const userId = data.rows[0].user_id;
+      if (codeResult.rows.length > 0) {
+        const userId = codeResult.rows[0].user_id;
         // Сохраняем chat_id
         await pool.query(
           "INSERT INTO telegram_connections (user_id, chat_id) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET chat_id = $2",
@@ -374,16 +374,18 @@ app.post('/api/telegram/connect', auth, async (req, res) => {
 // Проверить статус подключения
 app.get('/api/telegram/status', auth, async (req, res) => {
   try {
-    const { data } = await pool.query(
+    console.log('TG status check: user_id=' + req.user.id + ' type=' + typeof req.user.id);
+    const result = await pool.query(
       'SELECT chat_id, prefs FROM telegram_connections WHERE user_id = $1',
-      [req.user.id]
+      [String(req.user.id)]
     );
     res.json({
-      connected: data.rows.length > 0,
-      chatId: data.rows[0]?.chat_id || null,
-      prefs: data.rows[0]?.prefs || null,
+      connected: result.rows.length > 0,
+      chatId: result.rows[0]?.chat_id || null,
+      prefs: result.rows[0]?.prefs || null,
     });
   } catch (e) {
+    console.error('TG status error:', e.message);
     res.json({ connected: false });
   }
 });
@@ -408,11 +410,11 @@ app.post('/api/telegram/prefs', auth, async (req, res) => {
     );
     
     // Отправляем подтверждение в Telegram
-    const { data } = await pool.query(
+    const connResult = await pool.query(
       'SELECT chat_id FROM telegram_connections WHERE user_id = $1',
       [req.user.id]
     );
-    const chatId = data.rows[0]?.chat_id;
+    const chatId = connResult.rows[0]?.chat_id;
     if (chatId) {
       const labelMap = {
         sale: 'Каждая продажа в кассе',
