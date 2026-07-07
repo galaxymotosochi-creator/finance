@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
+import Training from './Training';
+
 export default function Settings() {
   const n = useNavigate();
   const { user } = useAuth();
   const [toast, setToast] = useState(null);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
+  const [tab, setTab] = useState('main');
   const [company, setCompany] = useState({ name: '', address: '', regNumber: '', phone: '', email: '' });
   const [country, setCountry] = useState('Россия');
   const [lang, setLang] = useState('Русский');
@@ -80,7 +83,32 @@ export default function Settings() {
   const regLabels = { 'Россия': 'ИНН', 'Казахстан': 'БИН', 'Беларусь': 'УНП', 'Армения': 'ИНН', 'Узбекистан': 'ИНН', 'Кыргызстан': 'ИНН' };
 
   return (
-    <div style={{ fontFamily: "'Inter',sans-serif", color: '#111' }}>
+    <div>
+
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+        <button onClick={() => setTab('main')}
+          style={{
+            padding: '.35rem 1rem', borderRadius: 100, border: 'none',
+            fontSize: '.78rem', fontWeight: 600, cursor: 'pointer',
+            fontFamily: 'inherit',
+            background: tab === 'main' ? '#000' : '#f0f0f0',
+            color: tab === 'main' ? '#fff' : '#555',
+          }}>
+          Основные
+        </button>
+        <button onClick={() => setTab('training')}
+          style={{
+            padding: '.35rem 1rem', borderRadius: 100, border: 'none',
+            fontSize: '.78rem', fontWeight: 600, cursor: 'pointer',
+            fontFamily: 'inherit',
+            background: tab === 'training' ? '#000' : '#f0f0f0',
+            color: tab === 'training' ? '#fff' : '#555',
+          }}>
+          Обучение
+        </button>
+      </div>
+
+    <div style={{ fontFamily: "'Inter',sans-serif", color: '#111', display: tab === 'main' ? 'block' : 'none' }}>
       
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius: 'var(--radius-md)',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
@@ -236,5 +264,10 @@ export default function Settings() {
           }} style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
     </div>
+
+    <div style={{ display: tab === 'training' ? 'block' : 'none' }}>
+      <Training />
+    </div>
+  </div>
   );
 }
