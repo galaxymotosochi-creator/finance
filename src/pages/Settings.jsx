@@ -96,7 +96,7 @@ export default function Settings() {
     try {
       const r = await fetch('/api/telegram/connect', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+        headers: { 'Authorization': 'Bearer ' + getToken() },
       });
       const d = await r.json();
       if (d.code) setTgCode(d.code);
@@ -107,7 +107,7 @@ export default function Settings() {
   const disconnectTelegram = async () => {
     await fetch('/api/telegram/disconnect', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      headers: { 'Authorization': 'Bearer ' + getToken() },
     });
     setTgStatus('disconnected');
     setTgCode(null);
