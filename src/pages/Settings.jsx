@@ -290,16 +290,7 @@ export default function Settings() {
             ))}
           </div>
         </div>
-        <div>
-          <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Типы уведомлений</div>
-          {[['sales', 'Отчёты о продажах'], ['stock', 'Критические остатки'], ['payment', 'Оплата тарифа']].map(([key, label]) => (
-            <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: '.82rem', cursor: 'pointer' }}>
-              <input type="checkbox" checked={notifications[key]} onChange={() => setNotifications({...notifications, [key]: !notifications[key]})}
-                style={{ width: 16, height: 16, accentColor: '#000', cursor: 'pointer' }} />
-              {label}
-            </label>
-          ))}
-        </div>
+
 
         {/* Telegram подключение */}
         <div style={{ marginTop: 16, padding: '14px', background: '#f8f8f8', borderRadius: 'var(--radius-md)' }}>
