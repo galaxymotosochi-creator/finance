@@ -423,29 +423,26 @@ const load = async () => {
                 <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginBottom:'8px'}}>
-                  <span style={{fontSize:'.72rem',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.3px'}}>Товары в поставке</span>
+                <div style={{display:'flex',gap:'.35rem',padding:'0 0 .15rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
                   <span onClick={function(){scanBarcode(function(bc){
                     var found=products.find(function(p){return p.barcode===bc;});
                     if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
                   })}} title="Сканировать штрихкод" 
-                    style={{fontSize:'16px',cursor:'pointer',padding:'1px 6px',background:'#fff',border:'1.5px solid #eee',borderRadius:'6px',lineHeight:1,display:'inline-flex',alignItems:'center'}}>📷</span>
-                </div>
-                <div style={{display:'flex',gap:'.35rem',padding:'.3rem .5rem .2rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px'}}>
-                  <span style={{flex:3}}>Товар</span>
+                    style={{fontSize:'16px',cursor:'pointer',padding:'1px 4px',background:'transparent',border:'none',borderRadius:'4px',lineHeight:1,display:'inline-flex',alignItems:'center',marginRight:'4px'}}>📷</span>
+                  <span style={{flex:3,textAlign:'left'}}>Товар</span>
                   <span style={{flex:1,textAlign:'center'}}>Кол-во</span>
                   <span style={{flex:1,textAlign:'right'}}>Сумма</span>
-                  <span style={{width:'1rem'}}></span>
+                  <span style={{width:'1.5rem'}}></span>
                 </div>
                 <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
                   {fItems.length===0 ? (
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
                   ) : fItems.map((it,idx)=>(
-                    <div key={idx} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.85rem'}}>
-                      <span style={{flex:3,fontWeight:500}}>{it.name}</span>
+                    <div key={idx} style={{display:'flex',gap:'.35rem',padding:'.4rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
+                      <span style={{flex:3,fontWeight:500,textAlign:'left'}}>{it.name}</span>
                       <span style={{flex:1,textAlign:'center',color:'#888'}}>{it.qty} шт</span>
                       <span style={{flex:1,textAlign:'right',fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
-                      <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem'}}>✕</button>
+                      <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0}}>✕</button>
                     </div>
                   ))}
                 </div>
