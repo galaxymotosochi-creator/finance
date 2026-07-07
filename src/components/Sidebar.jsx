@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const svgIcons = {
   dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  ai: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 014 4c0 2-2 3-2 3h-4s-2-1-2-3a4 4 0 014-4z"/><path d="M8 13h8v1a4 4 0 01-4 4h0a4 4 0 01-4-4v-1z"/><circle cx="12" cy="20" r="1.5"/><circle cx="10" cy="10" r="1" fill="#999"/><circle cx="14" cy="10" r="1" fill="#999"/></svg>',
   registers: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#999"/><circle cx="20" cy="21" r="1" fill="#999"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
   finance: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
   stock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="15" height="10" rx="1.5"/><polyline points="16 7 19 7 21 9 21 12 16 12"/><circle cx="5" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/><circle cx="15" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/></svg>',
@@ -14,6 +15,7 @@ const svgIcons = {
 
 const menu = [
   { label: 'Панель управления', path: '/dashboard', icon: 'dashboard' },
+  { label: 'AI помощник', path: '/ai-assistant', icon: 'ai' },
   { label: 'Касса', path: '/kassa', icon: 'registers' },
   {
     label: 'Финансы', icon: 'finance', children: [

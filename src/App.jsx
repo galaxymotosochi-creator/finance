@@ -31,6 +31,7 @@ import Writeoffs from './pages/stock/Writeoffs';
 import Inventory from './pages/stock/Inventory';
 import Health from './pages/stock/Health';
 import Subscription from './pages/Subscription';
+import AiAssistant from './pages/AiAssistant';
 import SettingsPage from './pages/Settings';
 import Clients from './pages/clients/Clients';
 import Loyalty from './pages/clients/Loyalty';
@@ -56,6 +57,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Landing />} />
       <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+      <Route path="/ai-assistant" element={<ProtectedRoute><AppLayout><AiAssistant /></AppLayout></ProtectedRoute>} />
       <Route path="/variant/1" element={<Variant1 />} />
       <Route path="/variant/2" element={<Variant2 />} />
       <Route path="/variant/3" element={<Variant3 />} />

@@ -1,7 +1,6 @@
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 import Sidebar from '../components/Sidebar';
-import AiChat from '../components/AiChat';
 import QuickSale from '../components/QuickSale';
 import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
@@ -71,7 +70,6 @@ export default function AppLayout({ children }) {
         <div className="content" style={{paddingBottom:'90px'}}>
           {children}
         </div>
-        <AiChat />
       </div>
 
       {/* Плавающие кнопки */}
