@@ -243,7 +243,7 @@ export default function Settings() {
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <div onClick={() => setAcExpand(!acExpand)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
           <span style={{ fontSize: '.65rem', color: '#999', transition: 'transform .2s', transform: acExpand ? 'rotate(90deg)' : 'none' }}>▶</span>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, flex: 1, letterSpacing: '-.02em' }}>Финансовые счета</h2>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, flex: 1, letterSpacing: '-.02em', margin: 0, lineHeight: 1.3 }}>Финансовые счета</h2>
           <span style={{ fontSize: '.72rem', color: '#999', background: '#f0f0f0', padding: '.1rem .5rem', borderRadius: 100 }}>{userAccounts?.length || 0}</span>
         </div>
         
