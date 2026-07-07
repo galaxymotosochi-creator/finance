@@ -439,11 +439,11 @@ const load = async () => {
                   {fItems.length===0 ? (
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
                   ) : fItems.map((it,idx)=>(
-                    <div key={idx} style={{display:'flex',gap:'.35rem',padding:'.4rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
-                      <span style={{flex:3,fontWeight:500,textAlign:'left'}}>{it.name}</span>
+                    <div key={idx} style={{display:'flex',gap:'.5rem',padding:'.4rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
+                      <span style={{flex:3,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.name}</span>
                       <span style={{flex:1,textAlign:'center',color:'#888'}}>{it.qty} шт</span>
-                      <span style={{flex:1,textAlign:'right',fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
-                      <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0}}>✕</button>
+                      <span style={{flex:1,textAlign:'right',fontWeight:500,whiteSpace:'nowrap'}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
+                      <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0,flexShrink:0}}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -473,7 +473,7 @@ const load = async () => {
                     style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Цена" min="0" step="0.01"
                     style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px'}} />
-                  <button type="button" onClick={addItem} style={{padding:'.3rem .5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',lineHeight:1.2}}>+</button>
+                  <button type="button" onClick={addItem} style={{width:'1.5rem',height:'1.5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
                 </div>
               </div>
               {fItems.length > 0 && (
