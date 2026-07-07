@@ -401,10 +401,35 @@ app.post('/api/telegram/disconnect', auth, async (req, res) => {
 // Сохранить настройки уведомлений
 app.post('/api/telegram/prefs', auth, async (req, res) => {
   try {
+    const prefs = req.body;
     await pool.query(
       'UPDATE telegram_connections SET prefs = $1 WHERE user_id = $2',
-      [JSON.stringify(req.body), req.user.id]
+      [JSON.stringify(prefs), req.user.id]
     );
+    
+    // Отправляем подтверждение в Telegram
+    const { data } = await pool.query(
+      'SELECT chat_id FROM telegram_connections WHERE user_id = $1',
+      [req.user.id]
+    );
+    const chatId = data.rows[0]?.chat_id;
+    if (chatId) {
+      const labelMap = {
+        sale: 'Каждая продажа в кассе',
+        low_stock: 'Критические остатки',
+        daily: 'Ежедневный отчёт',
+        big_sale: 'Крупная продажа (от 10 000 ₽)',
+      };
+      const enabled = Object.entries(prefs)
+        .filter(([, v]) => v)
+        .map(([k]) => '- ' + (labelMap[k] || k))
+        .join('\n');
+      const text = enabled
+        ? '\u2705 \u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u044b!\n\u0411\u0443\u0434\u0443 \u043f\u0440\u0438\u0441\u044b\u043b\u0430\u0442\u044c:\n' + enabled
+        : '\u274c \u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u043e\u0442\u043a\u043b\u044e\u0447\u0435\u043d\u044b';
+      sendMessage(chatId, text);
+    }
+    
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
