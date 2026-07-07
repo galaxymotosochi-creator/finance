@@ -430,9 +430,9 @@ const load = async () => {
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
                 <div style={{display:'flex',gap:'0',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end',borderBottom:'1px solid #e0e0e0'}}>
-                  <span style={{flex:3,textAlign:'left',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Товар</span>
-                  <span style={{flex:1,textAlign:'center',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Кол-во</span>
-                  <span style={{flex:1,textAlign:'right',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Сумма</span>
+                  <span style={{flex:1,textAlign:'left',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Товар</span>
+                  <span style={{width:'70px',textAlign:'center',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Кол-во</span>
+                  <span style={{width:'80px',textAlign:'right',padding:'0 .5rem',borderRight:'1px solid #e0e0e0'}}>Сумма</span>
                   <span style={{width:'1.5rem'}}></span>
                 </div>
                 <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
@@ -440,15 +440,15 @@ const load = async () => {
                     <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
                   ) : fItems.map((it,idx)=>(
                     <div key={idx} style={{display:'flex',gap:'0',padding:'.35rem 0',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
-                      <span style={{flex:3,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{it.name}</span>
-                      <span style={{flex:1,textAlign:'center',color:'#888',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{it.qty} шт</span>
-                      <span style={{flex:1,textAlign:'right',fontWeight:500,whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
+                      <span style={{flex:1,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0'}}>{it.name}</span>
+                      <span style={{width:'70px',textAlign:'center',color:'#888',padding:'0 .5rem',borderRight:'1px solid #f0f0f0',flexShrink:0}}>{it.qty} шт</span>
+                      <span style={{width:'80px',textAlign:'right',fontWeight:500,whiteSpace:'nowrap',padding:'0 .5rem',borderRight:'1px solid #f0f0f0',flexShrink:0}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
                       <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0,flexShrink:0}}>✕</button>
                     </div>
                   ))}
                 </div>
                 <div style={{display:'flex',gap:'.5rem',alignItems:'center',marginTop:'.15rem'}}>
-                  <div style={{position:'relative',flex:3}}>
+                  <div style={{position:'relative',flex:1}}>
                     <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
                       onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
                       placeholder="Поиск товара..."
@@ -470,9 +470,9 @@ const load = async () => {
                     )}
                   </div>
                   <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Кол-во" min="1" step="any"
-                    style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px'}} />
+                    style={{width:'70px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px',flexShrink:0}} />
                   <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Цена" min="0" step="0.01"
-                    style={{flex:1,padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px'}} />
+                    style={{width:'80px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px',flexShrink:0}} />
                   <button type="button" onClick={addItem} style={{width:'1.5rem',height:'1.5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
                 </div>
               </div>
