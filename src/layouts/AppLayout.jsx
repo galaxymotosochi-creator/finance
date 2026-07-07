@@ -1,20 +1,27 @@
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 import Sidebar from '../components/Sidebar';
+import OnboardingTour from '../components/OnboardingTour';
 import QuickSale from '../components/QuickSale';
 import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
 import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
   const { user, signOut } = useAuth();
+  const location = useLocation();
   const n = useNavigate();
   const [showSale, setShowSale] = useState(false);
   const [showSupply, setShowSupply] = useState(false);
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
+  const [showTour, setShowTour] = useState(
+    !localStorage.getItem('onboarding_done') &&
+    !location.pathname.includes('/login') &&
+    !location.pathname.includes('/register')
+  );
 
   <svg id="quick-icons" style="display:none"/>
   const actions = [
@@ -91,6 +98,7 @@ export default function AppLayout({ children }) {
       {showSupply && <QuickSupply onClose={() => setShowSupply(false)} />}
       {showIncome && <QuickIncome onClose={() => setShowIncome(false)} />}
       {showExpense && <QuickExpense onClose={() => setShowExpense(false)} />}
+      <OnboardingTour active={showTour} onFinish={() => setShowTour(false)} />
     </>
   );
 }
