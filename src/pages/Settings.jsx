@@ -262,7 +262,7 @@ export default function Settings() {
                     <div style={{ fontSize: '.82rem', fontWeight: 600, color: '#111' }}>{a.name}</div>
                     <div style={{ fontSize: '.7rem', color: '#999' }}>{a.description || typeLabel}</div>
                   </div>
-                  <div style={{ fontSize: '.82rem', fontWeight: 700, color: '#16a34a', textAlign: 'right' }}>{(parseFloat(a.balance)||0).toLocaleString()} ₽</div>
+                  <div style={{ fontSize: '.82rem', fontWeight: 700, color: '#111', textAlign: 'right' }}>{(parseFloat(a.balance)||0).toLocaleString()} ₽</div>
                   <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
                     <button onClick={async () => {
                       const newName = prompt('Новое название:', a.name);
