@@ -213,18 +213,6 @@ export default function Settings() {
 
 
 
-      {/* Обучение */}
-      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 8 }}>Обучение</h2>
-        <p style={{ fontSize: '.82rem', color: 'rgba(0,0,0,.54)', marginBottom: 12, lineHeight: 1.5 }}>
-          Пройдите обучение по программе — узнайте, где что находится и как работать с кассой, финансами и складом.
-        </p>
-        <button onClick={() => { localStorage.removeItem('onboarding_done'); window.location.href = '/dashboard'; }}
-          style={{ padding: '.5rem 1.2rem', borderRadius: 'var(--radius-pill)', border: 'none', background: '#000', color: '#fff', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-          🎓 Запустить обучение
-        </button>
-      </div>
-
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
         <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
         <button onClick={async () => {
