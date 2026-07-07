@@ -288,14 +288,18 @@ export default function Settings() {
             </div>
           ) : tgCode ? (
             <div>
-              <div style={{ fontSize: '.78rem', color: '#555', marginBottom: 6 }}>
-                Напишите боту <strong>@AtlasPos_bot</strong> команду:
+              <div style={{ fontSize: '.78rem', color: '#555', marginBottom: 10, lineHeight: 1.6 }}>
+                <strong>Как подключить:</strong><br />
+                1. Откройте Telegram<br />
+                2. Найдите бота <strong>@AtlasPos_bot</strong><br />
+                3. Нажмите «Начать» или отправьте этот код:
               </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#000', letterSpacing: 2, textAlign: 'center', padding: '10px', background: '#fff', borderRadius: 10, border: '1.5px dashed #ccc' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#000', letterSpacing: 2, textAlign: 'center', padding: '10px', background: '#fff', borderRadius: 10, border: '1.5px dashed #ccc', cursor: 'pointer', userSelect: 'all' }}>
                 /start {tgCode}
               </div>
-              <div style={{ fontSize: '.7rem', color: '#999', marginTop: 6, textAlign: 'center' }}>
-                Код действует 5 минут
+              <div style={{ fontSize: '.7rem', color: '#999', marginTop: 8, textAlign: 'center', lineHeight: 1.5 }}>
+                Код действует 5 минут<br />
+                Бот ответит ✅ и уведомления будут подключены
               </div>
             </div>
           ) : (
