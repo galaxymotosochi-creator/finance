@@ -72,6 +72,7 @@ const CLIENT_TYPES = [
 
 export default function Register() {
   const [step, setStep] = useState(1);
+  const [orgName, setOrgName] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [revenue, setRevenue] = useState('');
   const [productVolume, setProductVolume] = useState('');
@@ -95,15 +96,16 @@ export default function Register() {
   if (user) { n('/dashboard', { replace: true }); return null; }
 
   const nextStep = () => {
-    if (step === 1 && !businessType) { setError('Выберите тип бизнеса'); return; }
-    if (step === 2 && !revenue) { setError('Укажите объём продаж'); return; }
-    if (step === 3 && !productVolume) { setError('Укажите количество товаров/услуг'); return; }
-    if (step === 4 && !currency) { setError('Выберите валюту'); return; }
-    if (step === 5 && !hasBranches) { setError('Ответьте на вопрос'); return; }
-    if (step === 5 && hasBranches === 'yes' && !branchCount.trim()) { setError('Укажите количество филиалов'); return; }
-    if (step === 6 && !employees) { setError('Укажите количество сотрудников'); return; }
-    if (step === 7 && selectedReports.length === 0) { setError('Выберите хотя бы один отчёт'); return; }
-    if (step === 8 && !clientType) { setError('Выберите тип клиентов'); return; }
+    if (step === 1 && !orgName.trim()) { setError('Введите название организации'); return; }
+    if (step === 2 && !businessType) { setError('Выберите тип бизнеса'); return; }
+    if (step === 3 && !revenue) { setError('Укажите объём продаж'); return; }
+    if (step === 4 && !productVolume) { setError('Укажите количество товаров/услуг'); return; }
+    if (step === 5 && !currency) { setError('Выберите валюту'); return; }
+    if (step === 6 && !hasBranches) { setError('Ответьте на вопрос'); return; }
+    if (step === 6 && hasBranches === 'yes' && !branchCount.trim()) { setError('Укажите количество филиалов'); return; }
+    if (step === 7 && !employees) { setError('Укажите количество сотрудников'); return; }
+    if (step === 8 && selectedReports.length === 0) { setError('Выберите хотя бы один отчёт'); return; }
+    if (step === 9 && !clientType) { setError('Выберите тип клиентов'); return; }
     setError('');
     setFade('out');
     setTimeout(() => { setStep(s => s + 1); setFade('in'); }, 150);
@@ -255,16 +257,40 @@ export default function Register() {
           AtlasPos
         </div>
         <h1 style={{fontSize:'1.15rem',fontWeight:700,textAlign:'center',marginBottom:2,letterSpacing:'-.03em'}}>
-          {step === 1 ? 'Создать аккаунт' : step === 2 ? 'Объём продаж' : step === 3 ? 'Товары и услуги' : step === 4 ? 'Валюта' : step === 5 ? 'Филиалы' : step === 6 ? 'Сотрудники' : step === 7 ? 'Отчёты' : step === 8 ? 'Ваши клиенты' : 'Регистрация'}
+          {step === 1 ? 'Название организации' : step === 2 ? 'Тип бизнеса' : step === 3 ? 'Объём продаж' : step === 4 ? 'Товары и услуги' : step === 5 ? 'Валюта' : step === 6 ? 'Филиалы' : step === 7 ? 'Сотрудники' : step === 8 ? 'Отчёты' : step === 9 ? 'Ваши клиенты' : 'Регистрация'}
         </h1>
         <p style={{fontSize:'.8rem',color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:'1rem'}}>
-          {step === 1 ? 'Расскажите о своём бизнесе' : step === 2 ? 'Сколько продаёте в месяц?' : step === 3 ? 'Сколько товаров/услуг?' : step === 4 ? 'В какой валюте работаете?' : step === 5 ? 'У вас есть филиалы?' : step === 6 ? 'Сколько у вас сотрудников?' : step === 7 ? 'Какие отчёты нужны?' : step === 8 ? 'Кто ваши клиенты?' : 'Данные для входа'}
+          {step === 1 ? 'Как называется ваша организация?' : step === 2 ? 'Расскажите о своём бизнесе' : step === 3 ? 'Сколько продаёте в месяц?' : step === 4 ? 'Сколько товаров/услуг?' : step === 5 ? 'В какой валюте работаете?' : step === 6 ? 'У вас есть филиалы?' : step === 7 ? 'Сколько у вас сотрудников?' : step === 8 ? 'Какие отчёты нужны?' : step === 9 ? 'Кто ваши клиенты?' : 'Данные для входа'}
         </p>
 
-        <Progress current={step - 1} total={9} />
+        <Progress current={step - 1} total={10} />
 
-        {/* Шаг 1: Тип бизнеса */}
+        {/* Шаг 1: Название организации */}
         {step === 1 && (
+          <div style={fadeStyle}>
+            <label style={{
+              fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
+              textTransform:'uppercase',letterSpacing:'.02em',display:'block',marginBottom:'.35rem',
+            }}>
+              Как называется ваша организация?
+            </label>
+            <input type="text" placeholder="Например: Мой магазин"
+              value={orgName} onChange={e => { setOrgName(e.target.value); setError(''); }}
+              autoFocus
+              style={{
+                width:'100%', padding:'.65rem .75rem', fontSize:'.82rem',
+                border:'1.5px solid var(--border)', borderRadius:'var(--radius-md)',
+                outline:'none', fontFamily:'var(--font)', marginBottom:'.5rem',
+                transition:'border-color var(--transition)',
+                color:'var(--body-color)', boxSizing:'border-box',
+              }} />
+            {error && <p className="error" style={{marginBottom:0}}>{error}</p>}
+            <NextBtn disabled={!orgName.trim()} />
+          </div>
+        )}
+
+        {/* Шаг 2: Тип бизнеса */}
+        {step === 2 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -294,12 +320,23 @@ export default function Register() {
               ))}
             </div>
             {error && <p className="error" style={{marginBottom:0}}>{error}</p>}
-            <NextBtn disabled={!businessType} />
+            <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
+              <button onClick={prevStep}
+                style={{
+                  flex:1, padding:'.7rem', fontSize:'.82rem', fontWeight:600,
+                  border:'1px solid rgba(0,0,0,.12)', borderRadius:'var(--radius-pill)',
+                  cursor:'pointer', background:'transparent', color:'#555',
+                  fontFamily:'inherit', transition:'all .15s',
+                }}>
+                Назад
+              </button>
+              <div style={{flex:'2'}}><NextBtn disabled={!businessType} /></div>
+            </div>
           </div>
         )}
 
-        {/* Шаг 2: Объём продаж */}
-        {step === 2 && (
+        {/* Шаг 3: Объём продаж */}
+        {step === 3 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -659,8 +696,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 9: Email + пароль */}
-        {step === 9 && (
+        {/* Шаг 10: Email + пароль */}
+        {step === 10 && (
           <form onSubmit={handleSubmit} style={fadeStyle}>
             <input type="email" placeholder="Email" value={email}
               onChange={e=>setEmail(e.target.value)} required autoFocus
