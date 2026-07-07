@@ -46,6 +46,14 @@ const BRANCH_OPTIONS = [
   { id: 'no', label: 'Нет' },
 ];
 
+const EMPLOYEE_OPTIONS = [
+  { id: 'none', label: 'Нет сотрудников' },
+  { id: '1_5', label: '1 — 5' },
+  { id: '5_20', label: '5 — 20' },
+  { id: '20_50', label: '20 — 50' },
+  { id: 'more_50', label: 'Более 50' },
+];
+
 const CLIENT_TYPES = [
   { id: 'b2c', label: 'Только физические лица (b2c)' },
   { id: 'b2b', label: 'Только компании (b2b)' },
@@ -62,6 +70,7 @@ export default function Register() {
   const [currency, setCurrency] = useState('');
   const [hasBranches, setHasBranches] = useState('');
   const [branchCount, setBranchCount] = useState('');
+  const [employees, setEmployees] = useState('');
   const [clientType, setClientType] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,7 +91,8 @@ export default function Register() {
     if (step === 4 && !currency) { setError('Выберите валюту'); return; }
     if (step === 5 && !hasBranches) { setError('Ответьте на вопрос'); return; }
     if (step === 5 && hasBranches === 'yes' && !branchCount.trim()) { setError('Укажите количество филиалов'); return; }
-    if (step === 6 && !clientType) { setError('Выберите тип клиентов'); return; }
+    if (step === 6 && !employees) { setError('Укажите количество сотрудников'); return; }
+    if (step === 7 && !clientType) { setError('Выберите тип клиентов'); return; }
     setError('');
     setFade('out');
     setTimeout(() => { setStep(s => s + 1); setFade('in'); }, 150);
@@ -188,13 +198,13 @@ export default function Register() {
           AtlasPos
         </div>
         <h1 style={{fontSize:'1.15rem',fontWeight:700,textAlign:'center',marginBottom:2,letterSpacing:'-.03em'}}>
-          {step === 1 ? 'Создать аккаунт' : step === 2 ? 'Объём продаж' : step === 3 ? 'Товары и услуги' : step === 4 ? 'Валюта' : step === 5 ? 'Филиалы' : step === 6 ? 'Ваши клиенты' : 'Регистрация'}
+          {step === 1 ? 'Создать аккаунт' : step === 2 ? 'Объём продаж' : step === 3 ? 'Товары и услуги' : step === 4 ? 'Валюта' : step === 5 ? 'Филиалы' : step === 6 ? 'Сотрудники' : step === 7 ? 'Ваши клиенты' : 'Регистрация'}
         </h1>
         <p style={{fontSize:'.8rem',color:'rgba(0,0,0,.54)',textAlign:'center',marginBottom:'1rem'}}>
-          {step === 1 ? 'Расскажите о своём бизнесе' : step === 2 ? 'Сколько продаёте в месяц?' : step === 3 ? 'Сколько товаров/услуг?' : step === 4 ? 'В какой валюте работаете?' : step === 5 ? 'У вас есть филиалы?' : step === 6 ? 'Кто ваши клиенты?' : 'Данные для входа'}
+          {step === 1 ? 'Расскажите о своём бизнесе' : step === 2 ? 'Сколько продаёте в месяц?' : step === 3 ? 'Сколько товаров/услуг?' : step === 4 ? 'В какой валюте работаете?' : step === 5 ? 'У вас есть филиалы?' : step === 6 ? 'Сколько у вас сотрудников?' : step === 7 ? 'Кто ваши клиенты?' : 'Данные для входа'}
         </p>
 
-        <Progress current={step - 1} total={7} />
+        <Progress current={step - 1} total={8} />
 
         {/* Шаг 1: Тип бизнеса */}
         {step === 1 && (
@@ -438,8 +448,54 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 6: Тип клиентов */}
+        {/* Шаг 6: Сотрудники */}
         {step === 6 && (
+          <div style={fadeStyle}>
+            <label style={{
+              fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
+              textTransform:'uppercase',letterSpacing:'.02em',display:'block',marginBottom:'.4rem',
+            }}>
+              Сколько у вас сотрудников?
+            </label>
+            <div style={{display:'flex',flexDirection:'column',gap:'4px',marginBottom:'.5rem'}}>
+              {EMPLOYEE_OPTIONS.map(e => (
+                <label key={e.id} onClick={() => { setEmployees(e.id); setError(''); }}
+                  style={{
+                    display:'flex',alignItems:'center',gap:'.45rem',
+                    padding:'.45rem .65rem',borderRadius:'.5rem',
+                    cursor:'pointer',fontSize:'.78rem',color:'#555',
+                    transition:'all .12s',fontFamily:'inherit',
+                    background: employees === e.id ? '#ffdd2d' : '#f8f8f8',
+                    border: employees === e.id ? '1px solid #ffdd2d' : '1px solid transparent',
+                    fontWeight: employees === e.id ? 600 : 400,
+                  }}>
+                  <span style={{
+                    width:'16px',height:'16px',borderRadius:'50%',
+                    border: employees === e.id ? '5px solid #000' : '2px solid #ccc',
+                    transition:'all .15s',flexShrink:0,
+                  }} />
+                  {e.label}
+                </label>
+              ))}
+            </div>
+            {error && <p className="error" style={{marginBottom:0}}>{error}</p>}
+            <div style={{display:'flex',gap:'.5rem',marginTop:'.5rem'}}>
+              <button onClick={prevStep}
+                style={{
+                  flex:1, padding:'.7rem', fontSize:'.82rem', fontWeight:600,
+                  border:'1px solid rgba(0,0,0,.12)', borderRadius:'var(--radius-pill)',
+                  cursor:'pointer', background:'transparent', color:'#555',
+                  fontFamily:'inherit', transition:'all .15s',
+                }}>
+                Назад
+              </button>
+              <div style={{flex:'2'}}><NextBtn disabled={!employees} /></div>
+            </div>
+          </div>
+        )}
+
+        {/* Шаг 7: Тип клиентов */}
+        {step === 7 && (
           <div style={fadeStyle}>
             <label style={{
               fontSize:'.72rem',fontWeight:600,color:'rgba(0,0,0,.5)',
@@ -484,8 +540,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* Шаг 7: Email + пароль */}
-        {step === 7 && (
+        {/* Шаг 8: Email + пароль */}
+        {step === 8 && (
           <form onSubmit={handleSubmit} style={fadeStyle}>
             <input type="email" placeholder="Email" value={email}
               onChange={e=>setEmail(e.target.value)} required autoFocus
