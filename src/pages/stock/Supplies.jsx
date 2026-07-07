@@ -406,7 +406,13 @@ const load = async () => {
             <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([]);setFAddSearch('')}}>&times;</button>
             <div className="page-header" style={{marginBottom:'12px'}}>
               <div>
-                <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0}}>{editId?'Редактировать поставку':'Новая поставка'}</h1>
+                <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0,display:'flex',alignItems:'center',gap:'.5rem'}}>{editId?'Редактировать поставку':'Новая поставка'}
+                  <span onClick={function(){scanBarcode(function(bc){
+                    var found=products.find(function(p){return p.barcode===bc;});
+                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
+                  })}} title="Сканировать штрихкод" 
+                    style={{fontSize:'1.1rem',cursor:'pointer',lineHeight:1,display:'inline-flex',alignItems:'center',opacity:.6}}>📷</span>
+                </h1>
                 <div className="sub" style={{marginBottom:0}}>Добавление товаров на склад</div>
               </div>
             </div>
@@ -424,11 +430,6 @@ const load = async () => {
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
                 <div style={{display:'flex',gap:'.35rem',padding:'0 0 .15rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
-                  <span onClick={function(){scanBarcode(function(bc){
-                    var found=products.find(function(p){return p.barcode===bc;});
-                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
-                  })}} title="Сканировать штрихкод" 
-                    style={{fontSize:'16px',cursor:'pointer',padding:'1px 4px',background:'transparent',border:'none',borderRadius:'4px',lineHeight:1,display:'inline-flex',alignItems:'center',marginRight:'4px'}}>📷</span>
                   <span style={{flex:3,textAlign:'left'}}>Товар</span>
                   <span style={{flex:1,textAlign:'center'}}>Кол-во</span>
                   <span style={{flex:1,textAlign:'right'}}>Сумма</span>
