@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Референсы — Поставка (Poster, iiko и др.)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: #f2f2f5; color: #111; padding: 24px; }
+.page-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -.02em; }
+.page-sub { font-size: .8rem; color: #999; margin-bottom: 20px; }
+.variants { display: flex; flex-direction: column; gap: 28px; max-width: 720px; }
+.v-wrap { background: #fff; border-radius: 18px; padding: 22px; border: 1px solid rgba(0,0,0,.05); }
+.v-label { font-size: .7rem; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 1px; }
+.v-source { font-size: .72rem; color: #888; margin-bottom: 12px; }
+.v-source strong { color: #111; font-weight: 600; }
+.btn { font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600; border: none; border-radius: 8px; padding: .5rem 1rem; cursor: pointer; transition: all .12s; }
+.btn-primary { background: #1976d2; color: #fff; }
+.btn-primary:hover { background: #1565c0; }
+.btn-ghost { background: transparent; color: #666; border: 1px solid #ddd; }
+.btn-ghost:hover { background: #f5f5f5; }
+.btn-success { background: #43a047; color: #fff; }
+.btn-success:hover { background: #388e3c; }
+
+/* Poster */
+.v1-top { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.v1-field { flex: 1; min-width: 140px; }
+.v1-field label { display: block; font-size: .65rem; font-weight: 600; color: #888; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .3px; }
+.v1-field select, .v1-field input { width: 100%; padding: .4rem .5rem; border: 1px solid #ddd; border-radius: 6px; font-size: .78rem; font-family: 'Inter', sans-serif; outline: none; background: #fff; }
+.v1-field select:focus, .v1-field input:focus { border-color: #1976d2; }
+.v1-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.v1-table th { text-align: left; padding: .35rem .4rem; font-size: .62rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .3px; border-bottom: 1.5px solid #e0e0e0; }
+.v1-table th:nth-child(2) { text-align: center; width: 60px; }
+.v1-table th:nth-child(3) { width: 80px; text-align: right; }
+.v1-table th:nth-child(4) { width: 80px; text-align: right; }
+.v1-table th:last-child { width: 22px; text-align: center; }
+.v1-table td { padding: .35rem .4rem; border-bottom: 1px solid #eee; font-weight: 500; }
+.v1-table td:nth-child(3) { font-weight: 400; color: #666; }
+.v1-table td:nth-child(4) { font-weight: 600; }
+.v1-add { display: flex; align-items: center; gap: 6px; padding: .3rem .4rem; }
+.v1-add button { background: none; border: 1px dashed #bbb; border-radius: 6px; padding: .3rem .6rem; font-size: .75rem; color: #666; cursor: pointer; font-family: 'Inter', sans-serif; }
+.v1-add button:hover { border-color: #1976d2; color: #1976d2; }
+.v1-total { display: flex; justify-content: space-between; align-items: center; padding: .5rem .4rem 0; margin-top: 2px; border-top: 1px solid #eee; }
+.v1-total .sum { font-size: 1rem; font-weight: 700; }
+.v1-total .sum span { font-weight: 400; color: #888; font-size: .72rem; }
+.v1-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+
+/* iiko */
+.v2-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.v2-head h3 { font-size: .85rem; font-weight: 700; }
+.v2-head .doc-num { font-size: .72rem; color: #888; background: #f5f5f7; padding: .2rem .6rem; border-radius: 4px; }
+.v2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin-bottom: 10px; }
+.v2-field label { display: block; font-size: .62rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 2px; }
+.v2-field input, .v2-field select { width: 100%; padding: .35rem .5rem; border: 1px solid #ddd; border-radius: 4px; font-size: .78rem; font-family: 'Inter', sans-serif; outline: none; background: #fff; }
+.v2-field input:focus, .v2-field select:focus { border-color: #e53935; box-shadow: 0 0 0 1.5px rgba(229,57,53,.15); }
+.v2-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.v2-table th { padding: .3rem .4rem; font-size: .6rem; font-weight: 600; color: #fff; text-align: left; background: #37474f; }
+.v2-table th:first-child { border-radius: 4px 0 0 0; }
+.v2-table th:last-child { border-radius: 0 4px 0 0; text-align: center; }
+.v2-table th:nth-child(2), .v2-table td:nth-child(2) { text-align: center; width: 55px; }
+.v2-table th:nth-child(3), .v2-table td:nth-child(3) { text-align: right; width: 75px; }
+.v2-table th:nth-child(4), .v2-table td:nth-child(4) { text-align: right; width: 75px; }
+.v2-table th:last-child, .v2-table td:last-child { width: 22px; text-align: center; }
+.v2-table td { padding: .3rem .4rem; border-bottom: 1px solid #eee; }
+.v2-table tr:hover td { background: #fafafa; }
+.v2-table .del { color: #ddd; cursor: pointer; background: none; border: none; font-size: .8rem; }
+.v2-table .del:hover { color: #e53935; }
+.v2-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding: .4rem .4rem 0; border-top: 1px solid #eee; }
+.v2-footer .total { font-size: .9rem; font-weight: 700; }
+.v2-footer .count { font-size: .75rem; color: #888; }
+
+/* Evotor */
+.v3-bar { display: flex; gap: 6px; margin-bottom: 10px; }
+.v3-bar button { flex: 1; padding: .55rem; border-radius: 10px; border: 1.5px solid #e0e0e0; background: #fff; font-size: .72rem; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer; }
+.v3-bar button:hover { border-color: #111; }
+.v3-bar .active { border-color: #111; background: #111; color: #fff; }
+.v3-list { display: flex; flex-direction: column; gap: 2px; }
+.v3-item { display: flex; align-items: center; gap: 8px; padding: .5rem .65rem; background: #fff; border: 1px solid #f0f0f0; border-radius: 10px; }
+.v3-icon { width: 36px; height: 36px; border-radius: 10px; background: #f5f5f7; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+.v3-info { flex: 1; min-width: 0; }
+.v3-info .name { font-size: .82rem; font-weight: 600; }
+.v3-info .sub { font-size: .68rem; color: #999; }
+.v3-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.v3-controls button { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid #e0e0e0; background: #fff; font-size: .8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #333; }
+.v3-controls button:hover { border-color: #111; }
+.v3-controls .qty { min-width: 32px; text-align: center; font-weight: 700; font-size: .85rem; }
+.v3-price { text-align: right; min-width: 70px; }
+.v3-price .sum { font-weight: 700; font-size: .85rem; }
+.v3-price .unit { font-size: .62rem; color: #aaa; }
+.v3-item .del { color: #ddd; cursor: pointer; background: none; border: none; font-size: .9rem; padding: 0 2px; flex-shrink: 0; }
+.v3-item .del:hover { color: #dc2626; }
+.v3-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: .55rem 0 0; border-top: 1px solid #eee; }
+.v3-bottom .total { font-size: .9rem; }
+.v3-bottom .total strong { font-size: 1.05rem; }
+
+/* MoySklad */
+.v4-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.v4-header input { flex: 1; padding: .4rem .5rem; border: 1px solid #ddd; border-radius: 6px; font-size: .78rem; font-family: 'Inter', sans-serif; outline: none; }
+.v4-header input:focus { border-color: #43a047; }
+.v4-header .badge { font-size: .68rem; color: #888; background: #f5f5f5; padding: .2rem .6rem; border-radius: 4px; white-space: nowrap; }
+.v4-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.v4-table th { padding: .3rem .4rem; font-size: .6rem; font-weight: 600; color: #888; text-align: left; border-bottom: 2px solid #43a047; }
+.v4-table th:nth-child(2) { width: 50px; text-align: center; }
+.v4-table th:nth-child(3) { width: 70px; text-align: right; }
+.v4-table th:nth-child(4) { width: 70px; text-align: right; }
+.v4-table th:last-child { width: 20px; text-align: center; }
+.v4-table td { padding: .3rem .4rem; border-bottom: 1px solid #eee; }
+.v4-table td:nth-child(2) { text-align: center; }
+.v4-table td:nth-child(3) { text-align: right; color: #666; }
+.v4-table td:nth-child(4) { text-align: right; font-weight: 600; }
+.v4-table td:last-child { text-align: center; }
+.v4-table .del { color: #ccc; cursor: pointer; background: none; border: none; font-size: .78rem; }
+.v4-table .del:hover { color: #e53935; }
+.v4-row-add { padding: .3rem .4rem; }
+.v4-row-add a { font-size: .75rem; color: #43a047; text-decoration: none; cursor: pointer; }
+.v4-row-add a:hover { text-decoration: underline; }
+.v4-summary { display: flex; justify-content: space-between; align-items: center; padding: .45rem .4rem 0; margin-top: 4px; border-top: 1px solid #eee; }
+.v4-summary .left { font-size: .72rem; color: #888; }
+.v4-summary .right { font-size: .95rem; font-weight: 700; }
+
+/* QuickResto */
+.v5-tabs { display: flex; gap: 0; margin-bottom: 10px; border-bottom: 1.5px solid #e0e0e0; }
+.v5-tabs button { padding: .4rem .8rem; font-size: .75rem; font-weight: 500; font-family: 'Inter', sans-serif; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: #888; margin-bottom: -1.5px; }
+.v5-tabs button:hover { color: #111; }
+.v5-tabs .active { color: #111; border-bottom-color: #111; font-weight: 600; }
+.v5-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.v5-table th { padding: .25rem .35rem; font-size: .6rem; font-weight: 600; color: #aaa; text-align: left; text-transform: uppercase; letter-spacing: .3px; border-bottom: 1px solid #eee; }
+.v5-table th:nth-child(2) { width: 45px; text-align: center; }
+.v5-table th:nth-child(3) { width: 65px; text-align: right; }
+.v5-table th:nth-child(4) { width: 65px; text-align: right; }
+.v5-table th:last-child { width: 18px; text-align: center; }
+.v5-table td { padding: .25rem .35rem; border-bottom: 1px solid #f5f5f5; }
+.v5-table td:nth-child(2) { text-align: center; }
+.v5-table td:nth-child(3) { text-align: right; color: #888; }
+.v5-table td:nth-child(4) { text-align: right; font-weight: 600; }
+.v5-table td:last-child { text-align: center; }
+.v5-table .del { color: #ddd; cursor: pointer; background: none; border: none; font-size: .75rem; }
+.v5-table .del:hover { color: #dc2626; }
+.v5-footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+</style>
+</head>
+<body>
+<h1 class="page-title">Референсы — модалка поставки</h1>
+<p class="page-sub">Как сделано в реальных программах. Один набор данных, разный UX.</p>
+<div class="variants">
+  <!-- #1 Poster -->
+  <div class="v-wrap">
+    <div class="v-label">#1 Poster</div>
+    <div class="v-source"><strong>Poster</strong> — приходная накладная. Сверху поля (поставщик, склад), таблица с ценой закупки и суммой.</div>
+    <div class="v1-top">
+      <div class="v1-field"><label>Поставщик</label><select><option>Мотоциклы РУС</option><option>MotoParts СПб</option></select></div>
+      <div class="v1-field"><label>Склад</label><select><option>Основной</option><option>Резервный</option></select></div>
+      <div class="v1-field"><label>Дата</label><input type="date" value="2026-07-09"></div>
+      <div class="v1-field"><label>Номер</label><input type="text" value="ПН-128"></div>
+    </div>
+    <table class="v1-table">
+      <tr><th>Товар</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5</td><td>3 500</td><td>17 500</td><td><span style="color:#ccc;cursor:pointer">✕</span></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2</td><td>10 500</td><td>21 000</td><td><span style="color:#ccc;cursor:pointer">✕</span></td></tr>
+      <tr><td>Колодки Brembo</td><td>10</td><td>1 800</td><td>18 000</td><td><span style="color:#ccc;cursor:pointer">✕</span></td></tr>
+    </table>
+    <div class="v1-add"><button>+ Добавить товар</button></div>
+    <div class="v1-total"><span>Итого:</span><span class="sum"><span>3 товара · 17 шт</span> 56 500 ₽</span></div>
+    <div class="v1-actions"><button class="btn btn-ghost">Отмена</button><button class="btn btn-primary">💾 Сохранить</button></div>
+  </div>
+
+  <!-- #2 iiko -->
+  <div class="v-wrap">
+    <div class="v-label">#2 iiko</div>
+    <div class="v-source"><strong>iiko</strong> — корпоративный стиль. Строгие поля, тёмный хедер таблицы, hover-подсветка строк.</div>
+    <div class="v2-head"><h3>Приходная накладная</h3><span class="doc-num">№ ПН-128 от 09.07.2026</span></div>
+    <div class="v2-grid">
+      <div class="v2-field"><label>Поставщик</label><select><option>Мотоциклы РУС</option><option>MotoParts СПб</option></select></div>
+      <div class="v2-field"><label>Склад</label><select><option>Основной</option></select></div>
+      <div class="v2-field"><label>Тип операции</label><select><option>Закупка</option><option>Возврат</option></select></div>
+      <div class="v2-field"><label>Юр. лицо</label><select><option>ИП Шиманская</option></select></div>
+    </div>
+    <table class="v2-table">
+      <tr><th>Товар</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5</td><td>3 500</td><td>17 500</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2</td><td>10 500</td><td>21 000</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Колодки Brembo</td><td>10</td><td>1 800</td><td>18 000</td><td><span class="del">✕</span></td></tr>
+    </table>
+    <div class="v2-footer"><span class="count">3 позиции</span><span class="total">56 500 ₽</span></div>
+  </div>
+
+  <!-- #3 Evotor -->
+  <div class="v-wrap">
+    <div class="v-label">#3 Эвотор</div>
+    <div class="v-source"><strong>Эвотор</strong> — сенсорный интерфейс. Крупные элементы, иконки, +/- для количества, подходит для планшета.</div>
+    <div class="v3-bar">
+      <button class="active">Все товары</button>
+      <button>Масла</button>
+      <button>Аксессуары</button>
+      <button>Запчасти</button>
+    </div>
+    <div class="v3-list">
+      <div class="v3-item">
+        <div class="v3-icon">🛢️</div>
+        <div class="v3-info"><div class="name">Масло Motul 10W40</div><div class="sub">3 500 ₽ · Арт. MN-001</div></div>
+        <div class="v3-controls"><button>−</button><span class="qty">5</span><button>+</button></div>
+        <div class="v3-price"><div class="sum">17 500</div><div class="unit">₽</div></div>
+        <span class="del">✕</span>
+      </div>
+      <div class="v3-item">
+        <div class="v3-icon">⛑️</div>
+        <div class="v3-info"><div class="name">Шлем LS2 FF320</div><div class="sub">10 500 ₽ · Арт. SH-002</div></div>
+        <div class="v3-controls"><button>−</button><span class="qty">2</span><button>+</button></div>
+        <div class="v3-price"><div class="sum">21 000</div><div class="unit">₽</div></div>
+        <span class="del">✕</span>
+      </div>
+      <div class="v3-item">
+        <div class="v3-icon">🔧</div>
+        <div class="v3-info"><div class="name">Колодки Brembo</div><div class="sub">1 800 ₽ · Арт. BR-003</div></div>
+        <div class="v3-controls"><button>−</button><span class="qty">10</span><button>+</button></div>
+        <div class="v3-price"><div class="sum">18 000</div><div class="unit">₽</div></div>
+        <span class="del">✕</span>
+      </div>
+    </div>
+    <div class="v3-bottom"><span class="total">Итого: <strong>56 500 ₽</strong></span><button class="btn btn-primary">✅ Провести</button></div>
+  </div>
+
+  <!-- #4 МойСклад -->
+  <div class="v-wrap">
+    <div class="v-label">#4 МойСклад</div>
+    <div class="v-source"><strong>МойСклад</strong> — облачный сервис. Зелёный акцент, поиск сверху, строка добавления снизу-ссылкой.</div>
+    <div class="v4-header">
+      <input type="text" placeholder="Поиск товара по названию или артикулу...">
+      <span class="badge">3 позиции</span>
+    </div>
+    <table class="v4-table">
+      <tr><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5</td><td>3 500</td><td>17 500</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2</td><td>10 500</td><td>21 000</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Колодки Brembo</td><td>10</td><td>1 800</td><td>18 000</td><td><span class="del">✕</span></td></tr>
+    </table>
+    <div class="v4-row-add"><a href="#">+ Добавить позицию</a></div>
+    <div class="v4-summary"><span class="left">Всего: 3 позиции на сумму</span><span class="right">56 500 ₽</span></div>
+  </div>
+
+  <!-- #5 QuickResto -->
+  <div class="v-wrap">
+    <div class="v-label">#5 QuickResto / R-Keeper</div>
+    <div class="v-source"><strong>QuickResto / R-Keeper</strong> — ресторанные системы. Табы «Поставка / Возврат», компактная таблица, кнопки снизу.</div>
+    <div class="v5-tabs">
+      <button class="active">Поставка</button>
+      <button>Возврат</button>
+      <button>Перемещение</button>
+    </div>
+    <table class="v5-table">
+      <tr><th>Товар</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5</td><td>3 500</td><td>17 500</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2</td><td>10 500</td><td>21 000</td><td><span class="del">✕</span></td></tr>
+      <tr><td>Колодки Brembo</td><td>10</td><td>1 800</td><td>18 000</td><td><span class="del">✕</span></td></tr>
+    </table>
+    <div class="v5-footer"><button class="btn btn-ghost">➕ Добавить</button><button class="btn btn-primary">💾 Принять</button></div>
+  </div>
+
+</div>
+</body>
+</html>
