@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -20,7 +20,9 @@ export default function SupplyNew() {
   const [supName, setSupName] = useState('');
   const [supCustom, setSupCustom] = useState('');
   const [invoice, setInvoice] = useState('');
-  const [dateStr, setDateStr] = useState(new Date().toISOString().split('T')[0]);
+  const now = useMemo(() => new Date(), []);
+  const [dateStr, setDateStr] = useState(now.toISOString().split('T')[0]);
+  const [timeStr, setTimeStr] = useState(now.toTimeString().slice(0,5));
   const [comment, setComment] = useState('');
   const [items, setItems] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -184,72 +186,68 @@ export default function SupplyNew() {
         </div>
       </div>
 
-      {/* Main card */}
-      <div className="modal-box" style={{ maxWidth: '100%', padding: '1.25rem 1.5rem', marginBottom: 24 }}>
+      {/* Fields — flat layout without card */}
+      <div style={{ marginBottom: 20 }}>
         
-        {/* Row 1: Date, Supplier, Invoice */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
-          <div style={{ flex: 1, minWidth: 160 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Дата поставки</label>
+        {/* Row 1: Date & time */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Дата и время поставки</label>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)}
-              style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
-          </div>
-          <div style={{ flex: 2, minWidth: 200 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Поставщик</label>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <select value={supName} onChange={e => { setSupName(e.target.value); if (e.target.value) setSupCustom(''); }}
-                style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)', color: supName ? 'inherit' : '#999' }}>
-                <option value="">Выберите поставщика</option>
-                {suppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                <option value="__new__">+ Новый поставщик</option>
-              </select>
-              {supName === '__new__' && (
-                <input type="text" placeholder="Название" value={supCustom} onChange={e => setSupCustom(e.target.value)}
-                  style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none' }} />
-              )}
-            </div>
-          </div>
-          <div style={{ flex: 1, minWidth: 120 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>№ накладной</label>
-            <input type="text" value={invoice} onChange={e => setInvoice(e.target.value)} placeholder="Например ПН-128"
-              style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
+              style={{ width: 'auto', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
+            <input type="time" value={timeStr} onChange={e => setTimeStr(e.target.value)}
+              style={{ width: 'auto', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
           </div>
         </div>
 
-        {/* Row 2: Type, Warehouse, Payment */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
-          <div style={{ flex: 1, minWidth: 140 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Тип</label>
-            <select style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
-              <option>Закупка</option>
-              <option>Возврат</option>
-              <option>Перемещение</option>
+        {/* Row 2: Supplier */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Поставщик</label>
+          <div style={{ display: 'flex', gap: 6, maxWidth: 280 }}>
+            <select value={supName} onChange={e => { setSupName(e.target.value); if (e.target.value) setSupCustom(''); }}
+              style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)', color: supName ? 'inherit' : '#999' }}>
+              <option value="">Выберите поставщика</option>
+              {suppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+              <option value="__new__">+ Новый поставщик</option>
             </select>
+            {supName === '__new__' && (
+              <input type="text" placeholder="Название" value={supCustom} onChange={e => setSupCustom(e.target.value)}
+                style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none' }} />
+            )}
           </div>
-          <div style={{ flex: 1, minWidth: 140 }}>
+        </div>
+
+        {/* Row 3: Warehouse | Payment | Comment */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+          <div style={{ flex: 1, minWidth: 160 }}>
             <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Склад</label>
             <select style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
               <option>Основной</option>
             </select>
           </div>
-          <div style={{ flex: 1, minWidth: 140 }}>
+          <div style={{ flex: 1, minWidth: 160 }}>
             <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Оплата</label>
-            <div>
+            <div onClick={() => setShowPayPanel(true)} style={{ cursor: 'pointer', width: '100%' }}>
               {payments.length === 0 ? (
-                <button onClick={() => setShowPayPanel(true)} style={{ background: 'none', border: '1px dashed var(--border)', borderRadius: 8, padding: '.4rem .7rem', fontSize: '.78rem', color: 'var(--muted)', cursor: 'pointer', width: '100%', fontFamily: 'inherit' }}>+ Добавить платеж</button>
+                <div style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', color: 'var(--muted)', background: 'var(--body-bg)', lineHeight: '1.3' }}>+ Добавить платеж</div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', background: 'var(--body-bg)' }}>
                   {payments.map((p, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.78rem', padding: '.25rem .5rem', background: '#f0fdf4', borderRadius: 6 }}>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.78rem' }}>
                       <span style={{ fontWeight: 600 }}>{Number(p.amount).toLocaleString()} ₽</span>
                       <span style={{ color: 'var(--muted)' }}>— {p.method}</span>
-                      <button onClick={() => setPayments(prev => prev.filter((_, j) => j !== i))} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</button>
+                      <span onClick={e => { e.stopPropagation(); setPayments(prev => prev.filter((_, j) => j !== i)); }} style={{ marginLeft: 'auto', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</span>
                     </div>
                   ))}
-                  <button onClick={() => setShowPayPanel(true)} style={{ background: 'none', border: 'none', fontSize: '.75rem', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', padding: 0 }}>+ Добавить ещё</button>
+                  <div style={{ fontSize: '.72rem', color: 'var(--primary)', cursor: 'pointer' }}>+ Добавить ещё</div>
                 </div>
               )}
             </div>
+          </div>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Комментарий</label>
+            <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Примечание к поставке..."
+              style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
           </div>
         </div>
 
@@ -278,13 +276,7 @@ export default function SupplyNew() {
             </div>
           </div>
         )}
-
-        {/* Comment */}
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Комментарий</label>
-          <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Примечание к поставке..."
-            style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
-        </div>
+      </div>
 
         {/* Import zone */}
         <div
@@ -412,7 +404,6 @@ export default function SupplyNew() {
           </button>
         </div>
 
-      </div>
     </div>
   );
 }
