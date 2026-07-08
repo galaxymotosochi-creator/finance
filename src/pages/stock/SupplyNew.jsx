@@ -217,38 +217,40 @@ export default function SupplyNew() {
           </div>
         </div>
 
-        {/* Row 3: Warehouse | Payment | Comment */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-          <div style={{ flex: 1, minWidth: 160 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Склад</label>
-            <select style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
-              <option>Основной</option>
-            </select>
+        {/* Row 3: Warehouse */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Склад</label>
+          <select style={{ width: '100%', maxWidth: 280, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
+            <option>Основной</option>
+          </select>
+        </div>
+
+        {/* Row 4: Payment */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Оплата</label>
+          <div onClick={() => setShowPayPanel(true)} style={{ cursor: 'pointer', maxWidth: 280 }}>
+            {payments.length === 0 ? (
+              <div style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', color: 'var(--muted)', background: 'var(--body-bg)', lineHeight: '1.3' }}>+ Добавить платеж</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', background: 'var(--body-bg)' }}>
+                {payments.map((p, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.78rem' }}>
+                    <span style={{ fontWeight: 600 }}>{Number(p.amount).toLocaleString()} ₽</span>
+                    <span style={{ color: 'var(--muted)' }}>— {p.method}</span>
+                    <span onClick={e => { e.stopPropagation(); setPayments(prev => prev.filter((_, j) => j !== i)); }} style={{ marginLeft: 'auto', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</span>
+                  </div>
+                ))}
+                <div style={{ fontSize: '.72rem', color: 'var(--primary)', cursor: 'pointer' }}>+ Добавить ещё</div>
+              </div>
+            )}
           </div>
-          <div style={{ flex: 1, minWidth: 160 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Оплата</label>
-            <div onClick={() => setShowPayPanel(true)} style={{ cursor: 'pointer', width: '100%' }}>
-              {payments.length === 0 ? (
-                <div style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', color: 'var(--muted)', background: 'var(--body-bg)', lineHeight: '1.3' }}>+ Добавить платеж</div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', background: 'var(--body-bg)' }}>
-                  {payments.map((p, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.78rem' }}>
-                      <span style={{ fontWeight: 600 }}>{Number(p.amount).toLocaleString()} ₽</span>
-                      <span style={{ color: 'var(--muted)' }}>— {p.method}</span>
-                      <span onClick={e => { e.stopPropagation(); setPayments(prev => prev.filter((_, j) => j !== i)); }} style={{ marginLeft: 'auto', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</span>
-                    </div>
-                  ))}
-                  <div style={{ fontSize: '.72rem', color: 'var(--primary)', cursor: 'pointer' }}>+ Добавить ещё</div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Комментарий</label>
-            <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Примечание к поставке..."
-              style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
-          </div>
+        </div>
+
+        {/* Row 5: Comment */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Комментарий</label>
+          <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Примечание к поставке..."
+            style={{ width: '100%', maxWidth: 400, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
         </div>
 
         {/* Payment panel */}
@@ -272,7 +274,7 @@ export default function SupplyNew() {
                 if (!amt || amt <= 0) return showToast('Введите сумму');
                 setPayments(prev => [...prev, { amount: amt, method, date: new Date().toISOString() }]);
                 setShowPayPanel(false);
-              }} style={{ padding: '.45rem .9rem', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
+              }} style={{ padding: '.45rem .9rem', background: '#fff', color: '#111', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
             </div>
           </div>
         )}
@@ -396,11 +398,11 @@ export default function SupplyNew() {
           <button className="btn btn-ghost" onClick={() => navigate('/stock/supplies')} style={{ fontFamily: 'inherit' }}>Отмена</button>
           <button onClick={save} disabled={saving}
             style={{
-              padding: '.55rem 1.4rem', background: saving ? '#ccc' : 'var(--primary)', color: '#fff',
+              padding: '.55rem 1.4rem', background: saving ? '#ccc' : '#fff', color: '#111', border: '1.5px solid var(--border)',
               border: 'none', borderRadius: 8, fontSize: '.82rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               transition: 'all .12s', fontFamily: 'inherit'
             }}>
-            {saving ? '⏳ Сохранение...' : '💾 Провести поставку'}
+            {saving ? '⏳ Сохранение...' : 'Провести поставку'}
           </button>
         </div>
 
