@@ -172,8 +172,8 @@ export default function Employees() {
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
           <thead id="colHeaders"><tr>
-            <th style={{whiteSpace:'nowrap'}}>Сотрудник</th><th style={{whiteSpace:'nowrap'}}>Должность</th><th style={{whiteSpace:'nowrap'}}>Телефон</th><th style={{whiteSpace:'nowrap'}}>E-mail</th>
-            <th>Принят</th><th>Оклад</th><th>С продаж</th><th style={{width:'110px'}}></th>
+            <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
+            <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>С продаж</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
@@ -183,16 +183,16 @@ export default function Employees() {
               const pos = getPosition(emp.position_id);
               return (
                 <tr key={emp.id}>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>
                     <div className="prod-name" style={{color:'#555'}}>{emp.name}</div>
                     {emp.status === 'inactive' && <span>Уволен</span>}
                   </td>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{pos ? pos.name : '—'}</td>
-                  <td style={{color:'#555'}}>{emp.phone || '—'}</td>
-                  <td style={{color:'#555'}}>{emp.email || '—'}</td>
-                  <td style={{color:'#555'}}>{fmtDate(emp.hire_date)}</td>
-                  <td style={{color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{color:'#555'}}>{getRulesSummary(emp)}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{emp.phone || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{emp.email || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{fmtDate(emp.hire_date)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={e => {

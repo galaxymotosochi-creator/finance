@@ -7,6 +7,13 @@ export default function Landing() {
   const { user } = useAuth();
   useEffect(() => { if (user) n('/dashboard', { replace: true }); }, [user, n]);
 
+  const [mobile, setMobile] = useState(window.innerWidth < 700);
+  useEffect(() => {
+    const h = () => setMobile(window.innerWidth < 700);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
+
     const [period, setPeriod] = useState("1m");
 
   // Prices for each period
@@ -118,7 +125,7 @@ export default function Landing() {
   );
 
   return (
-    <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
+    <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1280,margin:"0 auto"}}>
         <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>AtlasPos</span>
@@ -128,7 +135,7 @@ export default function Landing() {
       </header>
 
       {/* ===== HERO С ПРЕВЬЮ ДАШБОРДА ===== */}
-      <section style={{maxWidth:1280,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:"1fr 1.3fr",gap:40,alignItems:"center"}}>
+      <section style={{maxWidth:1280,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:mobile?'1fr':'repeat(auto-fit, minmax(320px, 1fr))',gap:mobile?24:32,alignItems:"center"}}>
         <div>
           <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#000",fontSize:13,fontWeight:700,color:"#ffdd2d",marginBottom:20}}>
             Первая программа с AI аналитикой
@@ -185,7 +192,7 @@ export default function Landing() {
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учёте с первых минут</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в AtlasPos</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,alignItems:"stretch"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:20,alignItems:"stretch"}}>
         {[
           {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
           {num:"02",title:"Надёжность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
@@ -208,7 +215,7 @@ export default function Landing() {
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
         <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — всё работает так, как вы видите</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,alignItems:"stretch"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch"}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
@@ -282,7 +289,7 @@ export default function Landing() {
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Сравните, как работают привычные методы и наша умная платформа</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20,alignItems:"start"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:20,alignItems:"start"}}>
           {/* Карточка 1 — ERP */}
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
             <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжёлые программы<br/>(1С и аналоги)</h3>
@@ -319,7 +326,7 @@ export default function Landing() {
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
         <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для какого бизнеса создана платформа?</h2>
         <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36,maxWidth:560,margin:"0 auto 36px"}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:16}}>
           {[
             {
               svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',

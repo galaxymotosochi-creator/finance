@@ -350,9 +350,9 @@ export default function Timesheet() {
                   <th style={{textAlign:'left',paddingLeft:0,width:'12%'}}>Дата</th>
                   <th style={{width:'26%',textAlign:'left'}}>Сотрудник</th>
                   <th style={{width:'26%',textAlign:'left'}}>Статус</th>
-                  <th style={{width:'15%'}}>Бонус</th>
-                  <th style={{width:'15%'}}>Штраф</th>
-                  <th style={{width:'6%'}}></th>
+                  <th style={{textAlign:'left',width:'15%'}}>Бонус</th>
+                  <th style={{textAlign:'left',width:'15%'}}>Штраф</th>
+                  <th style={{width:'6%',textAlign:'left'}}></th>
                 </tr>
               </thead>
               <tbody>
@@ -360,7 +360,7 @@ export default function Timesheet() {
                   <tr><td colSpan={6} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',paddingLeft:0,color:'#555',whiteSpace:'nowrap'}}>{fmtDate(e.date)}</td>
+                    <td style={{textAlign:'left',paddingLeft:0,color:'#555',whiteSpace:'nowrap'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
                     <td style={{color:'#555',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
                     <td style={{color:'#555',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
                     <td style={{color:'#555'}}>
@@ -396,7 +396,7 @@ export default function Timesheet() {
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowDay(null); }}>
           <div className="modal-box" style={{maxWidth:'560px'}}>
             <button className="modal-close" onClick={() => setShowDay(null)}>&times;</button>
-            <h2>{fmtDate(showDay)}</h2>
+            <h2>{(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'}</h2>
             <div className="sub">Статусы сотрудников и события дня</div>
 
             <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>

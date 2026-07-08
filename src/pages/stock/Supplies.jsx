@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
@@ -21,6 +21,7 @@ function getPayStatus(s) {
 
 export default function Supplies() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [paySplit, setPaySplit] = useState(false);
   const [splitAmts, setSplitAmts] = useState({});
   const loc = useLocation();
@@ -275,7 +276,7 @@ const load = async () => {
           <div className="sub">Учет поступлений товаров от поставщиков</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
+          <button className="btn-mint" onClick={() => navigate('/stock/supply/new')}>+ Добавить поставку</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

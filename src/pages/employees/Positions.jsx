@@ -22,7 +22,11 @@ const BONUS_TYPES = [
 const PAY_TYPE_LABELS = {
   fixed: 'Фиксированная',
   piecework: 'Сдельная',
-  percent: 'За смену',
+  percent: '% с продаж',
+  per_day: 'За смену',
+  daily: 'За смену',
+  hourly: 'Почасовая',
+  monthly: 'Оклад',
 };
 
 export default function Positions() {
@@ -165,10 +169,10 @@ export default function Positions() {
             <thead id="colHeaders">
               <tr>
                 <th style={{textAlign:'left',paddingLeft:0,width:'26%'}}>Название должности</th>
-                <th style={{width:'16%'}}>Тип оплаты</th>
-                <th style={{width:'14%'}}>Сумма</th>
+                <th style={{textAlign:'left',width:'16%'}}>Тип оплаты</th>
+                <th style={{textAlign:'left',width:'14%'}}>Сумма</th>
                 <th style={{textAlign:'left',width:'34%'}}>Группы прав доступа</th>
-                <th style={{width:'10%'}}></th>
+                <th style={{width:'10%',textAlign:'left'}}></th>
               </tr>
             </thead>
             <tbody>
@@ -177,8 +181,8 @@ export default function Positions() {
                   <td style={{textAlign:'left',paddingLeft:0,color:'#555'}}>
                     <span className="prod-name">{p.name}</span>
                   </td>
-                  <td style={{color:'#555'}}>{formatPayType(p)}</td>
-                  <td className="num" style={{color:'#555'}}>{formatSalary(p)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{formatPayType(p)}</td>
+                  <td className="num" style={{textAlign:'left',color:'#555'}}>{formatSalary(p)}</td>
                   <td style={{textAlign:'left',color:'#555'}}>
                     {formatPermissions(p)}
                   </td>

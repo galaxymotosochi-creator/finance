@@ -114,7 +114,7 @@ export default function Clients() {
     <>
       <div className="page-header">
         <div>
-          <h1>Клиенты</h1>
+          <h1>База клиентов</h1>
           <div className="sub">История покупок, лояльность и статистика</div>
         </div>
         <div className="page-actions">
@@ -156,15 +156,15 @@ export default function Clients() {
         <table className="data-table">
           <thead id="clientColHeaders">
             <tr>
-              <th>Клиент</th>
+              <th style={{textAlign:'left'}}>Клиент</th>
               <th style={{textAlign:'left'}}>Примечание 1</th>
               <th style={{textAlign:'left'}}>Примечание 2</th>
-              <th>Телефон</th>
-              <th>ДР</th>
-              <th>Покупок</th>
-              <th>Ср. чек</th>
-              <th>Сумма</th>
-              <th>Долг</th>
+              <th style={{textAlign:'left'}}>Телефон</th>
+              <th style={{textAlign:'left'}}>ДЕНЬ РОЖДЕНИЯ</th>
+              <th style={{textAlign:'left'}}>Покупок</th>
+              <th style={{textAlign:'left'}}>Ср. чек</th>
+              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Долг</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
@@ -177,7 +177,7 @@ export default function Clients() {
               const isBday = c.birthday && c.birthday.slice(5) === todayMD;
               return (
                 <tr key={c.id}>
-                  <td>
+                  <td style={{textAlign:'left'}}>
                     <div className="prod-name">
                       {c.name}
                       {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
@@ -186,16 +186,16 @@ export default function Clients() {
                   </td>
                   <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
                   <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
-                  <td style={{color:'#555'}}>{c.phone || '—'}</td>
-                  <td style={{color:'#555'}}>
+                  <td style={{textAlign:'left',color:'#555'}}>{c.phone || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>
                     {c.birthday ? (
                       <span>{fmtDate(c.birthday)}{isBday && ' 🎉'}</span>
                     ) : '—'}
                   </td>
-                  <td style={{color:'#555'}}>{st.checks > 0 ? st.checks : '—'}</td>
-                  <td style={{color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{st.checks > 0 ? st.checks : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {

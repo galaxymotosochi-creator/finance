@@ -26,6 +26,7 @@ import Products from './pages/stock/Products';
 import StockCategories from './pages/stock/Categories';
 import Stock from './pages/stock/Stock';
 import Supplies from './pages/stock/Supplies';
+import SupplyNew from './pages/stock/SupplyNew';
 import Suppliers from './pages/stock/Suppliers';
 import Writeoffs from './pages/stock/Writeoffs';
 import Inventory from './pages/stock/Inventory';
@@ -84,6 +85,7 @@ function AppRoutes() {
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/supplies" element={<ProtectedRoute><AppLayout><Supplies /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/supply/new" element={<ProtectedRoute><AppLayout><SupplyNew /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/suppliers" element={<ProtectedRoute><AppLayout><Suppliers /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/writeoffs" element={<ProtectedRoute><AppLayout><Writeoffs /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/inventory" element={<ProtectedRoute><AppLayout><Inventory /></AppLayout></ProtectedRoute>} />

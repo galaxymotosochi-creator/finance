@@ -119,12 +119,12 @@ export default function Suppliers() {
               const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
               return (
                 <tr key={s.id}>
-                  <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
-                  <td style={{whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
-                  <td style={{color:'#555'}}>{s.phone||'—'}</td>
-                  <td style={{color:'#555'}}><span className="prod-cat">{label}</span></td>
-                  <td style={{color:'#555'}}>{supplyCount}</td>
-                  <td style={{color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{s.phone||'—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}><span className="prod-cat">{label}</span></td>
+                  <td style={{textAlign:'left',color:'#555'}}>{supplyCount}</td>
+                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
