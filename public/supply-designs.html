@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 вариантов дизайна — Поставка</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f5f7; color: #111; padding: 30px; }
+h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -.02em; }
+.sub { font-size: .82rem; color: #999; margin-bottom: 24px; }
+.variants { display: flex; flex-direction: column; gap: 24px; }
+
+.variant { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid rgba(0,0,0,.06); }
+.variant-label { font-size: .72rem; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+
+/* ====== VARIANT 1: Clean table ====== */
+.v1-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.v1-table th { text-align: left; padding: .4rem .5rem .4rem 0; font-size: .65rem; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: .3px; border-bottom: 1.5px solid #e0e0e0; }
+.v1-table th:nth-child(2), .v1-table td:nth-child(2) { text-align: center; width: 70px; }
+.v1-table th:nth-child(3), .v1-table td:nth-child(3) { width: 80px; text-align: right; }
+.v1-table th:last-child, .v1-table td:last-child { width: 24px; text-align: center; }
+.v1-table td { padding: .45rem .5rem .45rem 0; border-bottom: 1px solid #eee; font-weight: 500; }
+.v1-table td:nth-child(3) { font-weight: 600; }
+.v1-table tr:last-child td { border-bottom: none; }
+.v1-table .del { color: #ccc; cursor: pointer; transition: color .12s; font-size: .9rem; background: none; border: none; }
+.v1-table .del:hover { color: #dc2626; }
+
+/* ====== VARIANT 2: Cards ====== */
+.v2-item { display: flex; align-items: center; gap: .5rem; padding: .5rem .65rem; background: #f8f8f8; border-radius: 10px; margin-bottom: 4px; }
+.v2-name { flex: 1; font-weight: 500; font-size: .8rem; }
+.v2-qty { width: 70px; text-align: center; color: #888; font-size: .8rem; }
+.v2-sum { width: 80px; text-align: right; font-weight: 600; font-size: .8rem; }
+.v2-del { width: 24px; font-size: .85rem; color: #ccc; cursor: pointer; text-align: center; background: none; border: none; }
+.v2-del:hover { color: #dc2626; }
+
+/* ====== VARIANT 3: Minimal ====== */
+.v3-item { display: flex; align-items: baseline; gap: .5rem; padding: .55rem .25rem; border-bottom: 1px solid #f0f0f0; }
+.v3-item:last-child { border-bottom: none; }
+.v3-name { flex: 1; font-weight: 500; font-size: .82rem; }
+.v3-qty { width: 70px; text-align: center; color: #888; font-size: .82rem; }
+.v3-sum { width: 80px; text-align: right; font-weight: 600; font-size: .82rem; }
+.v3-del { width: 24px; text-align: center; color: #ccc; cursor: pointer; background: none; border: none; font-size: .85rem; }
+.v3-del:hover { color: #dc2626; }
+
+/* ====== VARIANT 4: Dark header ====== */
+.v4-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .82rem; border-radius: 10px; overflow: hidden; }
+.v4-table thead { background: #111; }
+.v4-table th { padding: .5rem .5rem .5rem .75rem; font-size: .68rem; font-weight: 600; color: rgba(255,255,255,.85); text-align: left; }
+.v4-table th:nth-child(2), .v4-table td:nth-child(2) { text-align: center; width: 70px; }
+.v4-table th:nth-child(3), .v4-table td:nth-child(3) { width: 80px; text-align: right; }
+.v4-table th:last-child, .v4-table td:last-child { width: 24px; text-align: center; }
+.v4-table td { padding: .45rem .5rem .45rem .75rem; background: #fff; border-bottom: 1px solid #f0f0f0; font-weight: 500; }
+.v4-table td:nth-child(3) { font-weight: 600; }
+.v4-table .del { color: #ccc; cursor: pointer; background: none; border: none; font-size: .9rem; }
+.v4-table .del:hover { color: #dc2626; }
+
+/* ====== VARIANT 5: Compact ====== */
+.v5-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.v5-table th { padding: .3rem .4rem .3rem .4rem; font-size: .62rem; font-weight: 600; color: #999; text-align: left; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+.v5-table th:nth-child(2), .v5-table td:nth-child(2) { text-align: center; width: 50px; }
+.v5-table th:nth-child(3), .v5-table td:nth-child(3) { width: 65px; text-align: right; }
+.v5-table th:last-child, .v5-table td:last-child { width: 18px; text-align: center; }
+.v5-table td { padding: .3rem .4rem .3rem .4rem; border-bottom: 1px solid #eee; font-weight: 500; white-space: nowrap; }
+.v5-table td:nth-child(3) { font-weight: 600; }
+.v5-table tr:hover td { background: #fafafa; }
+.v5-table .del { color: #ddd; cursor: pointer; background: none; border: none; font-size: .78rem; }
+.v5-table .del:hover { color: #dc2626; }
+</style>
+</head>
+<body>
+<h1>5 вариантов дизайна</h1>
+<p class="sub">Таблица добавленных товаров в модалке поставки</p>
+
+<div class="variants">
+
+  <!-- Вариант 1: Классическая таблица -->
+  <div class="variant">
+    <div class="variant-label">#1 Классическая таблица</div>
+    <table class="v1-table">
+      <tr><th>Товар</th><th>Кол-во</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5 шт</td><td>17 500 ₽</td><td><button class="del">✕</button></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2 шт</td><td>21 000 ₽</td><td><button class="del">✕</button></td></tr>
+      <tr><td>Колодки тормозные Brembo</td><td>10 шт</td><td>18 000 ₽</td><td><button class="del">✕</button></td></tr>
+    </table>
+  </div>
+
+  <!-- Вариант 2: Карточки -->
+  <div class="variant">
+    <div class="variant-label">#2 Карточки (плашки)</div>
+    <div class="v2-item"><span class="v2-name">Масло Motul 10W40</span><span class="v2-qty">5 шт</span><span class="v2-sum">17 500 ₽</span><button class="v2-del">✕</button></div>
+    <div class="v2-item"><span class="v2-name">Шлем LS2 FF320</span><span class="v2-qty">2 шт</span><span class="v2-sum">21 000 ₽</span><button class="v2-del">✕</button></div>
+    <div class="v2-item"><span class="v2-name">Колодки тормозные Brembo</span><span class="v2-qty">10 шт</span><span class="v2-sum">18 000 ₽</span><button class="v2-del">✕</button></div>
+  </div>
+
+  <!-- Вариант 3: Минимал -->
+  <div class="variant">
+    <div class="variant-label">#3 Минимализм</div>
+    <div style="marginBottom:4px;display:flex;gap:.5rem;padding:.25rem;font-size:.65rem;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:.3px">
+      <span style="flex:1">Товар</span>
+      <span style="width:70px;text-align:center">Кол-во</span>
+      <span style="width:80px;text-align:right">Сумма</span>
+      <span style="width:24px"></span>
+    </div>
+    <div class="v3-item"><span class="v3-name">Масло Motul 10W40</span><span class="v3-qty">5 шт</span><span class="v3-sum">17 500 ₽</span><button class="v3-del">✕</button></div>
+    <div class="v3-item"><span class="v3-name">Шлем LS2 FF320</span><span class="v3-qty">2 шт</span><span class="v3-sum">21 000 ₽</span><button class="v3-del">✕</button></div>
+    <div class="v3-item"><span class="v3-name">Колодки тормозные Brembo</span><span class="v3-qty">10 шт</span><span class="v3-sum">18 000 ₽</span><button class="v3-del">✕</button></div>
+  </div>
+
+  <!-- Вариант 4: Тёмный хедер -->
+  <div class="variant">
+    <div class="variant-label">#4 Тёмный заголовок</div>
+    <table class="v4-table">
+      <thead><tr><th>Товар</th><th>Кол-во</th><th>Сумма</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Масло Motul 10W40</td><td>5 шт</td><td>17 500 ₽</td><td><button class="del">✕</button></td></tr>
+        <tr><td>Шлем LS2 FF320</td><td>2 шт</td><td>21 000 ₽</td><td><button class="del">✕</button></td></tr>
+        <tr><td>Колодки тормозные Brembo</td><td>10 шт</td><td>18 000 ₽</td><td><button class="del">✕</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Вариант 5: Компакт -->
+  <div class="variant">
+    <div class="variant-label">#5 Компактный (как таблица Excel)</div>
+    <table class="v5-table">
+      <tr><th>Товар</th><th>Кол-во</th><th>Сумма</th><th></th></tr>
+      <tr><td>Масло Motul 10W40</td><td>5 шт</td><td>17 500 ₽</td><td><button class="del">✕</button></td></tr>
+      <tr><td>Шлем LS2 FF320</td><td>2 шт</td><td>21 000 ₽</td><td><button class="del">✕</button></td></tr>
+      <tr><td>Колодки тормозные Brembo</td><td>10 шт</td><td>18 000 ₽</td><td><button class="del">✕</button></td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
