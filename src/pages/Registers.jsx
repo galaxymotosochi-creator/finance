@@ -578,17 +578,19 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               </div>
               {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
-                <div style={{display:"flex",alignItems:"center",gap:"6px",marginTop:"4px",paddingLeft:"4px"}}>
-                  <span style={{fontSize:"10px",color:"#999",whiteSpace:"nowrap"}}>Исполнитель:</span>
-                  <span onClick={function(){
-                    var curEmpId = item.employee_id;
-                    var idx = employees.findIndex(function(e){return e.id === curEmpId;});
-                    var nextIdx = (idx + 1) % employees.length;
-                    var nextEmpId = employees[nextIdx].id;
-                    setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: nextEmpId} : x;});});
-                  }} style={{fontSize:"11px",fontWeight:600,color:"#333",cursor:"pointer",padding:"2px 8px",borderRadius:"100px",background:"#f0f0f0",whiteSpace:"nowrap"}}>
-                    {item.employee_id ? (employees.find(function(e){return e.id === item.employee_id;})?.name || "Кассир") : "Кассир"}
-                  </span>
+                <div style={{paddingTop:"6px",marginTop:"4px",borderTop:"1px solid #eee"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:"4px"}}>
+                    <span style={{fontSize:"12px",fontWeight:500,color:"#888",whiteSpace:"nowrap"}}>Исполнитель:</span>
+                    <span onClick={function(){
+                      var curEmpId = item.employee_id;
+                      var idx = employees.findIndex(function(e){return e.id === curEmpId;});
+                      var nextIdx = (idx + 1) % employees.length;
+                      var nextEmpId = employees[nextIdx].id;
+                      setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: nextEmpId} : x;});});
+                    }} style={{fontSize:"12px",fontWeight:500,color:"#888",cursor:"pointer",whiteSpace:"nowrap",borderBottom:"1px dashed #ddd"}}>
+                      {item.employee_id ? abbreviateName(employees.find(function(e){return e.id === item.employee_id;})?.name || "Кассир") : "Кассир"}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

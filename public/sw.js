@@ -1,6 +1,6 @@
 // Service Worker — AtlasPos офлайн-режим
 
-const CACHE = '888-finance-v2';
+const CACHE = '888-finance-v3';
 const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
