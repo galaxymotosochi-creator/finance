@@ -9,7 +9,7 @@ export default function Registers({ fullscreen }) {
   const [allCats, setAllCats] = useState([]);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(function(){try{return JSON.parse(localStorage.getItem('kassa_cart')||'[]')}catch(e){return []}});
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [payMode, setPayMode] = useState(null);
@@ -151,6 +151,9 @@ export default function Registers({ fullscreen }) {
       setLoading(false);
     })();
   }, [user]);
+
+  // Сохраняем корзину в localStorage при изменениях
+  useEffect(function(){ try { localStorage.setItem('kassa_cart', JSON.stringify(cart)); } catch(e){} }, [cart]);
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2000); return () => clearTimeout(t); } }, [toast]);
 
