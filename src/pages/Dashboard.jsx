@@ -182,7 +182,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div style={{textAlign:'right'}}>
-              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal).toLocaleString()} ₽</div>
+              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal||0).toLocaleString()} ₽</div>
               <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.35)'}}>в кассе</div>
             </div>
           </div>
@@ -284,7 +284,7 @@ export default function Dashboard() {
               <td style={{padding:'3px',color:'rgba(0,0,0,.3)',fontWeight:700}}>{i+1}</td>
               <td style={{padding:'3px'}}>{p.name}</td>
               <td style={{padding:'3px',textAlign:'left'}}>{p.qty}</td>
-              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{p.rev.toLocaleString()}</td>
+              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{(p.rev||0).toLocaleString()}</td>
             </tr>
           ))}</tbody>
         </table>}
@@ -309,7 +309,7 @@ export default function Dashboard() {
           <tbody>{d.debtors.slice(0,5).map((c,i)=>(
             <tr key={i}>
               <td style={{padding:'3px'}}>{c.name}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{c.debt.toLocaleString()} ₽</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{(c.debt||0).toLocaleString()} ₽</td>
             </tr>
           ))}</tbody>
         </table>}
@@ -321,23 +321,23 @@ export default function Dashboard() {
         <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{d.rev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{(d.rev||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round(d.rev*(period==='day'?0.8:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round((d.rev||0)*(period==='day'?0.8:1)).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'−20%':'—'}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round(d.rev*(period==='day'?7:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round((d.rev||0)*(period==='day'?7:1)).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+800%':'—'}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{d.rev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{(d.rev||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{(d.rev*12).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{((d.rev||0)*12).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
         </div>
       </div>
