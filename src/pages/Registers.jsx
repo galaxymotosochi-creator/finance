@@ -1057,10 +1057,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
               <button onClick={async () => {
                 setShowActions(false);
-                const start = new Date(activeShift.opened_at);
-                const now = new Date();
-                const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
-                setShiftTx(data || []);
+                const shiftId = activeShift?.id;
+                if (shiftId) {
+                  const { data } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', String(shiftId)).order('created_at', { ascending: false });
+                  setRegisterReceipts(data || []);
+                  setShowReceiptsModal(true);
+                } else {
+                  setToast('Смена не найдена');
+                }
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
               {heldReceipts.length > 0 && (
