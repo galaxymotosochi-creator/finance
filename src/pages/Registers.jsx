@@ -269,6 +269,10 @@ export default function Registers({ fullscreen }) {
     // Создаём чек
     var receiptId = null;
     var clientObj = clients.find(c => c.id === selectedClient);
+    // Формируем список товаров для items_json
+    var receiptItemsNames = cart.map(function(item){
+      return {name: item.name, qty: item.qty};
+    });
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: total, comment: receiptComment.trim() || null,
@@ -279,6 +283,7 @@ export default function Registers({ fullscreen }) {
       shift_id: activeShift?.id || null,
       cashier_name: activeShift?.current_cashier_name || activeShift?.cashier_name || userName || '',
       source: 'register',
+      items_json: receiptItemsNames,
     }).select('id').single();
     if (receiptErr || !newReceipt) {
       // Таблица receipts может ещё не существовать — продолжаем без чеков
@@ -1061,15 +1066,40 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 if (activeShift?.id) {
                   opts.shift_id = String(activeShift.id);
                 } else {
-                  // Если смены нет — показываем чеки за сегодня
                   var today = new Date().toISOString().split('T')[0];
                   opts.date = today;
                 }
                 var query = supabase.from('receipts').select('*').eq('user_id', user.id);
                 if (opts.shift_id) query = query.eq('shift_id', opts.shift_id);
                 if (opts.date) query = query.eq('date', opts.date);
-                var { data } = await query.order('created_at', { ascending: false });
-                setRegisterReceipts((data || []).filter(function(r){return r.total_amount > 0;}).map(function(r){return {amount:r.total_amount, description:'Продажа по чеку №'+r.receipt_number, created_at:r.created_at, status:r.status, type:'income', account_id:null};}));
+                var { data: receipts } = await query.order('created_at', { ascending: false });
+                if (!receipts || receipts.length === 0) { setRegisterReceipts([]); setShowReceiptsModal(true); return; }
+                // Загружаем транзакции за период для способов оплаты
+                var { data: txData } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', new Date(receipts[receipts.length-1]?.created_at || Date.now()).toISOString()).lte('created_at', new Date().toISOString()).order('created_at', { ascending: false });
+                var txList = txData || [];
+                setRegisterReceipts(receipts.filter(function(r){return r.total_amount > 0;}).map(function(r){
+                  // Товары из items_json
+                  var rItems = r.items_json || [];
+                  var itemsStr = rItems.map(function(it){
+                    return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name;
+                  }).join(', ');
+                  // Транзакции для способа оплаты (по номеру чека в описании)
+                  var rTx = txList.filter(function(tx){return (tx.description || '').indexOf('№' + r.receipt_number + ' ') >= 0 || (tx.description || '').indexOf('№' + r.receipt_number) === (tx.description || '').length - String(r.receipt_number).length - 1;});
+                  var acNames = [];
+                  rTx.forEach(function(tx){
+                    var ac = accounts.find(function(a){return a.id === tx.account_id;});
+                    if (ac && acNames.indexOf(ac.name) < 0) acNames.push(ac.name);
+                  });
+                  var time = r.created_at ? new Date(r.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '';
+                  return {
+                    receipt_number: r.receipt_number,
+                    items_str: itemsStr || '—',
+                    time_str: time,
+                    accounts_str: acNames.join(', ') || '—',
+                    status: r.status,
+                    total_amount: r.total_amount,
+                  };
+                }));
                 setShowReceiptsModal(true);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
@@ -1148,28 +1178,24 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   </tr>
                 </thead>
                 <tbody>
-                  {registerReceipts.map((t, i) => {
-                    const ac = accounts.find(a => a.id === t.account_id);
-                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
-                    return (
-                      <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
-                        <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{i + 1}</td>
-                        <td style={{padding:'10px 10px',textAlign:'left'}}>{t.description}</td>
-                        <td style={{padding:'10px 10px',color:'#999',textAlign:'left'}}>{time}</td>
-                        <td style={{padding:'10px 10px',textAlign:'left'}}>{ac?.name || '—'}</td>
-                        <td style={{padding:'10px 10px',textAlign:'left'}}>
-                          <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: t.status === 'debt' ? '#fef2f2' : t.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: t.status === 'debt' ? '#dc2626' : t.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{t.status === 'debt' ? 'Долг' : t.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
-                        </td>
-                        <td style={{padding:'10px 10px',textAlign:'left',fontWeight:700,color: t.type === 'income' ? '#16a34a' : '#dc2626'}}>{t.type === 'income' ? '+' : ''}{(t.amount || 0).toLocaleString()}</td>
-                      </tr>
-                    );
-                  })}
+                  {registerReceipts.map((r, i) => (
+                    <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
+                      <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{i + 1}</td>
+                      <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.items_str}</td>
+                      <td style={{padding:'10px 10px',textAlign:'left',color:'#999'}}>{r.time_str}</td>
+                      <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.accounts_str}</td>
+                      <td style={{padding:'10px 10px',textAlign:'left'}}>
+                        <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
+                      </td>
+                      <td style={{padding:'10px 10px',textAlign:'left',fontWeight:700}}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
             <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
               <span>Итого:</span>
-              <span>+{registerReceipts.filter(t => t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
+              <span>{registerReceipts.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
             <div className="modal-actions">
               <button className="btn btn-account-select" onClick={() => setShowReceiptsModal(false)}>Закрыть</button>
