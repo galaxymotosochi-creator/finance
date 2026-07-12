@@ -9,7 +9,7 @@ export default function Registers({ fullscreen }) {
   const [allCats, setAllCats] = useState([]);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
-  const [cart, setCart] = useState(function(){try{return JSON.parse(localStorage.getItem('kassa_cart')||'[]')}catch(e){return []}});
+  const [cart, setCart] = useState(function(){try{var c=JSON.parse(localStorage.getItem('kassa_cart')||'[]');return Array.isArray(c)?c.map(function(x){if(!x.type)x.type='product';return x;}):[]}catch(e){return []}});
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [payMode, setPayMode] = useState(null);
@@ -134,20 +134,7 @@ export default function Registers({ fullscreen }) {
         setShowOpenShift(true);
       }
       // Загружаем остатки склада
-      Promise.all([
-        supabase.from('supplies').select('items').eq('user_id', user.id),
-        supabase.from('writeoffs').select('items').eq('user_id', user.id),
-      ]).then(function(rr){
-        var sm = {};
-        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
-          if (!sm[it.prodId]) sm[it.prodId] = 0;
-          sm[it.prodId] += it.qty || 0;
-        });});
-        (rr[1].data||[]).forEach(function(wo){ (wo.items||[]).forEach(function(it){
-          if (sm[it.prodId]) sm[it.prodId] -= it.qty || 0;
-        });});
-        setStockMap(sm);
-      });
+      recalcStockMap();
       setLoading(false);
     })();
   }, [user]);
@@ -199,7 +186,7 @@ export default function Registers({ fullscreen }) {
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
       const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, ...comboData }];
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, type: p.type, ...comboData }];
     });
   };
 
@@ -217,6 +204,32 @@ export default function Registers({ fullscreen }) {
   const totalOriginal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+
+  // Пересчёт остатков склада из supplies (items) и writeoffs (product_id/quantity)
+  const recalcStockMap = function(){
+    Promise.all([
+      supabase.from('supplies').select('items').eq('user_id', user.id),
+      supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id),
+    ]).then(function(rr){
+      var sm = {};
+      // Приходы: items — массив {prodId, qty}
+      (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
+        if (it.prodId) {
+          if (!sm[it.prodId]) sm[it.prodId] = 0;
+          sm[it.prodId] += it.qty || 0;
+        }
+      });});
+      // Списания: каждая строка — {product_id, quantity}
+      (rr[1].data||[]).forEach(function(wo){
+        var pid = wo.product_id;
+        if (pid != null) {
+          if (!sm[pid]) sm[pid] = 0;
+          sm[pid] -= wo.quantity || 0;
+        }
+      });
+      setStockMap(sm);
+    });
+  };
 
   const openPay = () => {
     if (!cart.length) return;
@@ -372,40 +385,38 @@ export default function Registers({ fullscreen }) {
     // Уменьшаем остатки на складе (только для оплаченных чеков)
     if (!payUnpaid) {
       try {
-        var woItems = [];
+        var woProducts = {};
         cart.forEach(function(item){
           if (item.combo_items && item.combo_items.length > 0) {
             item.combo_items.forEach(function(ci){
               var prod = products.find(function(p){ return p.id === ci.id; });
               if (prod && prod.type !== 'service') {
-                woItems.push({prodId:ci.id, name:ci.name, qty:ci.qty * item.qty, cost:0});
+                if (!woProducts[ci.id]) woProducts[ci.id] = 0;
+                woProducts[ci.id] += ci.qty * item.qty;
               }
             });
-          } else {
-            woItems.push({prodId:item.id, name:item.name, qty:item.qty, cost:0});
+          } else if (item.type !== 'service') {
+            if (!woProducts[item.id]) woProducts[item.id] = 0;
+            woProducts[item.id] += item.qty;
           }
         });
-        await supabase.from('writeoffs').insert({
-          id: Date.now(), user_id: user.id, name: 'Продажа по чеку №' + receiptNum,
-          items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),
-          reason: 'Продажа', date: date, created_at: new Date().toISOString()
+        // Вставляем отдельную строку для каждого товара
+        var woInserts = Object.keys(woProducts).map(function(prodId, i){
+          return {
+            id: Date.now() + i,
+            user_id: user.id,
+            product_id: parseInt(prodId),
+            quantity: woProducts[prodId],
+            reason: 'Продажа по чеку №' + receiptNum,
+            date: date,
+          };
         });
+        if (woInserts.length > 0) {
+          await supabase.from('writeoffs').insert(woInserts);
+        }
       } catch(e) { console.error('Ошибка списания со склада:', e); }
-      // Обновляем stockMap после списания
-      Promise.all([
-        supabase.from('supplies').select('items').eq('user_id', user.id),
-        supabase.from('writeoffs').select('items').eq('user_id', user.id),
-      ]).then(function(rr){
-        var sm = {};
-        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
-          if (!sm[it.prodId]) sm[it.prodId] = 0;
-          sm[it.prodId] += it.qty || 0;
-        });});
-        (rr[1].data||[]).forEach(function(wo){ (wo.items||[]).forEach(function(it){
-          if (sm[it.prodId]) sm[it.prodId] -= it.qty || 0;
-        });});
-        setStockMap(sm);
-      });
+      // Обновляем stockMap после списания пересчётом из БД
+      recalcStockMap();
     }
     
     setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
@@ -707,9 +718,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 {p.cat && <div style={{fontSize:'10px',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'#999'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
                 <span style={{fontSize:'16px',fontWeight:800,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
-                {(p.type!=='service'&&(stockMap[p.id]||0)<=0) ? null : (
-                  <span style={{fontSize:'10px',fontWeight:500,color:'#16a34a'}}>остаток: {stockMap[p.id] || 0}</span>
-                )}
+                {p.type !== 'service' ? (
+                  <span style={{fontSize:'10px',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
+                ) : null}
               </div>
               </div>
             </div>
