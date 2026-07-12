@@ -235,7 +235,7 @@ export default function Registers({ fullscreen }) {
     if (cats) {
       saleCatId = cats.id;
     } else {
-      const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Доход от продаж', type: 'income' }).select('id').single();
+      const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Доход от продаж', type: 'income' });
       if (newCat) saleCatId = newCat.id;
     }
 
@@ -485,7 +485,7 @@ export default function Registers({ fullscreen }) {
     const bal = parseFloat(openShiftBal) || 0;
     const { data, error } = await supabase.from('shifts').insert({
       user_id: user.id, opening_balance: bal, status: 'open', cashier_name: openShiftCashier.trim() || userName,
-    }).select().single();
+    });
     if (error) return setToast('Ошибка: ' + error.message);
     if (data) setActiveShift(data);
     setShowOpenShift(false);

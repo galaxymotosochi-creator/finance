@@ -53,7 +53,8 @@ class PostgrestFilter {
   select(cols) {
     const c = this._clone();
     c.selectCols = cols || '*';
-    c.method = 'GET';
+    // Не меняем метод для POST (insert/upsert) — оставляем как есть
+    if (c.method !== 'POST') c.method = 'GET';
     return c;
   }
 
