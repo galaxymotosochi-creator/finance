@@ -1187,7 +1187,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       <td style={{textAlign:'left'}}>
                         <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                       </td>
-                      <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount).toLocaleString()} ₽</span></td>
+                      <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount || 0).toLocaleString()} ₽</span></td>
                     </tr>
                   ))}
                 </tbody>

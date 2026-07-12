@@ -62,7 +62,7 @@ export default function Dashboard() {
         const reserve = acctList.filter(a=>a.name==='Резерв').reduce((s,a)=>s+a.balance,0);
         const sm={};
         (supRaw||[]).forEach(sp=>(sp.items||[]).forEach(it=>{if(!sm[it.prodId])sm[it.prodId]={qty:0,cost:0};sm[it.prodId].qty+=it.qty||0;sm[it.prodId].cost+=(it.cost||0)*(it.qty||0);}));
-        (wo||[]).forEach(w=>(w.items||[]).forEach(it=>{if(sm[it.prodId])sm[it.prodId].qty-=it.qty||0;}));
+        (wo||[]).forEach(function(w){var pid=w.product_id;if(pid!=null&&sm[pid])sm[pid].qty-=w.quantity||0;});
         const deficit = (prods||[]).filter(p=>p.type!=='service'&&p.type!=='combo'&&p.min_qty>0).map(p=>({name:p.name,qty:sm[p.id]?.qty||0,min:p.min_qty,need:Math.max(0,p.min_qty-(sm[p.id]?.qty||0))})).filter(p=>p.qty<p.min).sort((a,b)=>(a.qty/a.min)-(b.qty/b.min)).slice(0,5);
         const sc = Object.values(sm).reduce((s,v)=>s+v.cost,0);
         const sr = (prods||[]).reduce((s,p)=>s+((sm[p.id]?.qty||0)*(p.price||0)),0);
@@ -151,11 +151,11 @@ export default function Dashboard() {
       {/* TOP 3 */}
       <div style={{display:'flex',gap:'10px',marginBottom:'12px'}}>
         <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{d.salesRev.toLocaleString()} ₽</div></div>
+          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{Number(d.salesRev||0).toLocaleString()} ₽</div></div>
         <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{d.cogs.toLocaleString()} ₽</div></div>
+          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{Number(d.cogs||0).toLocaleString()} ₽</div></div>
         <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{d.totalCash.toLocaleString()} ₽</div></div>
+          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{Number(d.totalCash||0).toLocaleString()} ₽</div></div>
       </div>
 
       {/* Счета | Долги */}
@@ -163,9 +163,9 @@ export default function Dashboard() {
         <div style={st}>Счета | Долги</div>
         <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
           {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
-            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{a.balance.toLocaleString()} ₽</b></span>;
+            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{Number(a.balance||0).toLocaleString()} ₽</b></span>;
           }):<span>Нет счетов</span>}
-          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{d.debt.toLocaleString()} ₽</b></span>
+          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{Number(d.debt||0).toLocaleString()} ₽</b></span>
         </div>
       </div>
 
@@ -230,8 +230,8 @@ export default function Dashboard() {
           ))}</tbody>
         </table>
         <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)',marginTop:'6px'}}>
-          <span>По закупке: <b>{d.stockCost.toLocaleString()} ₽</b></span>
-          <span>В продаже: <b>{d.stockRetail.toLocaleString()} ₽</b></span>
+          <span>По закупке: <b>{Number(d.stockCost||0).toLocaleString()} ₽</b></span>
+          <span>В продаже: <b>{Number(d.stockRetail||0).toLocaleString()} ₽</b></span>
         </div>
       </div>}
 
@@ -245,7 +245,7 @@ export default function Dashboard() {
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{d.monthRev.toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{Number(d.monthRev||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.monthRev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
           <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль план</div>
@@ -253,7 +253,7 @@ export default function Dashboard() {
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
           <div style={{flex:1,background:d.monthProfit>=0?'#f0fdf4':'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{d.monthProfit.toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{Number(d.monthProfit||0).toLocaleString()} ₽</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':''}</div></div>
         </div>
       </div>
@@ -267,7 +267,7 @@ export default function Dashboard() {
             <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.sold}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Ср.чек</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.avgCheck.toLocaleString()} ₽</div></div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Number(d.avgCheck||0).toLocaleString()} ₽</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Покуп.</div>
             <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.buyers}</div></div>
