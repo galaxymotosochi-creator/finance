@@ -1057,14 +1057,20 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
               <button onClick={async () => {
                 setShowActions(false);
-                const shiftId = activeShift?.id;
-                if (shiftId) {
-                  const { data } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', String(shiftId)).order('created_at', { ascending: false });
-                  setRegisterReceipts(data || []);
-                  setShowReceiptsModal(true);
+                var opts = { user_id: user.id };
+                if (activeShift?.id) {
+                  opts.shift_id = String(activeShift.id);
                 } else {
-                  setToast('Смена не найдена');
+                  // Если смены нет — показываем чеки за сегодня
+                  var today = new Date().toISOString().split('T')[0];
+                  opts.date = today;
                 }
+                var query = supabase.from('receipts').select('*').eq('user_id', user.id);
+                if (opts.shift_id) query = query.eq('shift_id', opts.shift_id);
+                if (opts.date) query = query.eq('date', opts.date);
+                var { data } = await query.order('created_at', { ascending: false });
+                setRegisterReceipts(data || []);
+                setShowReceiptsModal(true);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
               {heldReceipts.length > 0 && (
@@ -1124,9 +1130,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
 
       {/* Чеки за смену */}
       {showReceiptsModal && !showCloseShift && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setRegisterReceipts([]); } }}>
+        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setShowReceiptsModal(false); } }}>
           <div className="modal-box" style={{maxWidth:'520px'}}>
-            <button className="modal-close" onClick={() => setRegisterReceipts([])}>&times;</button>
+            <button className="modal-close" onClick={() => setShowReceiptsModal(false)}>&times;</button>
             <h2>Чеки за смену</h2>
             <div className="sub" style={{marginBottom:'12px'}}>Чеки, пробитые через кассу</div>
             <div style={{overflowY:'auto',maxHeight:'50vh'}}>
