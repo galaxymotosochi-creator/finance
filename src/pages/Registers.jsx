@@ -1069,7 +1069,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 if (opts.shift_id) query = query.eq('shift_id', opts.shift_id);
                 if (opts.date) query = query.eq('date', opts.date);
                 var { data } = await query.order('created_at', { ascending: false });
-                setRegisterReceipts(data || []);
+                setRegisterReceipts((data || []).filter(function(r){return r.total_amount > 0;}).map(function(r){return {amount:r.total_amount, description:'Продажа по чеку №'+r.receipt_number, created_at:r.created_at, status:r.status, type:'income', account_id:null};}));
                 setShowReceiptsModal(true);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
