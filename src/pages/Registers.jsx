@@ -1165,29 +1165,29 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <button className="modal-close" onClick={() => setShowReceiptsModal(false)}>&times;</button>
             <h2>Чеки за смену</h2>
             <div className="sub" style={{marginBottom:'12px'}}>Чеки, пробитые через кассу</div>
-            <div style={{overflowY:'auto',maxHeight:'50vh'}}>
-              <table style={{width:'100%',borderCollapse:'collapse',fontSize:'13px'}}>
+            <div className="product-table" style={{overflowY:'auto',maxHeight:'50vh'}}>
+              <table>
                 <thead>
-                  <tr style={{borderBottom:'1px solid #eee'}}>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Чек</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Товар</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Время</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Способ</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Статус</th>
-                    <th style={{padding:'8px 10px',fontSize:'11px',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.04em',background:'#fafafa',textAlign:'left'}}>Сумма</th>
+                  <tr>
+                    <th style={{textAlign:'left'}}>Чек</th>
+                    <th style={{textAlign:'left'}}>Товар</th>
+                    <th style={{textAlign:'left'}}>Время</th>
+                    <th style={{textAlign:'left'}}>Способ</th>
+                    <th style={{textAlign:'left'}}>Статус</th>
+                    <th style={{textAlign:'left'}}>Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
                   {registerReceipts.map((r, i) => (
-                    <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
-                      <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{r.receipt_number}</td>
-                      <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.items_str}</td>
-                      <td style={{padding:'10px 10px',textAlign:'left',color:'#999'}}>{r.time_str}</td>
-                      <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.accounts_str}</td>
-                      <td style={{padding:'10px 10px',textAlign:'left'}}>
-                        <span style={{fontSize:'11px',fontWeight:600,padding:'2px 8px',borderRadius:'100px',background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
+                    <tr key={i}>
+                      <td style={{textAlign:'left',fontWeight:600}}>{r.receipt_number}</td>
+                      <td style={{textAlign:'left'}}><span className="prod-name">{r.items_str}</span></td>
+                      <td style={{textAlign:'left'}}>{r.time_str}</td>
+                      <td style={{textAlign:'left'}}>{r.accounts_str}</td>
+                      <td style={{textAlign:'left'}}>
+                        <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                       </td>
-                      <td style={{padding:'10px 10px',textAlign:'left',fontWeight:700}}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount).toLocaleString()} ₽</span></td>
                     </tr>
                   ))}
                 </tbody>
