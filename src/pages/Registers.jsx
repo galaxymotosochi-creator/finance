@@ -1180,7 +1180,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <tbody>
                   {registerReceipts.map((r, i) => (
                     <tr key={i} style={{borderBottom:'1px solid #f5f5f5'}}>
-                      <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{i + 1}</td>
+                      <td style={{padding:'10px 10px',fontWeight:600,textAlign:'left'}}>{r.receipt_number}</td>
                       <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.items_str}</td>
                       <td style={{padding:'10px 10px',textAlign:'left',color:'#999'}}>{r.time_str}</td>
                       <td style={{padding:'10px 10px',textAlign:'left',fontSize:'12px',color:'#555'}}>{r.accounts_str}</td>
