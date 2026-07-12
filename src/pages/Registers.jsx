@@ -21,6 +21,10 @@ export default function Registers({ fullscreen }) {
   const [showAddClient, setShowAddClient] = useState(false);
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [newClientBirthday, setNewClientBirthday] = useState('');
+  const [newClientNote1, setNewClientNote1] = useState('');
+  const [newClientNote2, setNewClientNote2] = useState('');
   const [clientSearch, setClientSearch] = useState('');
   const [clientDrop, setClientDrop] = useState(false);
   const [openShiftCashier, setOpenShiftCashier] = useState('');
@@ -44,8 +48,11 @@ export default function Registers({ fullscreen }) {
   const [showActions, setShowActions] = useState(false);
   const [editingCashier, setEditingCashier] = useState(false);
   const [displayCashierName, setDisplayCashierName] = useState('');
+  const [transferEmpId, setTransferEmpId] = useState('');
+  const [transferBalance, setTransferBalance] = useState('');
   const [showCloseShift, setShowCloseShift] = useState(false);
   const [closeFactBal, setCloseFactBal] = useState('');
+  const [showReceiptsModal, setShowReceiptsModal] = useState(false);
   const [shiftTx, setShiftTx] = useState([]);
   const [registerReceipts, setRegisterReceipts] = useState([]);
   const [receiptComment, setReceiptComment] = useState('');
@@ -53,6 +60,7 @@ export default function Registers({ fullscreen }) {
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [heldIndex, setHeldIndex] = useState(0);
   const [promos, setPromos] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [stockMap, setStockMap] = useState({});
   const [uploadingId, setUploadingId] = useState(null);
 
@@ -99,19 +107,21 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes, clRes, proRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes, proRes, empRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id),
+        supabase.from('employees').select('id, name').eq('user_id', user.id).order('name'),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
       if (aRes.data) setAccounts(aRes.data);
       if (clRes && clRes.data) setClients(clRes.data);
       if (proRes?.data) setPromos(proRes.data);
+      if (empRes?.data) setEmployees(empRes.data);
       if (sRes.data) {
         setActiveShift(sRes.data);
         // Синхронизируем имя кассира из настроек
@@ -186,7 +196,7 @@ export default function Registers({ fullscreen }) {
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
       const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, discount_percent: discountPct, ...comboData }];
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, ...comboData }];
     });
   };
 
@@ -230,8 +240,8 @@ export default function Registers({ fullscreen }) {
     }
 
     // Номер чека
-    const { count } = await supabase.from('receipts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
-    const receiptNum = (count || 0) + 1;
+    const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
+    const receiptNum = (maxReceipt?.receipt_number || 0) + 1;
 
     // Определяем статус чека
     var receiptStatus = 'paid';
@@ -249,12 +259,14 @@ export default function Registers({ fullscreen }) {
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       shift_id: activeShift?.id || null,
-      cashier_name: activeShift?.cashier_name || userName || '',
+      cashier_name: activeShift?.current_cashier_name || activeShift?.cashier_name || userName || '',
       source: 'register',
     }).select('id').single();
     if (receiptErr || !newReceipt) {
       // Таблица receipts может ещё не существовать — продолжаем без чеков
-      console.warn('Не удалось создать чек:', receiptErr?.message);
+      showToast('Не удалось создать чек: ' + (receiptErr?.message || ''), 'error');
+      setProcessingPay(false);
+      return;
     } else {
       receiptId = newReceipt.id;
       // Сохраняем товары чека
@@ -266,7 +278,7 @@ export default function Registers({ fullscreen }) {
           price: item.price, total: (item.final_price || item.price) * item.qty,
           discount_percent: item.discount_percent || 0,
           discount_amount: ((item.price - (item.final_price || item.price)) * item.qty),
-          promo_id: item.promo_id || null,
+          promo_id: item.promo_id || null, employee_id: item.employee_id || null,
         };
         if (item.combo_items && item.combo_items.length > 0) {
           entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
@@ -274,7 +286,7 @@ export default function Registers({ fullscreen }) {
         receiptItems.push(entry);
       });
       var { error: itemsErr } = await supabase.from('receipt_items').insert(receiptItems);
-      if (itemsErr) console.warn('Не удалось сохранить товары чека:', itemsErr.message);
+      if (itemsErr) showToast('Не удалось сохранить товары чека: ' + itemsErr.message, 'error');
     }
 
     if (payUnpaid) {
@@ -564,6 +576,21 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
                 )}
               </div>
+              {/* Строка выбора сотрудника */}
+              {employees.length > 0 && (
+                <div style={{display:"flex",alignItems:"center",gap:"6px",marginTop:"4px",paddingLeft:"4px"}}>
+                  <span style={{fontSize:"10px",color:"#999",whiteSpace:"nowrap"}}>Исполнитель:</span>
+                  <span onClick={function(){
+                    var curEmpId = item.employee_id;
+                    var idx = employees.findIndex(function(e){return e.id === curEmpId;});
+                    var nextIdx = (idx + 1) % employees.length;
+                    var nextEmpId = employees[nextIdx].id;
+                    setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: nextEmpId} : x;});});
+                  }} style={{fontSize:"11px",fontWeight:600,color:"#333",cursor:"pointer",padding:"2px 8px",borderRadius:"100px",background:"#f0f0f0",whiteSpace:"nowrap"}}>
+                    {item.employee_id ? (employees.find(function(e){return e.id === item.employee_id;})?.name || "Кассир") : "Кассир"}
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -817,7 +844,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   {clientDrop && (
                     <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
-                        <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
+                        <div key={c.id} onPointerDown={function(e){e.preventDefault(); setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
                           style={{padding:'8px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
                           onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
                           onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>
@@ -828,7 +855,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     </div>
                   )}
                 </div>
-                <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setClientSearch(''); }} 
+                <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setNewClientEmail(''); setNewClientBirthday(''); setNewClientNote1(''); setNewClientNote2(''); setClientSearch(''); }} 
                   style={{padding:'8px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
               </div>
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
@@ -906,7 +933,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               e.preventDefault();
               if (!newClientName.trim()) return setToast('⚠️ Введите имя');
               var { data, error } = await supabase.from('clients').insert({
-                user_id: user.id, name: newClientName.trim(), phone: newClientPhone.trim(),
+                user_id: user.id, name: newClientName.trim(), phone: newClientPhone.trim(), email: newClientEmail.trim() || null, birthday: newClientBirthday || null, comment: (newClientNote1||newClientNote2) ? JSON.stringify({n1:newClientNote1.trim(), n2:newClientNote2.trim()}) : null,
               }).select();
               if (error) return setToast('' + error.message);
               // Обновляем список клиентов
@@ -924,6 +951,22 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div className="form-group">
                 <label>Телефон</label>
                 <input type="text" value={newClientPhone} onChange={e => setNewClientPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" value={newClientEmail} onChange={e => setNewClientEmail(e.target.value)} placeholder="ivan@mail.ru" />
+              </div>
+              <div className="form-group">
+                <label>Дата рождения</label>
+                <input type="date" value={newClientBirthday} onChange={e => setNewClientBirthday(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Примечание 1</label>
+                <input type="text" value={newClientNote1} onChange={e => setNewClientNote1(e.target.value)} placeholder="Марка скутера, год и т.д." />
+              </div>
+              <div className="form-group">
+                <label>Примечание 2</label>
+                <input type="text" value={newClientNote2} onChange={e => setNewClientNote2(e.target.value)} placeholder="Номер ПТС, Telegram и т.д." />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-account-select">Добавить</button>
@@ -994,7 +1037,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
-              <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>👤 Сменить кассира</button>
+              <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
               {heldReceipts.length > 0 && (
                 <button onClick={()=>{setShowActions(false);setHeldIndex(0);setShowHoldModal(true)}} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Отложенные чеки ({heldReceipts.length})</button>
               )}
@@ -1006,31 +1049,52 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
       {/* Модалка смены кассира */}
       {editingCashier && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setEditingCashier(false); }}>
-          <div className="modal-box" style={{maxWidth:'340px'}}>
+          <div className="modal-box" style={{maxWidth:'380px'}}>
             <button className="modal-close" onClick={() => setEditingCashier(false)}>&times;</button>
             <h2>Сменить кассира</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Введите Фамилию и Имя</div>
-            <input type="text" value={displayCashierName || effectiveName || ''} onChange={e => setDisplayCashierName(e.target.value)}
-              placeholder="Фамилия Имя" autoFocus
-              style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+            <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'13px',lineHeight:1.7}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#888"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==="income"?1:-1)});}return Math.round(b).toLocaleString()})()} ₽</span></div>
+            </div>
+            <div className="form-group">
+              <label>Новый кассир</label>
+              <select value={transferEmpId} onChange={e=>setTransferEmpId(e.target.value)} style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box',background:'#fff'}}>
+                <option value="">— выберите сотрудника —</option>
+                {employees.map(function(e){return <option key={e.id} value={e.id}>{e.name}</option>})}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Остаток при передаче (?)</label>
+              <input type="number" value={transferBalance} onChange={e=>setTransferBalance(e.target.value)} min="0" step="0.01" style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+            </div>
             <div style={{marginTop:'12px',display:'flex',gap:'8px'}}>
               <button onClick={() => setEditingCashier(false)} style={{flex:1,padding:'10px',borderRadius:'8px',border:'1px solid #ddd',background:'#fff',fontSize:'13px',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
               <button onClick={async () => {
-                const name = displayCashierName.trim() || userName;
-                if (activeShift && name) {
-                  await supabase.from('shifts').update({ cashier_name: name }).eq('id', activeShift.id).eq('user_id', user.id);
-                  setActiveShift({...activeShift, cashier_name: name});
+                const newEmpId = transferEmpId;
+                if (!newEmpId) { showToast('Выберите сотрудника', 'warning'); return; }
+                if (!transferBalance && transferBalance !== '0') { showToast('Укажите остаток', 'warning'); return; }
+                const newEmp = employees.find(function(e){return e.id === newEmpId});
+                const newCashierName = newEmp?.name || 'Кассир';
+                const bal = parseFloat(transferBalance) || 0;
+                if (activeShift) {
+                  const changes = activeShift.cashier_changes || [];
+                  changes.push({ from: activeShift.current_cashier_name || activeShift.cashier_name || effectiveName, to: newCashierName, balance: bal, timestamp: new Date().toISOString() });
+                  await supabase.from('shifts').update({ current_cashier_name: newCashierName, cashier_changes: changes }).eq('id', activeShift.id).eq('user_id', user.id);
+                  setActiveShift({...activeShift, current_cashier_name: newCashierName, cashier_changes: changes});
                 }
-                setDisplayCashierName(name);
+                setDisplayCashierName(newCashierName);
+                setTransferEmpId('');
+                setTransferBalance('');
                 setEditingCashier(false);
-              }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Сохранить</button>
+                showToast('Кассир сменён: ' + newCashierName, 'success');
+              }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Передать смену</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Чеки за смену */}
-      {registerReceipts.length > 0 && !showCloseShift && (
+      {showReceiptsModal && !showCloseShift && (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setRegisterReceipts([]); } }}>
           <div className="modal-box" style={{maxWidth:'520px'}}>
             <button className="modal-close" onClick={() => setRegisterReceipts([])}>&times;</button>
@@ -1073,7 +1137,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <span>+{registerReceipts.filter(t => t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
             <div className="modal-actions">
-              <button className="btn btn-account-select" onClick={() => setRegisterReceipts([])}>Закрыть</button>
+              <button className="btn btn-account-select" onClick={() => setShowReceiptsModal(false)}>Закрыть</button>
             </div>
           </div>
         </div>

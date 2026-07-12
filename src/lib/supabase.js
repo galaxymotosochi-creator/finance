@@ -105,7 +105,8 @@ class PostgrestFilter {
         res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(this.body) });
         if (!res.ok) return { data: null, error: new Error('HTTP ' + res.status) };
         const d = await res.json();
-        return { data: Array.isArray(d) ? d : [d], error: null };
+        const pData = Array.isArray(d) ? d : [d];
+        return { data: this.limitVal === 1 ? (pData[0] || null) : pData, error: null };
       } else if (this.method === 'PATCH') {
         headers['Prefer'] = 'return=representation';
         res = await fetch(url, { method: 'PATCH', headers, body: JSON.stringify(this.body) });
