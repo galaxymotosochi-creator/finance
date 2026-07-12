@@ -278,7 +278,8 @@ export default function Registers({ fullscreen }) {
           price: item.price, total: (item.final_price || item.price) * item.qty,
           discount_percent: item.discount_percent || 0,
           discount_amount: ((item.price - (item.final_price || item.price)) * item.qty),
-          promo_id: item.promo_id || null, employee_id: item.employee_id || null,
+          promo_id: item.promo_id || null,
+          employee_id: item.employee_id || null,
         };
         if (item.combo_items && item.combo_items.length > 0) {
           entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
@@ -537,9 +538,12 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
 
       {/* Левая панель — чек */}
       <div style={{width:'280px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
-        {/* Шапка */}
+        {/* Шапка Вариант 3 — плашка с тенью */}
         <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
-          <span style={{fontSize:'12px',fontWeight:500,color:'#888',flex:1}}>Касса</span>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#ff6052',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#ffbd2e',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
+          <span style={{width:'5px',height:'5px',borderRadius:'50%',background:'#28c93f',display:'block',flexShrink:0,minWidth:'5px',minHeight:'5px'}}></span>
+          <span style={{fontSize:'12px',fontWeight:700,color:'#222',marginLeft:'8px',flex:1}}>Касса</span>
           <span style={{fontSize:'12px',fontWeight:500,color:'#888',cursor:'pointer'}} onClick={() => { if (activeShift) setEditingCashier(true); else setShowOpenShift(true); }} title="Нажмите чтобы изменить">
             {displayCashierName || activeShift?.cashier_name || userName}
           </span>
@@ -573,31 +577,13 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
                 )}
               </div>
-              {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
-                <div style={{paddingTop:"6px",marginTop:"4px",borderTop:"1px solid #eee"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:"4px"}}>
-                    <span style={{fontSize:"12px",fontWeight:500,color:"#888",whiteSpace:"nowrap"}}>Исполнитель:</span>
-                    <span onClick={function(){
-                      var curEmpId = item.employee_id;
-                      if (curEmpId === null) {
-                        // Первый тап — переключаем на первого сотрудника
-                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[0]?.id || null} : x;});});
-                      } else {
-                        // Ищем текущего и переключаем на следующего, после последнего — обратно на кассира
-                        var idx = employees.findIndex(function(e){return e.id === curEmpId;});
-                        var nextIdx = (idx + 1) % employees.length;
-                        if (nextIdx === 0) {
-                          // Вернулись к началу — показываем кассира
-                          setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: null} : x;});});
-                        } else {
-                          setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[nextIdx].id} : x;});});
-                        }
-                      }
-                    }} style={{fontSize:"12px",fontWeight:500,color:"#888",cursor:"pointer",whiteSpace:"nowrap",borderBottom:"1px dashed #ddd"}}>
-                      {item.employee_id ? abbreviateName(employees.find(function(e){return e.id === item.employee_id;})?.name || '') : effectiveName}
-                    </span>
-                  </div>
+                <div style={{fontSize:'11px',color:'#999',marginTop:'2px'}}>
+                  <span style={{color:'#888'}}>Исполнитель:</span>
+                  <span onClick={function(e){e.stopPropagation();var names=[null].concat(employees.map(function(e){return e.id}));var idx=names.indexOf(item.employee_id||null);var next=names[(idx+1)%names.length];setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,employee_id:next||null}:x})})}}
+                    style={{color:'var(--secondary)',cursor:'pointer',marginLeft:'4px'}}>
+                    {item.employee_id ? employees.find(function(e){return e.id===item.employee_id})?.name : (userName || 'Кассир')}
+                  </span>
                 </div>
               )}
             </div>
@@ -709,6 +695,15 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 )}
               </div>
               </div>
+              {employees.length > 0 && (
+                <div style={{fontSize:'11px',color:'#999',marginTop:'2px'}}>
+                  <span style={{color:'#888'}}>Исполнитель:</span>
+                  <span onClick={function(e){e.stopPropagation();var names=[null].concat(employees.map(function(e){return e.id}));var idx=names.indexOf(item.employee_id||null);var next=names[(idx+1)%names.length];setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,employee_id:next||null}:x})})}}
+                    style={{color:'var(--secondary)',cursor:'pointer',marginLeft:'4px'}}>
+                    {item.employee_id ? employees.find(function(e){return e.id===item.employee_id})?.name : (userName || 'Кассир')}
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -1056,14 +1051,16 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
       )}
 
       {/* Модалка смены кассира */}
-      {editingCashier && (
+      {editingCashier && (function(){
+        var cashRegBal = (function(){var b=0;var ca=accounts.find(function(a){return a.type==='cash_register'});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==='income'?1:-1)});}return Math.round(b)})();
+        return (
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setEditingCashier(false); }}>
           <div className="modal-box" style={{maxWidth:'380px'}}>
             <button className="modal-close" onClick={() => setEditingCashier(false)}>&times;</button>
             <h2>Сменить кассира</h2>
             <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'13px',lineHeight:1.7}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#888"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==="income"?1:-1)});}return Math.round(b).toLocaleString()})()} ₽</span></div>
+              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Остаток в кассе:</span><span style={{fontWeight:700}}>{cashRegBal}</span></div>
             </div>
             <div className="form-group">
               <label>Новый кассир</label>
@@ -1099,8 +1096,8 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Передать смену</button>
             </div>
           </div>
-        </div>
-      )}
+        </div>);
+      })()}
 
       {/* Чеки за смену */}
       {showReceiptsModal && !showCloseShift && (
@@ -1232,7 +1229,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         var cur = heldReceipts[heldIndex];
         if (!cur) return null;
         return (
-          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowHoldModal(false)}}}>
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowHoldModal(false)}}>
             <div className="modal-box" style={{maxWidth:'460px',maxHeight:'85vh',display:'flex',flexDirection:'column',gap:'14px'}}>
               <button className="modal-close" onClick={function(){setShowHoldModal(false)}}>&times;</button>
               
