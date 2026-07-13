@@ -180,6 +180,7 @@ export default function Receipts() {
               <th style={{ textAlign: 'left', paddingLeft: 0 }}>№ чека</th>
               <th style={{ textAlign: 'left' }}>Дата</th>
               <th style={{ textAlign: 'left' }}>Сумма</th>
+              <th style={{ textAlign: 'left' }}>Скидка</th>
               <th style={{ textAlign: 'left' }}>Статус</th>
               <th style={{ textAlign: 'left' }}>Клиент</th>
               <th style={{ textAlign: 'left' }}>Комментарий</th>
@@ -198,6 +199,11 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
+                  {parseInt(r.receipt_discount) > 0 || parseInt(r.discount_sum) > 0
+                    ? '-' + ((parseInt(r.receipt_discount)||0)+(parseInt(r.discount_sum)||0)).toLocaleString() + ' ₽'
+                    : '—'}
+                </td>
                 <td style={{ textAlign: 'left' }}>{STATUS_LABELS[r.status] || r.status}</td>
                 <td style={{ textAlign: 'left' }}>{r.client_name || '—'}</td>
                 <td style={{ textAlign: 'left',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>

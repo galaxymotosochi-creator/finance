@@ -65,6 +65,8 @@ export default function Registers({ fullscreen }) {
   const [employees, setEmployees] = useState([]);
   const [stockMap, setStockMap] = useState({});
   const [uploadingId, setUploadingId] = useState(null);
+  const [receiptDiscountPercent, setReceiptDiscountPercent] = useState(0);
+  const [showDiscountPanel, setShowDiscountPanel] = useState(false);
 
   const abbreviateName = (name) => {
     if (!name) return name;
@@ -206,6 +208,8 @@ export default function Registers({ fullscreen }) {
   const totalOriginal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  const receiptDiscountAmount = total > 0 ? Math.round(total * receiptDiscountPercent / 100) : 0;
+  const finalTotal = Math.max(0, total - receiptDiscountAmount);
 
   // Пересчёт остатков склада из supplies (items) и writeoffs (product_id/quantity)
   const recalcStockMap = function(){
@@ -275,8 +279,10 @@ export default function Registers({ fullscreen }) {
     });
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
-      date, total_amount: total, comment: receiptComment.trim() || null,
-      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0),
+      date, total_amount: finalTotal, comment: receiptComment.trim() || null,
+      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0),
+      receipt_discount: receiptDiscountAmount || 0,
+      receipt_discount_percent: receiptDiscountPercent || 0,
       status: receiptStatus,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
@@ -635,23 +641,77 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             )}
             {discountTotal > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#16a34a'}}>
-                <span>Скидка:</span>
+                <span>Скидка по акциям:</span>
                 <span>-{discountTotal.toLocaleString()} ₽</span>
               </div>
             )}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontSize:'12px',color:'#999'}}>К оплате:</span>
-              <span style={{fontSize:'20px',fontWeight:800}}>{total.toLocaleString()} ₽</span>
+              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                <span style={{fontSize:'20px',fontWeight:800,color:receiptDiscountPercent>0?'#999':'#111',textDecoration:receiptDiscountPercent>0?'line-through':'none'}}>{total.toLocaleString()} ₽</span>
+                {cart.length > 0 && (
+                  <span onClick={()=>{setShowDiscountPanel(!showDiscountPanel);if(showDiscountPanel){setReceiptDiscountPercent(0)}}}
+                    style={{fontSize:'16px',cursor:'pointer',color:receiptDiscountPercent>0?'#16a34a':'var(--muted)',fontWeight:700,userSelect:'none',transition:'.2s',position:'relative',top:'-2px',background:receiptDiscountPercent>0?'#f0fdf4':'transparent',borderRadius:'8px',padding:'2px 6px',lineHeight:1}}>−%</span>
+                )}
+              </div>
             </div>
+            {receiptDiscountPercent > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#16a34a'}}>
+                <span>Скидка на чек ({receiptDiscountPercent}%):</span>
+                <span>-{receiptDiscountAmount.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {receiptDiscountPercent > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:'12px',color:'#999',fontWeight:600}}>Итого со скидкой:</span>
+                <span style={{fontSize:'22px',fontWeight:800,color:'#16a34a'}}>{finalTotal.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {/* Выездная плашка скидки */}
+            {showDiscountPanel && (
+              <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'12px',marginTop:'-4px',border:'1px solid #eee'}}>
+                <div style={{fontSize:'11px',color:'#888',marginBottom:'8px',fontWeight:600}}>Скидка на весь чек</div>
+                <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'8px'}}>
+                  {[0,5,10,15,20,25].map(function(pct){
+                    return (
+                      <span key={pct} onClick={()=>setReceiptDiscountPercent(pct)}
+                        style={{
+                          padding:'6px 14px',borderRadius:'100px',fontSize:'13px',fontWeight:600,
+                          cursor:'pointer',transition:'.15s',fontFamily:'inherit',
+                          background:receiptDiscountPercent===pct?'#111':'#fff',
+                          color:receiptDiscountPercent===pct?'#fff':'#555',
+                          border:receiptDiscountPercent===pct?'none':'1.5px solid #ddd',
+                          userSelect:'none',
+                        }}>{pct === 0 ? 'Без' : pct + '%'}</span>
+                    );
+                  })}
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
+                  <span style={{fontSize:'12px',color:'#888'}}>Своя:</span>
+                  <input type="number" min="0" max="99" value={receiptDiscountPercent}
+                    onChange={function(e){
+                      var v = Math.min(99, Math.max(0, parseInt(e.target.value) || 0));
+                      setReceiptDiscountPercent(v);
+                    }}
+                    style={{width:'56px',padding:'6px 8px',border:'1.5px solid #ddd',borderRadius:'8px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
+                  <span style={{fontSize:'12px',color:'#888'}}>%</span>
+                  <span style={{fontSize:'12px',color:'#999',marginLeft:'auto'}}>−{receiptDiscountAmount.toLocaleString()} ₽</span>
+                </div>
+                <div style={{display:'Flex',alignItems:'center',justifyContent:'space-between',marginTop:'6px',paddingTop:'8px',borderTop:'1px solid #e8e8e8'}}>
+                  <span style={{fontSize:'13px',fontWeight:600}}>Итог:</span>
+                  <span style={{fontSize:'18px',fontWeight:800}}>{finalTotal.toLocaleString()} ₽</span>
+                </div>
+              </div>
+            )}
             <div style={{display:'flex',gap:'8px'}}>
               {cart.length > 0 && (
-                <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:total,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setToast('Чек отложен')}} style={{
+                <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setReceiptDiscountPercent(0);setShowDiscountPanel(false);setToast('Чек отложен')}} style={{
                   flex:1, padding:'13px', borderRadius:'100px', border:'1.5px solid #ddd',
                   background:'#fff', color:'#555', fontSize:'14px', fontWeight:600,
                   cursor:'pointer', fontFamily:'inherit',
                 }}>Отложить</button>
               )}
-              <button onClick={openPay} disabled={!cart.length} style={{
+              <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
                 flex:1, padding:'13px', borderRadius:'100px', border:'none',
                 background: cart.length ? '#ffdd2d' : '#ddd',
                 color: cart.length ? '#111' : '#fff', fontSize:'14px', fontWeight:700,
