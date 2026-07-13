@@ -264,8 +264,68 @@ app.get('/api/:table', auth, async (req, res) => {
   try {
     const { table } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
-    let sql = 'SELECT * FROM ' + table + ' WHERE user_id = $1';
-    const params = [req.user.id];
+    let sql = 'SELECT * FROM ' + table + ' WHERE 1=1';
+    const params = [];
+    var paramIdx = 1;
+    // Парсим PostgREST-style параметры: col=op.val (например status=eq.open)
+    const ops = ['neq','gte','lte','gt','lt','like','ilike','is','in','not','eq'];
+    Object.entries(req.query).forEach(function([col, val]){
+      if (col === 'order' || col === 'limit' || col === 'select') return;
+      if (typeof val === 'string') {
+        var dotIdx = val.indexOf('.');
+        if (dotIdx > 0) {
+          var op = val.slice(0, dotIdx);
+          var v = val.slice(dotIdx + 1);
+          if (ops.includes(op)) {
+            if (col === 'user_id') {
+              // user_id из токена, игнорируем переданный
+              return;
+            }
+            // Экранируем имя колонки
+            var cleanCol = col.replace(/[^a-z_]/gi, '');
+            if (op === 'eq') {
+              sql += ' AND ' + cleanCol + ' = $' + paramIdx;
+              params.push(v);
+            } else if (op === 'neq') {
+              sql += ' AND ' + cleanCol + ' != $' + paramIdx;
+              params.push(v);
+            } else if (op === 'gt') {
+              sql += ' AND ' + cleanCol + ' > $' + paramIdx;
+              params.push(v);
+            } else if (op === 'gte') {
+              sql += ' AND ' + cleanCol + ' >= $' + paramIdx;
+              params.push(v);
+            } else if (op === 'lt') {
+              sql += ' AND ' + cleanCol + ' < $' + paramIdx;
+              params.push(v);
+            } else if (op === 'lte') {
+              sql += ' AND ' + cleanCol + ' <= $' + paramIdx;
+              params.push(v);
+            } else if (op === 'like' || op === 'ilike') {
+              sql += ' AND ' + cleanCol + ' ' + op + ' $' + paramIdx;
+              params.push(v);
+            } else if (op === 'is') {
+              if (v === 'null') sql += ' AND ' + cleanCol + ' IS NULL';
+              else if (v === 'not.null') sql += ' AND ' + cleanCol + ' IS NOT NULL';
+            } else {
+              return;
+            }
+            paramIdx++;
+            return;
+          }
+        }
+      }
+      // Если не PostgREST — добавляем как прямой фильтр (col=val)
+      var cleanCol = col.replace(/[^a-z_]/gi, '');
+      if (cleanCol !== 'user_id') {
+        sql += ' AND ' + cleanCol + ' = $' + paramIdx;
+        params.push(val);
+      }
+    });
+    // Всегда фильтруем по user_id из токена
+    sql += ' AND user_id = $' + paramIdx;
+    params.push(req.user.id);
+    paramIdx++;
     const { order, limit } = req.query;
     if (order) {
       const col = order.split('.')[0];
