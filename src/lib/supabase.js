@@ -1,6 +1,6 @@
 // Custom Supabase-compatible client for AtlasPos — uses local API + PostgREST
 
-const API_URL = window.location.origin.includes('api.atlaspos.ru') ? '' : 'https://api.atlaspos.ru';
+const API_URL = '';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.anon';
 
 let currentSession = null;

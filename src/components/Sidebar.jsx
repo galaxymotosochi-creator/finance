@@ -156,7 +156,7 @@ export default function Sidebar() {
               return (
                 <a key={item.path}
                   className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
-                  onClick={() => navigate(item.path)}>
+                  onClick={() => item.path === '/kassa' ? window.open('/kassa', '_blank') : navigate(item.path)}>
                   <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                   {!collapsed && item.label}
                 </a>

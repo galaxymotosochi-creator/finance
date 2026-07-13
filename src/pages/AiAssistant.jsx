@@ -131,7 +131,7 @@ export default function AiAssistant() {
     setMessages(p => [...p, { role: 'user', text: userMsg, data: null }]);
     setLoading(true);
     try {
-      const res = await fetch('https://api.atlaspos.ru/api/ai/chat', {
+      const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

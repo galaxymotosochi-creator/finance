@@ -24,7 +24,7 @@ export default function Login() {
       setError('');
       window.history.replaceState({}, '', '/login');
 
-      fetch('https://api.atlaspos.ru/api/auth/yandex/login', {
+      fetch('/api/auth/yandex/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
