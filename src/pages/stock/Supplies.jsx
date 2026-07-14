@@ -310,11 +310,11 @@ const load = async () => {
               return (
                 <>
                 <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
-                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{i + 1}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{i + 1}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
-                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
-                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{totalItems(s)}</td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
@@ -323,11 +323,11 @@ const load = async () => {
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
-                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#555',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
+                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
                     <div style={{display:'inline-block',position:'relative',marginLeft:'4px'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -541,7 +541,7 @@ const load = async () => {
         <div id="toast" style={{
           position:'fixed', bottom:'1.5rem', left:'50%', transform:'translateX(-50%)',
           background:'#fff', border:'1px solid #e5e7eb', borderRadius:'.75rem',
-          padding:'.65rem 1.2rem', fontSize:'.85rem', color:'#333',
+          padding:'.65rem 1.2rem', fontSize:'.85rem', color:'#222',
           boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)', zIndex:9999,
           display:'flex', alignItems:'center', gap:'.5rem'
         }}>
