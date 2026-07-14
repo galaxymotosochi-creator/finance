@@ -352,9 +352,9 @@ const load = async () => {
                       <td colSpan="10" style={{padding:0}}>
                         <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
                           <div style={{display:"flex",color:"#222",fontWeight:400,paddingBottom:"6px",marginBottom:"8px",borderBottom:"1px solid #f0f0f0"}}>
-                            <span style={{flex:1}}>Товар</span>
-                            <span style={{width:"70px",textAlign:"center"}}>Кол-во</span>
-                            <span style={{width:"80px",textAlign:"right"}}>Сумма</span>
+                            <span style={{flex:1}}>ТОВАР</span>
+                            <span style={{width:"70px",textAlign:"center"}}>КОЛ-ВО</span>
+                            <span style={{width:"80px",textAlign:"right"}}>СУММА</span>
                           </div>
                           {items.map((it,i) => (
                             <div key={i} style={{display:"flex",fontSize:".78rem",color:"#222",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
@@ -410,9 +410,9 @@ const load = async () => {
               </div>
               <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
                 <div style={{display:'flex',gap:'.5rem',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
-                  <span style={{flex:1,textAlign:'left',paddingLeft:'.25rem'}}>Товар</span>
-                  <span style={{width:'70px',textAlign:'center'}}>Кол-во</span>
-                  <span style={{width:'80px',textAlign:'right'}}>Сумма</span>
+                  <span style={{flex:1,textAlign:'left',paddingLeft:'.25rem'}}>ТОВАР</span>
+                  <span style={{width:'70px',textAlign:'center'}}>КОЛ-ВО</span>
+                  <span style={{width:'80px',textAlign:'right'}}>СУММА</span>
                   <span style={{width:'1.5rem'}}></span>
                 </div>
                 <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
