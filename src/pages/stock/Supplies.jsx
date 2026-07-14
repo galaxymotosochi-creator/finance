@@ -285,16 +285,16 @@ const load = async () => {
         <table className="data-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th style={{textAlign:'left',width:'30px'}}>№</th>
-              <th style={{textAlign:'left'}}>Дата</th>
-              <th style={{textAlign:'left'}}>Поставщик</th>
-              <th style={{textAlign:'left'}}>Товары</th>
-              <th style={{textAlign:'left',width:'50px'}}>Кол-во</th>
-              <th style={{textAlign:'left'}}>Поставка</th>
-              <th style={{textAlign:'left'}}>Оплата</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
-              <th style={{textAlign:'left'}}>Задолж.</th>
-              <th style={{textAlign:'left'}}></th>
+              <th style={{color:'#222',textAlign:'left',width:'30px'}}>№</th>
+              <th style={{color:'#222',textAlign:'left'}}>Дата</th>
+              <th style={{color:'#222',textAlign:'left'}}>Поставщик</th>
+              <th style={{color:'#222',textAlign:'left'}}>Товары</th>
+              <th style={{color:'#222',textAlign:'left',width:'50px'}}>Кол-во</th>
+              <th style={{color:'#222',textAlign:'left'}}>Поставка</th>
+              <th style={{color:'#222',textAlign:'left'}}>Оплата</th>
+              <th style={{color:'#222',textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',textAlign:'left'}}>Задолж.</th>
+              <th style={{color:'#222',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplyTableBody">
