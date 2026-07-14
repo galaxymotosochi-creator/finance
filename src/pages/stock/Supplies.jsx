@@ -259,7 +259,7 @@ const load = async () => {
       s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     }
     const totalPaid = (s.payments||[]).reduce((sum,p) => sum + (parseFloat(p.amount)||0), 0);
-    await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay);
+    const { error: payUpdateErr } = await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay); if (payUpdateErr) { showToast('Ошибка обновления: ' + payUpdateErr.message); return; }
     await load(); setShowPay(null); setPaySplit(false); setSplitAmts({});
     showToast('Оплата проведена');
   };
