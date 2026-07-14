@@ -239,7 +239,7 @@ const load = async () => {
           user_id: user.id, account_id: ac.id, type: 'expense', amount: amt,
           description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
         });
-        if (!s.payments) s.payments = [];
+        if (!Array.isArray(s.payments)) s.payments = [];
         s.payments.push({ amount: amt, method: ac.name, date: new Date().toLocaleDateString('ru-RU') });
       }
     } else {
@@ -255,7 +255,7 @@ const load = async () => {
         user_id: user.id, account_id: acId, type: 'expense', amount: amount,
         description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
       });
-      if (!s.payments) s.payments = [];
+      if (!Array.isArray(s.payments)) s.payments = [];
       s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     }
     const totalPaid = (s.payments||[]).reduce((sum,p) => sum + (parseFloat(p.amount)||0), 0);
