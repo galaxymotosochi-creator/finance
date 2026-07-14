@@ -31,7 +31,7 @@ export default function Supplies() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [viewId, setViewId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
   const [showPay, setShowPay] = useState(false);
   const [payAccounts, setPayAccounts] = useState([]);
   const [payTxList, setPayTxList] = useState([]);
@@ -306,7 +306,8 @@ const load = async () => {
               const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
               const payColor = PAY_COLORS[payStatus]||'#dc2626';
               return (
-                <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setViewId(s.id)}} style={{cursor:'pointer'}}>
+                <>
+                <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
                   <td style={{textAlign:'left',color:'#555'}}>
                     <div className="prod-name">{s.invoice||'—'}</div>
                   </td>
@@ -331,7 +332,7 @@ const load = async () => {
                         dd.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
-                        <button onClick={() => setViewId(s.id)}>Детали</button>
+                        <button onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}>Детали</button>
                         <button onClick={() => edit(s.id)}>Редактировать</button>
                         <button onClick={() => copy(s.id)}>Копировать</button>
                         <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
@@ -339,67 +340,42 @@ const load = async () => {
                     </div>
                   </td>
                 </tr>
+              )
+                {expandedId === s.id && (() => {
+                  const items = s.items || [{name:'Товар',qty:s.qty||0,cost:s.cost||0}];
+                  const total = s.total || items.reduce((sum,it) => sum + it.qty*it.cost, 0);
+                  const payStatus = getPayStatus(s);
+                  return (
+                    <tr>
+                      <td colSpan="8" style={{padding:0}}>
+                        <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
+                          <div style={{display:"flex",fontSize:".78rem",color:"#999",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
+                            <span style={{flex:1}}>Товар</span>
+                            <span style={{width:"70px",textAlign:"center"}}>Кол-во</span>
+                            <span style={{width:"80px",textAlign:"right"}}>Сумма</span>
+                          </div>
+                          {items.map((it,i) => (
+                            <div key={i} style={{display:"flex",fontSize:".85rem",color:"#333",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
+                              <span style={{flex:1}}>{it.name}</span>
+                              <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
+                              <span style={{width:"80px",textAlign:"right",fontWeight:500}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
+                            </div>
+                          ))}
+                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".85rem",fontWeight:600,paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
+                            <span>Итого:</span>
+                            <span>{total.toLocaleString()} ₽</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })()}
+                </>
               );
             })}
           </tbody>
         </table>
       </div>
-
-      {/* Просмотр поставки */}
-      {viewId && (() => {
-        const s = supplies.find(x => x.id === viewId);
-        if (!s) return null;
-        const items = s.items || [{name:'Товар',qty:s.qty||0,cost:s.cost||0}];
-        const total = s.total || items.reduce((sum,it) => sum + it.qty*it.cost, 0);
-        const supSt = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
-        const payStatus = getPayStatus(s);
-        const paySt = PAY_LABELS[payStatus];
-        const supColor = SUPPLY_COLORS[s.status||'ordered']||'#2563eb';
-        const payColor = PAY_COLORS[payStatus]||'#dc2626';
-        return (
-          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setViewId(null)}}>
-            <div className="modal-box" style={{maxWidth:'480px'}}>
-              <button className="modal-close" onClick={() => setViewId(null)}>&times;</button>
-              <h2>Поставка №{s.invoice||''}</h2>
-              <div className="sub" style={{marginBottom:'.5rem'}}>
-                {s.supplier_name ? s.supplier_name + ' | ' : ''}{fmtDate(s.date)}
-              </div>
-              <div style={{display:'flex',gap:'.5rem',marginBottom:'.75rem'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{fontSize:'.75rem',color:'var(--muted)'}}>Поставка:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer'}} onClick={() => cycleStatus(s.id)}>{supSt}</span></div>
-                <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}><span style={{fontSize:'.75rem',color:'var(--muted)'}}>Оплата:</span> <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:payStatus!=='paid'?'pointer':'default'}} onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span></div>
-              </div>
-              <div style={{fontSize:'.78rem',fontWeight:600,color:'var(--muted)',marginBottom:'.35rem'}}>Товары</div>
-              {items.map((it,i) => (
-                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'.2rem 0',fontSize:'.82rem'}}>
-                  <span>{it.name}</span>
-                  <span>{it.qty} шт x {it.cost.toFixed(2)}</span>
-                  <span style={{fontWeight:500}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
-                </div>
-              ))}
-              <div style={{borderTop:'1px solid var(--border)',marginTop:'.35rem',paddingTop:'.35rem',display:'flex',justifyContent:'space-between',fontWeight:600,fontSize:'.85rem'}}>
-                <span>Итого:</span><span>{total.toFixed(2)}₽</span>
-              </div>
-              {(s.payments||[]).length > 0 && (
-                <div style={{marginTop:'.5rem',borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
-                  <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',marginBottom:'.25rem'}}>Платежи</div>
-                  {(s.payments||[]).map((p,i) => (
-                    <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:'.78rem',padding:'.1rem 0'}}>
-                      <span style={{color:'#555'}}>{fmtDate(p.date)}</span>
-                      <span style={{color:'#555'}}>{p.method}</span>
-                      <span style={{fontWeight:600,color:'#16a34a'}}>-{Number(p.amount).toLocaleString()} ₽</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {(s.paid||0) < total && (
-                <div style={{display:'flex',justifyContent:'space-between',color:'#dc2626',fontSize:'.82rem'}}>
-                  <span>Долг:</span><span>{(total-(s.paid||0)).toFixed(2)}₽</span>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
       {showModal && (
