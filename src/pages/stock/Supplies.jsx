@@ -331,6 +331,7 @@ const load = async () => {
                         dd.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
+                        <button onClick={() => setViewId(s.id)}>Детали</button>
                         <button onClick={() => edit(s.id)}>Редактировать</button>
                         <button onClick={() => copy(s.id)}>Копировать</button>
                         <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
