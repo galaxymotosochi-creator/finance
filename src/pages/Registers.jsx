@@ -47,7 +47,6 @@ export default function Registers({ fullscreen }) {
   const [payAmount, setPayAmount] = useState('');
   const [splitAmts, setSplitAmts] = useState({});
   const [processingPay, setProcessingPay] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
   const showToast = (msg) => { setToast(msg); };
   const [showActions, setShowActions] = useState(false);
   const [editingCashier, setEditingCashier] = useState(false);
@@ -1195,33 +1194,8 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 </div>
               </div>
               
-              {/* Детали */}
-              {showDetails && (
-                <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:"14px",padding:"12px 14px",marginBottom:"12px"}}>
-                  <div style={{display:"flex",fontSize:".78rem",color:"#999",marginBottom:"6px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
-                    <span style={{flex:1}}>Товар</span>
-                    <span style={{width:"60px",textAlign:"center"}}>Кол-во</span>
-                    <span style={{width:"70px",textAlign:"right"}}>Сумма</span>
-                  </div>
-                  {cart.map(item => (
-                    <div key={item.id} style={{display:"flex",fontSize:".85rem",color:"#333",padding:"3px 0",borderBottom:"1px solid #f8f8f8"}}>
-                      <span style={{flex:1}}>{item.name}</span>
-                      <span style={{width:"60px",textAlign:"center"}}>{item.qty}</span>
-                      <span style={{width:"70px",textAlign:"right",fontWeight:500}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</span>
-                    </div>
-                  ))}
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:".85rem",fontWeight:600,paddingTop:"6px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
-                    <span>Итого:</span>
-                    <span>{finalTotal.toLocaleString()} ₽</span>
-                  </div>
-                </div>
-              )}
-              <div style={{display:"flex",alignItems:"center",gap:"8px",justifyContent:"flex-end",marginTop:"auto"}}>
-                <button type="button" onClick={() => setShowDetails(!showDetails)}
-                  style={{padding:"8px 16px",border:"1.5px solid #eee",borderRadius:"100px",fontSize:".76rem",fontWeight:500,cursor:"pointer",fontFamily:"inherit",background:"#fff",color:"#444"}}>Детали</button>
-                <button type="button" onClick={processPay} disabled={!selectedClient}
-                  style={{padding:"14px 28px",border:"none",borderRadius:"100px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background:"#ffdd2d",color:"#222",opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
-              </div>
+              <button type="button" onClick={processPay} disabled={!selectedClient}
+                style={{padding:"14px 28px",border:"none",borderRadius:"100px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background:"#ffdd2d",color:"#222",alignSelf:"flex-end",marginTop:"auto",opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
