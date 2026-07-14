@@ -351,7 +351,7 @@ const load = async () => {
                     <tr>
                       <td colSpan="10" style={{padding:0}}>
                         <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
-                          <div style={{display:"flex",fontSize:".78rem",color:"#222",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
+                          <div style={{display:"flex",fontSize:".78rem",color:"#222",textTransform:"uppercase",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
                             <span style={{flex:1}}>Товар</span>
                             <span style={{width:"70px",textAlign:"center"}}>Кол-во</span>
                             <span style={{width:"80px",textAlign:"right"}}>Сумма</span>
