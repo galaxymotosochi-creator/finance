@@ -285,16 +285,16 @@ const load = async () => {
         <table className="data-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th style={{color:'#222',textAlign:'left',width:'30px'}}>№</th>
-              <th style={{color:'#222',textAlign:'left'}}>Дата</th>
-              <th style={{color:'#222',textAlign:'left'}}>Поставщик</th>
-              <th style={{color:'#222',textAlign:'left'}}>Товары</th>
-              <th style={{color:'#222',textAlign:'left',width:'50px'}}>Кол-во</th>
-              <th style={{color:'#222',textAlign:'left'}}>Поставка</th>
-              <th style={{color:'#222',textAlign:'left'}}>Оплата</th>
-              <th style={{color:'#222',textAlign:'left'}}>Сумма</th>
-              <th style={{color:'#222',textAlign:'left'}}>Задолж.</th>
-              <th style={{color:'#222',textAlign:'left'}}></th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left',width:'30px'}}>№</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Дата</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Поставщик</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Товары</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left',width:'50px'}}>Кол-во</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Поставка</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Оплата</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Задолж.</th>
+              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplyTableBody">
@@ -316,11 +316,11 @@ const load = async () => {
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
