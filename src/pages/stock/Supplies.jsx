@@ -316,18 +316,18 @@ const load = async () => {
                   <td style={{textAlign:'left',color:'#555',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
                   <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
-                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
+                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#555',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
                     <div style={{display:'inline-block',position:'relative',marginLeft:'4px'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
