@@ -276,7 +276,7 @@ const load = async () => {
           <div className="sub">Учет поступлений товаров от поставщиков</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={() => navigate('/stock/supply/new')}>+ Добавить поставку</button>
+          <button className="btn-mint" style={{color:"#222",fontWeight:400}} onClick={() => navigate('/stock/supply/new')}>+ Добавить поставку</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
