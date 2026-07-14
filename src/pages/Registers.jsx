@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import QuaggaInit from 'quagga';
 
 export default function Registers({ fullscreen }) {
   const { user } = useAuth();
@@ -65,8 +66,19 @@ export default function Registers({ fullscreen }) {
   const [employees, setEmployees] = useState([]);
   const [stockMap, setStockMap] = useState({});
   const [uploadingId, setUploadingId] = useState(null);
+  const [isWide, setIsWide] = useState(window.innerWidth > 900);
   const [receiptDiscountPercent, setReceiptDiscountPercent] = useState(0);
-  const [showDiscountPanel, setShowDiscountPanel] = useState(false);
+  const [receiptDiscountFixed, setReceiptDiscountFixed] = useState(0);
+  const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
+  const [shiftReceipts, setShiftReceipts] = useState([]);
+  const [receiptDropdownOpen, setReceiptDropdownOpen] = useState(false);
+  const [activeReceiptId, setActiveReceiptId] = useState(null);
+  const [viewingReceipt, setViewingReceipt] = useState(null);
+  const [currentReceiptNum, setCurrentReceiptNum] = useState(null);
+  const [pinLocked, setPinLocked] = useState(true);
+  const [pinValue, setPinValue] = useState('');
+  const [pinError, setPinError] = useState(false);
+  const PIN_MASTER = '8888';
 
   const abbreviateName = (name) => {
     if (!name) return name;
@@ -139,9 +151,44 @@ export default function Registers({ fullscreen }) {
       }
       // Загружаем остатки склада
       recalcStockMap();
+      // Загружаем последний номер чека
+      var { data: lastRx } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
+      if (lastRx && lastRx.receipt_number) {
+        setCurrentReceiptNum(Number(lastRx.receipt_number) + 1);
+      } else {
+        setCurrentReceiptNum(1);
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  // Отслеживание ширины экрана для адаптивной вёрстки
+  useEffect(function(){
+    var handler = function(){ setIsWide(window.innerWidth > 900); };
+    window.addEventListener('resize', handler);
+    return function(){ window.removeEventListener('resize', handler); };
+  }, []);
+
+  // Закрытие дропдаунов по клику вне
+  useEffect(function(){
+    var handler = function(e){ if (!e.target.closest('.receipt-dropdown-wrap')) setReceiptDropdownOpen(false); if (!e.target.closest('.discount-dropdown-wrap')) setDiscountDropdownOpen(false); };
+    document.addEventListener('click', handler);
+    return function(){ document.removeEventListener('click', handler); };
+  }, []);
+
+  // Проверка пин-кода
+  useEffect(function(){
+    if (pinValue.length === 4) {
+      if (pinValue === PIN_MASTER) {
+        setPinLocked(false);
+        setPinValue('');
+      } else {
+        setPinError(true);
+        var t = setTimeout(function(){ setPinValue(''); }, 800);
+        return function(){ clearTimeout(t); };
+      }
+    }
+  }, [pinValue]);
 
   // Сохраняем корзину в localStorage при изменениях
   useEffect(function(){ try { localStorage.setItem('kassa_cart', JSON.stringify(cart)); } catch(e){} }, [cart]);
@@ -208,7 +255,7 @@ export default function Registers({ fullscreen }) {
   const totalOriginal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  const receiptDiscountAmount = total > 0 ? Math.round(total * receiptDiscountPercent / 100) : 0;
+  const receiptDiscountAmount = receiptDiscountPercent > 0 ? Math.round(total * receiptDiscountPercent / 100) : (receiptDiscountFixed > 0 ? receiptDiscountFixed : 0);
   const finalTotal = Math.max(0, total - receiptDiscountAmount);
 
   // Пересчёт остатков склада из supplies (items) и writeoffs (product_id/quantity)
@@ -281,8 +328,6 @@ export default function Registers({ fullscreen }) {
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: finalTotal, comment: receiptComment.trim() || null,
       discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0),
-      receipt_discount: receiptDiscountAmount || 0,
-      receipt_discount_percent: receiptDiscountPercent || 0,
       status: receiptStatus,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
@@ -322,13 +367,13 @@ export default function Registers({ fullscreen }) {
       // Неоплаченный чек — одна транзакция на весь чек без счёта
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: total,
-        description: 'Продажа по чеку №' + receiptNum,
+        description: 'Продажа по чеку № ' + receiptNum,
         date, status: 'unpaid', category_id: saleCatId,
       });
       setProcessingPay(false); if (error) return setToast('Ошибка: ' + error.message);
-      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: 'unpaid', type:'income' }]);
+      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: 'unpaid', type:'income' }]);
       setCart([]); setShowPay(false);
-      setProcessingPay(false); return setToast('Чек №' + receiptNum + ' сохранён (не оплачен)');
+      setProcessingPay(false); return setToast('Чек № ' + receiptNum + ' сохранён (не оплачен)');
     }
 
     if (paySplit) {
@@ -341,15 +386,15 @@ export default function Registers({ fullscreen }) {
       for (const [acId, amt] of entries) {
         const { error } = await supabase.from('transactions').insert({
           user_id: user.id, type: 'income', amount: parseFloat(amt),
-          description: 'Продажа по чеку №' + receiptNum + ' (Часть ' + part + ')',
+          description: 'Продажа по чеку № ' + receiptNum + ' (Часть ' + part + ')',
           date, account_id: acId, status: 'paid', category_id: saleCatId,
         });
         if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
         part++;
       }
-      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: 'paid', type:'income' }]);
+      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: 'paid', type:'income' }]);
       setCart([]); setShowPay(false); setPayMode(null);
-      setProcessingPay(false); return setToast('Чек №' + receiptNum + ' — оплачено с нескольких счетов');
+      setProcessingPay(false); return setToast('Чек № ' + receiptNum + ' — оплачено с нескольких счетов');
     }
 
     // Обычная оплата на один счёт — с учётом частичной оплаты
@@ -369,7 +414,7 @@ export default function Registers({ fullscreen }) {
     if (paidAmt > 0) {
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
-        description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
+        description: (paidAmt >= total ? 'Продажа по чеку № ' : 'Частичная оплата по чеку № ') + receiptNum,
         date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
       });
       if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
@@ -381,7 +426,7 @@ export default function Registers({ fullscreen }) {
       // Транзакция долга (не влияет на Cash Flow)
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: remain,
-        description: 'Долг по чеку №' + receiptNum,
+        description: 'Долг по чеку № ' + receiptNum,
         date, status: 'debt', category_id: saleCatId,
       });
       if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
@@ -420,7 +465,7 @@ export default function Registers({ fullscreen }) {
             user_id: user.id,
             product_id: parseInt(prodId),
             quantity: woProducts[prodId],
-            reason: 'Продажа по чеку №' + receiptNum,
+            reason: 'Продажа по чеку № ' + receiptNum,
             date: date,
           };
         });
@@ -432,12 +477,12 @@ export default function Registers({ fullscreen }) {
       recalcStockMap();
     }
     
-    setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку №' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
+    setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
     setReceiptComment('');
     setCart([]); setShowPay(false); setPayMode(null);
     const msg = paidAmt >= total 
-      ? 'Чек №' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
-      : 'Чек №' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
+      ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
+      : 'Чек № ' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
     setToast(msg);
     setProcessingPay(false);
   };
@@ -521,12 +566,18 @@ export default function Registers({ fullscreen }) {
   // Сканер штрихкода (камера)
   var scanBarcode = function(onResult){
   if (!navigator.mediaDevices) { setToast && setToast('Камера недоступна'); return; }
-  import('quagga').then(function(mod){
-    var Quagga = mod.default || mod;
+  var Quagga = QuaggaInit;
+    // Сначала показываем экран загрузки
     var w=document.createElement('div');
     w.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center';
+    var loadInner=document.createElement('div');
+    loadInner.style.cssText='background:#fff;border-radius:16px;padding:36px 40px;text-align:center;box-shadow:0 8px 60px rgba(0,0,0,.15)';
+    loadInner.style.cssText='background:#fff;border-radius:16px;padding:28px 40px;text-align:center;box-shadow:0 8px 60px rgba(0,0,0,.15)';
+    loadInner.innerHTML='<div style="width:200px;height:4px;background:#eee;border-radius:2px;overflow:hidden;margin:0 auto"><div style="width:0%;height:100%;background:#222;border-radius:2px;animation:scanLoad 2s ease-in-out forwards"></div></div>';;
+    w.appendChild(loadInner);
+    // Создаём контейнер для видео (скрыт пока не загрузится)
     var v=document.createElement('div');v.id='qv';
-    v.style.cssText='position:relative;width:100%;max-width:500px;overflow:hidden;border-radius:12px;background:#000';
+    v.style.cssText='position:relative;width:100%;max-width:500px;overflow:hidden;border-radius:12px;background:#000;display:none';
     var f=document.createElement('div');
     f.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:320px;height:130px;border:2px solid rgba(255,255,255,.5);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
     var i=document.createElement('input');i.type='text';i.placeholder='';
@@ -534,7 +585,14 @@ export default function Registers({ fullscreen }) {
     var c=document.createElement('div');c.textContent='✕';c.title='Закрыть';
     c.style.cssText='position:fixed;top:20px;right:20px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
     var beep=function(){try{var ac=new AudioContext();var g=ac.createGain();g.connect(ac.destination);g.gain.value=.15;var o=ac.createOscillator();o.type='sine';o.frequency.value=1200;o.connect(g);o.start();setTimeout(function(){o.stop();ac.close()},100)}catch(e){}};
-    v.appendChild(f);w.appendChild(v);w.appendChild(i);document.body.appendChild(w);    setTimeout(function(){var c=document.getElementById("qv");if(c){c.querySelectorAll("video").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"});c.querySelectorAll("canvas").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"})}},200);
+    v.appendChild(f);w.appendChild(v);document.body.appendChild(w);
+    // CSS анимация
+    if (!document.getElementById('scan-style')) {
+      var ss=document.createElement('style');ss.id='scan-style';
+      ss.textContent='@keyframes scanLoad{0%{width:0%}50%{width:65%}100%{width:100%}}.scanner-visible video{animation:scanFadeIn .3s ease}@keyframes scanFadeIn{from{opacity:0}to{opacity:1}}';
+      document.head.appendChild(ss);
+    }
+    setTimeout(function(){var c=document.getElementById("qv");if(c){c.querySelectorAll("video").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"});c.querySelectorAll("canvas").forEach(function(el){el.style.cssText="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"})}},200);
 document.body.appendChild(c);
     var q=null;var lock=false;
     var done=function(val){if(val&&!lock){lock=true;beep();if(onResult)onResult(val);setTimeout(function(){lock=false},3000)}cl()};
@@ -544,87 +602,233 @@ document.body.appendChild(c);
       inputStream:{name:'Live',type:'LiveStream',target:v,targetSize:1,constraints:{width:640,height:480,facingMode:'environment'}},
       decoder:{readers:['ean_reader','ean_8_reader','code_128_reader','code_39_reader','upc_reader','upc_e_reader']},
       locate:true
-    },function(err){if(err){setToast && setToast('Ошибка камеры');return}
+    },function(err){if(err){setToast && setToast('Ошибка камеры');w.remove();c.remove();return}
+      // Убираем загрузку, добавляем поле ввода, показываем видео
+      loadInner.remove();
+      w.appendChild(i);
+      v.style.display='block';
       q=Quagga;Quagga.start();
+      // Добавляем класс для анимации появления
+      setTimeout(function(){v.classList.add('scanner-visible')}, 50);
       Quagga.onDetected(function(data){if(data&&data.codeResult&&data.codeResult.code){done(data.codeResult.code)}});
     });
-  }).catch(function(){setToast && setToast('Ошибка загрузки сканера')});
 };
 
-if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#fff',zIndex:9999}}><div style={{fontSize:'3rem',marginBottom:'1rem'}}>⏳</div><div style={{fontSize:'1rem',color:'#888'}}>Загрузка...</div></div>;
+if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#fff',zIndex:9999}}><div style={{fontSize:'2rem',marginBottom:'1rem'}}>⏳</div><div style={{fontSize:'.80rem',color:'#777'}}>Загрузка...</div></div>;
 
   return (
-    <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'20px',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif'}}>
-      <div style={{display:'flex',flex:1,flexShrink:0,width:'100%',background:'#fff',borderRadius:'24px',overflow:'hidden',boxShadow:'0 8px 60px rgba(0,0,0,.06)'}}>
+    <>
+      <style>{`
+        .receipt-qty-btn { opacity: 0; transition: opacity .12s; }
+        .receipt-qty:hover .receipt-qty-btn { opacity: 1; }
+        .receipt-qty-btn:active { opacity: 1; }
+      `}</style>
+    <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'10px',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
+      {/* Экран блокировки */}
+      {pinLocked && (
+        <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
+          <div style={{background:'#fff',borderRadius:'24px',padding:'40px 36px',boxShadow:'0 8px 60px rgba(0,0,0,.08)',textAlign:'center',maxWidth:'340px',width:'100%'}}>
+            <div style={{fontSize:'.95rem',fontWeight:700,marginBottom:'4px'}}>Касса заблокирована</div>
+            <div style={{fontSize:'.80rem',color:'#777',marginBottom:'24px'}}>Введите пин-код для разблокировки</div>
+            <div style={{display:'flex',gap:'10px',justifyContent:'center',marginBottom:'24px'}}>
+              <div style={{width:'16px',height:'16px',borderRadius:'50%',background:pinValue.length>0?'#222':'#e0e0e0',transition:'0.15s'}}></div>
+              <div style={{width:'16px',height:'16px',borderRadius:'50%',background:pinValue.length>1?'#222':'#e0e0e0',transition:'0.15s'}}></div>
+              <div style={{width:'16px',height:'16px',borderRadius:'50%',background:pinValue.length>2?'#222':'#e0e0e0',transition:'0.15s'}}></div>
+              <div style={{width:'16px',height:'16px',borderRadius:'50%',background:pinValue.length>3?'#222':'#e0e0e0',transition:'0.15s'}}></div>
+            </div>
+            {pinError && <div style={{fontSize:'.76rem',color:'#dc2626',marginBottom:'12px'}}>Неверный пин-код</div>}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',maxWidth:'240px',margin:'0 auto'}}>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'1');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>1</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'2');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>2</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'3');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>3</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'4');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>4</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'5');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>5</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'6');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>6</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'7');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>7</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'8');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>8</button>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'9');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>9</button>
+              <div></div>
+              <button onClick={()=>{if(pinValue.length<4){setPinValue(pinValue+'0');setPinError(false)}}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'1.2rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#222'}}>0</button>
+              <button onClick={()=>{setPinValue(pinValue.slice(0,-1));setPinError(false)}} style={{padding:'14px',border:'none',borderRadius:'12px',background:'#f5f5f5',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',color:'#777'}}>⌫</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div style={{display:'flex',flexDirection:'column',flex:1,flexShrink:0,width:'100%'}}>
       {toast && (
-        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.95rem',color:'#444',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
         </div>
       )}
+        {/* Единая плашка — Фамилия И. 🔒 | Чек № ▼ | ⚙ | 🔍 | +Добавить */}
+        <div style={{margin:'0 0 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative'}}>
+          <span style={{fontSize:'.80rem',fontWeight:600,color:'#444',whiteSpace:'nowrap'}}>{effectiveName}</span>
+          <span onClick={()=>setPinLocked(true)} style={{fontSize:'.80rem',cursor:'pointer',color:'#777',userSelect:'none',lineHeight:1}} title="Заблокировать кассу">🔒</span>
 
-      {/* Левая панель — чек */}
-      <div style={{width:'280px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
-        {/* Шапка */}
-        <div style={{margin:'10px',background:'#fff',borderRadius:'12px',padding:'8px 14px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}}>
-          <span style={{fontSize:'12px',fontWeight:500,color:'#888',flex:1}}>Касса</span>
-          <span style={{fontSize:'12px',fontWeight:500,color:'#888',cursor:'pointer'}} onClick={() => { if (activeShift) setEditingCashier(true); else setShowOpenShift(true); }} title="Нажмите чтобы изменить">
-            {displayCashierName || activeShift?.cashier_name || userName}
-          </span>
+          {/* Чек № — переключатель */}
+          <div className="receipt-dropdown-wrap" style={{position:'relative',marginRight:'auto'}}>
+            <span onClick={async function(){
+              setReceiptDropdownOpen(!receiptDropdownOpen);
+              if (!receiptDropdownOpen && (!shiftReceipts || shiftReceipts.length === 0) && activeShift?.id) {
+                var { data: rData } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', activeShift.id).order('created_at', { ascending: false });
+                if (rData) {
+                  setShiftReceipts(rData.map(function(r){
+                    var rItems = r.items_json || [];
+                    var itemsStr = rItems.map(function(it){ return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name; }).slice(0, 3).join(', ');
+                    return {
+                      id: r.id, receipt_number: r.receipt_number,
+                      items_str: itemsStr || '—', status: r.status,
+                      total_amount: r.total_amount, items_json: r.items_json,
+                      client_name: r.client_name, date: r.date,
+                    };
+                  }));
+                }
+              }
+            }} style={{fontSize:'.80rem',fontWeight:600,color:'#222',cursor:'pointer',whiteSpace:'nowrap',padding:'2px 6px',borderRadius:'6px',background: receiptDropdownOpen ? '#f0f0f0' : 'transparent',userSelect:'none'}}>
+              Чек № {currentReceiptNum || 1} <span style={{fontSize:'.68rem',color:'#777'}}>▼</span>
+            </span>
+            {receiptDropdownOpen && (
+              <div style={{position:'absolute',top:'100%',left:0,marginTop:'6px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 30px rgba(0,0,0,.12)',padding:'6px',minWidth:'280px',maxHeight:'260px',overflowY:'auto',zIndex:100,border:'1px solid #f0f0f0'}}>
+                {(!shiftReceipts || shiftReceipts.length === 0) ? (
+                  <div style={{padding:'10px 12px',fontSize:'.80rem',color:'#999',textAlign:'center'}}>Нет чеков за смену</div>
+                ) : shiftReceipts.map(function(r){
+                  var isPaid = r.status === 'paid';
+                  return (
+                    <div key={r.id} onClick={function(){
+                      setReceiptDropdownOpen(false);
+                      setCurrentReceiptNum(r.receipt_number);
+                      if (isPaid) {
+                        var items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
+                        setCart(items);
+                        setViewingReceipt(r);
+                      } else {
+                        var items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
+                        setCart(items);
+                        setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);
+                        
+                      }
+                    }}
+                      style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 10px',borderRadius:'8px',cursor:'pointer',fontSize:'.80rem',color:'#333',borderBottom:'1px solid #f5f5f5',opacity:isPaid?.65:1}}
+                      onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
+                      onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                      <span style={{minWidth:'46px'}}>№ {r.receipt_number}</span>
+                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.items_str}</span>
+                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total_amount||0).toLocaleString()} ₽</span>
+                    </div>
+                  );
+                })}
+                {/* Отложенные чеки */}
+                {heldReceipts.length > 0 && <div style={{height:'1px',background:'#eee',margin:'4px 0'}} />}
+                {heldReceipts.map(function(r, i){
+                  var itemsStr = (r.items || []).map(function(it){ return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name; }).slice(0, 3).join(', ');
+                  return (
+                    <div key={r.id || i} onClick={function(){
+                      setReceiptDropdownOpen(false);
+                      setCart((r.items || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; }));
+                      setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);
+                      
+                      setViewingReceipt(null);
+                    }}
+                      style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 10px',borderRadius:'8px',cursor:'pointer',fontSize:'.80rem',color:'#777',borderBottom:'1px solid #f5f5f5',fontStyle:'italic'}}
+                      onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
+                      onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                      <span style={{minWidth:'46px',fontWeight:600}}>📋</span>
+                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{itemsStr}</span>
+                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total||0).toLocaleString()} ₽</span>
+                    </div>
+                  );
+                })}
+                <div onClick={function(){setReceiptDropdownOpen(false);setCart([]);setActiveReceiptId(null);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setCurrentReceiptNum((currentReceiptNum||1)+1);setViewingReceipt(null)}}
+                  style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 10px',borderRadius:'8px',cursor:'pointer',fontSize:'.80rem',color:'#444',borderTop:'1px solid #eee',marginTop:'4px'}}
+                  onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
+                  onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                  <span>＋ Создать новый</span>
+                </div>
+              </div>
+            )}
+          </div>
 
-          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'14px',cursor:'pointer',color:'#999',padding:'2px',marginLeft:'12px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}}>⚙</span>
+          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} style={{fontSize:'.95rem',cursor:'pointer',color:'#777',padding:'2px',userSelect:'none',lineHeight:1,display:'inline-flex',alignItems:'center'}} title="Настройки смены">⚙</span>
+          <div style={{flex:1,maxWidth:'240px',position:'relative'}}>
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Поиск"
+              style={{width:'100%',border:'1px solid #e0e0e0',outline:'none',fontSize:'.80rem',fontFamily:'inherit',padding:'4px 8px',color:'#444',background:'#fff',borderRadius:'8px',boxSizing:'border-box'}} />
+          </div>
+          <span onClick={function(){scanBarcode(function(bc){
+            var found=products.find(function(p){return p.barcode===bc;});
+            if(found){addToCart(found);setToast('Найден: '+found.name)}else setToast('Товар со штрихкодом '+bc+' не найден');
+          })}} title="Сканировать штрихкод"
+            style={{padding:'4px 8px',borderRadius:'8px',cursor:'pointer',fontSize:'.80rem',color:'#777',lineHeight:1,userSelect:'none'}}>📷</span>
+          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'6px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
         </div>
 
-        {/* Список товаров в чеке */}
-        <div style={{flex:1,overflowY:'auto'}}>
+        {/* Карточка с панелями (белый блок с тенью) */}
+        <div style={{display:'flex',flex:1,background:'#fff',borderRadius:'24px',boxShadow:'0 8px 60px rgba(0,0,0,.06)',overflow:'hidden'}}>
+
+      {/* Левая панель — чек */}
+      <div style={{width:isWide?'560px':'320px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
+
+        {/* Список товаров в чеке — как таблица */}
+        <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
+          {/* Шапка таблицы */}
+          {cart.length > 0 && (
+            <div style={{display:'flex',alignItems:'center',padding:'10px 0 6px',fontSize:'.76rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.3px',gap:isWide?'6px':'3px'}}>
+              <span style={{flex:1,minWidth:0,paddingRight:'8px'}}>Наименование</span>
+              <span style={{width:isWide?'80px':'60px',textAlign:'center'}}>Кол-во</span>
+              <span style={{width:isWide?'80px':'60px',textAlign:'center'}}>Цена</span>
+              <span style={{width:isWide?'90px':'70px',textAlign:'center'}}>Итого</span>
+            </div>
+          )}
+          {/* Разделитель */}
+          {cart.length > 0 && <div style={{height:'1px',background:'#eee',margin:'0 0 4px'}} />}
+          {/* Строки товаров */}
           {cart.length === 0 ? (
-            <div style={{textAlign:'center',padding:'2rem 1rem',color:'#bbb',fontSize:'13px'}}>Выберите товары</div>
+            <div style={{textAlign:'center',padding:'2rem 1rem',color:'var(--muted)',fontSize:'.80rem',marginTop:'1rem'}}>Выберите товары</div>
           ) : cart.map((item, i) => (
-            <div key={item.id} style={{padding:'10px 14px',borderBottom:'1px solid #f5f5f5'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:'13px',fontWeight:500}}>{item.name}</div>
+            <div key={item.id} style={{padding:'6px 0',borderBottom:'1px solid #f0f0f0'}}>
+              <div style={{display:'flex',alignItems:'center',gap:isWide?'6px':'3px'}}>
+                <div style={{flex:1,minWidth:0,paddingRight:"8px"}}>
+                  <div style={{fontSize:'.80rem',fontWeight:500}}>{item.name}</div>
                   {item.combo_items && item.combo_items.length > 0 ? (
-                    <div style={{fontSize:'10px',color:'#999',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
+                    <div style={{fontSize:'.76rem',color:'var(--muted)',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
                   ) : null}
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
-                  <button onClick={function(){updateQty(item.id, -1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>-</button>
-                  <span style={{fontWeight:600,minWidth:'16px',textAlign:'center',fontSize:'13px',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
-                  <button onClick={function(){updateQty(item.id, 1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'1px solid #e0e0e0',background:'#fff',fontSize:'14px',cursor:'pointer',color:'#333',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>+</button>
+                <div className="receipt-qty" style={{width:isWide?'80px':'60px',display:'flex',alignItems:'center',justifyContent:'center',gap:'4px'}}>
+                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, -1)}} style={{width:'18px',height:'20px',borderRadius:'4px',border:'1px solid var(--border)',background:'#fff',fontSize:'.76rem',cursor:'pointer',color:'#444',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',padding:0,lineHeight:1}}>-</button>
+                  <span style={{fontWeight:600,minWidth:'20px',textAlign:'center',fontSize:'.80rem',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>{item.qty}</span>
+                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, 1)}} style={{width:'18px',height:'20px',borderRadius:'4px',border:'1px solid var(--border)',background:'#fff',fontSize:'.76rem',cursor:'pointer',color:'#444',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',padding:0,lineHeight:1}}>+</button>
                 </div>
-                {item.free_price ? (
-                  <input type="number" min="0" step="0.01" value={item.price} 
-                    onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
-                    style={{width:'80px',textAlign:'right',border:'1.5px solid #e0e0e0',borderRadius:'6px',padding:'4px 6px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
-                ) : (
-                  <div style={{fontSize:'13px',fontWeight:700,minWidth:'60px',textAlign:'right'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
-                )}
+                <div style={{width:isWide?'80px':'60px',textAlign:'center',fontSize:'.80rem',fontWeight:600}}>
+                  {item.free_price ? (
+                    <input type="number" min="0" step="0.01" value={item.price} 
+                      onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
+                      style={{width:'52px',textAlign:'center',border:'1.5px solid var(--border)',borderRadius:'5px',padding:'3px 4px',fontSize:'.80rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
+                  ) : (
+                    <span>{(item.final_price || item.price).toLocaleString()} ₽</span>
+                  )}
+                </div>
+                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
               </div>
               {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
-                <div style={{paddingTop:"6px",marginTop:"4px",borderTop:"1px solid #eee"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:"4px"}}>
-                    <span style={{fontSize:"12px",fontWeight:500,color:"#888",whiteSpace:"nowrap"}}>Исполнитель:</span>
-                    <span onClick={function(){
-                      var curEmpId = item.employee_id;
-                      if (curEmpId === null) {
-                        // Первый тап — переключаем на первого сотрудника
-                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[0]?.id || null} : x;});});
+                <div style={{paddingTop:"4px",marginTop:"2px",display:'flex',alignItems:'center',gap:'4px',paddingLeft:0}}>
+                  <span style={{fontSize:".76rem",fontWeight:500,color:"var(--muted)",whiteSpace:"nowrap"}}>Исполнитель:</span>
+                  <span onClick={function(){
+                    var curEmpId = item.employee_id;
+                    if (curEmpId === null) {
+                      setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[0]?.id || null} : x;});});
+                    } else {
+                      var idx = employees.findIndex(function(e){return e.id === curEmpId;});
+                      var nextIdx = (idx + 1) % employees.length;
+                      if (nextIdx === 0) {
+                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: null} : x;});});
                       } else {
-                        // Ищем текущего и переключаем на следующего, после последнего — обратно на кассира
-                        var idx = employees.findIndex(function(e){return e.id === curEmpId;});
-                        var nextIdx = (idx + 1) % employees.length;
-                        if (nextIdx === 0) {
-                          // Вернулись к началу — показываем кассира
-                          setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: null} : x;});});
-                        } else {
-                          setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[nextIdx].id} : x;});});
-                        }
+                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[nextIdx].id} : x;});});
                       }
-                    }} style={{fontSize:"12px",fontWeight:500,color:"#888",cursor:"pointer",whiteSpace:"nowrap",borderBottom:"1px dashed #ddd"}}>
-                      {item.employee_id ? abbreviateName(employees.find(function(e){return e.id === item.employee_id;})?.name || '') : effectiveName}
-                    </span>
-                  </div>
+                    }
+                  }} style={{fontSize:".76rem",fontWeight:500,color:"#777",cursor:"pointer",whiteSpace:"nowrap",borderBottom:"1px dashed #ddd"}}>
+                    {item.employee_id ? abbreviateName(employees.find(function(e){return e.id === item.employee_id;})?.name || '') : effectiveName}
+                  </span>
                 </div>
               )}
             </div>
@@ -634,119 +838,119 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         {/* Итого и оплата */}
         <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
             {discountTotal > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#999'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'var(--muted)'}}>
                 <span>Итого:</span>
-                <span style={{textDecoration:'line-through',color:'#bbb'}}>{totalOriginal.toLocaleString()} ₽</span>
+                <span style={{textDecoration:'line-through',color:'#777'}}>{totalOriginal.toLocaleString()} ₽</span>
               </div>
             )}
             {discountTotal > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#16a34a'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#16a34a'}}>
                 <span>Скидка по акциям:</span>
                 <span>-{discountTotal.toLocaleString()} ₽</span>
               </div>
             )}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'12px',color:'#999'}}>К оплате:</span>
-              <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
-                <span style={{fontSize:'20px',fontWeight:800,color:receiptDiscountPercent>0?'#999':'#111',textDecoration:receiptDiscountPercent>0?'line-through':'none'}}>{total.toLocaleString()} ₽</span>
-                {cart.length > 0 && (
-                  <span onClick={()=>{setShowDiscountPanel(!showDiscountPanel);if(showDiscountPanel){setReceiptDiscountPercent(0)}}}
-                    style={{fontSize:'16px',cursor:'pointer',color:receiptDiscountPercent>0?'#16a34a':'var(--muted)',fontWeight:700,userSelect:'none',transition:'.2s',position:'relative',top:'-2px',background:receiptDiscountPercent>0?'#f0fdf4':'transparent',borderRadius:'8px',padding:'2px 6px',lineHeight:1}}>−%</span>
-                )}
-              </div>
+              <span style={{fontSize:'.80rem',color:'var(--muted)'}}>К оплате:</span>
+              <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} ₽</span>
             </div>
-            {receiptDiscountPercent > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'12px',color:'#16a34a'}}>
-                <span>Скидка на чек ({receiptDiscountPercent}%):</span>
-                <span>-{receiptDiscountAmount.toLocaleString()} ₽</span>
-              </div>
-            )}
-            {receiptDiscountPercent > 0 && (
+            {/* Строка скидки — всегда видна */}
+            {cart.length > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:'12px',color:'#999',fontWeight:600}}>Итого со скидкой:</span>
-                <span style={{fontSize:'22px',fontWeight:800,color:'#16a34a'}}>{finalTotal.toLocaleString()} ₽</span>
-              </div>
-            )}
-            {/* Выездная плашка скидки */}
-            {showDiscountPanel && (
-              <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'12px',marginTop:'-4px',border:'1px solid #eee'}}>
-                <div style={{fontSize:'11px',color:'#888',marginBottom:'8px',fontWeight:600}}>Скидка на весь чек</div>
-                <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'8px'}}>
-                  {[0,5,10,15,20,25].map(function(pct){
-                    return (
-                      <span key={pct} onClick={()=>setReceiptDiscountPercent(pct)}
-                        style={{
-                          padding:'6px 14px',borderRadius:'100px',fontSize:'13px',fontWeight:600,
-                          cursor:'pointer',transition:'.15s',fontFamily:'inherit',
-                          background:receiptDiscountPercent===pct?'#111':'#fff',
-                          color:receiptDiscountPercent===pct?'#fff':'#555',
-                          border:receiptDiscountPercent===pct?'none':'1.5px solid #ddd',
-                          userSelect:'none',
-                        }}>{pct === 0 ? 'Без' : pct + '%'}</span>
-                    );
-                  })}
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}}>
-                  <span style={{fontSize:'12px',color:'#888'}}>Своя:</span>
-                  <input type="number" min="0" max="99" value={receiptDiscountPercent}
-                    onChange={function(e){
-                      var v = Math.min(99, Math.max(0, parseInt(e.target.value) || 0));
-                      setReceiptDiscountPercent(v);
-                    }}
-                    style={{width:'56px',padding:'6px 8px',border:'1.5px solid #ddd',borderRadius:'8px',fontSize:'13px',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
-                  <span style={{fontSize:'12px',color:'#888'}}>%</span>
-                  <span style={{fontSize:'12px',color:'#999',marginLeft:'auto'}}>−{receiptDiscountAmount.toLocaleString()} ₽</span>
-                </div>
-                <div style={{display:'Flex',alignItems:'center',justifyContent:'space-between',marginTop:'6px',paddingTop:'8px',borderTop:'1px solid #e8e8e8'}}>
-                  <span style={{fontSize:'13px',fontWeight:600}}>Итог:</span>
-                  <span style={{fontSize:'18px',fontWeight:800}}>{finalTotal.toLocaleString()} ₽</span>
+                <span style={{fontSize:'.80rem',color:'var(--muted)'}}>Скидка:</span>
+                <div className="discount-dropdown-wrap" style={{display:'flex',alignItems:'center',gap:'6px',position:'relative'}}>
+                  <span onClick={()=>{setDiscountDropdownOpen(!discountDropdownOpen)}}
+                    style={{fontSize:'.95rem',fontWeight:700,cursor:'pointer',color:'#444',padding:'2px 8px',borderRadius:'6px',background:'transparent',userSelect:'none'}}>
+                    {receiptDiscountPercent > 0 ? receiptDiscountPercent + '%' : receiptDiscountFixed > 0 ? receiptDiscountFixed + ' ₽' : '0%'} <span style={{fontSize:'.68rem',color:'#999'}}>▼</span>
+                  </span>
+                  {receiptDiscountAmount > 0 && <span style={{fontSize:'.95rem',color:'#444',fontWeight:700}}>−{receiptDiscountAmount.toLocaleString()} ₽</span>}
+                  {discountDropdownOpen && (
+                    <div style={{position:'absolute',bottom:'100%',right:0,marginBottom:'4px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 30px rgba(0,0,0,.12)',padding:'10px',minWidth:'280px',zIndex:100,border:'1px solid #f0f0f0'}}>
+                      <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'8px'}}>
+                        {[0,5,10,15,20].map(function(pct){
+                          return (
+                            <span key={pct} onClick={function(){setReceiptDiscountPercent(pct);setReceiptDiscountFixed(0);setDiscountDropdownOpen(false)}}
+                              style={{padding:'4px 10px',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',background:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#111':'#f5f5f5',color:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#fff':'#444',userSelect:'none'}}>{pct === 0 ? '0%' : pct + '%'}</span>
+                          );
+                        })}
+                      </div>
+                      <div style={{display:'flex',alignItems:'center',gap:'6px',borderTop:'1px solid #eee',paddingTop:'8px'}}>
+                        <span style={{fontSize:'.80rem',color:'#444',whiteSpace:'nowrap'}}>Своя:</span>
+                        <input type="number" min="0" value={receiptDiscountPercent||''} placeholder="%"
+                          onChange={function(e){var v=parseInt(e.target.value)||0;setReceiptDiscountPercent(Math.min(99,v));setReceiptDiscountFixed(0)}}
+                          style={{width:'46px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
+                        <span style={{fontSize:'.80rem',color:'#444'}}>или</span>
+                        <input type="number" min="0" placeholder="₽"
+                          onChange={function(e){var v=parseFloat(e.target.value);if(isNaN(v)||v<0)v=0;setReceiptDiscountFixed(Math.min(total,Math.round(v)));setReceiptDiscountPercent(0)}}
+                          style={{width:'60px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
-            <div style={{display:'flex',gap:'8px'}}>
-              {cart.length > 0 && (
-                <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setReceiptDiscountPercent(0);setShowDiscountPanel(false);setToast('Чек отложен')}} style={{
-                  flex:1, padding:'13px', borderRadius:'100px', border:'1.5px solid #ddd',
-                  background:'#fff', color:'#555', fontSize:'14px', fontWeight:600,
+            {/* Итого со скидкой */}
+            {receiptDiscountAmount > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid #eee',paddingTop:'8px'}}>
+                <span style={{fontSize:'.80rem',color:'var(--muted)',fontWeight:600}}>Итого:</span>
+                <span style={{fontSize:'.95rem',fontWeight:700}}>{finalTotal.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {viewingReceipt ? (
+              <>
+                {/* Режим просмотра оплаченного чека */}
+                <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',fontSize:'.80rem',color:'#777',lineHeight:1.7}}>
+                  <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <span>Клиент:</span>
+                    <span>{viewingReceipt.client_name || '—'}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <span>Дата:</span>
+                    <span>{((viewingReceipt.date || '').split('T')[0] || viewingReceipt.date || '').split('-').reverse().join('.')}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <span>Статус:</span>
+                    <span>Оплачен</span>
+                  </div>
+                </div>
+                <button onClick={function(){setViewingReceipt(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0)}} style={{
+                  width:'100%', padding:'13px', borderRadius:'100px', border:'2px solid #eee',
+                  background:'#fff', color:'#777', fontSize:'.80rem', fontWeight:600,
                   cursor:'pointer', fontFamily:'inherit',
-                }}>Отложить</button>
-              )}
-              <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
-                flex:1, padding:'13px', borderRadius:'100px', border:'none',
-                background: cart.length ? '#ffdd2d' : '#ddd',
-                color: cart.length ? '#111' : '#fff', fontSize:'14px', fontWeight:700,
-                cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
-              }}>Продажа</button>
-            </div>
+                }}>✕ Закрыть просмотр</button>
+              </>
+            ) : (
+              <div style={{display:'flex',gap:'8px'}}>
+                {cart.length > 0 && (
+                  <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast('Чек отложен')}} style={{
+                    flex:1, padding:'13px', borderRadius:'100px', border:'1.5px solid var(--border)',
+                    background:'#fff', color:'#444', fontSize:'.80rem', fontWeight:600,
+                    cursor:'pointer', fontFamily:'inherit',
+                  }}>Отложить</button>
+                )}
+                <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
+                  flex:1, padding:'13px', borderRadius:'100px', border:'none',
+                  background: cart.length ? '#ffdd2d' : '#ddd',
+                  color: cart.length ? '#111' : '#fff', fontSize:'.80rem', fontWeight:700,
+                  cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
+                }}>Продажа</button>
+              </div>
+            )}
           </div>
       </div>
 
       {/* Правая панель — товары */}
       <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
-        {/* Поиск */}
-        <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="🔍 Поиск"
-            style={{flex:1,border:'1px solid #eee',borderRadius:'10px',padding:'9px 14px',fontSize:'13px',outline:'none',fontFamily:'inherit',background:'#fff',boxShadow:'0 2px 8px rgba(0,0,0,.06)'}} />
-          <span onClick={function(){scanBarcode(function(bc){
-            var found=products.find(function(p){return p.barcode===bc;});
-            if(found){addToCart(found);setToast('Найден: '+found.name)}else setToast('Товар со штрихкодом '+bc+' не найден');
-          })}} title="Сканировать штрихкод"
-            style={{padding:'7px 10px',border:'1.5px solid #eee',borderRadius:'10px',cursor:'pointer',fontSize:'16px',background:'#fff',lineHeight:1}}>📷</span>
-          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'9px 16px',border:'none',borderRadius:'10px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+ Добавить позицию</button>
-        </div>
-
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
-            padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'11px',
+            padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
             background: catFilter === 'all' ? '#000' : '#e8e8ed',
             color: catFilter === 'all' ? '#fff' : '#666', fontFamily:'inherit',
           }}>Все</button>
           {categories.map(c => (
             <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
-              padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'11px',
+              padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
               fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
               background: catFilter === c.name ? '#000' : '#e8e8ed',
               color: catFilter === c.name ? '#fff' : '#666', fontFamily:'inherit',
@@ -755,9 +959,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gridAutoRows:'210px',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat('+(window.innerWidth>1100?4:3)+',1fr)',gridAutoRows:window.innerWidth>1100?'190px':'210px',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
-            <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'#bbb',fontSize:'13px'}}>Нет товаров</div>
+            <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
           ) : filtered.map(p => (
             <div key={p.id} onClick={function(){var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos)addToCart(p)}}
               style={{background: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#fafafa':'#fff',borderRadius:'14px',padding:'14px',cursor:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?'default':'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid '+( (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#f0f0f0':'#eee' ),boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%',opacity:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?.5:1}}
@@ -772,21 +976,21 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     <div style={{width:'40px',height:'4px',borderRadius:'2px',background:'#e0e0e0',overflow:'hidden'}}>
                       <div style={{width:'100%',height:'100%',background:'#111',borderRadius:'2px',animation:'loadbar 1.2s infinite'}}></div>
                     </div>
-                    <span style={{fontSize:'10px',color:'#999'}}>загрузка...</span>
+                    <span style={{fontSize:'.76rem',color:'var(--muted)'}}>загрузка...</span>
                   </div>
                 ) : p.photo_url ? (
                   <img src={p.photo_url} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',borderRadius:'8px'}} />
                 ) : (
-                  <span style={{fontSize:'28px',opacity:0.3}}>📷</span>
+                  <span style={{fontSize:'.95rem',opacity:0.3}}>📷</span>
                 )}
               </div>
-              <div style={{fontSize:'12px',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3}}>{p.name}</div>
+              <div style={{fontSize:'.80rem',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3}}>{p.name}</div>
               <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
-                {p.cat && <div style={{fontSize:'10px',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'#999'}}>{p.cat}</div>}
+                {p.cat && <div style={{fontSize:'.76rem',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'var(--muted)'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
-                <span style={{fontSize:'16px',fontWeight:800,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
+                <span style={{fontSize:'.95rem',fontWeight:700,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
                 {p.type !== 'service' ? (
-                  <span style={{fontSize:'10px',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
+                  <span style={{fontSize:'.76rem',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
                 ) : null}
               </div>
               </div>
@@ -883,7 +1087,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowPay(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowPay(false)}>&times;</button>
-            <h2 style={{marginBottom:'16px',fontSize:'1.15rem',fontWeight:700}}>Чек №{(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
+            <h2 style={{marginBottom:'16px',fontSize:'.95rem',fontWeight:700}}>Чек № {(shiftTx.length || 0) + 1} — {total.toLocaleString()} ₽</h2>
 
             {/* Выбор счёта */}
             <div className="form-group">
@@ -894,7 +1098,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
                     background: payMode === a.id ? '#111' : '#fff',
                     color: payMode === a.id ? '#fff' : '#555',
-                    fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:'60px'
+                    fontSize:'.76rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit',whiteSpace:'nowrap',minWidth:'60px'
                   }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
                 ))}
               </div>
@@ -903,20 +1107,20 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             {/* Сумма оплаты */}
             {payMode && !paySplit && (
               <div style={{marginBottom:'10px'}}>
-                <label style={{fontSize:'12px',fontWeight:600,color:'#888',display:'block',marginBottom:'6px'}}>Сумма</label>
+                <label style={{fontSize:'.80rem',fontWeight:600,color:'#777',display:'block',marginBottom:'6px'}}>Сумма</label>
                 <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
                   <input type="number" min="0" step="0.01" placeholder={total.toString()} 
                     value={payAmount} 
                     onChange={e => setPayAmount(e.target.value)}
-                    style={{width:'50%',border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                    style={{width:'50%',border:'1.5px solid #e0e0e0',borderRadius:'8px',padding:'9px 10px',fontSize:'.80rem',outline:'none',fontFamily:'inherit'}} />
                   {payUnpaid ? (
-                    <span style={{fontSize:'11px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#fef2f2',color:'#dc2626'}}>✕ Долг</span>
+                    <span style={{fontSize:'.76rem',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#fef2f2',color:'#dc2626'}}>✕ Долг</span>
                   ) : (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total) ? (
-                    <span style={{fontSize:'11px',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#f0fdf4',color:'#16a34a'}}>✓ Оплачено</span>
+                    <span style={{fontSize:'.76rem',fontWeight:600,padding:'1px 8px',borderRadius:'100px',background:'#f0fdf4',color:'#16a34a'}}>✓ Оплачено</span>
                   ) : null}
                 </div>
                 {payAmount && parseFloat(payAmount) > total && (
-                  <div style={{fontSize:'11px',color:'#16a34a',marginTop:'4px'}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</div>
+                  <div style={{fontSize:'.76rem',color:'#16a34a',marginTop:'4px'}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</div>
                 )}
               </div>
             )}
@@ -935,21 +1139,21 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
                         <div key={c.id} onPointerDown={function(e){e.preventDefault(); setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
-                          style={{padding:'8px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
+                          style={{padding:'8px 10px',cursor:'pointer',fontSize:'.80rem',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
                           onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
                           onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>
                       ))}
                       {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).length === 0 && (
-                        <div style={{padding:'10px',fontSize:'12px',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
+                        <div style={{padding:'10px',fontSize:'.80rem',color:'#777',textAlign:'center'}}>Ничего не найдено</div>
                       )}
                     </div>
                   )}
                 </div>
                 <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setNewClientEmail(''); setNewClientBirthday(''); setNewClientNote1(''); setNewClientNote2(''); setClientSearch(''); }} 
-                  style={{padding:'8px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
+                  style={{padding:'8px 12px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
               </div>
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
-                <div style={{fontSize:'11px',color:'#92400e',marginTop:'4px',background:'#fff3cd',padding:'4px 8px',borderRadius:'6px'}}>
+                <div style={{fontSize:'.76rem',color:'#92400e',marginTop:'4px',background:'#fff3cd',padding:'4px 8px',borderRadius:'6px'}}>
                   Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — уйдёт в долг
                 </div>
               )}
@@ -958,7 +1162,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             {/* Комментарий к чеку */}
             <div className="form-group" style={{marginBottom:'8px'}}>
               <input type="text" value={receiptComment} onChange={e=>setReceiptComment(e.target.value)} placeholder="Комментарий к чеку (пробег, примечание...)" 
-                style={{width:'100%',padding:'8px 10px',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'13px',outline:'none',fontFamily:'inherit'}} />
+                style={{width:'100%',padding:'8px 10px',border:'1.5px solid #e0e0e0',borderRadius:'8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit'}} />
             </div>
 
             {/* Ползунок «Разделить на счета» */}
@@ -969,7 +1173,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <span style={{position:'absolute',top:'2px',left:paySplit?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
                 </span>
               </label>
-              <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Разделить на счета</span>
+              <span style={{fontSize:'.80rem',fontWeight:500,color:'#222'}}>Разделить на счета</span>
             </div>
 
             {paySplit && (
@@ -979,15 +1183,15 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   const remain = total - Object.entries(splitAmts).filter(([id]) => id !== a.id).reduce((s, [, v]) => s + (parseFloat(v) || 0), 0);
                   return (
                     <div key={a.id} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px',justifyContent:'flex-end'}}>
-                      <span style={{fontSize:'12px',fontWeight:500,color:'#555'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
+                      <span style={{fontSize:'.80rem',fontWeight:500,color:'#444'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                       <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
                         value={splitAmts[a.id] || ''} 
                         onChange={e => setSplitAmts({...splitAmts, [a.id]: e.target.value})}
-                        style={{width:'90px',border:'1.5px solid #eee',borderRadius:'6px',padding:'5px 8px',fontSize:'13px',outline:'none',fontFamily:'inherit',textAlign:'right'}} />
+                        style={{width:'90px',border:'1.5px solid #eee',borderRadius:'6px',padding:'5px 8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit',textAlign:'right'}} />
                     </div>
                   );
                 })}
-                <div style={{fontSize:'12px',fontWeight:600,marginTop:'4px',color: Math.abs(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)) < 0.01 ? '#16a34a' : '#dc2626'}}>
+                <div style={{fontSize:'.80rem',fontWeight:600,marginTop:'4px',color: Math.abs(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)) < 0.01 ? '#16a34a' : '#dc2626'}}>
                   {(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} ₽
                 </div>
               </div>
@@ -1001,12 +1205,12 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <span style={{position:'absolute',top:'2px',left:payUnpaid?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
                 </span>
               </label>
-              <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
+              <span style={{fontSize:'.80rem',fontWeight:500,color:'#222'}}>Не оплачивать сейчас (долг)</span>
             </div>
 
             <div style={{textAlign:'center',marginTop:'16px',borderTop:'1px solid #eee',paddingTop:'14px'}}>
               <button type="button" onClick={processPay} disabled={!selectedClient}
-                style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
+                style={{padding:'.5rem 1.5rem',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.80rem',fontWeight:700,cursor: selectedClient ? 'pointer' : 'not-allowed',fontFamily:'inherit',opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
@@ -1095,7 +1299,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <div className="form-group"><label>Остаток денег на начало дня</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                     <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus />
-                    {cashRegBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
+                    {cashRegBal > 0 && <span style={{fontSize:'.80rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
                   </div>
                 </div>
                 <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
@@ -1119,53 +1323,8 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
                 setShiftTx(data || []);
                 setShowCloseShift(true);
-              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
-              <button onClick={async () => {
-                setShowActions(false);
-                var opts = { user_id: user.id };
-                if (activeShift?.id) {
-                  opts.shift_id = String(activeShift.id);
-                } else {
-                  var today = new Date().toISOString().split('T')[0];
-                  opts.date = today;
-                }
-                var query = supabase.from('receipts').select('*').eq('user_id', user.id);
-                if (opts.shift_id) query = query.eq('shift_id', opts.shift_id);
-                if (opts.date) query = query.eq('date', opts.date);
-                var { data: receipts } = await query.order('created_at', { ascending: false });
-                if (!receipts || receipts.length === 0) { setRegisterReceipts([]); setShowReceiptsModal(true); return; }
-                // Загружаем транзакции за период для способов оплаты
-                var { data: txData } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', new Date(receipts[receipts.length-1]?.created_at || Date.now()).toISOString()).lte('created_at', new Date().toISOString()).order('created_at', { ascending: false });
-                var txList = txData || [];
-                setRegisterReceipts(receipts.filter(function(r){return r.total_amount > 0;}).map(function(r){
-                  // Товары из items_json
-                  var rItems = r.items_json || [];
-                  var itemsStr = rItems.map(function(it){
-                    return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name;
-                  }).join(', ');
-                  // Транзакции для способа оплаты (по номеру чека в описании)
-                  var rTx = txList.filter(function(tx){return (tx.description || '').indexOf('№' + r.receipt_number + ' ') >= 0 || (tx.description || '').indexOf('№' + r.receipt_number) === (tx.description || '').length - String(r.receipt_number).length - 1;});
-                  var acNames = [];
-                  rTx.forEach(function(tx){
-                    var ac = accounts.find(function(a){return a.id === tx.account_id;});
-                    if (ac && acNames.indexOf(ac.name) < 0) acNames.push(ac.name);
-                  });
-                  var time = r.created_at ? new Date(r.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '';
-                  return {
-                    receipt_number: r.receipt_number,
-                    items_str: itemsStr || '—',
-                    time_str: time,
-                    accounts_str: acNames.join(', ') || '—',
-                    status: r.status,
-                    total_amount: r.total_amount,
-                  };
-                }));
-                setShowReceiptsModal(true);
-              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Чеки за смену</button>
-              <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
-              {heldReceipts.length > 0 && (
-                <button onClick={()=>{setShowActions(false);setHeldIndex(0);setShowHoldModal(true)}} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#111',fontSize:'13px',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Отложенные чеки ({heldReceipts.length})</button>
-              )}
+              }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
+              <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
             </div>
           </div>
         </div>
@@ -1177,23 +1336,23 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
           <div className="modal-box" style={{maxWidth:'380px'}}>
             <button className="modal-close" onClick={() => setEditingCashier(false)}>&times;</button>
             <h2>Сменить кассира</h2>
-            <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'13px',lineHeight:1.7}}>
-              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#888"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==="income"?1:-1)});}return Math.round(b).toLocaleString()})()} ₽</span></div>
+            <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'.80rem',lineHeight:1.7}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#777'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==="income"?1:-1)});}return Math.round(b).toLocaleString()})()} ₽</span></div>
             </div>
             <div className="form-group">
               <label>Новый кассир</label>
-              <select value={transferEmpId} onChange={e=>setTransferEmpId(e.target.value)} style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box',background:'#fff'}}>
+              <select value={transferEmpId} onChange={e=>setTransferEmpId(e.target.value)} style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit',boxSizing:'border-box',background:'#fff'}}>
                 <option value="">— выберите сотрудника —</option>
                 {employees.map(function(e){return <option key={e.id} value={e.id}>{e.name}</option>})}
               </select>
             </div>
             <div className="form-group">
               <label>Остаток при передаче (?)</label>
-              <input type="number" value={transferBalance} onChange={e=>setTransferBalance(e.target.value)} min="0" step="0.01" style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'14px',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
+              <input type="number" value={transferBalance} onChange={e=>setTransferBalance(e.target.value)} min="0" step="0.01" style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
             </div>
             <div style={{marginTop:'12px',display:'flex',gap:'8px'}}>
-              <button onClick={() => setEditingCashier(false)} style={{flex:1,padding:'10px',borderRadius:'8px',border:'1px solid #ddd',background:'#fff',fontSize:'13px',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+              <button onClick={() => setEditingCashier(false)} style={{flex:1,padding:'10px',borderRadius:'8px',border:'1px solid #ddd',background:'#fff',fontSize:'.80rem',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
               <button onClick={async () => {
                 const newEmpId = transferEmpId;
                 if (!newEmpId) { showToast('Выберите сотрудника', 'warning'); return; }
@@ -1212,7 +1371,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 setTransferBalance('');
                 setEditingCashier(false);
                 showToast('Кассир сменён: ' + newCashierName, 'success');
-              }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Передать смену</button>
+              }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Передать смену</button>
             </div>
           </div>
         </div>
@@ -1245,7 +1404,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       <td style={{textAlign:'left'}}>{r.time_str}</td>
                       <td style={{textAlign:'left'}}>{r.accounts_str}</td>
                       <td style={{textAlign:'left'}}>
-                        <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
+                        <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.76rem',fontWeight:600,background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                       </td>
                       <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount || 0).toLocaleString()} ₽</span></td>
                     </tr>
@@ -1253,7 +1412,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 </tbody>
               </table>
             </div>
-            <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:800,fontSize:'15px'}}>
+            <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:700,fontSize:'.95rem'}}>
               <span>Итого:</span>
               <span>{registerReceipts.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0).toLocaleString()} ₽</span>
             </div>
@@ -1272,7 +1431,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <h2>Закрытие смены</h2>
             <div className="sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
             
-            <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'13px',lineHeight:1.8,marginBottom:'12px'}}>
+            <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'.80rem',lineHeight:1.8,marginBottom:'12px'}}>
               <div style={{display:'flex'}}>
                 <span style={{flex:1}}>Начальный остаток</span>
                 <span>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</span>
@@ -1294,7 +1453,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 ));
               })()}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
-              <div style={{display:'flex',fontWeight:800}}>
+              <div style={{display:'flex',fontWeight:700}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
                 <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
@@ -1309,9 +1468,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
-                return <div style={{textAlign:'center',padding:'6px',background:'#f0fdf4',borderRadius:'8px',color:'#16a34a',fontWeight:600,fontSize:'13px',marginBottom:'8px'}}>✅ Касса сходится</div>;
+                return <div style={{textAlign:'center',padding:'6px',background:'#f0fdf4',borderRadius:'8px',color:'#16a34a',fontWeight:600,fontSize:'.80rem',marginBottom:'8px'}}>✅ Касса сходится</div>;
               } else {
-                return <div style={{textAlign:'center',padding:'6px',background:'#fef2f2',borderRadius:'8px',color:'#dc2626',fontWeight:600,fontSize:'13px',marginBottom:'8px'}}>⚠️ Расхождение: {diff > 0 ? 'излишек' : 'недостача'} {Math.abs(diff).toLocaleString()} ₽</div>;
+                return <div style={{textAlign:'center',padding:'6px',background:'#fef2f2',borderRadius:'8px',color:'#dc2626',fontWeight:600,fontSize:'.80rem',marginBottom:'8px'}}>⚠️ Расхождение: {diff > 0 ? 'излишек' : 'недостача'} {Math.abs(diff).toLocaleString()} ₽</div>;
               }
             })()}
 
@@ -1350,18 +1509,18 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               
               {/* Шапка */}
               <div style={{marginBottom:'2px'}}>
-                <span style={{fontSize:'1.2rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
+                <span style={{fontSize:'.95rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
                 {cur.clientName ? (
-                  <div className="sub" style={{marginBottom:0,fontSize:'.8rem',color:'var(--muted)'}}>
+                  <div className="sub" style={{marginBottom:0,fontSize:'.80rem',color:'var(--muted)'}}>
                     {cur.clientName} | {cur.items?.length || 0} товаров | {Number(cur.total||0).toLocaleString()} ₽
                   </div>
                 ) : null}
               </div>
 
               {/* Серая плашка с товарами */}
-              <div style={{background:'#f9f9f9',borderRadius:'12px',padding:'14px',fontSize:'13px',lineHeight:2,flex:1,overflowY:'auto'}}>
+              <div style={{background:'#f9f9f9',borderRadius:'12px',padding:'14px',fontSize:'.80rem',lineHeight:2,flex:1,overflowY:'auto'}}>
                 {/* Заголовки */}
-                <div style={{display:'flex',fontSize:'10px',fontWeight:600,color:'#aaa',padding:'2px 0 4px',borderBottom:'1px solid #e8e8e8',marginBottom:'2px'}}>
+                <div style={{display:'flex',fontSize:'.76rem',fontWeight:600,color:'#777',padding:'2px 0 4px',borderBottom:'1px solid #e8e8e8',marginBottom:'2px'}}>
                   <span style={{flex:1}}>Товар</span>
                   <span style={{width:'50px',textAlign:'center'}}>Кол-во</span>
                   <span style={{width:'60px',textAlign:'right'}}>Цена</span>
@@ -1371,14 +1530,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   return (
                     <div key={i} style={{display:'flex',alignItems:'center',gap:'4px'}}>
                       <span style={{flex:1,fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</span>
-                      <span style={{width:'50px',textAlign:'center',color:'#888',fontSize:'12px'}}>{item.qty}</span>
-                      <span style={{width:'60px',textAlign:'right',color:'#888',fontSize:'12px'}}>{Number(item.price).toLocaleString()}</span>
+                      <span style={{width:'50px',textAlign:'center',color:'#777',fontSize:'.80rem'}}>{item.qty}</span>
+                      <span style={{width:'60px',textAlign:'right',color:'#777',fontSize:'.80rem'}}>{Number(item.price).toLocaleString()}</span>
                       <span style={{width:'80px',textAlign:'right',fontWeight:600}}>{Number(item.price*item.qty).toLocaleString()} ₽</span>
                     </div>
                   );
                 })}
                 <div style={{borderTop:'1px solid #e8e8e8',margin:'4px 0'}}></div>
-                <div style={{display:'flex',justifyContent:'space-between',fontWeight:700,fontSize:'14px',padding:'2px 0'}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontWeight:700,fontSize:'.80rem',padding:'2px 0'}}>
                   <span>Итого</span>
                   <span>{Number(cur.total||0).toLocaleString()} ₽</span>
                 </div>
@@ -1392,7 +1551,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   if (heldIndex >= newList.length) setHeldIndex(Math.max(0, newList.length-1));
                   if (newList.length === 0) setShowHoldModal(false);
                   setToast('Чек удалён');
-                }} style={{flex:1,padding:'10px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#888',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✕ Удалить</button>
+                }} style={{flex:1,padding:'10px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#777',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✕ Удалить</button>
                 <button type="button" onClick={function(){
                   setCart(cur.items || []);
                   setSelectedClient(cur.client || '');
@@ -1400,7 +1559,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   var newList = heldReceipts.filter(function(_,i){return i!==heldIndex;});
                   setHeldReceipts(newList);
                   setShowHoldModal(false);
-                }} style={{flex:1,padding:'10px',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>→ Продолжить</button>
+                }} style={{flex:1,padding:'10px',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>→ Продолжить</button>
               </div>
 
               {/* Точки */}
@@ -1409,10 +1568,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               </div>
 
               {/* Навигация */}
-              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',paddingTop:'10px',marginTop:'8px',borderTop:'1px solid #f0f0f0',fontSize:'11px',color:'#999'}}>
-                <span onClick={function(){if(heldIndex>0)setHeldIndex(heldIndex-1)}} style={{fontSize:'18px',color:heldIndex>0?'#111':'#bbb',cursor:heldIndex>0?'pointer':'default',userSelect:'none',lineHeight:1}}>←</span>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',paddingTop:'10px',marginTop:'8px',borderTop:'1px solid #f0f0f0',fontSize:'.76rem',color:'#777'}}>
+                <span onClick={function(){if(heldIndex>0)setHeldIndex(heldIndex-1)}} style={{fontSize:'.95rem',color:heldIndex>0?'#111':'#bbb',cursor:heldIndex>0?'pointer':'default',userSelect:'none',lineHeight:1}}>←</span>
                 <span>Чек {heldIndex+1} из {heldReceipts.length}</span>
-                <span onClick={function(){if(heldIndex<heldReceipts.length-1)setHeldIndex(heldIndex+1)}} style={{fontSize:'18px',color:heldIndex<heldReceipts.length-1?'#111':'#bbb',cursor:heldIndex<heldReceipts.length-1?'pointer':'default',userSelect:'none',lineHeight:1}}>→</span>
+                <span onClick={function(){if(heldIndex<heldReceipts.length-1)setHeldIndex(heldIndex+1)}} style={{fontSize:'.95rem',color:heldIndex<heldReceipts.length-1?'#111':'#bbb',cursor:heldIndex<heldReceipts.length-1?'pointer':'default',userSelect:'none',lineHeight:1}}>→</span>
               </div>
 
             </div>
@@ -1420,5 +1579,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         );
       })()}
     </div>
+    </div>
+    </>
   );
 }
