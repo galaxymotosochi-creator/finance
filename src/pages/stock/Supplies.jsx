@@ -324,7 +324,7 @@ const load = async () => {
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#d97706',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
                       style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
