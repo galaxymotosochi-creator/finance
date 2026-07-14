@@ -357,13 +357,13 @@ const load = async () => {
                             <span style={{width:"80px",textAlign:"right"}}>Сумма</span>
                           </div>
                           {items.map((it,i) => (
-                            <div key={i} style={{display:"flex",fontSize:".85rem",color:"#333",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
+                            <div key={i} style={{display:"flex",fontSize:".78rem",color:"#555",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
                               <span style={{flex:1}}>{it.name}</span>
                               <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
                               <span style={{width:"80px",textAlign:"right",fontWeight:500}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
                             </div>
                           ))}
-                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".85rem",fontWeight:600,paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",fontWeight:600,paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
                             <span>Итого:</span>
                             <span>{total.toLocaleString()} ₽</span>
                           </div>
