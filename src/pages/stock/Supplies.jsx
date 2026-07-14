@@ -311,7 +311,7 @@ const load = async () => {
                 <>
                 <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
                   <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{i + 1}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{fmtDate(s.date)}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
                   <td style={{textAlign:'left',color:'#555',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
                   <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{totalItems(s)}</td>
