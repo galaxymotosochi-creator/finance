@@ -25,6 +25,8 @@ export default function Clients() {
   const [fNote2, setFNote2] = useState('');
   const [debtPayAmt, setDebtPayAmt] = useState('');
   const [debtPayAc, setDebtPayAc] = useState('');
+  const [showDebtPay, setShowDebtPay] = useState(false);
+  const [debtPayClientId, setDebtPayClientId] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -165,12 +167,13 @@ export default function Clients() {
               <th style={{textAlign:'left'}}>Ср. чек</th>
               <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{textAlign:'left'}}>Долг</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>Оплата</th>
+              <th style={{width:'80px'}}></th>
             </tr>
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr><td colSpan="11"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
@@ -196,6 +199,18 @@ export default function Clients() {
                   <td style={{textAlign:'left',color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left'}}>
+                    {(() => {
+                      const debtVal = parseFloat(c.debt) || 0;
+                      const payStatus = debtVal < 0 ? 'unpaid' : 'paid';
+                      const paySt = ({unpaid:'Не оплачено (' + Math.abs(debtVal).toLocaleString() + ' ₽)',paid:'Оплачено',partially_paid:'Частично оплачено'})[payStatus]||'Не оплачено';
+                      const payColor = ({unpaid:'#dc2626',paid:'#16a34a',partially_paid:'#d97706'})[payStatus]||'#dc2626';
+                      return (
+                        <span onClick={() => { if (debtVal < 0) { setDebtPayClientId(c.id); setDebtPayAmt(''); setDebtPayAc(''); setShowDebtPay(true); }}}
+                          style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:payColor+'18',cursor:debtVal<0?'pointer':'default',fontFamily:'inherit',whiteSpace:'nowrap'}}>{paySt}</span>
+                      );
+                    })()}
+                  </td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
@@ -301,6 +316,67 @@ export default function Clients() {
           </div>
         </div>
       )}
+
+      {/* Модалка оплаты долга */}
+      {showDebtPay && debtPayClientId && (() => {
+        var dc = clients.find(x => x.id === debtPayClientId);
+        if (!dc) return null;
+        var debtAbs = Math.abs(parseFloat(dc.debt) || 0);
+        return (
+          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowDebtPay(false);setDebtPayClientId(null)}}}>
+            <div className="modal-box" style={{maxWidth:'420px'}}>
+              <button className="modal-close" onClick={()=>{setShowDebtPay(false);setDebtPayClientId(null)}}>&times;</button>
+              <div className="page-header" style={{marginBottom:'12px'}}>
+                <div>
+                  <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата долга</h1>
+                  <div className="sub" style={{marginBottom:0}}>{dc.name}</div>
+                </div>
+              </div>
+              <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.85rem',lineHeight:2}}>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Сумма долга:</span><span style={{color:'#dc2626',fontWeight:700}}>{debtAbs.toLocaleString()} ₽</span></div>
+              </div>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                var amt = parseFloat(debtPayAmt) || debtAbs;
+                if (!debtPayAc) return alert('Выберите счёт');
+                var ec = clients.find(x => x.id === debtPayClientId);
+                if (!ec) return;
+                var curDebt = parseFloat(ec.debt) || 0;
+                var paid = Math.min(amt, Math.abs(curDebt));
+                var newDebt = Math.min(0, curDebt + paid);
+                await supabase.from('clients').update({debt: newDebt}).eq('id', debtPayClientId);
+                await supabase.from('transactions').insert({
+                  user_id: user.id, type: 'income', amount: paid,
+                  description: 'Погашение долга — ' + ec.name,
+                  date: new Date().toISOString().split('T')[0],
+                  account_id: debtPayAc, status: 'paid'
+                });
+                setDebtPayAmt(''); setDebtPayAc(''); setShowDebtPay(false); setDebtPayClientId(null);
+                await load();
+              }}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Сумма (₽)</label>
+                    <input type="number" id="payAmount" defaultValue={debtAbs>0?debtAbs.toFixed(2):''} min="0" step="0.01"
+                      onChange={e => setDebtPayAmt(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>Счет зачисления</label>
+                    <select value={debtPayAc} onChange={e => setDebtPayAc(e.target.value)}>
+                      <option value="">— выберите счет —</option>
+                      {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })()}
+
     {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
