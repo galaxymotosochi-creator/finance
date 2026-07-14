@@ -340,7 +340,6 @@ const load = async () => {
                     </div>
                   </td>
                 </tr>
-              )
                 {expandedId === s.id && (() => {
                   const items = s.items || [{name:'Товар',qty:s.qty||0,cost:s.cost||0}];
                   const total = s.total || items.reduce((sum,it) => sum + it.qty*it.cost, 0);
