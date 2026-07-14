@@ -285,20 +285,22 @@ const load = async () => {
         <table className="data-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>№ накладной</th>
-              <th style={{textAlign:'left'}}>Кол-во</th>
+              <th style={{textAlign:'left',width:'30px'}}>№</th>
+              <th style={{textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Поставщик</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Товары</th>
+              <th style={{textAlign:'left',width:'50px'}}>Кол-во</th>
               <th style={{textAlign:'left'}}>Поставка</th>
               <th style={{textAlign:'left'}}>Оплата</th>
-              <th style={{textAlign:'left'}}>Дата</th>
-              <th style={{width:'130px',textAlign:'left'}}></th>
+              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Задолж.</th>
+              <th style={{textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
-            ) : supplies.map(s => {
+              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
+            ) : supplies.map((s, i) => {
               const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0);
               const payStatus = getPayStatus(s);
               const supSt = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
@@ -308,12 +310,11 @@ const load = async () => {
               return (
                 <>
                 <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
-                  <td style={{textAlign:'left',color:'#555'}}>
-                    <div className="prod-name">{s.invoice||'—'}</div>
-                  </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{totalItems(s)}</td>
+                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{i + 1}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555',fontSize:'.78rem'}}>{fmtDate(s.date)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
+                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => cycleStatus(s.id)}>{supSt}</span>
@@ -322,9 +323,12 @@ const load = async () => {
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:"#555",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{fmtDate(s.date)}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#d97706',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
+                    <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
+                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
+                    <div style={{display:'inline-block',position:'relative',marginLeft:'4px'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
                         const dd = e.currentTarget.nextElementSibling;
@@ -332,7 +336,6 @@ const load = async () => {
                         dd.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
-                        <button onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}>Детали</button>
                         <button onClick={() => edit(s.id)}>Редактировать</button>
                         <button onClick={() => copy(s.id)}>Копировать</button>
                         <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
@@ -346,7 +349,7 @@ const load = async () => {
                   const payStatus = getPayStatus(s);
                   return (
                     <tr>
-                      <td colSpan="8" style={{padding:0}}>
+                      <td colSpan="10" style={{padding:0}}>
                         <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
                           <div style={{display:"flex",fontSize:".78rem",color:"#999",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
                             <span style={{flex:1}}>Товар</span>
