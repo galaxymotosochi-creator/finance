@@ -351,19 +351,19 @@ const load = async () => {
                     <tr>
                       <td colSpan="10" style={{padding:0}}>
                         <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
-                          <div style={{display:"flex",fontSize:".78rem",color:"#999",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px"}}>
+                          <div style={{display:"flex",fontSize:".78rem",color:"#222",marginBottom:"8px",borderBottom:"1px solid #f0f0f0",paddingBottom:"6px",textTransform:"uppercase"}}>
                             <span style={{flex:1}}>Товар</span>
                             <span style={{width:"70px",textAlign:"center"}}>Кол-во</span>
                             <span style={{width:"80px",textAlign:"right"}}>Сумма</span>
                           </div>
                           {items.map((it,i) => (
-                            <div key={i} style={{display:"flex",fontSize:".78rem",color:"#555",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
+                            <div key={i} style={{display:"flex",fontSize:".78rem",color:"#222",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
                               <span style={{flex:1}}>{it.name}</span>
                               <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
-                              <span style={{width:"80px",textAlign:"right",fontWeight:500}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
+                              <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
                             </div>
                           ))}
-                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",fontWeight:600,paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
                             <span>Итого:</span>
                             <span>{total.toLocaleString()} ₽</span>
                           </div>
