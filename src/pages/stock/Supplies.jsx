@@ -12,7 +12,7 @@ const PAY_LABELS = {unpaid:'Не оплачено',partially_paid:'Частич�
 const PAY_COLORS = {unpaid:'#dc2626',partially_paid:'#d97706',paid:'#16a34a'};
 
 function getPayStatus(s) {
-  const total = s.total || 0;
+  const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0) || 0;
   const paid = s.paid || 0;
   if (paid >= total) return 'paid';
   if (paid > 0) return 'partially_paid';
