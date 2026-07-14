@@ -363,7 +363,7 @@ const load = async () => {
                               <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
                             </div>
                           ))}
-                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",color:"#222",fontWeight:500,paddingTop:"8px",marginTop:"4px",borderTop:"1px solid #f0f0f0"}}>
+                          <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",color:"#222",fontWeight:500,paddingTop:"8px",marginTop:"0"}}>
                             <span>Итого:</span>
                             <span>{total.toLocaleString()} ₽</span>
                           </div>
