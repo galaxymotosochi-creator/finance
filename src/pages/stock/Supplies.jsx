@@ -329,7 +329,7 @@ const load = async () => {
                     <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
                       style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
                     <div style={{display:'inline-block',position:'relative',marginLeft:'4px'}} className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={(e) => {
+                      <button className="act-btn prod-more-btn" style={{fontWeight:400,color:"#222"}} onClick={(e) => {
                         e.stopPropagation();
                         const dd = e.currentTarget.nextElementSibling;
                         document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
