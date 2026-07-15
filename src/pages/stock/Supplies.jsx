@@ -285,16 +285,16 @@ const load = async () => {
         <table className="data-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left',width:'30px'}}>№</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Дата</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Поставщик</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Товары</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left',width:'50px'}}>Кол-во</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Поставка</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Оплата</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Сумма</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}>Задолж.</th>
-              <th style={{color:'#222',fontWeight:400,textAlign:'left'}}></th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'30px'}}>№</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Дата</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Поставщик</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товары</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'50px'}}>Кол-во</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Поставка</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оплата</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Задолж.</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}></th>
             </tr>
           </thead>
           <tbody id="supplyTableBody">
