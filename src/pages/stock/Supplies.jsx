@@ -496,26 +496,29 @@ const load = async () => {
         if (!s) return null;
         const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
         const nextSt = SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length];
-        const curLbl = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
-        const nextLbl = SUPPLY_LABELS[nextSt]||nextSt;
+        const curLbl = SUPPLY_LABELS[s.status||'ordered']||'';
+        const nextLbl = SUPPLY_LABELS[nextSt]||'';
+        const nextColor = SUPPLY_COLORS[nextSt]||'#2563eb';
+        const hints = {
+          ordered:'Товар заказан у поставщика, но ещё не отправлен. Можно редактировать состав поставки.',
+          transit:'Поставка в пути. Товар скоро поступит на склад.',
+          received:'Товар поступил на склад и готов к продаже. Редактирование недоступно.'
+        };
         return (
           <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowStatusConfirm(null)}>
-            <div className="modal-box" style={{maxWidth:'360px'}}>
+            <div className="modal-box" style={{maxWidth:'360px',padding:'24px'}}>
               <button className="modal-close" onClick={()=>setShowStatusConfirm(null)}>&times;</button>
-              <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'8px'}}>Смена статуса</h1>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',padding:'12px 0',fontSize:'.78rem',color:'#222'}}>
-                <span style={{padding:'.25rem .7rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:400,color:'#222',background:SUPPLY_COLORS[s.status||'ordered']+'18'}}>{curLbl}</span>
-                <span style={{fontSize:'.78rem',color:'#999'}}>→</span>
-                <span style={{padding:'.25rem .7rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:400,color:'#222',background:SUPPLY_COLORS[nextSt]+'18'}}>{nextLbl}</span>
+              <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'16px'}}>
+                <span style={{padding:'.3rem .7rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:SUPPLY_COLORS[s.status||'ordered']+'18',whiteSpace:'nowrap'}}>{curLbl}</span>
+                <span style={{fontSize:'.78rem',color:'#ccc'}}>→</span>
+                <span style={{padding:'.3rem .7rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:nextColor+'18',whiteSpace:'nowrap'}}>{nextLbl}</span>
               </div>
-              {nextSt === 'received' && (
-                <div style={{background:'#f0fdf4',borderRadius:'8px',padding:'8px 10px',fontSize:'.72rem',color:'#16a34a',marginBottom:'12px',textAlign:'center'}}>Товары поступят на склад</div>
-              )}
+              <div style={{fontSize:'.76rem',color:'#555',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
               <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
                 <button type="button" onClick={()=>setShowStatusConfirm(null)}
                   style={{padding:'8px 20px',borderRadius:'100px',border:'1.5px solid #eee',background:'#fff',color:'#444',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
                 <button type="button" onClick={confirmStatusChange}
-                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
+                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
               </div>
             </div>
           </div>
