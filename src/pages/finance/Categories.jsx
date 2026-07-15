@@ -121,13 +121,12 @@ export default function Categories() {
             <tr>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'50%'}}>Название</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Тип категории</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'right',width:'1%',whiteSpace:'nowrap'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">
             {!loading && list.length === 0 && (
               <tr>
-                <td colSpan="3">
+                <td colSpan="2">
                   <div className="empty-products">
                     <div className="big-icon">📂</div>
                     <p>Список категорий пуст</p>
@@ -138,18 +137,9 @@ export default function Categories() {
             )}
             {list.map(function (c) {
               return (
-                <tr key={c.id}>
+                <tr key={c.id} style={{cursor:'pointer'}} onClick={() => openModal(c)}>
                   <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <div className="prod-more-wrap" style={{display:'inline-block',position:'relative',zIndex:2}}>
-                      <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={function () { openModal(c); }}>Редактировать</button>
-                        <button onClick={function () { remove(c.id); }} style={{ color: '#dc3545' }}>Удалить</button>
-                      </div>
-                    </div>
-                  </td>
                 </tr>
               );
             })}
@@ -178,6 +168,7 @@ export default function Categories() {
                 </select>
               </div>
               <div className="modal-actions">
+                {editingId && <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);remove(editingId)}} style={{color:'#dc3545',marginRight:'auto'}}>Удалить</button>}
                 <button type="submit" className="btn btn-account-select">Сохранить</button>
               </div>
             </form>
