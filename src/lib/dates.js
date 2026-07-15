@@ -6,8 +6,8 @@
 export function fmtDate(d) {
   if (!d) return '—';
   try {
-    // Если строка с точками — уже отформатирована
-    if (typeof d === 'string' && d.includes('.')) return d;
+    // Если уже отформатирована как ДД.ММ.ГГГГ — не трогаем
+    if (typeof d === 'string' && /^\d{2}\.\d{2}\.\d{4}$/.test(d)) return d;
     
     const date = new Date(d);
     if (isNaN(date.getTime())) return String(d);
