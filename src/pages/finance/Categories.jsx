@@ -119,7 +119,7 @@ export default function Categories() {
         <table className="data-table">
           <thead id="dirColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'50%'}}>Название</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Тип категории</th>
             </tr>
           </thead>
@@ -137,7 +137,7 @@ export default function Categories() {
             )}
             {list.map(function (c) {
               return (
-                <tr key={c.id} style={{cursor:'pointer',position:'relative'}} onClick={() => openModal(c)}>
+                <tr key={c.id} style={{position:'relative'}}>
                   <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
                   <td style={{position:'absolute',right:'8px',top:'50%',transform:'translateY(-50%)',padding:0,border:'none',background:'none',zIndex:5}}>
