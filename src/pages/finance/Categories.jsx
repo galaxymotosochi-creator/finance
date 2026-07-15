@@ -115,7 +115,7 @@ export default function Categories() {
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }}></div>
 
-      <div className="product-table" style={{ overflowX: 'auto', overflowY:'visible' }}>
+      <div className="product-table" style={{ overflowX: 'auto', overflowY:'visible', paddingRight:'25px' }}>
         <table className="data-table">
           <thead id="dirColHeaders">
             <tr>
@@ -137,14 +137,16 @@ export default function Categories() {
             )}
             {list.map(function (c) {
               return (
-                <tr key={c.id} style={{position:'relative'}}>
+                <tr key={c.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
-                  <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
-                  <td style={{position:'absolute',right:'8px',top:'50%',transform:'translateY(-50%)',padding:0,border:'none',background:'none',zIndex:5}}>
-                    <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;if(el){el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');var h=function(){el.classList.remove('open');document.removeEventListener('click',h)};setTimeout(function(){document.addEventListener('click',h)},10)}}}>⋯</button>
-                    <div className="prod-dropdown">
-                      <button onClick={function(e){e.stopPropagation();openModal(c)}}>Редактировать</button>
-                      <button onClick={function(e){e.stopPropagation();remove(c.id)}} style={{color:'#dc3545'}}>Удалить</button>
+                  <td style={{textAlign:'left',position:'relative'}}>
+                    <span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span>
+                    <div className="prod-more-wrap" style={{display:'inline-block',position:'absolute',right:'0',top:'50%',transform:'translateY(-50%)'}}>
+                      <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;if(el){el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');var h=function(){el.classList.remove('open');document.removeEventListener('click',h)};setTimeout(function(){document.addEventListener('click',h)},10)}}}>⋯</button>
+                      <div className="prod-dropdown">
+                        <button onClick={function(e){e.stopPropagation();openModal(c)}}>Редактировать</button>
+                        <button onClick={function(e){e.stopPropagation();remove(c.id)}} style={{color:'#dc3545'}}>Удалить</button>
+                      </div>
                     </div>
                   </td>
                 </tr>
