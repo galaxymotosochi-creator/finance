@@ -193,7 +193,7 @@ export default function Inventory() {
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
-                  <td style={{textAlign:'left'}}>{fmtDate(inv.date)}</td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
                   <td style={{textAlign:'left'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
