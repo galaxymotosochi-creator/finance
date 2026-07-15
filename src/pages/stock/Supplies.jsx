@@ -32,6 +32,7 @@ export default function Supplies() {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [showStatusConfirm, setShowStatusConfirm] = useState(null);
   const [showPay, setShowPay] = useState(false);
   const [payAccounts, setPayAccounts] = useState([]);
   const [payTxList, setPayTxList] = useState([]);
@@ -196,7 +197,17 @@ const load = async () => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
     const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
-    await supabase.from('supplies').update({ status: SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length] }).eq('id', id).eq('user_id', user.id);
+    const nextStatus = SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length];
+    setShowStatusConfirm({ id, nextStatus });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!showStatusConfirm) return;
+    const { id, nextStatus } = showStatusConfirm;
+    const s = supplies.find(x => x.id === id);
+    if (!s) return;
+    await supabase.from('supplies').update({ status: nextStatus }).eq('id', id).eq('user_id', user.id);
+    setShowStatusConfirm(null);
     await load();
   };
 
@@ -474,12 +485,43 @@ const load = async () => {
 
               </div>
               <div style={{textAlign:'right',marginTop:'10px'}}>
-                <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести</button>
+                <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Провести</button>
               </div>
             </form>
           </div>
         </div>
       )}{/* Модалка оплаты */}
+      {showStatusConfirm && (() => {
+        const s = supplies.find(x => x.id === showStatusConfirm.id);
+        if (!s) return null;
+        const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
+        const nextSt = SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length];
+        const curLbl = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
+        const nextLbl = SUPPLY_LABELS[nextSt]||nextSt;
+        return (
+          <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowStatusConfirm(null)}>
+            <div className="modal-box" style={{maxWidth:'360px'}}>
+              <button className="modal-close" onClick={()=>setShowStatusConfirm(null)}>&times;</button>
+              <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'8px'}}>Смена статуса</h1>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',padding:'12px 0',fontSize:'.78rem',color:'#222'}}>
+                <span style={{padding:'.25rem .7rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:400,color:'#222',background:SUPPLY_COLORS[s.status||'ordered']+'18'}}>{curLbl}</span>
+                <span style={{fontSize:'.78rem',color:'#999'}}>→</span>
+                <span style={{padding:'.25rem .7rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:400,color:'#222',background:SUPPLY_COLORS[nextSt]+'18'}}>{nextLbl}</span>
+              </div>
+              {nextSt === 'received' && (
+                <div style={{background:'#f0fdf4',borderRadius:'8px',padding:'8px 10px',fontSize:'.72rem',color:'#16a34a',marginBottom:'12px',textAlign:'center'}}>Товары поступят на склад</div>
+              )}
+              <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
+                <button type="button" onClick={()=>setShowStatusConfirm(null)}
+                  style={{padding:'8px 20px',borderRadius:'100px',border:'1.5px solid #eee',background:'#fff',color:'#444',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+                <button type="button" onClick={confirmStatusChange}
+                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      
       {showPay && (() => {
         const s = supplies.find(x => x.id === showPay);
         if (!s) return null;
@@ -488,34 +530,32 @@ const load = async () => {
         const debt = total - paid;
         return (
           <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowPay(null)}>
-            <div className="modal-box" style={{maxWidth:'420px'}}>
+            <div className="modal-box" style={{maxWidth:'480px'}}>
               <button className="modal-close" onClick={()=>setShowPay(null)}>&times;</button>
-              <div className="page-header" style={{marginBottom:'12px'}}>
-                <div>
-                  <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата поставки</h1>
-                  <div className="sub" style={{marginBottom:0}}>{s.invoice||''} {s.supplier_name||''}</div>
-                </div>
+              <div style={{marginBottom:'12px'}}>
+                <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата поставки</h1>
               </div>
-              <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.85rem',lineHeight:2}}>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Сумма накладной:</span><span style={{fontWeight:600}}>{total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Уже оплачено:</span><span style={{color:'#16a34a',fontWeight:600}}>{paid.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontWeight:600}}>Остаток:</span><span style={{color:'#dc2626',fontWeight:700}}>{debt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+              <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.78rem',lineHeight:2}}>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Поставщик:</span><span style={{fontSize:'.78rem',color:'#222'}}>{s.supplier_name || s.invoice || '—'}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Уже оплачено:</span><span style={{fontSize:'.78rem',color:'#222'}}>{paid.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontSize:'.78rem',color:'#222'}}>Остаток:</span><span style={{fontSize:'.78rem',color:'#222'}}>{debt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
               </div>
               <form onSubmit={confirmPay}>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Сумма (₽)</label>
+                    <label style={{fontSize:'.78rem',color:'#222'}}>Сумма</label>
                     <input type="number" id="payAmount" defaultValue={debt>0?debt.toFixed(2):''} min="0" step="0.01" required />
                   </div>
                   <div className="form-group">
-                    <label>Счет списания</label>
+                    <label style={{fontSize:'.78rem',color:'#222'}}>Счет списания</label>
                     <select id="payMethod">
                       <option value="">— выберите счет —</option>
                       {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} ₽)</option>})}
                     </select>
                   </div>
                 </div>
-                <div style={{fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',marginBottom:'.5rem',fontWeight:500,marginTop:'.25rem'}} onClick={function(){setPaySplit(!paySplit);if(!paySplit)setSplitAmts({})}}>+ Разделить</div>
+                <div style={{fontSize:'.78rem',color:'var(--secondary)',cursor:'pointer',marginBottom:'.5rem',fontWeight:500,marginTop:'.25rem'}} onClick={function(){setPaySplit(!paySplit);if(!paySplit)setSplitAmts({})}}>+ Разделить</div>
                 {paySplit && <div style={{padding:'.5rem 0',borderTop:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:'.35rem',marginBottom:'.5rem'}}>
                   {payAccounts.map(function(a){
                     return (
@@ -528,7 +568,7 @@ const load = async () => {
                   })}
                 </div>}
                 <div style={{textAlign:'right'}}>
-                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
+                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
                 </div>
               </form>
             </div>
