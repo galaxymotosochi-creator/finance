@@ -121,7 +121,7 @@ export default function Categories() {
             <tr>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Тип категории</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',width:'140px',textAlign:'right'}}></th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'right',width:'1%',whiteSpace:'nowrap'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">
