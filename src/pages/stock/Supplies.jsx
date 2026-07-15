@@ -196,7 +196,7 @@ const load = async () => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
     const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
-    await supabase.from('supplies').update({ status: SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length] }).eq('id', id);
+    await supabase.from('supplies').update({ status: SUPPLY_STATUSES[(idx + 1) % SUPPLY_STATUSES.length] }).eq('id', id).eq('user_id', user.id);
     await load();
   };
 
@@ -259,7 +259,7 @@ const load = async () => {
       s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     }
     const totalPaid = (s.payments||[]).reduce((sum,p) => sum + (parseFloat(p.amount)||0), 0);
-    const { error: payUpdateErr } = await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay); if (payUpdateErr) { showToast('Ошибка обновления: ' + payUpdateErr.message); return; }
+    const { error: payUpdateErr } = await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay).eq('user_id', user.id); if (payUpdateErr) { showToast('Ошибка обновления: ' + payUpdateErr.message); return; }
     await load(); setShowPay(null); setPaySplit(false); setSplitAmts({});
     showToast('Оплата проведена');
   };
