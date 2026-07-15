@@ -120,10 +120,10 @@ export default function Writeoffs() {
             ) : list.map(w => (
               <tr key={w.id}>
                 <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
-                <td style={{whiteSpace:'nowrap'}}>{w.quantity}</td>
-                <td style={{whiteSpace:'nowrap'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
-                <td style={{whiteSpace:'nowrap'}}><span className="prod-cat">{w.reason||'—'}</span></td>
-                <td style={{}}>{fmtDate(w.date)}</td>
+                <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{w.quantity}</td>
+                <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} ₽</span></td>
+                <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}><span className="prod-cat">{w.reason||'—'}</span></td>
+                <td style={{color:'#222',fontSize:'.78rem'}}>{fmtDate(w.date)}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={(e) => {
