@@ -121,7 +121,7 @@ export default function Categories() {
             <tr>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Тип категории</th>
-              <th style={{ width: '130px' }}></th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'130px'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">
@@ -141,7 +141,7 @@ export default function Categories() {
                 <tr key={c.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <td style={{ textAlign: 'left', whiteSpace: 'nowrap' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={toggleMenu}>⋯</button>
                       <div className="prod-dropdown">
