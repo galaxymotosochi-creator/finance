@@ -493,27 +493,27 @@ export default function Products() {
       case 'category': return `<span class="prod-cat">${CAT_LABELS[p.cat] || p.cat || '—'}</span>`;
       case 'cost': {
         const cp = costPrice(p);
-        if (p.type === 'service') return '<span style="color:#555">—</span>';
+        if (p.type === 'service') return '<span style="color:#222">—</span>';
         return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + ' ₽' : '—'}</span>`;
       }
       case 'price': return `<span class="prod-price">${(p.price || 0).toLocaleString()} ₽</span>`;
       case 'markup': {
-        if (p.type === 'service') return '<span style="color:#555">—</span>';
+        if (p.type === 'service') return '<span style="color:#222">—</span>';
         const cp = costPrice(p);
-        if (cp <= 0) return '<span style="color:#555">—</span>';
+        if (cp <= 0) return '<span style="color:#222">—</span>';
         const mk = Math.round(((p.price || 0) - cp) / cp * 100);
-        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : '#555';
+        const color = mk > 0 ? '#16a34a' : mk < 0 ? '#dc2626' : '#222';
         return `<span style="color:${color}">${mk > 0 ? '+' : ''}${mk}%</span>`;
       }
-      case 'unit': return `<span style="color:#555">${p.unit || '—'}</span>`;
-      case 'sku': return `<span style="color:#555">${p.sku || '—'}</span>`;
-      case 'barcode': return `<span style="color:#555">${p.barcode || '—'}</span>`;
+      case 'unit': return `<span style="color:#222">${p.unit || '—'}</span>`;
+      case 'sku': return `<span style="color:#222">${p.sku || '—'}</span>`;
+      case 'barcode': return `<span style="color:#222">${p.barcode || '—'}</span>`;
       case 'weight': {
         if (p.type==='service') return '<span style="color:#555">—</span>';
         const w = parseFloat(p.weight) || 0;
         return `<span>${w > 0 ? w + (p.weightUnit||p.weight_unit||'кг') : '—'}</span>`;
       }
-      case 'description': return `<span style="color:#555">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
+      case 'description': return `<span style="color:#222">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
       default: return '—';
     }
   };
