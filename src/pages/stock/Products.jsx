@@ -846,7 +846,7 @@ export default function Products() {
                 {editId && fHidden && (
                   <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => restore(editId)}>Восстановить товар</button>
                 )}
-                <button type="submit" className="btn btn-account-select">'Сохранить'</button>
+                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
               </div>
             </form>
           </div>
