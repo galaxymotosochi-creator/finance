@@ -228,7 +228,7 @@ export default function Stock() {
         <table className="data-table" style={{minWidth:'680px'}}>
           <thead id="stockColHeaders">
             <tr>
-              <th style={{textAlign:'left',minWidth:'200px'}}>Товар</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',minWidth:'200px'}}>Товар</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Артикул</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Штрихкод</th>
               <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Категория</th>
