@@ -260,32 +260,32 @@ export default function Stock() {
               const markupPct = costPrice > 0 ? Math.round((markup / costPrice) * 100) : 0;
               return (
                 <tr key={p.id}>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{color:'#555'}}>{p.name}</span>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',fontSize:'.78rem',color:'#222'}}>
+                    <span>{p.name}</span>
                   </td>
-                  <td style={{textAlign:'left',color:'#555',fontFamily:'monospace'}}>{p.sku || '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{p.barcode || '—'}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
-                  <td style={{textAlign:'left',color:'#555'}}>{qty}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222',fontFamily:'monospace'}}>{p.sku || '—'}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{p.barcode || '—'}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',fontSize:'.78rem',color:'#222'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{qty}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     {p.min_qty > 0 ? (
                       <span style={{color: qty >= p.min_qty ? '#16a34a' : '#dc2626',fontWeight:500}}>
                         {qty + ' / ' + p.min_qty + ' шт'}
                       </span>
                     ) : '—'}
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{costPrice.toLocaleString()}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{costPrice.toLocaleString()}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     <span className="editable-price"
-                      style={{cursor:'pointer',color:'#555',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
+                      style={{cursor:'pointer',color:'#222',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
                       onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     <span className={`markup-badge${markup >= 0 ? '' : ' neg'}`}>
                       {markup >= 0 ? '+' : ''}{markup.toLocaleString()}{markupPct ? ` (${markupPct}%)` : ''}
                     </span>
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{sumValue.toLocaleString()}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{sumValue.toLocaleString()}</td>
                 </tr>
               );
             })}
