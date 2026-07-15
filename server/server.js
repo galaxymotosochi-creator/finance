@@ -357,6 +357,19 @@ app.post('/api/:table', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.patch('/api/:table', auth, async (req, res) => {
+  try {
+    const { table } = req.params;
+    const filters = supFilters(req.query);
+    if (filters.length === 0) return res.status(400).json({ error: 'No filters' });
+    const sets = Object.keys(req.body).map((k,i) => `"${k}" = $${i+1}`).join(', ');
+    const vals = Object.values(req.body);
+    const { error } = await db.query(`UPDATE "${table}" SET ${sets} WHERE ${filters.join(' AND ')}`, vals);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.patch('/api/:table/:id', auth, async (req, res) => {
   try {
     const { table, id } = req.params;
