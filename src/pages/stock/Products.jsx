@@ -148,7 +148,8 @@ export default function Products() {
   const [fHidden, setFHidden] = useState(false);
   const [fComboItems, setFComboItems] = useState([]);
   const [fComboSearch, setFComboSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [typeFilterSet, setTypeFilterSet] = useState(new Set());
+  const [typeOpen, setTypeOpen] = useState(false);
 
   // Dropdowns
   const [catOpen, setCatOpen] = useState(false);
@@ -207,6 +208,7 @@ export default function Products() {
   useEffect(() => {
     const handler = (e) => {
       if (!e.target.closest('.cat-wrapper')) setCatOpen(false);
+      if (!e.target.closest('.type-wrapper')) setTypeOpen(false);
       if (!e.target.closest('.cols-wrapper')) setColsOpen(false);
       if (!e.target.closest('.export-wrapper')) setExportOpen(false);
       if (!e.target.closest('.prod-more-wrap')) {
@@ -344,6 +346,20 @@ export default function Products() {
     showToast('Столбцы сброшены');
   };
 
+  const toggleType = (t) => {
+    const next = new Set(typeFilterSet);
+    if (next.has(t)) next.delete(t); else next.add(t);
+    setTypeFilterSet(next);
+  };
+
+  const selectAllTypes = () => {
+    setTypeFilterSet(new Set(['product','service','combo']));
+  };
+
+  const clearAllTypes = () => {
+    setTypeFilterSet(new Set());
+  };
+
   const toggleCat = (name) => {
     const next = new Set(selectedCats);
     if (next.has(name)) next.delete(name); else next.add(name);
@@ -470,9 +486,7 @@ export default function Products() {
   const q = search.toLowerCase().trim();
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
-  if (typeFilter === 'product') filtered = filtered.filter(p => p.type === 'product');
-  else if (typeFilter === 'service') filtered = filtered.filter(p => p.type === 'service');
-  else if (typeFilter === 'combo') filtered = filtered.filter(p => p.type === 'combo');
+  if (typeFilterSet.size > 0) filtered = filtered.filter(p => typeFilterSet.has(p.type));
   filtered = filtered.sort((a, b) => (a.hidden ? 1 : 0) - (b.hidden ? 1 : 0));
 
   const costPrice = (p) => {
@@ -532,22 +546,7 @@ export default function Products() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      {/* Фильтр по типу */}
-      <div className="nav-tabs" style={{display:'flex',gap:'.25rem',marginBottom:'.35rem',justifyContent:'flex-end'}}>
-        {['all','product','service','combo'].map(function(t) {
-          return (
-            <button key={t} onClick={function(){setTypeFilter(t)}}
-              style={{
-                padding:'.2rem .6rem', fontSize:'.75rem', fontFamily:'var(--font)',
-                background: typeFilter === t ? '#111' : 'transparent',
-                color: typeFilter === t ? '#fff' : '#555',
-                border: typeFilter === t ? 'none' : '1px solid var(--border)',
-                borderRadius:'100px', cursor:'pointer', fontWeight: typeFilter === t ? 600 : 400,
-                transition:'all .15s'
-              }}>{t === 'all' ? 'Все' : t === 'product' ? 'Товары' : t === 'service' ? 'Услуги' : 'Комбо'}</button>
-          );
-        })}
-      </div>
+
 
       <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
         <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
@@ -596,8 +595,28 @@ export default function Products() {
               </div>
             )}
           </div>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1,opacity:importing?0.5:1}}
-            onClick={()=>{if(!importing){fileInputRef.current.click()}}}>{importing ? '⏳ Загрузка...' : '📥 Загрузить'}</span>
+          <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип</span>
+            {typeOpen && (
+              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+                <div className="cat-dd-list">
+                  {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
+                    const checked = typeFilterSet.has(t.v);
+                    return (
+                      <div key={t.v} className="cat-dd-item" onClick={() => toggleType(t.v)}>
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
+                        <span>{t.l}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
+                  <span className="cat-dd-action" onClick={selectAllTypes}>Выбрать все</span>
+                  <span className="cat-dd-action" onClick={clearAllTypes}>Очистить</span>
+                </div>
+              </div>
+            )}</div>
           <div className="cols-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
