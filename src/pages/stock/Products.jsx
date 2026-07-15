@@ -527,7 +527,7 @@ export default function Products() {
           <div className="sub">Каталог товаров, услуг и комбо</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openAdd}>+ Добавить</button>
+          <button className="btn-mint" onClick={openAdd} style={{color:'#222',fontWeight:400}}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
