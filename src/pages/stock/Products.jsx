@@ -705,9 +705,9 @@ export default function Products() {
         <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h2>
-            <div className="sub">Заполните данные для каталога и нажмите Сохранить</div>
-            <form onSubmit={save}>
+            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h1>
+            <div style={{fontSize:'.78rem',color:'#222',margin:'.35rem 0 .75rem'}}>Заполните данные для каталога и нажмите Сохранить</div>
+            <form onSubmit={save} style={{fontSize:'.78rem'}}>
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
@@ -827,8 +827,13 @@ export default function Products() {
                 </div>
                 <div className="form-group" style={{border:'none'}}></div>
               </div>
-              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.35rem',fontSize:'.78rem',fontWeight:500,marginBottom:'.75rem',cursor:'pointer',color:'#555'}}>
-                <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{width:'16px',height:'16px',cursor:'pointer',margin:0}} />
+              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.78rem',color:'#222',marginBottom:'.75rem',cursor:'pointer'}}>
+                <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
+                  <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
+                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#111':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
+                    <span style={{position:'absolute',content:'',height:'16px',width:'16px',left:'2px',bottom:'2px',background:'#fff',borderRadius:'50%',transition:'transform .2s',transform:fFreePrice?'translateX(14px)':'translateX(0)'}}></span>
+                  </span>
+                </span>
                 Продавать по свободной цене
               </label>}
               <div className="form-group">
