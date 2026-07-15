@@ -291,16 +291,16 @@ export default function Stock() {
             })}
             {items.length > 0 && (
               <tr className="total-row">
-                <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
+                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>Итого:</td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style={{textAlign:'left',fontWeight:700}}>{totalQty}</td>
+                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalQty}</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style={{textAlign:'left',fontWeight:700}}>{totalSum.toLocaleString()}</td>
+                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalSum.toLocaleString()}</td>
               </tr>
             )}
           </tbody>
