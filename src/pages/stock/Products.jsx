@@ -560,6 +560,28 @@ export default function Products() {
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
+          <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип</span>
+            {typeOpen && (
+              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+                <div className="cat-dd-list">
+                  {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
+                    const checked = typeFilterSet.has(t.v);
+                    return (
+                      <div key={t.v} className="cat-dd-item" onClick={() => toggleType(t.v)}>
+                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
+                        <span>{t.l}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
+                  <span className="cat-dd-action" onClick={selectAllTypes}>Выбрать все</span>
+                  <span className="cat-dd-action" onClick={clearAllTypes}>Очистить</span>
+                </div>
+              </div>
+            )}</div>
           <div className="cat-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
@@ -587,69 +609,31 @@ export default function Products() {
               </div>
             )}
           </div>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</span>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-            onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}}>Скачать</span>
-          <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип</span>
-            {typeOpen && (
-              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
-                <div className="cat-dd-list">
-                  {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
-                    const checked = typeFilterSet.has(t.v);
-                    return (
-                      <div key={t.v} className="cat-dd-item" onClick={() => toggleType(t.v)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
-                        <span>{t.l}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
-                  <span className="cat-dd-action" onClick={selectAllTypes}>Выбрать все</span>
-                  <span className="cat-dd-action" onClick={clearAllTypes}>Очистить</span>
-                </div>
-              </div>
-            )}</div>
           <div className="cols-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
+            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
             {colsOpen && (
               <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                 <div className="cols-title">Основные столбцы</div>
                 <div className="cols-list">
-                  {ALL_COLUMNS.filter(c => !c.always && c.def).map(c => {
-                    const checked = activeCols.has(c.id);
-                    return (
-                      <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
-                        <span>{c.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="cols-title" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>Дополнительные</div>
-                <div className="cols-list">
-                  {ALL_COLUMNS.filter(c => !c.always && !c.def).map(c => {
-                    const checked = activeCols.has(c.id);
-                    return (
-                      <div key={c.id} className="cols-item" onClick={() => toggleCol(c.id)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
-                        <span>{c.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="cols-footer">
-                  <span className="cols-reset" onClick={resetCols}>Вернуть по умолчанию</span>
-                </div>
-              </div>
-            )}
+                {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
+                  const active = activeCols.has(col.id);
+                  return (
+                    <div key={col.id} className="cols-item" onClick={() => toggleCol(col.id)}>
+                      <input type="checkbox" checked={active} onChange={()=>{}} />
+                      <span>{col.label}</span>
+                    </div>
+                  );
+                })}
+              </div></div>
+            )}</div>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</span>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}}>Скачать</span>
           </div>
         </div>
-      </div>
+
 
       </div>
       {/* Таблица */}
