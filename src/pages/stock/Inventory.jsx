@@ -162,8 +162,8 @@ export default function Inventory() {
                       <td style={{textAlign:'left'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'—'}</div></td>
                       <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
                       <td style={{textAlign:'left'}}><span className="num">{it.actual}</span></td>
-                      <td style={{textAlign:'left',color:'#555'}}><span className="num">{d>0?'+':''}{d}</span></td>
-                      <td style={{textAlign:'left',color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
+                      <td style={{textAlign:'left'}}><span className="num">{d>0?'+':''}{d}</span></td>
+                      <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
                     </tr>;
                   })}
                 </tbody>
@@ -193,9 +193,9 @@ export default function Inventory() {
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
-                  <td style={{textAlign:'left',color:'#555'}}>{fmtDate(inv.date)}</td>
+                  <td style={{textAlign:'left'}}>{fmtDate(inv.date)}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <button className="act-btn prod-edit-btn" onClick={() => view(inv.id)}>Открыть</button>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -230,11 +230,11 @@ export default function Inventory() {
                 {editing.items.map(function(it,idx) {
                   var diff = it.actual - it.expected;
                   var ds = diff * it.cost;
-                  return <tr key={idx}><td style={{textAlign:'left',color:'#555'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
-                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{it.expected}</span></td>
+                  return <tr key={idx}><td style={{textAlign:'left'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
+                    <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
                     <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
-                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{textAlign:'left',color:'#555'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
+                    <td style={{textAlign:'left'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
+                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
                   </tr>;
                 })}
               </tbody>
