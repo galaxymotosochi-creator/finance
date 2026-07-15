@@ -496,7 +496,7 @@ export default function Products() {
         if (p.type === 'service') return '<span style="color:#222">—</span>';
         return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + ' ₽' : '—'}</span>`;
       }
-      case 'price': return `<span class="prod-price">${(p.price || 0).toLocaleString()} ₽</span>`;
+      case 'price': return `<span class="prod-price" style="color:#222">${(p.price || 0).toLocaleString()} ₽</span>`;
       case 'markup': {
         if (p.type === 'service') return '<span style="color:#222">—</span>';
         const cp = costPrice(p);
