@@ -5,24 +5,20 @@
  */
 export function fmtDate(d) {
   if (!d) return '—';
-  // Если уже отформатировано (содержит точки)
-  if (typeof d === 'string' && d.includes('.')) return d;
   try {
-    // Если передали Date объект
-    if (d instanceof Date) {
-      return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-    // Если ISO строка с T
-    if (d.includes('T')) {
-      const parts = d.split('T')[0].split('-');
-      if (parts.length === 3) return parts[2] + '.' + parts[1] + '.' + parts[0];
-    }
-    // Если просто YYYY-MM-DD
-    const parts = d.split('-');
-    if (parts.length === 3) return parts[2] + '.' + parts[1] + '.' + parts[0];
-    return d;
+    // Если строка с точками — уже отформатирована
+    if (typeof d === 'string' && d.includes('.')) return d;
+    
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return String(d);
+    
+    return date.toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   } catch(e) {
-    return d;
+    return String(d);
   }
 }
 
