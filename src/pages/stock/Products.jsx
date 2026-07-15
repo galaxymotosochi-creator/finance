@@ -584,17 +584,8 @@ export default function Products() {
           </div>
           <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</span>
-          <div className="export-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setExportOpen(!exportOpen);setCatOpen(false);setColsOpen(false)}}>📥 Скачать</span>
-            {exportOpen && (
-              <div className="export-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
-                <div className="export-dd-title" style={{fontSize:'.72rem',color:'var(--muted)',padding:'.25rem .5rem',marginBottom:'.15rem',textAlign:'left'}}>Скачать</div>
-                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportTemplate()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📋 Шаблон для импорта</div>
-                <div className="export-dd-btn" onClick={()=>{setExportOpen(false);exportExcel()}} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.35rem .5rem',fontSize:'.78rem',cursor:'pointer',borderRadius:'var(--radius)',color:'var(--body-color)',background:'transparent'}}>📤 Выгрузить товары</div>
-              </div>
-            )}
-          </div>
+          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+            onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}}>Скачать</span>
           <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
               onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип</span>
