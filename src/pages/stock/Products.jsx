@@ -748,7 +748,10 @@ export default function Products() {
                   <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
                 </div>
                 {fType !== 'service' && <div className="form-group">
-                  <label>Штрихкод</label>
+                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    Штрихкод
+                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => setFBarcode(genBarcode())}>Сгенерировать</span>
+                  </label>
                   <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
                 </div>}
                 {fType === 'service' && <div className="form-group"></div>}
