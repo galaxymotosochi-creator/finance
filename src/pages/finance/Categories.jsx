@@ -162,8 +162,7 @@ export default function Categories() {
         <div className="modal-overlay active" onClick={function (e) { if (e.target.className === 'modal-overlay active') { setShowModal(false); setEditingId(null); } }}>
           <div className="modal-box">
             <button className="modal-close" onClick={function () { setShowModal(false); setEditingId(null); }}>&times;</button>
-            <h2>{editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'}</h2>
-            <div className="sub">{editingId ? 'Измените название и тип' : 'Введите название и выберите тип'}</div>
+            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'.75rem'}}>{editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'}</h1>
             <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
@@ -179,7 +178,7 @@ export default function Categories() {
               </div>
               <div className="modal-actions">
                 {editingId && <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);remove(editingId)}} style={{color:'#dc3545',marginRight:'auto'}}>Удалить</button>}
-                <button type="submit" className="btn btn-account-select">Сохранить</button>
+                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
               </div>
             </form>
           </div>
