@@ -705,8 +705,7 @@ export default function Products() {
         <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
           <div className="modal-box">
             <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h1>
-            <div style={{fontSize:'.78rem',color:'#222',margin:'.35rem 0 .75rem'}}>Заполните данные для каталога и нажмите Сохранить</div>
+            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'.75rem'}}>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h1>
             <form onSubmit={save} style={{fontSize:'.78rem'}}>
               <div className="form-group">
                 <label>Название</label>
