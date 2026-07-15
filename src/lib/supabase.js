@@ -72,6 +72,11 @@ class PostgrestFilter {
     return c;
   }
 
+  single() {
+    this.limitVal = 1;
+    return this;
+  }
+
   delete() {
     const c = this._clone();
     c.method = 'DELETE';
@@ -110,7 +115,20 @@ class PostgrestFilter {
         return { data: this.limitVal === 1 ? (pData[0] || null) : pData, error: null };
       } else if (this.method === 'PATCH') {
         headers['Prefer'] = 'return=representation';
-        res = await fetch(url, { method: 'PATCH', headers, body: JSON.stringify(this.body) });
+        // Извлекаем id=eq.XXX из params и переносим в URL
+        var idParam = this.params.find(function(p){ return p.startsWith('id=eq.'); });
+        var otherParams = this.params.filter(function(p){ return !p.startsWith('id=eq.') && !p.startsWith('user_id=eq.'); });
+        var apiUrl = this.url;
+        if (idParam) {
+          var idVal = decodeURIComponent(idParam.split('=')[1].replace('eq.', ''));
+          apiUrl = this.url + '/' + idVal;
+        }
+        if (otherParams.length > 0) {
+          // Добавляем оставшиеся параметры как query
+          var prefix = apiUrl.includes('?') ? '&' : '?';
+          apiUrl += prefix + otherParams.join('&');
+        }
+        res = await fetch(apiUrl, { method: 'PATCH', headers, body: JSON.stringify(this.body) });
         if (!res.ok) return { data: null, error: new Error('HTTP ' + res.status) };
         let d = null;
         try { d = await res.json(); } catch(e) {}
