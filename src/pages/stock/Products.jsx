@@ -644,11 +644,11 @@ export default function Products() {
             <tr>
               {COL_ORDER.map(col => {
                 if (col === 'name' || activeCols.has(col)) {
-                  return <th key={col} data-col={col} style={col==='name'?{minWidth:'200px',textAlign:'left'}:{textAlign:'left'}}>{COL_LABELS[col]}</th>;
+                  return <th key={col} data-col={col} style={col==='name'?{minWidth:'200px',textAlign:'left',color:'#222',fontWeight:400,fontSize:'.78rem'}:{textAlign:'left',color:'#222',fontWeight:400,fontSize:'.78rem'}}>{COL_LABELS[col]}</th>;
                 }
                 return null;
               })}
-              <th style={{width:'140px',textAlign:'right'}}></th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',width:'140px',textAlign:'right'}}></th>
             </tr>
           </thead>
           <tbody id="productTableBody">

@@ -183,7 +183,6 @@ const load = async () => {
 
   const save = async (e) => {
     e.preventDefault();
-    if (!fItems.length) return alert('Добавьте хотя бы один товар');
     const total = fItems.reduce((acc, it) => acc + it.qty * it.cost, 0);
     const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, paid: 0, date: new Date().toISOString().split('T')[0] };
     if (editId) {
@@ -328,7 +327,7 @@ const load = async () => {
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
-                      onClick={() => cycleStatus(s.id)}>{supSt}</span>
+                      onClick={() => s.status !== 'received' && cycleStatus(s.id)}>{supSt}</span>
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
@@ -508,17 +507,17 @@ const load = async () => {
           <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowStatusConfirm(null)}>
             <div className="modal-box" style={{maxWidth:'360px',padding:'24px'}}>
               <button className="modal-close" onClick={()=>setShowStatusConfirm(null)}>&times;</button>
-              <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'16px'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',marginBottom:'16px'}}>
                 <span style={{padding:'.3rem .7rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:SUPPLY_COLORS[s.status||'ordered']+'18',whiteSpace:'nowrap'}}>{curLbl}</span>
-                <span style={{fontSize:'.78rem',color:'#ccc'}}>→</span>
+                <span style={{fontSize:'.78rem',color:'#222'}}>→</span>
                 <span style={{padding:'.3rem .7rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:nextColor+'18',whiteSpace:'nowrap'}}>{nextLbl}</span>
               </div>
-              <div style={{fontSize:'.76rem',color:'#555',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
+              <div style={{fontSize:'.76rem',color:'#222',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
               <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
                 <button type="button" onClick={()=>setShowStatusConfirm(null)}
-                  style={{padding:'8px 20px',borderRadius:'100px',border:'1.5px solid #eee',background:'#fff',color:'#444',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+                  style={{padding:'8px 20px',borderRadius:'100px',border:'1.5px solid #ccc',background:'#fff',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
                 <button type="button" onClick={confirmStatusChange}
-                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
+                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
               </div>
             </div>
           </div>

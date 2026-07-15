@@ -229,15 +229,15 @@ export default function Stock() {
           <thead id="stockColHeaders">
             <tr>
               <th style={{textAlign:'left',minWidth:'200px'}}>Товар</th>
-              <th style={{textAlign:'left'}}>Артикул</th>
-              <th style={{textAlign:'left'}}>Штрихкод</th>
-              <th style={{textAlign:'left'}}>Категория</th>
-              <th style={{textAlign:'left'}}>Остаток</th>
-              <th style={{textAlign:'left'}}>Мин. остаток</th>
-              <th style={{textAlign:'left'}}>Закуп</th>
-              <th style={{textAlign:'left'}}>Продажа</th>
-              <th style={{textAlign:'left'}}>Наценка</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Артикул</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Штрихкод</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Категория</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Остаток</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Мин. остаток</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Закуп</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Продажа</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Наценка</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
             </tr>
           </thead>
           <tbody id="stockTableBody">

@@ -105,11 +105,11 @@ export default function Writeoffs() {
         <table className="data-table">
           <thead id="woColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>Товар</th>
-              <th style={{textAlign:'left'}}>Кол-во</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
-              <th style={{textAlign:'left'}}>Причина</th>
-              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Кол-во</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Причина</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Дата</th>
               <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>

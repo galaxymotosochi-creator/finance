@@ -173,7 +173,7 @@ export default function Employees() {
         <table className="data-table">
           <thead id="colHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
-            <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>С продаж</th><th style={{width:'110px',textAlign:'left'}}></th>
+            <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Принят</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оклад</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>С продаж</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (

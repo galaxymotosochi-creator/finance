@@ -99,12 +99,12 @@ export default function Suppliers() {
         <table className="data-table">
           <thead id="supColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>Название</th>
-              <th style={{textAlign:'left'}}>Контакт</th>
-              <th style={{textAlign:'left'}}>Телефон</th>
-              <th style={{textAlign:'left'}}>Способ связи</th>
-              <th style={{textAlign:'left'}}>Поставок</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Контакт</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Телефон</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Способ связи</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Поставок</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
               <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>

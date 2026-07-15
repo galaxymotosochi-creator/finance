@@ -210,7 +210,7 @@ export default function Accounts() {
             <table className="data-table">
               <thead id="colHeaders">
                 <tr>
-                  <th style={{paddingLeft:0}}>Счет</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',paddingLeft:0}}>Счет</th>
                   <th style={{textAlign:'left'}}>Начальный остаток</th>
                   <th style={{textAlign:'left'}}>Поступления</th>
                   <th style={{textAlign:'left'}}>Расходы</th>

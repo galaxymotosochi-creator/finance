@@ -177,10 +177,10 @@ export default function Inventory() {
         <table className="data-table">
           <thead id="invColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>№</th>
-              <th style={{textAlign:'left'}}>Дата</th>
-              <th style={{textAlign:'left'}}>Расхождений</th>
-              <th style={{textAlign:'left'}}>Результат</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>№</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Дата</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Расхождений</th>
+              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Результат</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>
@@ -225,7 +225,7 @@ export default function Inventory() {
           <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {fmtDate(editing.date)}</div>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table className="data-table">
-              <thead id="colHeaders"><tr><th style={{textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
+              <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
               <tbody>
                 {editing.items.map(function(it,idx) {
                   var diff = it.actual - it.expected;
