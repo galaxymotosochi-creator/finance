@@ -196,7 +196,7 @@ export default function Inventory() {
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
-                  <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => view(inv.id)}>Открыть</span>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
