@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -234,13 +235,8 @@ export default function Clients() {
       )}
 
       {/* Модалка */}
-      {show && (
-        <div className="modal-overlay active" onClick={(e)=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать клиента' : 'Добавить клиента'}</h2>
-            <div className="sub">Создание карточки нового покупателя</div>
-            <form onSubmit={save}>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать клиента' : 'Добавить клиента'} subtitle="Создание карточки нового покупателя" width="medium">
+        <form onSubmit={save}>
               <div className="form-group">
                 <label>Имя</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Иванов" required />
@@ -313,25 +309,15 @@ export default function Clients() {
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* Модалка оплаты долга */}
-      {showDebtPay && debtPayClientId && (() => {
+      <Modal open={showDebtPay && debtPayClientId} onClose={()=>{setShowDebtPay(false);setDebtPayClientId(null)}} title="Оплата долга" subtitle={(()=>{var dc = clients.find(x => x.id === debtPayClientId); return dc ? dc.name : '';})()} width="medium">
+        {(() => {
         var dc = clients.find(x => x.id === debtPayClientId);
         if (!dc) return null;
         var debtAbs = Math.abs(parseFloat(dc.debt) || 0);
-        return (
-          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowDebtPay(false);setDebtPayClientId(null)}}}>
-            <div className="modal-box" style={{maxWidth:'420px'}}>
-              <button className="modal-close" onClick={()=>{setShowDebtPay(false);setDebtPayClientId(null)}}>&times;</button>
-              <div className="page-header" style={{marginBottom:'12px'}}>
-                <div>
-                  <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата долга</h1>
-                  <div className="sub" style={{marginBottom:0}}>{dc.name}</div>
-                </div>
-              </div>
+        return (<>
               <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.85rem',lineHeight:2}}>
                 <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#888'}}>Сумма долга:</span><span style={{color:'#dc2626',fontWeight:700}}>{debtAbs.toLocaleString()} ₽</span></div>
               </div>
@@ -372,10 +358,10 @@ export default function Clients() {
                   <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
                 </div>
               </form>
-            </div>
-          </div>
-        );
-      })()}
+            </>
+            );
+          })()}
+          </Modal>
 
     {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
