@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -225,66 +226,59 @@ export default function Loyalty() {
       )}
 
       {/* Модалка */}
-      {show && (
-        <div className="modal-overlay active" onClick={(e)=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать программу' : 'Добавить программу'}</h2>
-            <div className="sub">Создание и настройка условий лояльности</div>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнерская программа" required />
-              </div>
-              <div className="form-group">
-                <label>Иконка (эмодзи)</label>
-                <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
-                  {LOY_EMOJIS.map(e => (
-                    <span key={e} className={`loy-emoji${fIcon === e ? ' selected' : ''}`}
-                      onClick={() => setFIcon(e)}>{e}</span>
-                  ))}
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Тип программы</label>
-                <select value={fType} onChange={e=>setFType(e.target.value)}>
-                  <option value="constant">📋 Постоянная — фиксированная скидка</option>
-                  <option value="accumulative">📈 Накопительная — скидка растет от суммы</option>
-                  <option value="bonus">🎯 Бонусная — баллы за покупки</option>
-                  <option value="birthday">🎂 ДР-скидка — автоскидка в день рождения</option>
-                </select>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Скидка (%)</label>
-                  <input type="number" value={fDiscount} onChange={e=>setFDiscount(e.target.value)} placeholder="10" min="0" max="100" />
-                </div>
-                <div className="form-group">
-                  <label>Порог (₽)</label>
-                  <input type="number" value={fCondition} onChange={e=>setFCondition(e.target.value)} placeholder="0 — без порога" min="0" />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Описание</label>
-                <textarea value={fDesc} onChange={e=>setFDesc(e.target.value)} placeholder="Например: Скидка 10% для постоянных партнеров" rows="2" />
-              </div>
-              <div className="loy-modal-preview" id="loyPreview">
-                <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>
-                <div style={{display:'flex',alignItems:'center',gap:'.75rem',background:'#f8f9fa',borderRadius:'.75rem',padding:'.75rem'}}>
-                  <div id="loyPreviewIcon" style={{fontSize:'1.8rem'}}>{fIcon}</div>
-                  <div>
-                    <div id="loyPreviewName" style={{fontWeight:600,fontSize:'.85rem'}}>{fName || 'Новая программа'}</div>
-                    <div id="loyPreviewDesc" style={{fontSize:'.75rem',color:'var(--muted)'}}>{fDiscount ? 'Скидка '+fDiscount+'%' : 'Без скидки'}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId?'Сохранить':'✨ Создать программу'}</button>
-              </div>
-            </form>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать программу' : 'Добавить программу'} subtitle="Создание и настройка условий лояльности" width="wide">
+        <form onSubmit={save}>
+          <div className="form-group">
+            <label>Название</label>
+            <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнерская программа" required />
           </div>
-        </div>
-      )}
+          <div className="form-group">
+            <label>Иконка (эмодзи)</label>
+            <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
+              {LOY_EMOJIS.map(e => (
+                <span key={e} className={`loy-emoji${fIcon === e ? ' selected' : ''}`}
+                  onClick={() => setFIcon(e)}>{e}</span>
+              ))}
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Тип программы</label>
+            <select value={fType} onChange={e=>setFType(e.target.value)}>
+              <option value="constant">📋 Постоянная — фиксированная скидка</option>
+              <option value="accumulative">📈 Накопительная — скидка растет от суммы</option>
+              <option value="bonus">🎯 Бонусная — баллы за покупки</option>
+              <option value="birthday">🎂 ДР-скидка — автоскидка в день рождения</option>
+            </select>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Скидка (%)</label>
+              <input type="number" value={fDiscount} onChange={e=>setFDiscount(e.target.value)} placeholder="10" min="0" max="100" />
+            </div>
+            <div className="form-group">
+              <label>Порог (₽)</label>
+              <input type="number" value={fCondition} onChange={e=>setFCondition(e.target.value)} placeholder="0 — без порога" min="0" />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Описание</label>
+            <textarea value={fDesc} onChange={e=>setFDesc(e.target.value)} placeholder="Например: Скидка 10% для постоянных партнеров" rows="2" />
+          </div>
+          <div className="loy-modal-preview" id="loyPreview">
+            <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>
+            <div style={{display:'flex',alignItems:'center',gap:'.75rem',background:'#f8f9fa',borderRadius:'.75rem',padding:'.75rem'}}>
+              <div id="loyPreviewIcon" style={{fontSize:'1.8rem'}}>{fIcon}</div>
+              <div>
+                <div id="loyPreviewName" style={{fontWeight:600,fontSize:'.85rem'}}>{fName || 'Новая программа'}</div>
+                <div id="loyPreviewDesc" style={{fontSize:'.75rem',color:'var(--muted)'}}>{fDiscount ? 'Скидка '+fDiscount+'%' : 'Без скидки'}</div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="btn btn-primary">{editId?'Сохранить':'✨ Создать программу'}</button>
+          </div>
+        </form>
+      </Modal>
     </>
   );
 }
