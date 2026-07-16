@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -150,31 +151,25 @@ export default function Categories() {
       </div>
 
       {/* Модалка */}
-      {showModal && (
-        <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'.75rem'}}>{editId ? 'Редактировать категорию' : 'Добавить категорию'}</h1>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" value={fName} onChange={e => setFName(e.target.value)}
-                  placeholder="Например, Электроинструменты" required />
-              </div>
-              <div className="form-group">
-                <label>Вид</label>
-                <select value={fType} onChange={e => setFType(e.target.value)}>
-                  <option value="product">Товар</option>
-                  <option value="service">Услуга</option>
-                </select>
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editId ? 'Сохранить' : 'Добавить'}</button>
-              </div>
-            </form>
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="Добавьте или измените категорию товаров/услуг" width="medium">
+        <form onSubmit={save}>
+          <div className="form-group">
+            <label>Название</label>
+            <input type="text" value={fName} onChange={e => setFName(e.target.value)}
+              placeholder="Например, Электроинструменты" required />
           </div>
-        </div>
-      )}
+          <div className="form-group">
+            <label>Вид</label>
+            <select value={fType} onChange={e => setFType(e.target.value)}>
+              <option value="product">Товар</option>
+              <option value="service">Услуга</option>
+            </select>
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить'}</button>
+          </div>
+        </form>
+      </Modal>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}

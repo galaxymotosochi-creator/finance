@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -158,44 +159,32 @@ export default function Categories() {
       </div>
 
       {/* МОДАЛКА */}
-      {showModal && (
-        <div className="modal-overlay active" onClick={function (e) { if (e.target.className === 'modal-overlay active') { setShowModal(false); setEditingId(null); } }}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={function () { setShowModal(false); setEditingId(null); }}>&times;</button>
-            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'.75rem'}}>{editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'}</h1>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
-              </div>
-              <div className="form-group">
-                <label>Тип категории</label>
-                <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-                  <option value="income">Доходы (Внекассовые)</option>
-                  <option value="expense">Расходы бизнеса (Операционные)</option>
-                  <option value="supply_expense">Расходы поставки (Себестоимость)</option>
-                </select>
-              </div>
-              <div className="modal-actions">
-                {editingId && <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);remove(editingId)}} style={{color:'#dc3545',marginRight:'auto'}}>Удалить</button>}
-                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
-              </div>
-            </form>
+      <Modal open={showModal} onClose={() => { setShowModal(false); setEditingId(null); }} title={editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'} subtitle="Добавьте или измените категорию доходов/расходов" width="medium">
+        <form onSubmit={save}>
+          <div className="form-group">
+            <label>Название</label>
+            <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
           </div>
-        </div>
-      )}
-      {showConfirm && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
-          <div className="modal-box" style={{maxWidth:'420px'}}>
-            <h2 style={{fontSize:'1rem'}}>Удалить категорию?</h2>
-            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>Это действие нельзя отменить. Категория будет удалена навсегда.</p>
-            <div className="modal-actions">
-              <button className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>Отмена</button>
-              <button className="btn btn-primary" onClick={confirmDelete} style={{marginLeft:'.5rem'}}>Да, удалить</button>
-            </div>
+          <div className="form-group">
+            <label>Тип категории</label>
+            <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
+              <option value="income">Доходы (Внекассовые)</option>
+              <option value="expense">Расходы бизнеса (Операционные)</option>
+              <option value="supply_expense">Расходы поставки (Себестоимость)</option>
+            </select>
           </div>
-        </div>
-      )}
+          <div className="modal-actions">
+            {editingId && <button type="button" className="btn btn-ghost" onClick={()=>{setShowModal(false);remove(editingId)}}>Удалить</button>}
+            <button type="submit" className="btn btn-primary">Сохранить</button>
+          </div>
+        </form>
+      </Modal>
+      <Modal open={showConfirm} onClose={() => { setShowConfirm(false); setPendingDeleteId(null); }} title="Удалить категорию?" subtitle="Это действие нельзя отменить. Категория будет удалена навсегда." width="narrow"
+        actions={<>
+          <button className="btn btn-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>Отмена</button>
+          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
+        </>}>
+      </Modal>
     </>
   );
 }
