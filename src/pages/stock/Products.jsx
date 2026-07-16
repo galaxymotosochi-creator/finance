@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../lib/supabase';
@@ -700,12 +701,8 @@ export default function Products() {
       </div>
 
       {/* Модалка товара */}
-      {showModal && (
-        <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowModal(false); }}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-            <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0,marginBottom:'.75rem'}}>{editId ? 'Редактировать позицию' : 'Добавить позицию'}</h1>
-            <form onSubmit={save} style={{fontSize:'.78rem'}}>
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
+        <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
@@ -848,34 +845,18 @@ export default function Products() {
                 <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* Модалка подтверждения удаления */}
-      {showRemoveModal && (
-        <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') { setShowRemoveModal(false); setRemoveTarget(null); } }}>
-          <div className="modal-box" style={{maxWidth:'400px'}}>
-            <button className="modal-close" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>&times;</button>
-            <h2>Вы действительно хотите удалить товар?</h2>
-            <div className="sub" style={{marginBottom:'1.2rem'}}>Он перенесётся в корзину и будет удалён через 30 дней</div>
-            <div className="modal-actions">
-              <button type="button" className="btn btn-outline" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
-              <button type="button" className="btn btn-primary" onClick={confirmRemove} style={{background:'#dc2626',color:'#fff'}}>Да</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal open={showRemoveModal} onClose={() => { setShowRemoveModal(false); setRemoveTarget(null); }} title="Удалить товар?" subtitle="Он перенесётся в корзину и будет удалён через 30 дней" width="narrow"
+        actions={<>
+          <button className="btn btn-ghost" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
+          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmRemove}>Да</button>
+        </>}>
+      </Modal>
 
       {/* Корзина модалка */}
-      {showTrash && (
-        <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') setShowTrash(false); }}>
-          <div className="modal-box" style={{maxWidth:'460px',display:'flex',flexDirection:'column'}}>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.5rem'}}>
-              <h2>Корзина</h2>
-              <button onClick={() => setShowTrash(false)} style={{background:'none',border:'none',fontSize:'1.2rem',cursor:'pointer',color:'var(--muted)',lineHeight:1}}>✕</button>
-            </div>
-            <div className="sub" style={{marginBottom:'1rem'}}>Товары хранятся в корзине в течение 30 дней после удаления</div>
+      <Modal open={showTrash} onClose={() => setShowTrash(false)} title="Корзина" subtitle="Товары хранятся в корзине в течение 30 дней после удаления" width="medium">
             {(() => {
               const trash = getTrash();
               if (!trash.length) {
@@ -924,9 +905,7 @@ export default function Products() {
                 </div>
               );
             })()}
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* Toast */}
       {toast && (
