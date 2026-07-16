@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -166,15 +167,11 @@ export default function Shifts() {
       </div>
 
       {/* Модалка открытия */}
-      {showOpen && (function(){
+      <Modal open={showOpen} onClose={() => setShowOpen(false)} title="Открыть смену" subtitle="Укажите остаток в кассе на момент открытия" width="narrow">
+        {(function(){
         var cashBal = getCashRegisterBalance();
         if (openBal === '0' && cashBal > 0) setTimeout(function(){setOpenBal(String(cashBal))}, 50);
-        return (
-          <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowOpen(false); }}>
-            <div className="modal-box" style={{maxWidth:'380px'}}>
-              <button className="modal-close" onClick={() => setShowOpen(false)}>&times;</button>
-              <h2>Открыть смену</h2>
-              <div className="sub">Укажите остаток в кассе на момент открытия</div>
+        return (<>
               <form onSubmit={e => { e.preventDefault(); openShift(); }}>
                 <div className="form-group">
                   <label>Имя кассира</label>
@@ -189,21 +186,16 @@ export default function Shifts() {
                   </div>
                 </div>
                 <div className="modal-actions">
-                  <button type="submit" className="btn btn-account-select">Открыть смену</button>
+                  <button type="submit" className="btn btn-primary">Открыть смену</button>
                 </div>
               </form>
-            </div>
-          </div>
+        </>
         );
       })()}
+      </Modal>
 
       {/* Модалка закрытия */}
-      {showClose && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowClose(null); }}>
-          <div className="modal-box" style={{maxWidth:'380px'}}>
-            <button className="modal-close" onClick={() => setShowClose(null)}>&times;</button>
-            <h2>Закрыть смену</h2>
-            <div className="sub">Сверьте фактический остаток с расчётным</div>
+      <Modal open={showClose} onClose={() => setShowClose(null)} title="Закрыть смену" subtitle="Сверьте фактический остаток с расчётным" width="narrow">
             <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'.6rem .8rem',marginBottom:'1rem',fontSize:'.82rem',lineHeight:1.7}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Расчётный остаток</span><b>{( (parseFloat(showClose.opening_balance)||0) + getShiftIncome(showClose) - getShiftExpense(showClose) ).toLocaleString()} ₽</b></div>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Открытие</span><b>{(parseFloat(showClose.opening_balance)||0).toLocaleString()} ₽</b></div>
@@ -216,13 +208,11 @@ export default function Shifts() {
                 <input type="number" placeholder="0" step="0.01" value={closeBal} onChange={e => setCloseBal(e.target.value)} autoFocus />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={() => setShowClose(null)}>Отмена</button>
-                <button type="submit" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}}>Закрыть смену</button>
+                <button type="button" className="btn btn-ghost" onClick={() => setShowClose(null)}>Отмена</button>
+                <button type="submit" className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}}>Закрыть смену</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 }
