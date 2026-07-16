@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -337,15 +338,8 @@ export default function Salary() {
       )}
 
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
-      {show && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box" style={{maxWidth:'560px',padding:0,overflow:'hidden',borderRadius:'16px'}}>
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid var(--border)'}}>
-              <h2>{editId?'Редактировать':'Начислить зарплату'}</h2>
-              <div className="sub" style={{margin:0,marginTop:'2px'}}>Выберите сотрудника и период</div>
-            </div>
-            <form onSubmit={save} style={{padding:'1rem 1.25rem',display:'flex',flexDirection:'column',gap:'.75rem'}}>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId?'Редактировать':'Начислить зарплату'} subtitle="Выберите сотрудника и период" width="wide">
+        <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
               {/* Сотрудник + период */}
               <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
@@ -513,19 +507,13 @@ export default function Salary() {
               </div>
 
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* МОДАЛКА ВЫБОРА СЧЕТА */}
-      {showAcc && (()=>{
+      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null)}} title="Выплата зарплаты" subtitle="Выберите счет для выплаты" width="medium">
+        {(()=>{
         const accsList = accs.filter(a => a.type !== 'credit');
-        return (
-          <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowAcc(false);setPendingPayId(null)}}}>
-            <div className="modal-box" style={{maxWidth:'400px'}}>
-              <button className="modal-close" onClick={()=>{setShowAcc(false);setPendingPayId(null)}}>&times;</button>
-              <h2>Выплата зарплаты</h2>
-              <div className="sub">Выберите счет для выплаты</div>
+        return (<>
               <div style={{display:'flex',flexDirection:'column',gap:'.35rem',marginTop:'.25rem'}}>
                 {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
                 {!salarySplitMode ? accsList.map(a => (
@@ -556,10 +544,10 @@ export default function Salary() {
                     style={{padding:'.45rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--primary)',color:'var(--primary-text)',fontFamily:'var(--font)',display:'block',margin:'.15rem auto 0'}}>Подтвердить разделение</button>
                 )}
               </div>
-            </div>
-          </div>
+        </>
         );
       })()}
+      </Modal>
     </>
   );
 }
