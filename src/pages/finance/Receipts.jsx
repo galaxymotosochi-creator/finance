@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -218,17 +219,8 @@ export default function Receipts() {
       </div>
 
       {/* Модалка состава чека */}
-      {selectedReceipt && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') { setSelectedReceipt(null); setReceiptItems([]); } }}>
-          <div className="modal-box" style={{ maxWidth: '480px' }}>
-            <button className="modal-close" onClick={() => { setSelectedReceipt(null); setReceiptItems([]); }}>&times;</button>
-            <h2>Чек #{selectedReceipt.receipt_number}</h2>
-            <div className="sub">
-              {fmtDate(selectedReceipt.date)}
-              {selectedReceipt.cashier_name ? ' • Кассир: ' + selectedReceipt.cashier_name : ''}
-              {selectedReceipt.client_name ? ' • Клиент: ' + selectedReceipt.client_name : ''}
-              {selectedReceipt.comment ? <div style={{marginTop:'6px',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
-            </div>
+      <Modal open={selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={'Чек #'+(selectedReceipt?.receipt_number||'')} subtitle={(selectedReceipt?.date ? fmtDate(selectedReceipt.date) : '') + (selectedReceipt?.cashier_name ? ' • Кассир: '+selectedReceipt.cashier_name : '') + (selectedReceipt?.client_name ? ' • Клиент: '+selectedReceipt.client_name : '')} width="medium">
+        {selectedReceipt?.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
             {/* Позиции */}
             {itemsLoading ? (
@@ -282,12 +274,7 @@ export default function Receipts() {
               }}>{STATUS_LABELS[selectedReceipt.status] || selectedReceipt.status}</span>
             </div>
 
-            <div className="modal-actions" style={{ marginTop: '1rem' }}>
-              <button type="button" className="btn btn-outline" onClick={() => { setSelectedReceipt(null); setReceiptItems([]); }}>Закрыть</button>
-            </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }
