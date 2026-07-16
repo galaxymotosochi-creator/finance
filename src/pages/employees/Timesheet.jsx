@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -392,12 +393,7 @@ export default function Timesheet() {
       )}
 
       {/* МОДАЛКА ДНЯ */}
-      {showDay && (
-        <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') setShowDay(null); }}>
-          <div className="modal-box" style={{maxWidth:'560px'}}>
-            <button className="modal-close" onClick={() => setShowDay(null)}>&times;</button>
-            <h2>{(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'}</h2>
-            <div className="sub">Статусы сотрудников и события дня</div>
+      <Modal open={showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="Статусы сотрудников и события дня" width="wide">
 
             <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f8f9fa',borderBottom:'1px solid var(--border)'}}>
@@ -536,9 +532,7 @@ export default function Timesheet() {
                 {saving ? 'Сохранение...' : 'Сохранить'}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }
