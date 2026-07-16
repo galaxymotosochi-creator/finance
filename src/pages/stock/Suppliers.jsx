@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -147,46 +148,39 @@ export default function Suppliers() {
       </div>
 
       {/* Модалка */}
-      {showModal && (
-        <div className="modal-overlay active" onClick={(e)=>{if(e.target.className==='modal-overlay active')setShowModal(false)}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShowModal(false)}>&times;</button>
-            <h2>{editId?'Редактировать поставщика':'Добавить поставщика'}</h2>
-            <div className="sub">Создание карточки нового контрагента</div>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например, ООО СтройМаркет" required />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Контактное лицо</label>
-                  <input type="text" value={fContact} onChange={e=>setFContact(e.target.value)} placeholder="Иван Иванов" />
-                </div>
-                <div className="form-group">
-                  <label>Телефон</label>
-                  <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Способ связи</label>
-                  <select value={fMethod} onChange={e=>setFMethod(e.target.value)}>
-                    <option value="">— нет —</option>
-                    <option value="telegram">📱 Telegram</option>
-                    <option value="whatsapp">💬 WhatsApp</option>
-                    <option value="max">🧑‍💼 MAX</option>
-                  </select>
-                </div>
-                <div className="form-group"></div>
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editId?'Сохранить':'Добавить'}</button>
-              </div>
-            </form>
+      <Modal open={showModal} onClose={()=>setShowModal(false)} title={editId?'Редактировать поставщика':'Добавить поставщика'} subtitle="Создание карточки нового контрагента" width="medium">
+        <form onSubmit={save}>
+          <div className="form-group">
+            <label>Название</label>
+            <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например, ООО СтройМаркет" required />
           </div>
-        </div>
-      )}
+          <div className="form-row">
+            <div className="form-group">
+              <label>Контактное лицо</label>
+              <input type="text" value={fContact} onChange={e=>setFContact(e.target.value)} placeholder="Иван Иванов" />
+            </div>
+            <div className="form-group">
+              <label>Телефон</label>
+              <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Способ связи</label>
+              <select value={fMethod} onChange={e=>setFMethod(e.target.value)}>
+                <option value="">— нет —</option>
+                <option value="telegram">📱 Telegram</option>
+                <option value="whatsapp">💬 WhatsApp</option>
+                <option value="max">🧑‍💼 MAX</option>
+              </select>
+            </div>
+            <div className="form-group"></div>
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Добавить'}</button>
+          </div>
+        </form>
+      </Modal>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
