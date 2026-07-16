@@ -219,8 +219,9 @@ export default function Receipts() {
       </div>
 
       {/* Модалка состава чека */}
-      <Modal open={selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={'Чек #'+(selectedReceipt?.receipt_number||'')} subtitle={(selectedReceipt?.date ? fmtDate(selectedReceipt.date) : '') + (selectedReceipt?.cashier_name ? ' • Кассир: '+selectedReceipt.cashier_name : '') + (selectedReceipt?.client_name ? ' • Клиент: '+selectedReceipt.client_name : '')} width="medium">
-        {selectedReceipt?.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
+      <Modal open={!!selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={selectedReceipt ? 'Чек #'+selectedReceipt.receipt_number : ''} subtitle={selectedReceipt ? fmtDate(selectedReceipt.date) + (selectedReceipt.cashier_name ? ' • Кассир: '+selectedReceipt.cashier_name : '') + (selectedReceipt.client_name ? ' • Клиент: '+selectedReceipt.client_name : '') : ''} width="medium">
+        {selectedReceipt && (<>
+        {selectedReceipt.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
             {/* Позиции */}
             {itemsLoading ? (
@@ -273,7 +274,7 @@ export default function Receipts() {
                 color: STATUS_COLORS[selectedReceipt.status] || '#999',
               }}>{STATUS_LABELS[selectedReceipt.status] || selectedReceipt.status}</span>
             </div>
-
+        </>)}
       </Modal>
     </div>
   );
