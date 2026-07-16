@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
@@ -29,7 +30,6 @@ export default function Supplies() {
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [showStatusConfirm, setShowStatusConfirm] = useState(null);
@@ -63,10 +63,7 @@ export default function Supplies() {
   useEffect(() => {
     const params = new URLSearchParams(loc.search);
     if (params.get('add') === 'supply') {
-      setEditId(null);
-      setFInvoice(''); setFStatus('ordered'); setFPaid('0'); setFItems([]);
-      setFAddProd(''); setFAddQty(''); setFAddCost(''); setFSupName('');
-      setShowModal(true);
+      navigate('/stock/supply/new');
     }
   }, [loc.search]);
 
@@ -162,10 +159,7 @@ const load = async () => {
     }
   }, [user, supplies.length]);
   const openAdd = () => {
-    setEditId(null);
-    setFInvoice(''); setFStatus('ordered'); setFPaid('0'); setFItems([]);
-    setFAddProd(''); setFAddQty(''); setFAddCost(''); setFSupName('');
-    setShowModal(true);
+    navigate('/stock/supply/new');
   };
 
   const addItem = () => {
@@ -389,108 +383,8 @@ const load = async () => {
         </table>
       </div>
 
-      {/* Модалка поставки — Вариант 7 (Фокус на поставщика) */}
-      {showModal && (
-        <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&(setShowModal(false),setFItems([]),setFAddSearch(''))}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>{setShowModal(false);setFItems([]);setFAddSearch('')}}>&times;</button>
-            <div className="page-header" style={{marginBottom:'12px'}}>
-              <div>
-                <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:0,display:'flex',alignItems:'center',gap:'.5rem'}}>{editId?'Редактировать поставку':'Новая поставка'}
-                  <span onClick={function(){scanBarcode(function(bc){
-                    var found=products.find(function(p){return p.barcode===bc;});
-                    if(found){setFAddProd(String(found.id));setFAddSearch(found.name);setToast('Найден: '+found.name);setFAddDrop(false)}else setToast('Штрихкод '+bc+' не найден');
-                  })}} title="Сканировать штрихкод" 
-                    style={{fontSize:'1.1rem',cursor:'pointer',lineHeight:1,display:'inline-flex',alignItems:'center',opacity:.6}}>📷</span>
-                </h1>
-                <div className="sub" style={{marginBottom:0}}>Добавление товаров на склад</div>
-              </div>
-            </div>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Поставщик</label>
-                <select value={fSupName} onChange={e=>setFSupName(e.target.value)}>
-                  <option value="">— выберите поставщика —</option>
-                  {suppliers.map(s=><option key={s.id} value={s.name}>{s.name}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>№ накладной</label>
-                <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="INV-001" />
-              </div>
-              <div style={{border:'1px solid #eee',borderRadius:'10px',padding:'12px',margin:'12px 0',background:'#fafafa'}}>
-                <div style={{display:'flex',gap:'.5rem',padding:'0 0 .4rem',fontSize:'.68rem',fontWeight:600,color:'#aaa',textTransform:'uppercase',letterSpacing:'.3px',alignItems:'end'}}>
-                  <span style={{flex:1,textAlign:'left',paddingLeft:'.25rem'}}>ТОВАР</span>
-                  <span style={{width:'70px',textAlign:'center'}}>КОЛ-ВО</span>
-                  <span style={{width:'80px',textAlign:'right'}}>СУММА</span>
-                  <span style={{width:'1.5rem'}}></span>
-                </div>
-                <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'8px'}}>
-                  {fItems.length===0 ? (
-                    <div style={{textAlign:'center',padding:'.4rem',color:'#bbb',fontSize:'.8rem'}}></div>
-                  ) : fItems.map((it,idx)=>(
-                    <div key={idx} style={{display:'flex',gap:'.5rem',padding:'.35rem .25rem',borderBottom:'1px solid #f0f0f0',fontSize:'.82rem',alignItems:'center'}}>
-                      <span style={{flex:1,fontWeight:500,textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.name}</span>
-                      <span style={{width:'70px',textAlign:'center',color:'#888',flexShrink:0}}>{it.qty} шт</span>
-                      <span style={{width:'80px',textAlign:'right',fontWeight:500,whiteSpace:'nowrap',flexShrink:0}}>{(it.qty*it.cost).toFixed(2)} ₽</span>
-                      <button type="button" onClick={()=>removeItem(idx)} style={{background:'none',border:'none',color:'#dc2626',cursor:'pointer',fontSize:'1rem',width:'1.5rem',textAlign:'center',padding:0,flexShrink:0}}>✕</button>
-                    </div>
-                  ))}
-                </div>
-                <div style={{display:'flex',gap:'.5rem',alignItems:'center',marginTop:'.15rem'}}>
-                  <div style={{position:'relative',flex:1}}>
-                    <input type="text" value={fAddSearch} onChange={function(e){setFAddSearch(e.target.value);setFAddProd('');setFAddDrop(true)}} 
-                      onFocus={function(){setFAddDrop(true)}} onBlur={function(){setTimeout(function(){setFAddDrop(false)},200)}}
-                      placeholder="Поиск товара..."
-                      style={{width:'100%',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',boxSizing:'border-box',minHeight:'38px',textAlign:'left'}} />
-                    {fAddDrop && (
-                      <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
-                        {(fAddSearch ? products.filter(function(p){return p.name.toLowerCase().includes(fAddSearch.toLowerCase())}) : products).map(function(p){
-                          return (
-                            <div key={p.id} onMouseDown={function(){setFAddProd(String(p.id));setFAddSearch(p.name);setFAddDrop(false)}}
-                              style={{padding:'6px 10px',cursor:'pointer',fontSize:'.82rem',borderBottom:'1px solid #f5f5f5'}}
-                              onMouseEnter={function(e){e.currentTarget.style.background='#f5f5f5'}}
-                              onMouseLeave={function(e){e.currentTarget.style.background='#fff'}}>{p.name}</div>
-                          );
-                        })}
-                        {products.filter(function(p){return !fAddSearch || p.name.toLowerCase().includes(fAddSearch.toLowerCase())}).length === 0 && (
-                          <div style={{padding:'8px',fontSize:'.78rem',color:'#999',textAlign:'center'}}>Ничего не найдено</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Кол-во" min="1" step="any"
-                    style={{width:'70px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'center',boxSizing:'border-box',minHeight:'38px',flexShrink:0}} />
-                  <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} placeholder="Цена" min="0" step="0.01"
-                    style={{width:'80px',padding:'.5rem .65rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',fontSize:'.82rem',fontFamily:'var(--font)',outline:'none',background:'var(--body-bg)',textAlign:'left',boxSizing:'border-box',minHeight:'38px',flexShrink:0}} />
-                  <button type="button" onClick={addItem} style={{width:'1.5rem',height:'1.5rem',fontSize:'.72rem',fontWeight:600,border:'none',borderRadius:'6px',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'inherit',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
-                </div>
-              </div>
-              {fItems.length > 0 && (
-                <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontWeight:700,fontSize:'.85rem'}}>
-                  <span>Итого: {fItems.length} {function(n){if(n%10===1&&n%100!==11)return'товар';if(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))return'товара';return'товаров'}(fItems.length)}</span>
-                  <span>{fItems.reduce((a,it)=>a+it.qty*it.cost,0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span>
-                </div>
-              )}
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Статус</label>
-                  <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
-                    <option value="ordered">Заказано</option>
-                    <option value="transit">В пути</option>
-                    <option value="received">Оприходовано</option>
-                  </select>
-                </div>
-
-              </div>
-              <div style={{textAlign:'right',marginTop:'10px'}}>
-                <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Провести</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}{/* Модалка оплаты */}
-      {showStatusConfirm && (() => {
+      <Modal open={showStatusConfirm} onClose={()=>setShowStatusConfirm(null)} width="narrow">
+        {showStatusConfirm && (() => {
         const s = supplies.find(x => x.id === showStatusConfirm.id);
         if (!s) return null;
         const idx = SUPPLY_STATUSES.indexOf(s.status || 'ordered');
@@ -503,10 +397,7 @@ const load = async () => {
           transit:'Поставка в пути. Товар скоро поступит на склад.',
           received:'Товар поступил на склад и готов к продаже. Редактирование недоступно.'
         };
-        return (
-          <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowStatusConfirm(null)}>
-            <div className="modal-box" style={{maxWidth:'360px',padding:'24px'}}>
-              <button className="modal-close" onClick={()=>setShowStatusConfirm(null)}>&times;</button>
+        return (<>
               <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.5rem',marginBottom:'16px'}}>
                 <span style={{padding:'.3rem .7rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:SUPPLY_COLORS[s.status||'ordered']+'18',whiteSpace:'nowrap'}}>{curLbl}</span>
                 <span style={{fontSize:'.78rem',color:'#222'}}>→</span>
@@ -519,24 +410,17 @@ const load = async () => {
                 <button type="button" onClick={confirmStatusChange}
                   style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
               </div>
-            </div>
-          </div>
-        );
-      })()}
+        </>);})()}
+      </Modal>
       
-      {showPay && (() => {
+      <Modal open={showPay} onClose={()=>setShowPay(null)} title="Оплата поставки" width="medium">
+        {showPay && (() => {
         const s = supplies.find(x => x.id === showPay);
         if (!s) return null;
         const total = s.total || (s.items||[]).reduce((sum,it)=>sum+it.qty*it.cost,0) || 0;
         const paid = s.paid || 0;
         const debt = total - paid;
-        return (
-          <div className="modal-overlay active" onClick={(e)=>e.target.className==='modal-overlay active'&&setShowPay(null)}>
-            <div className="modal-box" style={{maxWidth:'480px'}}>
-              <button className="modal-close" onClick={()=>setShowPay(null)}>&times;</button>
-              <div style={{marginBottom:'12px'}}>
-                <h1 style={{fontSize:'1.2rem',fontWeight:700,margin:0}}>Оплата поставки</h1>
-              </div>
+        return (<>
               <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.78rem',lineHeight:2}}>
                 <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Поставщик:</span><span style={{fontSize:'.78rem',color:'#222'}}>{s.supplier_name || s.invoice || '—'}</span></div>
                 <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
@@ -573,10 +457,9 @@ const load = async () => {
                   <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
                 </div>
               </form>
-            </div>
-          </div>
-        );
+        </>);
       })()}
+      </Modal>
 
       {/* Toast */}
       {toast && (
