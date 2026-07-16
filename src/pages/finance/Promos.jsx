@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -230,7 +231,8 @@ export default function Promos() {
         );
       })}
 
-      {detail && (() => {
+      <Modal open={detail} onClose={function(){setDetail(null);setStats(null)}} title={(()=>{const p=promos.find(x=>x.id===detail);return p?p.name:''})()} width="medium">
+        {(() => {
         const p = promos.find(x => x.id === detail);
         if (!p) return null;
         const s = status(p);
@@ -243,17 +245,11 @@ export default function Promos() {
         else if (cond.type === 'category_services') matchedProducts = products.filter(x => x.type === 'service' && x.cat === categories.find(c => c.id === parseInt(cond.catId))?.name);
         const sc = s === 'active' ? '#16a34a' : s === 'planned' ? '#92400e' : '#9ca3af';
         const sb = s === 'active' ? '#dcfce7' : s === 'planned' ? '#fef3c7' : '#f1f3f5';
-        return (
-          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setDetail(null);setStats(null)}}}>
-            <div className="modal-box" style={{maxWidth:'520px'}}>
-              <button className="modal-close" onClick={function(){setDetail(null);setStats(null)}}>&times;</button>
-              <h2>{p.name}</h2>
-              <div className="sub" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+        return (<>
                 <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
                 <span>💰 {p.discount}%</span>
                 <span>📅 {fmtDate(p.start_date)} — {fmtDate(p.end_date)}</span>
                 <span>🎯 {targetLabel(p)}</span>
-              </div>
               {p.description && <div style={{fontSize:'.82rem',color:'var(--muted)',margin:'0 0 .75rem'}}>{p.description}</div>}
 
               {stats && (
@@ -289,18 +285,13 @@ export default function Promos() {
                   <button onClick={function(){setDetail(null);setStats(null);del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
                 </div>
               </div>
-            </div>
-          </div>
+        </>
         );
       })()}
+      </Modal>
 
-      {show && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShow(false);setEditId(null)}}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShow(false);setEditId(null)}}>&times;</button>
-            <h2>{editId ? 'Редактировать акцию' : 'Добавить акцию'}</h2>
-            <div className="sub">Настройка условий и сроков действия акции</div>
-            <form onSubmit={save}>
+      <Modal open={show} onClose={function(){setShow(false);setEditId(null)}} title={editId ? 'Редактировать акцию' : 'Добавить акцию'} subtitle="Настройка условий и сроков действия акции" width="wide">
+        <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" placeholder="Например: Новогодняя распродажа" value={name} onChange={e=>setName(e.target.value)} required />
@@ -384,9 +375,7 @@ export default function Promos() {
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
