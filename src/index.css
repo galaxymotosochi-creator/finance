@@ -384,32 +384,39 @@ body {
 .modal-close { position: absolute; top: .75rem; right: .75rem; background: none; border: none; font-size: 1.3rem; color: #999; cursor: pointer; line-height: 1; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background .15s; }
 .modal-close:hover { background: #f1f3f5; color: #555; }
 .modal-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: #111;
+  color: var(--body-color);
   margin: 0 0 .15rem 0;
-  letter-spacing: -.01em;
 }
 .modal-sub {
-  font-size: .78rem;
+  font-size: .8rem;
   color: var(--muted);
   margin-bottom: 1.2rem;
 }
 .modal-body {
-  font-size: .85rem;
+  font-size: .82rem;
+  color: #555;
 }
 .modal-actions { margin-top: 1.2rem; display: flex; justify-content: flex-end; gap: .5rem; align-items: center; }
 .modal-actions .btn { border-radius: var(--radius-pill); }
 
 /* ======== FORMS ======== */
 .form-group { margin-bottom: .65rem; }
-.form-group label { display: block; font-size: .75rem; font-weight: 500; color: var(--body-color); margin-bottom: .25rem; }
+.form-group label { display: block; font-size: .8rem; font-weight: 500; color: var(--muted); margin-bottom: .25rem; }
 .form-group input, .form-group select, .form-group textarea {
-  width: 100%; padding: .5rem .65rem; font-size: .82rem;
-  border: 1.5px solid var(--border); border-radius: var(--radius-md);
-  outline: none; font-family: var(--font); background: var(--body-bg);
-  color: var(--body-color); transition: border-color var(--transition), box-shadow var(--transition);
-  box-sizing: border-box; min-height: 38px;
+  font-family: var(--font);
+  font-size: .82rem;
+  color: #555;
+  width: 100%;
+  padding: .5rem .65rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--body-bg);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  box-sizing: border-box;
+  min-height: 38px;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
   border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(66,139,249,.12);
