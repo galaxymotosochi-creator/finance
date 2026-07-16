@@ -1,4 +1,3 @@
-import Modal from '../../components/Modal';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,12 +8,6 @@ export default function Shifts() {
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showOpen, setShowOpen] = useState(false);
-  const [openBal, setOpenBal] = useState('0');
-  const [cashierName, setCashierName] = useState('');
-  const [showClose, setShowClose] = useState(null);
-  const [closeBal, setCloseBal] = useState('');
-  const [closeNote, setCloseNote] = useState('');
   const [toast, setToast] = useState(null);
 
   var getCashRegisterBalance = function() {
@@ -61,32 +54,6 @@ export default function Shifts() {
     ).reduce((sum, t) => sum + Number(t.amount || 0), 0);
   };
 
-  const openShift = async () => {
-    const bal = parseFloat(openBal) || 0;
-    const { error } = await supabase.from('shifts').insert({
-      user_id: user.id, opening_balance: bal, status: 'open', cashier_name: cashierName.trim() || null,
-    });
-    if (error) return showToast('' + error.message);
-    setShowOpen(false); setOpenBal('0'); setCashierName('');
-    const { data } = await supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false });
-    if (data) setShifts(data);
-    showToast('Смена открыта');
-  };
-
-  const closeShift = async () => {
-    if (!showClose) return;
-    const bal = parseFloat(closeBal);
-    if (isNaN(bal)) return showToast('⚠️ Введите фактический остаток');
-    const { error } = await supabase.from('shifts').update({
-      closed_at: new Date().toISOString(), closing_balance: bal, status: 'closed',
-    }).eq('id', showClose.id);
-    if (error) return showToast('' + error.message);
-    setShowClose(null); setCloseBal(''); setCloseNote('');
-    const { data } = await supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false });
-    if (data) setShifts(data);
-    showToast('Смена закрыта');
-  };
-
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2500);
@@ -98,8 +65,6 @@ export default function Shifts() {
   };
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
-
-
 
   return (
     <>
@@ -114,11 +79,8 @@ export default function Shifts() {
           <h1>Смены</h1>
           <div className="sub">Контроль работы касс и выручки</div>
         </div>
-
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-
-
 
       {/* Таблица */}
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch',overflowY:'visible'}}>
@@ -165,54 +127,6 @@ export default function Shifts() {
           </tbody>
         </table>
       </div>
-
-      {/* Модалка открытия */}
-      <Modal open={showOpen} onClose={() => setShowOpen(false)} title="Открыть смену" subtitle="Укажите остаток в кассе на момент открытия" width="narrow">
-        {(function(){
-        var cashBal = getCashRegisterBalance();
-        if (openBal === '0' && cashBal > 0) setTimeout(function(){setOpenBal(String(cashBal))}, 50);
-        return (<>
-              <form onSubmit={e => { e.preventDefault(); openShift(); }}>
-                <div className="form-group">
-                  <label>Имя кассира</label>
-                  <input type="text" placeholder="Иван Иванов" value={cashierName} onChange={e => setCashierName(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Остаток в кассе (₽)</label>
-                  <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                    <input type="number" placeholder="0" min="0" step="0.01" value={openBal} onChange={e => setOpenBal(e.target.value)}
-                      style={{flex:1}} />
-                    {cashBal > 0 && <span style={{fontSize:'.75rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {cashBal.toLocaleString()} ₽</span>}
-                  </div>
-                </div>
-                <div className="modal-actions">
-                  <button type="submit" className="btn btn-primary">Открыть смену</button>
-                </div>
-              </form>
-        </>
-        );
-      })()}
-      </Modal>
-
-      {/* Модалка закрытия */}
-      <Modal open={showClose} onClose={() => setShowClose(null)} title="Закрыть смену" subtitle="Сверьте фактический остаток с расчётным" width="narrow">
-            <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'.6rem .8rem',marginBottom:'1rem',fontSize:'.82rem',lineHeight:1.7}}>
-              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Расчётный остаток</span><b>{( (parseFloat(showClose.opening_balance)||0) + getShiftIncome(showClose) - getShiftExpense(showClose) ).toLocaleString()} ₽</b></div>
-              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Открытие</span><b>{(parseFloat(showClose.opening_balance)||0).toLocaleString()} ₽</b></div>
-              <div style={{display:'flex',justifyContent:'space-between',color:'#16a34a'}}><span>Доходы</span><b>+{getShiftIncome(showClose).toLocaleString()} ₽</b></div>
-              <div style={{display:'flex',justifyContent:'space-between',color:'#dc2626'}}><span>Расходы</span><b>−{getShiftExpense(showClose).toLocaleString()} ₽</b></div>
-            </div>
-            <form onSubmit={e => { e.preventDefault(); closeShift(); }}>
-              <div className="form-group">
-                <label>Фактический остаток (₽)</label>
-                <input type="number" placeholder="0" step="0.01" value={closeBal} onChange={e => setCloseBal(e.target.value)} autoFocus />
-              </div>
-              <div className="modal-actions">
-                <button type="button" className="btn btn-ghost" onClick={() => setShowClose(null)}>Отмена</button>
-                <button type="submit" className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}}>Закрыть смену</button>
-              </div>
-            </form>
-      </Modal>
     </>
   );
 }
