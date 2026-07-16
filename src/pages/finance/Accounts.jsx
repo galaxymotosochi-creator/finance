@@ -1,5 +1,6 @@
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 
 const ACC_TYPES = [
@@ -272,13 +273,8 @@ export default function Accounts() {
         </>
       )}
 
-      {showModal && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowModal(false);setEditingId(null)}}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>{setShowModal(false);setEditingId(null)}}>&times;</button>
-            <h2>{editingId?'Редактировать счет':'Добавить счет'}</h2>
-            <div className="sub">{editingId?'Измените данные счета':'Настройка нового кошелька, расчетного счета или кассы'}</div>
-            <form onSubmit={save}>
+      <Modal open={showModal} onClose={()=>{setShowModal(false);setEditingId(null)}} title={editingId?'Редактировать счет':'Добавить счет'} subtitle={editingId?'Измените данные счета':'Настройка нового кошелька, расчетного счета или кассы'} width="medium">
+        <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
@@ -294,19 +290,12 @@ export default function Accounts() {
                 </div>
               )}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editingId?'Сохранить':'Добавить'}</button>
+                <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Добавить'}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {showCorrect && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowCorrect(false)}}}>
-          <div className="modal-box" style={{maxWidth:'450px'}}>
-            <button className="modal-close" onClick={()=>setShowCorrect(false)}>&times;</button>
-            <h2>Корректировка баланса</h2>
-            <div className="sub">Исправьте остаток на счете</div>
+      <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
             <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.type===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Счет</label>
@@ -332,19 +321,12 @@ export default function Accounts() {
                 <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Применить</button>
+                <button type="submit" className="btn btn-primary">Применить</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {showInit && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowInit(false)}}}>
-          <div className="modal-box" style={{maxWidth:'500px'}}>
-            <button className="modal-close" onClick={()=>setShowInit(false)}>&times;</button>
-            <h2>Введите первоначальные остатки</h2>
-            <div className="sub">Используйте эту функцию при первом заполнении программы</div>
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Используйте эту функцию при первом заполнении программы" width="medium">
             <form onSubmit={saveInit}>
               {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
@@ -358,19 +340,13 @@ export default function Accounts() {
                 );
               })}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Сохранить</button>
+                <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {viewAcTx && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setViewAcTx(null)}}}>
-          <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
-            <button className="modal-close" onClick={()=>setViewAcTx(null)}>&times;</button>
-            <h2>{viewAcTx.name}</h2>
-            <div className="sub" style={{marginBottom:'.5rem'}}>{viewAcTx.description || (function(){var m=ACC_TYPES.find(t=>t.type===viewAcTx.type);return m?m.label:viewAcTx.type;})()}</div>
+      <Modal open={viewAcTx} onClose={()=>setViewAcTx(null)} title={viewAcTx?.name||''}
+        subtitle={viewAcTx?.description||''} width="medium">
             <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:'.5rem'}}>История операций по счету</div>
             <div className="product-table" style={{flex:1,overflowY:'auto'}}>
               <table className="data-table">
@@ -402,16 +378,9 @@ export default function Accounts() {
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {showTransfer && (
-        <div className="modal-overlay active" onClick={e=>{if(e.target.className==='modal-overlay active'){setShowTransfer(false)}}}>
-          <div className="modal-box" style={{maxWidth:'420px'}}>
-            <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
-            <h2>Перевод между счетами</h2>
-            <div className="sub" style={{marginBottom:'1rem'}}>Перемещение средств между счетами</div>
+      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств между счетами" width="medium">
             <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Откуда</label>
@@ -432,14 +401,17 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Перевести</button>
+                <button type="submit" className="btn btn-primary">Перевести</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {showConfirm && (
+      <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle={pendingDeleteAc ? 'Счет «'+pendingDeleteAc.name+'» будет удален навсегда.' : ''} width="narrow"
+        actions={<>
+          <button className="btn btn-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
+          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
+        </>}>
+      </Modal>
         <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
           <div className="modal-box" style={{maxWidth:'420px'}}>
             <h2 style={{fontSize:'1rem'}}>Удалить счет?</h2>
@@ -453,7 +425,8 @@ export default function Accounts() {
       )}
 
       {/* Инкассация */}
-      {showCollection && (()=>{
+      <Modal open={showCollection} onClose={()=>setShowCollection(false)} title="Инкассация" subtitle="Изъятие наличных из кассы" width="medium">
+        {(()=>{
         var cashRegAc = accounts.find(a => a.type === 'cash_register');
         var cashRegBal = 0;
         if (cashRegAc) {
@@ -461,12 +434,7 @@ export default function Accounts() {
           (transactions||[]).forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
         }
         var otherAccs = accounts.filter(function(a){return a.id !== cashRegAc?.id;});
-        return (
-          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowCollection(false)}}}>
-            <div className="modal-box" style={{maxWidth:'420px'}}>
-              <button className="modal-close" onClick={()=>setShowCollection(false)}>&times;</button>
-              <h2>Инкассация</h2>
-              <div className="sub" style={{marginBottom:'.75rem'}}>Изъятие наличных из кассы</div>
+        return (<>
               <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
                 <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
                 <span style={{fontWeight:700}}>{cashRegBal.toLocaleString()} ₽</span>
@@ -513,10 +481,10 @@ export default function Accounts() {
                   <button type="submit" style={{padding:'.5rem 1.2rem',fontSize:'.82rem',fontWeight:600,borderRadius:'8px',border:'none',cursor:'pointer',background:'#e65100',color:'#fff',fontFamily:'inherit'}}>Инкассировать</button>
                 </div>
               </form>
-            </div>
-          </div>
+        </>
         );
       })()}
+      </Modal>
     </div>
   );
 }
