@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -148,43 +149,37 @@ export default function Writeoffs() {
         </table>
       </div>
 
-      {show && (
-        <div className="modal-overlay active" onClick={(e)=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId?'Редактировать списание':'Списать товар'}</h2>
-            <div className="sub">Оформление брака, порчи или утери</div>
-            <form onSubmit={save}>
-              <div className="form-group">
-                <label>Товар</label>
-                <select value={fProd} onChange={e=>setFProd(e.target.value)} required>
-                  <option value="">— выберите товар —</option>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Количество</label>
-                  <input type="number" value={fQty} onChange={e=>setFQty(e.target.value)} min="1" required />
-                </div>
-                <div className="form-group">
-                  <label>Дата</label>
-                  <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Причина</label>
-                <select value={fReason} onChange={e=>setFReason(e.target.value)}>
-                  {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editId?'Сохранить':'Списать'}</button>
-              </div>
-            </form>
+      {/* Модалка */}
+      <Modal open={show} onClose={()=>setShow(false)} title={editId?'Редактировать списание':'Списать товар'} subtitle="Оформление брака, порчи или утери" width="medium">
+        <form onSubmit={save}>
+          <div className="form-group">
+            <label>Товар</label>
+            <select value={fProd} onChange={e=>setFProd(e.target.value)} required>
+              <option value="">— выберите товар —</option>
+              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
           </div>
-        </div>
-      )}
+          <div className="form-row">
+            <div className="form-group">
+              <label>Количество</label>
+              <input type="number" value={fQty} onChange={e=>setFQty(e.target.value)} min="1" required />
+            </div>
+            <div className="form-group">
+              <label>Дата</label>
+              <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Причина</label>
+            <select value={fReason} onChange={e=>setFReason(e.target.value)}>
+              {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Списать'}</button>
+          </div>
+        </form>
+      </Modal>
     {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
