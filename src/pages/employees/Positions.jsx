@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -208,13 +209,8 @@ export default function Positions() {
       )}
 
       {/* Модалка */}
-      {show && (
-        <div className="modal-overlay active" onClick={(e)=>{if(e.target.className==='modal-overlay active')setShow(false)}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать должность' : 'Новая должность'}</h2>
-            <div className="sub">Параметры и права доступа новой должности</div>
-            <form onSubmit={save}>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать должность' : 'Новая должность'} subtitle="Параметры и права доступа новой должности" width="wide">
+        <form onSubmit={save}>
               <div className="form-group">
                 <label>Название должности</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
@@ -272,9 +268,7 @@ export default function Positions() {
                 <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }
