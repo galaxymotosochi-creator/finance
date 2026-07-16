@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -215,13 +216,8 @@ export default function Employees() {
       )}
 
       {/* ============ МОДАЛКА ============ */}
-      {show && (
-        <div className="modal-overlay active" onClick={e => { if(e.target.className==='modal-overlay active') setShow(false); }}>
-          <div className="modal-box" style={{maxWidth:'560px'}}>
-            <button className="modal-close" onClick={()=>setShow(false)}>&times;</button>
-            <h2>{editId ? 'Редактировать' : 'Новый сотрудник'}</h2>
-            <div className="sub">Создание карточки сотрудника</div>
-            <form onSubmit={save}>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="Создание карточки сотрудника" width="wide">
+        <form onSubmit={save}>
 
               {/* БЛОК 1: БАЗА */}
               <div className="form-group">
@@ -286,9 +282,7 @@ export default function Employees() {
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
