@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
@@ -423,12 +424,7 @@ export default function Transactions() {
           <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первую финансовую операцию, чтобы начать учет</p>
         </div>
       )}
-      {showActionSelect && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowActionSelect(false)}}}>
-          <div className="modal-box" style={{maxWidth:'420px'}}>
-            <button className="modal-close" onClick={()=>setShowActionSelect(false)}>&times;</button>
-            <h2>Что вы хотите сделать?</h2>
-            <div className="sub" style={{marginBottom:'1rem'}}>Выберите тип операции</div>
+      <Modal open={showActionSelect} onClose={()=>setShowActionSelect(false)} title="Что вы хотите сделать?" subtitle="Выберите тип операции" width="medium">
             <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
               <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
                 style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
@@ -449,15 +445,8 @@ export default function Transactions() {
                 <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
               </button>
             </div>
-          </div>
-        </div>
-      )}
-      {showTransfer && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowTransfer(false)}}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={()=>setShowTransfer(false)}>&times;</button>
-            <h2>Перевод между счетами</h2>
-            <div className="sub">Перемещение средств со счета на счет</div>
+      </Modal>
+      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств со счета на счет" width="medium">
             <form onSubmit={async function(e){
               e.preventDefault();
               if (!trAmt||parseFloat(trAmt)<=0) {alert('Введите сумму');return;}
@@ -502,17 +491,11 @@ export default function Transactions() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Перевести</button>
+                <button type="submit" className="btn btn-primary">Перевести</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-      {showIncome && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowIncome(false);setEditingId(null)}}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowIncome(false);setEditingId(null)}}>&times;</button>
-            <h2>{editingId ? "Редактировать доход" : "Добавить доход"}</h2>
+      </Modal>
+      <Modal open={showIncome} onClose={function(){setShowIncome(false);setEditingId(null)}} title={editingId ? "Редактировать доход" : "Добавить доход"} subtitle="Поступление средств" width="medium">
 
             <form onSubmit={function(e){
               e.preventDefault();
@@ -556,19 +539,12 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {showExpense && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowExpense(false);setEditingId(null)}}}>
-          <div className="modal-box">
-            <button className="modal-close" onClick={function(){setShowExpense(false);setEditingId(null)}}>&times;</button>
-            <h2>{editingId ? "Редактировать расход" : "Добавить расход"}</h2>
-
+      <Modal open={showExpense} onClose={function(){setShowExpense(false);setEditingId(null)}} title={editingId ? "Редактировать расход" : "Добавить расход"} subtitle="Списание средств" width="medium">
             <form onSubmit={function(e){
               e.preventDefault();
               if(!expName || !expAmount){alert("Заполните название и сумму");return}
@@ -611,18 +587,11 @@ export default function Transactions() {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="btn btn-primary">{editingId ? "Сохранить" : "Добавить"}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-      {showAccSelect && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==="modal-overlay active"){setShowAccSelect(false);setPendingTx(null)}}}>
-          <div className="modal-box" style={{maxWidth:"400px"}}>
-            <button className="modal-close" onClick={function(){setShowAccSelect(false);setPendingTx(null)}}>&times;</button>
-            <h2>{pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"}</h2>
-            <div className="sub">{(pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") : "") + ": " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}</div>
+      </Modal>
+      <Modal open={showAccSelect} onClose={function(){setShowAccSelect(false);setPendingTx(null)}} title={pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"} subtitle={pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") + ": " + Number(pendingTx.amount).toLocaleString() + " ₽" : ""} width="medium">
             <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
               {accs.map(function(a){
                 var sel = selectedAcc === a.id;
@@ -659,9 +628,7 @@ export default function Transactions() {
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
