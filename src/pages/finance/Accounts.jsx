@@ -347,6 +347,7 @@ export default function Accounts() {
 
       <Modal open={viewAcTx} onClose={()=>setViewAcTx(null)} title={viewAcTx?.name||''}
         subtitle={viewAcTx?.description||''} width="medium">
+        {viewAcTx && (<>
             <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:'.5rem'}}>История операций по счету</div>
             <div className="product-table" style={{flex:1,overflowY:'auto'}}>
               <table className="data-table">
@@ -378,6 +379,7 @@ export default function Accounts() {
                 </tbody>
               </table>
             </div>
+        </>)}
       </Modal>
 
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств между счетами" width="medium">
