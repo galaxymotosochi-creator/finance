@@ -4,14 +4,67 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 const ALL_SECTIONS = [
-  { id: 'dashboard', label: 'Панель управления', icon: '📊' },
-  { id: 'registers', label: 'Касса', icon: '🛒' },
-  { id: 'finance', label: 'Финансы', icon: '💰' },
-  { id: 'stock', label: 'Склад и Каталог', icon: '📦' },
-  { id: 'clients', label: 'Клиенты (CRM)', icon: '👥' },
-  { id: 'team', label: 'Команда', icon: '👤' },
-  { id: 'settings', label: 'Настройки', icon: '⚙️' },
+  { id: 'dashboard', label: 'Панель управления' },
+  { id: 'registers', label: 'Касса' },
+  { id: 'finance', label: 'Финансы', children: [
+    { id: 'finance.transactions', label: 'Транзакции' },
+    { id: 'finance.accounts', label: 'Счета' },
+    { id: 'finance.receipts', label: 'Чеки' },
+    { id: 'finance.salary', label: 'Зарплата' },
+    { id: 'finance.shifts', label: 'Смены' },
+    { id: 'finance.pnl', label: 'Чистая прибыль' },
+    { id: 'finance.categories', label: 'Категории' },
+    { id: 'finance.plans', label: 'Планирование' },
+  ]},
+  { id: 'stock', label: 'Склад', children: [
+    { id: 'stock.products', label: 'Товары и услуги' },
+    { id: 'stock.categories', label: 'Категории' },
+    { id: 'stock.turnover', label: 'Аналитика товаров' },
+    { id: 'stock.stock', label: 'Остатки' },
+    { id: 'stock.supplies', label: 'Поставки' },
+    { id: 'stock.inventory', label: 'Инвентаризация' },
+    { id: 'stock.writeoffs', label: 'Списания' },
+    { id: 'stock.suppliers', label: 'Поставщики' },
+  ]},
+  { id: 'clients', label: 'Клиенты', children: [
+    { id: 'clients.base', label: 'База клиентов' },
+    { id: 'clients.loyalty', label: 'Лояльность' },
+    { id: 'clients.promos', label: 'Акции' },
+  ]},
+  { id: 'team', label: 'Команда', children: [
+    { id: 'team.employees', label: 'Сотрудники' },
+    { id: 'team.positions', label: 'Должности' },
+    { id: 'team.timesheet', label: 'Табель' },
+  ]},
+  { id: 'settings', label: 'Настройки', children: [
+    { id: 'settings.general', label: 'Общие' },
+    { id: 'settings.venues', label: 'Заведения' },
+    { id: 'settings.subscription', label: 'Подписка' },
+  ]},
 ];
+
+function Toggle({ checked, onChange, disabled }) {
+  return (
+    <span style={{position:'relative',display:'inline-block',width:'28px',height:'16px',flexShrink:0}}>
+      <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} style={{opacity:0,width:0,height:0,position:'absolute'}} />
+      <span style={{
+        position:'absolute',cursor:disabled?'default':'pointer',
+        top:0,left:0,right:0,bottom:0,
+        background:checked?'#111':'#ccc',
+        borderRadius:'20px',transition:'background .15s',
+        opacity:disabled?.4:1
+      }}>
+        <span style={{
+          position:'absolute',content:'',height:'12px',width:'12px',
+          left:'2px',bottom:'2px',
+          background:'#fff',borderRadius:'50%',
+          transition:'transform .15s',
+          transform:checked?'translateX(12px)':'translateX(0)'
+        }}></span>
+      </span>
+    </span>
+  );
+}
 
 const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
@@ -38,9 +91,10 @@ export default function Employees() {
   const [fBonusType, setFBonusType] = useState('none');
   const [fBonusValue, setFBonusValue] = useState('');
   const [fBonusRules, setFBonusRules] = useState([]);
-  const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
+  const [fPermissions, setFPermissions] = useState([]);
   const [fPin, setFPin] = useState('');
   const [fStatus, setFStatus] = useState('active');
+  const [expanded, setExpanded] = useState({});
   const [showAddRule, setShowAddRule] = useState(false);
   const [addRuleSearch, setAddRuleSearch] = useState('');
 
@@ -81,7 +135,7 @@ export default function Employees() {
     setFPositionId(''); setFHireDate(new Date().toISOString().split('T')[0]);
     setFBaseSalary(''); setFBonusType('none'); setFBonusValue('');
     setFBonusRules([]); setFPermissions([]);
-    setFPin(''); setFStatus('active'); setShow(true);
+    setFPin(''); setFStatus('active'); setExpanded({}); setShow(true);
   };
 
   const openEdit = (e) => {
@@ -92,8 +146,8 @@ export default function Employees() {
     setFBonusType(e.bonus_type||'none');
     setFBonusValue(String(e.bonus_value||''));
     setFBonusRules(e.bonus_rules || []);
-    setFPermissions(e.permissions||['clients','stock']);
-    setFPin(e.pin||''); setFStatus(e.status||'active'); setShow(true);
+    setFPermissions(e.permissions||[]);
+    setFPin(e.pin||''); setFStatus(e.status||'active'); setExpanded({}); setShow(true);
   };
 
   const save = async (e) => {
@@ -121,7 +175,21 @@ export default function Employees() {
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
-  const togglePerm = (pid) => setFPermissions(prev => prev.includes(pid) ? prev.filter(p => p !== pid) : [...prev, pid]);
+  const togglePerm = (pid, children) => {
+    setFPermissions(prev => {
+      const isOn = prev.includes(pid);
+      if (children) {
+        if (isOn) {
+          return prev.filter(p => p !== pid && !children.some(c => c.id === p));
+        } else {
+          return [...prev.filter(p => !children.some(c => c.id === p)), pid];
+        }
+      } else {
+        return isOn ? prev.filter(p => p !== pid) : [...prev, pid];
+      }
+    });
+  };
+
   const genPin = () => setFPin(String(1000 + Math.floor(Math.random() * 9000)));
   const addBonusRule = (scope, type, rate = 0) => setFBonusRules(prev => [...prev, { scope, type, rate, name: '', catId: '', catName: '', itemId: '', itemName: '' }]);
   const updRule = (idx, field, val) => setFBonusRules(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: val }; return n; });
@@ -147,6 +215,41 @@ export default function Employees() {
   const prodCats = allCats.filter(c => c.type === 'product');
   const svcCats = allCats.filter(c => c.type === 'service');
   const products = allProds;
+
+  const renderSectionToggle = (section) => {
+    const isParentOn = fPermissions.includes(section.id);
+    const hasChildren = section.children && section.children.length > 0;
+    const isExpanded = expanded[section.id];
+    const allChildOn = hasChildren && section.children.every(c => fPermissions.includes(c.id));
+    return (
+      <div key={section.id} style={{marginBottom:'.35rem'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'.25rem'}}>
+          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.72rem',fontWeight:500,color:'#333',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
+            <Toggle checked={isParentOn || allChildOn} onChange={() => togglePerm(section.id, section.children)} />
+            <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{section.label}</span>
+          </label>
+          {hasChildren && (
+            <span onClick={() => setExpanded(prev => ({...prev, [section.id]: !prev[section.id]}))} style={{fontSize:'.6rem',color:'#999',cursor:'pointer',padding:'.1rem .25rem',borderRadius:'4px',userSelect:'none',lineHeight:1,flexShrink:0}}>
+              {isExpanded ? '▲' : '▼'}
+            </span>
+          )}
+        </div>
+        {hasChildren && isExpanded && (
+          <div style={{paddingLeft:'1.25rem',marginTop:'.15rem',display:'flex',flexDirection:'column',gap:'.15rem'}}>
+            {section.children.map(child => {
+              const childOn = fPermissions.includes(child.id) || isParentOn;
+              return (
+                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.65rem',fontWeight:400,color:isParentOn?'#bbb':'#555',fontFamily:'inherit',lineHeight:1.3}}>
+                  <Toggle checked={childOn} onChange={() => { if (!isParentOn) togglePerm(child.id); }} disabled={isParentOn} />
+                  <span>{child.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -174,7 +277,7 @@ export default function Employees() {
         <table className="data-table">
           <thead id="colHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
-            <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Принят</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оклад</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>С продаж</th><th style={{width:'110px',textAlign:'left'}}></th>
+            <th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
@@ -250,10 +353,11 @@ export default function Employees() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Пин-код кассы</label>
-                  <div style={{display:'flex',gap:'.5rem'}}>
-                    <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
-                  </div>
+                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    Пин-код кассы
+                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={genPin}>Сгенерировать</span>
+                  </label>
+                  <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
                 </div>
                 <div className="form-group">
                   <label>&nbsp;</label>
@@ -277,7 +381,13 @@ export default function Employees() {
                 </div>
               </div>
 
-
+              {/* ПРАВА ДОСТУПА */}
+              <div className="form-group" style={{marginTop:'.5rem'}}>
+                <label>Доступ к разделам</label>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.15rem .75rem',marginTop:'.2rem'}}>
+                  {ALL_SECTIONS.map(renderSectionToggle)}
+                </div>
+              </div>
 
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
