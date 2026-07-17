@@ -1,3 +1,4 @@
+import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -218,11 +219,7 @@ export default function Inventory() {
       </div>
     
 
-      {editing && <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')cancelEdit()}}>
-        <div className="modal-box" style={{maxWidth:'700px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
-          <button className="modal-close" onClick={cancelEdit}>&times;</button>
-          <h2>Редактирование инвентаризации</h2>
-          <div className="sub" style={{marginBottom:'.75rem',flexShrink:0}}>{editing.number} - {fmtDate(editing.date)}</div>
+      <Modal open={editing} onClose={cancelEdit} title="Редактирование инвентаризации" subtitle={editing ? editing.number + ' - ' + fmtDate(editing.date) : ''} width="wide">
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table className="data-table">
               <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
@@ -244,8 +241,7 @@ export default function Inventory() {
             <button className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
             <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
           </div>
-        </div>
-      </div>}
+      </Modal>
 
 </>
   );
