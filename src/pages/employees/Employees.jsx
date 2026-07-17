@@ -97,6 +97,8 @@ export default function Employees() {
   const [expanded, setExpanded] = useState({});
   const [showAddRule, setShowAddRule] = useState(false);
   const [addRuleSearch, setAddRuleSearch] = useState('');
+  const [showNoPermsConfirm, setShowNoPermsConfirm] = useState(false);
+  const [pendingSave, setPendingSave] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -150,16 +152,8 @@ export default function Employees() {
     setFPin(e.pin||''); setFStatus(e.status||'active'); setExpanded({}); setShow(true);
   };
 
-  const save = async (e) => {
-    e.preventDefault();
-    if (!fName.trim()) return alert('Введите имя сотрудника');
+  const doSave = async () => {
     if (!user) return alert('Ошибка: пользователь не авторизован');
-
-    // Если нет прав — предупреждаем
-    if (fPermissions.length === 0 && !confirm('⚠️ Не выбран ни один раздел — сотрудник не будет иметь доступа к разделам.\n\nПродолжить?')) {
-      return;
-    }
-
     try {
       const obj = {
         user_id: user.id, name: fName.trim(), phone: fPhone.trim(),
@@ -170,7 +164,6 @@ export default function Employees() {
         pin: fPin, status: fStatus,
       };
 
-      // Сначала сохраняем сотрудника
       var savedId;
       if (editId) {
         await supabase.from('employees').update(obj).eq('id', editId);
@@ -181,7 +174,6 @@ export default function Employees() {
         savedId = ins.data.id;
       }
 
-      // Если есть email — автоматом отправляем приглашение
       if (fEmail.trim()) {
         try {
           var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
@@ -195,6 +187,19 @@ export default function Employees() {
 
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
+  };
+
+  const save = async (e) => {
+    e.preventDefault();
+    if (!fName.trim()) return alert('Введите имя сотрудника');
+    if (!user) return alert('Ошибка: пользователь не авторизован');
+
+    if (fPermissions.length === 0) {
+      setShowNoPermsConfirm(true);
+      return;
+    }
+
+    await doSave();
   };
 
   const remove = async (id) => {
@@ -403,6 +408,18 @@ export default function Employees() {
               </div>
             </form>
       </Modal>
+
+      {/* Модалка: нет прав */}
+      <Modal open={showNoPermsConfirm} onClose={() => setShowNoPermsConfirm(false)} title="Доступ не настроен" subtitle="" width="narrow"
+        actions={<>
+          <button className="btn btn-ghost" onClick={() => setShowNoPermsConfirm(false)} style={{fontFamily:'inherit'}}>Отмена</button>
+          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff',fontFamily:'inherit'}} onClick={async () => { setShowNoPermsConfirm(false); await doSave(); }}>Всё равно сохранить</button>
+        </>}>
+        <p style={{fontSize:'.85rem',color:'#555',lineHeight:1.5,margin:'.5rem 0'}}>
+          Не выбран ни один раздел — сотрудник не будет иметь доступа к разделам.
+        </p>
+      </Modal>
+
     {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
