@@ -261,9 +261,10 @@ export default function Employees() {
             if (!fEmail.trim()) return alert('Введите email сотрудника');
             if (!editId) return alert('Сначала сохраните сотрудника');
             try {
+              var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
               var r = await fetch('/api/invite-user', {
                 method:'POST',
-                headers:{'Content-Type':'application/json'},
+                headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (s.access_token || '')},
                 body:JSON.stringify({email:fEmail.trim(), employeeId:editId, employeeName:fName.trim()})
               });
               var j = await r.json();
