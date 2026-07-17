@@ -154,6 +154,7 @@ export default function Employees() {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите имя сотрудника');
     if (!user) return alert('Ошибка: пользователь не авторизован');
+    if (fPermissions.length === 0) return alert('❌ Выберите хотя бы один раздел в правах доступа, иначе сотрудник ничего не увидит');
     try {
       const obj = {
         user_id: user.id, name: fName.trim(), phone: fPhone.trim(),

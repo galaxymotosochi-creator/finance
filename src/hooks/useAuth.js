@@ -69,7 +69,7 @@ export function useAuth() {
   const hasPermission = (perm) => {
     if (!employeeData) return true; // владелец — полный доступ
     const perms = employeeData.permissions || [];
-    if (!perms || perms.length === 0) return true;
+    if (!perms || perms.length === 0) return false; // сотрудник без прав = нет доступа
     return perms.includes(perm) || perms.includes('admin');
   };
 
