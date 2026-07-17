@@ -66,22 +66,7 @@ function Toggle({ checked, onChange, disabled }) {
   );
 }
 
-const BONUS_TYPES = [
-  { value: 'none', label: 'Нет бонуса' },
-  { value: 'percent', label: '% от продаж' },
-  { value: 'fixed', label: 'Фиксированная сумма' },
-  { value: 'category', label: 'Зависит от категории' },
-];
 
-const PAY_TYPE_LABELS = {
-  fixed: 'Фиксированная',
-  piecework: 'Сдельная',
-  percent: '% с продаж',
-  per_day: 'За смену',
-  daily: 'За смену',
-  hourly: 'Почасовая',
-  monthly: 'Оклад',
-};
 
 export default function Positions() {
   const { user } = useAuth();
@@ -93,32 +78,16 @@ export default function Positions() {
   const [editId, setEditId] = useState(null);
 
   const [fName, setFName] = useState('');
-  const [fSalary, setFSalary] = useState('');
-  const [fPayType, setFPayType] = useState('fixed');
-  const [fBonusType, setFBonusType] = useState('none');
-  const [fBonusValue, setFBonusValue] = useState('');
   const [fPermissions, setFPermissions] = useState([]);
   const [expanded, setExpanded] = useState({});
-
-  const [empCount, setEmpCount] = useState({});
 
   const load = async () => {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const [posRes, empRes] = await Promise.all([
-        supabase.from('position_templates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('employees').select('position_id').eq('user_id', user.id),
-      ]);
+      const posRes = await supabase.from('position_templates').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       if (posRes.error) { alert('Ошибка загрузки: ' + posRes.error.message); return; }
       if (posRes.data) setPositionsState(posRes.data);
-      const counts = {};
-      if (empRes.data) {
-        empRes.data.forEach(e => {
-          if (e.position_id) counts[e.position_id] = (counts[e.position_id] || 0) + 1;
-        });
-      }
-      setEmpCount(counts);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     setLoading(false);
   };
@@ -126,15 +95,12 @@ export default function Positions() {
   useEffect(() => { load(); }, [user]);
 
   const openAdd = () => {
-    setEditId(null); setFName(''); setFSalary(''); setFPayType('fixed'); setFBonusType('none');
-    setFBonusValue(''); setFPermissions([]); setExpanded({});
+    setEditId(null); setFName(''); setFPermissions([]); setExpanded({});
     setShow(true);
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setFName(p.name); setFPayType(p.pay_type||'fixed'); setFSalary(String(p.salary||''));
-    setFBonusType(p.bonus_type||'none'); setFBonusValue(String(p.bonus_value||''));
-    setFPermissions(p.permissions||[]); setExpanded({});
+    setEditId(p.id); setFName(p.name); setFPermissions(p.permissions||[]); setExpanded({});
     setShow(true);
   };
 
@@ -160,15 +126,12 @@ export default function Positions() {
     try {
       const obj = {
         user_id: user.id, name: fName.trim(),
-        salary: fPayType === 'fixed' ? parseFloat(fSalary)||0 : 0,
-        bonus_type: fBonusType,
-        bonus_value: parseFloat(fBonusValue)||0,
         permissions: fPermissions,
       };
       if (editId) {
-        try { await supabase.from('position_templates').update({...obj, pay_type: fPayType}).eq('id', editId); } catch(e) { await supabase.from('position_templates').update(obj).eq('id', editId); }
+        await supabase.from('position_templates').update(obj).eq('id', editId);
       } else {
-        try { await supabase.from('position_templates').insert({...obj, pay_type: fPayType}); } catch(e) { await supabase.from('position_templates').insert(obj); }
+        await supabase.from('position_templates').insert(obj);
       }
       await load();
       setShow(false);
@@ -184,19 +147,6 @@ export default function Positions() {
   };
 
   const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
-
-  const formatPayType = (p) => {
-    const pt = p.pay_type || 'fixed';
-    const label = PAY_TYPE_LABELS[pt] || pt;
-    return label;
-  };
-
-  const formatSalary = (p) => {
-    const pt = p.pay_type || 'fixed';
-    if (pt === 'fixed' && p.salary) return Number(p.salary).toLocaleString() + ' ₽';
-    if (pt === 'percent') return (p.salary || 0).toLocaleString() + ' ₽/смена';
-    return '—';
-  };
 
   const formatPermissions = (p) => {
     if (!p.permissions || p.permissions.length === 0) return 'Нет доступов';
@@ -275,9 +225,7 @@ export default function Positions() {
             <thead id="colHeaders">
               <tr>
                 <th style={{textAlign:'left',paddingLeft:0,width:'26%'}}>Название должности</th>
-                <th style={{textAlign:'left',width:'16%'}}>Тип оплаты</th>
-                <th style={{textAlign:'left',width:'14%'}}>Сумма</th>
-                <th style={{textAlign:'left',width:'34%'}}>Группы прав доступа</th>
+                <th style={{textAlign:'left',width:'50%'}}>Группы прав доступа</th>
                 <th style={{width:'10%',textAlign:'left'}}></th>
               </tr>
             </thead>
@@ -287,8 +235,7 @@ export default function Positions() {
                   <td style={{textAlign:'left',paddingLeft:0,color:'#555'}}>
                     <span className="prod-name">{p.name}</span>
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{formatPayType(p)}</td>
-                  <td className="num" style={{textAlign:'left',color:'#555'}}>{formatSalary(p)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{formatPermissions(p)}</td>
                   <td style={{textAlign:'left',color:'#555'}}>
                     {formatPermissions(p)}
                   </td>
@@ -320,39 +267,6 @@ export default function Positions() {
                 <label>Название должности</label>
               <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
               </div>
-              <div style={{display:'flex',gap:'10px'}}>
-                <div style={{flex:1}}>
-                  <div className="form-group">
-                    <label>Тип оплаты</label>
-                    <select value={fPayType} onChange={e => setFPayType(e.target.value)}>
-                      <option value="fixed">Фиксир.</option>
-                      <option value="piecework">Сдельная</option>
-                      <option value="percent">За смену</option>
-                    </select>
-                  </div>
-                </div>
-                <div style={{flex:1,display: fPayType === 'fixed' ? 'block' : 'none'}}>
-                  <div className="form-group">
-                    <label>Сумма (руб)</label>
-                    <input type="number" value={fSalary} onChange={e=>setFSalary(e.target.value)} placeholder="50000" min="0" />
-                  </div>
-                </div>
-                <div style={{flex:1}}>
-                  <div className="form-group">
-                    <label>Тип бонуса</label>
-                    <select value={fBonusType} onChange={e=>setFBonusType(e.target.value)}>
-                      {BONUS_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                  </div>
-                </div>
-              </div>
-              {fBonusType !== 'none' && (
-                <div className="form-group">
-                  <label>{fBonusType === 'percent' ? 'Процент от продаж' : fBonusType === 'fixed' ? 'Сумма бонуса (₽)' : 'Описание бонуса'}</label>
-                  <input type="text" value={fBonusValue} onChange={e=>setFBonusValue(e.target.value)}
-                    placeholder={fBonusType === 'percent' ? '5' : fBonusType === 'fixed' ? '10000' : 'Зависит от категории'} />
-                </div>
-              )}
 
               {/* ПРАВА ДОСТУПА */}
               <div className="form-group" style={{marginTop:'.5rem'}}>
