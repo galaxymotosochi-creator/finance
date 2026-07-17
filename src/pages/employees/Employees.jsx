@@ -154,7 +154,12 @@ export default function Employees() {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите имя сотрудника');
     if (!user) return alert('Ошибка: пользователь не авторизован');
-    if (fPermissions.length === 0) return alert('❌ Выберите хотя бы один раздел в правах доступа, иначе сотрудник ничего не увидит');
+
+    // Если нет прав — предупреждаем
+    if (fPermissions.length === 0 && !confirm('⚠️ Не выбран ни один раздел — сотрудник не будет иметь доступа к разделам.\n\nПродолжить?')) {
+      return;
+    }
+
     try {
       const obj = {
         user_id: user.id, name: fName.trim(), phone: fPhone.trim(),
@@ -164,8 +169,30 @@ export default function Employees() {
         bonus_rules: fBonusRules, permissions: fPermissions,
         pin: fPin, status: fStatus,
       };
-      if (editId) await supabase.from('employees').update(obj).eq('id', editId);
-      else await supabase.from('employees').insert(obj);
+
+      // Сначала сохраняем сотрудника
+      var savedId;
+      if (editId) {
+        await supabase.from('employees').update(obj).eq('id', editId);
+        savedId = editId;
+      } else {
+        var ins = await supabase.from('employees').insert(obj).select('id').single();
+        if (ins.error) throw ins.error;
+        savedId = ins.data.id;
+      }
+
+      // Если есть email — автоматом отправляем приглашение
+      if (fEmail.trim()) {
+        try {
+          var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+          await fetch('/api/invite-user', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (s.access_token || '')},
+            body:JSON.stringify({email:fEmail.trim(), employeeId:savedId, employeeName:fName.trim()})
+          });
+        } catch(e) { console.error('Invite error:', e); }
+      }
+
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -334,24 +361,7 @@ export default function Employees() {
                   <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
                 </div>
                 <div className="form-group">
-                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                    E-mail
-                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={async () => {
-            if (!fEmail.trim()) return alert('Введите email сотрудника');
-            if (!editId) return alert('Сначала сохраните сотрудника');
-            try {
-              var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
-              var r = await fetch('/api/invite-user', {
-                method:'POST',
-                headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (s.access_token || '')},
-                body:JSON.stringify({email:fEmail.trim(), employeeId:editId, employeeName:fName.trim()})
-              });
-              var j = await r.json();
-              if (j.error) return alert('Ошибка: ' + j.error);
-              alert('Приглашение отправлено на ' + fEmail);
-            } catch(e) { alert('Ошибка: ' + e.message); }
-          }}>Выдать доступ</span>
-                  </label>
+                  <label>E-mail</label>
                   <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="ivan@example.com" />
                 </div>
               </div>
