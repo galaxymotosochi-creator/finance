@@ -130,7 +130,13 @@ export default function Sidebar() {
               var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Настройки':'settings' };
               var p = permMap[item.label];
               if (!p) return true;
-              return hasPermission(p);
+              // Если есть родительский доступ — показываем раздел
+              if (hasPermission(p)) return true;
+              // Если нет родительского, проверяем детей
+              if (item.children) {
+                return item.children.some(function(c){ return hasPermission(p + '.' + c.path.split('/').pop()); });
+              }
+              return false;
             }).map((item) => {
               if (item.children) {
                 const open = expanded === item.label;
@@ -144,7 +150,17 @@ export default function Sidebar() {
                       {!collapsed && <span className="arrow">&#9656;</span>}
                     </a>
                     <div className={`nav-children${open ? ' open' : ''}`}>
-                      {item.children.map((child) => (
+                      {item.children.filter(function(child){
+                        if (!employeeData) return true;
+                        var perms = employeeData.permissions || [];
+                        if (!perms || perms.length === 0) return true;
+                        var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Настройки':'settings' };
+                        var parentPerm = permMap[item.label];
+                        // Если родитель разрешён — все дети видны
+                        if (parentPerm && perms.includes(parentPerm)) return true;
+                        var childId = parentPerm + '.' + child.path.split('/').pop();
+                        return perms.includes(childId);
+                      }).map((child) => (
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
                           onClick={() => navigate(child.path)}>{child.label}</a>

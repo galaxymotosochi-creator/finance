@@ -228,8 +228,8 @@ app.post('/api/invite-user', auth, async (req, res) => {
     // Создаём пользователя
     const empName = employeeName || empCheck.rows[0].name || email.split('@')[0];
     await pool.query(
-      'INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, $3, $4, NOW())',
-      [id, email, hash, empName]
+      'INSERT INTO users (id, email, password_hash, name, created_at, employee_id) VALUES ($1, $2, $3, $4, NOW(), $5)',
+      [id, email, hash, empName, employeeId]
     );
 
     // Обновляем запись сотрудника
@@ -321,8 +321,18 @@ app.post('/api/ai/chat', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.get('/api/auth/me', auth, (req, res) => {
-  res.json({ user: { id: req.user.id, email: req.user.email, name: req.user.name } });
+app.get('/api/auth/me', auth, async (req, res) => {
+  let employeePerms = null;
+  if (req.user.employee_id) {
+    try {
+      const emp = await pool.query('SELECT permissions FROM employees WHERE id = $1', [req.user.employee_id]);
+      if (emp.rows.length) employeePerms = emp.rows[0].permissions;
+    } catch (e) { console.error('Failed to load employee permissions:', e.message); }
+  }
+  res.json({
+    user: { id: req.user.id, email: req.user.email, name: req.user.name, employee_id: req.user.employee_id },
+    permissions: employeePerms,
+  });
 });
 
 // ===== GENERIC TABLE CRUD =====

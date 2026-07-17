@@ -2,49 +2,66 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export function useAuth() {
-  // Синхронно читаем сессию из localStorage, чтобы user был сразу
   const storedSession = (() => { try { const s = localStorage.getItem('atlaspos_session'); return s ? JSON.parse(s) : null; } catch(e) { return null; } })();
   const [user, setUser] = useState(storedSession?.user || null);
   const [loading, setLoading] = useState(!storedSession);
   const [employeeData, setEmployeeData] = useState(null);
 
-  // Загружаем данные сотрудника по user_id или employee_id из metadata
-  const loadEmployee = async (u) => {
-    if (!u) { setEmployeeData(null); return; }
-    const meta = u.user_metadata || {};
-    const empId = meta.employee_id;
-    
-    if (!empId) {
-      // Владелец — полный доступ, игнорируем любые записи в employees
-      setEmployeeData(null);
-      return;
-    }
-    
-    const { data } = await supabase
-      .from('employees')
-      .select('permissions,position_id,name,pin')
-      .eq('id', empId)
-      .maybeSingle();
-    
-    if (data) { setEmployeeData(data); }
-    else { setEmployeeData(null); }
-  };
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      loadEmployee(u);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const u = session?.user ?? null;
-        setUser(u);
-        loadEmployee(u);
+    const checkAuth = async () => {
+      const stored = localStorage.getItem('atlaspos_session');
+      if (!stored) {
+        setUser(null); setEmployeeData(null); setLoading(false);
+        return;
       }
-    );
+      const session = JSON.parse(stored);
+      setUser(session.user);
+
+      // Загружаем права доступа через API
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + (session.access_token || '') }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.permissions && Array.isArray(data.permissions) && data.permissions.length > 0) {
+            setEmployeeData({ permissions: data.permissions });
+          } else {
+            setEmployeeData(null); // владелец или полный доступ
+          }
+        } else {
+          // Токен протух
+          localStorage.removeItem('atlaspos_session');
+          setUser(null); setEmployeeData(null);
+        }
+      } catch(e) {
+        console.error('Auth check failed:', e);
+        // При ошибке сети — всё равно пускаем, но без ограничений
+        setEmployeeData(null);
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
+
+    // Слушаем изменения аутентификации (через supabase client)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null);
+        // После входа перезагрузим права
+        fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + (session?.access_token || '') }
+        }).then(r => r.ok ? r.json() : null).then(data => {
+          if (data?.permissions && Array.isArray(data.permissions) && data.permissions.length > 0) {
+            setEmployeeData({ permissions: data.permissions });
+          } else {
+            setEmployeeData(null);
+          }
+        }).catch(() => setEmployeeData(null));
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null); setEmployeeData(null);
+      }
+    });
 
     return () => subscription?.unsubscribe();
   }, []);
@@ -52,7 +69,7 @@ export function useAuth() {
   const hasPermission = (perm) => {
     if (!employeeData) return true; // владелец — полный доступ
     const perms = employeeData.permissions || [];
-    if (!perms || perms.length === 0) return true; // пустые права = полный доступ
+    if (!perms || perms.length === 0) return true;
     return perms.includes(perm) || perms.includes('admin');
   };
 
