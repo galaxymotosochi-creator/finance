@@ -127,7 +127,7 @@ export default function Employees() {
   const updRule = (idx, field, val) => setFBonusRules(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: val }; return n; });
   const rmRule = (idx) => setFBonusRules(prev => prev.filter((_, i) => i !== idx));
 
-  const fmtDate = (d) => { if (!d) return '—'; const p = d.split('-'); return p.length === 3 ? p[2]+'.'+p[1]+'.'+p[0].slice(2) : d; };
+  const fmtDate = (d) => { if (!d) return '—'; const datePart = d.split('T')[0]; const p = datePart.split('-'); return p.length === 3 ? p[2]+'.'+p[1]+'.'+p[0].slice(2) : d; };
 
   const getRulesSummary = (emp) => {
     const rules = emp.bonus_rules || []; const parts = [];
