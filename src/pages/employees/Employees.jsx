@@ -384,7 +384,7 @@ export default function Employees() {
                 </div>
               </div>
 
-              <div className="form-row">
+              {fPermissions.includes('registers') && <div className="form-row">
                 <div className="form-group">
                   <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                     Пин-код кассы
@@ -393,7 +393,7 @@ export default function Employees() {
                   <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
                 </div>
                 <div className="form-group"></div>
-              </div>
+              </div>}
 
               {/* ПРАВА ДОСТУПА */}
               <div className="form-group" style={{marginTop:'1rem'}}>
