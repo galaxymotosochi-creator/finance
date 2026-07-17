@@ -361,7 +361,7 @@ export default function Employees() {
                 </div>
                 <div className="form-group">
                   <label>&nbsp;</label>
-                  <button type="button" style={{width:'100%',padding:'.5rem .65rem',borderRadius:'var(--radius-md)',border:'none',background:'#ffdd2d',color:'#000',fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px'}} onClick={async () => {
+                  <button type="button" style={{width:'100%',padding:'.45rem .65rem',borderRadius:'var(--radius-md)',border:'1px solid #ddd',background:'#fff',color:'#555',fontWeight:400,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px',fontSize:'.75rem',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.borderColor='#ccc',e.currentTarget.style.background='#fafafa'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#ddd',e.currentTarget.style.background='#fff'}} onClick={async () => {
             if (!fEmail.trim()) return alert('Введите email сотрудника');
             if (!editId) return alert('Сначала сохраните сотрудника');
             try {
@@ -376,7 +376,7 @@ export default function Employees() {
               alert('Приглашение отправлено на ' + fEmail);
             } catch(e) { alert('Ошибка: ' + e.message); }
           }}>
-                    <span>✉️</span> Выдать доступ
+                    Выдать доступ
                   </button>
                 </div>
               </div>

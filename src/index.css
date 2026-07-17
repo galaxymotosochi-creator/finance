@@ -271,7 +271,7 @@ body {
   display: inline-flex; align-items: center; gap: .3rem;
   padding: .5rem .8rem; font-size: .78rem;
   border-radius: var(--radius-pill); cursor: pointer;
-  font-family: var(--font); font-weight: 600;
+  font-family: var(--font); font-weight: 400;
   background: var(--primary); color: var(--primary-text); border: none;
   transition: all var(--transition);
 }
