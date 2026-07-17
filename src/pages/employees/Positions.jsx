@@ -4,14 +4,67 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 const ALL_SECTIONS = [
-  { id: 'dashboard', label: 'Панель управления', icon: '📊' },
-  { id: 'registers', label: 'Касса', icon: '🛒' },
-  { id: 'finance', label: 'Финансы', icon: '💰' },
-  { id: 'stock', label: 'Склад и Каталог', icon: '📦' },
-  { id: 'clients', label: 'Клиенты (CRM)', icon: '👥' },
-  { id: 'team', label: 'Команда', icon: '👤' },
-  { id: 'settings', label: 'Настройки', icon: '⚙️' },
+  { id: 'dashboard', label: 'Панель управления' },
+  { id: 'registers', label: 'Касса' },
+  { id: 'finance', label: 'Финансы', children: [
+    { id: 'finance.transactions', label: 'Транзакции' },
+    { id: 'finance.accounts', label: 'Счета' },
+    { id: 'finance.receipts', label: 'Чеки' },
+    { id: 'finance.salary', label: 'Зарплата' },
+    { id: 'finance.shifts', label: 'Смены' },
+    { id: 'finance.pnl', label: 'Чистая прибыль' },
+    { id: 'finance.categories', label: 'Категории' },
+    { id: 'finance.plans', label: 'Планирование' },
+  ]},
+  { id: 'stock', label: 'Склад', children: [
+    { id: 'stock.products', label: 'Товары и услуги' },
+    { id: 'stock.categories', label: 'Категории' },
+    { id: 'stock.turnover', label: 'Аналитика товаров' },
+    { id: 'stock.stock', label: 'Остатки' },
+    { id: 'stock.supplies', label: 'Поставки' },
+    { id: 'stock.inventory', label: 'Инвентаризация' },
+    { id: 'stock.writeoffs', label: 'Списания' },
+    { id: 'stock.suppliers', label: 'Поставщики' },
+  ]},
+  { id: 'clients', label: 'Клиенты', children: [
+    { id: 'clients.base', label: 'База клиентов' },
+    { id: 'clients.loyalty', label: 'Лояльность' },
+    { id: 'clients.promos', label: 'Акции' },
+  ]},
+  { id: 'team', label: 'Команда', children: [
+    { id: 'team.employees', label: 'Сотрудники' },
+    { id: 'team.positions', label: 'Должности' },
+    { id: 'team.timesheet', label: 'Табель' },
+  ]},
+  { id: 'settings', label: 'Настройки', children: [
+    { id: 'settings.general', label: 'Общие' },
+    { id: 'settings.venues', label: 'Заведения' },
+    { id: 'settings.subscription', label: 'Подписка' },
+  ]},
 ];
+
+function Toggle({ checked, onChange, disabled }) {
+  return (
+    <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
+      <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} style={{opacity:0,width:0,height:0,position:'absolute'}} />
+      <span style={{
+        position:'absolute',cursor:disabled?'default':'pointer',
+        top:0,left:0,right:0,bottom:0,
+        background:checked?'#111':'#ccc',
+        borderRadius:'20px',transition:'background .15s',
+        opacity:disabled?.4:1
+      }}>
+        <span style={{
+          position:'absolute',content:'',height:'16px',width:'16px',
+          left:'2px',bottom:'2px',
+          background:'#fff',borderRadius:'50%',
+          transition:'transform .15s',
+          transform:checked?'translateX(14px)':'translateX(0)'
+        }}></span>
+      </span>
+    </span>
+  );
+}
 
 const BONUS_TYPES = [
   { value: 'none', label: 'Нет бонуса' },
@@ -44,7 +97,8 @@ export default function Positions() {
   const [fPayType, setFPayType] = useState('fixed');
   const [fBonusType, setFBonusType] = useState('none');
   const [fBonusValue, setFBonusValue] = useState('');
-  const [fPermissions, setFPermissions] = useState(['clients', 'stock']);
+  const [fPermissions, setFPermissions] = useState([]);
+  const [expanded, setExpanded] = useState({});
 
   const [empCount, setEmpCount] = useState({});
 
@@ -73,15 +127,30 @@ export default function Positions() {
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFSalary(''); setFPayType('fixed'); setFBonusType('none');
-    setFBonusValue(''); setFPermissions(['clients', 'stock']);
+    setFBonusValue(''); setFPermissions([]); setExpanded({});
     setShow(true);
   };
 
   const openEdit = (p) => {
     setEditId(p.id); setFName(p.name); setFPayType(p.pay_type||'fixed'); setFSalary(String(p.salary||''));
     setFBonusType(p.bonus_type||'none'); setFBonusValue(String(p.bonus_value||''));
-    setFPermissions(p.permissions||['clients','stock']);
+    setFPermissions(p.permissions||[]); setExpanded({});
     setShow(true);
+  };
+
+  const togglePerm = (pid, children) => {
+    setFPermissions(prev => {
+      const isOn = prev.includes(pid);
+      if (children) {
+        if (isOn) {
+          return prev.filter(p => p !== pid && !children.some(c => c.id === p));
+        } else {
+          return [...prev.filter(p => !children.some(c => c.id === p)), pid];
+        }
+      } else {
+        return isOn ? prev.filter(p => p !== pid) : [...prev, pid];
+      }
+    });
   };
 
   const save = async (e) => {
@@ -114,12 +183,6 @@ export default function Positions() {
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
-  const togglePerm = (permId) => {
-    setFPermissions(prev =>
-      prev.includes(permId) ? prev.filter(p => p !== permId) : [...prev, permId]
-    );
-  };
-
   const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
 
   const formatPayType = (p) => {
@@ -139,8 +202,50 @@ export default function Positions() {
     if (!p.permissions || p.permissions.length === 0) return 'Нет доступов';
     return p.permissions.map(permId => {
       const sec = getSectionMeta(permId);
-      return sec ? sec.icon + ' ' + sec.label : permId;
+      if (sec) return sec.label;
+      const parentId = permId.split('.')[0];
+      const parent = getSectionMeta(parentId);
+      if (parent) {
+        const child = parent.children?.find(c => c.id === permId);
+        return (parent.label + ' → ' + (child ? child.label : permId.split('.')[1]));
+      }
+      return permId;
     }).join(', ');
+  };
+
+  const renderSectionToggle = (section) => {
+    const isParentOn = fPermissions.includes(section.id);
+    const hasChildren = section.children && section.children.length > 0;
+    const isExpanded = expanded[section.id];
+    const allChildOn = hasChildren && section.children.every(c => fPermissions.includes(c.id));
+    return (
+      <div key={section.id} style={{marginBottom:'.35rem'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'.25rem'}}>
+          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
+            <Toggle checked={isParentOn || allChildOn} onChange={() => togglePerm(section.id, section.children)} />
+            <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{section.label}</span>
+          </label>
+          {hasChildren && (
+            <span onClick={() => setExpanded(prev => ({...prev, [section.id]: !prev[section.id]}))} style={{fontSize:'.65rem',color:'rgba(0,0,0,.34)',cursor:'pointer',padding:'.1rem .3rem',borderRadius:'4px',userSelect:'none',lineHeight:1,flexShrink:0}}>
+              {isExpanded ? '▲' : '▼'}
+            </span>
+          )}
+        </div>
+        {hasChildren && isExpanded && (
+          <div style={{paddingLeft:'1.25rem',marginTop:'.15rem',display:'flex',flexDirection:'column',gap:'.15rem'}}>
+            {section.children.map(child => {
+              const childOn = fPermissions.includes(child.id) || isParentOn;
+              return (
+                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.75rem',fontWeight:400,color:isParentOn?'rgba(0,0,0,.34)':'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.3}}>
+                  <Toggle checked={childOn} onChange={() => { if (!isParentOn) togglePerm(child.id); }} disabled={isParentOn} />
+                  <span>{child.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -213,7 +318,7 @@ export default function Positions() {
         <form onSubmit={save}>
               <div className="form-group">
                 <label>Название должности</label>
-                <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
+              <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
               </div>
               <div style={{display:'flex',gap:'10px'}}>
                 <div style={{flex:1}}>
@@ -249,18 +354,11 @@ export default function Positions() {
                 </div>
               )}
 
-              {/* Доступы */}
-              <div className="form-group">
-                <label>Группы прав доступа</label>
-                <div className="pos-perms-grid">
-                  {ALL_SECTIONS.map(s => (
-                    <div key={s.id} className={`pos-perm-check${fPermissions.includes(s.id) ? ' checked' : ''}`}
-                      onClick={() => togglePerm(s.id)} role="button" tabIndex={0}
-                      onKeyDown={e => { if(e.key==='Enter'||e.key===' ') { e.preventDefault(); togglePerm(s.id); } }}>
-                      <span className="pos-perm-check-icon">{s.icon}</span>
-                      <span>{s.label}</span>
-                    </div>
-                  ))}
+              {/* ПРАВА ДОСТУПА */}
+              <div className="form-group" style={{marginTop:'.5rem'}}>
+                <label>Доступ к разделам</label>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
+                  {ALL_SECTIONS.map(renderSectionToggle)}
                 </div>
               </div>
 
