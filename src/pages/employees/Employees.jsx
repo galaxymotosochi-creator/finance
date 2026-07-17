@@ -333,7 +333,24 @@ export default function Employees() {
                   <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
                 </div>
                 <div className="form-group">
-                  <label>E-mail</label>
+                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    E-mail
+                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={async () => {
+            if (!fEmail.trim()) return alert('Введите email сотрудника');
+            if (!editId) return alert('Сначала сохраните сотрудника');
+            try {
+              var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+              var r = await fetch('/api/invite-user', {
+                method:'POST',
+                headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (s.access_token || '')},
+                body:JSON.stringify({email:fEmail.trim(), employeeId:editId, employeeName:fName.trim()})
+              });
+              var j = await r.json();
+              if (j.error) return alert('Ошибка: ' + j.error);
+              alert('Приглашение отправлено на ' + fEmail);
+            } catch(e) { alert('Ошибка: ' + e.message); }
+          }}>Выдать доступ</span>
+                  </label>
                   <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="ivan@example.com" />
                 </div>
               </div>
@@ -359,26 +376,7 @@ export default function Employees() {
                   </label>
                   <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
                 </div>
-                <div className="form-group">
-                  <label>&nbsp;</label>
-                  <button type="button" style={{width:'100%',padding:'.45rem .65rem',borderRadius:'var(--radius-md)',border:'1px solid #ddd',background:'#fff',color:'#555',fontWeight:400,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',fontFamily:'inherit',boxSizing:'border-box',height:'38px',fontSize:'.75rem',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.borderColor='#ccc',e.currentTarget.style.background='#fafafa'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#ddd',e.currentTarget.style.background='#fff'}} onClick={async () => {
-            if (!fEmail.trim()) return alert('Введите email сотрудника');
-            if (!editId) return alert('Сначала сохраните сотрудника');
-            try {
-              var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
-              var r = await fetch('/api/invite-user', {
-                method:'POST',
-                headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (s.access_token || '')},
-                body:JSON.stringify({email:fEmail.trim(), employeeId:editId, employeeName:fName.trim()})
-              });
-              var j = await r.json();
-              if (j.error) return alert('Ошибка: ' + j.error);
-              alert('Приглашение отправлено на ' + fEmail);
-            } catch(e) { alert('Ошибка: ' + e.message); }
-          }}>
-                    Выдать доступ
-                  </button>
-                </div>
+                <div className="form-group"></div>
               </div>
 
               {/* ПРАВА ДОСТУПА */}
