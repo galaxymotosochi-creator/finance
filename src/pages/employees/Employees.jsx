@@ -45,7 +45,7 @@ const ALL_SECTIONS = [
 
 function Toggle({ checked, onChange, disabled }) {
   return (
-    <span style={{position:'relative',display:'inline-block',width:'28px',height:'16px',flexShrink:0}}>
+    <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
       <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} style={{opacity:0,width:0,height:0,position:'absolute'}} />
       <span style={{
         position:'absolute',cursor:disabled?'default':'pointer',
@@ -55,11 +55,11 @@ function Toggle({ checked, onChange, disabled }) {
         opacity:disabled?.4:1
       }}>
         <span style={{
-          position:'absolute',content:'',height:'12px',width:'12px',
+          position:'absolute',content:'',height:'16px',width:'16px',
           left:'2px',bottom:'2px',
           background:'#fff',borderRadius:'50%',
           transition:'transform .15s',
-          transform:checked?'translateX(12px)':'translateX(0)'
+          transform:checked?'translateX(14px)':'translateX(0)'
         }}></span>
       </span>
     </span>
@@ -224,12 +224,12 @@ export default function Employees() {
     return (
       <div key={section.id} style={{marginBottom:'.35rem'}}>
         <div style={{display:'flex',alignItems:'center',gap:'.25rem'}}>
-          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.72rem',fontWeight:500,color:'#333',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
+          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
             <Toggle checked={isParentOn || allChildOn} onChange={() => togglePerm(section.id, section.children)} />
             <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{section.label}</span>
           </label>
           {hasChildren && (
-            <span onClick={() => setExpanded(prev => ({...prev, [section.id]: !prev[section.id]}))} style={{fontSize:'.6rem',color:'#999',cursor:'pointer',padding:'.1rem .25rem',borderRadius:'4px',userSelect:'none',lineHeight:1,flexShrink:0}}>
+            <span onClick={() => setExpanded(prev => ({...prev, [section.id]: !prev[section.id]}))} style={{fontSize:'.65rem',color:'rgba(0,0,0,.34)',cursor:'pointer',padding:'.1rem .3rem',borderRadius:'4px',userSelect:'none',lineHeight:1,flexShrink:0}}>
               {isExpanded ? '▲' : '▼'}
             </span>
           )}
@@ -239,7 +239,7 @@ export default function Employees() {
             {section.children.map(child => {
               const childOn = fPermissions.includes(child.id) || isParentOn;
               return (
-                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.65rem',fontWeight:400,color:isParentOn?'#bbb':'#555',fontFamily:'inherit',lineHeight:1.3}}>
+                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.75rem',fontWeight:400,color:isParentOn?'rgba(0,0,0,.34)':'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.3}}>
                   <Toggle checked={childOn} onChange={() => { if (!isParentOn) togglePerm(child.id); }} disabled={isParentOn} />
                   <span>{child.label}</span>
                 </label>
@@ -382,9 +382,9 @@ export default function Employees() {
               </div>
 
               {/* ПРАВА ДОСТУПА */}
-              <div className="form-group" style={{marginTop:'.5rem'}}>
+              <div className="form-group" style={{marginTop:'1rem'}}>
                 <label>Доступ к разделам</label>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.15rem .75rem',marginTop:'.2rem'}}>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
                   {ALL_SECTIONS.map(renderSectionToggle)}
                 </div>
               </div>
