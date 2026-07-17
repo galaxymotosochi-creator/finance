@@ -220,6 +220,7 @@ export default function Inventory() {
     
 
       <Modal open={editing} onClose={cancelEdit} title="Редактирование инвентаризации" subtitle={editing ? editing.number + ' - ' + fmtDate(editing.date) : ''} width="wide">
+        {editing && (<>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table className="data-table">
               <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
@@ -241,6 +242,7 @@ export default function Inventory() {
             <button className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
             <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
           </div>
+        </>)}
       </Modal>
 
 </>

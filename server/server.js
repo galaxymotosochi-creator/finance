@@ -197,6 +197,78 @@ app.post('/api/auth/yandex/login', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Приглашение сотрудника (создание учётной записи)
+app.post('/api/invite-user', auth, async (req, res) => {
+  try {
+    const { email, employeeId, employeeName } = req.body;
+    if (!email || !employeeId) {
+      return res.status(400).json({ error: 'Email и employeeId обязательны' });
+    }
+
+    // Проверяем, что сотрудник принадлежит текущему пользователю
+    const empCheck = await pool.query(
+      'SELECT id, name FROM employees WHERE id = $1 AND user_id = $2',
+      [employeeId, req.user.id]
+    );
+    if (!empCheck.rows.length) {
+      return res.status(404).json({ error: 'Сотрудник не найден' });
+    }
+
+    // Проверяем, нет ли уже пользователя с таким email
+    const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length) {
+      return res.status(400).json({ error: 'Пользователь с таким email уже зарегистрирован' });
+    }
+
+    // Генерируем временный пароль
+    const tempPassword = Math.random().toString(36).slice(2, 8) + Math.floor(Math.random() * 1000);
+    const hash = await bcrypt.hash(tempPassword, 10);
+    const id = uuidv4();
+
+    // Создаём пользователя
+    const empName = employeeName || empCheck.rows[0].name || email.split('@')[0];
+    await pool.query(
+      'INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, $3, $4, NOW())',
+      [id, email, hash, empName]
+    );
+
+    // Обновляем запись сотрудника
+    await pool.query(
+      'UPDATE employees SET email = $1, status = $2 WHERE id = $3',
+      [email, 'invited', employeeId]
+    );
+
+    // Отправляем письмо с приглашением
+    const appUrl = process.env.APP_URL || 'https://atlaspos.ru';
+    const html = [
+      '<p>Здравствуйте, <b>' + empName + '</b>!</p>',
+      '<p>Вам предоставлен доступ к системе учёта <b>AtlasPos</b>.</p>',
+      '<hr style="border:none;border-top:1px solid #eee;margin:16px 0">',
+      '<p><b>Данные для входа:</b></p>',
+      '<p>Сайт: <a href="' + appUrl + '/login">' + appUrl + '/login</a></p>',
+      '<p>Email: <b>' + email + '</b></p>',
+      '<p>Пароль: <b>' + tempPassword + '</b></p>',
+      '<hr style="border:none;border-top:1px solid #eee;margin:16px 0">',
+      '<p style="color:#999;font-size:12px">Настоятельно рекомендуем сменить пароль после первого входа.</p>',
+    ].join('');
+
+    const sent = await sendMail(email, 'Доступ к AtlasPos', html);
+    if (!sent) {
+      console.error('Failed to send invite email to ' + email);
+    }
+
+    res.json({
+      message: 'Приглашение отправлено на ' + email,
+      user_id: id,
+      temp_password: tempPassword,
+      email_sent: sent,
+    });
+  } catch (e) {
+    console.error('Invite error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // AI-чат (заглушка, без внешнего AI, пока нет API ключа)
 app.post('/api/ai/chat', auth, async (req, res) => {
   try {
