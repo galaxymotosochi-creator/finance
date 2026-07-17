@@ -307,30 +307,14 @@ export default function Stock() {
         </table>
       </div>
 
-      {/* Confirm correction modal */}
-      {showConfirm && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
-          <div className="modal-box" style={{maxWidth:'420px'}}>
-            <button className="modal-close" onClick={()=>setShowConfirm(false)}>&times;</button>
-            <h2 style={{fontSize:'1rem'}}>Начальные остатки уже внесены</h2>
-            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>
-              Вы уже вносили начальные остатки. Хотите их откорректировать?
-            </p>
-            <div className="modal-actions">
-              <button className="btn btn-outline" onClick={cancelCorrection}>Нет</button>
-              <button className="btn btn-account-select" onClick={confirmCorrection} style={{marginLeft:'.5rem'}}>Да, откорректировать</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow"
+        actions={<>
+          <button className="btn btn-ghost" onClick={cancelCorrection}>Нет</button>
+          <button className="btn btn-primary" onClick={confirmCorrection}>Да, откорректировать</button>
+        </>}>
+      </Modal>
 
-      {/* Initial stock modal */}
-      {showInitModal && (
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowInitModal(false)}}}>
-          <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
-            <button className="modal-close" onClick={()=>setShowInitModal(false)}>&times;</button>
-            <h2 style={{fontSize:'1rem'}}>Введите начальные остатки</h2>
-            <div className="sub" style={{marginBottom:'.5rem'}}>Укажите количество каждого товара на складе</div>
+      <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Укажите количество каждого товара на складе" width="wide">
 
             <div className="stock-search" style={{marginBottom:'.6rem'}}>
               <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
@@ -358,12 +342,9 @@ export default function Stock() {
             </div>
 
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
-              <button className="btn btn-outline" onClick={()=>setShowInitModal(false)} style={{marginRight:'.5rem'}}>Отмена</button>
-              <button className="btn btn-account-select" onClick={saveInitialStock}>Сохранить остатки</button>
+              <button className="btn btn-primary" onClick={saveInitialStock}>Сохранить остатки</button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 }
