@@ -412,17 +412,6 @@ export default function Accounts() {
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
         </>}>
       </Modal>
-        <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active'){setShowConfirm(false)}}}>
-          <div className="modal-box" style={{maxWidth:'420px'}}>
-            <h2 style={{fontSize:'1rem'}}>Удалить счет?</h2>
-            <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.75rem 0',lineHeight:1.5}}>Счет «{pendingDeleteAc?.name}» будет удален навсегда.</p>
-            <div className="modal-actions">
-              <button className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
-              <button className="btn btn-primary" onClick={confirmDelete} style={{marginLeft:'.5rem'}}>Да, удалить</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Инкассация */}
       <Modal open={showCollection} onClose={()=>setShowCollection(false)} title="Инкассация" subtitle="Изъятие наличных из кассы" width="medium">
