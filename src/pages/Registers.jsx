@@ -770,7 +770,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
                 <div style={{paddingTop:'12px',display:'flex',alignItems:'center',gap:'4px',paddingLeft:0}}>
-                  <span style={{fontSize:".76rem",fontWeight:500,color:"var(--muted)",whiteSpace:"nowrap"}}>Исполнитель:</span>
+                  <span style={{fontSize:".76rem",fontWeight:500,color:"var(--muted)",whiteSpace:"nowrap"}}>{item.type === 'service' ? 'Исполнитель:' : 'Продавец:'}</span>
                   <span onClick={function(){
                     var curEmpId = item.employee_id;
                     if (curEmpId === null) {
