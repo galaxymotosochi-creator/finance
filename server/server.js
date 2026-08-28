@@ -342,6 +342,35 @@ const ALLOWED_TABLES = ['products','categories','accounts','transactions','recei
   'timesheet','timesheet_entries','clients','loyalty','loyalties','promos','subscriptions',
   'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items'];
 
+// --- Схема БД: кеш колонок и типов (чтобы корректно приводить типы фильтров) ---
+const tableColumnsCache = new Map();
+const columnTypeCache = new Map();
+
+async function getTableColumns(table) {
+  if (tableColumnsCache.has(table)) return tableColumnsCache.get(table);
+  const { rows } = await pool.query('SELECT column_name FROM information_schema.columns WHERE table_name = $1', [table]);
+  const cols = new Set(rows.map(r => r.column_name));
+  tableColumnsCache.set(table, cols);
+  return cols;
+}
+
+// Возвращает SQL-каст для параметра фильтра по фактическому типу колонки
+async function castForColumn(table, col) {
+  const cacheKey = table + '.' + col;
+  if (columnTypeCache.has(cacheKey)) return columnTypeCache.get(cacheKey);
+  let cast = '';
+  try {
+    const { rows } = await pool.query('SELECT data_type FROM information_schema.columns WHERE table_name = $1 AND column_name = $2', [table, col]);
+    const t = rows[0] && rows[0].data_type;
+    if (t) {
+      if (t.indexOf('timestamp') >= 0) cast = '::timestamptz';
+      else if (t.indexOf('int') >= 0 || t.indexOf('numeric') >= 0 || t.indexOf('double') >= 0 || t.indexOf('real') >= 0 || t.indexOf('bigint') >= 0) cast = '::numeric';
+    }
+  } catch (e) { /* если таблицы нет — без каста */ }
+  columnTypeCache.set(cacheKey, cast);
+  return cast;
+}
+
 app.get('/api/:table', auth, async (req, res) => {
   try {
     const { table } = req.params;
@@ -351,63 +380,52 @@ app.get('/api/:table', auth, async (req, res) => {
     var paramIdx = 1;
     // Парсим PostgREST-style параметры: col=op.val (например status=eq.open)
     const ops = ['neq','gte','lte','gt','lt','like','ilike','is','in','not','eq'];
-    Object.entries(req.query).forEach(function([col, val]){
-      if (col === 'order' || col === 'limit' || col === 'select') return;
-      if (typeof val === 'string') {
-        var dotIdx = val.indexOf('.');
+    for (const [col, valRaw] of Object.entries(req.query)) {
+      if (col === 'order' || col === 'limit' || col === 'select') continue;
+      // Повторные параметры (date=gte.x&date=lte.y) Express собирает в массив
+      const vals = Array.isArray(valRaw) ? valRaw : [valRaw];
+      for (const val of vals) {
+        if (typeof val !== 'string') continue;
+        const dotIdx = val.indexOf('.');
         if (dotIdx > 0) {
-          var op = val.slice(0, dotIdx);
-          var v = val.slice(dotIdx + 1);
+          const op = val.slice(0, dotIdx);
+          const v = val.slice(dotIdx + 1);
           if (ops.includes(op)) {
-            if (col === 'user_id') {
-              // user_id из токена, игнорируем переданный
-              return;
-            }
-            // Экранируем имя колонки
-            var cleanCol = col.replace(/[^a-z_]/gi, '');
-            if (op === 'eq') {
-              sql += ' AND ' + cleanCol + ' = $' + paramIdx;
-              params.push(v);
-            } else if (op === 'neq') {
-              sql += ' AND ' + cleanCol + ' != $' + paramIdx;
-              params.push(v);
-            } else if (op === 'gt') {
-              sql += ' AND ' + cleanCol + ' > $' + paramIdx;
-              params.push(v);
-            } else if (op === 'gte') {
-              sql += ' AND ' + cleanCol + ' >= $' + paramIdx;
-              params.push(v);
-            } else if (op === 'lt') {
-              sql += ' AND ' + cleanCol + ' < $' + paramIdx;
-              params.push(v);
-            } else if (op === 'lte') {
-              sql += ' AND ' + cleanCol + ' <= $' + paramIdx;
-              params.push(v);
-            } else if (op === 'like' || op === 'ilike') {
-              sql += ' AND ' + cleanCol + ' ' + op + ' $' + paramIdx;
-              params.push(v);
-            } else if (op === 'is') {
+            if (col === 'user_id') continue; // user_id берём из токена
+            const cleanCol = col.replace(/[^a-z_]/gi, '');
+            const cast = await castForColumn(table, cleanCol);
+            if (op === 'eq') { sql += ' AND ' + cleanCol + ' = $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'neq') { sql += ' AND ' + cleanCol + ' != $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'gt') { sql += ' AND ' + cleanCol + ' > $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'gte') { sql += ' AND ' + cleanCol + ' >= $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'lt') { sql += ' AND ' + cleanCol + ' < $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'lte') { sql += ' AND ' + cleanCol + ' <= $' + paramIdx + cast; params.push(v); paramIdx++; }
+            else if (op === 'like' || op === 'ilike') { sql += ' AND ' + cleanCol + ' ' + op + ' $' + paramIdx; params.push(v); paramIdx++; }
+            else if (op === 'is') {
+              // is НЕ добавляет параметр — paramIdx не сдвигаем (фикс "could not determine data type")
               if (v === 'null') sql += ' AND ' + cleanCol + ' IS NULL';
               else if (v === 'not.null') sql += ' AND ' + cleanCol + ' IS NOT NULL';
-            } else {
-              return;
             }
-            paramIdx++;
-            return;
+            continue;
           }
         }
+        // Если не PostgREST — добавляем как прямой фильтр (col=val)
+        const cleanCol = col.replace(/[^a-z_]/gi, '');
+        if (cleanCol !== 'user_id') {
+          const cast = await castForColumn(table, cleanCol);
+          sql += ' AND ' + cleanCol + ' = $' + paramIdx + cast;
+          params.push(val);
+          paramIdx++;
+        }
       }
-      // Если не PostgREST — добавляем как прямой фильтр (col=val)
-      var cleanCol = col.replace(/[^a-z_]/gi, '');
-      if (cleanCol !== 'user_id') {
-        sql += ' AND ' + cleanCol + ' = $' + paramIdx;
-        params.push(val);
-      }
-    });
-    // Всегда фильтруем по user_id из токена
-    sql += ' AND user_id = $' + paramIdx;
-    params.push(req.user.id);
-    paramIdx++;
+    }
+    // Фильтр по user_id из токена — только если колонка есть (иначе 500 для receipt_items/users)
+    const cols = await getTableColumns(table);
+    if (cols.has('user_id')) {
+      sql += ' AND user_id = $' + paramIdx;
+      params.push(req.user.id);
+      paramIdx++;
+    }
     const { order, limit } = req.query;
     if (order) {
       const col = order.split('.')[0];
@@ -430,7 +448,8 @@ app.post('/api/:table', auth, async (req, res) => {
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
     const body = Array.isArray(req.body) ? req.body[0] : req.body;
     const keys = Object.keys(body).filter(k => body[k] !== undefined);
-    if (!keys.includes('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
+    const cols = await getTableColumns(table);
+    if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
     if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
     const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
     const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
@@ -445,9 +464,18 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
     const data = req.body;
     const keys = Object.keys(data).filter(k => data[k] !== undefined);
+    const cols = await getTableColumns(table);
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
-    const vals = [...keys.map(k => data[k]), id, req.user.id];
-    const { rows } = await q('UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (vals.length - 1) + ' AND user_id = $' + vals.length + ' RETURNING *', vals);
+    let sql;
+    let vals;
+    if (cols.has('user_id')) {
+      vals = [...keys.map(k => data[k]), id, req.user.id];
+      sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1) + ' AND user_id = $' + (keys.length + 2);
+    } else {
+      vals = [...keys.map(k => data[k]), id];
+      sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1);
+    }
+    const { rows } = await q(sql, vals);
     res.json(rows[0] || {});
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -456,7 +484,12 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
   try {
     const { table, id } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
-    await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    const cols = await getTableColumns(table);
+    if (cols.has('user_id')) {
+      await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    } else {
+      await q('DELETE FROM ' + table + ' WHERE id = $1', [id]);
+    }
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
