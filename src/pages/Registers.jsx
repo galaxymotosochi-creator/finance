@@ -1034,7 +1034,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             {/* Левая половина — чек */}
             <div style={{width:'440px',flexShrink:0,display:'flex',flexDirection:'column',borderRight:'1px solid #f0f0f0',padding:'24px 24px'}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
-                <span style={{fontSize:'1rem',fontWeight:700,color:'#222'}}>Чек № {(shiftTx.length || 0) + 1}</span>
+                <span style={{fontSize:'1rem',fontWeight:700,color:'#222'}}>Чек № {currentReceiptNum || 1}</span>
                 <span style={{fontSize:'.80rem',fontWeight:500,color:'#777'}}>{effectiveName}</span>
               </div>
               

@@ -327,8 +327,8 @@ const load = async () => {
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:payColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => payStatus !== 'paid' && setShowPay(s.id)}>{paySt}</span>
                   </td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}₽</span></td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '₽' : '—'}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString()}₽</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString() + '₽' : '—'}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
                       style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
@@ -423,9 +423,9 @@ const load = async () => {
         return (<>
               <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.78rem',lineHeight:2}}>
                 <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Поставщик:</span><span style={{fontSize:'.78rem',color:'#222'}}>{s.supplier_name || s.invoice || '—'}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Уже оплачено:</span><span style={{fontSize:'.78rem',color:'#222'}}>{paid.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontSize:'.78rem',color:'#222'}}>Остаток:</span><span style={{fontSize:'.78rem',color:'#222'}}>{debt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString()} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Уже оплачено:</span><span style={{fontSize:'.78rem',color:'#222'}}>{paid.toLocaleString()} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontSize:'.78rem',color:'#222'}}>Остаток:</span><span style={{fontSize:'.78rem',color:'#222'}}>{debt.toLocaleString()} ₽</span></div>
               </div>
               <form onSubmit={confirmPay}>
                 <div className="form-row">

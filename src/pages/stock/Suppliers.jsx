@@ -3,14 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
-const getSupplies = () => JSON.parse(localStorage.getItem('supplies88') || '[]');
-
 const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
 const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
 
 export default function Suppliers() {
   const { user } = useAuth();
   const [suppliers, setSuppliersState] = useState([]);
+  const [supplies, setSupplies] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fName, setFName] = useState('');
@@ -25,6 +24,9 @@ export default function Suppliers() {
     setLoading(true);
     const { data } = await supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at');
     if (data) setSuppliersState(data);
+    // Поставки — из БД (раньше читались из localStorage и всегда были пустыми)
+    const { data: supData } = await supabase.from('supplies').select('*').eq('user_id', user.id);
+    if (supData) setSupplies(supData);
     setLoading(false);
   };
 
@@ -79,8 +81,6 @@ export default function Suppliers() {
     await load();
   };
 
-  const supplies = getSupplies();
-
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
 
   return (
@@ -113,9 +113,9 @@ export default function Suppliers() {
             {suppliers.length === 0 ? (
               <tr><td colSpan="7"><div className="empty-products"><div className="big-icon">🏢</div><p>Список поставщиков пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Внесите первого контрагента, чтобы начать работу</p></div></td></tr>
             ) : suppliers.map(s => {
-              const supSupplies = supplies.filter(sp => sp.supplierName === s.name);
+              const supSupplies = supplies.filter(sp => (sp.supplier_name || sp.supplierName) === s.name);
               const supplyCount = supSupplies.length;
-              const totalSum = supSupplies.reduce((sum, sp) => sum + ((sp.qty||0) * (sp.cost||0)), 0);
+              const totalSum = supSupplies.reduce((sum, sp) => sum + (Number(sp.total) || 0), 0);
               const icon = CONTACT_ICONS[s.contact_method] || '📞';
               const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
               return (

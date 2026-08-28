@@ -1,45 +1,47 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { useAuth } from './hooks/useAuth';
-import Login from './pages/Login';
-import Landing from './pages/Landing';
-import Register from './pages/Register';
-import Variant1 from './pages/Variant1';
-import Variant2 from './pages/Variant2';
-import Variant3 from './pages/Variant3';
-import Variant4 from './pages/Variant4';
-import Variant5 from './pages/Variant5';
-import Dashboard from './pages/Dashboard';
 import AppLayout from './layouts/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import PnL from './pages/finance/PnL';
-import Transactions from './pages/finance/Transactions';
-import Categories from './pages/finance/Categories';
-import Shifts from './pages/finance/Shifts';
-import Salary from './pages/finance/Salary';
-import Accounts from './pages/finance/Accounts';
-import Plans from './pages/finance/Plans';
-import Receipts from './pages/finance/Receipts';
-import Promos from './pages/finance/Promos';
-import Products from './pages/stock/Products';
-import StockCategories from './pages/stock/Categories';
-import Stock from './pages/stock/Stock';
-import Supplies from './pages/stock/Supplies';
-import SupplyNew from './pages/stock/SupplyNew';
-import Suppliers from './pages/stock/Suppliers';
-import Writeoffs from './pages/stock/Writeoffs';
-import Inventory from './pages/stock/Inventory';
-import Health from './pages/stock/Health';
-import Subscription from './pages/Subscription';
-import AiAssistant from './pages/AiAssistant';
-import SettingsPage from './pages/Settings';
-import Clients from './pages/clients/Clients';
-import Loyalty from './pages/clients/Loyalty';
-import Positions from './pages/employees/Positions';
-import Employees from './pages/employees/Employees';
-import Timesheet from './pages/employees/Timesheet';
-import RegistersPage from './pages/Registers';
+// Ленивая загрузка страниц — ускоряет первую загрузку (чанк ~1.4MB → по разделам)
+const Login = lazy(() => import('./pages/Login'));
+const Landing = lazy(() => import('./pages/Landing'));
+const Register = lazy(() => import('./pages/Register'));
+const Variant1 = lazy(() => import('./pages/Variant1'));
+const Variant2 = lazy(() => import('./pages/Variant2'));
+const Variant3 = lazy(() => import('./pages/Variant3'));
+const Variant4 = lazy(() => import('./pages/Variant4'));
+const Variant5 = lazy(() => import('./pages/Variant5'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const PnL = lazy(() => import('./pages/finance/PnL'));
+const Transactions = lazy(() => import('./pages/finance/Transactions'));
+const Categories = lazy(() => import('./pages/finance/Categories'));
+const Shifts = lazy(() => import('./pages/finance/Shifts'));
+const Salary = lazy(() => import('./pages/finance/Salary'));
+const Accounts = lazy(() => import('./pages/finance/Accounts'));
+const Plans = lazy(() => import('./pages/finance/Plans'));
+const Receipts = lazy(() => import('./pages/finance/Receipts'));
+const Promos = lazy(() => import('./pages/finance/Promos'));
+const Products = lazy(() => import('./pages/stock/Products'));
+const StockCategories = lazy(() => import('./pages/stock/Categories'));
+const Stock = lazy(() => import('./pages/stock/Stock'));
+const Supplies = lazy(() => import('./pages/stock/Supplies'));
+const SupplyNew = lazy(() => import('./pages/stock/SupplyNew'));
+const Suppliers = lazy(() => import('./pages/stock/Suppliers'));
+const Writeoffs = lazy(() => import('./pages/stock/Writeoffs'));
+const Inventory = lazy(() => import('./pages/stock/Inventory'));
+const Health = lazy(() => import('./pages/stock/Health'));
+const Subscription = lazy(() => import('./pages/Subscription'));
+const AiAssistant = lazy(() => import('./pages/AiAssistant'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const Clients = lazy(() => import('./pages/clients/Clients'));
+const Loyalty = lazy(() => import('./pages/clients/Loyalty'));
+const Positions = lazy(() => import('./pages/employees/Positions'));
+const Employees = lazy(() => import('./pages/employees/Employees'));
+const Timesheet = lazy(() => import('./pages/employees/Timesheet'));
+const RegistersPage = lazy(() => import('./pages/Registers'));
 
 function FullKassa() {
   return (
@@ -107,8 +109,10 @@ function AppRoutes() {
   );
 }
 
+const pageLoader = <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#999',fontSize:'.85rem'}}>Загрузка…</div>;
+
 export default function App() {
   const { loading } = useAuth();
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
-  return <ErrorBoundary><BrowserRouter><AppRoutes /></BrowserRouter></ErrorBoundary>;
+  return <ErrorBoundary><BrowserRouter><Suspense fallback={pageLoader}><AppRoutes /></Suspense></BrowserRouter></ErrorBoundary>;
 }

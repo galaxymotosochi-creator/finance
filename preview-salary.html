@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"content="width=device-width, initial-scale=1.0">
+<title>Ведомость — Зарплата</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+<style>
+:root {
+ --primary: #ffdd2d; --primary-hover: #f5d100; --primary-light: #fff8d6; --primary-text: #000;
+ --secondary: #428bf9; --secondary-hover: #3170d4; --secondary-light: #e8f0ff;
+ --danger: #e53e3e; --success: #16a34a; --warning: #f59e0b;
+ --body-color: #111; --muted: rgba(0,0,0,.54);
+ --border: rgba(0,16,36,.12);
+ --font:'Inter', -apple-system, sans-serif;
+ --radius-sm: 6px; --radius-md: 8px; --radius-lg: 16px; --radius-pill: 100px;
+ --shadow-sm: 0 1px 3px rgba(0,0,0,.06); --shadow-md: 0 4px 12px rgba(0,0,0,.08); --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--font);background:#f8f9fa;color:var(--body-color);padding:2rem;-webkit-font-smoothing:antialiased}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.5rem}
+.page-header h1{font-size:1.2rem;font-weight:700}
+.page-header .sub{font-size:.8rem;color:var(--muted);width:100%;margin-top:2px}
+.page-actions{display:flex;gap:.4rem}
+.btn-mint{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font);background:var(--primary);color:var(--primary-text);border:none;transition:.12s}
+.btn-mint:hover{background:var(--primary-hover);box-shadow:var(--shadow-sm)}
+.nav-sep{height:1px;background:var(--border);margin:.25rem 0;width:100%;border:none}
+.product-table{overflow-x:auto;background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border)}
+.product-table table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:960px}
+.product-table th{text-align:left;padding:.5rem .7rem;color:var(--muted);font-weight:500;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);background:#fff;white-space:nowrap}
+.product-table td{padding:.45rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle;background:transparent;font-size:.78rem;color:#222;white-space:nowrap}
+.product-table td:first-child{width:32px;color:var(--muted);font-size:.72rem}
+.product-table td:nth-child(2){min-width:160px;font-weight:500}
+.product-table td:nth-child(3){min-width:130px}
+.product-table .prod-name{font-weight:400;color:#222;font-size:.78rem;cursor:pointer}
+.product-table tr:last-child td{border-bottom:none}
+.product-table tr:hover td{background:#fafafa}
+.summary-cards{display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.summary-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:.65rem 1rem;flex:1;min-width:150px}
+.summary-card .label{font-size:.68rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.summary-card .value{font-size:1.1rem;font-weight:700;margin-top:4px}
+.summary-card .value.green{color:var(--success)}
+.summary-card .value.red{color:var(--danger)}
+.filter-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.65rem}
+.filter-tag{display:inline-flex;align-items:center;gap:4px;padding:.2rem .55rem;font-size:.72rem;font-weight:500;border-radius:var(--radius-pill);cursor:pointer;background:#f1f3f5;color:var(--muted);transition:.12s}
+.filter-tag.active{background:var(--primary);color:#000}
+.filter-tag:hover{background:var(--primary-light)}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:.15rem .45rem;font-size:.7rem;font-weight:500;border-radius:var(--radius-pill);white-space:nowrap}
+.status-badge.accrued{background:#eff6ff;color:#2563eb}
+.status-badge.paid{background:#f0fdf4;color:#16a34a}
+.status-badge.cancelled{background:#fef2f2;color:#dc2626}
+.status-badge.draft{background:#f1f3f5;color:var(--muted)}
+.pay-btn{padding:.2rem .6rem;font-size:.72rem;font-weight:600;border-radius:var(--radius-pill);border:none;cursor:pointer;background:#16a34a;color:#fff;font-family:var(--font);display:inline-flex;align-items:center;gap:3px;transition:.12s}
+.pay-btn:hover{background:#15803d}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.modal{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:1rem 1rem 0;gap:1rem}
+.modal-header h2{font-size:1.05rem;font-weight:700}
+.modal-header .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:.2rem}
+.modal-body{padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+.form-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.form-row{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap}
+.form-input,.form-select{padding:.35rem .5rem;font-size:.78rem;font-family:var(--font);line-height:1.3;border:1.5px solid var(--border);border-radius:var(--radius-md);outline:none;background:#fff;color:#111;transition:.12s}
+.form-input:focus,.form-select:focus{border-color:var(--primary)}
+.emp-card{background:#f8f9fa;border-radius:var(--radius-md);padding:.65rem .75rem;display:flex;align-items:center;gap:.6rem;border:1.5px solid var(--border)}
+.emp-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+.emp-info .emp-name{font-size:.82rem;font-weight:600}
+.emp-info .emp-meta{font-size:.68rem;color:var(--muted)}
+.section-card{border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.section-card .section-header{padding:.5rem .65rem;background:#f8f9fa;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-card .section-header .title{font-size:.78rem;font-weight:600}
+.section-card .section-body{padding:.5rem .65rem}
+.total-block{display:flex;justify-content:space-between;align-items:center;padding:.65rem .75rem;background:#f8f9fa;border-radius:var(--radius-md);border:1px solid var(--border)}
+.total-block .total-label{font-size:.72rem;color:var(--muted)}
+.total-block .total-value{font-size:1.15rem;font-weight:700}
+.type-chip{display:inline-flex;align-items:center;gap:4px;padding:.2rem .5rem;font-size:.72rem;font-weight:500;border-radius:var(--radius-pill);cursor:pointer}
+.type-chip.active{background:var(--primary);color:#000}
+.type-chip.inactive{background:#f1f3f5;color:var(--muted)}
+.editable-input{padding:.2rem .35rem;font-size:.78rem;font-family:var(--font);border:1.5px solid var(--border);border-radius:var(--radius-sm);outline:none;width:80px;text-align:right}
+.editable-input:focus{border-color:var(--primary)}
+</style>
+</head>
+<body>
+
+<!-- ===== ШАПКА ===== -->
+<div class="page-header">
+ <div>
+  <h1>Ведомость</h1>
+  <div class="sub">Начисления и выплаты зарплаты за период</div>
+ </div>
+ <div class="page-actions">
+  <button class="btn-mint"onclick="document.getElementById('calcModal').style.display='flex'">+ Создать ведомость</button>
+  <button class="btn-mint"style="background:#f1f3f5">Скачать</button>
+ </div>
+</div>
+<div class="nav-sep"></div>
+
+<!-- ===== СВОДКА ===== -->
+<div class="summary-cards">
+ <div class="summary-card">
+  <div class="label">К начислению</div>
+  <div class="value">2 048 500 ₽</div>
+ </div>
+ <div class="summary-card">
+  <div class="label">Выплачено</div>
+  <div class="value green">1 282 000 ₽</div>
+ </div>
+ <div class="summary-card">
+  <div class="label">Остаток</div>
+  <div class="value red">766 500 ₽</div>
+ </div>
+ <div class="summary-card">
+  <div class="label">Сотрудников</div>
+  <div class="value"style="font-size:.95rem">6</div>
+ </div>
+</div>
+
+<!-- ===== ФИЛЬТРЫ ===== -->
+<div class="filter-tags">
+ <span class="filter-tag active">Все (6)</span>
+ <span class="filter-tag">Начислено (3)</span>
+ <span class="filter-tag">Выплачено (2)</span>
+ <span class="filter-tag">Черновик (1)</span>
+</div>
+
+<!-- ===== ТАБЛИЦА ===== -->
+<div class="product-table">
+<table>
+ <thead>
+  <tr>
+   <th>№</th>
+   <th style="text-align:left">Сотрудник</th>
+   <th style="text-align:left">Вид оплаты</th>
+   <th style="text-align:left">Период</th>
+   <th>Отраб.</th>
+   <th>Ставка</th>
+   <th>Начислено</th>
+   <th>Премии</th>
+   <th>Штрафы</th>
+   <th>Источник</th>
+   <th>К выплате</th>
+   <th>Статус</th>
+   <th></th>
+  </tr>
+ </thead>
+ <tbody>
+
+  <!-- 1 – Оклад -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">1</td>
+   <td style="text-align:left">
+    <div class="prod-name">Иванова И. А.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Менеджер</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge paid"style="background:#f0fdf4;color:#16a34a">Оклад</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–31.07</td>
+   <td style="text-align:left;color:#555">23 / 23 дн</td>
+   <td style="text-align:left;color:#555">80 000 ₽</td>
+   <td style="text-align:left;font-weight:500">80 000 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">—</td>
+   <td style="text-align:left;font-weight:600">80 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge paid">Выплачено</span></td>
+   <td style="text-align:right"><span style="color:var(--muted);font-size:.72rem;cursor:pointer">⋯</span></td>
+  </tr>
+
+  <!-- 2 – Процент с продаж (авто) -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">2</td>
+   <td style="text-align:left">
+    <div class="prod-name">Петров А. С.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Продавец</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge accrued"style="background:#eff6ff;color:#3b82f6">% с продаж</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–31.07</td>
+   <td style="text-align:left;color:#555">—</td>
+   <td style="text-align:left;color:#555">5%</td>
+   <td style="text-align:left;font-weight:500">245 000 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">Выручка 4.9 млн ₽</td>
+   <td style="text-align:left;font-weight:600">245 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge accrued">Начислено</span></td>
+   <td style="text-align:right"><button class="pay-btn"onclick="document.getElementById('payModal').style.display='flex'">Выплатить</button></td>
+  </tr>
+
+  <!-- 3 – За смену + процент -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">3</td>
+   <td style="text-align:left">
+    <div class="prod-name">Сидоров Д. В.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Кассир</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge draft"style="background:#fef9c3;color:#a16207;font-size:.65rem">За смену + 1.5%</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–31.07</td>
+   <td style="text-align:left;color:#555">15 смен</td>
+   <td style="text-align:left;color:#555">2 500 ₽/см + 1.5%</td>
+   <td style="text-align:left;font-weight:500">37 500 + 21 000 = 58 500 ₽</td>
+   <td style="text-align:left;font-size:.75rem;color:var(--success)">+1 000 ₽</td>
+   <td style="text-align:left;font-size:.75rem;color:var(--danger)">−500 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">Смены: 15 / Продажи: 1.4 млн</td>
+   <td style="text-align:left;font-weight:600">59 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge draft">Черновик</span></td>
+   <td style="text-align:right"><span style="color:var(--muted);font-size:.72rem;cursor:pointer">⋯</span></td>
+  </tr>
+
+  <!-- 4 – Сдельная -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">4</td>
+   <td style="text-align:left">
+    <div class="prod-name">Кузнецов И. П.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Разнорабочий</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge draft"style="background:#f0fdf4;color:#16a34a">Сдельная</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–15.07</td>
+   <td style="text-align:left;color:#555">120 ед.</td>
+   <td style="text-align:left;color:#555">1 500 ₽/ед</td>
+   <td style="text-align:left;font-weight:500">180 000 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">Объём работ: 120 шт</td>
+   <td style="text-align:left;font-weight:600">180 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge accrued">Начислено</span></td>
+   <td style="text-align:right"><button class="pay-btn"onclick="document.getElementById('payModal').style.display='flex'">Выплатить</button></td>
+  </tr>
+
+  <!-- 5 – Почасовая (ручной ввод) -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">5</td>
+   <td style="text-align:left">
+    <div class="prod-name">Соколова Е. В.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Бухгалтер (0.5 ставки)</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge paid"style="background:#eff6ff;color:#2563eb">Почасовая</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–31.07</td>
+   <td style="text-align:left;color:#555">80 ч</td>
+   <td style="text-align:left;color:#555">750 ₽/ч</td>
+   <td style="text-align:left;font-weight:500">60 000 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">Табель (80 ч)</td>
+   <td style="text-align:left;font-weight:600">60 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge paid">Выплачено</span></td>
+   <td style="text-align:right"><span style="color:var(--muted);font-size:.72rem;cursor:pointer">⋯</span></td>
+  </tr>
+
+  <!-- 6 – Оклад + Премия -->
+  <tr>
+   <td style="color:var(--muted);font-size:.72rem">6</td>
+   <td style="text-align:left">
+    <div class="prod-name">Фёдоров П. А.</div>
+    <div style="font-size:.65rem;color:var(--muted)">Зам. директора</div>
+   </td>
+   <td style="text-align:left"><span class="status-badge draft"style="background:#fffbeb;color:#92400e">Оклад + премия</span></td>
+   <td style="text-align:left;white-space:nowrap;color:#555">01.07–31.07</td>
+   <td style="text-align:left;color:#555">23 / 23 дн</td>
+   <td style="text-align:left;color:#555">120 000 + премия 60 000</td>
+   <td style="text-align:left;font-weight:500">180 000 ₽</td>
+   <td style="text-align:left;color:var(--success);font-size:.75rem">+60 000 ₽</td>
+   <td style="text-align:left;color:var(--muted);font-size:.75rem">—</td>
+   <td style="text-align:left;color:var(--muted);font-size:.72rem">Выполнение плана 112%</td>
+   <td style="text-align:left;font-weight:600">180 000 ₽</td>
+   <td style="text-align:left"><span class="status-badge draft">Начислено</span></td>
+   <td style="text-align:right"><button class="pay-btn"onclick="document.getElementById('payModal').style.display='flex'">Выплатить</button></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<!-- ===== МОДАЛКА СОЗДАНИЯ ===== -->
+<div class="modal-overlay"id="calcModal">
+ <div class="modal">
+  <div class="modal-header">
+   <div>
+    <h2>Создать начисление</h2>
+    <div class="sub">Выплата зарплаты, аванса или разовая выплата</div>
+   </div>
+   <button class="modal-close"onclick="this.closest('.modal-overlay').style.display='none'">×</button>
+  </div>
+  <div class="modal-body">
+
+   <div class="form-row">
+    <div style="flex:1">
+     <div class="form-label"style="margin-bottom:4px">Тип выплаты</div>
+     <select class="form-select"style="width:100%"id="payType"onchange="togglePayType(this.value)">
+      <option value="salary">Зарплата</option>
+      <option value="advance">Аванс</option>
+      <option value="bonus">Премия</option>
+      <option value="one-time">Разово</option>
+     </select>
+    </div>
+    <div style="flex:1">
+     <div class="form-label"style="margin-bottom:4px">Сотрудники</div>
+     <select class="form-select"style="width:100%">
+      <option value="">Все сотрудники</option>
+      <option>Иванова И. А. — Оклад</option>
+      <option>Петров А. С. — % с продаж</option>
+      <option>Сидоров Д. В. — За смену + %</option>
+      <option>Кузнецов И. П. — Сдельная</option>
+      <option>Соколова Е. В. — Почасовая</option>
+      <option>Фёдоров П. А. — Оклад + премия</option>
+     </select>
+    </div>
+   </div>
+   <div class="form-row">
+    <div style="flex:1">
+     <div class="form-label"style="margin-bottom:4px">Начало периода</div>
+     <input class="form-input"type="date"style="width:100%"value="2026-07-01">
+    </div>
+    <div style="flex:1">
+     <div class="form-label"style="margin-bottom:4px">Конец периода</div>
+     <input class="form-input"type="date"style="width:100%"value="2026-07-31">
+    </div>
+   </div>
+
+   <!-- Блок: Зарплата (авторасчёт) -->
+   <div class="section-card"id="salaryBlock">
+    <div class="section-header">
+     <span class="title">Система соберёт данные:</span>
+     <span style="font-size:.72rem;color:var(--success);font-weight:600">авто</span>
+    </div>
+    <div class="section-body"style="font-size:.75rem;color:var(--muted);display:flex;flex-direction:column;gap:6px">
+     <span>Продажи по каждому сотруднику (из кассы)</span>
+     <span>Смены (из графика)</span>
+     <span>Часы (из табеля)</span>
+     <span>Объём работ (из нарядов / заказов)</span>
+     <span>Премии и штрафы (из табеля)</span>
+    </div>
+   </div>
+
+   <!-- Блок: Аванс (ручной ввод) -->
+   <div class="section-card"id="advanceBlock"style="display:none">
+    <div class="section-header">
+     <span class="title">Аванс — введите сумму вручную</span>
+    </div>
+    <div class="section-body"style="display:flex;flex-direction:column;gap:6px;font-size:.78rem">
+     <div style="display:flex;align-items:center;gap:.5rem">
+      <span style="width:160px;font-weight:500">Иванова И. А.</span>
+      <input type="number"class="form-input"style="width:120px;text-align:right"placeholder="0"value="40 000">
+      <span style="color:var(--muted);font-size:.7rem">оклад 80 000</span>
+     </div>
+     <div style="display:flex;align-items:center;gap:.5rem">
+      <span style="width:160px;font-weight:500">Петров А. С.</span>
+      <input type="number"class="form-input"style="width:120px;text-align:right"placeholder="0">
+      <span style="color:var(--muted);font-size:.7rem">% с продаж</span>
+     </div>
+     <div style="display:flex;align-items:center;gap:.5rem">
+      <span style="width:160px;font-weight:500">Сидоров Д. В.</span>
+      <input type="number"class="form-input"style="width:120px;text-align:right"placeholder="0"value="10 000">
+      <span style="color:var(--muted);font-size:.7rem">за смену + %</span>
+     </div>
+     <div style="display:flex;align-items:center;gap:.5rem">
+      <span style="width:160px;font-weight:500">Кузнецов И. П.</span>
+      <input type="number"class="form-input"style="width:120px;text-align:right"placeholder="0">
+      <span style="color:var(--muted);font-size:.7rem">сдельная</span>
+     </div>
+    </div>
+   </div>
+
+   <!-- Предпросмотр -->
+   <div class="section-card">
+    <div class="section-header">
+     <span class="title"id="previewTitle"> Попадут в расчёт</span>
+     <span style="font-size:.72rem;color:var(--muted)">6 сотрудников</span>
+    </div>
+    <div class="section-body"style="font-size:.75rem">
+     <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;justify-content:space-between">
+       <span>Иванова И. А.</span>
+       <span style="font-weight:500"id="s1">80 000 ₽</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+       <span>Петров А. С.</span>
+       <span style="font-weight:500"id="s2">245 000 ₽</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+       <span>Сидоров Д. В.</span>
+       <span style="font-weight:500"id="s3">58 500 ₽</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+       <span>Кузнецов И. П.</span>
+       <span style="font-weight:500"id="s4">180 000 ₽</span>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div style="display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:.72rem;color:var(--muted)">Итого: <b style="font-size:.95rem;color:#111"id="totalPreview">563 500 ₽</b></span>
+    <button class="btn-mint"onclick="this.closest('.modal-overlay').style.display='none'">Создать</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- ===== МОДАЛКА ВЫПЛАТЫ ===== -->
+<div class="modal-overlay"id="payModal">
+ <div class="modal">
+  <div class="modal-header">
+   <div>
+    <h2>Выплата зарплаты</h2>
+    <div class="sub">Петров А.С. — 245 000 ₽</div>
+   </div>
+   <button class="modal-close"onclick="this.closest('.modal-overlay').style.display='none'">×</button>
+  </div>
+  <div class="modal-body">
+
+   <div class="emp-card">
+    <div class="emp-avatar">П</div>
+    <div class="emp-info">
+     <div class="emp-name">Петров Александр Сергеевич</div>
+     <div class="emp-meta">Продавец · 5% от продаж · Июль 2026</div>
+    </div>
+   </div>
+
+   <!-- Детализация -->
+   <div class="section-card">
+    <div class="section-header">
+     <span class="title">Детализация</span>
+    </div>
+    <div class="section-body"style="font-size:.78rem">
+     <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between">
+       <span>Общая выручка за период</span>
+       <span>4 900 000 ₽</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+       <span>Ставка</span>
+       <span>5%</span>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;justify-content:space-between;font-weight:600">
+       <span>Итого начислено</span>
+       <span>245 000 ₽</span>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Счёт для выплаты -->
+   <div>
+    <div class="form-label"style="margin-bottom:4px">Списать со счёта</div>
+    <div class="section-card">
+     <div class="section-body"style="padding:0">
+      <div onclick="selectAccount(this)"style="display:flex;align-items:center;gap:.5rem;padding:.65rem .75rem;cursor:pointer;border-bottom:1px solid var(--border);transition:.12s"onmouseenter="this.style.background='var(--secondary-light)'"onmouseleave="this.style.background=''">
+       <span style="flex:1;font-size:.8rem;font-weight:500">Наличные</span>
+       <span style="font-size:.78rem;color:#555">430 000 ₽</span>
+       <span style="font-size:.7rem;color:var(--muted)"></span>
+      </div>
+      <div onclick="selectAccount(this)"style="display:flex;align-items:center;gap:.5rem;padding:.65rem .75rem;cursor:pointer;transition:.12s"onmouseenter="this.style.background='var(--secondary-light)'"onmouseleave="this.style.background=''">
+       <span style="flex:1;font-size:.8rem;font-weight:500">Расчётный счёт</span>
+       <span style="font-size:.78rem;color:#555">1 200 000 ₽</span>
+       <span style="font-size:.7rem;color:#aaa">○</span>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Комментарий -->
+   <div>
+    <div class="form-label"style="margin-bottom:4px">Комментарий к выплате</div>
+    <input class="form-input"type="text"style="width:100%"placeholder="Например: зарплата за июль, аванс…">
+   </div>
+
+   <div class="total-block">
+    <div>
+     <div class="total-label">Сумма к выплате</div>
+     <div style="font-size:.72rem;color:var(--muted);margin-top:2px">245 000 ₽ × 1 выплата</div>
+    </div>
+    <div class="total-value">245 000 ₽</div>
+   </div>
+
+   <div style="display:flex;gap:.5rem;justify-content:flex-end">
+    <button class="btn-mint"style="background:#f1f3f5"onclick="this.closest('.modal-overlay').style.display='none'">Отмена</button>
+    <button class="btn-mint"onclick="this.closest('.modal-overlay').style.display='none'">Выплатить 245 000 ₽</button>
+   </div>
+
+  </div>
+ </div>
+</div>
+
+<script>
+function togglePayType(val) {
+ const salaryBlock = document.getElementById('salaryBlock');
+ const advanceBlock = document.getElementById('advanceBlock');
+ const previewTitle = document.getElementById('previewTitle');
+ const totalPreview = document.getElementById('totalPreview');
+
+ if (val ==='advance') {
+  salaryBlock.style.display ='none';
+  advanceBlock.style.display ='block';
+  previewTitle.textContent ='Выплатить аванс';
+  // Суммируем введённые авансы
+  const inputs = advanceBlock.querySelectorAll('input[type=number]');
+  let total = 0;
+  inputs.forEach(inp =>{
+   const v = parseFloat(inp.value.replace(/\s/g,'')) || 0;
+   total += v;
+  });
+  totalPreview.textContent = total.toLocaleString() +'₽';
+ } else {
+  salaryBlock.style.display ='block';
+  advanceBlock.style.display ='none';
+  previewTitle.textContent =' Попадут в расчёт';
+  totalPreview.textContent ='563 500 ₽';
+ }
+}
+
+// При изменении полей аванса пересчитывать итог
+function recalcAdvance() {
+ if (document.getElementById('advanceBlock').style.display !=='none') {
+  togglePayType('advance');
+ }
+}
+document.addEventListener('input', function(e) {
+ if (e.target.closest('#advanceBlock')) recalcAdvance();
+});
+
+function selectAccount(el) {
+ const items = el.closest('.section-body').querySelectorAll('div[onclick]');
+ items.forEach(i =>{
+  const check = i.querySelector('span:last-child');
+  if (i === el) check.textContent ='';
+  else check.textContent ='○';
+ });
+}
+</script>
+</body>
+</html>
