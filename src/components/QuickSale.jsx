@@ -115,6 +115,8 @@ export default function QuickSale({ onClose }) {
       source: 'quick_sale',
     }).select('id').single();
     if (newReceipt) {
+      // Реальный номер от сервера (атомарный MAX+1) — чинит дубли от count+1
+      receiptNum = newReceipt.receipt_number;
       var receiptItems = [];
       cart.forEach(function(item) {
         var entry = {

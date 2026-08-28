@@ -447,8 +447,24 @@ app.post('/api/:table', auth, async (req, res) => {
     const { table } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
     const body = Array.isArray(req.body) ? req.body[0] : req.body;
-    const keys = Object.keys(body).filter(k => body[k] !== undefined);
     const cols = await getTableColumns(table);
+
+    // Атомарная нумерация чеков: игнорируем переданный receipt_number, берём MAX+1 на сервере
+    // (чинит дубли: раньше QuickSale считал count+1, касса max+1, плюс гонки)
+    if (table === 'receipts') {
+      const keys = Object.keys(body).filter(k => body[k] !== undefined && k !== 'receipt_number');
+      if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
+      if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
+      const uidIdx = keys.indexOf('user_id') + 1;
+      const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
+      const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
+      const sql = 'INSERT INTO receipts (' + keys.join(', ') + ', receipt_number) VALUES (' + ph +
+        ', (SELECT COALESCE(MAX(receipt_number),0)+1 FROM receipts WHERE user_id = $' + uidIdx + ')) RETURNING *';
+      const { rows } = await q(sql, vals);
+      return res.json(rows[0] || rows);
+    }
+
+    const keys = Object.keys(body).filter(k => body[k] !== undefined);
     if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
     if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
     const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);

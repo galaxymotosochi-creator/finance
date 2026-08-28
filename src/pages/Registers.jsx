@@ -342,6 +342,8 @@ export default function Registers({ fullscreen }) {
       return;
     } else {
       receiptId = newReceipt.id;
+      // Реальный номер от сервера (атомарный MAX+1) — чтобы транзакции/списания совпадали с чеком
+      receiptNum = newReceipt.receipt_number;
       // Сохраняем товары чека
       var receiptItems = [];
       cart.forEach(function(item) {
