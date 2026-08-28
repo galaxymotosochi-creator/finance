@@ -22,6 +22,7 @@ export default function QuickSale({ onClose }) {
   const [userName, setUserName] = useState('');
   const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [avgCostMap, setAvgCostMap] = useState({}); // средняя себестоимость: prodId -> цена за шт
 
   useEffect(() => {
     (async () => {
@@ -32,6 +33,39 @@ export default function QuickSale({ onClose }) {
         supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
       ]);
+      if (pRes.data) setProducts(pRes.data);
+      if (aRes.data) setAccounts(aRes.data);
+      if (clRes?.data) setClients(clRes.data);
+      if (catRes?.data) setAllCats(catRes.data);
+      // Средняя себестоимость для списаний при продаже
+      Promise.all([
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('initial_stocks').select('*').eq('user_id', user.id).maybeSingle(),
+      ]).then(function(rr){
+        var cm = {};
+        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
+          if (it.prodId) {
+            if (!cm[it.prodId]) cm[it.prodId] = { qty: 0, cost: 0 };
+            cm[it.prodId].qty += it.qty || 0;
+            cm[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+          }
+        });});
+        var init = rr[1].data;
+        if (init && init.done && init.items) {
+          Object.keys(init.items).forEach(function(id){
+            var q = parseInt(init.items[id]) || 0;
+            var c = (init.costs && parseInt(init.costs[id])) || 0;
+            if (q > 0) {
+              if (!cm[id]) cm[id] = { qty: 0, cost: 0 };
+              cm[id].qty += q;
+              cm[id].cost += c * q;
+            }
+          });
+        }
+        var avg = {};
+        Object.keys(cm).forEach(function(id){ avg[id] = cm[id].qty > 0 ? Math.round(cm[id].cost / cm[id].qty) : 0; });
+        setAvgCostMap(avg);
+      });
       if (pRes.data) setProducts(pRes.data);
       if (aRes.data) setAccounts(aRes.data);
       if (clRes?.data) setClients(clRes.data);
@@ -96,7 +130,7 @@ export default function QuickSale({ onClose }) {
     }
 
     const { count } = await supabase.from('receipts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
-    const receiptNum = (count || 0) + 1;
+    let receiptNum = (count || 0) + 1;
 
     // Определяем статус чека
     var receiptStatus = 'paid';
@@ -176,24 +210,35 @@ export default function QuickSale({ onClose }) {
 
     // Уменьшаем остатки на складе
     try {
-      var woItems = [];
+      var woProducts = {};
       cart.forEach(function(item){
         if (item.combo_items && item.combo_items.length > 0) {
           item.combo_items.forEach(function(ci){
             const prod = products.find(function(p){ return p.id === ci.id; });
             if (prod && prod.type !== 'service') {
-              woItems.push({prodId:ci.id, name:ci.name, qty:ci.qty * item.qty, cost:0});
+              if (!woProducts[ci.id]) woProducts[ci.id] = 0;
+              woProducts[ci.id] += ci.qty * item.qty;
             }
           });
-        } else {
-          woItems.push({prodId:item.id, name:item.name, qty:item.qty, cost:0});
+        } else if (item.type !== 'service') {
+          if (!woProducts[item.id]) woProducts[item.id] = 0;
+          woProducts[item.id] += item.qty;
         }
       });
-      await supabase.from('writeoffs').insert({
-        id: Date.now(), user_id: user.id, name: 'Продажа (быстрая) по чеку №' + receiptNum,
-        items: woItems, quantity: woItems.reduce(function(s,i){return s+i.qty},0),
-        reason: 'Продажа', date: date, created_at: new Date().toISOString()
+      var woInserts = Object.keys(woProducts).map(function(prodId, i){
+        return {
+          id: Date.now() + i,
+          user_id: user.id,
+          product_id: parseInt(prodId),
+          quantity: woProducts[prodId],
+          cost: avgCostMap[prodId] || 0, // средняя себестоимость за шт
+          reason: 'Продажа (быстрая) по чеку №' + receiptNum,
+          date: date,
+        };
       });
+      if (woInserts.length > 0) {
+        await supabase.from('writeoffs').insert(woInserts);
+      }
     } catch(e) { console.error('Ошибка списания со склада:', e); }
 
     onClose();

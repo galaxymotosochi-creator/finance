@@ -65,6 +65,7 @@ export default function Registers({ fullscreen }) {
   const [promos, setPromos] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [stockMap, setStockMap] = useState({});
+  const [avgCostMap, setAvgCostMap] = useState({}); // средняя себестоимость: prodId -> цена за шт
   const [isWide, setIsWide] = useState(window.innerWidth > 900);
   const [receiptDiscountPercent, setReceiptDiscountPercent] = useState(0);
   const [receiptDiscountFixed, setReceiptDiscountFixed] = useState(0);
@@ -150,6 +151,35 @@ export default function Registers({ fullscreen }) {
       }
       // Загружаем остатки склада
       recalcStockMap();
+      // Средняя себестоимость (для списаний при продаже): сумма закупок / количество
+      Promise.all([
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('initial_stocks').select('*').eq('user_id', user.id).maybeSingle(),
+      ]).then(function(rr){
+        var cm = {};
+        (rr[0].data||[]).forEach(function(sp){ (sp.items||[]).forEach(function(it){
+          if (it.prodId) {
+            if (!cm[it.prodId]) cm[it.prodId] = { qty: 0, cost: 0 };
+            cm[it.prodId].qty += it.qty || 0;
+            cm[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+          }
+        });});
+        var init = rr[1].data;
+        if (init && init.done && init.items) {
+          Object.keys(init.items).forEach(function(id){
+            var q = parseInt(init.items[id]) || 0;
+            var c = (init.costs && parseInt(init.costs[id])) || 0;
+            if (q > 0) {
+              if (!cm[id]) cm[id] = { qty: 0, cost: 0 };
+              cm[id].qty += q;
+              cm[id].cost += c * q;
+            }
+          });
+        }
+        var avg = {};
+        Object.keys(cm).forEach(function(id){ avg[id] = cm[id].qty > 0 ? Math.round(cm[id].cost / cm[id].qty) : 0; });
+        setAvgCostMap(avg);
+      });
       // Загружаем последний номер чека
       var { data: lastRx } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
       if (lastRx && lastRx.receipt_number) {
@@ -309,7 +339,7 @@ export default function Registers({ fullscreen }) {
 
     // Номер чека
     const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
-    const receiptNum = (maxReceipt?.receipt_number || 0) + 1;
+    let receiptNum = (maxReceipt?.receipt_number || 0) + 1;
 
     // Определяем статус чека
     var receiptStatus = 'paid';
@@ -472,6 +502,7 @@ export default function Registers({ fullscreen }) {
             user_id: user.id,
             product_id: parseInt(prodId),
             quantity: woProducts[prodId],
+            cost: avgCostMap[prodId] || 0, // средняя себестоимость за шт
             reason: 'Продажа по чеку № ' + receiptNum,
             date: date,
           };
