@@ -61,7 +61,7 @@ export default function Dashboard() {
         }));
         const cash = acctList.filter(a=>a.type==='cash_register').reduce((s,a)=>s+a.balance,0);
         const bank = acctList.filter(a=>a.type!=='cash_register'&&a.type!=='cash').reduce((s,a)=>s+a.balance,0);
-        const reserve = acctList.filter(a=>a.name==='Резерв').reduce((s,a)=>s+a.balance,0);
+        const reserve = acctList.filter(a=>a.type==='reserve').reduce((s,a)=>s+a.balance,0);
         const sm={};
         (supRaw||[]).forEach(sp=>(sp.items||[]).forEach(it=>{if(!sm[it.prodId])sm[it.prodId]={qty:0,cost:0};sm[it.prodId].qty+=it.qty||0;sm[it.prodId].cost+=(it.cost||0)*(it.qty||0);}));
         (wo||[]).forEach(function(w){var pid=w.product_id;if(pid!=null&&sm[pid])sm[pid].qty-=w.quantity||0;});

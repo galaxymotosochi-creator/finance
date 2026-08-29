@@ -458,7 +458,7 @@ export default function Products() {
             if (!name) { errors++; continue; }
 
             const typeStr = (row[headers.find(h => (colMap[h]||'')==='type')] || 'товар').toString().toLowerCase();
-            const type = typeStr.includes('услуг') ? 'service' : 'product';
+            const type = typeStr.includes('услуг') ? 'service' : (typeStr.includes('товар') ? 'product' : 'product');
 
             const cat = (row[headers.find(h => (colMap[h]||'')==='category')] || '').toString().trim();
             const price = parseFloat(row[headers.find(h => (colMap[h]||'')==='price')]) || 0;
