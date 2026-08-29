@@ -168,7 +168,6 @@ export default function Clients() {
               <th style={{textAlign:'left'}}>Ср. чек</th>
               <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{textAlign:'left'}}>Долг</th>
-              <th style={{textAlign:'left'}}>Оплата</th>
               <th style={{width:'80px'}}></th>
             </tr>
           </thead>
@@ -200,18 +199,6 @@ export default function Clients() {
                   <td style={{textAlign:'left',color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left'}}>
-                    {(() => {
-                      const debtVal = parseFloat(c.debt) || 0;
-                      const payStatus = debtVal < 0 ? 'unpaid' : 'paid';
-                      const paySt = ({unpaid:'Не оплачено (' + Math.abs(debtVal).toLocaleString() + ' ₽)',paid:'Оплачено',partially_paid:'Частично оплачено'})[payStatus]||'Не оплачено';
-                      const payColor = ({unpaid:'#dc2626',paid:'#16a34a',partially_paid:'#d97706'})[payStatus]||'#dc2626';
-                      return (
-                        <span
-                          style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:payColor+'18',cursor:'default',fontFamily:'inherit',whiteSpace:'nowrap'}}>{paySt}</span>
-                      );
-                    })()}
-                  </td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
