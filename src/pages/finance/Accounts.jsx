@@ -354,7 +354,7 @@ export default function Accounts() {
                 );
               })}
               {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
-                <div style={{padding:'.75rem 0',fontSize:'1.4rem',textAlign:'center'}}>✅</div>
+                <div style={{padding:'.25rem 0'}}></div>
               )}
               {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
