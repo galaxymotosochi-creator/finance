@@ -35,6 +35,7 @@ export default function Accounts() {
   const [initNewName, setInitNewName] = useState('');
   const [initNewAmt, setInitNewAmt] = useState('');
   const [initNewDesc, setInitNewDesc] = useState('');
+  const [initNewType, setInitNewType] = useState('custom');
   const [showCorrect, setShowCorrect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [trFrom, setTrFrom] = useState('');
@@ -179,9 +180,9 @@ export default function Accounts() {
       }
       // Новый счёт прямо из модалки первоначальных остатков
       if (initNewName.trim()) {
-        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:'custom', balance:parseFloat(initNewAmt)||0, description:initNewDesc.trim() || null});
+        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:initNewType, balance:parseFloat(initNewAmt)||0, description:initNewDesc.trim() || null});
       }
-      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt(''); setInitNewDesc('');
+      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt(''); setInitNewDesc(''); setInitNewType('custom');
       await fetchAccounts();
     } catch(err) {alert(err.message);}
   };
@@ -373,6 +374,9 @@ export default function Accounts() {
                   <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
                 </div>
                 <input placeholder="Комментарий (необязательно)" value={initNewDesc} onChange={e=>setInitNewDesc(e.target.value)} style={{marginTop:'.5rem',width:'100%'}} />
+                <select value={initNewType} onChange={e=>setInitNewType(e.target.value)} style={{marginTop:'.5rem',width:'100%'}}>
+                  {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                </select>
               </div>
               )}
               <div className="modal-actions">
