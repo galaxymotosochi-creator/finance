@@ -143,6 +143,7 @@ export default function QuickSale({ onClose }) {
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: total,
       status: receiptStatus,
+      paid_amount: receiptStatus === 'paid' ? total : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, total) : 0),
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       cashier_name: userName || '',

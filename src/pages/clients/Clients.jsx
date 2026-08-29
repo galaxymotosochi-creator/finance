@@ -207,8 +207,8 @@ export default function Clients() {
                       const paySt = ({unpaid:'Не оплачено (' + Math.abs(debtVal).toLocaleString() + ' ₽)',paid:'Оплачено',partially_paid:'Частично оплачено'})[payStatus]||'Не оплачено';
                       const payColor = ({unpaid:'#dc2626',paid:'#16a34a',partially_paid:'#d97706'})[payStatus]||'#dc2626';
                       return (
-                        <span onClick={() => { if (debtVal < 0) { setDebtPayClientId(c.id); setDebtPayAmt(''); setDebtPayAc(''); setShowDebtPay(true); }}}
-                          style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:payColor+'18',cursor:debtVal<0?'pointer':'default',fontFamily:'inherit',whiteSpace:'nowrap'}}>{paySt}</span>
+                        <span
+                          style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:600,color:'#555',background:payColor+'18',cursor:'default',fontFamily:'inherit',whiteSpace:'nowrap'}}>{paySt}</span>
                       );
                     })()}
                   </td>

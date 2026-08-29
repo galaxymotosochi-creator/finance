@@ -33,6 +33,12 @@ export default function Receipts() {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [receiptItems, setReceiptItems] = useState([]);
   const [itemsLoading, setItemsLoading] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [payReceipt, setPayReceipt] = useState(null);
+  const [payAc, setPayAc] = useState('');
+  const [payAmt, setPayAmt] = useState('');
+  const [toast, setToast] = useState(null);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
     if (!user) return;
@@ -50,6 +56,10 @@ export default function Receipts() {
       setReceipts([]);
       console.warn('Таблица receipts недоступна. Выполните SQL миграцию в Supabase.');
     }
+    try {
+      const { data: ac } = await supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id);
+      setAccounts(ac || []);
+    } catch (e) { setAccounts([]); }
     setLoading(false);
   };
 
@@ -96,6 +106,44 @@ export default function Receipts() {
     if (!d) return '—';
     const p = (d.split('T')[0]||'').split('-');
     return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : d;
+  };
+
+  // Сумма долга по чеку (не оплачено)
+  const receiptRemain = (r) => Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0));
+
+  // Оплата долга по чеку
+  const payDebt = async () => {
+    if (!payReceipt) return;
+    const remain = receiptRemain(payReceipt);
+    const amt = parseFloat(payAmt) || remain;
+    if (!amt || amt <= 0) return alert('Введите сумму');
+    if (!payAc) return alert('Выберите счёт');
+    if (amt > remain) return alert('Сумма больше остатка долга (' + remain.toLocaleString() + ' ₽)');
+    try {
+      // Категория «Доход от продаж»
+      let saleCatId = null;
+      const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();
+      if (cats) saleCatId = cats.id;
+      // Обновляем чек
+      const newPaid = (Number(payReceipt.paid_amount)||0) + amt;
+      const newStatus = newPaid >= Number(payReceipt.total_amount) ? 'paid' : 'partially_paid';
+      await supabase.from('receipts').update({ status: newStatus, paid_amount: newPaid }).eq('id', payReceipt.id);
+      // Транзакция оплаты долга
+      await supabase.from('transactions').insert({
+        user_id: user.id, type: 'income', amount: amt,
+        description: 'Оплата долга по чеку № ' + payReceipt.receipt_number,
+        date: new Date().toISOString().split('T')[0],
+        account_id: payAc, status: 'paid', category_id: saleCatId,
+      });
+      // Уменьшаем долг клиента
+      if (payReceipt.client_id) {
+        const { data: cl } = await supabase.from('clients').select('debt').eq('id', payReceipt.client_id).maybeSingle();
+        await supabase.from('clients').update({ debt: (parseFloat(cl?.debt)||0) + amt }).eq('id', payReceipt.client_id);
+      }
+      setPayReceipt(null); setPayAc(''); setPayAmt('');
+      await load();
+      setToast('Долг по чеку № ' + payReceipt.receipt_number + ' оплачен: ' + amt.toLocaleString() + ' ₽');
+    } catch (err) { alert(err.message); }
   };
 
   if (loading) {
@@ -183,6 +231,7 @@ export default function Receipts() {
               <th style={{ textAlign: 'left' }}>Сумма</th>
               <th style={{ textAlign: 'left' }}>Скидка</th>
               <th style={{ textAlign: 'left' }}>Статус</th>
+              <th style={{ textAlign: 'left' }}>Оплата</th>
               <th style={{ textAlign: 'left' }}>Клиент</th>
               <th style={{ textAlign: 'left' }}>Комментарий</th>
               <th style={{ textAlign: 'left' }}>Кассир</th>
@@ -206,6 +255,17 @@ export default function Receipts() {
                     : '—'}
                 </td>
                 <td style={{ textAlign: 'left' }}>{STATUS_LABELS[r.status] || r.status}</td>
+                <td style={{ textAlign: 'left' }}>
+                  {(() => {
+                    const remain = receiptRemain(r);
+                    const paySt = r.status === 'paid' ? 'Оплачено' : (r.status === 'partially_paid' ? 'Частично (' + remain.toLocaleString() + ' ₽)' : 'Не оплачено (' + remain.toLocaleString() + ' ₽)');
+                    const payColor = r.status === 'paid' ? '#16a34a' : (r.status === 'partially_paid' ? '#d97706' : '#dc2626');
+                    return (
+                      <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid') { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
+                        style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: payColor, background: payColor + '18', cursor: r.status !== 'paid' ? 'pointer' : 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{paySt}</span>
+                    );
+                  })()}
+                </td>
                 <td style={{ textAlign: 'left' }}>{r.client_name || '—'}</td>
                 <td style={{ textAlign: 'left',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
                 <td style={{ textAlign: 'left' }}>{r.cashier_name || '—'}</td>
@@ -276,6 +336,30 @@ export default function Receipts() {
             </div>
         </>)}
       </Modal>
+
+      {/* Модалка оплаты долга по чеку */}
+      <Modal open={!!payReceipt} onClose={() => setPayReceipt(null)} title={payReceipt ? 'Оплата долга по чеку №' + payReceipt.receipt_number : ''} subtitle={payReceipt ? 'Клиент: ' + (payReceipt.client_name || '—') + ' • Остаток долга: ' + receiptRemain(payReceipt).toLocaleString() + ' ₽' : ''} width="medium">
+        {payReceipt && (<>
+          <div className="form-group">
+            <label>Сумма (₽)</label>
+            <input type="number" min="0" step="0.01" value={payAmt} onChange={e => setPayAmt(e.target.value)} autoFocus />
+          </div>
+          <div className="form-group">
+            <label>Счёт зачисления</label>
+            <select value={payAc} onChange={e => setPayAc(e.target.value)}>
+              <option value="">— выберите счёт —</option>
+              {accounts.filter(a => a.type !== 'cash').map(a => <option key={a.id} value={a.id}>{a.type === 'cash_register' ? 'Наличные' : a.name}</option>)}
+            </select>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-outline" onClick={() => setPayReceipt(null)}>Отмена</button>
+            <button type="button" className="btn btn-primary" onClick={payDebt}>Оплатить</button>
+          </div>
+        </>)}
+      </Modal>
+      {toast && (
+        <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>{toast}</div>
+      )}
     </div>
   );
 }

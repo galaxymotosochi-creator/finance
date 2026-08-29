@@ -136,8 +136,8 @@ export default function Transactions() {
     const catName = c ? c.name : '';
     return d.startsWith('Перевод со счета') || d.startsWith('Перевод на счет') || d.startsWith('Инкассация') || catName === 'Перевод между счетами' || catName === 'Инкассация';
   };
-  const incomeTotal = filtered.filter(t => t && t.type === 'income' && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const incomeTotal = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);

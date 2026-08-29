@@ -358,6 +358,7 @@ export default function Registers({ fullscreen }) {
       date, total_amount: finalTotal, comment: receiptComment.trim() || null,
       discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0),
       status: receiptStatus,
+      paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       shift_id: activeShift?.id || null,

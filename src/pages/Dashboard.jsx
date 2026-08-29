@@ -46,7 +46,7 @@ export default function Dashboard() {
         const {data:recItems} = rids.length ? (await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id',rids)) : {data:[]};
 
         let rev=0, exp=0;
-        (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&t.status!=='unpaid'&&!t.kind)rev+=a;else if(t.type==='expense'&&!t.kind)exp+=a;});
+        (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&(t.status==='paid'||!t.status)&&!t.kind)rev+=a;else if(t.type==='expense'&&!t.kind)exp+=a;});
         // Баланс счетов = начальный остаток + ВСЕ транзакции (без фильтра по дате)
         const txById = {};
         (allTx||[]).forEach(t => {
@@ -108,7 +108,7 @@ export default function Dashboard() {
         (allTx||[]).forEach(t => {
           if (t.date && t.date >= ms) {
             const a = t.amount||0;
-            if (t.type==='income' && t.status!=='unpaid' && !t.kind) monthRev += a;
+            if (t.type==='income' && (t.status==='paid'||!t.status) && !t.kind) monthRev += a;
             else if (t.type==='expense' && !t.kind) monthExp += a;
           }
         });
