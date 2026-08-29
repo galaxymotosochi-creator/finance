@@ -340,7 +340,7 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Укажите стартовые суммы по счетам — это не повлияет на отчёты" width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Введите балансы всех счетов вашего бизнеса — если нужно, добавьте новый. На отчёты не повлияет" width="medium">
             <form onSubmit={saveInit}>
               {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
