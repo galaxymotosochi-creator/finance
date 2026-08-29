@@ -455,6 +455,8 @@ app.post('/api/:table', auth, async (req, res) => {
       const keys = Object.keys(body).filter(k => body[k] !== undefined && k !== 'receipt_number');
       if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
       if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
+      // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
+      if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
       const uidIdx = keys.indexOf('user_id') + 1;
       const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
       const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
@@ -467,6 +469,8 @@ app.post('/api/:table', auth, async (req, res) => {
     const keys = Object.keys(body).filter(k => body[k] !== undefined);
     if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
     if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now(); }
+    // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
+    if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
     const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
     const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
     const { rows } = await q('INSERT INTO ' + table + ' (' + keys.join(', ') + ') VALUES (' + ph + ') RETURNING *', vals);
