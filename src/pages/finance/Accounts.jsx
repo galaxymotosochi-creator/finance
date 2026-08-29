@@ -13,6 +13,7 @@ const ACC_TYPES = [
   { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
   { type: 'reserve', icon: '🔒', label: 'Резерв' },
   { type: 'deposit', icon: '📜', label: 'Депозит' },
+  { type: 'custom', icon: '🏦', label: 'Счёт' },
 ];
 const SYSTEM_KEY = 'systemAccountIds';
 
@@ -208,7 +209,7 @@ export default function Accounts() {
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
             onClick={()=>{setInitAmts({});setShowInit(true)}}>Начальные остатки</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-            onClick={()=>{setCorAcct('cash');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка</span>
+            onClick={()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#e65100',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
             onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}}>Инкассация</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
@@ -310,11 +311,11 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.type===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.type}>{''} {a.name}</option>})}
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{''} {a.name}</option>})}
                 </select>
               </div>
               <div className="form-row">
@@ -416,7 +417,7 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств между счетами" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;var fromBal=getBal(fromAc);if(amt>fromBal)return alert('Недостаточно средств на счете «'+fromAc.name+'». Баланс: '+fromBal.toLocaleString()+' ₽');await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Откуда</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
@@ -441,7 +442,7 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle={pendingDeleteAc ? 'Счет «'+pendingDeleteAc.name+'» будет удален навсегда.' : ''} width="narrow"
+      <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle={pendingDeleteAc ? 'Счет «'+pendingDeleteAc.name+'» будет удален навсегда.' + ((parseFloat(pendingDeleteAc.balance)||0)>0 ? ' На счету '+(parseFloat(pendingDeleteAc.balance)||0).toLocaleString()+' ₽ — они исчезнут из учёта.' : '') : ''} width="narrow"
         actions={<>
           <button className="btn btn-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
