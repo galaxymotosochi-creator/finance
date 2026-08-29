@@ -44,9 +44,9 @@ const ACTION_MAP = {
     text += `\n📊 Общий баланс: ${total.toLocaleString()} ₽`; return text;
   },
   GET_DEBTORS: async (p, user) => {
-    const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false});
+    const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true});
     if (!clients?.length) return '✅ Нет должников';
-    return '⚠️ Должники:\n' + clients.map(c => `- ${c.name}: ${Number(c.debt).toLocaleString()} ₽`).join('\n');
+    return '⚠️ Должники:\n' + clients.map(c => `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ₽`).join('\n');
   },
   GET_STOCK: async (p, user) => {
     const name = (p.product_name||'').toLowerCase().trim();

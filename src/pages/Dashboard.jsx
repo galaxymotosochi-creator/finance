@@ -34,7 +34,7 @@ export default function Dashboard() {
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
           supabase.from('accounts').select('id,name,balance,type').eq('user_id',user.id),
-          supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false}),
+          supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true}),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
           supabase.from('supplies').select('items').eq('user_id',user.id),
           supabase.from('writeoffs').select('items').eq('user_id',user.id),
@@ -114,7 +114,7 @@ export default function Dashboard() {
         });
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
         const cashBal = acctList.find(a => a.type === 'cash_register')?.balance || 0;
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3)});
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3)});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -311,7 +311,7 @@ export default function Dashboard() {
           <tbody>{d.debtors.slice(0,5).map((c,i)=>(
             <tr key={i}>
               <td style={{padding:'3px'}}>{c.name}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{(c.debt||0).toLocaleString()} ₽</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{Math.abs(c.debt||0).toLocaleString()} ₽</td>
             </tr>
           ))}</tbody>
         </table>}

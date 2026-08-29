@@ -402,6 +402,12 @@ export default function Registers({ fullscreen }) {
         date, status: 'unpaid', category_id: saleCatId,
       });
       setProcessingPay(false); if (error) return setToast('Ошибка: ' + error.message);
+      // Долг клиента (отрицательное число = должен)
+      if (selectedClient) {
+        const client = clients.find(c => c.id === selectedClient);
+        const curDebt = parseFloat(client?.debt) || 0;
+        await supabase.from('clients').update({debt: curDebt - total}).eq('id', selectedClient);
+      }
       setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: 'unpaid', type:'income' }]);
       setCart([]); setShowPay(false);
       setProcessingPay(false); return setToast('Чек № ' + receiptNum + ' сохранён (не оплачен)');
@@ -462,11 +468,11 @@ export default function Registers({ fullscreen }) {
       });
       if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
       
-      // Обновляем долг клиента
+      // Обновляем долг клиента (отрицательное число = должен)
       if (selectedClient) {
         const client = clients.find(c => c.id === selectedClient);
         const curDebt = parseFloat(client?.debt) || 0;
-        const { error: debtErr } = await supabase.from('clients').update({debt: curDebt + remain}).eq('id', selectedClient);
+        const { error: debtErr } = await supabase.from('clients').update({debt: curDebt - remain}).eq('id', selectedClient);
         if (debtErr) console.error('Ошибка обновления долга клиента:', debtErr);
       }
     }

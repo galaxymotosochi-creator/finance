@@ -184,10 +184,10 @@ const ACTION_MAP = {
     return text;
   },
   GET_DEBTORS: async (p, user) => {
-    const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).gt('debt',0).order('debt',{ascending:false});
+    const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true});
     if (!clients || clients.length === 0) return '✅ Нет должников';
     let text = '⚠️ Должники:\n';
-    clients.forEach(c => { text += `- ${c.name}: ${Number(c.debt).toLocaleString()} ₽\n`; });
+    clients.forEach(c => { text += `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ₽\n`; });
     return text;
   },
   GET_STOCK: async (p, user) => {
@@ -286,7 +286,7 @@ const ACTION_MAP = {
     let query = supabase.from('clients').select('name,phone,debt,orders_count,total_spent,note').eq('user_id',user.id);
     // Фильтр по долгу
     if (p.debtors_only === 'true' || p.debt_only === 'true' || p.debt === 'true') {
-      query = query.gt('debt', 0).not('debt','is',null);
+      query = query.lt('debt', 0).not('debt','is',null);
     }
     const {data:clients} = await query.order('name', {ascending: true}).limit(parseInt(p.limit) || 50);
     if (!clients || clients.length === 0) {
@@ -297,7 +297,7 @@ const ACTION_MAP = {
     clients.forEach(c => {
       text += `- ${c.name}`;
       if (c.phone) text += ` (${c.phone})`;
-      if (c.debt && Number(c.debt) > 0) text += ` долг: ${Number(c.debt).toLocaleString()} ₽`;
+      if (c.debt && Number(c.debt) < 0) text += ` долг: ${Math.abs(Number(c.debt)).toLocaleString()} ₽`;
       if (c.total_spent && Number(c.total_spent) > 0) text += ` всего: ${Number(c.total_spent).toLocaleString()} ₽`;
       text += '\n';
     });
