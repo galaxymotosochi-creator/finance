@@ -1461,7 +1461,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               {(() => {
                 const byAc = {};
-                shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').forEach(t => {
+                shiftTx.filter(t => t.type === 'income' && t.status === 'paid').forEach(t => {
                   const key = t.account_id || 'unknown';
                   byAc[key] = (byAc[key] || 0) + (parseFloat(t.amount) || 0);
                 });
@@ -1474,10 +1474,19 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   </div>
                 ));
               })()}
+              {(() => {
+                const debtSum = shiftTx.filter(t => t.type === 'income' && (t.status === 'debt' || t.status === 'unpaid')).reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                return debtSum > 0 ? (
+                  <div style={{display:'flex',padding:'2px 0',color:'#d97706'}}>
+                    <span style={{flex:1}}>Продажи в долг (не в кассе)</span>
+                    <span>+{debtSum.toLocaleString()} ₽</span>
+                  </div>
+                ) : null;
+              })()}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:700}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
               </div>
             </div>
 
@@ -1486,7 +1495,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {
-              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
@@ -1501,7 +1510,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
                 const fact = parseFloat(closeFactBal);
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
-                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status !== 'debt').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
                 const { error } = await supabase.from('shifts').update({
                   closed_at: new Date().toISOString(),
                   closing_balance: fact,
