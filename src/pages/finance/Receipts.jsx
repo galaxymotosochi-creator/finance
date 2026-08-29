@@ -92,6 +92,12 @@ export default function Receipts() {
 
   const filtered = receipts.filter(r => {
     if (statusFilter && r.status !== statusFilter) return false;
+    // Фильтр по периоду
+    const d = (r.date || r.created_at || '').split('T')[0];
+    if (period === 'today' && d !== new Date().toISOString().split('T')[0]) return false;
+    if (period === 'yesterday') { const y = new Date(); y.setDate(y.getDate()-1); if (d !== y.toISOString().split('T')[0]) return false; }
+    if (period === 'week') { const w = new Date(); w.setDate(w.getDate()-7); if (d < w.toISOString().split('T')[0]) return false; }
+    if (period === 'custom' && !(d >= periodFrom && d <= periodTo)) return false;
     if (search) {
       const q = search.toLowerCase();
       const numMatch = String(r.receipt_number).includes(q);
