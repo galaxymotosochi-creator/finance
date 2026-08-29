@@ -1453,8 +1453,8 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
                 const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
                 try {
-                  // Номер смены (для описания транзакции)
-                  const { count } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+                  // Номер смены (для описания транзакции): считаем только закрытые + 1
+                  const { count } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'closed');
                   const shiftNum = (count || 0) + 1;
                   // Категория «Доход от продаж»
                   let saleCatId = null;
