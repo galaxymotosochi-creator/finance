@@ -444,7 +444,7 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств между счетами" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;var fromBal=getBal(fromAc);if(amt>fromBal)return alert('Недостаточно средств на счете «'+fromAc.name+'». Баланс: '+fromBal.toLocaleString()+' ₽');await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0]});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0]});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;var fromBal=getBal(fromAc);if(amt>fromBal)return alert('Недостаточно средств на счете «'+fromAc.name+'». Баланс: '+fromBal.toLocaleString()+' ₽');var tid=Date.now();await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Откуда</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
@@ -513,9 +513,10 @@ export default function Accounts() {
                     if (newCat) colCatId = newCat.id;
                   }
                   // Расход с Кассы + доход на выбранный счёт
+                  var tid = Date.now();
                   await supabase.from('transactions').insert([
-                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация из кассового ящика',date:new Date().toISOString().split('T')[0],category_id:colCatId},
-                    {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация на счет ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId}
+                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация из кассового ящика',date:new Date().toISOString().split('T')[0],category_id:colCatId,kind:'collection',transfer_id:tid},
+                    {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация на счет ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId,kind:'collection',transfer_id:tid}
                   ]);
                   setShowCollection(false);
                   await fetchTx();

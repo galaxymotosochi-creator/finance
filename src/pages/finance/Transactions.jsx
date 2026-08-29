@@ -127,7 +127,10 @@ export default function Transactions() {
   const accIcons = { cash:'💵', card:'💳', transfer:'🔄', checking:'🏦', bank:'🏛️', electronic:'🌐', reserve:'🔒', deposit:'📜' };
   const cats = categories || [];
 
+  // Внутреннее перемещение денег (перевод/инкассация) — по метке kind, для старых данных запасной вариант по названию
   const isTransfer = (t) => {
+    if (t && t.kind === 'transfer') return true;
+    if (t && t.kind === 'collection') return true;
     const d = (t && t.description) || '';
     const c = cats.find(x => x && x.id === t.category_id);
     const catName = c ? c.name : '';
@@ -484,8 +487,8 @@ export default function Transactions() {
                   if (newCat) trCatId = newCat.id;
                 }
                 await supabase.from('transactions').insert([
-                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод со счета '+fr.name,date:new Date().toISOString().split('T')[0],category_id:trCatId},
-                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод на счет '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId}
+                  {user_id:user.id,account_id:fr.id,type:'expense',amount:amt,description:'Перевод со счета '+fr.name,date:new Date().toISOString().split('T')[0],category_id:trCatId,kind:'transfer',transfer_id:Date.now()},
+                  {user_id:user.id,account_id:to.id,type:'income',amount:amt,description:'Перевод на счет '+to.name,date:new Date().toISOString().split('T')[0],category_id:trCatId,kind:'transfer',transfer_id:Date.now()}
                 ]);
                 setShowTransfer(false); setTrAmt(''); await refresh();
                 setToast('Перевод успешно выполнен!');
