@@ -340,7 +340,7 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Введите балансы всех счетов вашего бизнеса — если нужно, добавьте новый. На отчёты не повлияет" width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(a => parseFloat(a.balance)===0).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(a => parseFloat(a.balance)===0).length ? "Введите балансы всех счетов вашего бизнеса — если нужно, добавьте новый. На отчёты не повлияет" : "Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку»"} width="medium">
             <form onSubmit={saveInit}>
               {sorted.filter(a => parseFloat(a.balance)===0).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
@@ -354,10 +354,9 @@ export default function Accounts() {
                 );
               })}
               {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
-                <div style={{padding:'.5rem 0',fontSize:'.82rem',color:'var(--muted)'}}>
-                  Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку».
-                </div>
+                <div style={{padding:'.75rem 0',fontSize:'1.4rem',textAlign:'center'}}>✅</div>
               )}
+              {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
                 <label>+ Добавить счёт</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
@@ -365,9 +364,15 @@ export default function Accounts() {
                   <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
                 </div>
               </div>
+              )}
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Пропустить</button>
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (<>
+                  <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Пропустить</button>
+                  <button type="submit" className="btn btn-primary">Сохранить</button>
+                </>)}
+                {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
+                  <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Закрыть</button>
+                )}
               </div>
             </form>
       </Modal>
