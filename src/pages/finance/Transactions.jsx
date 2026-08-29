@@ -113,7 +113,7 @@ export default function Transactions() {
     var rows = [['Дата','Название','Сумма','Счет','Категория']];
     list.forEach(function(tx){
       var typeLabels = {income:'Доход',expense:'Расход',sale:'Продажа'};
-      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',(tx.type==='income'?'+':'-')+Number(tx.amount||0).toLocaleString('ru-RU')+' ₽',tx.account_name||'',tx.categories?.name||'']);
+      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',(tx.type==='income'?'+':'-')+Number(tx.amount||0).toLocaleString('ru-RU')+' ₽',tx.account_name||'',(cats.find(c => c && c.id === tx.category_id)?.name)||'']);
     });
     var csv = rows.map(function(r){return r.join(',')}).join('\n');
     var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
@@ -197,6 +197,12 @@ export default function Transactions() {
       var isEdit = !!pendingTx.id;
       var txData = { account_id: null, user_id: pendingTx.user_id, amount: pendingTx.amount, description: pendingTx.description, date: pendingTx.date, category_id: pendingTx.category_id, type: pendingTx.type };
       if (splitMode) {
+        // Проверка: сумма по счетам должна совпадать с суммой операции
+        var splitSum = accs.reduce(function(s,a){return s + (parseFloat(splitAmounts[a.id])||0);},0);
+        if (Math.abs(splitSum - pendingTx.amount) > 0.01) {
+          alert('Сумма по счетам (' + Math.round(splitSum).toLocaleString() + ' ₽) не совпадает с суммой операции (' + Math.round(pendingTx.amount).toLocaleString() + ' ₽)');
+          return;
+        }
         for (const a of accs) {
           var amt = splitAmounts[a.id] || 0;
           if (amt > 0) {
@@ -216,6 +222,11 @@ export default function Transactions() {
         if (!acct) {
           alert('Нет доступных счетов. Сначала создайте счёт в разделе "Финансовые счета".');
           return;
+        }
+        // Предупреждение, если расход уводит счёт в минус
+        if (pendingTx.type === 'expense') {
+          var curBal = accBalance[acct.id] || 0;
+          if (pendingTx.amount > curBal && !window.confirm('На счёте «' + acct.name + '» недостаточно средств (' + Math.round(curBal).toLocaleString() + ' ₽). Списать ' + Math.round(pendingTx.amount).toLocaleString() + ' ₽?')) return;
         }
         if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
         else await add({ ...txData, account_id: acct.id });
@@ -395,7 +406,7 @@ export default function Transactions() {
                     {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
                   </td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
-                  <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{tx.categories?.name || '—'}</span></td>
+                  <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
                   <td style={{ padding: '.5rem', color: '#555', fontSize:'.75rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{userMap[tx.user_id] || '—'}</td>
                   <td style={{ textAlign: 'left', whiteSpace: 'nowrap',borderRight:'none' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -454,6 +465,8 @@ export default function Transactions() {
               try {
                 var fr=accs.find(function(a){return a.id===trFrom}), to=accs.find(function(a){return a.id===trTo});
                 if (!fr||!to) {alert('Выберите оба счета');return;}
+                var frBal = accBalance[fr.id] || 0;
+                if (amt > frBal) { alert('Недостаточно средств на счете «' + fr.name + '». Баланс: ' + Math.round(frBal).toLocaleString() + ' ₽'); return; }
                 // Найти или создать категорию «Перевод между счетами»
                 var trCatId = null;
                 var { data: foundCat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Перевод между счетами').maybeSingle();
@@ -506,7 +519,7 @@ export default function Transactions() {
                   update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
                   setPendingTx({id:editingId,type:'income',user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                  setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowAccSelect(true);
+                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
                 } else {
                   update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
@@ -554,7 +567,7 @@ export default function Transactions() {
                   update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
                   setPendingTx({id:editingId,type:'expense',user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                  setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowAccSelect(true);
+                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
                 } else {
                   update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
