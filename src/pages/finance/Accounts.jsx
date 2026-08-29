@@ -32,6 +32,7 @@ export default function Accounts() {
   const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
+  const [showInitNew, setShowInitNew] = useState(true);
   const [initNewName, setInitNewName] = useState('');
   const [initNewAmt, setInitNewAmt] = useState('');
   const [initNewDesc, setInitNewDesc] = useState('');
@@ -368,7 +369,11 @@ export default function Accounts() {
               )}
               {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
-                <label>+ Добавить счёт</label>
+                <button type="button" onClick={()=>setShowInitNew(!showInitNew)}
+                  style={{background:'none',border:'none',padding:0,margin:0,fontFamily:'inherit',fontSize:'.85rem',fontWeight:600,color:'#16a34a',cursor:'pointer',marginBottom:'.5rem'}}>
+                  {showInitNew ? '− Скрыть добавление' : '+ Добавить счёт'}
+                </button>
+                {showInitNew && (<>
                 <div style={{display:'flex',gap:'.5rem'}}>
                   <input placeholder="Название (Карта, Перевод…)" value={initNewName} onChange={e=>setInitNewName(e.target.value)} style={{flex:1}} />
                   <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
@@ -377,6 +382,7 @@ export default function Accounts() {
                 <select value={initNewType} onChange={e=>setInitNewType(e.target.value)} style={{marginTop:'.5rem',width:'100%'}}>
                   {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                 </select>
+                </>)}
               </div>
               )}
               <div className="modal-actions">
