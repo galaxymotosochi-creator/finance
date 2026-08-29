@@ -140,6 +140,9 @@ export default function Registers({ fullscreen }) {
       if (empRes?.data) setEmployees(empRes.data);
       if (sRes.data) {
         setActiveShift(sRes.data);
+        // Загружаем чеки открытой смены (для баланса кассы и закрытия)
+        const { data: sr } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', sRes.data.id);
+        setShiftReceipts(sr || []);
         // Синхронизируем имя кассира из настроек
         if (userName && sRes.data.cashier_name !== userName) {
           supabase.from('shifts').update({ cashier_name: userName }).eq('id', sRes.data.id).eq('user_id', user.id).then();
@@ -326,25 +329,35 @@ export default function Registers({ fullscreen }) {
   const processPay = async () => {
     if (!cart.length) return;
     const date = new Date().toISOString().split('T')[0];
-    
-    // Получаем или создаём категорию «Доход от продаж»
-    let saleCatId = null;
-    const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();
-    if (cats) {
-      saleCatId = cats.id;
-    } else {
-      const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Доход от продаж', type: 'income' }).select('id').single();
-      if (newCat) saleCatId = newCat.id;
-    }
 
-    // Номер чека
-    const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
-    let receiptNum = (maxReceipt?.receipt_number || 0) + 1;
+    // Проверки до создания чека
+    if (!selectedClient) { setProcessingPay(false); return setToast('⚠️ Выберите клиента'); }
+    if (!payUnpaid && !payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
 
     // Определяем статус чека
     var receiptStatus = 'paid';
     if (payUnpaid) receiptStatus = 'unpaid';
     else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total) receiptStatus = 'partially_paid';
+
+    // Разбивка оплаты по счетам (для агрегации «Кассовая смена» при закрытии)
+    var payments = [];
+    if (paySplit) {
+      const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
+      if (entries.length === 0) { setProcessingPay(false); return setToast('⚠️ Укажите суммы для оплаты'); }
+      const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
+      if (Math.abs(sum - total) > 0.01) { setProcessingPay(false); return setToast('⚠️ Сумма оплаты не совпадает с итогом'); }
+      entries.forEach(([acId, amt]) => payments.push({ account_id: acId, amount: parseFloat(amt) }));
+    } else if (!payUnpaid) {
+      const selAc = accounts.find(a => a.id === payMode);
+      var tgt = selAc;
+      if (selAc && selAc.type === 'cash') tgt = accounts.find(a => a.type === 'cash_register') || selAc;
+      const paidAmt = payAmount ? parseFloat(payAmount) : total;
+      if (paidAmt > 0) payments.push({ account_id: tgt?.id || null, amount: Math.min(paidAmt, total) });
+    }
+
+    // Номер чека
+    const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
+    let receiptNum = (maxReceipt?.receipt_number || 0) + 1;
 
     // Создаём чек
     var receiptId = null;
@@ -359,6 +372,7 @@ export default function Registers({ fullscreen }) {
       discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0),
       status: receiptStatus,
       paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
+      payments,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       shift_id: activeShift?.id || null,
@@ -395,95 +409,29 @@ export default function Registers({ fullscreen }) {
       if (itemsErr) showToast('Не удалось сохранить товары чека: ' + itemsErr.message, 'error');
     }
 
-    if (payUnpaid) {
-      // Неоплаченный чек — одна транзакция на весь чек без счёта
-      const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: total,
-        description: 'Продажа по чеку № ' + receiptNum,
-        date, status: 'unpaid', category_id: saleCatId,
-      });
-      setProcessingPay(false); if (error) return setToast('Ошибка: ' + error.message);
-      // Долг клиента (отрицательное число = должен)
-      if (selectedClient) {
-        const client = clients.find(c => c.id === selectedClient);
-        const curDebt = parseFloat(client?.debt) || 0;
-        await supabase.from('clients').update({debt: curDebt - total}).eq('id', selectedClient);
-      }
-      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: 'unpaid', type:'income' }]);
-      setCart([]); setShowPay(false);
-      setProcessingPay(false); return setToast('Чек № ' + receiptNum + ' сохранён (не оплачен)');
-    }
-
-    if (paySplit) {
-      // Раздельная оплата — по одной транзакции на каждую часть
-      const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
-      if (entries.length === 0) { setProcessingPay(false); return setToast('⚠️ Укажите суммы для оплаты'); }
-      const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
-      if (Math.abs(sum - total) > 0.01) { setProcessingPay(false); return setToast('⚠️ Сумма оплаты не совпадает с итогом'); }
-      let part = 1;
-      for (const [acId, amt] of entries) {
-        const { error } = await supabase.from('transactions').insert({
-          user_id: user.id, type: 'income', amount: parseFloat(amt),
-          description: 'Продажа по чеку № ' + receiptNum + ' (Часть ' + part + ')',
-          date, account_id: acId, status: 'paid', category_id: saleCatId,
-        });
-        if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
-        part++;
-      }
-      setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: 'paid', type:'income' }]);
-      setCart([]); setShowPay(false); setPayMode(null);
-      setProcessingPay(false); return setToast('Чек № ' + receiptNum + ' — оплачено с нескольких счетов');
-    }
-
-    // Обычная оплата на один счёт — с учётом частичной оплаты
-    if (!payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
-    const selectedAc = accounts.find(a => a.id === payMode);
-    // Наличные → перенаправляем на счёт Касса
-    var targetAc = selectedAc;
-    if (selectedAc && selectedAc.type === 'cash') {
-      targetAc = accounts.find(a => a.type === 'cash_register') || selectedAc;
-    }
-    const paidAmt = payAmount ? parseFloat(payAmount) : total;
-    
-    if (!selectedClient) {
-      setProcessingPay(false); return setToast('⚠️ Выберите клиента');
-    }
-    
-    if (paidAmt > 0) {
-      const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
-        description: (paidAmt >= total ? 'Продажа по чеку № ' : 'Частичная оплата по чеку № ') + receiptNum,
-        date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
-      });
-      if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
-    }
-    
-    // Долг на остаток — записываем клиенту
-    if (paidAmt > 0 && paidAmt < total) {
-      const remain = total - paidAmt;
-      // Транзакция долга (не влияет на Cash Flow)
-      const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: remain,
-        description: 'Долг по чеку № ' + receiptNum,
-        date, status: 'debt', category_id: saleCatId,
-      });
-      if (error) { setProcessingPay(false); return setToast('Ошибка: ' + error.message); }
-      
-      // Обновляем долг клиента (отрицательное число = должен)
-      if (selectedClient) {
-        const client = clients.find(c => c.id === selectedClient);
-        const curDebt = parseFloat(client?.debt) || 0;
-        const { error: debtErr } = await supabase.from('clients').update({debt: curDebt - remain}).eq('id', selectedClient);
-        if (debtErr) console.error('Ошибка обновления долга клиента:', debtErr);
-      }
-    }
-    
-    // Записываем долг клиенту (при полном долге)
-    if (payUnpaid && selectedClient) {
+    // Долг клиента (отрицательное число = должен)
+    if (selectedClient) {
       const client = clients.find(c => c.id === selectedClient);
       const curDebt = parseFloat(client?.debt) || 0;
-      await supabase.from('clients').update({debt: curDebt + total}).eq('id', selectedClient);
+      if (payUnpaid) {
+        await supabase.from('clients').update({debt: curDebt - total}).eq('id', selectedClient);
+      } else {
+        const paidAmt = payAmount ? parseFloat(payAmount) : total;
+        if (paidAmt > 0 && paidAmt < total) {
+          await supabase.from('clients').update({debt: curDebt - (total - paidAmt)}).eq('id', selectedClient);
+        }
+      }
     }
+    
+    setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: receiptStatus, type:'income' }]);
+    setCart([]); setShowPay(false); setPayMode(null);
+    setProcessingPay(false);
+    const msg = receiptStatus === 'paid'
+      ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
+      : (receiptStatus === 'partially_paid'
+        ? 'Чек № ' + receiptNum + ' — оплачено ' + (payAmount ? parseFloat(payAmount).toLocaleString() : '0') + ' ₽, долг ' + (total - (payAmount ? parseFloat(payAmount) : 0)).toLocaleString() + ' ₽'
+        : 'Чек № ' + receiptNum + ' сохранён (не оплачен)');
+    setToast(msg);
     
     // Уменьшаем остатки на складе
       try {
@@ -520,15 +468,7 @@ export default function Registers({ fullscreen }) {
       } catch(e) { console.error('Ошибка списания со склада:', e); }
       // Обновляем stockMap после списания пересчётом из БД
       recalcStockMap();
-    
-    setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: paidAmt >= total ? 'paid' : 'partially_paid', type:'income' }]);
     setReceiptComment('');
-    setCart([]); setShowPay(false); setPayMode(null);
-    const msg = paidAmt >= total 
-      ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
-      : 'Чек № ' + receiptNum + ' — оплачено ' + paidAmt.toLocaleString() + ' ₽, долг ' + (total - paidAmt).toLocaleString() + ' ₽';
-    setToast(msg);
-    setProcessingPay(false);
   };
 
   const saveProduct = async (e) => {
@@ -1341,10 +1281,8 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <div style={{display:'flex',flexDirection:'column',gap:'8px',marginTop:'16px'}}>
               <button onClick={async () => {
                 setShowActions(false);
-                const start = new Date(activeShift.opened_at);
-                const now = new Date();
-                const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('created_at', start.toISOString()).lte('created_at', now.toISOString()).order('created_at', { ascending: false });
-                setShiftTx(data || []);
+                const { data } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', activeShift.id);
+                setShiftReceipts(data || []);
                 setShowCloseShift(true);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
@@ -1361,7 +1299,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <h2>Сменить кассира</h2>
             <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'.80rem',lineHeight:1.7}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#777'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;if(shiftTx.length>0)shiftTx.forEach(function(t){if(t.account_id===ca.id)b+=Number(t.amount||0)*(t.type==="income"?1:-1)});}return Math.round(b).toLocaleString()})()} ₽</span></div>
+              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;(shiftReceipts||[]).forEach(function(r){(r.payments||[]).forEach(function(p){if(p.account_id===ca.id)b+=Number(p.amount||0)});});}return Math.round(b).toLocaleString()})()} ₽</span></div>
             </div>
             <div className="form-group">
               <label>Новый кассир</label>
@@ -1462,9 +1400,11 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               {(() => {
                 const byAc = {};
-                shiftTx.filter(t => t.type === 'income' && t.status === 'paid').forEach(t => {
-                  const key = t.account_id || 'unknown';
-                  byAc[key] = (byAc[key] || 0) + (parseFloat(t.amount) || 0);
+                (shiftReceipts||[]).forEach(r => {
+                  (r.payments||[]).forEach(p => {
+                    const key = p.account_id || 'unknown';
+                    byAc[key] = (byAc[key] || 0) + (parseFloat(p.amount) || 0);
+                  });
                 });
                 const acMap = {};
                 accounts.forEach(a => { acMap[a.id] = a.name; });
@@ -1476,7 +1416,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 ));
               })()}
               {(() => {
-                const debtSum = shiftTx.filter(t => t.type === 'income' && (t.status === 'debt' || t.status === 'unpaid')).reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+                const debtSum = (shiftReceipts||[]).reduce((s, r) => s + Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0)), 0);
                 return debtSum > 0 ? (
                   <div style={{display:'flex',padding:'2px 0',color:'#d97706'}}>
                     <span style={{flex:1}}>Продажи в долг (не в кассе)</span>
@@ -1487,7 +1427,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:700}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) ).toLocaleString()} ₽</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) ).toLocaleString()} ₽</span>
               </div>
             </div>
 
@@ -1496,7 +1436,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {
-              const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
@@ -1511,19 +1451,39 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
                 const fact = parseFloat(closeFactBal);
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
-                const calcBal = (parseFloat(activeShift.opening_balance)||0) + shiftTx.filter(t => t.type === 'income' && t.status === 'paid').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
-                const { error } = await supabase.from('shifts').update({
-                  closed_at: new Date().toISOString(),
-                  closing_balance: fact,
-                  status: 'closed',
-                }).eq('id', activeShift.id);
-                if (error) return setToast('' + error.message);
-                setShowCloseShift(false); setCloseFactBal(''); setShiftTx([]);
-                setActiveShift(null);
-                setShowOpenShift(true);
-                setOpenShiftCashier(userName);
-                setOpenShiftBal('0');
-                setToast('Смена закрыта' + (Math.abs(fact - calcBal) > 0.01 ? ' (расхождение ' + (fact - calcBal > 0 ? 'излишек' : 'недостача') + ' ' + Math.abs(fact - calcBal).toLocaleString() + ' ₽)' : ''));
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
+                try {
+                  // Номер смены (для описания транзакции)
+                  const { count } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+                  const shiftNum = (count || 0) + 1;
+                  // Категория «Доход от продаж»
+                  let saleCatId = null;
+                  const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();
+                  if (cats) saleCatId = cats.id;
+                  // Агрегируем оплаты смены по счетам (только реально оплаченное)
+                  const byAc = {};
+                  (shiftReceipts||[]).forEach(r => (r.payments||[]).forEach(p => { const k = p.account_id || null; byAc[k] = (byAc[k]||0) + (parseFloat(p.amount)||0); }));
+                  const txList = Object.entries(byAc).filter(([, amt]) => amt > 0).map(([acId, amt]) => ({
+                    user_id: user.id, type: 'income', amount: Math.round(amt),
+                    description: 'Кассовая смена №' + shiftNum,
+                    date: new Date().toISOString().split('T')[0],
+                    account_id: acId, status: 'paid', category_id: saleCatId,
+                  }));
+                  if (txList.length > 0) await supabase.from('transactions').insert(txList);
+                  // Закрываем смену
+                  const { error } = await supabase.from('shifts').update({
+                    closed_at: new Date().toISOString(),
+                    closing_balance: fact,
+                    status: 'closed',
+                  }).eq('id', activeShift.id);
+                  if (error) return setToast('' + error.message);
+                  setShowCloseShift(false); setCloseFactBal(''); setShiftTx([]); setShiftReceipts([]);
+                  setActiveShift(null);
+                  setShowOpenShift(true);
+                  setOpenShiftCashier(userName);
+                  setOpenShiftBal('0');
+                  setToast('Смена №' + shiftNum + ' закрыта' + (Math.abs(fact - calcBal) > 0.01 ? ' (расхождение ' + (fact - calcBal > 0 ? 'излишек' : 'недостача') + ' ' + Math.abs(fact - calcBal).toLocaleString() + ' ₽)' : ''));
+                } catch(err) { return setToast('' + err.message); }
               }}>Закрыть смену</button>
             </div>
           </div>
