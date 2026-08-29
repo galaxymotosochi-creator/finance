@@ -449,6 +449,17 @@ app.post('/api/:table', auth, async (req, res) => {
     const cols = await getTableColumns(table);
     // Поддержка batch-вставки: фронтенд шлёт массив (позиции чека, инкассация, счета)
     const items = Array.isArray(req.body) ? req.body : [req.body];
+    // Защита: системные типы счетов (cash/cash_register) — только один на пользователя
+    if (table === 'accounts') {
+      for (const b of items) {
+        if (b.type === 'cash' || b.type === 'cash_register') {
+          const { rows: ex } = await pool.query('SELECT id FROM accounts WHERE user_id = $1 AND type = $2', [req.user.id, b.type]);
+          if (ex.length > 0) {
+            return res.status(400).json({ error: 'Счёт «' + (b.type === 'cash' ? 'Наличные' : 'Кассовый ящик') + '» уже существует — на одно заведение можно завести только один' });
+          }
+        }
+      }
+    }
     const results = [];
     for (const body of items) {
       // Атомарная нумерация чеков: игнорируем переданный receipt_number, берём MAX+1 на сервере
@@ -510,6 +521,15 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     const { table, id } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
     const cols = await getTableColumns(table);
+    // Защита счетов: системные (наличные/касса) и счета с операциями удалять нельзя
+    if (table === 'accounts') {
+      const { rows: ac } = await pool.query('SELECT type FROM accounts WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+      if (ac.length && (ac[0].type === 'cash' || ac[0].type === 'cash_register')) {
+        return res.status(400).json({ error: 'Системный счёт («Наличные»/«Кассовый ящик») удалить нельзя' });
+      }
+      const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE account_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      if (tx.length > 0) return res.status(400).json({ error: 'Нельзя удалить счёт — на нём есть операции' });
+    }
     if (cols.has('user_id')) {
       await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     } else {

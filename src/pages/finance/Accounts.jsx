@@ -302,7 +302,7 @@ export default function Accounts() {
                 <div className="form-group">
                   <label>Тип счёта</label>
                   <select value={modalType} onChange={e=>setModalType(e.target.value)}>
-                    {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                    {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                   </select>
                 </div>
               )}
@@ -384,7 +384,7 @@ export default function Accounts() {
                       </div>
                       <input placeholder="Комментарий (необязательно)" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
                       <select value={na.type} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}}>
-                        {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                        {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                       </select>
                     </div>
                   );
@@ -486,6 +486,10 @@ export default function Accounts() {
           (transactions||[]).forEach(function(t){if(t.account_id===cashRegAc.id) cashRegBal += Number(t.amount||0) * (t.type==='income'?1:-1);});
         }
         var otherAccs = accounts.filter(function(a){return a.id !== cashRegAc?.id;});
+        if (!cashRegAc) return (<>
+              <div style={{padding:'1rem 0',fontSize:'.85rem',color:'var(--muted)'}}>Счёт «Кассовый ящик» не найден. Обновите страницу — он создастся автоматически.</div>
+              <div className="modal-actions"><button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Закрыть</button></div>
+        </>);
         return (<>
               <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
                 <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
@@ -510,7 +514,7 @@ export default function Accounts() {
                   }
                   // Расход с Кассы + доход на выбранный счёт
                   await supabase.from('transactions').insert([
-                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация со счета Касса',date:new Date().toISOString().split('T')[0],category_id:colCatId},
+                    {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация из кассового ящика',date:new Date().toISOString().split('T')[0],category_id:colCatId},
                     {user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Инкассация на счет ' + toAc.name,date:new Date().toISOString().split('T')[0],category_id:colCatId}
                   ]);
                   setShowCollection(false);
