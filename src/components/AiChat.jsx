@@ -491,7 +491,7 @@ export default function AiChat() {
         const md = now.toISOString().slice(5,10);
         const bdays = (emps||[]).filter(() => false); // пока отключено
 
-        const sales = (txs||[]).filter(t => t.type==='income'&&!t.description?.startsWith('Перевод')).reduce((s,t)=>s+Number(t.amount||0),0);
+        const sales = (txs||[]).filter(t => t.type==='income' && !(t.description||'').startsWith('Перевод со счета') && !(t.description||'').startsWith('Перевод на счет') && !(t.description||'').startsWith('Инкассация')).reduce((s,t)=>s+Number(t.amount||0),0);
         const recCount = (recs||[]).length;
         let greet = 'Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
         if (shift?.cashier_name && recCount > 0) {

@@ -127,9 +127,15 @@ export default function Transactions() {
   const accIcons = { cash:'💵', card:'💳', transfer:'🔄', checking:'🏦', bank:'🏛️', electronic:'🌐', reserve:'🔒', deposit:'📜' };
   const cats = categories || [];
 
-  const incomeTotal = filtered.filter(t => t && t.type === 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && !(t.description||'').startsWith('Перевод')).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const sales = txs.filter(t => t && t.type === 'sale' && !(t.description||'').startsWith('Перевод'));
+  const isTransfer = (t) => {
+    const d = (t && t.description) || '';
+    const c = cats.find(x => x && x.id === t.category_id);
+    const catName = c ? c.name : '';
+    return d.startsWith('Перевод со счета') || d.startsWith('Перевод на счет') || d.startsWith('Инкассация') || catName === 'Перевод между счетами' || catName === 'Инкассация';
+  };
+  const incomeTotal = filtered.filter(t => t && t.type === 'income' && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
 
