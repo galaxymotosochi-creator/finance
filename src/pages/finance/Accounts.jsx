@@ -378,7 +378,7 @@ export default function Accounts() {
                   return (
                     <div key={idx} style={{padding:'.5rem 0',borderTop:'1px solid var(--border)'}}>
                       <div style={{display:'flex',gap:'.5rem'}}>
-                        <input placeholder="Название (Карта, Перевод…)" value={na.name} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],name:e.target.value};setNewAccs(r);}} style={{flex:1}} />
+                        <input placeholder="Название счёта" value={na.name} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],name:e.target.value};setNewAccs(r);}} style={{flex:1}} />
                         <input type="number" placeholder="Остаток" min="0" step="0.01" value={na.amt} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],amt:e.target.value};setNewAccs(r);}} style={{width:'100px'}} />
                         <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
                       </div>
