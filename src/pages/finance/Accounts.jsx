@@ -33,6 +33,7 @@ export default function Accounts() {
   const [initAmts, setInitAmts] = useState({});
   const [initNewName, setInitNewName] = useState('');
   const [initNewAmt, setInitNewAmt] = useState('');
+  const [initNewDesc, setInitNewDesc] = useState('');
   const [showCorrect, setShowCorrect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [trFrom, setTrFrom] = useState('');
@@ -177,9 +178,9 @@ export default function Accounts() {
       }
       // Новый счёт прямо из модалки первоначальных остатков
       if (initNewName.trim()) {
-        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:'custom', balance:parseFloat(initNewAmt)||0});
+        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:'custom', balance:parseFloat(initNewAmt)||0, description:initNewDesc.trim() || null});
       }
-      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt('');
+      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt(''); setInitNewDesc('');
       await fetchAccounts();
     } catch(err) {alert(err.message);}
   };
@@ -362,6 +363,7 @@ export default function Accounts() {
                   <input placeholder="Название (Карта, Перевод…)" value={initNewName} onChange={e=>setInitNewName(e.target.value)} style={{flex:1}} />
                   <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
                 </div>
+                <input placeholder="Комментарий (необязательно)" value={initNewDesc} onChange={e=>setInitNewDesc(e.target.value)} style={{marginTop:'.5rem',width:'100%'}} />
               </div>
               )}
               <div className="modal-actions">
