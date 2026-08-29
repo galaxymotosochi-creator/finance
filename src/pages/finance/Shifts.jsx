@@ -6,6 +6,7 @@ export default function Shifts() {
   const { user } = useAuth();
   const [shifts, setShifts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [receipts, setReceipts] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
@@ -21,14 +22,16 @@ export default function Shifts() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [sRes, tRes, aRes] = await Promise.all([
+      const [sRes, tRes, aRes, rRes] = await Promise.all([
         supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false }),
         supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
         supabase.from('accounts').select('*').order('created_at', { ascending: true }),
+        supabase.from('receipts').select('shift_id,paid_amount').eq('user_id', user.id),
       ]);
       setShifts(sRes.data || []);
       setTransactions(tRes.data || []);
       setAccounts(aRes.data || []);
+      setReceipts(rRes.data || []);
       setLoading(false);
     })();
   }, [user]);
@@ -39,20 +42,11 @@ export default function Shifts() {
 
   const activeShift = useMemo(() => shifts.find(s => s.status === 'open'), [shifts]);
 
+  // Выручка смены = сумма оплаченного по чекам смены (только кассовые чеки, быстрые продажи не входят)
   const getShiftIncome = (s) => {
-    const start = new Date(s.opened_at);
-    const end = s.closed_at ? new Date(s.closed_at) : new Date();
-    return transactions.filter(t =>
-      t.date && new Date(t.date) >= start && new Date(t.date) <= end && t.type === 'income'
-    ).reduce((sum, t) => sum + Number(t.amount || 0), 0);
+    return (receipts||[]).filter(r => r.shift_id === s.id).reduce((sum, r) => sum + (Number(r.paid_amount)||0), 0);
   };
-  const getShiftExpense = (s) => {
-    const start = new Date(s.opened_at);
-    const end = s.closed_at ? new Date(s.closed_at) : new Date();
-    return transactions.filter(t =>
-      t.date && new Date(t.date) >= start && new Date(t.date) <= end && t.type !== 'income'
-    ).reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  };
+  const getShiftExpense = (s) => { return 0; };
 
   const showToast = (msg) => {
     setToast(msg);
@@ -92,7 +86,7 @@ export default function Shifts() {
               <th style={{textAlign:'left'}}>Смена №</th>
               <th style={{textAlign:'left'}}>Кассир</th>
               <th style={{textAlign:'left'}}>Начальный остаток</th>
-              <th style={{textAlign:'left'}}>Касса</th>
+              <th style={{textAlign:'left'}}>Выручка</th>
               <th style={{textAlign:'left'}}>Конечный остаток</th>
               <th style={{textAlign:'left'}}>Время закрытия</th>
               <th style={{textAlign:'left'}}>Статус</th>
@@ -114,10 +108,10 @@ export default function Shifts() {
                 <tr key={s.id}>
                   <td style={{textAlign:'left',color:'#555',paddingLeft:0}}>{dateStr}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{timeOpen}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{'#'+(idx+1)}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{'#'+(shifts.length - idx)}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{s.cashier_name || '—'}</td>
                   <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
-                  <td style={{textAlign:'left',color:'#555'}}>Основная</td>
+                  <td style={{textAlign:'left',fontWeight:600}}>{income > 0 ? '+'+income.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{timeClose}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
