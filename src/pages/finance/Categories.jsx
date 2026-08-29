@@ -80,6 +80,13 @@ export default function Categories() {
     if (!pendingDeleteId) return;
     setShowConfirm(false);
     try {
+      // Проверяем, используется ли категория в операциях
+      const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('category_id', pendingDeleteId);
+      if (count > 0) {
+        setToast('⚠️ Эта категория используется в ' + count + ' операциях. Сначала переназначьте операции на другую категорию');
+        setPendingDeleteId(null);
+        return;
+      }
       const { error } = await supabase.from('categories').delete().eq('id', pendingDeleteId).eq('user_id', user.id);
       if (error) {
         if ((error.code === '23503') || (error.message && error.message.includes('foreign key'))) {

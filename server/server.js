@@ -530,6 +530,11 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE account_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
       if (tx.length > 0) return res.status(400).json({ error: 'Нельзя удалить счёт — на нём есть операции' });
     }
+    // Защита категорий: используемые в операциях удалять нельзя
+    if (table === 'categories') {
+      const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE category_id = $1 LIMIT 1', [id]);
+      if (tx.length > 0) return res.status(400).json({ error: 'Категория используется в операциях — удалить нельзя' });
+    }
     if (cols.has('user_id')) {
       await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     } else {
