@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 const ACC_TYPES = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
-  { type: 'cash_register', icon: '🗄️', label: 'Касса' },
+  { type: 'cash_register', icon: '🗄️', label: 'Кассовый ящик' },
   { type: 'card', icon: '💳', label: 'Оплата картой' },
   { type: 'transfer', icon: '🔄', label: 'Перевод' },
   { type: 'checking', icon: '🏦', label: 'Расчетный счет' },
@@ -31,6 +31,8 @@ export default function Accounts() {
   const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
+  const [initNewName, setInitNewName] = useState('');
+  const [initNewAmt, setInitNewAmt] = useState('');
   const [showCorrect, setShowCorrect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [trFrom, setTrFrom] = useState('');
@@ -63,8 +65,8 @@ export default function Accounts() {
       var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
       if (user) {
         var cr = [];
-        if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Наличные деньги (не через кассу)'});
-        if (need.cash_register) cr.push({user_id:user.id,name:'Касса',type:'cash_register',balance:0,description:'Наличные продажи через кассу'});
+        if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Деньги вне кассы (сейф) — сюда инкассируется'});
+        if (need.cash_register) cr.push({user_id:user.id,name:'Кассовый ящик',type:'cash_register',balance:0,description:'Наличные от продаж — лежат в ящике кассы'});
         if (cr.length > 0) {
           var r = await supabase.from('accounts').insert(cr).select();
           if (r.data) {
@@ -90,6 +92,14 @@ export default function Accounts() {
   };
 
   useEffect(() => { fetchAccounts(); fetchTx(); }, []);
+
+  // Онбординг: показываем «Первоначальные остатки», пока у пользователя нет учтённых данных
+  useEffect(() => {
+    if (initDone && !loading) {
+      const hasData = accounts.some(a => parseFloat(a.balance) > 0) || transactions.length > 0;
+      if (!hasData) setShowInit(true);
+    }
+  }, [initDone, loading, accounts, transactions]);
 
   var getBal = (ac) => {
     if (!ac) return 0;
@@ -165,7 +175,11 @@ export default function Accounts() {
           await supabase.from('accounts').update({balance:amt}).eq('id',acId);
         }
       }
-      setShowInit(false); setInitAmts({});
+      // Новый счёт прямо из модалки первоначальных остатков
+      if (initNewName.trim()) {
+        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:'custom', balance:parseFloat(initNewAmt)||0});
+      }
+      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt('');
       await fetchAccounts();
     } catch(err) {alert(err.message);}
   };
@@ -326,7 +340,7 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Используйте эту функцию при первом заполнении программы" width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Укажите стартовые суммы по счетам — это не повлияет на отчёты" width="medium">
             <form onSubmit={saveInit}>
               {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
@@ -339,7 +353,15 @@ export default function Accounts() {
                   </div>
                 );
               })}
+              <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
+                <label>+ Добавить счёт</label>
+                <div style={{display:'flex',gap:'.5rem'}}>
+                  <input placeholder="Название (Карта, Перевод…)" value={initNewName} onChange={e=>setInitNewName(e.target.value)} style={{flex:1}} />
+                  <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
+                </div>
+              </div>
               <div className="modal-actions">
+                <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Пропустить</button>
                 <button type="submit" className="btn btn-primary">Сохранить</button>
               </div>
             </form>

@@ -55,10 +55,12 @@ export default function Dashboard() {
         });
         const acctList = (accts||[]).map(a => ({
           name: a.name || a.type,
+          type: a.type,
+          id: a.id,
           balance: (parseFloat(a.balance)||0) + (txById[a.id]||0)
         }));
-        const cash = acctList.filter(a=>a.name==='Касса').reduce((s,a)=>s+a.balance,0);
-        const bank = acctList.filter(a=>a.name!=='Касса'&&a.name!=='Наличные').reduce((s,a)=>s+a.balance,0);
+        const cash = acctList.filter(a=>a.type==='cash_register').reduce((s,a)=>s+a.balance,0);
+        const bank = acctList.filter(a=>a.type!=='cash_register'&&a.type!=='cash').reduce((s,a)=>s+a.balance,0);
         const reserve = acctList.filter(a=>a.name==='Резерв').reduce((s,a)=>s+a.balance,0);
         const sm={};
         (supRaw||[]).forEach(sp=>(sp.items||[]).forEach(it=>{if(!sm[it.prodId])sm[it.prodId]={qty:0,cost:0};sm[it.prodId].qty+=it.qty||0;sm[it.prodId].cost+=(it.cost||0)*(it.qty||0);}));
@@ -111,7 +113,7 @@ export default function Dashboard() {
           }
         });
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
-        const cashBal = acctList.find(a => a.name === 'Касса')?.balance || 0;
+        const cashBal = acctList.find(a => a.type === 'cash_register')?.balance || 0;
         setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:(clients||[]).reduce((s,c)=>s+(c.debt||0),0),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3)});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
