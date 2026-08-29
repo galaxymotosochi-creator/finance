@@ -230,7 +230,6 @@ export default function Receipts() {
               <th style={{ textAlign: 'left' }}>Дата</th>
               <th style={{ textAlign: 'left' }}>Сумма</th>
               <th style={{ textAlign: 'left' }}>Скидка</th>
-              <th style={{ textAlign: 'left' }}>Статус</th>
               <th style={{ textAlign: 'left' }}>Оплата</th>
               <th style={{ textAlign: 'left' }}>Клиент</th>
               <th style={{ textAlign: 'left' }}>Комментарий</th>
@@ -254,7 +253,6 @@ export default function Receipts() {
                     ? '-' + ((parseInt(r.receipt_discount)||0)+(parseInt(r.discount_sum)||0)).toLocaleString() + ' ₽'
                     : '—'}
                 </td>
-                <td style={{ textAlign: 'left' }}>{STATUS_LABELS[r.status] || r.status}</td>
                 <td style={{ textAlign: 'left' }}>
                   {(() => {
                     const remain = receiptRemain(r);
