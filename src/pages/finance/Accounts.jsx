@@ -32,11 +32,7 @@ export default function Accounts() {
   const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
-  const [showInitNew, setShowInitNew] = useState(true);
-  const [initNewName, setInitNewName] = useState('');
-  const [initNewAmt, setInitNewAmt] = useState('');
-  const [initNewDesc, setInitNewDesc] = useState('');
-  const [initNewType, setInitNewType] = useState('custom');
+  const [newAccs, setNewAccs] = useState([]);
   const [showCorrect, setShowCorrect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [trFrom, setTrFrom] = useState('');
@@ -179,11 +175,13 @@ export default function Accounts() {
           await supabase.from('accounts').update({balance:amt}).eq('id',acId);
         }
       }
-      // Новый счёт прямо из модалки первоначальных остатков
-      if (initNewName.trim()) {
-        await supabase.from('accounts').insert({user_id:user.id, name:initNewName.trim(), type:initNewType, balance:parseFloat(initNewAmt)||0, description:initNewDesc.trim() || null});
+      // Новые счета из модалки — каждый добавляется строкой «+ Добавить счёт»
+      for (var na of newAccs) {
+        if (na.name && na.name.trim()) {
+          await supabase.from('accounts').insert({user_id:user.id, name:na.name.trim(), type:na.type||'custom', balance:parseFloat(na.amt)||0, description:(na.desc||'').trim() || null});
+        }
       }
-      setShowInit(false); setInitAmts({}); setInitNewName(''); setInitNewAmt(''); setInitNewDesc(''); setInitNewType('custom');
+      setShowInit(false); setInitAmts({}); setNewAccs([]);
       await fetchAccounts();
     } catch(err) {alert(err.message);}
   };
@@ -209,7 +207,7 @@ export default function Accounts() {
       <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
         <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto'}}>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-            onClick={()=>{setInitAmts({});setShowInit(true)}}>Начальные остатки</span>
+            onClick={()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}}>Начальные остатки</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
             onClick={()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#e65100',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
@@ -369,25 +367,36 @@ export default function Accounts() {
               )}
               {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
-                <button type="button" onClick={()=>setShowInitNew(!showInitNew)}
-                  style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,marginBottom:'.5rem',fontFamily:'inherit',fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',lineHeight:1,fontWeight:400}}>
-                  {showInitNew ? '− Скрыть добавление' : '+ Добавить счёт'}
-                </button>
-                {showInitNew && (<>
-                <div style={{display:'flex',gap:'.5rem'}}>
-                  <input placeholder="Название (Карта, Перевод…)" value={initNewName} onChange={e=>setInitNewName(e.target.value)} style={{flex:1}} />
-                  <input type="number" placeholder="Остаток" min="0" step="0.01" value={initNewAmt} onChange={e=>setInitNewAmt(e.target.value)} style={{width:'110px'}} />
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.5rem'}}>
+                  <label style={{margin:0}}>Новые счета</label>
+                  <button type="button" onClick={()=>setNewAccs([...newAccs, {name:'',amt:'',desc:'',type:'custom'}])}
+                    style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,fontFamily:'inherit',fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',lineHeight:1,fontWeight:400}}>
+                    + Добавить счёт
+                  </button>
                 </div>
-                <input placeholder="Комментарий (необязательно)" value={initNewDesc} onChange={e=>setInitNewDesc(e.target.value)} style={{marginTop:'.5rem',width:'100%'}} />
-                <select value={initNewType} onChange={e=>setInitNewType(e.target.value)} style={{marginTop:'.5rem',width:'100%'}}>
-                  {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
-                </select>
-                </>)}
+                {newAccs.map(function(na, idx){
+                  return (
+                    <div key={idx} style={{padding:'.5rem 0',borderTop:'1px solid var(--border)'}}>
+                      <div style={{display:'flex',gap:'.5rem'}}>
+                        <input placeholder="Название (Карта, Перевод…)" value={na.name} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],name:e.target.value};setNewAccs(r);}} style={{flex:1}} />
+                        <input type="number" placeholder="Остаток" min="0" step="0.01" value={na.amt} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],amt:e.target.value};setNewAccs(r);}} style={{width:'100px'}} />
+                        <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
+                      </div>
+                      <input placeholder="Комментарий (необязательно)" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
+                      <select value={na.type} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}}>
+                        {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                      </select>
+                    </div>
+                  );
+                })}
+                {newAccs.length === 0 && (
+                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Нажмите «+ Добавить счёт», чтобы завести ещё один. Все счета сохранятся кнопкой «Сохранить».</div>
+                )}
               </div>
               )}
               <div className="modal-actions">
                 {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (<>
-                  <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Пропустить</button>
+                  <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
                   <button type="submit" className="btn btn-primary">Сохранить</button>
                 </>)}
                 {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
