@@ -124,7 +124,7 @@ export default function Accounts() {
   var isSys = (ac) => systemIds.has(ac?.id);
   var hasAct = (ac) => (transactions||[]).some(t=>t.account_id===ac.id);
 
-  var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
+  var openAdd = () => { setEditingId(null); setModalName(''); setModalType('custom'); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
   var openEdit = (ac) => {
     if (hasAct(ac)) return setToast('⚠️ Нельзя редактировать счет — на нем есть движения');
     setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setModalDesc(ac.description||''); setShowModal(true);
@@ -139,7 +139,7 @@ export default function Accounts() {
         if (up.error) { alert(up.error.message); return; }
         setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim(), description:modalDesc.trim()||''}:a));
       } else {
-        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:'custom',balance:ib, description:modalDesc.trim()||''}).select();
+        var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib, description:modalDesc.trim()||''}).select();
         if (ins.error) { alert(ins.error.message); return; }
       }
       await fetchAccounts();
@@ -298,6 +298,14 @@ export default function Accounts() {
                 <label>Комментарий</label>
                 <input type="text" placeholder="Например: основная касса в магазине" value={modalDesc} onChange={e=>setModalDesc(e.target.value)} />
               </div>
+              {!editingId && (
+                <div className="form-group">
+                  <label>Тип счёта</label>
+                  <select value={modalType} onChange={e=>setModalType(e.target.value)}>
+                    {ACC_TYPES.map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                  </select>
+                </div>
+              )}
               {!editingId && (
                 <div className="form-group">
                   <label>Начальный остаток (₽)</label>
