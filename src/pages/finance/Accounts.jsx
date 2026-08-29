@@ -121,7 +121,7 @@ export default function Accounts() {
     } catch(e) { return ACC_TYPES.find(x => x.type === ac.type); }
   };
   var isSys = (ac) => systemIds.has(ac?.id);
-  var hasAct = (ac) => parseFloat(ac.balance)>0||(transactions||[]).some(t=>t.account_id===ac.id);
+  var hasAct = (ac) => (transactions||[]).some(t=>t.account_id===ac.id);
 
   var openAdd = () => { setEditingId(null); setModalName(''); setModalType('cash'); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
   var openEdit = (ac) => {
