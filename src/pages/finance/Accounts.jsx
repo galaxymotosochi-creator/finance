@@ -342,7 +342,7 @@ export default function Accounts() {
 
       <Modal open={showInit} onClose={()=>setShowInit(false)} title="Введите первоначальные остатки" subtitle="Введите балансы всех счетов вашего бизнеса — если нужно, добавьте новый. На отчёты не повлияет" width="medium">
             <form onSubmit={saveInit}>
-              {sorted.filter(a => !isSys(a) || parseFloat(a.balance)===0).map(a => {
+              {sorted.filter(a => parseFloat(a.balance)===0).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
                 return (
                   <div key={a.id} className="form-group">
@@ -353,6 +353,11 @@ export default function Accounts() {
                   </div>
                 );
               })}
+              {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
+                <div style={{padding:'.5rem 0',fontSize:'.82rem',color:'var(--muted)'}}>
+                  Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку».
+                </div>
+              )}
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
                 <label>+ Добавить счёт</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
