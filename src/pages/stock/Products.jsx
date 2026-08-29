@@ -277,14 +277,15 @@ export default function Products() {
   const confirmRemove = async () => {
     if (!removeTarget) return;
     const id = removeTarget;
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) { setShowRemoveModal(false); return alert(error.message); }
+    // Только после успешного удаления — в корзину восстановления
     let trash = getTrash();
     const { data: items } = await supabase.from("products").select("*").eq("id", id);
     if (items && items[0]) {
       trash.unshift({ ...items[0], deletedAt: Date.now() });
       setTrash(trash);
     }
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) { setShowRemoveModal(false); return alert(error.message); }
     load();
     showToast('Товар успешно удалён!');
     setShowRemoveModal(false);

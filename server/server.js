@@ -535,6 +535,35 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE category_id = $1 LIMIT 1', [id]);
       if (tx.length > 0) return res.status(400).json({ error: 'Категория используется в операциях — удалить нельзя' });
     }
+    // Защита связанных данных: клиент с чеками, товар в чеках/закупках, сотрудник в зарплате и т.д.
+    if (table === 'clients') {
+      const { rows } = await pool.query('SELECT id FROM receipts WHERE client_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      if (rows.length > 0) return res.status(400).json({ error: 'Нельзя удалить клиента — у него есть чеки. Сначала удалите или переназначьте чеки' });
+    }
+    if (table === 'products') {
+      const { rows: ri } = await pool.query('SELECT id FROM receipt_items WHERE product_id = $1 LIMIT 1', [id]);
+      if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — он есть в чеке. Можно скрыть его в каталоге' });
+      const { rows: wo } = await pool.query('SELECT id FROM writeoffs WHERE product_id::text = $1 LIMIT 1', [id]);
+      if (wo.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — по нему есть списания со склада' });
+      const { rows: sp } = await pool.query('SELECT id FROM supplies, jsonb_array_elements(items) it WHERE user_id = $2 AND it->>\'prodId\' = $1 LIMIT 1', [id, req.user.id]);
+      if (sp.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — он есть в закупках' });
+    }
+    if (table === 'employees') {
+      const { rows: s } = await pool.query('SELECT id FROM salary WHERE employee_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      if (s.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — по нему есть зарплатные начисления' });
+      const { rows: t } = await pool.query('SELECT id FROM timesheet_entries WHERE employee_id::text = $1 LIMIT 1', [id]);
+      if (t.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — по нему есть записи в табеле' });
+      const { rows: ri } = await pool.query('SELECT id FROM receipt_items WHERE employee_id = $1 LIMIT 1', [id]);
+      if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — он участвует в продажах' });
+    }
+    if (table === 'suppliers') {
+      const { rows: sp } = await pool.query('SELECT id FROM supplies WHERE supplier_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      if (sp.length > 0) return res.status(400).json({ error: 'Нельзя удалить поставщика — есть закупки от него' });
+    }
+    if (table === 'promos') {
+      const { rows: ri } = await pool.query('SELECT id FROM receipt_items WHERE promo_id = $1 LIMIT 1', [id]);
+      if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить акцию — она применялась в продажах' });
+    }
     if (cols.has('user_id')) {
       await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     } else {

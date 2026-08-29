@@ -136,7 +136,9 @@ export default function Promos() {
 
   const del = async (id) => {
     if (!confirm('Удалить акцию?')) return;
-    await supabase.from('promos').delete().eq('id', id); load();
+    const { error } = await supabase.from('promos').delete().eq('id', id);
+    if (error) return alert(error.message);
+    load();
   };
 
   const loadStats = async (promo) => {
