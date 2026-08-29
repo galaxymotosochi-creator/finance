@@ -258,7 +258,7 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left' }}>
                   {(() => {
                     const remain = receiptRemain(r);
-                    const paySt = r.status === 'paid' ? 'Оплачено' : (r.status === 'partially_paid' ? 'Частично (' + remain.toLocaleString() + ' ₽)' : 'Не оплачено (' + remain.toLocaleString() + ' ₽)');
+                    const paySt = r.status === 'paid' ? 'Оплачено' : 'Долг ' + remain.toLocaleString() + ' ₽';
                     const payColor = r.status === 'paid' ? '#16a34a' : (r.status === 'partially_paid' ? '#d97706' : '#dc2626');
                     return (
                       <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid') { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
