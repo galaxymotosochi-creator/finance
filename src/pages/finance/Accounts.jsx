@@ -370,7 +370,7 @@ export default function Accounts() {
               {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
                 <button type="button" onClick={()=>setShowInitNew(!showInitNew)}
-                  style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,marginBottom:'.5rem',fontFamily:'inherit',fontSize:'.72rem',color:'#555',cursor:'pointer',lineHeight:1,fontWeight:400}}>
+                  style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,marginBottom:'.5rem',fontFamily:'inherit',fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',lineHeight:1,fontWeight:400}}>
                   {showInitNew ? '− Скрыть добавление' : '+ Добавить счёт'}
                 </button>
                 {showInitNew && (<>
