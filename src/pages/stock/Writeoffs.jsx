@@ -22,12 +22,17 @@ export default function Writeoffs() {
 
   const load = async () => {
     setLoading(true);
-    const [wRes, pRes] = await Promise.all([
-      supabase.from('writeoffs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-    ]);
-    if (wRes.data) setList(wRes.data);
-    if (pRes.data) setProducts(pRes.data);
+    try {
+      const [wRes, pRes] = await Promise.all([
+        supabase.from('writeoffs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+      ]);
+      if (wRes.error) throw wRes.error;
+      if (wRes.data) setList(wRes.data);
+      if (pRes.data) setProducts(pRes.data);
+    } catch (e) {
+      alert('Ошибка загрузки списаний: ' + (e.message || 'неизвестная ошибка'));
+    }
     setLoading(false);
   };
 
@@ -50,12 +55,27 @@ export default function Writeoffs() {
     setFDate(new Date().toISOString().split('T')[0]); setShow(true);
   };
 
-  const getStock = async (prodId) => {
-    const { data: supplies } = await supabase.from('supplies').select('items').eq('user_id', user.id);
-    const { data: writeoffs } = await supabase.from('writeoffs').select('quantity,product_id').eq('user_id', user.id);
-    let inQty = 0; (supplies||[]).forEach(s => (s.items||[]).forEach(it => { if (it.prodId == prodId) inQty += it.qty||0; }));
-    let outQty = 0; (writeoffs||[]).forEach(w => { if (w.product_id == prodId) outQty += w.quantity||0; });
-    return inQty - outQty;
+  const getStockData = async (prodId) => {
+    const [supRes, woRes, initRes] = await Promise.all([
+      supabase.from('supplies').select('items').eq('user_id', user.id),
+      supabase.from('writeoffs').select('quantity,product_id').eq('user_id', user.id),
+      supabase.from('initial_stocks').select('*').eq('user_id', user.id).single()
+    ]);
+    let inQty = 0, inCost = 0;
+    (supRes.data || []).forEach(s => (s.items || []).forEach(it => {
+      if (it.prodId == prodId) { inQty += it.qty || 0; inCost += (it.cost || 0) * (it.qty || 0); }
+    }));
+    // Начальные остатки тоже учитываем (иначе товар только из них — «на складе 0»)
+    const initial = initRes.data;
+    if (initial && initial.done && initial.items && initial.items[prodId]) {
+      const q = parseInt(initial.items[prodId]) || 0;
+      const c = (initial.costs && parseInt(initial.costs[prodId])) || 0;
+      inQty += q; inCost += c * q;
+    }
+    let outQty = 0;
+    // quantity из БД приходит строкой (numeric) — без Number будет конкатенация («3»+«2»=«32»)
+    (woRes.data || []).forEach(w => { if (w.product_id == prodId) outQty += Number(w.quantity) || 0; });
+    return { stock: inQty - outQty, avgCost: inQty > 0 ? Math.round(inCost / inQty) : 0 };
   };
 
   const save = async (e) => {
@@ -65,26 +85,34 @@ export default function Writeoffs() {
     const qty = parseInt(fQty) || 1;
     if (qty <= 0) return alert('Введите количество');
     const prod = products.find(p => p.id === prodId);
-    const cost = prod ? (prod.price || 0) : 0;
 
-    // Проверяем остаток
-    const stock = await getStock(prodId);
+    // Проверяем остаток (с учётом текущего списания при редактировании)
+    const data = await getStockData(prodId);
+    const curQty = editId ? (Number(list.find(x => x.id === editId)?.quantity) || 0) : 0;
+    const stock = data.stock + curQty;
     if (stock < qty) {
-      setToast('На складе ' + stock + ' шт. Не удастся списать больше, чем есть на складе!');
+      setToast('На складе ' + Math.max(0, data.stock) + ' шт. Не удастся списать больше, чем есть на складе!');
       return;
     }
 
+    // Себестоимость — средняя из поставок/начальных остатков (раньше бралась розничная цена!)
+    const cost = data.avgCost || 0;
+
     if (editId) {
-      await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
+      const { error } = await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
+      if (error) return alert('Ошибка: ' + error.message);
     } else {
-      await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
+      const { error } = await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
+      if (error) return alert('Ошибка: ' + error.message);
     }
     await load(); setShow(false);
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить списание?')) return;
-    await supabase.from('writeoffs').delete().eq('id', id); await load();
+    const { error } = await supabase.from('writeoffs').delete().eq('id', id);
+    if (error) return alert('Ошибка удаления: ' + error.message);
+    await load();
   };
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
