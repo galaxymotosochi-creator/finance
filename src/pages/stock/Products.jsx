@@ -41,21 +41,6 @@ document.body.appendChild(c);
   }).catch(function(){alert('Ошибка загрузки сканера')});
 };
 
-  // Загрузка фото товара/услуги на сервер
-  const uploadPhoto = async (file) => {
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return alert('Файл больше 10 МБ');
-    try {
-      const fd = new FormData();
-      fd.append('photo', file);
-      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
-      const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (s.access_token || '') }, body: fd });
-      const d = await res.json();
-      if (d.url) { setFPhoto(d.url); showToast('Фото загружено'); }
-      else alert('Ошибка загрузки: ' + (d.error || 'неизвестная'));
-    } catch (e) { alert('Ошибка загрузки фото: ' + e.message); }
-  };
-
   const genBarcode = () => {
   let s = '';
   for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
@@ -263,6 +248,21 @@ export default function Products() {
     setFComboItems(p.combo_items || []);
     setFComboSearch('');
     setShowModal(true);
+  };
+
+  // Загрузка фото товара/услуги на сервер
+  const uploadPhoto = async (file) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) return alert('Файл больше 10 МБ');
+    try {
+      const fd = new FormData();
+      fd.append('photo', file);
+      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+      const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (s.access_token || '') }, body: fd });
+      const d = await res.json();
+      if (d.url) { setFPhoto(d.url); showToast('Фото загружено'); }
+      else alert('Ошибка загрузки: ' + (d.error || 'неизвестная'));
+    } catch (e) { alert('Ошибка загрузки фото: ' + e.message); }
   };
 
   const save = async (e) => {
