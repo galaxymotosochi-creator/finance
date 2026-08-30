@@ -34,6 +34,7 @@ export default function Supplies() {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
+  const [showModal, setShowModal] = useState(false); // модалка редактирования поставки
   const [expandedId, setExpandedId] = useState(null);
   const [showStatusConfirm, setShowStatusConfirm] = useState(null);
   const [showPay, setShowPay] = useState(false);
