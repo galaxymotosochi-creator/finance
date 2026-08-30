@@ -749,6 +749,13 @@ export default function Products() {
                 <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
                   {fPhoto ? (
                     <img src={fPhoto} alt="" style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'10px',border:'1px solid var(--border)',flexShrink:0}} />
+                  ) : uploading ? (
+                    /* Полоска загрузки — прямо в квадратике */
+                    <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',background:'#fafafa',flexShrink:0}}>
+                      <div style={{width:'70%',height:'4px',background:'#eee',borderRadius:'2px',overflow:'hidden',position:'relative'}}>
+                        <div style={{position:'absolute',top:0,left:0,height:'100%',width:'40%',background:'#111',borderRadius:'2px',animation:'loadbar 1s ease-in-out infinite'}} />
+                      </div>
+                    </div>
                   ) : (
                     <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.68rem',textAlign:'center',flexShrink:0}}>без фото</div>
                   )}
@@ -758,12 +765,6 @@ export default function Products() {
                   </label>
                   {fPhoto && !uploading && <button type="button" onClick={() => setFPhoto('')} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
                 </div>
-                {/* Бегущая полоска загрузки */}
-                {uploading && (
-                  <div style={{width:'100%',maxWidth:'220px',height:'4px',background:'#eee',borderRadius:'2px',overflow:'hidden',position:'relative',marginTop:'8px'}}>
-                    <div style={{position:'absolute',top:0,left:0,height:'100%',width:'40%',background:'#111',borderRadius:'2px',animation:'loadbar 1s ease-in-out infinite'}} />
-                  </div>
-                )}
               </div>
               <div className="form-row">
                 <div className="form-group">
