@@ -527,6 +527,12 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
       const { rows: oldRows } = await pool.query('SELECT name FROM stock_categories WHERE id = $1', [id]);
       if (oldRows.length && oldRows[0].name !== data.name) oldCatName = oldRows[0].name;
     }
+    // Запоминаем старое имя поставщика — после переименования обновим закупки
+    let oldSupplierName = null;
+    if (table === 'suppliers' && typeof data.name === 'string') {
+      const { rows: oldRows } = await pool.query('SELECT name FROM suppliers WHERE id = $1', [id]);
+      if (oldRows.length && oldRows[0].name !== data.name) oldSupplierName = oldRows[0].name;
+    }
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
     // jsonb-колонки (массивы объектов) сериализуем, как в POST — иначе PATCH падает с
     // «invalid input syntax for type json» (ломало редактирование комбо, смену кассира, права сотрудников, зарплату)
@@ -544,6 +550,10 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     // Переименование складской категории → обновляем товары/услуги этой категории
     if (oldCatName) {
       await pool.query('UPDATE products SET cat = $1 WHERE cat = $2 AND user_id = $3', [data.name, oldCatName, req.user.id]);
+    }
+    // Переименование поставщика → обновляем закупки (иначе статистика и защита теряют связь)
+    if (oldSupplierName) {
+      await pool.query('UPDATE supplies SET supplier_name = $1 WHERE supplier_name = $2 AND user_id = $3', [data.name, oldSupplierName, req.user.id]);
     }
     res.json(rows[0] || {});
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -598,7 +608,10 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — он участвует в продажах' });
     }
     if (table === 'suppliers') {
-      const { rows: sp } = await pool.query('SELECT id FROM supplies WHERE supplier_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      // Проверяем и по supplier_id, и по supplier_name (старые поставки пишут только имя)
+      const { rows: sup } = await pool.query('SELECT name FROM suppliers WHERE id = $1', [id]);
+      const supName = sup.length ? sup[0].name : null;
+      const { rows: sp } = await pool.query('SELECT id FROM supplies WHERE user_id = $2 AND (supplier_id = $1 OR (supplier_name IS NOT NULL AND supplier_name = $3)) LIMIT 1', [id, req.user.id, supName]);
       if (sp.length > 0) return res.status(400).json({ error: 'Нельзя удалить поставщика — есть закупки от него' });
     }
     if (table === 'promos') {

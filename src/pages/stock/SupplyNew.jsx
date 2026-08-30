@@ -19,6 +19,7 @@ export default function SupplyNew() {
   // Form fields
   const [supName, setSupName] = useState('');
   const [supCustom, setSupCustom] = useState('');
+  const [supId, setSupId] = useState(null); // id выбранного поставщика (для связи с закупками)
   const [invoice, setInvoice] = useState('');
   const now = useMemo(() => new Date(), []);
   const [dateStr, setDateStr] = useState(now.toISOString().split('T')[0]);
@@ -99,6 +100,8 @@ export default function SupplyNew() {
       id: Date.now(),
       user_id: user.id,
       supplier_name: supplier,
+      // supplier_id — чтобы защита удаления поставщика и статистика работали (раньше был только supplier_name)
+      supplier_id: supId || null,
       invoice: invoice.trim() || '—',
       date: dateStr,
       status: 'received',
@@ -195,7 +198,12 @@ export default function SupplyNew() {
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Поставщик</label>
           <div style={{ display: 'flex', gap: 6, maxWidth: 280 }}>
-            <select value={supName} onChange={e => { setSupName(e.target.value); if (e.target.value) setSupCustom(''); }}
+            <select value={supName} onChange={e => {
+              setSupName(e.target.value);
+              const sel = suppliers.find(s => s.name === e.target.value);
+              setSupId(sel ? sel.id : null);
+              if (e.target.value) setSupCustom('');
+            }}
               style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)', color: supName ? 'inherit' : '#999' }}>
               <option value="">Выберите поставщика</option>
               {suppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
