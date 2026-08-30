@@ -107,8 +107,15 @@ export default function Timesheet() {
     const de = getDayEntries(d);
     const hasBonus = de.some(e => (e.bonus_amount || 0) > 0);
     const hasDeduct = de.some(e => (e.deduct_amount || 0) > 0);
-    const hasSick = de.some(e => e.status === 'sick');
-    return { hasBonus, hasDeduct, hasSick };
+    // Цветные точки статусов: больничный, отпуск, прогул, удалёнка
+    const dots = [];
+    if (de.some(e => e.status === 'sick')) dots.push('#f97316');
+    if (de.some(e => e.status === 'vacation')) dots.push('#3b82f6');
+    if (de.some(e => e.status === 'absent')) dots.push('#111');
+    if (de.some(e => e.status === 'remote')) dots.push('#8b5cf6');
+    if (hasBonus) dots.push('#16a34a');
+    if (hasDeduct) dots.push('#dc2626');
+    return { hasBonus, hasDeduct, dots, hasEntries: de.length > 0 };
   };
 
   const openDay = (d, dateStr) => {
@@ -264,11 +271,11 @@ export default function Timesheet() {
                 if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
                 const stat = getDayStat(d);
                 return (
-                  <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}>
+                  <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}
+                    style={stat.hasEntries ? {background:'#f0fdf4'} : undefined}>
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
-                      {stat.hasBonus && <span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a'}} />}
-                      {stat.hasDeduct && <span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626',marginLeft:'2px'}} />}
+                      {stat.dots.map((c, idx) => <span key={idx} style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:c}} />)}
                     </div>
                   </div>
                 );
