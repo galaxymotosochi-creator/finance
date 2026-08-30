@@ -33,19 +33,44 @@ export default function Inventory() {
 
   const load = async () => {
     setLoading(true);
-    const [invRes, prodRes, supRes] = await Promise.all([
-      supabase.from('inventory').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('supplies').select('items').eq('user_id', user.id)
-    ]);
-    if (invRes.data) setList(invRes.data);
-    if (prodRes.data) setProducts(prodRes.data);
-    if (supRes.data) {
+    try {
+      const [invRes, prodRes, supRes, initRes, woRes] = await Promise.all([
+        supabase.from('inventory').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('initial_stocks').select('*').eq('user_id', user.id).single(),
+        supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id)
+      ]);
+      if (invRes.error) throw invRes.error;
+      if (invRes.data) setList(invRes.data);
+      if (prodRes.data) setProducts(prodRes.data);
+      // Остаток = поставки + начальные − списания (как в разделе «Остатки» и кассе)
       const map = {};
-      supRes.data.forEach(sp => {
-        (sp.items||[]).forEach(it => { if (!map[it.prodId]) map[it.prodId] = 0; map[it.prodId] += it.qty || 0; });
+      (supRes.data || []).forEach(sp => {
+        (sp.items||[]).forEach(it => {
+          if (!map[it.prodId]) map[it.prodId] = { qty: 0, cost: 0 };
+          map[it.prodId].qty += it.qty || 0;
+          map[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+        });
       });
-      setSupplies(Object.keys(map).map(k => ({ prodId: parseInt(k), qty: map[k] })));
+      const initial = initRes.data;
+      if (initial && initial.done && initial.items) {
+        Object.keys(initial.items).forEach(id => {
+          const q = parseInt(initial.items[id]) || 0;
+          const c = (initial.costs && parseInt(initial.costs[id])) || 0;
+          if (q > 0) {
+            if (!map[id]) map[id] = { qty: 0, cost: 0 };
+            map[id].qty += q;
+            map[id].cost += c * q;
+          }
+        });
+      }
+      (woRes.data || []).forEach(wo => {
+        if (map[wo.product_id]) map[wo.product_id].qty -= (Number(wo.quantity) || 0);
+      });
+      setSupplies(Object.keys(map).map(k => ({ prodId: parseInt(k), qty: Math.max(0, map[k].qty), cost: map[k].cost })));
+    } catch (e) {
+      alert('Ошибка загрузки инвентаризации: ' + (e.message || 'неизвестная ошибка'));
     }
     setLoading(false);
   };
@@ -67,13 +92,18 @@ export default function Inventory() {
   const startNew = async () => {
     const num = 'INV-' + String(list.length + 1).padStart(3, '0');
     const stockMap = {};
-    supplies.forEach(sp => { stockMap[sp.prodId] = sp.qty || 0; });
-    const items = products.filter(p => !p.hidden).map(p => ({
-      prodId: p.id, name: p.name, sku: p.sku || '',
-      cat: CAT_LABELS[p.cat] || p.cat || '',
-      expected: stockMap[p.id] || 0, actual: stockMap[p.id] || 0,
-      cost: parseFloat(p.costPrice) || 0
-    }));
+    supplies.forEach(sp => { stockMap[sp.prodId] = { qty: sp.qty || 0, cost: sp.cost || 0 }; });
+    const items = products.filter(p => !p.hidden).map(p => {
+      const st = stockMap[p.id] || { qty: 0, cost: 0 };
+      const qty = Math.max(0, st.qty);
+      // Средняя себестоимость из поставок/начальных остатков (у товара нет поля costPrice)
+      const cost = qty > 0 && st.cost > 0 ? Math.round(st.cost / qty) : 0;
+      return {
+        prodId: p.id, name: p.name, sku: p.sku || '',
+        cat: CAT_LABELS[p.cat] || p.cat || '',
+        expected: qty, actual: qty, cost
+      };
+    });
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
     const doc = {
       id: Date.now(), number: num, date: new Date().toISOString().split('T')[0],
@@ -81,7 +111,8 @@ export default function Inventory() {
       totals: { totalBefore, totalAfter: totalBefore, shortage: 0, surplus: 0, result: 0 }
     };
     const { error } = await supabase.from('inventory').insert({ id: doc.id, user_id: user.id, number: doc.number, date: doc.date, status: doc.status, items: doc.items, result: JSON.stringify(doc.totals) });
-    if (!error) { await load(); setEditing(doc); }
+    if (error) return alert('Ошибка: ' + error.message);
+    await load(); setEditing(doc);
   };
 
   const cancelEdit = async () => {
@@ -102,7 +133,8 @@ export default function Inventory() {
 
   const complete = async (id) => {
     const doc = editing; if (!doc) return;
-    await supabase.from('inventory').update({ items: doc.items, result: JSON.stringify(doc.totals), status: 'completed' }).eq('id', id);
+    const { error } = await supabase.from('inventory').update({ items: doc.items, result: JSON.stringify(doc.totals), status: 'completed' }).eq('id', id);
+    if (error) return alert('Ошибка: ' + error.message);
     setShowResult(doc);
   };
 
@@ -118,7 +150,8 @@ export default function Inventory() {
 
   const remove = async (id) => {
     if (!confirm('Удалить инвентаризацию?')) return;
-    await supabase.from('inventory').delete().eq('id', id);
+    const { error } = await supabase.from('inventory').delete().eq('id', id);
+    if (error) return alert('Ошибка удаления: ' + error.message);
     if (viewing?.id === id) setViewing(null);
     if (editing?.id === id) setEditing(null);
     await load();
@@ -190,13 +223,16 @@ export default function Inventory() {
               <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">📋</div><p>Инвентаризации не проводились</p>
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
             ) : list.map(inv => {
+              let totals = {};
+              try { totals = JSON.parse(inv.result || '{}'); } catch (e) {}
+              const result = totals.result ?? 0;
               const diffCount = inv.items.filter(it => it.actual !== it.expected).length;
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{(inv.totals?.result ?? 0) > 0 ? '+' : ''}{(inv.totals?.result ?? 0).toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{result > 0 ? '+' : ''}{result.toLocaleString()} ₽</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => view(inv.id)}>Открыть</span>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -232,7 +268,7 @@ export default function Inventory() {
                     <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
                     <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
                     <td style={{textAlign:'left'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} p</span></td>
+                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
                   </tr>;
                 })}
               </tbody>
