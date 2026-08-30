@@ -4,8 +4,11 @@ import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 export default function Transactions() {
+  const cur = getCurrencySymbol();
   const loc = useLocation();
   const { user } = useAuth();
   const { transactions, loading, add, remove, update, refresh } = useTransactions();
@@ -365,14 +368,14 @@ export default function Transactions() {
             <div style={{ height: '3px', background: '#4caf50' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Поступления</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{incomeTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{incomeTotal.toLocaleString()} {cur}</div>
             </div>
           </div>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#e53935' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Расходы</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{expenseTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{expenseTotal.toLocaleString()} {cur}</div>
             </div>
           </div>
 
@@ -380,7 +383,7 @@ export default function Transactions() {
             <div style={{ height: '3px', background: '#1e88e5' }}></div>
             <div style={{ padding: '12px 14px' }}>
               <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Баланс счетов</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111', textAlign:'center' }}>{balanceTotal.toLocaleString()} ₽</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111', textAlign:'center' }}>{balanceTotal.toLocaleString()} {cur}</div>
             </div>
           </div>
         </div>
@@ -412,7 +415,7 @@ export default function Transactions() {
                   <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[1]||'').slice(0,5) : '—'}</td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}</td>
                   <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
-                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} ₽
+                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}
                   </td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
@@ -498,14 +501,14 @@ export default function Transactions() {
                 <label>С какого счета</label>
                 <select value={trFrom} onChange={function(e){setTrFrom(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} ₽)</option>})}
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-group">
                 <label>На какой счет</label>
                 <select value={trTo} onChange={function(e){setTrTo(e.target.value)}} required>
                   <option value="">— выберите —</option>
-                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} ₽)</option>})}
+                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-group">
@@ -623,7 +626,7 @@ export default function Transactions() {
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--secondary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b.toLocaleString()})()} ₽</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b.toLocaleString()})()} {cur}</span>
                   </div>
                 );
               })}

@@ -2,6 +2,8 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const LD = [
   {id:'loyal',icon:'⭐',name:'Постоянный клиент',discount:5,condition:50000,desc:'Скидка 5% при покупках от 50 000₽',type:'accumulative',color:'#f59e0b',bg:'#fffbeb'},
@@ -15,6 +17,7 @@ const TYPE_LABELS = {constant:'Постоянная',accumulative:'📈 Нако
 const LD_IDS = new Set(LD.map(x => x.id));
 
 export default function Loyalty() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [allProgs, setAllProgs] = useState([]);
   const [idx, setIdx] = useState(0);
@@ -163,7 +166,7 @@ export default function Loyalty() {
                 <span className="loy-card-badge" style={{background:p.bg,color:p.color}}>{badge}</span>
                 <div className="loy-card-stat">
                   <span>💰 {p.discount ? p.discount+'%' : '—'}</span>
-                  {p.condition ? <span>📋 от {p.condition.toLocaleString()} ₽</span> : null}
+                  {p.condition ? <span>📋 от {p.condition.toLocaleString()} {cur}</span> : null}
                 </div>
               </div>
             );

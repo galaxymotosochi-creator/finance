@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 const ACTION_MAP = {
   ADD_INCOME: async (p, user) => {
@@ -47,7 +49,7 @@ const ACTION_MAP = {
     const expense = txs.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
     const profit = income - expense;
     const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
-    return `📊 Отчёт за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ₽\n- Расходы: −${expense.toLocaleString()} ₽\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`;
+    return `📊 Отчёт за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ${cur}\n- Расходы: −${expense.toLocaleString()} ${cur}\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ${cur}`;
   },
   GET_TIMESHEET_STATS: async (p, user) => {
     try {
@@ -112,9 +114,9 @@ const ACTION_MAP = {
         let text = `🎯 Бонусы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '🎯 Бонусов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `- ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()} ₽\n`;
+          text += `- ${name}: ${s.count} раз(а), всего +${s.sum.toLocaleString()} ${cur}\n`;
         });
-        text += `\nИтого: +${totalBonus.toLocaleString()} ₽`;
+        text += `\nИтого: +${totalBonus.toLocaleString()} ${cur}`;
         return text;
       }
 
@@ -129,9 +131,9 @@ const ACTION_MAP = {
         let text = `⚠️ Штрафы с ${from} по ${to}:\n`;
         if (Object.keys(empStats).length === 0) return '⚠️ Штрафов за этот период нет';
         Object.entries(empStats).forEach(([name, s]) => {
-          text += `- ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()} ₽\n`;
+          text += `- ${name}: ${s.count} раз(а), всего -${s.sum.toLocaleString()} ${cur}\n`;
         });
-        text += `\nИтого: -${totalDeduct.toLocaleString()} ₽`;
+        text += `\nИтого: -${totalDeduct.toLocaleString()} ${cur}`;
         return text;
       }
 
@@ -163,9 +165,9 @@ const ACTION_MAP = {
       });
       let text = `📊 Табель с ${from} по ${to}:\n`;
       Object.entries(empStats).forEach(([name, s]) => {
-        text += `- ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()} ₽, штрафы -${s.deduct.toLocaleString()} ₽\n`;
+        text += `- ${name}: ${s.worked} дн., бонусы +${s.bonus.toLocaleString()} ${cur}, штрафы -${s.deduct.toLocaleString()} ${cur}\n`;
       });
-      text += `\n📌 Всего: +${totalBonus.toLocaleString()} ₽ бонусов, -${totalDeduct.toLocaleString()} ₽ штрафов, ${workedDays} рабочих дней`;
+      text += `\n📌 Всего: +${totalBonus.toLocaleString()} ${cur} бонусов, -${totalDeduct.toLocaleString()} ${cur} штрафов, ${workedDays} рабочих дней`;
       return text;
     } catch (err) {
       return '❌ Ошибка загрузки табеля: ' + err.message;
@@ -179,15 +181,15 @@ const ACTION_MAP = {
     (txs||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
     let text = '💰 Баланс счетов:\n';
     let total = 0;
-    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `- ${a.name}: ${b.toLocaleString()} ₽\n`; total += b; });
-    text += `\n📊 Общий баланс: ${total.toLocaleString()} ₽`;
+    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `- ${a.name}: ${b.toLocaleString()} ${cur}\n`; total += b; });
+    text += `\n📊 Общий баланс: ${total.toLocaleString()} ${cur}`;
     return text;
   },
   GET_DEBTORS: async (p, user) => {
     const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true});
     if (!clients || clients.length === 0) return '✅ Нет должников';
     let text = '⚠️ Должники:\n';
-    clients.forEach(c => { text += `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ₽\n`; });
+    clients.forEach(c => { text += `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ${cur}\n`; });
     return text;
   },
   GET_STOCK: async (p, user) => {
@@ -219,7 +221,7 @@ const ACTION_MAP = {
     (items||[]).forEach(i => { const n = i.product_name||'Товар'; if (!top[n]) top[n] = {qty:0,rev:0}; top[n].qty += i.quantity||0; top[n].rev += i.total||0; });
     const sorted = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0, parseInt(p.limit)||5);
     let text = `🏆 Топ ${Math.min(sorted.length, parseInt(p.limit)||5)} товаров:\n`;
-    sorted.forEach(([name,v],i) => { text += `${i+1}. ${name}: ${v.qty} шт, ${v.rev.toLocaleString()} ₽\n`; });
+    sorted.forEach(([name,v],i) => { text += `${i+1}. ${name}: ${v.qty} шт, ${v.rev.toLocaleString()} ${cur}\n`; });
     return text;
   },
   GET_SHIFT_INFO: async (p, user) => {
@@ -254,13 +256,13 @@ const ACTION_MAP = {
       const monthIncome = prev.reduce((s,t) => s + Number(t.amount||0), 0);
       const avgPerDay = monthIncome / daysElapsed;
       const forecast = Math.round(avgPerDay * daysInMonth);
-      return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ₽\n(на основе ${monthIncome.toLocaleString()} ₽ за ${daysElapsed} дн.)`;
+      return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ${cur}\n(на основе ${monthIncome.toLocaleString()} ${cur} за ${daysElapsed} дн.)`;
     }
     const total = recs.reduce((s,r) => s + Number(r.total_amount||0), 0);
     const checksPerDay = recs.length / 30;
     const avgCheck = total / recs.length;
     const forecast = Math.round(avgCheck * checksPerDay * daysLeft + total);
-    return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ₽\nТекущая выручка: ${total.toLocaleString()} ₽\nСредний чек: ${Math.round(avgCheck).toLocaleString()} ₽`;
+    return `📊 Прогноз на месяц: ${forecast.toLocaleString()} ${cur}\nТекущая выручка: ${total.toLocaleString()} ${cur}\nСредний чек: ${Math.round(avgCheck).toLocaleString()} ${cur}`;
   },
 
   GET_ZERO_STOCK: async (p, user) => {
@@ -297,8 +299,8 @@ const ACTION_MAP = {
     clients.forEach(c => {
       text += `- ${c.name}`;
       if (c.phone) text += ` (${c.phone})`;
-      if (c.debt && Number(c.debt) < 0) text += ` долг: ${Math.abs(Number(c.debt)).toLocaleString()} ₽`;
-      if (c.total_spent && Number(c.total_spent) > 0) text += ` всего: ${Number(c.total_spent).toLocaleString()} ₽`;
+      if (c.debt && Number(c.debt) < 0) text += ` долг: ${Math.abs(Number(c.debt)).toLocaleString()} ${cur}`;
+      if (c.total_spent && Number(c.total_spent) > 0) text += ` всего: ${Number(c.total_spent).toLocaleString()} ${cur}`;
       text += '\n';
     });
     text += `\nВсего: ${clients.length}`;
@@ -312,7 +314,7 @@ const ACTION_MAP = {
     let text = '👥 Сотрудники:\n';
     emps.forEach(e => {
       text += `- ${e.name}${e.position ? ' — '+e.position : ''}`;
-      if (e.salary_value) text += ` (${e.salary_value.toLocaleString()} ₽${e.salary_type==='hourly'?'/час':'/мес'})`;
+      if (e.salary_value) text += ` (${e.salary_value.toLocaleString()} ${cur}${e.salary_type==='hourly'?'/час':'/мес'})`;
       text += '\n';
     });
     text += `\nВсего: ${emps.length}`;
@@ -327,7 +329,7 @@ const ACTION_MAP = {
     supplies.forEach(s => {
       const itemsTotal = (s.items||[]).reduce((sum,it) => sum + (it.qty||0), 0);
       const total = (s.items||[]).reduce((sum,it) => sum + (it.price||0)*(it.qty||0), 0);
-      text += `- ${s.supplier_name || 'Поставщик'} (${new Date(s.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ₽\n`;
+      text += `- ${s.supplier_name || 'Поставщик'} (${new Date(s.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ${cur}\n`;
     });
     return text;
   },
@@ -340,7 +342,7 @@ const ACTION_MAP = {
     wos.forEach(w => {
       const itemsTotal = (w.items||[]).reduce((sum,it) => sum + (it.qty||0), 0);
       const total = (w.items||[]).reduce((sum,it) => sum + (it.price||0)*(it.qty||0), 0);
-      text += `- ${w.reason || 'Причина не указана'} (${new Date(w.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ₽\n`;
+      text += `- ${w.reason || 'Причина не указана'} (${new Date(w.created_at).toLocaleDateString('ru-RU')}): ${itemsTotal} шт на ${total.toLocaleString()} ${cur}\n`;
     });
     return text;
   },
@@ -360,9 +362,9 @@ const ACTION_MAP = {
     let text = `💰 Операции за ${days===1?'сегодня':days===7?'неделю':days===30?'месяц':days+' дн.'}:\n`;
     txs.forEach(t => {
       const sign = t.type === 'income' ? '+' : '−';
-      text += `- ${sign}${Number(t.amount).toLocaleString()} ₽ — ${(t.description||'без описания').slice(0,40)}\n`;
+      text += `- ${sign}${Number(t.amount).toLocaleString()} ${cur} — ${(t.description||'без описания').slice(0,40)}\n`;
     });
-    text += `\nДоход: +${totalIncome.toLocaleString()} ₽\nРасход: −${totalExpense.toLocaleString()} ₽`;
+    text += `\nДоход: +${totalIncome.toLocaleString()} ${cur}\nРасход: −${totalExpense.toLocaleString()} ${cur}`;
     return text;
   },
 
@@ -382,7 +384,7 @@ const ACTION_MAP = {
       const profit = v.income - v.expense;
       const names = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
       const [y,mo] = m.split('-');
-      text += `- ${names[parseInt(mo)-1]} ${y}: +${v.income.toLocaleString()} ₽ / −${v.expense.toLocaleString()} ₽ = ${profit>=0?'+':''}${profit.toLocaleString()} ₽\n`;
+      text += `- ${names[parseInt(mo)-1]} ${y}: +${v.income.toLocaleString()} ${cur} / −${v.expense.toLocaleString()} ${cur} = ${profit>=0?'+':''}${profit.toLocaleString()} ${cur}\n`;
     });
     return text;
   },
@@ -455,6 +457,7 @@ const ACTION_MAP = {
 };
 
 export default function AiChat() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([

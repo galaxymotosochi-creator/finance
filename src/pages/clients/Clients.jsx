@@ -2,10 +2,13 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const getSales = async (userId) => { const { data } = await supabase.from('receipts').select('client_id, total_amount, status').eq('user_id', userId); return data || []; };
 
 export default function Clients() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
@@ -287,7 +290,7 @@ export default function Clients() {
 {(()=>{var editClient = clients.find(function(x){return x.id === editId;}); if(!editClient || !editClient.debt || editClient.debt >= 0) return null; return (
                 <div style={{marginBottom:'.5rem',borderTop:'1px solid #eee',paddingTop:'.5rem',display:'flex',justifyContent:'space-between',fontSize:'.82rem'}}>
                   <span style={{color:'#dc2626',fontWeight:600}}>Текущий долг</span>
-                  <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(editClient.debt).toLocaleString()} ₽</span>
+                  <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(editClient.debt).toLocaleString()} {cur}</span>
                 </div>
               )()})}
               <div className="modal-actions">

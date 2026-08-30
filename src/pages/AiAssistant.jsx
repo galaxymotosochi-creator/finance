@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { getReport, getWeeklyReport, getTopProducts, getZeroStock, getForecast, downloadExcel } from '../lib/aiActions';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 // ===== ДЕЙСТВИЯ AI (из AiChat.jsx) =====
 const ACTION_MAP = {
@@ -40,13 +42,13 @@ const ACTION_MAP = {
     if (!accts || accts.length === 0) return '📭 Нет счетов';
     const txById = {}; (txs||[]).forEach(t => { if (!txById[t.account_id]) txById[t.account_id] = 0; txById[t.account_id] += Number(t.amount||0) * (t.type==='income'?1:-1); });
     let text = '💰 Баланс счетов:\n'; let total = 0;
-    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `- ${a.name}: ${b.toLocaleString()} ₽\n`; total += b; });
-    text += `\n📊 Общий баланс: ${total.toLocaleString()} ₽`; return text;
+    accts.forEach(a => { const b = (parseFloat(a.balance)||0) + (txById[a.id]||0); text += `- ${a.name}: ${b.toLocaleString()} ${cur}\n`; total += b; });
+    text += `\n📊 Общий баланс: ${total.toLocaleString()} ${cur}`; return text;
   },
   GET_DEBTORS: async (p, user) => {
     const {data:clients} = await supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true});
     if (!clients?.length) return '✅ Нет должников';
-    return '⚠️ Должники:\n' + clients.map(c => `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ₽`).join('\n');
+    return '⚠️ Должники:\n' + clients.map(c => `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ${cur}`).join('\n');
   },
   GET_STOCK: async (p, user) => {
     const name = (p.product_name||'').toLowerCase().trim();
@@ -69,7 +71,7 @@ const ACTION_MAP = {
     const today = new Date().toISOString().split('T')[0];
     const {data:txs} = await supabase.from('transactions').select('amount').eq('user_id',user.id).eq('type','income').gte('date',today).not('description','ilike','%Перевод%');
     const sales = (txs||[]).reduce((s,t) => s + (t.amount||0), 0);
-    return `🗄️ Касса: ${shift.cashier_name || '—'}\nОткрыта: ${new Date(shift.opened_at).toLocaleString('ru-RU')}\nПродажи сегодня: +${sales.toLocaleString()} ₽`;
+    return `🗄️ Касса: ${shift.cashier_name || '—'}\nОткрыта: ${new Date(shift.opened_at).toLocaleString('ru-RU')}\nПродажи сегодня: +${sales.toLocaleString()} ${cur}`;
   },
   GET_FORECAST: async (p, user) => { const r = await getForecast(user); return r.text; },
 };
@@ -92,6 +94,7 @@ const QUICK_BUTTONS = [
 ];
 
 export default function AiAssistant() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [messages, setMessages] = useState([
     { role: 'assistant', text: '👋 Привет! Чем могу помочь?', data: null },

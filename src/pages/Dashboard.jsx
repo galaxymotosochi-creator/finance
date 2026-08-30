@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { fmtDate } from '../lib/dates';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function Dashboard() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('day');
@@ -153,11 +156,11 @@ export default function Dashboard() {
       {/* TOP 3 */}
       <div style={{display:'flex',gap:'10px',marginBottom:'12px'}}>
         <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{Number(d.salesRev||0).toLocaleString()} ₽</div></div>
+          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{Number(d.salesRev||0).toLocaleString()} {cur}</div></div>
         <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{Number(d.cogs||0).toLocaleString()} ₽</div></div>
+          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{Number(d.cogs||0).toLocaleString()} {cur}</div></div>
         <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{Number(d.totalCash||0).toLocaleString()} ₽</div></div>
+          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{Number(d.totalCash||0).toLocaleString()} {cur}</div></div>
       </div>
 
       {/* Счета | Долги */}
@@ -165,9 +168,9 @@ export default function Dashboard() {
         <div style={st}>Счета | Долги</div>
         <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
           {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
-            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{Number(a.balance||0).toLocaleString()} ₽</b></span>;
+            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{Number(a.balance||0).toLocaleString()} {cur}</b></span>;
           }):<span>Нет счетов</span>}
-          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{Number(d.debt||0).toLocaleString()} ₽</b></span>
+          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{Number(d.debt||0).toLocaleString()} {cur}</b></span>
         </div>
       </div>
 
@@ -184,7 +187,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div style={{textAlign:'right'}}>
-              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal||0).toLocaleString()} ₽</div>
+              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal||0).toLocaleString()} {cur}</div>
               <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.35)'}}>в кассе</div>
             </div>
           </div>
@@ -205,7 +208,7 @@ export default function Dashboard() {
               <tr key={i}>
                 <td style={{padding:'3px 3px',fontWeight:500}}>{r.client_name || 'Без имени'}</td>
                 <td style={{padding:'3px 3px',textAlign:'left',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{fmtDate(r.date)}</td>
-                <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} ₽</td>
+                <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} {cur}</td>
               </tr>
             ))}</tbody>
           </table>
@@ -232,8 +235,8 @@ export default function Dashboard() {
           ))}</tbody>
         </table>
         <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)',marginTop:'6px'}}>
-          <span>По закупке: <b>{Number(d.stockCost||0).toLocaleString()} ₽</b></span>
-          <span>В продаже: <b>{Number(d.stockRetail||0).toLocaleString()} ₽</b></span>
+          <span>По закупке: <b>{Number(d.stockCost||0).toLocaleString()} {cur}</b></span>
+          <span>В продаже: <b>{Number(d.stockRetail||0).toLocaleString()} {cur}</b></span>
         </div>
       </div>}
 
@@ -243,19 +246,19 @@ export default function Dashboard() {
         <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка план</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.revenue?d.planMap.revenue:0)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.revenue?d.planMap.revenue:0)).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{Number(d.monthRev||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{Number(d.monthRev||0).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.monthRev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
           <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль план</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
           <div style={{flex:1,background:d.monthProfit>=0?'#f0fdf4':'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{Number(d.monthProfit||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{Number(d.monthProfit||0).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':'нет плана'}</div></div>
         </div>
       </div>
@@ -269,7 +272,7 @@ export default function Dashboard() {
             <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.sold}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Ср.чек</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Number(d.avgCheck||0).toLocaleString()} ₽</div></div>
+            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Number(d.avgCheck||0).toLocaleString()} {cur}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Покуп.</div>
             <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.buyers}</div></div>
@@ -311,7 +314,7 @@ export default function Dashboard() {
           <tbody>{d.debtors.slice(0,5).map((c,i)=>(
             <tr key={i}>
               <td style={{padding:'3px'}}>{c.name}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{Math.abs(c.debt||0).toLocaleString()} ₽</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{Math.abs(c.debt||0).toLocaleString()} {cur}</td>
             </tr>
           ))}</tbody>
         </table>}
@@ -323,23 +326,23 @@ export default function Dashboard() {
         <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{(d.rev||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{(d.rev||0).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round((d.rev||0)*(period==='day'?0.8:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round((d.rev||0)*(period==='day'?0.8:1)).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'−20%':'—'}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round((d.rev||0)*(period==='day'?7:1)).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round((d.rev||0)*(period==='day'?7:1)).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+800%':'—'}</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{(d.rev||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>{(d.rev||0).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{((d.rev||0)*12).toLocaleString()} ₽</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{((d.rev||0)*12).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
         </div>
       </div>
@@ -357,7 +360,7 @@ export default function Dashboard() {
             const pct = totalExp>0?Math.round(amt/totalExp*100):0;
             return <tr key={i}>
               <td style={{padding:'3px'}}>{d.catMap[catId]||'Прочее'}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{amt.toLocaleString()} ₽</td>
+              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{amt.toLocaleString()} {cur}</td>
               <td style={{padding:'3px',textAlign:'left',color:'rgba(0,0,0,.5)'}}>{pct}%</td>
             </tr>;
           })}</tbody>

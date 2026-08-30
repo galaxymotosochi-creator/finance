@@ -2,11 +2,14 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const daysShort = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 export default function Promos() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [promos, setPromos] = useState([]);
   const [cal, setCal] = useState(new Date());
@@ -265,7 +268,7 @@ export default function Promos() {
                   </div>
                   <div style={{flex:1,background:'#fef2f2',borderRadius:'.5rem',padding:'.5rem .65rem',fontSize:'.78rem'}}>
                     <div style={{color:'var(--muted)'}}>Скидка</div>
-                    <div style={{fontWeight:700,fontSize:'1.1rem',color:'#dc2626'}}>-{stats.totalDiscount.toLocaleString()} ₽</div>
+                    <div style={{fontWeight:700,fontSize:'1.1rem',color:'#dc2626'}}>-{stats.totalDiscount.toLocaleString()} {cur}</div>
                   </div>
                 </div>
               )}

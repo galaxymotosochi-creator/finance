@@ -2,11 +2,14 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
 const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
 
 export default function Suppliers() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [suppliers, setSuppliersState] = useState([]);
   const [supplies, setSupplies] = useState([]);
@@ -125,7 +128,7 @@ export default function Suppliers() {
                   <td style={{textAlign:'left',color:'#555'}}>{s.phone||'—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}><span className="prod-cat">{label}</span></td>
                   <td style={{textAlign:'left',color:'#555'}}>{supplyCount}</td>
-                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{totalSum.toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {

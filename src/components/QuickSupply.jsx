@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function QuickSupply({ onClose }) {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -66,7 +69,7 @@ export default function QuickSupply({ onClose }) {
                 onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                 <span>{p.name}</span>
-                <span style={{fontWeight:600}}>{(p.price||0).toLocaleString()} ₽</span>
+                <span style={{fontWeight:600}}>{(p.price||0).toLocaleString()} {cur}</span>
               </div>
             ))}
           </div>
@@ -84,7 +87,7 @@ export default function QuickSupply({ onClose }) {
               ))}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0',paddingTop:'4px',display:'flex',justifyContent:'space-between',fontWeight:800}}>
                 <span>Итого:</span>
-                <span>{total.toLocaleString()} ₽</span>
+                <span>{total.toLocaleString()} {cur}</span>
               </div>
             </div>
           )}

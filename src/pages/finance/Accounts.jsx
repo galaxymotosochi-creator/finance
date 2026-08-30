@@ -2,6 +2,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const ACC_TYPES = [
   { type: 'cash', icon: '💵', label: 'Наличные' },
@@ -18,6 +20,7 @@ const ACC_TYPES = [
 const SYSTEM_KEY = 'systemAccountIds';
 
 export default function Accounts() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -220,7 +223,7 @@ export default function Accounts() {
       {!loading && initDone && (
         <>
           <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px',width:'fit-content'}}>
-            <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} ₽</div>
+            <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} {cur}</div>
           </div>
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table className="data-table">
@@ -250,10 +253,10 @@ export default function Accounts() {
                           </div>
                         </div>
                       </td>
-                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} ₽</td>
-                      <td style={{textAlign:'left',color:'#555'}}>+{mv.i.toLocaleString()} ₽</td>
-                      <td style={{textAlign:'left',color:'#555'}}>−{mv.e.toLocaleString()} ₽</td>
-                      <td style={{textAlign:'left',color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} ₽</td>
+                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>+{mv.i.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>−{mv.e.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -274,10 +277,10 @@ export default function Accounts() {
                   return (
                   <tr className="total-row">
                     <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
-                    <td style={{textAlign:'left',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} ₽</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} ₽</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} ₽</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} ₽</td>
+                    <td style={{textAlign:'left',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
                     <td></td>
                   </tr>
                   );
@@ -432,7 +435,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{t.type==='income'?'Доход':'Расход'}</span>
                           </td>
-                          <td style={{textAlign:'left',color:'#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} ₽</td>
+                          <td style={{textAlign:'left',color:'#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>
                         </tr>
                       );
                     });
@@ -493,7 +496,7 @@ export default function Accounts() {
         return (<>
               <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
                 <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
-                <span style={{fontWeight:700}}>{cashRegBal.toLocaleString()} ₽</span>
+                <span style={{fontWeight:700}}>{cashRegBal.toLocaleString()} {cur}</span>
               </div>
               <form onSubmit={async function(e){
                 e.preventDefault();

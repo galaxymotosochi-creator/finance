@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 
 
@@ -22,6 +24,7 @@ function recalcTotals(doc) {
 }
 
 export default function Inventory() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
@@ -197,7 +200,7 @@ export default function Inventory() {
                       <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
                       <td style={{textAlign:'left'}}><span className="num">{it.actual}</span></td>
                       <td style={{textAlign:'left'}}><span className="num">{d>0?'+':''}{d}</span></td>
-                      <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
+                      <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} {cur}</span></td>
                     </tr>;
                   })}
                 </tbody>
@@ -232,7 +235,7 @@ export default function Inventory() {
                   <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{result > 0 ? '+' : ''}{result.toLocaleString()} ₽</span></td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{result > 0 ? '+' : ''}{result.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => view(inv.id)}>Открыть</span>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
@@ -268,7 +271,7 @@ export default function Inventory() {
                     <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
                     <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
                     <td style={{textAlign:'left'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} ₽</span></td>
+                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} {cur}</span></td>
                   </tr>;
                 })}
               </tbody>

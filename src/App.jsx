@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
+import { supabase } from './lib/supabase';
+import { resetCurrencyCache } from './lib/currency';
 import AppLayout from './layouts/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -112,7 +114,27 @@ function AppRoutes() {
 const pageLoader = <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#999',fontSize:'.85rem'}}>Загрузка…</div>;
 
 export default function App() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
+  // При старте подтягиваем настройки профиля (валюта и др.) в localStorage —
+  // чтобы они работали во всех разделах ещё до открытия настроек
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await supabase.from('user_profiles').select('settings').eq('user_id', user.id).maybeSingle();
+        if (data && data.settings) {
+          const s = data.settings;
+          localStorage.setItem('settings_company', JSON.stringify(s.company || {}));
+          localStorage.setItem('settings_country', s.country || 'Россия');
+          localStorage.setItem('settings_lang', s.lang || 'Русский');
+          localStorage.setItem('settings_currency', s.currency || 'RUB');
+          localStorage.setItem('settings_tz', s.timezone || 'Europe/Moscow');
+          localStorage.setItem('settings_notifications', JSON.stringify(s.notifications || {}));
+          resetCurrencyCache();
+        }
+      } catch (e) {}
+    })();
+  }, [user]);
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
   return <ErrorBoundary><BrowserRouter><Suspense fallback={pageLoader}><AppRoutes /></Suspense></BrowserRouter></ErrorBoundary>;
 }

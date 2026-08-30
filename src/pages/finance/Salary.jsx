@@ -2,6 +2,8 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
 const STATUS_COLORS = {accrued:'#2563eb',paid:'#16a34a',cancelled:'#dc2626'};
@@ -43,6 +45,7 @@ function calcDays(from,to){
 const fmtDate = (ds) => { if(!ds) return ''; var p=ds.split('-'); return p.length===3?p[2]+'.'+p[1]:ds; };
 
 export default function Salary() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [list, setList] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -328,7 +331,7 @@ export default function Salary() {
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} ₽</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} {cur}</td>
                 <td style={{textAlign:'left',color:'#555'}}>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
                       style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
@@ -405,7 +408,7 @@ export default function Salary() {
               <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden'}}>
                 <div style={{padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <span style={{fontSize:'.78rem',fontWeight:600,color:'#16a34a'}}>Премии из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()} ₽</span>
+                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()} {cur}</span>
                 </div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsBonuses.length === 0 ? (
@@ -428,7 +431,7 @@ export default function Salary() {
                                 </span>
                               </td>
                               <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--body-color)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>+{Number(e.bonus_amount).toLocaleString()} ₽</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#16a34a',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>+{Number(e.bonus_amount).toLocaleString()} {cur}</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{e.bonus_comment||'—'}</td>
                             </tr>
                           ))}
@@ -448,7 +451,7 @@ export default function Salary() {
               <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden'}}>
                 <div style={{padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <span style={{fontSize:'.78rem',fontWeight:600,color:'#dc2626'}}>Штрафы из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()} ₽</span>
+                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()} {cur}</span>
                 </div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsDeducts.length === 0 ? (
@@ -471,7 +474,7 @@ export default function Salary() {
                                 </span>
                               </td>
                               <td style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--body-color)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{fmtDate(e.date)}</td>
-                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>-{Number(e.deduct_amount).toLocaleString()} ₽</td>
+                              <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#dc2626',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>-{Number(e.deduct_amount).toLocaleString()} {cur}</td>
                               <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{e.deduct_comment||'—'}</td>
                             </tr>
                           ))}
@@ -491,8 +494,8 @@ export default function Salary() {
               {existingDebt !== 0 && (
                 <div style={{background:'#fffbeb',border:'1px solid #f59e0b',borderRadius:'10px',padding:'.5rem .65rem',fontSize:'.78rem',display:'flex',gap:'.5rem',alignItems:'center'}}>
                   <span style={{color:'#f59e0b',fontWeight:700}}>⚠</span>
-                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()} ₽</b>
-                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()} ₽</span>
+                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()} {cur}</b>
+                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()} {cur}</span>
                   </span>
                 </div>
               )}
@@ -502,7 +505,7 @@ export default function Salary() {
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
                   {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(parts.length===3)return parts[0]+' + '+parts[1]+' − '+parts[2];if(parts.length===2&&parts[1].includes('Штраф'))return parts[0]+' − '+parts[1];return parts.join(' + ');})()}
                 </div>
-                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} ₽</div>
+                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} {cur}</div>
               </div>
 
               {/* Кнопки */}
@@ -510,7 +513,7 @@ export default function Salary() {
                 <span style={{fontSize:'.72rem',color:'var(--muted)'}}>Статус: Начислено (выплата — через кнопку «Выплатить» со счёта)</span>
                 <button type="submit"
                   style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
-                  {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} ₽
+                  {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}
                 </button>
               </div>
 
@@ -530,7 +533,7 @@ export default function Salary() {
                     onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
                     onMouseLeave={e=>{e.currentTarget.style.background='var(--body-bg)';e.currentTarget.style.borderColor='var(--border)'}}>
                     <span style={{fontWeight:500}}>{a.name}</span>
-                    <span style={{marginLeft:'auto',color:'#111'}}>{Number(a.balance||0).toLocaleString()} ₽</span>
+                    <span style={{marginLeft:'auto',color:'#111'}}>{Number(a.balance||0).toLocaleString()} {cur}</span>
                   </div>
                 )) : accsList.map(a => (
                   <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>

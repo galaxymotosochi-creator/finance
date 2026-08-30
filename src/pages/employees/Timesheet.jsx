@@ -2,6 +2,8 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const STATUS_OPTS = [
   { value: 'present', label: 'Работал' },
@@ -27,6 +29,7 @@ const PERIOD_OPTS = [
 const fmtShort = (ds) => { if (!ds) return ''; const p = ds.split('-'); return p.length === 3 ? p[2] + '.' + p[1] : ds; };
 
 export default function Timesheet() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [entries, setEntries] = useState([]);
@@ -435,7 +438,7 @@ export default function Timesheet() {
                         style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateBonusRow(idx,'comment',e.target.value)} placeholder="За что"
                         style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()} ₽</span>}
+                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()} {cur}</span>}
                     </div>
                   );
                 })}
@@ -464,7 +467,7 @@ export default function Timesheet() {
                         style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateDeductRow(idx,'comment',e.target.value)} placeholder="За что"
                         style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()} ₽</span>}
+                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()} {cur}</span>}
                     </div>
                   );
                 })}
@@ -478,8 +481,8 @@ export default function Timesheet() {
               if (tb === 0 && td === 0) return null;
               return (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px',fontSize:'.85rem',marginBottom:'.75rem'}}>
-                  <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()} ₽</b></span>
-                  <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()} ₽</b></span>
+                  <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()} {cur}</b></span>
+                  <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()} {cur}</b></span>
                 </div>
               );
             })()}

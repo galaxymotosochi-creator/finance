@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 export default function SupplyNew() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -234,7 +237,7 @@ export default function SupplyNew() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', background: 'var(--body-bg)' }}>
                 {payments.map((p, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.78rem' }}>
-                    <span style={{ fontWeight: 600 }}>{Number(p.amount).toLocaleString()} ₽</span>
+                    <span style={{ fontWeight: 600 }}>{Number(p.amount).toLocaleString()} {cur}</span>
                     <span style={{ color: 'var(--muted)' }}>— {p.method}</span>
                     <span onClick={e => { e.stopPropagation(); setPayments(prev => prev.filter((_, j) => j !== i)); }} style={{ marginLeft: 'auto', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</span>
                   </div>
@@ -264,7 +267,7 @@ export default function SupplyNew() {
                 <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Счёт</label>
                 <select id="payMethod" style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
                   <option value="">Выберите счёт</option>
-                  {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Number(a.balance||0).toLocaleString()} ₽</option>)}
+                  {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Number(a.balance||0).toLocaleString()} {cur}</option>)}
                 </select>
               </div>
               <button onClick={() => {
@@ -363,7 +366,7 @@ export default function SupplyNew() {
                         <input type="number" value={it.cost} onChange={e => updateItemCost(i, e.target.value)}
                           style={{ width: 70, padding: '.2rem .3rem', border: '1px solid var(--border)', borderRadius: 6, fontSize: '.78rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }} />
                       </td>
-                      <td style={{ padding: '.35rem .5rem', textAlign: 'right', fontWeight: 600 }}>{it.sum.toLocaleString()} ₽</td>
+                      <td style={{ padding: '.35rem .5rem', textAlign: 'right', fontWeight: 600 }}>{it.sum.toLocaleString()} {cur}</td>
                       <td style={{ padding: '.35rem .5rem', textAlign: 'center' }}>
                         <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '.8rem' }}>✕</button>
                       </td>
@@ -379,15 +382,15 @@ export default function SupplyNew() {
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 32, padding: '.6rem 0', borderTop: '2px solid var(--border)', marginTop: 4 }}>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '.72rem', color: 'var(--muted)' }}>К оплате</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{totalSum.toLocaleString()} ₽</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{totalSum.toLocaleString()} {cur}</div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '.72rem', color: 'var(--muted)' }}>Итого</div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: totalPaid > 0 && totalPaid >= totalSum ? '#16a34a' : '#111' }}>
-              {totalPaid > 0 ? `${totalPaid.toLocaleString()} ₽` : `${totalSum.toLocaleString()} ₽`}
+              {totalPaid > 0 ? `${totalPaid.toLocaleString()} ${cur}` : `${totalSum.toLocaleString()} ${cur}`}
             </div>
             {totalPaid > 0 && totalPaid < totalSum && (
-              <div style={{ fontSize: '.72rem', color: '#d97706' }}>Долг: {(totalSum - totalPaid).toLocaleString()} ₽</div>
+              <div style={{ fontSize: '.72rem', color: '#d97706' }}>Долг: {(totalSum - totalPaid).toLocaleString()} {cur}</div>
             )}
           </div>
         </div>

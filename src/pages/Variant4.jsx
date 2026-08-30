@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { getCurrencySymbol } from '../lib/currency';
+
 export default function Variant4() {
+  const cur = getCurrencySymbol();
   const n = useNavigate();
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",background:"#fafafa"}}>

@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 
 const SUPPLY_STATUSES = ['ordered','transit','received'];
@@ -21,6 +23,7 @@ function getPayStatus(s) {
 }
 
 export default function Supplies() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [paySplit, setPaySplit] = useState(false);
@@ -382,12 +385,12 @@ const load = async () => {
                             <div key={i} style={{display:"flex",fontSize:".78rem",color:"#222",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
                               <span style={{flex:1}}>{it.name}</span>
                               <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
-                              <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} ₽</span>
+                              <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} {cur}</span>
                             </div>
                           ))}
                           <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",color:"#222",fontWeight:500,paddingTop:"8px",marginTop:"0"}}>
                             <span>Итого:</span>
-                            <span>{total.toLocaleString()} ₽</span>
+                            <span>{total.toLocaleString()} {cur}</span>
                           </div>
                         </div>
                       </td>
@@ -490,9 +493,9 @@ const load = async () => {
         return (<>
               <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',marginBottom:'12px',fontSize:'.78rem',lineHeight:2}}>
                 <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Поставщик:</span><span style={{fontSize:'.78rem',color:'#222'}}>{s.supplier_name || s.invoice || '—'}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString()} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Уже оплачено:</span><span style={{fontSize:'.78rem',color:'#222'}}>{paid.toLocaleString()} ₽</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontSize:'.78rem',color:'#222'}}>Остаток:</span><span style={{fontSize:'.78rem',color:'#222'}}>{debt.toLocaleString()} ₽</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Сумма накладной:</span><span style={{fontSize:'.78rem',color:'#222'}}>{total.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#222',fontSize:'.78rem'}}>Уже оплачено:</span><span style={{fontSize:'.78rem',color:'#222'}}>{paid.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'4px',marginTop:'4px'}}><span style={{fontSize:'.78rem',color:'#222'}}>Остаток:</span><span style={{fontSize:'.78rem',color:'#222'}}>{debt.toLocaleString()} {cur}</span></div>
               </div>
               <form onSubmit={confirmPay}>
                 <div className="form-row">
@@ -504,7 +507,7 @@ const load = async () => {
                     <label style={{fontSize:'.78rem',color:'#222'}}>Счет списания</label>
                     <select id="payMethod">
                       <option value="">— выберите счет —</option>
-                      {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} ₽)</option>})}
+                      {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} {cur})</option>})}
                     </select>
                   </div>
                 </div>

@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function Landing() {
+  const cur = getCurrencySymbol();
   const n = useNavigate();
   const { user } = useAuth();
   useEffect(() => { if (user) n('/dashboard', { replace: true }); }, [user, n]);
@@ -165,15 +168,15 @@ export default function Landing() {
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}}>
                 <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Доходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 {cur}</div>
                 </div>
                 <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Расходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 {cur}</div>
                 </div>
                 <div style={{background:"#ffdd2d",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Итого</div>
-                  <div style={{fontSize:14,fontWeight:800}}>+161 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:800}}>+161 000 {cur}</div>
                 </div>
               </div>
               <div style={{fontSize:11,color:"rgba(0,0,0,.34)",marginBottom:6}}>ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
@@ -255,15 +258,15 @@ export default function Landing() {
             <div style={{display:"flex",gap:6,marginBottom:6}}>
               <div style={{flex:1,background:"#f0fdf4",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Приход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>284K ₽</div>
+                <div style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>284K {cur}</div>
               </div>
               <div style={{flex:1,background:"#fef2f2",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>123K ₽</div>
+                <div style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>123K {cur}</div>
               </div>
             </div>
             <MiniLabel text="P&amp;L" />
-            <div style={{fontSize:11,fontWeight:700,color:"#16a34a",textAlign:"center",padding:"4px 0",background:"#f9f9f9",borderRadius:6}}>+161 000 ₽ прибыль</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#16a34a",textAlign:"center",padding:"4px 0",background:"#f9f9f9",borderRadius:6}}>+161 000 {cur} прибыль</div>
           </MiniAppWindow>
           {/* Касса */}
           <MiniAppWindow title="Кассовые смены">
@@ -274,11 +277,11 @@ export default function Landing() {
             <div style={{display:"flex",gap:6}}>
               <div style={{flex:1,background:"#f9f9f9",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Наличные</div>
-                <div style={{fontSize:10,fontWeight:600}}>34 500 ₽</div>
+                <div style={{fontSize:10,fontWeight:600}}>34 500 {cur}</div>
               </div>
               <div style={{flex:1,background:"#f9f9f9",borderRadius:6,padding:6,textAlign:"center"}}>
                 <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Безнал</div>
-                <div style={{fontSize:10,fontWeight:600}}>128 000 ₽</div>
+                <div style={{fontSize:10,fontWeight:600}}>128 000 {cur}</div>
               </div>
             </div>
           </MiniAppWindow>
@@ -451,20 +454,20 @@ export default function Landing() {
               <div style={{marginBottom:2}}>
                 {period === '1m' ? (
                   <>
-                    <span style={{fontSize:22,fontWeight:800}}>{basePrice.toLocaleString()} ₽</span>
+                    <span style={{fontSize:22,fontWeight:800}}>{basePrice.toLocaleString()} {cur}</span>
                   </>
                 ) : (
                   <>
                     <span style={{fontSize:15,fontWeight:600,color:"rgba(0,0,0,.2)",textDecoration:"line-through",textDecorationColor:"rgba(220,38,38,.4)",textDecorationThickness:2}}>
-                      {basePrice.toLocaleString()} ₽
+                      {basePrice.toLocaleString()} {cur}
                     </span>
-                    <span style={{fontSize:22,fontWeight:800,marginLeft:6}}>{currentPrice.toLocaleString()} ₽</span>
+                    <span style={{fontSize:22,fontWeight:800,marginLeft:6}}>{currentPrice.toLocaleString()} {cur}</span>
                   </>
                 )}
               </div>
               {period !== '1m' && (
                 <div style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f0fdf4",borderRadius:6,padding:"3px 8px",fontSize:10,fontWeight:600,color:"#16a34a",marginBottom:6,width:"fit-content"}}>
-                  Выгода {saving.toLocaleString()} ₽
+                  Выгода {saving.toLocaleString()} {cur}
                 </div>
               )}
               <div style={{fontSize:11,color:"rgba(0,0,0,.54)",marginBottom:12,lineHeight:1.3}}>{t.desc}</div>

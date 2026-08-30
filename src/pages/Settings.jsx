@@ -4,8 +4,11 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 import Training from './Training';
+import { getCurrencySymbol, resetCurrencyCache } from '../lib/currency';
+
 
 export default function Settings() {
+  const cur = getCurrencySymbol();
   const n = useNavigate();
   const { user } = useAuth();
   const [toast, setToast] = useState(null);
@@ -73,6 +76,14 @@ export default function Settings() {
             if (s.currency) setCurrency(s.currency);
             if (s.timezone) setTz(s.timezone);
             if (s.notifications) setNotifications(s.notifications);
+            // Синхронизируем в localStorage, чтобы валюта/настройки подхватились во всех разделах
+            localStorage.setItem('settings_company', JSON.stringify(s.company || {}));
+            localStorage.setItem('settings_country', s.country || 'Россия');
+            localStorage.setItem('settings_lang', s.lang || 'Русский');
+            localStorage.setItem('settings_currency', s.currency || 'RUB');
+            localStorage.setItem('settings_tz', s.timezone || 'Europe/Moscow');
+            localStorage.setItem('settings_notifications', JSON.stringify(s.notifications || {}));
+            resetCurrencyCache();
           }
         }
       } catch(e) { /* Таблица может отсутствовать */ }
@@ -362,6 +373,7 @@ export default function Settings() {
             localStorage.setItem('settings_tz', tz);
             localStorage.setItem('settings_notifications', JSON.stringify(notifications));
             localStorage.setItem('settings_owner', JSON.stringify(owner));
+            resetCurrencyCache();
             try {
               var settingsData = { company, country, lang, currency, timezone: tz, notifications };
               const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();

@@ -2,6 +2,8 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const STATUS_LABELS = {
   paid: 'Оплачен',
@@ -20,6 +22,7 @@ const STATUS_BG = {
 };
 
 export default function Receipts() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -253,7 +256,7 @@ export default function Receipts() {
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
                 <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
-                <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} ₽</td>
+                <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
                   {parseInt(r.receipt_discount) > 0 || parseInt(r.discount_sum) > 0
                     ? '-' + ((parseInt(r.receipt_discount)||0)+(parseInt(r.discount_sum)||0)).toLocaleString() + ' ₽'
@@ -317,7 +320,7 @@ export default function Receipts() {
                         <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
                         <span style={{ width: '50px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
-                        <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} ₽</span>
+                        <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
                       </div>
                       {combo && Array.isArray(combo) && combo.length > 0 && (
                         <div style={{ padding: '0 .75rem .35rem 1.2rem', fontSize: '.72rem', color: '#999' }}>
@@ -333,7 +336,7 @@ export default function Receipts() {
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '50px', textAlign: 'left' }}></span>
                   <span style={{ width: '70px', textAlign: 'right' }}></span>
-                  <span style={{ width: '80px', textAlign: 'right' }}>{Number(selectedReceipt.total_amount).toLocaleString()} ₽</span>
+                  <span style={{ width: '80px', textAlign: 'right' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</span>
                 </div>
               </div>
             )}

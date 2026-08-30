@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function QuickSale({ onClose }) {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -197,7 +200,7 @@ export default function QuickSale({ onClose }) {
     const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
     const finalTotal = Math.max(0, total - loyaltyDiscountAmount);
 
-    // Начисление баллов (1 ₽ = 1 балл) — считаем до создания чека, чтобы записать в чек
+    // Начисление баллов (1 {cur} = 1 балл) — считаем до создания чека, чтобы записать в чек
     const bonusProgQS = (loyaltyPrograms || []).find(p => p.type === 'bonus');
     const paidAmtQS = payAmount ? parseFloat(payAmount) : finalTotal;
     const earnedPointsQS = (bonusProgQS && selectedClient && !payUnpaid) ? Math.round(Math.min(Math.max(paidAmtQS, 0), finalTotal)) : 0;
@@ -279,7 +282,7 @@ export default function QuickSale({ onClose }) {
       await supabase.from('clients').update({ debt: curDebt - (total - paidAmt) }).eq('id', selectedClient);
     }
 
-    // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл, бонусная программа)
+    // Лояльность: начисление баллов за оплату (1 {cur} = 1 балл, бонусная программа)
     const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
     if (bonusProg && selectedClient) {
       const earned = earnedPointsQS; // считаем как при записи в чек (по оплаченному с учётом скидки)
@@ -370,7 +373,7 @@ export default function QuickSale({ onClose }) {
                 onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                 <span>{p.name}</span>
-                <span style={{fontWeight:600}}>{(p.price||0).toLocaleString()} ₽</span>
+                <span style={{fontWeight:600}}>{(p.price||0).toLocaleString()} {cur}</span>
               </div>
             ))}
           </div>
@@ -386,12 +389,12 @@ export default function QuickSale({ onClose }) {
                     <span style={{minWidth:'14px',textAlign:'center',fontWeight:600}}>{item.qty}</span>
                     <button onClick={() => updateQty(item.id, 1)} style={{width:'22px',height:'22px',borderRadius:'4px',border:'1px solid #ddd',background:'#fff',cursor:'pointer',fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
                   </div>
-                  <span style={{fontWeight:700,minWidth:'55px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} ₽</span>
+                  <span style={{fontWeight:700,minWidth:'55px',textAlign:'right'}}>{(item.price * item.qty).toLocaleString()} {cur}</span>
                 </div>
               ))}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0',paddingTop:'4px',display:'flex',justifyContent:'space-between',fontWeight:800}}>
                 <span>ИТОГО:</span>
-                <span>{total.toLocaleString()} ₽</span>
+                <span>{total.toLocaleString()} {cur}</span>
               </div>
             </div>
           )}
@@ -419,7 +422,7 @@ export default function QuickSale({ onClose }) {
               <input type="number" min="0" step="0.01" placeholder={total.toString()} value={payAmount} onChange={e => setPayAmount(e.target.value)}
                 style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
               {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
-                <div style={{fontSize:'11px',color:'#92400e',marginTop:'3px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} ₽ — долг</div>
+                <div style={{fontSize:'11px',color:'#92400e',marginTop:'3px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} {cur} — долг</div>
               )}
             </div>
           )}

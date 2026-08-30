@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
@@ -116,6 +118,7 @@ const COL_ORDER = ['name','type','category','cost','price','markup','unit','sku'
 const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', description:'Описание' };
 
 export default function Products() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
@@ -517,9 +520,9 @@ export default function Products() {
       case 'cost': {
         const cp = costPrice(p);
         if (p.type === 'service') return '<span style="color:#222">—</span>';
-        return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + ' ₽' : '—'}</span>`;
+        return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + '  $₽' : '—'}</span>`;
       }
-      case 'price': return `<span class="prod-price" style="color:#222">${(p.price || 0).toLocaleString()} ₽</span>`;
+      case 'price': return `<span class="prod-price" style="color:#222">${(p.price || 0).toLocaleString()} ${cur}</span>`;
       case 'markup': {
         if (p.type === 'service') return '<span style="color:#222">—</span>';
         const cp = costPrice(p);
@@ -786,7 +789,7 @@ export default function Products() {
                             else { setFComboItems([...fComboItems, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }]); }
                           }}>
                           <span style={{fontSize:'.75rem',flex:1}}>{p.name}</span>
-                          <span style={{fontSize:'.7rem',color:'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()} ₽</span>
+                          <span style={{fontSize:'.7rem',color:'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()} {cur}</span>
                           {inCombo && <span style={{fontSize:'.7rem',marginLeft:'.25rem',color:'var(--primary)',fontWeight:700}}>+</span>}
                         </div>
                       );
@@ -809,14 +812,14 @@ export default function Products() {
                               next[idx].qty++; setFComboItems(next);
                             }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
                           </div>
-                          <span style={{width:'75px',textAlign:'right',fontWeight:600}}>{(item.price * item.qty).toLocaleString()} ₽</span>
+                          <span style={{width:'75px',textAlign:'right',fontWeight:600}}>{(item.price * item.qty).toLocaleString()} {cur}</span>
                           <button type="button" onClick={function() { setFComboItems(fComboItems.filter(function(_, i) { return i !== idx; })) }} style={{background:'none',border:'none',cursor:'pointer',color:'#dc2626',fontSize:'.8rem',marginLeft:'.25rem',lineHeight:1,padding:'.1rem'}}>x</button>
                         </div>
                       );
                     })}
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.25rem',fontSize:'.78rem'}}>
                       <span style={{fontWeight:600}}>Итого:</span>
-                      <span style={{fontWeight:700}}>{fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} ₽</span>
+                      <span style={{fontWeight:700}}>{fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} {cur}</span>
                     </div>
                   </div>}
                 </div>

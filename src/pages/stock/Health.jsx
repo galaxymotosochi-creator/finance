@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const HEALTH = { critical: 'critical', warning: 'warning', healthy: 'healthy' };
 const HEALTH_LABEL = { critical: 'Критический', warning: 'Внимание', healthy: 'Здоровый' };
@@ -8,6 +10,7 @@ const HEALTH_COLOR = { critical: '#dc2626', warning: '#f59e0b', healthy: '#16a34
 const HEALTH_BG = { critical: '#fef2f2', warning: '#fffbeb', healthy: '#f0fdf4' };
 
 export default function Health() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [suppliesCache, setSuppliesCache] = useState([]);
@@ -328,14 +331,14 @@ export default function Health() {
                   <span>
                     {h.daysLeft===999 ? '∞ нет продаж' : `Закончится через ${h.daysLeft} дн`}
                   </span>
-                  {h.retailPrice>0 && <span style={{fontWeight:600}}>{h.retailPrice.toLocaleString()} ₽</span>}
+                  {h.retailPrice>0 && <span style={{fontWeight:600}}>{h.retailPrice.toLocaleString()} {cur}</span>}
                 </div>
 
                 {/* Маржа */}
                 {h.markupPct!==0 && (
                   <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'8px'}}>
                     Маржа: <span style={{color:h.markup>=0?'#16a34a':'#dc2626',fontWeight:600}}>
-                      {h.markup>=0?'+':''}{h.markup.toLocaleString()} ₽ ({h.markupPct}%)
+                      {h.markup>=0?'+':''}{h.markup.toLocaleString()} {cur} ({h.markupPct}%)
                     </span>
                   </div>
                 )}
@@ -374,7 +377,7 @@ export default function Health() {
                 {/* Себестоимость */}
                 {h.costPrice>0 && (
                   <div style={{fontSize:'.62rem',color:'var(--muted)',marginTop:'6px'}}>
-                    Себестоимость: {h.costPrice.toLocaleString()} ₽ | Сумма: {h.sumValue.toLocaleString()} ₽
+                    Себестоимость: {h.costPrice.toLocaleString()} {cur} | Сумма: {h.sumValue.toLocaleString()} {cur}
                   </div>
                 )}
               </div>

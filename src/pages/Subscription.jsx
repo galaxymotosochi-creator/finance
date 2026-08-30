@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function Subscription() {
+  const cur = getCurrencySymbol();
   const n = useNavigate();
   const { subscription, daysLeft, isExpired } = useSubscription();
   const [period, setPeriod] = useState('1m');
@@ -138,19 +141,19 @@ export default function Subscription() {
             <div style={{fontSize:14,fontWeight:700,marginBottom:2}}>{t.name}</div>
             <div style={{marginBottom:2}}>
               {period === '1m' ? (
-                <span style={{fontSize:20,fontWeight:800}}>{basePrice.toLocaleString()} ₽</span>
+                <span style={{fontSize:20,fontWeight:800}}>{basePrice.toLocaleString()} {cur}</span>
               ) : (
                 <>
                   <span style={{fontSize:13,fontWeight:600,color:"rgba(0,0,0,.2)",textDecoration:"line-through",textDecorationColor:"rgba(220,38,38,.4)"}}>
-                    {basePrice.toLocaleString()} ₽
+                    {basePrice.toLocaleString()} {cur}
                   </span>
-                  <span style={{fontSize:20,fontWeight:800,marginLeft:4}}>{currentPrice.toLocaleString()} ₽</span>
+                  <span style={{fontSize:20,fontWeight:800,marginLeft:4}}>{currentPrice.toLocaleString()} {cur}</span>
                 </>
               )}
             </div>
             {period !== '1m' && (
               <div style={{display:"inline-flex",background:"#f0fdf4",borderRadius:4,padding:"2px 6px",fontSize:9,fontWeight:600,color:"#16a34a",marginBottom:6,width:"fit-content"}}>
-                Выгода {saving.toLocaleString()} ₽
+                Выгода {saving.toLocaleString()} {cur}
               </div>
             )}
             <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:10,lineHeight:1.3}}>{t.desc}</div>
@@ -272,7 +275,7 @@ export default function Subscription() {
             <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:4,lineHeight:1.4}}>
               Вы переходите на тариф <strong>{switchPlan.name}</strong>
             </p>
-            <p style={{fontSize:".9rem",fontWeight:700,textAlign:"center",marginBottom:16}}>{switchPlan.price.toLocaleString()} ₽/мес</p>
+            <p style={{fontSize:".9rem",fontWeight:700,textAlign:"center",marginBottom:16}}>{switchPlan.price.toLocaleString()} {cur}/мес</p>
             <button onClick={()=>{confirmSwitchPlan(switchPlan.name, switchPlan.price);setSwitchPlan(null)}} style={{
               width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",color:"#000",
               fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",marginBottom:8,

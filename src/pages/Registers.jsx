@@ -2,8 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import QuaggaInit from 'quagga';
+import { getCurrencySymbol } from '../lib/currency';
+
 
 export default function Registers({ fullscreen }) {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -333,7 +336,7 @@ export default function Registers({ fullscreen }) {
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const receiptDiscountAmount = receiptDiscountPercent > 0 ? Math.round(total * receiptDiscountPercent / 100) : (receiptDiscountFixed > 0 ? receiptDiscountFixed : 0);
-  // Лояльность: скидка по программе (постоянная/накопительная/ДР) + скидка баллами (1 балл = 1 ₽)
+  // Лояльность: скидка по программе (постоянная/накопительная/ДР) + скидка баллами (1 балл = 1 {cur})
   const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
   const loyaltyPointsAmount = Math.min(loyaltyPointsSpend, Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount));
   const finalTotal = Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount - loyaltyPointsAmount);
@@ -403,7 +406,7 @@ export default function Registers({ fullscreen }) {
       if (paidAmt > 0) payments.push({ account_id: tgt?.id || null, amount: Math.min(paidAmt, total) });
     }
 
-    // Баллы лояльности: начисление за оплату (1 ₽ = 1 балл) и списание как скидка — считаем до создания чека
+    // Баллы лояльности: начисление за оплату (1 {cur} = 1 балл) и списание как скидка — считаем до создания чека
     const bonusProgPay = (loyaltyPrograms || []).find(p => p.type === 'bonus');
     const paidSumPay = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const earnedPoints = (bonusProgPay && selectedClient && receiptStatus !== 'unpaid') ? Math.round(paidSumPay) : 0;
@@ -479,7 +482,7 @@ export default function Registers({ fullscreen }) {
           await supabase.from('clients').update({debt: curDebt - (total - paidAmt)}).eq('id', selectedClient);
         }
       }
-      // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл) и списание использованных баллов
+      // Лояльность: начисление баллов за оплату (1 {cur} = 1 балл) и списание использованных баллов
       if (earnedPoints > 0 || spentPoints > 0) {
         const cur = Number(client?.points) || 0;
         await supabase.from('clients').update({ points: Math.max(0, cur + earnedPoints - spentPoints) }).eq('id', selectedClient);
@@ -750,7 +753,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                       <span style={{minWidth:'46px'}}>№ {r.receipt_number}</span>
                       <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.items_str}</span>
-                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total_amount||0).toLocaleString()} ₽</span>
+                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total_amount||0).toLocaleString()} {cur}</span>
                     </div>
                   );
                 })}
@@ -771,7 +774,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                       <span style={{minWidth:'46px',fontWeight:600}}>📋</span>
                       <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{itemsStr}</span>
-                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total||0).toLocaleString()} ₽</span>
+                      <span style={{whiteSpace:'nowrap'}}>{Number(r.total||0).toLocaleString()} {cur}</span>
                     </div>
                   );
                 })}
@@ -841,10 +844,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
                       style={{width:'52px',textAlign:'center',border:'1.5px solid var(--border)',borderRadius:'5px',padding:'3px 4px',fontSize:'.80rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
                   ) : (
-                    <span>{(item.final_price || item.price).toLocaleString()} ₽</span>
+                    <span>{(item.final_price || item.price).toLocaleString()} {cur}</span>
                   )}
                 </div>
-                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} ₽</div>
+                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} {cur}</div>
               </div>
               {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
@@ -877,29 +880,29 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             {discountTotal > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'var(--muted)'}}>
                 <span>Итого:</span>
-                <span style={{textDecoration:'line-through',color:'#777'}}>{totalOriginal.toLocaleString()} ₽</span>
+                <span style={{textDecoration:'line-through',color:'#777'}}>{totalOriginal.toLocaleString()} {cur}</span>
               </div>
             )}
             {discountTotal > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#16a34a'}}>
                 <span>Скидка по акциям:</span>
-                <span>-{discountTotal.toLocaleString()} ₽</span>
+                <span>-{discountTotal.toLocaleString()} {cur}</span>
               </div>
             )}
             {/* Лояльность: автоскидка по программе клиента */}
             {selectedClient && loyaltyDiscountAmount > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#8b5cf6'}}>
                 <span>Скидка лояльности ({loyaltyPct}%):</span>
-                <span>-{loyaltyDiscountAmount.toLocaleString()} ₽</span>
+                <span>-{loyaltyDiscountAmount.toLocaleString()} {cur}</span>
               </div>
             )}
             {selectedClient && loyaltyPointsAmount > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#8b5cf6'}}>
                 <span>Скидка баллами:</span>
-                <span>-{loyaltyPointsAmount.toLocaleString()} ₽</span>
+                <span>-{loyaltyPointsAmount.toLocaleString()} {cur}</span>
               </div>
             )}
-            {/* Кнопка списания баллов (бонусная программа: 1 балл = 1 ₽) */}
+            {/* Кнопка списания баллов (бонусная программа: 1 балл = 1 {cur}) */}
             {selectedClient && (() => {
               const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
               const points = Number(clients.find(c => c.id === selectedClient)?.points) || 0;
@@ -919,7 +922,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             })()}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontSize:'.80rem',color:'var(--muted)'}}>К оплате:</span>
-              <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} ₽</span>
+              <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} {cur}</span>
             </div>
             {/* Строка скидки — всегда видна */}
             {cart.length > 0 && (
@@ -930,7 +933,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     style={{fontSize:'.95rem',fontWeight:700,cursor:'pointer',color:'#444',padding:'2px 8px',borderRadius:'6px',background:'transparent',userSelect:'none'}}>
                     {receiptDiscountPercent > 0 ? receiptDiscountPercent + '%' : receiptDiscountFixed > 0 ? receiptDiscountFixed + ' ₽' : '0%'} <span style={{fontSize:'.68rem',color:'#999'}}>▼</span>
                   </span>
-                  {receiptDiscountAmount > 0 && <span style={{fontSize:'.95rem',color:'#444',fontWeight:700}}>−{receiptDiscountAmount.toLocaleString()} ₽</span>}
+                  {receiptDiscountAmount > 0 && <span style={{fontSize:'.95rem',color:'#444',fontWeight:700}}>−{receiptDiscountAmount.toLocaleString()} {cur}</span>}
                   {discountDropdownOpen && (
                     <div style={{position:'absolute',bottom:'100%',right:0,marginBottom:'4px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 30px rgba(0,0,0,.12)',padding:'10px',minWidth:'280px',zIndex:100,border:'1px solid #f0f0f0'}}>
                       <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'8px'}}>
@@ -960,7 +963,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             {receiptDiscountAmount > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid #eee',paddingTop:'8px'}}>
                 <span style={{fontSize:'.80rem',color:'var(--muted)',fontWeight:600}}>Итого:</span>
-                <span style={{fontSize:'.95rem',fontWeight:700}}>{finalTotal.toLocaleString()} ₽</span>
+                <span style={{fontSize:'.95rem',fontWeight:700}}>{finalTotal.toLocaleString()} {cur}</span>
               </div>
             )}
             {viewingReceipt ? (
@@ -1039,7 +1042,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
                 {p.cat && <div style={{fontSize:'.76rem',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'var(--muted)'}}>{p.cat}</div>}
                 <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
-                <span style={{fontSize:'.95rem',fontWeight:700,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} ₽</span>
+                <span style={{fontSize:'.95rem',fontWeight:700,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} {cur}</span>
                 {p.type !== 'service' ? (
                   <span style={{fontSize:'.76rem',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
                 ) : null}
@@ -1180,7 +1183,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 {discountTotal > 0 && (
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:'.80rem',marginBottom:'4px'}}>
                     <span style={{color:'#999'}}>Скидка по акциям:</span>
-                    <span style={{color:'#444'}}>-{discountTotal.toLocaleString()} ₽</span>
+                    <span style={{color:'#444'}}>-{discountTotal.toLocaleString()} {cur}</span>
                   </div>
                 )}
                 <div style={{display:'flex',justifyContent:'space-between',fontSize:'.80rem',marginBottom:'4px'}}>
@@ -1189,7 +1192,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 </div>
                 <div style={{display:'flex',justifyContent:'space-between',fontSize:'1.1rem',fontWeight:800,color:'#222',paddingTop:'4px',borderTop:'1px solid #f0f0f0',marginTop:'4px'}}>
                   <span>Итого:</span>
-                  <span>{finalTotal.toLocaleString()} ₽</span>
+                  <span>{finalTotal.toLocaleString()} {cur}</span>
                 </div>
               </div>
             </div>            
@@ -1239,7 +1242,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   })}
                   <div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:'10px',fontSize:'.76rem',color:'#444'}}>
                     <span style={{fontWeight:500,color:'#444'}}>Остаток</span>
-                    <span style={{fontWeight:500,color:'#444',width:'72px',textAlign:'right'}}>{(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} ₽</span>
+                    <span style={{fontWeight:500,color:'#444',width:'72px',textAlign:'right'}}>{(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} {cur}</span>
                   </div>
                 </div>
               )}
@@ -1256,10 +1259,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total ? (
                     <span>Оплачено полностью</span>
                   ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total ? (
-                    <span style={{color:'#92400e'}}>Не оплачено: {(total - parseFloat(payAmount)).toLocaleString()} ₽</span>
+                    <span style={{color:'#92400e'}}>Не оплачено: {(total - parseFloat(payAmount)).toLocaleString()} {cur}</span>
                   ) : null}
                   {payAmount && parseFloat(payAmount) > total && (
-                    <span style={{color:'#999',fontWeight:500}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} ₽</span>
+                    <span style={{color:'#999',fontWeight:500}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} {cur}</span>
                   )}
                 </div>
               </div>
@@ -1403,7 +1406,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <div className="form-group"><label>Остаток денег на начало дня</label>
                   <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                     <input type="number" placeholder="0" min="0" step="0.01" value={openShiftBal} onChange={e => setOpenShiftBal(e.target.value)} autoFocus />
-                    {cashRegBal > 0 && <span style={{fontSize:'.80rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} ₽</span>}
+                    {cashRegBal > 0 && <span style={{fontSize:'.80rem',color:'var(--muted)',whiteSpace:'nowrap'}}>Баланс Кассы: {Math.round(cashRegBal).toLocaleString()} {cur}</span>}
                   </div>
                 </div>
                 <div className="modal-actions"><button type="submit" className="btn btn-account-select">Открыть смену</button></div>
@@ -1440,7 +1443,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <h2>Сменить кассира</h2>
             <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'.80rem',lineHeight:1.7}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#777'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;(shiftReceipts||[]).forEach(function(r){(r.payments||[]).forEach(function(p){if(p.account_id===ca.id)b+=Number(p.amount||0)});});}return Math.round(b).toLocaleString()})()} ₽</span></div>
+              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;(shiftReceipts||[]).forEach(function(r){(r.payments||[]).forEach(function(p){if(p.account_id===ca.id)b+=Number(p.amount||0)});});}return Math.round(b).toLocaleString()})()} {cur}</span></div>
             </div>
             <div className="form-group">
               <label>Новый кассир</label>
@@ -1508,7 +1511,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       <td style={{textAlign:'left'}}>
                         <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.76rem',fontWeight:600,background: r.status === 'unpaid' ? '#fff3cd' : '#f0fdf4',color: r.status === 'unpaid' ? '#d97706' : '#16a34a'}}>{r.status === 'unpaid' ? 'Не оплачен' : 'Оплачен'}</span>
                       </td>
-                      <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount || 0).toLocaleString()} ₽</span></td>
+                      <td style={{textAlign:'left',fontWeight:600}}><span className="num">{Number(r.total_amount || 0).toLocaleString()} {cur}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -1516,7 +1519,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             </div>
             <div style={{padding:'12px 0',borderTop:'1px solid #eee',marginTop:'12px',display:'flex',alignItems:'baseline',gap:'6px',fontWeight:700,fontSize:'.95rem'}}>
               <span>Итого:</span>
-              <span>{registerReceipts.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0).toLocaleString()} ₽</span>
+              <span>{registerReceipts.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0).toLocaleString()} {cur}</span>
             </div>
             <div className="modal-actions">
               <button className="btn btn-account-select" onClick={() => setShowReceiptsModal(false)}>Закрыть</button>
@@ -1536,7 +1539,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'.80rem',lineHeight:1.8,marginBottom:'12px'}}>
               <div style={{display:'flex'}}>
                 <span style={{flex:1}}>Начальный остаток</span>
-                <span>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} ₽</span>
+                <span>{(parseFloat(activeShift.opening_balance) || 0).toLocaleString()} {cur}</span>
               </div>
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               {(() => {
@@ -1552,7 +1555,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 return Object.entries(byAc).map(([acId, amt]) => (
                   <div key={acId} style={{display:'flex',padding:'2px 0'}}>
                     <span style={{flex:1}}>{acMap[acId] || 'Без счёта'}</span>
-                    <span>+{amt.toLocaleString()} ₽</span>
+                    <span>+{amt.toLocaleString()} {cur}</span>
                   </div>
                 ));
               })()}
@@ -1561,14 +1564,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 return debtSum > 0 ? (
                   <div style={{display:'flex',padding:'2px 0',color:'#d97706'}}>
                     <span style={{flex:1}}>Продажи в долг (не в кассе)</span>
-                    <span>+{debtSum.toLocaleString()} ₽</span>
+                    <span>+{debtSum.toLocaleString()} {cur}</span>
                   </div>
                 ) : null;
               })()}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:700}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) ).toLocaleString()} ₽</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) ).toLocaleString()} {cur}</span>
               </div>
             </div>
 
@@ -1583,7 +1586,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               if (Math.abs(diff) < 0.01) {
                 return <div style={{textAlign:'center',padding:'6px',background:'#f0fdf4',borderRadius:'8px',color:'#16a34a',fontWeight:600,fontSize:'.80rem',marginBottom:'8px'}}>✅ Касса сходится</div>;
               } else {
-                return <div style={{textAlign:'center',padding:'6px',background:'#fef2f2',borderRadius:'8px',color:'#dc2626',fontWeight:600,fontSize:'.80rem',marginBottom:'8px'}}>⚠️ Расхождение: {diff > 0 ? 'излишек' : 'недостача'} {Math.abs(diff).toLocaleString()} ₽</div>;
+                return <div style={{textAlign:'center',padding:'6px',background:'#fef2f2',borderRadius:'8px',color:'#dc2626',fontWeight:600,fontSize:'.80rem',marginBottom:'8px'}}>⚠️ Расхождение: {diff > 0 ? 'излишек' : 'недостача'} {Math.abs(diff).toLocaleString()} {cur}</div>;
               }
             })()}
 
@@ -1647,7 +1650,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <span style={{fontSize:'.95rem',fontWeight:700,letterSpacing:'-.02em'}}>Чек #{cur.id?.toString().slice(-3) || '—'}</span>
                 {cur.clientName ? (
                   <div className="sub" style={{marginBottom:0,fontSize:'.80rem',color:'var(--muted)'}}>
-                    {cur.clientName} | {cur.items?.length || 0} товаров | {Number(cur.total||0).toLocaleString()} ₽
+                    {cur.clientName} | {cur.items?.length || 0} товаров | {Number(cur.total||0).toLocaleString()} {cur}
                   </div>
                 ) : null}
               </div>
@@ -1667,14 +1670,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                       <span style={{flex:1,fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</span>
                       <span style={{width:'50px',textAlign:'center',color:'#777',fontSize:'.80rem'}}>{item.qty}</span>
                       <span style={{width:'60px',textAlign:'right',color:'#777',fontSize:'.80rem'}}>{Number(item.price).toLocaleString()}</span>
-                      <span style={{width:'80px',textAlign:'right',fontWeight:600}}>{Number(item.price*item.qty).toLocaleString()} ₽</span>
+                      <span style={{width:'80px',textAlign:'right',fontWeight:600}}>{Number(item.price*item.qty).toLocaleString()} {cur}</span>
                     </div>
                   );
                 })}
                 <div style={{borderTop:'1px solid #e8e8e8',margin:'4px 0'}}></div>
                 <div style={{display:'flex',justifyContent:'space-between',fontWeight:700,fontSize:'.80rem',padding:'2px 0'}}>
                   <span>Итого</span>
-                  <span>{Number(cur.total||0).toLocaleString()} ₽</span>
+                  <span>{Number(cur.total||0).toLocaleString()} {cur}</span>
                 </div>
               </div>
 

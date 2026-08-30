@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 export default function PnL() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [period, setPeriod] = useState('month');
   const [loading, setLoading] = useState(true);
@@ -225,10 +228,10 @@ export default function PnL() {
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#16a34a' }}></span>
           Доходы
         </div>
-        <Row label="Продажи" value={`+${d.salesRev.toLocaleString()} ₽`} />
-        <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ₽`} color="#dc2626" />
+        <Row label="Продажи" value={`+${d.salesRev.toLocaleString()} ${cur}`} />
+        <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ${cur}`} color="#dc2626" />
         <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
-        <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ₽`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
+        <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ${cur}`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
       </div>
 
       {/* Карточка: Расходы */}
@@ -241,7 +244,7 @@ export default function PnL() {
           Расходы
         </div>
         {d.opList.map(([name, amt], i) => (
-          <Row key={i} label={name} value={`−${amt.toLocaleString()} ₽`} color="#dc2626" />
+          <Row key={i} label={name} value={`−${amt.toLocaleString()} ${cur}`} color="#dc2626" />
         ))}
 
       </div>
@@ -255,7 +258,7 @@ export default function PnL() {
           Чистая прибыль
         </span>
         <span style={{ fontSize: '22px', fontWeight: 800, color: '#fff' }}>
-          {d.netProfit >= 0 ? '+' : ''}{d.netProfit.toLocaleString()} ₽
+          {d.netProfit >= 0 ? '+' : ''}{d.netProfit.toLocaleString()} {cur}
         </span>
       </div>
 

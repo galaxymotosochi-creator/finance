@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { getCurrencySymbol } from '../lib/currency';
+
 export default function Variant2() {
+  const cur = getCurrencySymbol();
   const n = useNavigate();
   return (
     <div style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
@@ -41,22 +44,22 @@ export default function Variant2() {
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}}>
                 <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Доходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 {cur}</div>
                 </div>
                 <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Расходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 {cur}</div>
                 </div>
                 <div style={{background:"#ffdd2d",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Итого</div>
-                  <div style={{fontSize:14,fontWeight:800}}>+161 000 ₽</div>
+                  <div style={{fontSize:14,fontWeight:800}}>+161 000 {cur}</div>
                 </div>
               </div>
               <div style={{fontSize:11,color:"rgba(0,0,0,.34)",marginBottom:6}}>ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
               {[["Продажа скутера","+72 000","#16a34a"],["Запчасти","−8 500","#dc2626"],["Аренда","+15 000","#16a34a"]].map((r,i)=>(
                 <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #f0f0f0"}}>
                   <span style={{fontWeight:500}}>{r[0]}</span>
-                  <span style={{fontWeight:600,color:r[2]}}>{r[1]} ₽</span>
+                  <span style={{fontWeight:600,color:r[2]}}>{r[1]} {cur}</span>
                 </div>
               ))}
             </div>

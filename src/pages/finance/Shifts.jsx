@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 export default function Shifts() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [shifts, setShifts] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -103,7 +106,7 @@ export default function Shifts() {
                   <td style={{textAlign:'left',color:'#555'}}>{timeOpen}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{s.shift_number ? '#'+s.shift_number : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{cashier || '—'}</td>
-                  <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
+                  <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} {cur}</td>
                   <td style={{textAlign:'left',fontWeight:600}}>{income > 0 ? '+'+income.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{timeClose}</td>

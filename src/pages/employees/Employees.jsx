@@ -2,6 +2,8 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
+
 
 const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления' },
@@ -70,6 +72,7 @@ const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 
 export default function Employees() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [positions, setPositions] = useState([]);
