@@ -284,7 +284,7 @@ export default function Stock() {
               const qty = st.qty;
               const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
               const retailPrice = p.price || 0;
-              const sumValue = costPrice * qty;
+              const sumValue = retailPrice * qty; // «Сумма» = количество × цена продажи
               const markup = retailPrice - costPrice;
               const markupPct = costPrice > 0 ? Math.round((markup / costPrice) * 100) : 0;
               return (
