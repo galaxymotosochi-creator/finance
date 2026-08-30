@@ -156,6 +156,7 @@ export default function QuickSale({ onClose }) {
       cart.forEach(function(item) {
         var entry = {
           receipt_id: newReceipt.id,
+          product_id: item.id || null, // иначе сервер не может защитить товар от удаления
           product_name: item.name, quantity: item.qty,
           price: item.price, total: (item.final_price || item.price) * item.qty,
         };

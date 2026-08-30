@@ -394,6 +394,7 @@ export default function Registers({ fullscreen }) {
       cart.forEach(function(item) {
         var entry = {
           receipt_id: receiptId,
+          product_id: item.id || null, // иначе сервер не может защитить товар от удаления (в чеках product_id всегда NULL)
           product_name: item.name, quantity: item.qty,
           price: item.price, total: (item.final_price || item.price) * item.qty,
           discount_percent: item.discount_percent || 0,

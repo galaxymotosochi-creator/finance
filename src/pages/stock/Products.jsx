@@ -239,7 +239,8 @@ export default function Products() {
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
-    setFWeightUnit(p.weightUnit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
+    setFWeightUnit(p.weight_unit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
+    setFFreePrice(p.free_price || false);
     setFComboItems(p.combo_items || []);
     setFComboSearch('');
     setShowModal(true);
@@ -255,6 +256,7 @@ export default function Products() {
       weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
       min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
       hidden: editId ? fHidden : false,
+      free_price: fFreePrice,
       combo_items: fType === 'combo' ? fComboItems : null
     };
     if (editId) {
@@ -277,12 +279,12 @@ export default function Products() {
   const confirmRemove = async () => {
     if (!removeTarget) return;
     const id = removeTarget;
+    // Сначала читаем товар (после удаления прочитать уже нельзя) — иначе корзина никогда не пополняется
+    const { data: items } = await supabase.from("products").select("*").eq("id", id);
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) { setShowRemoveModal(false); return alert(error.message); }
-    // Только после успешного удаления — в корзину восстановления
-    let trash = getTrash();
-    const { data: items } = await supabase.from("products").select("*").eq("id", id);
     if (items && items[0]) {
+      let trash = getTrash();
       trash.unshift({ ...items[0], deletedAt: Date.now() });
       setTrash(trash);
     }
@@ -369,7 +371,7 @@ export default function Products() {
   };
 
   const selectAllCats = () => {
-    setSelectedCats(new Set(getCats().map(c => c.name)));
+    setSelectedCats(new Set(cats.map(c => c.name)));
   };
 
   const clearAllCats = () => {
@@ -384,9 +386,9 @@ export default function Products() {
       'Название': p.name,
       'Тип': typeLabel(p.type),
       'Категория': CAT_LABELS[p.cat] || p.cat || '',
-      'Себестоимость': p.costPrice || '',
+      'Себестоимость': costPrice(p) || '',
       'Цена': p.price || '',
-      'Наценка': p.price && p.costPrice ? Math.round(((p.price - p.costPrice) / p.costPrice) * 100) + '%' : '',
+      'Наценка': p.price && costPrice(p) ? Math.round(((p.price - costPrice(p)) / costPrice(p)) * 100) + '%' : '',
       'Ед. измерения': p.unit || '',
       'Артикул': p.sku || '',
       'Штрихкод': p.barcode || '',
@@ -489,7 +491,7 @@ export default function Products() {
   };
 
   // Filter products
-  let filtered = products;
+  let filtered = [...products];
   const q = search.toLowerCase().trim();
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
@@ -841,7 +843,7 @@ export default function Products() {
               </div>
               <div className="modal-actions">
                 {editId && fHidden && (
-                  <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => restore(editId)}>Восстановить товар</button>
+                  <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
                 )}
                 <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
               </div>
