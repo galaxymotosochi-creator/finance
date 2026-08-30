@@ -919,7 +919,7 @@ export default function Products() {
       </Modal>
 
       {/* Модалка просмотра товара/услуги: слева информация, справа крупное фото */}
-      <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') : ''} width="wide">
+      <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle="" width="wide">
         {viewProduct && (() => {
           const costPriceP = costPrice(viewProduct);
           const markPct = costPriceP > 0 && viewProduct.price ? Math.round(((viewProduct.price - costPriceP) / costPriceP) * 100) : 0;
