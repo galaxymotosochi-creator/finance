@@ -117,6 +117,10 @@ app.post('/api/auth/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     const id = uuidv4();
     await pool.query('INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, $3, $4, NOW())', [id, email, hash, name || '']);
+    // Подписка: пробный период 14 дней при регистрации (иначе раздел «Подписка» мёртв)
+    try {
+      await pool.query("INSERT INTO subscriptions (user_id, status, plan, trial_starts_at, trial_ends_at) VALUES ($1, 'trial', 'Базовый', NOW(), NOW() + INTERVAL '14 days')", [id]);
+    } catch (e) { console.error('Subscription create error:', e.message); }
     const token = jwt.sign({ user_id: id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
     // Отправляем письмо с подтверждением
     sendMail(email, 'Добро пожаловать в AtlasPos!',

@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
 import { getCurrencySymbol } from '../lib/currency';
+import { useAuth } from '../hooks/useAuth';
 
 
 export default function Subscription() {
   const cur = getCurrencySymbol();
   const n = useNavigate();
+  const { user } = useAuth();
   const { subscription, daysLeft, isExpired } = useSubscription();
   const [period, setPeriod] = useState('1m');
   const [autoRenew, setAutoRenew] = useState(true);
@@ -14,14 +16,27 @@ export default function Subscription() {
   const [showDiscountOffer, setShowDiscountOffer] = useState(false);
   const [switchPlan, setSwitchPlan] = useState(null);
   const confirmSwitchPlan = (plan, price) => {
-    // Здесь будет интеграция с эквайрингом
+    // Смена тарифа: сохраняем выбранный план в подписке
+    // (онлайн-оплата — эквайринг — подключается отдельно, см. раздел «Способы оплаты»)
+    if (subscription && user) {
+      supabase.from('subscriptions').update({ plan, updated_at: new Date().toISOString() }).eq('user_id', user.id).eq('id', subscription.id).then((r) => {
+        if (r.error) alert('Ошибка: ' + r.error.message);
+      });
+    }
     setSwitchPlan(null);
   };
   const [cards, setCards] = useState([
     { id: 1, brand: 'visa', last4: '1234', exp: '12/27', main: true },
   ]);
 
-  const currentPlan = { name: 'Бизнес', price: 2900, period: '1m', until: '15.07.2026' };
+  // Текущий план — из реальной подписки (не хардкод)
+  const subPlanName = subscription?.plan || 'Базовый';
+  const currentPlan = {
+    name: subPlanName,
+    price: ({'Базовый':490,'Старт':990,'Бизнес':2900,'Профи':6900}[subPlanName] || 490),
+    period: '1m',
+    until: subscription?.trial_ends_at ? new Date(subscription.trial_ends_at).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric' }) : '—',
+  };
 
   const periodPrices = {"1m":[490,990,2900,6900],"3m":[440,890,2600,6200],"6m":[390,790,2300,5500],"1y":[340,690,1990,4800]};
   const periodSavings = {"3m":[150,300,900,2100],"6m":[600,1200,3600,8400],"1y":[1800,3600,10920,25200]};

@@ -19,6 +19,7 @@ export function useSubscription() {
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
         .maybeSingle();
 
       setSubscription(sub);
