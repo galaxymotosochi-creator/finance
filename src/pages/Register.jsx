@@ -9,6 +9,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [adminPin, setAdminPin] = useState(null);
   const { signUp, user } = useAuth();
   const n = useNavigate();
 
@@ -21,8 +22,9 @@ export default function Register() {
     if (password.length < 6) { setError('Пароль должен быть минимум 6 символов'); return; }
     setLoading(true);
     try {
-      const { error } = await signUp(email, password);
-      if (error) throw error;
+      const result = await signUp(email, password);
+      if (result.error) throw result.error;
+      setAdminPin(result?.adminPin || result?.data?.adminPin || null);
       setDone(true);
     } catch (err) {
       setError(err.message === 'User already registered'
@@ -42,6 +44,13 @@ export default function Register() {
           <p style={{fontSize:'.85rem',color:'rgba(0,0,0,.54)',lineHeight:1.4,marginBottom:8}}>
             Проверьте почту <strong>{email}</strong> и перейдите по ссылке в письме, чтобы подтвердить аккаунт.
           </p>
+          {adminPin && (
+            <div style={{background:'#fef9c3',border:'1px solid #fde047',borderRadius:'12px',padding:'12px 14px',marginBottom:14,textAlign:'left'}}>
+              <div style={{fontSize:'.78rem',fontWeight:700,marginBottom:4}}>Ваш пин руководителя</div>
+              <div style={{fontSize:'1.4rem',fontWeight:800,letterSpacing:4,marginBottom:6}}>{adminPin}</div>
+              <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.6)',lineHeight:1.4}}>Он нужен для входа в кассу и подтверждения скидок ниже минимальной цены. Сменить можно в разделе «Сотрудники». Запишите его.</div>
+            </div>
+          )}
           <p style={{fontSize:.78,color:'rgba(0,0,0,.34)',marginBottom:20}}>
             Если письмо не пришло — проверьте папку «Спам».
           </p>

@@ -142,7 +142,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id),
-        supabase.from('employees').select('id, name, pin').eq('user_id', user.id).order('name'),
+        supabase.from('employees').select('id, name, pin, permissions').eq('user_id', user.id).order('name'),
         supabase.from('loyalty_programs').select('*').eq('user_id', user.id),
       ]);
       if (pRes.data) setProducts(pRes.data);
@@ -719,7 +719,9 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               onChange={e=>{
                 setMinPricePin(e.target.value); setMinPriceError(false);
                 if (e.target.value.length === 4) {
-                  if (e.target.value === PIN_MASTER) {
+                  // Пин руководителя: мастер-пин 8888 или пин сотрудника с правом «Настройки»
+                  const isAdminPin = e.target.value === PIN_MASTER || (employees || []).some(emp => emp.pin === e.target.value && emp.permissions && emp.permissions.includes('settings'));
+                  if (isAdminPin) {
                     minPriceApprovedRef.current = true;
                     setMinPriceConfirm(false); setMinPricePin('');
                     processPay();

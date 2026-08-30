@@ -215,7 +215,7 @@ const auth = {
       };
       currentSession = session;
       localStorage.setItem('atlaspos_session', JSON.stringify(session));
-      return { data: { session, user: session.user }, error: null };
+      return { data: { session, user: session.user, adminPin: data.adminPin || null }, error: null };
     } catch(e) { return { data: null, error: e }; }
   },
 
