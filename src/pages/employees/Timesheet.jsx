@@ -492,36 +492,42 @@ export default function Timesheet() {
                     const entry = entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(showDay));
                     if (entry) {
                       await supabase.from('timesheet_entries').update({ status: localStatuses[empId] }).eq('id', entry.id);
-                    } else {
+                    } else if (localStatuses[empId] && localStatuses[empId] !== 'present') {
+                      // Создаём запись только если отметили нестандартный статус —
+                      // иначе каждый «Сохранить» плодит «Работал» всем сотрудникам
                       await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] });
                     }
                   }
-                  // Сохраняем бонусы
-                  for (const row of bonusRows) {
-                    if (!row.empId || !row.amount) continue;
-                    const { data: exBonus } = await supabase
-                      .from('timesheet_entries')
-                      .select('id,bonus_amount,bonus_comment')
-                      .eq('user_id',user.id).eq('employee_id',row.empId).eq('date',showDay)
-                      .maybeSingle();
-                    if (exBonus) {
-                      await supabase.from('timesheet_entries').update({ bonus_amount: (exBonus.bonus_amount||0)+parseFloat(row.amount), bonus_comment: exBonus.bonus_comment?exBonus.bonus_comment+'; '+row.comment:row.comment }).eq('id', exBonus.id);
-                    } else {
-                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', bonus_amount: parseFloat(row.amount), bonus_comment: row.comment });
+                  // Бонусы: полная перезапись по сотрудникам дня (идемпотентно — повторное
+                  // сохранение не удваивает сумму, а убранная строка обнуляет бонус)
+                  const bonusByEmp = {};
+                  const bonusComments = {};
+                  bonusRows.forEach(r => { if (r.empId && r.amount) { bonusByEmp[r.empId] = (bonusByEmp[r.empId]||0) + parseFloat(r.amount); if (r.comment) bonusComments[r.empId] = (bonusComments[r.empId] ? bonusComments[r.empId]+'; ' : '') + r.comment; } });
+                  for (const [empId, amount] of Object.entries(bonusByEmp)) {
+                    const { data: exB } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
+                    if (exB) await supabase.from('timesheet_entries').update({ bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }).eq('id', exB.id);
+                    else await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', bonus_amount: amount, bonus_comment: bonusComments[empId]||'' });
+                  }
+                  // Обнуляем бонусы, если строки убрали из формы
+                  const dayEntriesB = entries.filter(e => e.date && e.date.startsWith(showDay));
+                  for (const e of dayEntriesB) {
+                    if ((Number(e.bonus_amount)||0) > 0 && !bonusByEmp[e.employee_id]) {
+                      await supabase.from('timesheet_entries').update({ bonus_amount: 0, bonus_comment: '' }).eq('id', e.id);
                     }
                   }
-                  // Сохраняем штрафы
-                  for (const row of deductRows) {
-                    if (!row.empId || !row.amount) continue;
-                    const { data: exDeduct } = await supabase
-                      .from('timesheet_entries')
-                      .select('id,deduct_amount,deduct_comment')
-                      .eq('user_id',user.id).eq('employee_id',row.empId).eq('date',showDay)
-                      .maybeSingle();
-                    if (exDeduct) {
-                      await supabase.from('timesheet_entries').update({ deduct_amount: (exDeduct.deduct_amount||0)+parseFloat(row.amount), deduct_comment: exDeduct.deduct_comment?exDeduct.deduct_comment+'; '+row.comment:row.comment }).eq('id', exDeduct.id);
-                    } else {
-                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: row.empId, date: showDay, status: localStatuses[row.empId]||'present', deduct_amount: parseFloat(row.amount), deduct_comment: row.comment });
+                  // Штрафы: так же — полная перезапись
+                  const deductByEmp = {};
+                  const deductComments = {};
+                  deductRows.forEach(r => { if (r.empId && r.amount) { deductByEmp[r.empId] = (deductByEmp[r.empId]||0) + parseFloat(r.amount); if (r.comment) deductComments[r.empId] = (deductComments[r.empId] ? deductComments[r.empId]+'; ' : '') + r.comment; } });
+                  for (const [empId, amount] of Object.entries(deductByEmp)) {
+                    const { data: exD } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
+                    if (exD) await supabase.from('timesheet_entries').update({ deduct_amount: amount, deduct_comment: deductComments[empId]||'' }).eq('id', exD.id);
+                    else await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', deduct_amount: amount, deduct_comment: deductComments[empId]||'' });
+                  }
+                  const dayEntriesD = entries.filter(e => e.date && e.date.startsWith(showDay));
+                  for (const e of dayEntriesD) {
+                    if ((Number(e.deduct_amount)||0) > 0 && !deductByEmp[e.employee_id]) {
+                      await supabase.from('timesheet_entries').update({ deduct_amount: 0, deduct_comment: '' }).eq('id', e.id);
                     }
                   }
                   await load();
