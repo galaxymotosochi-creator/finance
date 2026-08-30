@@ -7,6 +7,7 @@ export default function PnL() {
   const [period, setPeriod] = useState('month');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [errMsg, setErrMsg] = useState(null);
 
   const getDateRange = () => {
     const now = new Date();
@@ -46,11 +47,12 @@ export default function PnL() {
           // Чеки за период
           supabase.from('receipts').select('id,total_amount')
             .eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
-          // Все чеки (для себестоимости)
+          // Все чеки (для расчёта остатков склада)
           supabase.from('receipts').select('id')
             .eq('user_id', user.id),
           supabase.from('supplies').select('items').eq('user_id', user.id),
-          supabase.from('products').select('id,name').eq('user_id', user.id).eq('hidden', false),
+          // Все товары (включая скрытые — по ним тоже продажи/себестоимость)
+          supabase.from('products').select('id,name').eq('user_id', user.id),
           // Расходные транзакции за период
           supabase.from('transactions').select('amount,category_id')
             .eq('user_id', user.id).eq('type', 'expense').gte('date', dr.from).lte('date', dr.to),
@@ -65,10 +67,16 @@ export default function PnL() {
         // Продажи за период
         const salesRev = (recs || []).reduce((s, r) => s + (r.total_amount || 0), 0);
 
-        // Все ID чеков
+        // Позиции чеков ЗА ПЕРИОД (для себестоимости) — только чеки периода
+        const periodRecIds = (recs || []).map(r => r.id);
+        const { data: recItems } = periodRecIds.length
+          ? await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id', periodRecIds)
+          : { data: [] };
+
+        // Все ID чеков (для расчёта остатков склада)
         const allRecIds = (allRecs || []).map(r => r.id);
         const { data: recItemsAll } = allRecIds.length
-          ? await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id', allRecIds)
+          ? await supabase.from('receipt_items').select('product_name,quantity').in('receipt_id', allRecIds)
           : { data: [] };
 
         // Себестоимость — средняя цена из поставок
@@ -87,9 +95,9 @@ export default function PnL() {
         const prodNameMap = {};
         (products || []).forEach(p => { prodNameMap[p.name] = p.id; });
 
-        // Себестоимость ВСЕХ проданных товаров (все чеки, не только за период)
+        // Себестоимость проданного ЗА ПЕРИОД (по средней цене из поставок)
         let totalCogs = 0;
-        (recItemsAll || []).forEach(item => {
+        (recItems || []).forEach(item => {
           const pid = prodNameMap[item.product_name];
           if (pid && avgCost[pid]) {
             totalCogs += (item.quantity || 0) * avgCost[pid];
@@ -120,18 +128,19 @@ export default function PnL() {
         const netProfit = grossProfit - opTotal;
         const profitability = salesRev > 0 ? Math.round(netProfit / salesRev * 100) : 0;
 
-        // Товарный запас (по себестоимости) — остатки на складе
+        // Товарный запас (по себестоимости) = приход − списания − продажи
         const stockQty = {};
         (supplies || []).forEach(sp => (sp.items || []).forEach(it => {
-          if (!stockQty[it.prodId]) stockQty[it.prodId] = { qty: 0, cost: 0 };
+          if (!stockQty[it.prodId]) stockQty[it.prodId] = { qty: 0 };
           stockQty[it.prodId].qty += it.qty || 0;
-          stockQty[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
         }));
         (writeoffs || []).forEach(w => (w.items || []).forEach(it => {
           if (stockQty[it.prodId]) stockQty[it.prodId].qty -= it.qty || 0;
         }));
-        const stockCost = Object.values(stockQty).reduce((s, v) => s + v.cost * (v.qty / (Object.values(costTotals).find(c => false) || 1)), 0);
-        // Правильный расчёт товарного запаса
+        (recItemsAll || []).forEach(item => {
+          const pid = prodNameMap[item.product_name];
+          if (pid && stockQty[pid]) stockQty[pid].qty -= item.quantity || 0;
+        });
         let totalStockValue = 0;
         for (const [id, v] of Object.entries(stockQty)) {
           const costPerUnit = avgCost[id];
@@ -164,6 +173,7 @@ export default function PnL() {
           month: now.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
         });
       } catch (e) {
+        setErrMsg(e.message || 'неизвестная ошибка');
         console.error('PnL error:', e);
       }
       setLoading(false);
@@ -191,6 +201,7 @@ export default function PnL() {
   }
 
   const d = data;
+  if (errMsg) return <div className="empty-products"><div className="big-icon">⚠️</div><p>Ошибка загрузки: {errMsg}</p></div>;
   if (!d) return <div className="empty-products"><div className="big-icon">📊</div><p>Нет данных</p></div>;
 
   return (
@@ -217,7 +228,7 @@ export default function PnL() {
         <Row label="Продажи" value={`+${d.salesRev.toLocaleString()} ₽`} />
         <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ₽`} color="#dc2626" />
         <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
-        <Row label="Валовая прибыль" value={`+${d.grossProfit.toLocaleString()} ₽`} color="#16a34a" bold />
+        <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ₽`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
       </div>
 
       {/* Карточка: Расходы */}

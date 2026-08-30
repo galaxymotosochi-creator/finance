@@ -401,6 +401,15 @@ app.get('/api/:table', auth, async (req, res) => {
             else if (op === 'lt') { sql += ' AND ' + cleanCol + ' < $' + paramIdx + cast; params.push(v); paramIdx++; }
             else if (op === 'lte') { sql += ' AND ' + cleanCol + ' <= $' + paramIdx + cast; params.push(v); paramIdx++; }
             else if (op === 'like' || op === 'ilike') { sql += ' AND ' + cleanCol + ' ' + op + ' $' + paramIdx; params.push(v); paramIdx++; }
+            else if (op === 'in') {
+              // col=in.(v1,v2,v3) — список через запятую (раньше оператор игнорировался и возвращались ВСЕ строки)
+              const list = v.split(',').map(x => x.trim()).filter(x => x !== '');
+              if (list.length > 0) {
+                sql += ' AND ' + cleanCol + ' IN (' + list.map((_, i) => '$' + (paramIdx + i) + cast).join(',') + ')';
+                params.push(...list);
+                paramIdx += list.length;
+              }
+            }
             else if (op === 'is') {
               // is НЕ добавляет параметр — paramIdx не сдвигаем (фикс "could not determine data type")
               if (v === 'null') sql += ' AND ' + cleanCol + ' IS NULL';
