@@ -109,9 +109,15 @@ const refreshCostMap = async (userId) => {
 };
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
 const getCols = () => {
+  const def = new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('productsCols');
-  if (saved) return new Set(JSON.parse(saved));
-  return new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
+  if (saved) {
+    // Добавляем новые колонки по умолчанию (например, «Мин. цена») к сохранённым настройкам
+    const set = new Set(JSON.parse(saved));
+    def.forEach(id => set.add(id));
+    return set;
+  }
+  return def;
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
