@@ -303,7 +303,7 @@ export default function Stock() {
                       </span>
                     ) : '—'}
                   </td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{costPrice.toLocaleString()}</td>
+                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{(costPrice * qty).toLocaleString()}</td>
                   <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     <span className="editable-price"
                       style={{cursor:'pointer',color:'#222',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
