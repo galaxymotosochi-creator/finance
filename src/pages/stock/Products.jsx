@@ -56,6 +56,7 @@ const ALL_COLUMNS = [
   { id:'category', label:'Категория', def:true },
   { id:'cost', label:'Себестоимость', def:true },
   { id:'price', label:'Цена', def:true },
+  { id:'min_price', label:'Мин. цена', def:true },
   { id:'markup', label:'Наценка', def:true },
   // Дополнительные (не включены по умолчанию)
   { id:'unit', label:'Ед. измерения' },
@@ -114,8 +115,8 @@ const getCols = () => {
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
-const COL_ORDER = ['name','type','category','cost','price','markup','unit','sku','barcode','weight','description'];
-const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', description:'Описание' };
+const COL_ORDER = ['name','type','category','cost','price','min_price','markup','unit','sku','barcode','weight','description'];
+const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', min_price:'Мин. цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', description:'Описание' };
 
 export default function Products() {
   const cur = getCurrencySymbol();
@@ -140,6 +141,7 @@ export default function Products() {
   const [fName, setFName] = useState('');
   const [fCat, setFCat] = useState('');
   const [fPrice, setFPrice] = useState('');
+  const [fMinPrice, setFMinPrice] = useState('');
   const [fUnit, setFUnit] = useState('');
   const [fSku, setFSku] = useState('');
   const [fBarcode, setFBarcode] = useState('');
@@ -231,7 +233,7 @@ export default function Products() {
 
   const openAdd = () => {
     setEditId(null); setMode('add'); setFHidden(false); setFPhoto('');
-    setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
+    setFName(''); setFCat(''); setFPrice(''); setFMinPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
     setFComboSearch('');
@@ -240,7 +242,7 @@ export default function Products() {
 
   const openEdit = (p) => {
     setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false); setFPhoto(p.photo_url || '');
-    setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || ''));
+    setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || '')); setFMinPrice(String(p.min_price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
     setFWeightUnit(p.weight_unit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
@@ -272,6 +274,7 @@ export default function Products() {
     const productData = {
       name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
       sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
+      min_price: parseFloat(fMinPrice) || 0,
       weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
       min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
       hidden: editId ? fHidden : false,
@@ -537,9 +540,10 @@ export default function Products() {
       case 'cost': {
         const cp = costPrice(p);
         if (p.type === 'service') return '<span style="color:#222">—</span>';
-        return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + '  $₽' : '—'}</span>`;
+        return `<span class="prod-cat">${cp > 0 ? cp.toLocaleString() + ' ' + cur : '—'}</span>`;
       }
       case 'price': return `<span class="prod-price" style="color:#222">${(p.price || 0).toLocaleString()} ${cur}</span>`;
+      case 'min_price': return `<span style="color:#b45309">${p.min_price > 0 ? p.min_price.toLocaleString() + ' ' + cur : '—'}</span>`;
       case 'markup': {
         if (p.type === 'service') return '<span style="color:#222">—</span>';
         const cp = costPrice(p);
@@ -769,6 +773,10 @@ export default function Products() {
                   <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
                 </div>
                 <div className="form-group">
+                  <label>Мин. цена (ниже — только с разрешения)</label>
+                  <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0 — без ограничения" />
+                </div>
+                <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
                     <option value="">— выберите —</option>
@@ -905,6 +913,7 @@ export default function Products() {
             ['Категория', viewProduct.cat ? (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '—'],
             ['Тип', typeLabel],
             ['Цена', Number(viewProduct.price || 0).toLocaleString() + ' ' + cur],
+            viewProduct.min_price > 0 ? ['Мин. цена', Number(viewProduct.min_price).toLocaleString() + ' ' + cur] : null,
             costPrice > 0 ? ['Себестоимость', costPrice.toLocaleString() + ' ' + cur] : null,
             markPct > 0 ? ['Наценка', '+' + markPct + '%'] : null,
             viewProduct.type !== 'service' ? ['Остаток', Math.max(0, st.qty) + (viewProduct.unit ? ' ' + viewProduct.unit : '')] : null,

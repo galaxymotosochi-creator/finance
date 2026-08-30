@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import QuaggaInit from 'quagga';
@@ -83,6 +83,11 @@ export default function Registers({ fullscreen }) {
   const [viewingReceipt, setViewingReceipt] = useState(null);
   const [currentReceiptNum, setCurrentReceiptNum] = useState(null);
   const [pinLocked, setPinLocked] = useState(true);
+  // Подтверждение скидки ниже минимальной цены (пин руководителя — мастер-пин)
+  const [minPriceConfirm, setMinPriceConfirm] = useState(false);
+  const [minPricePin, setMinPricePin] = useState('');
+  const [minPriceError, setMinPriceError] = useState(false);
+  const minPriceApprovedRef = useRef(false);
   const [pinValue, setPinValue] = useState('');
   const [pinError, setPinError] = useState(false);
   const PIN_MASTER = '8888';
@@ -317,7 +322,7 @@ export default function Registers({ fullscreen }) {
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
       const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, type: p.type, ...comboData }];
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, ...comboData }];
     });
   };
 
@@ -384,6 +389,14 @@ export default function Registers({ fullscreen }) {
     // Проверки до создания чека (клиент обязателен только для продажи в долг)
     if (!selectedClient && payUnpaid) { setProcessingPay(false); return setToast('⚠️ Для продажи в долг выберите клиента'); }
     if (!payUnpaid && !payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
+
+    // Минимальная цена: итог чека ниже суммы минимальных цен позиций — нужно подтверждение руководителя
+    const sumMinPrice = cart.reduce((s, i) => s + ((Number(i.min_price) || 0) * (i.qty || 1)), 0);
+    if (!minPriceApprovedRef.current && sumMinPrice > 0 && finalTotal < sumMinPrice) {
+      setMinPriceConfirm(true);
+      setProcessingPay(false);
+      return;
+    }
 
     // Определяем статус чека
     var receiptStatus = 'paid';
@@ -491,6 +504,7 @@ export default function Registers({ fullscreen }) {
     
     setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: receiptStatus, type:'income' }]);
     setCart([]); setShowPay(false); setPayMode(null); setLoyaltyPct(0); setLoyaltyPointsSpend(0);
+    minPriceApprovedRef.current = false;
     setProcessingPay(false);
     const msg = receiptStatus === 'paid'
       ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
@@ -695,6 +709,35 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
         </div>
       )}
       <div style={{display:'flex',flexDirection:'column',flex:1,flexShrink:0,width:'100%'}}>
+      {/* Подтверждение скидки ниже минимальной цены (пин руководителя) */}
+      {minPriceConfirm && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setMinPriceConfirm(false)}>
+          <div style={{background:'#fff',borderRadius:16,padding:20,maxWidth:340,width:'100%'}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:'1rem',fontWeight:700,marginBottom:4}}>Скидка ниже минимальной цены</div>
+            <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:14,lineHeight:1.5}}>Итог чека ниже суммы минимальных цен. Для подтверждения введите пин руководителя:</div>
+            <input type="password" inputMode="numeric" maxLength={4} value={minPricePin} autoFocus
+              onChange={e=>{
+                setMinPricePin(e.target.value); setMinPriceError(false);
+                if (e.target.value.length === 4) {
+                  if (e.target.value === PIN_MASTER) {
+                    minPriceApprovedRef.current = true;
+                    setMinPriceConfirm(false); setMinPricePin('');
+                    processPay();
+                  } else {
+                    setMinPriceError(true);
+                    setTimeout(() => setMinPricePin(''), 700);
+                  }
+                }
+              }}
+              style={{width:'100%',padding:'.55rem',border:'1.5px solid '+(minPriceError?'#dc2626':'var(--border)'),borderRadius:10,fontSize:'1.1rem',textAlign:'center',letterSpacing:8,fontFamily:'inherit',outline:'none'}} placeholder="••••" />
+            {minPriceError && <div style={{color:'#dc2626',fontSize:'.75rem',marginTop:6,textAlign:'center'}}>Неверный пин</div>}
+            <div style={{display:'flex',gap:8,marginTop:14}}>
+              <button onClick={()=>setMinPriceConfirm(false)} style={{flex:1,padding:'.5rem',borderRadius:100,border:'1.5px solid var(--border)',background:'#fff',color:'#555',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.95rem',color:'#444',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
@@ -1047,6 +1090,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <span style={{fontSize:'.76rem',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
                 ) : null}
               </div>
+                {p.min_price > 0 && <div style={{fontSize:'.7rem',fontWeight:600,color:'#b45309'}}>Мин. цена: {Number(p.min_price).toLocaleString()} {cur}</div>}
               </div>
             </div>
           ))}
