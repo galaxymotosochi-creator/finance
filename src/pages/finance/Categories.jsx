@@ -30,12 +30,17 @@ export default function Categories() {
 
   const fetch = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('name');
-    setList(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('name');
+      if (error) throw error;
+      setList(data || []);
+    } catch (e) {
+      setToast('⚠️ Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'));
+    }
     setLoading(false);
   };
 
@@ -58,11 +63,13 @@ export default function Categories() {
     e.preventDefault();
     if (!dirName.trim()) { setToast('⚠️ Введите название'); return; }
     try {
+      let res;
       if (editingId) {
-        await supabase.from('categories').update({ name: dirName.trim(), type: dirType }).eq('id', editingId);
+        res = await supabase.from('categories').update({ name: dirName.trim(), type: dirType }).eq('id', editingId);
       } else {
-        await supabase.from('categories').insert({ user_id: user.id, name: dirName.trim(), type: dirType });
+        res = await supabase.from('categories').insert({ user_id: user.id, name: dirName.trim(), type: dirType });
       }
+      if (res.error) throw res.error;
       setShowModal(false);
       setEditingId(null);
       setDirName('');
@@ -80,10 +87,11 @@ export default function Categories() {
     if (!pendingDeleteId) return;
     setShowConfirm(false);
     try {
-      // Проверяем, используется ли категория в операциях
-      const { count } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('category_id', pendingDeleteId);
-      if (count > 0) {
-        setToast('⚠️ Эта категория используется в ' + count + ' операциях. Сначала переназначьте операции на другую категорию');
+      // Проверяем, используется ли категория в операциях.
+      // Внимание: кастомный клиент не поддерживает count/head — считаем длину списка.
+      const { data: usedTx } = await supabase.from('transactions').select('id').eq('category_id', pendingDeleteId);
+      if (usedTx && usedTx.length > 0) {
+        setToast('⚠️ Эта категория используется в ' + usedTx.length + ' операциях. Сначала переназначьте операции на другую категорию');
         setPendingDeleteId(null);
         return;
       }
@@ -97,15 +105,6 @@ export default function Categories() {
       await fetch();
     } catch (err) { setToast('⚠️ ' + err.message); }
     setPendingDeleteId(null);
-  };
-
-  const toggleMenu = (e) => {
-    e.stopPropagation();
-    const el = e.currentTarget.nextElementSibling;
-    el.classList.add('open');
-    var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');
-    const h = function () { el.classList.remove('open'); document.removeEventListener('click', h); };
-    setTimeout(function () { document.addEventListener('click', h); }, 10);
   };
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
