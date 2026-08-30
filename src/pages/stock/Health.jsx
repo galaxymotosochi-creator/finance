@@ -21,16 +21,21 @@ export default function Health() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [prodRes, supRes, woRes] = await Promise.all([
-        supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('supplies').select('items').eq('user_id', user.id),
-        supabase.from('writeoffs').select('*').eq('user_id', user.id),
-      ]);
-      if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden));
-      const supplies = [];
-      (supRes.data || []).forEach(sp => { (sp.items || []).forEach(it => { supplies.push(it); }); });
-      setSuppliesCache(supplies);
-      setWriteoffs(woRes.data || []);
+      try {
+        const [prodRes, supRes, woRes] = await Promise.all([
+          supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+          supabase.from('supplies').select('items').eq('user_id', user.id),
+          supabase.from('writeoffs').select('*').eq('user_id', user.id),
+        ]);
+        if (prodRes.error) throw prodRes.error;
+        if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden));
+        const supplies = [];
+        (supRes.data || []).forEach(sp => { (sp.items || []).forEach(it => { supplies.push(it); }); });
+        setSuppliesCache(supplies);
+        setWriteoffs(woRes.data || []);
+      } catch (e) {
+        alert('Ошибка загрузки аналитики: ' + (e.message || 'неизвестная ошибка'));
+      }
       setLoading(false);
     })();
   }, [user]);
@@ -64,7 +69,8 @@ export default function Health() {
       const pid = wo.product_id;
       if (pid) {
         if (!map[pid]) map[pid] = { qty: 0, cost: 0 };
-        map[pid].qty -= wo.quantity || 0;
+        // quantity из БД приходит строкой (numeric) — Number обязателен, иначе вычитание даст NaN-логику
+        map[pid].qty -= (Number(wo.quantity) || 0);
         if (map[pid].qty < 0) map[pid].qty = 0;
       }
     });
@@ -83,7 +89,8 @@ export default function Health() {
       const pid = wo.product_id;
       if (!pid) return;
       if (!velocity[pid]) velocity[pid] = { qty: 0, count: 0 };
-      velocity[pid].qty += wo.quantity || 0;
+      // quantity из БД приходит строкой (numeric) — без Number будет конкатенация строк («40»+«40»=«4040»)
+      velocity[pid].qty += (Number(wo.quantity) || 0);
       velocity[pid].count += 1;
     });
     const result = {};
@@ -337,13 +344,13 @@ export default function Health() {
                 {h.status===HEALTH.critical && (
                   <div style={{display:'flex',gap:'6px',marginTop:'8px',paddingTop:'10px',
                     borderTop:'1px solid #f0f0f0'}}>
-                    <button onClick={()=>navigateTo('/supplies/add')}
+                    <button onClick={()=>navigateTo('/stock/supply/new')}
                       style={{flex:1,padding:'5px 8px',fontSize:'.68rem',fontWeight:600,
                         borderRadius:'6px',border:'1.5px solid #16a34a',color:'#16a34a',
                         background:'#f0fdf4',cursor:'pointer',fontFamily:'inherit'}}>
                       📦 Заказать
                     </button>
-                    <button
+                    <button onClick={()=>navigateTo('/stock/products')}
                       style={{flex:1,padding:'5px 8px',fontSize:'.68rem',fontWeight:600,
                         borderRadius:'6px',border:'1.5px solid #f59e0b',color:'#92400e',
                         background:'#fffbeb',cursor:'pointer',fontFamily:'inherit'}}>
@@ -355,7 +362,8 @@ export default function Health() {
                 {/* Для медленных — кнопка возврата */}
                 {h.isSlow && h.status!==HEALTH.critical && (
                   <div style={{marginTop:'8px',paddingTop:'10px',borderTop:'1px solid #f0f0f0'}}>
-                    <button style={{padding:'4px 10px',fontSize:'.68rem',fontWeight:600,
+                    <button onClick={()=>navigateTo('/stock/writeoffs')}
+                      style={{padding:'4px 10px',fontSize:'.68rem',fontWeight:600,
                       borderRadius:'6px',border:'1.5px solid #dc2626',color:'#dc2626',
                       background:'#fef2f2',cursor:'pointer',fontFamily:'inherit',width:'100%'}}>
                       ↩️ Вернуть / Уценить
