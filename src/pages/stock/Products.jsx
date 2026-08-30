@@ -779,8 +779,8 @@ export default function Products() {
                   <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
                 </div>
                 <div className="form-group">
-                  <label>Мин. цена (ниже — только с разрешения)</label>
-                  <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0 — без ограничения" />
+                  <label>Минимальная цена</label>
+                  <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0" />
                 </div>
                 <div className="form-group">
                   <label>Ед. измерения</label>
