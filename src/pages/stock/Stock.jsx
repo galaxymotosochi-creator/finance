@@ -147,7 +147,8 @@ export default function Stock() {
 
   // Initial stock handlers
   const openInitialStock = () => {
-    const existing = getInitialStock();
+    // Читаем сохранённые остатки из БД (а не только localStorage — иначе после сохранения показываются нули)
+    const existing = initialCache || getInitialStock();
     if (existing && existing.done) {
       setShowConfirm(true);
     } else {
@@ -156,7 +157,7 @@ export default function Stock() {
   };
 
   const prepareInitModal = () => {
-    const existing = getInitialStock();
+    const existing = initialCache || getInitialStock();
     const qtyMap = {};
     const costMap = {};
     (productsFromDB.length ? productsFromDB : products).forEach(p => {
@@ -192,7 +193,11 @@ export default function Stock() {
       return;
     }
     const { error } = await supabase.from('initial_stocks').upsert({ user_id: user.id, items: filtered, costs: filteredCosts, done: true }).eq('user_id', user.id);
-    if (!error) { setShowInitModal(false); await load(); setToast('Начальные остатки сохранены'); }
+    if (!error) {
+      // Синхронизируем и в localStorage, чтобы повторное открытие показывало сохранённые значения
+      setInitialStock({ items: filtered, costs: filteredCosts, done: true });
+      setShowInitModal(false); await load(); setToast('Начальные остатки сохранены');
+    }
     else alert(error.message);
   };
 
@@ -332,7 +337,7 @@ export default function Stock() {
         </>}>
       </Modal>
 
-      <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Укажите количество каждого товара на складе" width="wide">
+      <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
 
             <div className="stock-search" style={{marginBottom:'.6rem'}}>
               <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
