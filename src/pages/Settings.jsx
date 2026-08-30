@@ -90,21 +90,35 @@ export default function Settings() {
     })();
   }, [user]);
   const [tzDrop, setTzDrop] = useState(false);
-  const cityTz = {
-    'Москва':'Europe/Moscow','Санкт-Петербург':'Europe/Moscow','Новосибирск':'Asia/Novosibirsk',
-    'Екатеринбург':'Asia/Yekaterinburg','Казань':'Europe/Moscow','Красноярск':'Asia/Krasnoyarsk',
-    'Нижний Новгород':'Europe/Moscow','Челябинск':'Asia/Yekaterinburg','Уфа':'Asia/Yekaterinburg',
-    'Самара':'Europe/Samara','Ростов-на-Дону':'Europe/Moscow','Омск':'Asia/Omsk',
-    'Владивосток':'Asia/Vladivostok','Иркутск':'Asia/Irkutsk','Хабаровск':'Asia/Vladivostok',
-    'Алматы':'Asia/Almaty','Астана':'Asia/Almaty','Нур-Султан':'Asia/Almaty','Шымкент':'Asia/Almaty',
-    'Минск':'Europe/Minsk','Гомель':'Europe/Minsk','Ереван':'Asia/Yerevan','Ташкент':'Asia/Tashkent',
-    'Самарканд':'Asia/Samarkand','Бишкек':'Asia/Bishkek','Ош':'Asia/Bishkek',
+  // Часовые пояса по странам (город → зона, + смещение)
+  const TZ_BY_COUNTRY = {
+    'Россия': [
+      ['Europe/Kaliningrad','Калининград','+2'],
+      ['Europe/Moscow','Москва','+3'],['Europe/Moscow','Санкт-Петербург','+3'],['Europe/Moscow','Казань','+3'],['Europe/Moscow','Нижний Новгород','+3'],['Europe/Moscow','Ростов-на-Дону','+3'],
+      ['Europe/Samara','Самара','+4'],
+      ['Asia/Yekaterinburg','Екатеринбург','+5'],['Asia/Yekaterinburg','Челябинск','+5'],['Asia/Yekaterinburg','Уфа','+5'],['Asia/Yekaterinburg','Пермь','+5'],['Asia/Yekaterinburg','Тюмень','+5'],
+      ['Asia/Omsk','Омск','+6'],
+      ['Asia/Novosibirsk','Новосибирск','+7'],['Asia/Novosibirsk','Томск','+7'],['Asia/Novosibirsk','Кемерово','+7'],['Asia/Novosibirsk','Барнаул','+7'],
+      ['Asia/Krasnoyarsk','Красноярск','+7'],['Asia/Krasnoyarsk','Абакан','+7'],
+      ['Asia/Irkutsk','Иркутск','+8'],['Asia/Irkutsk','Улан-Удэ','+8'],
+      ['Asia/Yakutsk','Якутск','+9'],
+      ['Asia/Vladivostok','Владивосток','+10'],['Asia/Vladivostok','Хабаровск','+10'],
+      ['Asia/Magadan','Магадан','+11'],
+      ['Asia/Kamchatka','Петропавловск-Камчатский','+12'],
+    ],
+    'Казахстан': [
+      ['Asia/Almaty','Алматы','+5'],['Asia/Almaty','Астана','+5'],['Asia/Almaty','Шымкент','+5'],['Asia/Almaty','Караганда','+5'],['Asia/Almaty','Павлодар','+5'],['Asia/Almaty','Семей','+5'],['Asia/Almaty','Усть-Каменогорск','+5'],['Asia/Almaty','Талдыкорган','+5'],['Asia/Almaty','Туркестан','+5'],
+      ['Asia/Qostanay','Костанай','+5'],['Asia/Aqtobe','Актобе','+5'],['Asia/Atyrau','Атырау','+5'],['Asia/Aqtau','Актау','+5'],['Asia/Oral','Уральск','+5'],['Asia/Qyzylorda','Кызылорда','+5'],
+    ],
+    'Беларусь': [['Europe/Minsk','Минск','+3'],['Europe/Minsk','Гомель','+3'],['Europe/Minsk','Брест','+3'],['Europe/Minsk','Витебск','+3'],['Europe/Minsk','Гродно','+3'],['Europe/Minsk','Могилёв','+3']],
+    'Армения': [['Asia/Yerevan','Ереван','+4'],['Asia/Yerevan','Гюмри','+4'],['Asia/Yerevan','Ванадзор','+4']],
+    'Узбекистан': [['Asia/Tashkent','Ташкент','+5'],['Asia/Samarkand','Самарканд','+5'],['Asia/Samarkand','Бухара','+5'],['Asia/Tashkent','Наманган','+5'],['Asia/Tashkent','Андижан','+5'],['Asia/Tashkent','Фергана','+5']],
+    'Кыргызстан': [['Asia/Bishkek','Бишкек','+6'],['Asia/Bishkek','Ош','+6'],['Asia/Bishkek','Джалал-Абад','+6'],['Asia/Bishkek','Каракол','+6']],
   };
-  const tzLabels = {'Europe/Moscow':'МСК','Europe/Minsk':'+3','Europe/Samara':'+4',
-    'Asia/Yekaterinburg':'+5','Asia/Almaty':'+5','Asia/Novosibirsk':'+7',
-    'Asia/Krasnoyarsk':'+7','Asia/Irkutsk':'+8','Asia/Vladivostok':'+10',
-    'Asia/Omsk':'+6','Asia/Tashkent':'+5','Asia/Samarkand':'+5','Asia/Bishkek':'+6',
-    'Asia/Yerevan':'+4'};
+  const tzLabels = {'Europe/Kaliningrad':'+2','Europe/Moscow':'МСК','Europe/Samara':'+4',
+    'Asia/Yekaterinburg':'+5','Asia/Almaty':'+5','Asia/Qostanay':'+5','Asia/Aqtobe':'+5','Asia/Atyrau':'+5','Asia/Aqtau':'+5','Asia/Oral':'+5','Asia/Qyzylorda':'+5',
+    'Asia/Novosibirsk':'+7','Asia/Krasnoyarsk':'+7','Asia/Omsk':'+6','Asia/Irkutsk':'+8','Asia/Yakutsk':'+9','Asia/Vladivostok':'+10','Asia/Magadan':'+11','Asia/Kamchatka':'+12',
+    'Asia/Tashkent':'+5','Asia/Samarkand':'+5','Asia/Bishkek':'+6','Asia/Yerevan':'+4','Europe/Minsk':'+3'};
   const [notifications, setNotifications] = useState({ email: true, telegram: false, push: false, sales: true, stock: true, payment: true });
 
   // Проверка статуса Telegram
@@ -217,7 +231,11 @@ export default function Settings() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Страна</label>
-            <select value={country} onChange={e => { setCountry(e.target.value); setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB'); }}
+            <select value={country} onChange={e => { setCountry(e.target.value); setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB');
+                // При смене страны подставляем первый её часовой пояс
+                const zones = TZ_BY_COUNTRY[e.target.value] || [];
+                if (zones.length > 0) { setTz(zones[0][0]); setTzSearch(zones[0][1]); }
+              }}
               style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
               {countries.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -246,13 +264,13 @@ export default function Settings() {
                 style={{ width: '100%', padding: '.5rem .65rem', fontSize: '.82rem', border: '1.5px solid rgba(0,0,0,.12)', borderRadius: 'var(--radius-md)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
               {tzDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius: 'var(--radius-md)',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:180,overflowY:'auto',marginTop:2}}>
-                  {Object.entries(cityTz).filter(([city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).map(([city, zone]) => (
+                  {(TZ_BY_COUNTRY[country] || []).filter(([zone, city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).map(([zone, city, label]) => (
                     <div key={city} onMouseDown={() => { setTz(zone); setTzSearch(city); setTzDrop(false); }}
                       style={{padding:'7px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5'}}
                       onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
-                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{city} <span style={{color:'#999',fontSize:'11px'}}>({tzLabels[zone] || zone})</span></div>
+                      onMouseLeave={e => e.currentTarget.style.background='#fff'}>{city} <span style={{color:'#999',fontSize:'11px'}}>({tzLabels[zone] || label || zone})</span></div>
                   ))}
-                  {Object.entries(cityTz).filter(([city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).length === 0 && (
+                  {(TZ_BY_COUNTRY[country] || []).filter(([zone, city]) => !tzSearch || city.toLowerCase().includes(tzSearch.toLowerCase())).length === 0 && (
                     <div style={{padding:10,fontSize:12,color:'#999',textAlign:'center'}}>Город не найден</div>
                   )}
                 </div>
