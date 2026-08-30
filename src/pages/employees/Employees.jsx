@@ -180,7 +180,9 @@ export default function Employees() {
         savedId = ins.data.id;
       }
 
-      if (fEmail.trim()) {
+      // Приглашение отправляется явно кнопкой «Отправить приглашение» (повторно — тоже)
+      // Авто-отправка только при создании нового сотрудника с email
+      if (fEmail.trim() && !editId) {
         try {
           var s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
           await fetch('/api/invite-user', {
@@ -193,6 +195,23 @@ export default function Employees() {
 
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
+  };
+
+  // Отправка приглашения доступа сотруднику (письмо с паролем)
+  const sendInvite = async (emp) => {
+    if (!emp) return;
+    if (!emp.email) return alert('У сотрудника не указан email — добавьте его в карточке');
+    try {
+      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+      const res = await fetch('/api/invite-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (s.access_token || '') },
+        body: JSON.stringify({ email: emp.email, employeeId: emp.id, employeeName: emp.name }),
+      });
+      const d = await res.json();
+      if (res.ok) alert('Приглашение отправлено на ' + emp.email + '. Проверьте почту (и папку «Спам»).');
+      else alert(d.error || 'Ошибка отправки приглашения');
+    } catch (e) { alert('Ошибка: ' + e.message); }
   };
 
   const save = async (e) => {
@@ -350,6 +369,7 @@ export default function Employees() {
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => openEdit(emp)}>Редактировать</button>
+                        {emp.email ? <button onClick={() => sendInvite(emp)}>Отправить приглашение</button> : null}
                         <button onClick={() => remove(emp.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>
