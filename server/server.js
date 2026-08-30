@@ -339,7 +339,7 @@ app.get('/api/auth/me', auth, async (req, res) => {
 
 const ALLOWED_TABLES = ['products','categories','accounts','transactions','receipts','receipt_items',
   'shifts','supplies','writeoffs','inventory','suppliers','employees','positions','position_templates',
-  'timesheet','timesheet_entries','clients','loyalty','loyalties','promos','subscriptions',
+  'timesheet','timesheet_entries','clients','loyalty','loyalties','loyalty_programs','promos','subscriptions',
   'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks'];
 
 // --- Схема БД: кеш колонок и типов (чтобы корректно приводить типы фильтров) ---

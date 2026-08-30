@@ -10,6 +10,9 @@ export default function QuickSale({ onClose }) {
   const [search, setSearch] = useState('');
   const [cart, setCart] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+  // Лояльность: программы и автоскидка
+  const [loyaltyPrograms, setLoyaltyPrograms] = useState([]);
+  const [loyaltyPct, setLoyaltyPct] = useState(0);
   const [clientSearch, setClientSearch] = useState('');
   const [clientDrop, setClientDrop] = useState(false);
   const [payMode, setPayMode] = useState(null);
@@ -26,17 +29,19 @@ export default function QuickSale({ onClose }) {
 
   useEffect(() => {
     (async () => {
-      const [pRes, aRes, clRes, catRes] = await Promise.all([
+      const [pRes, aRes, clRes, catRes, loyRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id).order('start_date'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('loyalty_programs').select('*').eq('user_id', user.id),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (aRes.data) setAccounts(aRes.data);
       if (clRes?.data) setClients(clRes.data);
       if (catRes?.data) setAllCats(catRes.data);
+      if (loyRes && !loyRes.error && loyRes.data) setLoyaltyPrograms(loyRes.data);
       // Средняя себестоимость для списаний при продаже
       Promise.all([
         supabase.from('supplies').select('items').eq('user_id', user.id),
@@ -117,6 +122,31 @@ export default function QuickSale({ onClose }) {
     });
   };
 
+  // Лояльность: скидка программы при выборе клиента (постоянная/накопительная/ДР)
+  const applyLoyalty = async (clientId) => {
+    setLoyaltyPct(0);
+    if (!clientId) return;
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+    const progs = loyaltyPrograms || [];
+    if (progs.length === 0) return;
+    const now = new Date();
+    const todayMD = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const isBday = String(client.birthday || '').slice(5, 10) === todayMD;
+    const birthdayProg = progs.find(p => p.type === 'birthday');
+    if (isBday && birthdayProg) { setLoyaltyPct(parseFloat(birthdayProg.discount) || 0); return; }
+    const accum = progs.find(p => p.type === 'accumulative');
+    if (accum && parseFloat(accum.condition) > 0) {
+      try {
+        const { data: recs } = await supabase.from('receipts').select('total_amount').eq('user_id', user.id).eq('client_id', clientId);
+        const clientTotal = (recs || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+        if (clientTotal >= parseFloat(accum.condition)) { setLoyaltyPct(parseFloat(accum.discount) || 0); return; }
+      } catch (e) {}
+    }
+    const constant = progs.find(p => p.type === 'constant');
+    if (constant) setLoyaltyPct(parseFloat(constant.discount) || 0);
+  };
+
   const processSale = async () => {
     if (!cart.length || !selectedClient) return setToast('⚠️ Добавьте товары и выберите клиента');
     const date = new Date().toISOString().split('T')[0];
@@ -137,13 +167,18 @@ export default function QuickSale({ onClose }) {
     if (payUnpaid) receiptStatus = 'unpaid';
     else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total) receiptStatus = 'partially_paid';
 
+    // Лояльность: скидка по программе клиента
+    const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
+    const finalTotal = Math.max(0, total - loyaltyDiscountAmount);
+
     // Создаём чек
     var clientObj = clients.find(c => c.id === selectedClient);
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
-      date, total_amount: total,
+      date, total_amount: finalTotal,
+      discount_sum: loyaltyDiscountAmount,
       status: receiptStatus,
-      paid_amount: receiptStatus === 'paid' ? total : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, total) : 0),
+      paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       cashier_name: userName || '',
@@ -178,6 +213,7 @@ export default function QuickSale({ onClose }) {
         date, status: 'unpaid', category_id: saleCatId,
       });
       if (error) return setToast('' + error.message);
+      setLoyaltyPct(0);
       onClose();
       return;
     }
@@ -208,6 +244,17 @@ export default function QuickSale({ onClose }) {
       const client = clients.find(c => c.id === selectedClient);
       const curDebt = parseFloat(client?.debt) || 0;
       await supabase.from('clients').update({ debt: curDebt - (total - paidAmt) }).eq('id', selectedClient);
+    }
+
+    // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл, бонусная программа)
+    const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
+    if (bonusProg && selectedClient) {
+      const earned = paidAmt > 0 ? Math.round(Math.min(paidAmt, total)) : 0;
+      if (earned > 0) {
+        const client = clients.find(c => c.id === selectedClient);
+        const cur = Number(client?.points) || 0;
+        await supabase.from('clients').update({ points: cur + earned }).eq('id', selectedClient);
+      }
     }
 
     // Уменьшаем остатки на складе
@@ -243,6 +290,7 @@ export default function QuickSale({ onClose }) {
       }
     } catch(e) { console.error('Ошибка списания со склада:', e); }
 
+    setLoyaltyPct(0);
     onClose();
   };
 
@@ -260,14 +308,14 @@ export default function QuickSale({ onClose }) {
           <div style={{display:'flex',gap:'6px',marginBottom:'12px'}}>
             <div style={{position:'relative',flex:1}}>
               <input type="text" placeholder="Поиск по имени или телефону..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
-                onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
+                onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setLoyaltyPct(0); setClientDrop(true); }}
                 onFocus={() => setClientDrop(true)}
                 onBlur={() => setTimeout(() => setClientDrop(false), 200)}
                 style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
               {clientDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                   {(clientSearch ? clients.filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)) : clients).map(c => (
-                    <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
+                    <div key={c.id} onMouseDown={() => { setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); applyLoyalty(c.id); }}
                       style={{padding:'7px 10px',cursor:'pointer',fontSize:'13px',borderBottom:'1px solid #f5f5f5'}}
                       onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                       onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>

@@ -94,9 +94,11 @@ export default function Loyalty() {
         color:'#1983dd', bg:'#eaf5ff'
       };
       if (editId) {
-        await supabase.from('loyalty_programs').update(obj).eq('id', editId);
+        const { error } = await supabase.from('loyalty_programs').update(obj).eq('id', editId);
+        if (error) throw error;
       } else {
-        await supabase.from('loyalty_programs').insert(obj);
+        const { error } = await supabase.from('loyalty_programs').insert(obj);
+        if (error) throw error;
       }
       await load();
       if (allProgs.length > 0) selectCard(0);
@@ -108,7 +110,8 @@ export default function Loyalty() {
     if (LD_IDS.has(id)) { alert('Встроенную программу нельзя удалить'); return; }
     if (!confirm('Удалить программу "'+(allProgs.find(p=>p.id===id)?.name||'')+'"?')) return;
     try {
-      await supabase.from('loyalty_programs').delete().eq('id', id);
+      const { error } = await supabase.from('loyalty_programs').delete().eq('id', id);
+      if (error) throw error;
       await load();
       setIdx(0);
     } catch (err) { alert('Ошибка удаления: ' + err.message); }

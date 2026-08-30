@@ -19,6 +19,10 @@ export default function Registers({ fullscreen }) {
   const [accounts, setAccounts] = useState([]);
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+  // Лояльность: программы, автоскидка, списание баллов
+  const [loyaltyPrograms, setLoyaltyPrograms] = useState([]);
+  const [loyaltyPct, setLoyaltyPct] = useState(0);
+  const [loyaltyPointsSpend, setLoyaltyPointsSpend] = useState(0);
   const [showAddClient, setShowAddClient] = useState(false);
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
@@ -123,7 +127,7 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes, clRes, proRes, empRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes, proRes, empRes, loyRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
@@ -131,6 +135,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id),
         supabase.from('employees').select('id, name').eq('user_id', user.id).order('name'),
+        supabase.from('loyalty_programs').select('*').eq('user_id', user.id),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
@@ -138,6 +143,7 @@ export default function Registers({ fullscreen }) {
       if (clRes && clRes.data) setClients(clRes.data);
       if (proRes?.data) setPromos(proRes.data);
       if (empRes?.data) setEmployees(empRes.data);
+      if (loyRes && !loyRes.error && loyRes.data) setLoyaltyPrograms(loyRes.data);
       if (sRes.data) {
         setActiveShift(sRes.data);
         // Загружаем чеки открытой смены (для баланса кассы и закрытия)
@@ -288,7 +294,10 @@ export default function Registers({ fullscreen }) {
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const receiptDiscountAmount = receiptDiscountPercent > 0 ? Math.round(total * receiptDiscountPercent / 100) : (receiptDiscountFixed > 0 ? receiptDiscountFixed : 0);
-  const finalTotal = Math.max(0, total - receiptDiscountAmount);
+  // Лояльность: скидка по программе (постоянная/накопительная/ДР) + скидка баллами (1 балл = 1 ₽)
+  const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
+  const loyaltyPointsAmount = Math.min(loyaltyPointsSpend, Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount));
+  const finalTotal = Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount - loyaltyPointsAmount);
 
   // Пересчёт остатков склада из supplies (items) и writeoffs (product_id/quantity)
   const recalcStockMap = function(){
@@ -330,8 +339,8 @@ export default function Registers({ fullscreen }) {
     if (!cart.length) return;
     const date = new Date().toISOString().split('T')[0];
 
-    // Проверки до создания чека
-    if (!selectedClient) { setProcessingPay(false); return setToast('⚠️ Выберите клиента'); }
+    // Проверки до создания чека (клиент обязателен только для продажи в долг)
+    if (!selectedClient && payUnpaid) { setProcessingPay(false); return setToast('⚠️ Для продажи в долг выберите клиента'); }
     if (!payUnpaid && !payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
 
     // Определяем статус чека
@@ -369,7 +378,7 @@ export default function Registers({ fullscreen }) {
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: finalTotal, comment: receiptComment.trim() || null,
-      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0),
+      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0) + (loyaltyDiscountAmount || 0) + (loyaltyPointsAmount || 0),
       status: receiptStatus,
       paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
       payments,
@@ -422,10 +431,21 @@ export default function Registers({ fullscreen }) {
           await supabase.from('clients').update({debt: curDebt - (total - paidAmt)}).eq('id', selectedClient);
         }
       }
+      // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл) и списание использованных баллов
+      const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
+      if (bonusProg) {
+        const paidSum = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+        const earned = receiptStatus !== 'unpaid' ? Math.round(paidSum) : 0;
+        const spent = receiptStatus !== 'unpaid' ? loyaltyPointsAmount : 0;
+        if (earned > 0 || spent > 0) {
+          const cur = Number(client?.points) || 0;
+          await supabase.from('clients').update({ points: Math.max(0, cur + earned - spent) }).eq('id', selectedClient);
+        }
+      }
     }
     
     setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: receiptStatus, type:'income' }]);
-    setCart([]); setShowPay(false); setPayMode(null);
+    setCart([]); setShowPay(false); setPayMode(null); setLoyaltyPct(0); setLoyaltyPointsSpend(0);
     setProcessingPay(false);
     const msg = receiptStatus === 'paid'
       ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
@@ -490,6 +510,34 @@ export default function Registers({ fullscreen }) {
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
     if (data) setProducts(data);
     setToast('Товар добавлен!');
+  };
+
+  // Лояльность: применяем скидку программы при выборе клиента
+  const applyLoyalty = async (clientId) => {
+    setLoyaltyPct(0); setLoyaltyPointsSpend(0);
+    if (!clientId) return;
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+    const progs = loyaltyPrograms || [];
+    if (progs.length === 0) return;
+    const now = new Date();
+    const todayMD = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    // 1) ДР-скидка (в день рождения клиента)
+    const isBday = String(client.birthday || '').slice(5, 10) === todayMD;
+    const birthdayProg = progs.find(p => p.type === 'birthday');
+    if (isBday && birthdayProg) { setLoyaltyPct(parseFloat(birthdayProg.discount) || 0); return; }
+    // 2) Накопительная (если сумма покупок клиента достигла порога, заданного пользователем)
+    const accum = progs.find(p => p.type === 'accumulative');
+    if (accum && parseFloat(accum.condition) > 0) {
+      try {
+        const { data: recs } = await supabase.from('receipts').select('total_amount').eq('user_id', user.id).eq('client_id', clientId);
+        const clientTotal = (recs || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+        if (clientTotal >= parseFloat(accum.condition)) { setLoyaltyPct(parseFloat(accum.discount) || 0); return; }
+      } catch (e) {}
+    }
+    // 3) Постоянная скидка
+    const constant = progs.find(p => p.type === 'constant');
+    if (constant) setLoyaltyPct(parseFloat(constant.discount) || 0);
   };
 
   const openShift = async () => {
@@ -790,6 +838,37 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <span>-{discountTotal.toLocaleString()} ₽</span>
               </div>
             )}
+            {/* Лояльность: автоскидка по программе клиента */}
+            {selectedClient && loyaltyDiscountAmount > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#8b5cf6'}}>
+                <span>Скидка лояльности ({loyaltyPct}%):</span>
+                <span>-{loyaltyDiscountAmount.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {selectedClient && loyaltyPointsAmount > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'#8b5cf6'}}>
+                <span>Скидка баллами:</span>
+                <span>-{loyaltyPointsAmount.toLocaleString()} ₽</span>
+              </div>
+            )}
+            {/* Кнопка списания баллов (бонусная программа: 1 балл = 1 ₽) */}
+            {selectedClient && (() => {
+              const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
+              const points = Number(clients.find(c => c.id === selectedClient)?.points) || 0;
+              if (!bonusProg || points <= 0 || cart.length === 0) return null;
+              const maxSpend = Math.min(points, total - receiptDiscountAmount - loyaltyDiscountAmount);
+              if (maxSpend <= 0) return null;
+              const active = loyaltyPointsSpend > 0;
+              return (
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <span style={{fontSize:'.78rem',color:'var(--muted)'}}>🎁 Баллы клиента: {points.toLocaleString()}</span>
+                  <button type="button" onClick={() => setLoyaltyPointsSpend(active ? 0 : Math.round(maxSpend))}
+                    style={{padding:'4px 12px',borderRadius:'100px',border:active ? '1.5px solid #8b5cf6' : '1.5px solid #ddd',background:active ? '#f3e8ff' : '#fff',color:active ? '#7c3aed' : '#555',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>
+                    {active ? '−' + loyaltyPointsAmount.toLocaleString() + ' ₽ ✓' : 'Списать баллы (−' + maxSpend.toLocaleString() + ' ₽)'}
+                  </button>
+                </div>
+              );
+            })()}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontSize:'.80rem',color:'var(--muted)'}}>К оплате:</span>
               <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} ₽</span>
@@ -1144,14 +1223,14 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <div style={{position:'relative',flex:1}}>
                     <input type="text" placeholder="Поиск по имени или телефону..." 
                       value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
-                      onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setClientDrop(true); }}
+                      onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setLoyaltyPct(0); setLoyaltyPointsSpend(0); setClientDrop(true); }}
                       onFocus={() => setClientDrop(true)}
                       onBlur={() => setTimeout(() => setClientDrop(false), 200)}
                       style={{width:'100%',padding:'9px 10px',border:'1.5px solid #eee',borderRadius:'8px',fontSize:'.76rem',outline:'none',fontFamily:'inherit'}} />
                     {clientDrop && (
                       <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'180px',overflowY:'auto',marginTop:'2px'}}>
                         {clients.filter(c => !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)).map(c => (
-                          <div key={c.id} onPointerDown={function(e){e.preventDefault(); setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); }}
+                          <div key={c.id} onPointerDown={function(e){e.preventDefault(); setSelectedClient(c.id); setClientSearch(c.name + (c.phone ? ' | '+c.phone : '')); setClientDrop(false); applyLoyalty(c.id); }}
                             style={{padding:'8px 10px',cursor:'pointer',fontSize:'.80rem',borderBottom:'1px solid #f5f5f5',background: selectedClient === c.id ? '#f5f5f5' : '#fff'}}
                             onMouseEnter={e => e.currentTarget.style.background='#f9f9f9'}
                             onMouseLeave={e => e.currentTarget.style.background='#fff'}>{c.name}{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1?' | '+j.n1:''}catch(e){return ''}})()}{c.phone ? ' | '+c.phone : ''}</div>
@@ -1200,7 +1279,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
               var clData = await supabase.from('clients').select('*').eq('user_id', user.id).order('name');
               if (clData.data) setClients(clData.data);
               // Автоматически выбираем нового клиента
-              if (data && data.length > 0) setSelectedClient(data[0].id);
+              if (data && data.length > 0) { setSelectedClient(data[0].id); applyLoyalty(data[0].id); }
               setShowAddClient(false);
               setToast('Клиент добавлен');
             }}>
@@ -1552,6 +1631,7 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 <button type="button" onClick={function(){
                   setCart(cur.items || []);
                   setSelectedClient(cur.client || '');
+                  if (cur.client) applyLoyalty(cur.client);
                   setClientSearch(cur.clientName || '');
                   var newList = heldReceipts.filter(function(_,i){return i!==heldIndex;});
                   setHeldReceipts(newList);
