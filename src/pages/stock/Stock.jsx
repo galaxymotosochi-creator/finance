@@ -215,7 +215,7 @@ export default function Stock() {
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openInitialStock}>+ Ввести начальные остатки</button>
+          <button className="btn-mint" onClick={openInitialStock}>Внести остатки (товар уже есть)</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -269,7 +269,13 @@ export default function Stock() {
                 <td colSpan="10">
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
-                    <p>Товаров на складе нет</p>
+                    <p>Склад пока пуст</p>
+                    <div style={{maxWidth:'420px',margin:'0 auto',textAlign:'left',fontSize:'.8rem',color:'#555',lineHeight:1.6,marginTop:'.5rem'}}>
+                      <b>Как добавить товар на склад:</b><br />
+                      • Товар <b>уже куплен</b> и лежит у вас — нажмите «Внести остатки» и укажите его количество<br />
+                      • Товар <b>закупаете сейчас</b> — оформите Поставку (раздел «Поставки»)<br />
+                      После этого остатки появятся здесь и будут меняться сами при продажах.
+                    </div>
                   </div>
                 </td>
               </tr>
