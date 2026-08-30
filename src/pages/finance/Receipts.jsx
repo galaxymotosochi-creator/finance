@@ -94,7 +94,9 @@ export default function Receipts() {
   };
 
   const filtered = receipts.filter(r => {
-    if (statusFilter && r.status !== statusFilter) return false;
+    // «Долги» = не оплачен полностью (включая частично оплаченные)
+    if (statusFilter === 'unpaid' && r.status !== 'unpaid' && r.status !== 'partially_paid') return false;
+    if (statusFilter && statusFilter !== 'unpaid' && r.status !== statusFilter) return false;
     // Фильтр по периоду
     const d = (r.date || r.created_at || '').split('T')[0];
     if (period === 'today' && d !== new Date().toISOString().split('T')[0]) return false;
@@ -136,14 +138,16 @@ export default function Receipts() {
       // Обновляем чек
       const newPaid = (Number(payReceipt.paid_amount)||0) + amt;
       const newStatus = newPaid >= Number(payReceipt.total_amount) ? 'paid' : 'partially_paid';
-      await supabase.from('receipts').update({ status: newStatus, paid_amount: newPaid }).eq('id', payReceipt.id);
+      const updRes = await supabase.from('receipts').update({ status: newStatus, paid_amount: newPaid }).eq('id', payReceipt.id);
+      if (updRes.error) throw updRes.error;
       // Транзакция оплаты долга
-      await supabase.from('transactions').insert({
+      const txRes = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: amt,
         description: 'Оплата долга по чеку № ' + payReceipt.receipt_number,
         date: new Date().toISOString().split('T')[0],
         account_id: payAc, status: 'paid', category_id: saleCatId,
       });
+      if (txRes.error) throw txRes.error;
       // Уменьшаем долг клиента
       if (payReceipt.client_id) {
         const { data: cl } = await supabase.from('clients').select('debt').eq('id', payReceipt.client_id).maybeSingle();
@@ -258,8 +262,8 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
-                  {parseInt(r.receipt_discount) > 0 || parseInt(r.discount_sum) > 0
-                    ? '-' + ((parseInt(r.receipt_discount)||0)+(parseInt(r.discount_sum)||0)).toLocaleString() + ' ₽'
+                  {parseInt(r.discount_sum) > 0
+                    ? '-' + parseInt(r.discount_sum).toLocaleString() + ' ' + cur
                     : '—'}
                 </td>
                 <td style={{ textAlign: 'left' }}>
