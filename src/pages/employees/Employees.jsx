@@ -319,11 +319,11 @@ export default function Employees() {
         <table className="data-table">
           <thead id="colHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
-            <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Принят</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оклад</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>С продаж</th><th style={{width:'110px',textAlign:'left'}}></th>
+            <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Принят</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оклад</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>С продаж</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">👤</div><p>Список сотрудников пуст</p>
+              <tr><td colSpan="9"><div className="empty-products"><div className="big-icon">👤</div><p>Список сотрудников пуст</p>
                     <p style={{color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
             ) : filtered.map(emp => {
               const pos = getPosition(emp.position_id);
@@ -339,6 +339,7 @@ export default function Employees() {
                   <td style={{textAlign:'left',color:'#555'}}>{fmtDate(emp.hire_date)}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{getRulesSummary(emp)}</td>
+                  <td style={{textAlign:'left',color:'#555',fontWeight:600,letterSpacing:1}}>{emp.pin || '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={e => {
