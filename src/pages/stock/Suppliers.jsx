@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
@@ -84,7 +85,7 @@ export default function Suppliers() {
     await load();
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
 
   return (
     <>

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import QuaggaInit from 'quagga';
 import { getCurrencySymbol } from '../lib/currency';
+import Loader from '../components/Loader';
 
 
 export default function Registers({ fullscreen }) {
@@ -668,7 +669,7 @@ document.body.appendChild(c);
     });
 };
 
-if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#fff',zIndex:9999}}><div style={{fontSize:'2rem',marginBottom:'1rem'}}>⏳</div><div style={{fontSize:'.80rem',color:'#777'}}>Загрузка...</div></div>;
+if (loading) return <Loader />;
 
   return (
     <>

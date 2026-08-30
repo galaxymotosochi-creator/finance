@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 
@@ -160,7 +161,7 @@ export default function Inventory() {
     await load();
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
   // Режим редактирования — рендерится как модалка в основном контенте// Режим просмотра списка
   return (
     <>

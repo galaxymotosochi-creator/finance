@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { fmtDate } from '../lib/dates';
 import { getCurrencySymbol } from '../lib/currency';
+import Loader from '../components/Loader';
 
 
 export default function Dashboard() {
@@ -139,7 +140,7 @@ export default function Dashboard() {
   }, [user,period,customStart,customEnd]);
 
   const d = data;
-  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'300px',color:'#999',fontSize:'.85rem'}}>Загрузка...</div>;
+  if (loading) return <Loader />;
   if (!d) return <div style={{textAlign:'center',padding:'3rem',color:'#999',fontSize:'.85rem'}}>Нет данных</div>;
   try {
     // Check for required data

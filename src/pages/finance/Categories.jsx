@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import Loader from '../../components/Loader';
 
 const dirTypeLabels = {
   income: 'Доходы (Внекассовые)',
@@ -107,7 +108,7 @@ export default function Categories() {
     setPendingDeleteId(null);
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
   return (
     <>
       {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}

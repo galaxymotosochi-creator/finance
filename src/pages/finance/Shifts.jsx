@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 export default function Shifts() {
@@ -49,7 +50,7 @@ export default function Shifts() {
     return (receipts||[]).filter(r => r.shift_id === s.id).reduce((sum, r) => sum + (Number(r.paid_amount)||0), 0);
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
 
   return (
     <>

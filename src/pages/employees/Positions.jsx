@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import Loader from '../../components/Loader';
 
 const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления' },
@@ -223,7 +224,7 @@ export default function Positions() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+        <Loader />
       ) : positions.length === 0 ? (
         <div className="empty-products">
           <div className="big-icon">👤</div>

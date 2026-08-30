@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import Loader from '../../components/Loader';
 
 const TARGET_LABELS = {
   revenue: { label: 'Выручка', icon: '💰', unit: '₽', color: '#16a34a' },
@@ -159,7 +160,7 @@ export default function Plans() {
     }
   };
 
-  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'300px',color:'#999',fontSize:'.85rem'}}>Загрузка...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div>

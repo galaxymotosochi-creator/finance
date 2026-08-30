@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const STATUS_OPTS = [
@@ -255,7 +256,7 @@ export default function Timesheet() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+        <Loader />
       ) : (
         <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
           {/* КАЛЕНДАРЬ */}

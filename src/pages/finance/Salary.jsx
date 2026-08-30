@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
@@ -312,7 +313,7 @@ export default function Salary() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+        <Loader />
       ) : (
       <div className="product-table" style={{overflowX:'auto'}}>
         <table className="data-table">

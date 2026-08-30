@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const getSales = async (userId) => { const { data } = await supabase.from('receipts').select('client_id, total_amount, status').eq('user_id', userId); return data || []; };
@@ -163,7 +164,7 @@ export default function Clients() {
       )}
 
       {loading ? (
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка клиентов...</p></div>
+        <Loader />
       ) : (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">

@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import Loader from '../../components/Loader';
 
 export default function Categories() {
   const { user } = useAuth();
@@ -96,7 +97,7 @@ export default function Categories() {
     await load();
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
 
   return (
     <>

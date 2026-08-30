@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const LD = [
@@ -133,7 +134,7 @@ export default function Loyalty() {
           </div>
         </div>
         <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+        <Loader />
       </>
     );
   }

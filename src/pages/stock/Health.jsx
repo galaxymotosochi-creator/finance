@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const HEALTH = { critical: 'critical', warning: 'warning', healthy: 'healthy' };
@@ -166,7 +167,7 @@ export default function Health() {
     window.dispatchEvent(new Event('hashchange'));
   };
 
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
 
   return (
     <>

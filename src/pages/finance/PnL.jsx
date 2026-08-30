@@ -196,11 +196,7 @@ export default function PnL() {
   );
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#999', fontSize: '.85rem' }}>
-        Загрузка...
-      </div>
-    );
+    return <Loader />;
   }
 
   const d = data;

@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 
@@ -292,7 +293,7 @@ const load = async () => {
 
   const totalItems = (s) => (s.items||[s]).length;
   
-  if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
+  if (loading) return <Loader />;
 
   return (
     <>

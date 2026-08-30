@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 const ALL_SECTIONS = [
@@ -344,7 +345,7 @@ export default function Employees() {
       </div>
 
       {loading ? (
-        <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>
+        <Loader />
       ) : (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
