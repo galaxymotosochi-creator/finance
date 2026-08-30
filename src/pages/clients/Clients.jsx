@@ -46,7 +46,7 @@ export default function Clients() {
 
   const openEdit = (c) => {
     setEditId(c.id); setFName(c.name); setFPhone(c.phone||'');
-    setFEmail(c.email||''); setFBirthday(c.birthday||''); setFComment(c.comment||'');
+    setFEmail(c.email||''); setFBirthday((c.birthday||'').slice(0,10)); setFComment(c.comment||'');
     try { const j = JSON.parse(c.comment||'{}'); setFNote1(j.n1||''); setFNote2(j.n2||''); } catch(e) { setFNote1(c.comment||''); setFNote2(''); }
     setShow(true);
   };
@@ -57,15 +57,17 @@ export default function Clients() {
     try {
       var saveComment = fNote1 || fNote2 ? JSON.stringify({n1:fNote1.trim(), n2:fNote2.trim()}) : (fComment.trim() || null);
       if (editId) {
-        await supabase.from('clients').update({
+        const { error } = await supabase.from('clients').update({
           name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
           birthday: fBirthday || null, comment: saveComment
         }).eq('id', editId);
+        if (error) throw error;
       } else {
-        await supabase.from('clients').insert({
+        const { error } = await supabase.from('clients').insert({
           user_id: user.id, name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
           birthday: fBirthday || null, comment: saveComment
         });
+        if (error) throw error;
       }
       await load();
       setShow(false);
@@ -75,14 +77,17 @@ export default function Clients() {
   const remove = async (id) => {
     if (!confirm('Удалить клиента?')) return;
     try {
-      await supabase.from('clients').delete().eq('id', id);
+      const { error } = await supabase.from('clients').delete().eq('id', id);
+      if (error) return alert('' + error.message);
       await load();
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
   const fmtDate = (d) => {
     if (!d) return null;
-    const parts = d.split('-');
+    // birthday в БД — timestamptz (2026-08-30T00:00:00.000Z), берём только дату
+    const ds = String(d).slice(0, 10);
+    const parts = ds.split('-');
     if (parts.length !== 3) return d;
     return parts[2] + '.' + parts[1];
   };
@@ -97,10 +102,12 @@ export default function Clients() {
     clientStats[cid].checks += 1;
   });
 
-  const todayMD = new Date().toISOString().slice(5, 10);
+  // Локальная дата (не UTC!) — иначе после полуночи в Сочи показывались вчерашние именинники
+  const nowD = new Date();
+  const todayMD = String(nowD.getMonth() + 1).padStart(2, '0') + '-' + String(nowD.getDate()).padStart(2, '0');
 
   // Именинники
-  const birthdayClients = clients.filter(c => c.birthday && c.birthday.slice(5) === todayMD);
+  const birthdayClients = clients.filter(c => c.birthday && String(c.birthday).slice(5, 10) === todayMD);
 
   // Поиск
   const q = search.toLowerCase().trim();
@@ -173,7 +180,7 @@ export default function Clients() {
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
-              const isBday = c.birthday && c.birthday.slice(5) === todayMD;
+              const isBday = c.birthday && String(c.birthday).slice(5, 10) === todayMD;
               return (
                 <tr key={c.id}>
                   <td style={{textAlign:'left'}}>
