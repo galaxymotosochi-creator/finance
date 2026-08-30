@@ -409,7 +409,13 @@ export default function Employees() {
                 <div className="form-group">
                   <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                     E-mail
-                    {editId ? <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => sendInvite({ id: editId, name: fName, email: fEmail })}>Отправить приглашение</span> : null}
+                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => {
+                      if (editId) {
+                        sendInvite({ id: editId, name: fName, email: fEmail });
+                      } else {
+                        alert(fEmail.trim() ? 'Приглашение отправится автоматически после создания сотрудника (нажмите «Добавить сотрудника»)' : 'Укажите email — приглашение отправится автоматически при создании сотрудника');
+                      }
+                    }}>Отправить приглашение</span>
                   </label>
                   <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="ivan@example.com" />
                 </div>
