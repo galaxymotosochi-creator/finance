@@ -486,7 +486,8 @@ app.post('/api/:table', auth, async (req, res) => {
         // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
         if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
         const uidIdx = keys.indexOf('user_id') + 1;
-        const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
+        // jsonb-колонки: любые массивы (объектов И строк, напр. permissions) сериализуем
+        const vals = keys.map(k => Array.isArray(body[k]) ? JSON.stringify(body[k]) : body[k]);
         const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
         const sql = 'INSERT INTO receipts (' + keys.join(', ') + ', receipt_number) VALUES (' + ph +
           ', (SELECT COALESCE(MAX(receipt_number),0)+1 FROM receipts WHERE user_id = $' + uidIdx + ')) RETURNING *';
@@ -504,7 +505,8 @@ app.post('/api/:table', auth, async (req, res) => {
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
       // Кассовые смены: opened_at по умолчанию — иначе дата открытия NULL и раздел «Смены» показывает 01.01.1970
       if (table === 'shifts' && !keys.includes('opened_at') && cols.has('opened_at')) { keys.push('opened_at'); body.opened_at = new Date().toISOString(); }
-      const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
+      // jsonb-колонки: любые массивы (объектов И строк, напр. permissions) сериализуем
+      const vals = keys.map(k => Array.isArray(body[k]) ? JSON.stringify(body[k]) : body[k]);
       const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
       const { rows } = await q('INSERT INTO ' + table + ' (' + keys.join(', ') + ') VALUES (' + ph + ') RETURNING *', vals);
       results.push(rows[0] || rows);
@@ -534,9 +536,9 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
       if (oldRows.length && oldRows[0].name !== data.name) oldSupplierName = oldRows[0].name;
     }
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
-    // jsonb-колонки (массивы объектов) сериализуем, как в POST — иначе PATCH падает с
-    // «invalid input syntax for type json» (ломало редактирование комбо, смену кассира, права сотрудников, зарплату)
-    const toVal = (v) => Array.isArray(v) && typeof v[0] === 'object' ? JSON.stringify(v) : v;
+    // jsonb-колонки: любые массивы (объектов И строк, напр. permissions) сериализуем —
+    // иначе PATCH падает с «invalid input syntax for type json»
+    const toVal = (v) => Array.isArray(v) ? JSON.stringify(v) : v;
     let sql;
     let vals;
     if (cols.has('user_id')) {

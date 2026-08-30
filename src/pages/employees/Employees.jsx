@@ -143,7 +143,8 @@ export default function Employees() {
   const openEdit = (e) => {
     setEditId(e.id); setFName(e.name); setFPhone(e.phone||'');
     setFEmail(e.email||''); setFPositionId(e.position_id||'');
-    setFHireDate(e.hire_date || new Date().toISOString().split('T')[0]);
+    // hire_date в БД — timestamptz (с временем) — берём только дату, иначе поле в форме пустое
+    setFHireDate((e.hire_date||'').slice(0,10) || new Date().toISOString().split('T')[0]);
     setFBaseSalary(String(e.base_salary||''));
     setFBonusType(e.bonus_type||'none');
     setFBonusValue(String(e.bonus_value||''));
@@ -166,7 +167,8 @@ export default function Employees() {
 
       var savedId;
       if (editId) {
-        await supabase.from('employees').update(obj).eq('id', editId);
+        const { error: updErr } = await supabase.from('employees').update(obj).eq('id', editId);
+        if (updErr) throw updErr;
         savedId = editId;
       } else {
         var ins = await supabase.from('employees').insert(obj).select('id').single();
@@ -204,7 +206,11 @@ export default function Employees() {
 
   const remove = async (id) => {
     if (!confirm('Удалить сотрудника?')) return;
-    try { await supabase.from('employees').delete().eq('id', id); await load(); }
+    try {
+      const { error } = await supabase.from('employees').delete().eq('id', id);
+      if (error) return alert('' + error.message);
+      await load();
+    }
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
