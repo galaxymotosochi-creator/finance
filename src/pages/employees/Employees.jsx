@@ -122,6 +122,17 @@ export default function Employees() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Закрытие дропдауна «⋯» при клике в любом месте экрана
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.prod-more-wrap')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   // position_id хранится строкой, id должности — числом — сравниваем строково
   const getPosition = (id) => positions.find(p => String(p.id) === String(id));
 
@@ -433,6 +444,9 @@ export default function Employees() {
                 <label>Доступ к разделам</label>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
                   {ALL_SECTIONS.map(renderSectionToggle)}
+                </div>
+                <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.45rem',lineHeight:1.5}}>
+                  Права должности подтягиваются автоматически при её выборе. Меняйте галочки, только если для этого сотрудника нужен особый доступ.
                 </div>
               </div>
 
