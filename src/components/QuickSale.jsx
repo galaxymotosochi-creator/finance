@@ -175,6 +175,11 @@ export default function QuickSale({ onClose }) {
     const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
     const finalTotal = Math.max(0, total - loyaltyDiscountAmount);
 
+    // Начисление баллов (1 ₽ = 1 балл) — считаем до создания чека, чтобы записать в чек
+    const bonusProgQS = (loyaltyPrograms || []).find(p => p.type === 'bonus');
+    const paidAmtQS = payAmount ? parseFloat(payAmount) : finalTotal;
+    const earnedPointsQS = (bonusProgQS && selectedClient && !payUnpaid) ? Math.round(Math.min(Math.max(paidAmtQS, 0), finalTotal)) : 0;
+
     // Создаём чек
     var clientObj = clients.find(c => c.id === selectedClient);
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
@@ -183,6 +188,8 @@ export default function QuickSale({ onClose }) {
       discount_sum: loyaltyDiscountAmount,
       status: receiptStatus,
       paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
+      points_earned: earnedPointsQS,
+      points_spent: 0,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       cashier_name: userName || '',
@@ -253,7 +260,7 @@ export default function QuickSale({ onClose }) {
     // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл, бонусная программа)
     const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
     if (bonusProg && selectedClient) {
-      const earned = paidAmt > 0 ? Math.round(Math.min(paidAmt, total)) : 0;
+      const earned = earnedPointsQS; // считаем как при записи в чек (по оплаченному с учётом скидки)
       if (earned > 0) {
         const client = clients.find(c => c.id === selectedClient);
         const cur = Number(client?.points) || 0;

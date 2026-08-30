@@ -364,6 +364,12 @@ export default function Registers({ fullscreen }) {
       if (paidAmt > 0) payments.push({ account_id: tgt?.id || null, amount: Math.min(paidAmt, total) });
     }
 
+    // Баллы лояльности: начисление за оплату (1 ₽ = 1 балл) и списание как скидка — считаем до создания чека
+    const bonusProgPay = (loyaltyPrograms || []).find(p => p.type === 'bonus');
+    const paidSumPay = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    const earnedPoints = (bonusProgPay && selectedClient && receiptStatus !== 'unpaid') ? Math.round(paidSumPay) : 0;
+    const spentPoints = (bonusProgPay && selectedClient && receiptStatus !== 'unpaid') ? loyaltyPointsAmount : 0;
+
     // Номер чека
     const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
     let receiptNum = (maxReceipt?.receipt_number || 0) + 1;
@@ -382,6 +388,9 @@ export default function Registers({ fullscreen }) {
       status: receiptStatus,
       paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
       payments,
+      // Баллы лояльности: начислено за оплату и списано как скидка (видно в разделе «Чеки»)
+      points_earned: earnedPoints,
+      points_spent: spentPoints,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       shift_id: activeShift?.id || null,
@@ -432,15 +441,9 @@ export default function Registers({ fullscreen }) {
         }
       }
       // Лояльность: начисление баллов за оплату (1 ₽ = 1 балл) и списание использованных баллов
-      const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
-      if (bonusProg) {
-        const paidSum = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-        const earned = receiptStatus !== 'unpaid' ? Math.round(paidSum) : 0;
-        const spent = receiptStatus !== 'unpaid' ? loyaltyPointsAmount : 0;
-        if (earned > 0 || spent > 0) {
-          const cur = Number(client?.points) || 0;
-          await supabase.from('clients').update({ points: Math.max(0, cur + earned - spent) }).eq('id', selectedClient);
-        }
+      if (earnedPoints > 0 || spentPoints > 0) {
+        const cur = Number(client?.points) || 0;
+        await supabase.from('clients').update({ points: Math.max(0, cur + earnedPoints - spentPoints) }).eq('id', selectedClient);
       }
     }
     
@@ -1250,6 +1253,17 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                   <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setNewClientEmail(''); setNewClientBirthday(''); setNewClientNote1(''); setNewClientNote2(''); setClientSearch(''); }} 
                     style={{padding:'9px 12px',border:'1.5px solid #eee',borderRadius:'12px',background:'#f5f5f5',color:'#444',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
                 </div>
+                {/* Баллы выбранного клиента — видно сразу */}
+                {selectedClient && (() => {
+                  const sc = clients.find(c => c.id === selectedClient);
+                  const pts = Number(sc?.points) || 0;
+                  if (pts <= 0) return null;
+                  return (
+                    <div style={{marginTop:'6px',fontSize:'.74rem',color:'#7c3aed',fontWeight:600}}>
+                      Баллы клиента: {pts.toLocaleString()}
+                    </div>
+                  );
+                })()}
               </div>
               
               {/* Комментарий */}

@@ -287,6 +287,15 @@ export default function Receipts() {
         {selectedReceipt && (<>
         {selectedReceipt.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
+            {/* Баллы лояльности: начислено / списано */}
+            {((Number(selectedReceipt.points_earned) || 0) > 0 || (Number(selectedReceipt.points_spent) || 0) > 0) && (
+              <div style={{marginBottom:'.75rem',fontSize:'.78rem',color:'#7c3aed',background:'#f3e8ff',padding:'5px 10px',borderRadius:'6px',fontWeight:600}}>
+                {Number(selectedReceipt.points_earned) > 0 ? 'Начислено баллов: +' + Number(selectedReceipt.points_earned).toLocaleString() : ''}
+                {Number(selectedReceipt.points_earned) > 0 && Number(selectedReceipt.points_spent) > 0 ? ' • ' : ''}
+                {Number(selectedReceipt.points_spent) > 0 ? 'Списано баллов: −' + Number(selectedReceipt.points_spent).toLocaleString() : ''}
+              </div>
+            )}
+
             {/* Позиции */}
             {itemsLoading ? (
               <div style={{ textAlign: 'left', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Загрузка...</div>

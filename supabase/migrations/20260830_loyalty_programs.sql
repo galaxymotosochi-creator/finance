@@ -18,3 +18,7 @@ ALTER TABLE clients ADD COLUMN IF NOT EXISTS points BIGINT DEFAULT 0;
 
 -- Выборочная лояльность: 'auto' (по правилам) | 'none' (без скидки) | id программы (назначена вручную)
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS loyalty_mode TEXT DEFAULT 'auto';
+
+-- Баллы в чеке: начислено за оплату и списано как скидка (видно в разделе «Чеки»)
+ALTER TABLE receipts ADD COLUMN IF NOT EXISTS points_earned BIGINT DEFAULT 0;
+ALTER TABLE receipts ADD COLUMN IF NOT EXISTS points_spent BIGINT DEFAULT 0;
