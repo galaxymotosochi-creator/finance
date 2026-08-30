@@ -121,14 +121,19 @@ app.post('/api/auth/register', async (req, res) => {
     try {
       await pool.query("INSERT INTO subscriptions (user_id, status, plan, trial_starts_at, trial_ends_at) VALUES ($1, 'trial', 'Базовый', NOW(), NOW() + INTERVAL '14 days')", [id]);
     } catch (e) { console.error('Subscription create error:', e.message); }
-    // Сотрудник «Руководитель»: все права доступа + личный пин (вход в кассу и подтверждение скидок)
+    // Сотрудник «Руководитель»: должность + все права доступа + личный пин (вход в кассу и подтверждение скидок)
     let adminPin = '8888';
     try {
       adminPin = String(1000 + Math.floor(Math.random() * 9000));
       const adminId = 'admin-' + Date.now();
       const allPerms = ['dashboard','registers','finance','finance.transactions','finance.accounts','finance.receipts','finance.salary','finance.shifts','finance.pnl','finance.categories','finance.plans','stock','stock.products','stock.categories','stock.turnover','stock.stock','stock.supplies','stock.inventory','stock.writeoffs','stock.suppliers','clients','clients.base','clients.loyalty','clients.promos','team','team.employees','team.positions','team.timesheet','settings','settings.general','settings.venues','settings.subscription'];
-      await pool.query('INSERT INTO employees (id, user_id, name, base_salary, bonus_type, bonus_value, permissions, pin, status, hire_date, created_at) VALUES ($1, $2, $3, 0, $4, 0, $5::jsonb, $6, $7, NOW(), NOW())',
-        [adminId, id, (name || 'Руководитель'), 'none', JSON.stringify(allPerms), adminPin, 'active']);
+      // Должность «Руководитель» со всеми правами
+      const adminPosId = Date.now();
+      await pool.query('INSERT INTO position_templates (id, user_id, name, salary, bonus_type, bonus_value, permissions) VALUES ($1, $2, $3, 0, $4, 0, $5::jsonb)',
+        [adminPosId, id, 'Руководитель', 'none', JSON.stringify(allPerms)]);
+      // Сотрудник «Руководитель» на этой должности
+      await pool.query('INSERT INTO employees (id, user_id, name, position_id, base_salary, bonus_type, bonus_value, permissions, pin, status, hire_date, created_at) VALUES ($1, $2, $3, $4, 0, $5, 0, $6::jsonb, $7, $8, NOW(), NOW())',
+        [adminId, id, (name || 'Руководитель'), String(adminPosId), 'none', JSON.stringify(allPerms), adminPin, 'active']);
     } catch (e) { console.error('Admin employee create error:', e.message); }
     const token = jwt.sign({ user_id: id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
     // Отправляем письмо с подтверждением
