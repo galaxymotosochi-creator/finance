@@ -484,7 +484,8 @@ app.post('/api/:table', auth, async (req, res) => {
       const keys = Object.keys(body).filter(k => body[k] !== undefined);
       // user_id всегда берём из токена — не доверяем переданному в payload
       if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.user.id; }
-      if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now() + results.length; }
+      // timesheet_entries: id — serial (integer), Date.now() не влезает — не подставляем, пусть БД сама
+      if (!keys.includes('id') && table !== 'timesheet_entries') { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
       // Кассовые смены: opened_at по умолчанию — иначе дата открытия NULL и раздел «Смены» показывает 01.01.1970

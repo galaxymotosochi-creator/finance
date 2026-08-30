@@ -169,6 +169,7 @@ export default function Salary() {
   };
 
   const openEdit = (s) => {
+    if (s.status === 'paid') return alert('Выплаченное начисление нельзя редактировать. Создайте новое начисление или отмените выплату.');
     setEditId(s.id); setFEmpId(s.employee_id||'');
     setFPeriodFrom(s.period_from||''); setFPeriodTo(s.period_to||'');
     setFBaseSalary(s.base_salary||0); setFSalaryType('fixed');
@@ -196,13 +197,15 @@ export default function Salary() {
         user_id: user.id, employee_id: fEmpId, employee_name: emp ? emp.name : 'Сотрудник',
         period_from: fPeriodFrom, period_to: fPeriodTo, period_start: fPeriodFrom, period_end: fPeriodTo,
         base_salary: fBaseSalary, days_worked: fDays,
-        amount: grandTotal, status: fStatus, pay_type: fPayType,
+        // Статус всегда «Начислено» — выплата выполняется только через кнопку «Выплатить» с выбором счёта,
+        // иначе зарплата помечалась выплаченной без создания расходной операции
+        amount: grandTotal, status: 'pending', pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
         deduct_amount: checkedDeductTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })),
-        paid_at: fStatus === 'paid' ? fDate : null,
+        paid_at: null,
       };
-      if (editId) { await supabase.from('salary').update(obj).eq('id', editId); }
-      else { await supabase.from('salary').insert(obj); }
+      if (editId) { const { error } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; }
+      else { const { error } = await supabase.from('salary').insert(obj); if (error) throw error; }
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -234,14 +237,20 @@ export default function Salary() {
       }
 
       // Проверка баланса
+      const payDate = new Date().toISOString().split('T')[0]; // дата выплаты — сегодня
       if (splitAmts && Object.keys(splitAmts).length > 0) {
+        let totalSplit = 0;
         for (const [aid, amt] of Object.entries(splitAmts)) {
           if (amt <= 0) continue;
+          totalSplit += amt;
           const acct = accs.find(a => a.id === aid);
           const balance = acct ? getAccountBalance(acct) : 0;
           if (balance < amt) {
             return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + balance.toLocaleString() + ' ₽, нужно: ' + amt.toLocaleString() + ' ₽');
           }
+        }
+        if (Math.abs(totalSplit - Number(s.amount)) > 0.01) {
+          return alert('Сумма разделения (' + Math.round(totalSplit).toLocaleString() + ' ₽) не совпадает с суммой начисления (' + Number(s.amount).toLocaleString() + ' ₽)');
         }
       } else {
         const acct = accs.find(a => a.id === accId);
@@ -254,22 +263,25 @@ export default function Salary() {
       if (splitAmts && Object.keys(splitAmts).length > 0) {
         for (const [aid, amt] of Object.entries(splitAmts)) {
           if (amt <= 0) continue;
-          await supabase.from('transactions').insert({
+          const { error } = await supabase.from('transactions').insert({
             user_id: user.id, account_id: aid,
             type: 'expense', amount: amt,
             description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
-            date: fDate, category_id: salaryCatId,
+            date: payDate, category_id: salaryCatId,
           });
+          if (error) throw error;
         }
       } else {
-        await supabase.from('transactions').insert({
+        const { error } = await supabase.from('transactions').insert({
           user_id: user.id, account_id: accId,
           type: 'expense', amount: s.amount,
           description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
-          date: fDate, category_id: salaryCatId,
+          date: payDate, category_id: salaryCatId,
         });
+        if (error) throw error;
       }
-      await supabase.from('salary').update({ status: 'paid', paid_at: fDate }).eq('id', pendingPayId);
+      const { error: updErr } = await supabase.from('salary').update({ status: 'paid', paid_at: payDate }).eq('id', pendingPayId);
+      if (updErr) throw updErr;
       await load(); setShowAcc(false); setPendingPayId(null); setSalarySplitMode(false); setSalarySplitAmounts({});
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
@@ -495,14 +507,10 @@ export default function Salary() {
 
               {/* Кнопки */}
               <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
-                <select value={fStatus} onChange={e=>setFStatus(e.target.value)}
-                  style={{padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
-                  <option value="pending">Начислено</option>
-                  <option value="paid">Выплачено</option>
-                </select>
+                <span style={{fontSize:'.72rem',color:'var(--muted)'}}>Статус: Начислено (выплата — через кнопку «Выплатить» со счёта)</span>
                 <button type="submit"
                   style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
-                  {fStatus === 'paid' ? 'Выплатить' : 'Начислить'} {grandTotal.toLocaleString()} ₽
+                  {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} ₽
                 </button>
               </div>
 
