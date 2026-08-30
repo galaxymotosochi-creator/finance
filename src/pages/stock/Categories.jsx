@@ -16,8 +16,13 @@ export default function Categories() {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at');
-    if (data) setCats(data);
+    try {
+      const { data, error } = await supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at');
+      if (error) throw error;
+      if (data) setCats(data);
+    } catch (e) {
+      setToast('⚠️ Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'));
+    }
     setLoading(false);
   };
 

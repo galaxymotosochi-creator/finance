@@ -516,6 +516,12 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     delete data.user_id; // user_id всегда берём из токена
     const keys = Object.keys(data).filter(k => data[k] !== undefined);
     const cols = await getTableColumns(table);
+    // Запоминаем старое имя складской категории — после переименования обновим товары
+    let oldCatName = null;
+    if (table === 'stock_categories' && typeof data.name === 'string') {
+      const { rows: oldRows } = await pool.query('SELECT name FROM stock_categories WHERE id = $1', [id]);
+      if (oldRows.length && oldRows[0].name !== data.name) oldCatName = oldRows[0].name;
+    }
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
     let sql;
     let vals;
@@ -527,6 +533,10 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
       sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1);
     }
     const { rows } = await q(sql, vals);
+    // Переименование складской категории → обновляем товары/услуги этой категории
+    if (oldCatName) {
+      await pool.query('UPDATE products SET cat = $1 WHERE cat = $2 AND user_id = $3', [data.name, oldCatName, req.user.id]);
+    }
     res.json(rows[0] || {});
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -549,6 +559,14 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     if (table === 'categories') {
       const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE category_id = $1 LIMIT 1', [id]);
       if (tx.length > 0) return res.status(400).json({ error: 'Категория используется в операциях — удалить нельзя' });
+    }
+    // Защита складских категорий: с товарами/услугами удалять нельзя
+    if (table === 'stock_categories') {
+      const { rows: sc } = await pool.query('SELECT name FROM stock_categories WHERE id = $1', [id]);
+      if (sc.length) {
+        const { rows: prod } = await pool.query('SELECT id FROM products WHERE cat = $1 AND user_id = $2 LIMIT 1', [sc[0].name, req.user.id]);
+        if (prod.length > 0) return res.status(400).json({ error: 'Нельзя удалить категорию — в ней есть товары или услуги. Сначала переназначьте их' });
+      }
     }
     // Защита связанных данных: клиент с чеками, товар в чеках/закупках, сотрудник в зарплате и т.д.
     if (table === 'clients') {
