@@ -25,7 +25,8 @@ export function useTransactions() {
   };
 
   const remove = async (id) => {
-    await supabase.from('transactions').delete().eq('id', id);
+    const { error } = await supabase.from('transactions').delete().eq('id', id);
+    if (error) throw error;
     await fetch();
   };
 

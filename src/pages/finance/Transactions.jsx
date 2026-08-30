@@ -113,10 +113,10 @@ export default function Transactions() {
   const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || tx.type===typeFilter) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   var exportCsv = function(list) {
+    // CSV разделяется запятыми — числа без разделителей тысяч (точка для дробной части), валюта по настройкам
     var rows = [['Дата','Название','Сумма','Счет','Категория']];
     list.forEach(function(tx){
-      var typeLabels = {income:'Доход',expense:'Расход',sale:'Продажа'};
-      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',(tx.type==='income'?'+':'-')+Number(tx.amount||0).toLocaleString('ru-RU')+' ₽',tx.account_name||'',(cats.find(c => c && c.id === tx.category_id)?.name)||'']);
+      rows.push([(tx.date||tx.created_at||'').split('T')[0],tx.description||'',(tx.type==='income'?'+':'-')+Number(tx.amount||0).toFixed(2)+' '+cur,(accs.find(function(a){return a.id===tx.account_id})?.name)||tx.account_name||'',(cats.find(c => c && c.id === tx.category_id)?.name)||'']);
     });
     var csv = rows.map(function(r){return r.join(',')}).join('\n');
     var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
@@ -626,7 +626,7 @@ export default function Transactions() {
                     <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--secondary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
                     
                     <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(function(){var b=0;(txs||[]).forEach(function(t){if(t.account_id&&t.account_id===a.id){b+=Number(t.amount||0)*(t.type==="income"?1:-1)}});return b.toLocaleString()})()} {cur}</span>
+                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(accBalance[a.id] || 0).toLocaleString()} {cur}</span>
                   </div>
                 );
               })}
