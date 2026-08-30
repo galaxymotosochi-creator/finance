@@ -134,7 +134,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('accounts').select('*').eq('user_id', user.id).order('name'),
         supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
         supabase.from('promos').select('*').eq('user_id', user.id),
-        supabase.from('employees').select('id, name').eq('user_id', user.id).order('name'),
+        supabase.from('employees').select('id, name, pin').eq('user_id', user.id).order('name'),
         supabase.from('loyalty_programs').select('*').eq('user_id', user.id),
       ]);
       if (pRes.data) setProducts(pRes.data);
@@ -214,16 +214,33 @@ export default function Registers({ fullscreen }) {
     return function(){ document.removeEventListener('click', handler); };
   }, []);
 
-  // Проверка пин-кода
+  // Проверка пин-кода: мастер-пин владельца (8888) или личный пин сотрудника
   useEffect(function(){
     if (pinValue.length === 4) {
       if (pinValue === PIN_MASTER) {
         setPinLocked(false);
         setPinValue('');
+        setDisplayCashierName('');
       } else {
-        setPinError(true);
-        var t = setTimeout(function(){ setPinValue(''); }, 800);
-        return function(){ clearTimeout(t); };
+        // Ищем сотрудника с таким пином (у каждого сотрудника свой пин)
+        const emp = (employees || []).find(function(e){ return e.pin && String(e.pin) === pinValue; });
+        if (emp) {
+          setPinLocked(false);
+          setPinValue('');
+          setOpenShiftCashier(emp.name); // при открытии смены кассир = вошедший сотрудник
+          setDisplayCashierName(emp.name);
+          // Если смена уже открыта — делаем вошедшего текущим кассиром
+          if (activeShift) {
+            const changes = activeShift.cashier_changes || [];
+            changes.push({ from: activeShift.current_cashier_name || activeShift.cashier_name || userName, to: emp.name, balance: 0, timestamp: new Date().toISOString() });
+            supabase.from('shifts').update({ current_cashier_name: emp.name, cashier_changes: changes }).eq('id', activeShift.id).eq('user_id', user.id).then();
+            setActiveShift({ ...activeShift, current_cashier_name: emp.name, cashier_changes: changes });
+          }
+        } else {
+          setPinError(true);
+          var t = setTimeout(function(){ setPinValue(''); }, 800);
+          return function(){ clearTimeout(t); };
+        }
       }
     }
   }, [pinValue]);
