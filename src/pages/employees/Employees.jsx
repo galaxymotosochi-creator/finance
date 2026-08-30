@@ -122,11 +122,12 @@ export default function Employees() {
 
   useEffect(() => { load(); }, [user]);
 
-  const getPosition = (id) => positions.find(p => p.id === id);
+  // position_id хранится строкой, id должности — числом — сравниваем строково
+  const getPosition = (id) => positions.find(p => String(p.id) === String(id));
 
   const onPositionChange = (posId) => {
     setFPositionId(posId);
-    const pos = positions.find(p => p.id === posId);
+    const pos = positions.find(p => String(p.id) === String(posId));
     if (pos) {
       setFBaseSalary(String(pos.salary || ''));
       setFBonusType(pos.bonus_type || 'none');
@@ -385,7 +386,7 @@ export default function Employees() {
                   <label>Должность</label>
                   <select value={fPositionId} onChange={e => onPositionChange(e.target.value)}>
                     <option value="">— Без должности —</option>
-                    {positions.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    {positions.map(p => <option key={p.id} value={String(p.id)}>{p.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
