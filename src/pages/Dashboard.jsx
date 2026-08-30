@@ -33,7 +33,7 @@ export default function Dashboard() {
     (async () => {
       try {
         const dr = getDateRange();
-        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs},{data:activeShift},{data:lastRecs}] = await Promise.all([
+        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs},{data:activeShift},{data:lastRecs},{data:recsAllData}] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
           supabase.from('accounts').select('id,name,balance,type').eq('user_id',user.id),
@@ -44,6 +44,7 @@ export default function Dashboard() {
           supabase.from('receipts').select('id,total_amount').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
           supabase.from('shifts').select('*').eq('user_id',user.id).is('closed_at',null).order('opened_at',{ascending:false}).limit(1).maybeSingle(),
           supabase.from('receipts').select('id,total_amount,client_name,date').eq('user_id',user.id).order('date',{ascending:false}).limit(3),
+          supabase.from('receipts').select('total_amount,date,client_id').eq('user_id',user.id),
         ]);
         const rids = (recs||[]).map(r=>r.id);
         const {data:recItems} = rids.length ? (await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id',rids)) : {data:[]};
@@ -95,15 +96,19 @@ export default function Dashboard() {
             cogs += (item.quantity||0) * costPerUnit[pid];
           }
         });
-        const ac = sold>0?Math.round(tr/sold):0;
+        const ac = (recs||[]).length>0 ? Math.round(tr/(recs||[]).length) : 0; // средний чек = выручка / число чеков
         const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
         const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
         const ce={};(txs||[]).filter(t=>t.type==='expense').forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
         const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear()).eq('month',now2.getMonth()+1);const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
         const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
         // Доп. данные
-        const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
-        const repeatClients = 0; // можно будет добавить позже
+        const { data: allClients } = await supabase.from('clients').select('id').eq('user_id', user.id);
+        const totalClients = (allClients || []).length;
+        // Повторные клиенты: 2+ покупки (по всем чекам)
+        const buyCount = {};
+        (recsAllData || []).forEach(r => { if (r.client_id) buyCount[r.client_id] = (buyCount[r.client_id]||0) + 1; });
+        const repeatClients = totalClients > 0 ? Math.round(Object.values(buyCount).filter(c => c >= 2).length / totalClients * 100) : 0;
         // Факт за текущий месяц для блока Целей
         const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
         const ms = monthStart.toISOString().split('T')[0];
@@ -117,7 +122,17 @@ export default function Dashboard() {
         });
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
         const cashBal = acctList.find(a => a.type === 'cash_register')?.balance || 0;
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3)});
+        // Сравнение: реальная выручка по чекам за периоды (вчера / 7 дней / месяц / год)
+        const recAll = (recsAllData || []).map(r => ({ d: String(r.date || '').slice(0, 10), amt: Number(r.total_amount) || 0 }));
+        const locStr = (dt) => dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+        const tStr = locStr(new Date());
+        const yStr = locStr(new Date(Date.now() - 86400000));
+        const wStr = locStr(new Date(Date.now() - 6 * 86400000));
+        const mStr = locStr(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+        const yS = new Date().getFullYear() + '-01-01';
+        const sumR = (from, to) => recAll.filter(r => r.d >= from && r.d <= to).reduce((s, r) => s + r.amt, 0);
+        const cmp = { today: sumR(tStr, tStr), yesterday: sumR(yStr, yStr), week: sumR(wStr, tStr), month: sumR(mStr, tStr), year: sumR(yS, tStr) };
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3),cmp});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -289,7 +304,7 @@ export default function Dashboard() {
               <td style={{padding:'3px',color:'rgba(0,0,0,.3)',fontWeight:700}}>{i+1}</td>
               <td style={{padding:'3px'}}>{p.name}</td>
               <td style={{padding:'3px',textAlign:'left'}}>{p.qty}</td>
-              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{(p.rev||0).toLocaleString()}</td>
+              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{(p.rev||0).toLocaleString()} {cur}</td>
             </tr>
           ))}</tbody>
         </table>}
@@ -320,30 +335,30 @@ export default function Dashboard() {
         </table>}
       </div>
 
-{/* Сравнение */}
+{/* Сравнение — реальные суммы выручки по чекам */}
       <div style={sec}>
         <div style={st}>Сравнение</div>
         <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
           <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{(d.rev||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{Number((d.cmp||{}).today||0).toLocaleString()} {cur}</div>
             <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Math.round((d.rev||0)*(period==='day'?0.8:1)).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'−20%':'—'}</div></div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).yesterday||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{Math.round((d.rev||0)*(period==='day'?7:1)).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{period==='day'?'+800%':'—'}</div></div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).week||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>7 дней</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>{(d.rev||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
+            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).month||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>с начала месяца</div></div>
           <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
             <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>{((d.rev||0)*12).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
+            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{Number((d.cmp||{}).year||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>с начала года</div></div>
         </div>
       </div>
 
