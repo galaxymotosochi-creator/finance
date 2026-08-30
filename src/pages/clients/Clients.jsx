@@ -24,6 +24,8 @@ export default function Clients() {
   const [fComment, setFComment] = useState('');
   const [fNote1, setFNote1] = useState('');
   const [fNote2, setFNote2] = useState('');
+  const [fLoyalty, setFLoyalty] = useState('auto');
+  const [loyaltyPrograms, setLoyaltyPrograms] = useState([]);
 
   const load = async () => {
     setLoading(true);
@@ -34,6 +36,7 @@ export default function Clients() {
     } catch (e) { /* таблица еще не создана */ }
     const salesData = await getSales(user?.id); setSalesState(salesData);
     try { const { data: a } = await supabase.from('accounts').select('*').eq('user_id', user.id).order('name'); if (a) setAccounts(a); } catch(e) {}
+    try { const { data: lp } = await supabase.from('loyalty_programs').select('*').eq('user_id', user.id).order('created_at'); if (lp) setLoyaltyPrograms(lp); } catch(e) {}
     setLoading(false);
   };
 
@@ -41,12 +44,13 @@ export default function Clients() {
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
-    setFBirthday(''); setFComment(''); setFNote1(''); setFNote2(''); setShow(true);
+    setFBirthday(''); setFComment(''); setFNote1(''); setFNote2(''); setFLoyalty('auto'); setShow(true);
   };
 
   const openEdit = (c) => {
     setEditId(c.id); setFName(c.name); setFPhone(c.phone||'');
     setFEmail(c.email||''); setFBirthday((c.birthday||'').slice(0,10)); setFComment(c.comment||'');
+    setFLoyalty(c.loyalty_mode || 'auto');
     try { const j = JSON.parse(c.comment||'{}'); setFNote1(j.n1||''); setFNote2(j.n2||''); } catch(e) { setFNote1(c.comment||''); setFNote2(''); }
     setShow(true);
   };
@@ -59,13 +63,13 @@ export default function Clients() {
       if (editId) {
         const { error } = await supabase.from('clients').update({
           name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
-          birthday: fBirthday || null, comment: saveComment
+          birthday: fBirthday || null, comment: saveComment, loyalty_mode: fLoyalty
         }).eq('id', editId);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('clients').insert({
           user_id: user.id, name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
-          birthday: fBirthday || null, comment: saveComment
+          birthday: fBirthday || null, comment: saveComment, loyalty_mode: fLoyalty
         });
         if (error) throw error;
       }
@@ -171,7 +175,7 @@ export default function Clients() {
               <th style={{textAlign:'left'}}>Ср. чек</th>
               <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{textAlign:'left'}}>Долг</th>
-              <th style={{textAlign:'left'}}>Баллы</th>
+              <th style={{textAlign:'left'}}>Лояльность</th>
               <th style={{width:'80px'}}></th>
             </tr>
           </thead>
@@ -203,7 +207,17 @@ export default function Clients() {
                   <td style={{textAlign:'left',color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#8b5cf6'}}>{c.points > 0 ? '🎁 '+c.points : '—'}</td>
+                  <td style={{textAlign:'left'}}>{(() => {
+                    const mode = c.loyalty_mode || 'auto';
+                    const points = Number(c.points) || 0;
+                    const assignedProg = loyaltyPrograms.find(p => String(p.id) === String(mode));
+                    const parts = [];
+                    if (mode === 'none') parts.push(<span key="none" style={{background:'#f5f5f5',color:'#999',borderRadius:'100px',padding:'1px 8px',fontSize:'.68rem',fontWeight:600}}>без скидки</span>);
+                    else if (assignedProg) parts.push(<span key="prog" style={{background:'#f3e8ff',color:'#7c3aed',borderRadius:'100px',padding:'1px 8px',fontSize:'.68rem',fontWeight:600}}>{assignedProg.discount > 0 ? 'скидка '+Number(assignedProg.discount).toLocaleString()+'%' : 'программа'}</span>);
+                    if (points > 0) parts.push(<span key="pts" style={{color:'#7c3aed',fontSize:'.72rem',fontWeight:600}}>{points.toLocaleString()} баллов</span>);
+                    if (parts.length === 0) return <span style={{color:'#ccc'}}>—</span>;
+                    return <span style={{display:'flex',gap:'4px',alignItems:'center',flexWrap:'wrap'}}>{parts}</span>;
+                  })()}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
@@ -246,6 +260,14 @@ export default function Clients() {
               <div className="form-group">
                 <label>Дата рождения</label>
                 <input type="date" value={fBirthday} onChange={e=>setFBirthday(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Программа лояльности</label>
+                <select value={fLoyalty} onChange={e=>setFLoyalty(e.target.value)}>
+                  <option value="auto">Авто (по правилам программ)</option>
+                  {loyaltyPrograms.map(p => <option key={p.id} value={String(p.id)}>{p.name}{p.discount > 0 ? ' — скидка ' + Number(p.discount).toLocaleString() + '%' : ''}</option>)}
+                  <option value="none">Без скидки</option>
+                </select>
               </div>
               <div className="form-row">
                 <div className="form-group">

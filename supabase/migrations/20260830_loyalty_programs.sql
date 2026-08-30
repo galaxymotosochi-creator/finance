@@ -15,3 +15,6 @@ CREATE TABLE IF NOT EXISTS loyalty_programs (
 
 -- Баллы клиентов (бонусная программа: 1 ₽ = 1 балл, 100 баллов = 100 ₽)
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS points BIGINT DEFAULT 0;
+
+-- Выборочная лояльность: 'auto' (по правилам) | 'none' (без скидки) | id программы (назначена вручную)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS loyalty_mode TEXT DEFAULT 'auto';

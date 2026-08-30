@@ -25,7 +25,7 @@ export default function Loyalty() {
 
   const [fIcon, setFIcon] = useState('🎯');
   const [fName, setFName] = useState('');
-  const [fType, setFType] = useState('constant');
+  const [fType, setFType] = useState('accumulative');
   const [fDiscount, setFDiscount] = useState('');
   const [fCondition, setFCondition] = useState('');
   const [fDesc, setFDesc] = useState('');
@@ -69,14 +69,14 @@ export default function Loyalty() {
   };
 
   const openAdd = () => {
-    setEditId(null); setFIcon('🎯'); setFName(''); setFType('constant');
+    setEditId(null); setFIcon('🎯'); setFName(''); setFType('accumulative');
     setFDiscount(''); setFCondition(''); setFDesc('');
     setShow(true);
   };
 
   const openEdit = (p) => {
     setEditId(p.id); setFIcon(p.icon); setFName(p.name);
-    setFType(p.type||'constant'); setFDiscount(String(p.discount||''));
+    setFType(p.type||'accumulative'); setFDiscount(String(p.discount||''));
     setFCondition(String(p.condition||'')); setFDesc(p.desc||'');
     setShow(true);
   };
@@ -247,10 +247,9 @@ export default function Loyalty() {
           <div className="form-group">
             <label>Тип программы</label>
             <select value={fType} onChange={e=>setFType(e.target.value)}>
-              <option value="constant">📋 Постоянная — фиксированная скидка</option>
-              <option value="accumulative">📈 Накопительная — скидка растет от суммы</option>
-              <option value="bonus">🎯 Бонусная — баллы за покупки</option>
-              <option value="birthday">🎂 ДР-скидка — автоскидка в день рождения</option>
+              <option value="accumulative">Накопительная — скидка растет от суммы</option>
+              <option value="bonus">Бонусная — баллы за покупки</option>
+              <option value="birthday">ДР-скидка — автоскидка в день рождения</option>
             </select>
           </div>
           <div className="form-row">

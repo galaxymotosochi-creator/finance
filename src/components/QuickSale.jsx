@@ -122,14 +122,20 @@ export default function QuickSale({ onClose }) {
     });
   };
 
-  // Лояльность: скидка программы при выборе клиента (постоянная/накопительная/ДР)
+  // Лояльность: скидка при выборе клиента
+  // Приоритет: «Без скидки» → назначенная вручную программа → авто (ДР, накопительная)
   const applyLoyalty = async (clientId) => {
     setLoyaltyPct(0);
     if (!clientId) return;
     const client = clients.find(c => c.id === clientId);
     if (!client) return;
     const progs = loyaltyPrograms || [];
-    if (progs.length === 0) return;
+    const mode = client.loyalty_mode || 'auto';
+    if (mode === 'none') return;
+    if (mode !== 'auto') {
+      const assigned = progs.find(p => String(p.id) === String(mode));
+      if (assigned) { setLoyaltyPct(parseFloat(assigned.discount) || 0); return; }
+    }
     const now = new Date();
     const todayMD = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
     const isBday = String(client.birthday || '').slice(5, 10) === todayMD;
@@ -143,8 +149,6 @@ export default function QuickSale({ onClose }) {
         if (clientTotal >= parseFloat(accum.condition)) { setLoyaltyPct(parseFloat(accum.discount) || 0); return; }
       } catch (e) {}
     }
-    const constant = progs.find(p => p.type === 'constant');
-    if (constant) setLoyaltyPct(parseFloat(constant.discount) || 0);
   };
 
   const processSale = async () => {

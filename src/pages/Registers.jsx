@@ -512,21 +512,29 @@ export default function Registers({ fullscreen }) {
     setToast('Товар добавлен!');
   };
 
-  // Лояльность: применяем скидку программы при выборе клиента
+  // Лояльность: применяем скидку при выборе клиента
+  // Приоритет: «Без скидки» → назначенная вручную программа → авто (ДР, накопительная)
   const applyLoyalty = async (clientId) => {
     setLoyaltyPct(0); setLoyaltyPointsSpend(0);
     if (!clientId) return;
     const client = clients.find(c => c.id === clientId);
     if (!client) return;
     const progs = loyaltyPrograms || [];
-    if (progs.length === 0) return;
+    const mode = client.loyalty_mode || 'auto';
+    // 1) Клиент исключён из скидок
+    if (mode === 'none') return;
+    // 2) Назначенная вручную программа — применяем её скидку сразу
+    if (mode !== 'auto') {
+      const assigned = progs.find(p => String(p.id) === String(mode));
+      if (assigned) { setLoyaltyPct(parseFloat(assigned.discount) || 0); return; }
+    }
+    // 3) Авто: ДР-скидка (в день рождения клиента)
     const now = new Date();
     const todayMD = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-    // 1) ДР-скидка (в день рождения клиента)
     const isBday = String(client.birthday || '').slice(5, 10) === todayMD;
     const birthdayProg = progs.find(p => p.type === 'birthday');
     if (isBday && birthdayProg) { setLoyaltyPct(parseFloat(birthdayProg.discount) || 0); return; }
-    // 2) Накопительная (если сумма покупок клиента достигла порога, заданного пользователем)
+    // 4) Авто: накопительная (если сумма покупок клиента достигла порога)
     const accum = progs.find(p => p.type === 'accumulative');
     if (accum && parseFloat(accum.condition) > 0) {
       try {
@@ -535,9 +543,7 @@ export default function Registers({ fullscreen }) {
         if (clientTotal >= parseFloat(accum.condition)) { setLoyaltyPct(parseFloat(accum.discount) || 0); return; }
       } catch (e) {}
     }
-    // 3) Постоянная скидка
-    const constant = progs.find(p => p.type === 'constant');
-    if (constant) setLoyaltyPct(parseFloat(constant.discount) || 0);
+    // Постоянной скидки больше нет — ничего не применяем
   };
 
   const openShift = async () => {
