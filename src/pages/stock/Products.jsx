@@ -159,6 +159,7 @@ export default function Products() {
   const [fMinQty, setFMinQty] = useState('');
   const [fHidden, setFHidden] = useState(false);
   const [fPhoto, setFPhoto] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [fComboItems, setFComboItems] = useState([]);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilterSet, setTypeFilterSet] = useState(new Set());
@@ -262,6 +263,7 @@ export default function Products() {
   const uploadPhoto = async (file) => {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) return alert('Файл больше 10 МБ');
+    setUploading(true);
     try {
       const fd = new FormData();
       fd.append('photo', file);
@@ -271,6 +273,7 @@ export default function Products() {
       if (d.url) { setFPhoto(d.url); showToast('Фото загружено'); }
       else alert('Ошибка загрузки: ' + (d.error || 'неизвестная'));
     } catch (e) { alert('Ошибка загрузки фото: ' + e.message); }
+    setUploading(false);
   };
 
   const save = async (e) => {
@@ -749,12 +752,18 @@ export default function Products() {
                   ) : (
                     <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.68rem',textAlign:'center',flexShrink:0}}>без фото</div>
                   )}
-                  <label style={{cursor:'pointer',padding:'.35rem .8rem',border:'1.5px solid var(--border)',borderRadius:'100px',fontSize:'.75rem',fontWeight:600,color:'#555',fontFamily:'inherit',margin:0}}>
+                  <label style={{cursor: uploading ? 'default' : 'pointer',padding:'.35rem .8rem',border:'1.5px solid var(--border)',borderRadius:'100px',fontSize:'.75rem',fontWeight:600,color: uploading ? '#999' : '#555',fontFamily:'inherit',margin:0}}>
                     {fPhoto ? 'Заменить' : 'Загрузить'}
-                    <input type="file" accept="image/*" style={{display:'none'}} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
+                    <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
                   </label>
-                  {fPhoto && <button type="button" onClick={() => setFPhoto('')} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
+                  {fPhoto && !uploading && <button type="button" onClick={() => setFPhoto('')} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
                 </div>
+                {/* Бегущая полоска загрузки */}
+                {uploading && (
+                  <div style={{width:'100%',maxWidth:'220px',height:'4px',background:'#eee',borderRadius:'2px',overflow:'hidden',position:'relative',marginTop:'8px'}}>
+                    <div style={{position:'absolute',top:0,left:0,height:'100%',width:'40%',background:'#111',borderRadius:'2px',animation:'loadbar 1s ease-in-out infinite'}} />
+                  </div>
+                )}
               </div>
               <div className="form-row">
                 <div className="form-group">
