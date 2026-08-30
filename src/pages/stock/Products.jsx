@@ -921,18 +921,16 @@ export default function Products() {
       {/* Модалка просмотра товара/услуги: слева информация, справа крупное фото */}
       <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') : ''} width="wide">
         {viewProduct && (() => {
-          const st = stockMap[viewProduct.id] || { qty: 0, cost: 0 };
-          const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
-          const markPct = costPrice > 0 && viewProduct.price ? Math.round(((viewProduct.price - costPrice) / costPrice) * 100) : 0;
+          const costPriceP = costPrice(viewProduct);
+          const markPct = costPriceP > 0 && viewProduct.price ? Math.round(((viewProduct.price - costPriceP) / costPriceP) * 100) : 0;
           const typeLabel = viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар';
           const rows = [
             ['Категория', viewProduct.cat ? (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '—'],
             ['Тип', typeLabel],
             ['Цена', Number(viewProduct.price || 0).toLocaleString() + ' ' + cur],
             viewProduct.min_price > 0 ? ['Мин. цена', Number(viewProduct.min_price).toLocaleString() + ' ' + cur] : null,
-            costPrice > 0 ? ['Себестоимость', costPrice.toLocaleString() + ' ' + cur] : null,
+            costPriceP > 0 ? ['Себестоимость', costPriceP.toLocaleString() + ' ' + cur] : null,
             markPct > 0 ? ['Наценка', '+' + markPct + '%'] : null,
-            viewProduct.type !== 'service' ? ['Остаток', Math.max(0, st.qty) + (viewProduct.unit ? ' ' + viewProduct.unit : '')] : null,
             viewProduct.min_qty > 0 ? ['Мин. остаток', viewProduct.min_qty] : null,
             viewProduct.unit ? ['Ед. измерения', viewProduct.unit] : null,
             viewProduct.sku ? ['Артикул', viewProduct.sku] : null,
