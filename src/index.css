@@ -667,3 +667,6 @@ input:focus, select:focus, textarea:focus {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(200%); }
 }
+
+/* Спиннер загрузки */
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -111,7 +111,18 @@ function AppRoutes() {
   );
 }
 
-const pageLoader = <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#999',fontSize:'.85rem'}}>Загрузка…</div>;
+const loaderStyle = {
+  display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100vh',background:'#fff',gap:'14px'
+};
+const spinnerStyle = {
+  width:'34px',height:'34px',border:'3px solid #eee',borderTopColor:'#111',borderRadius:'50%',animation:'spin 0.8s linear infinite'
+};
+const pageLoader = (
+  <div style={loaderStyle}>
+    <div style={spinnerStyle} />
+    <div style={{fontWeight:700,fontSize:'1rem',letterSpacing:'-.02em',color:'#111'}}>AtlasPos</div>
+  </div>
+);
 
 export default function App() {
   const { loading, user } = useAuth();
@@ -135,6 +146,6 @@ export default function App() {
       } catch (e) {}
     })();
   }, [user]);
-  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'system-ui,sans-serif',color:'#666'}}></div>;
+  if (loading) return <div style={loaderStyle}><div style={spinnerStyle} /></div>;
   return <ErrorBoundary><BrowserRouter><Suspense fallback={pageLoader}><AppRoutes /></Suspense></BrowserRouter></ErrorBoundary>;
 }
