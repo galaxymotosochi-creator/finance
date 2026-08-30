@@ -397,7 +397,10 @@ export default function Employees() {
                   <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
                 </div>
                 <div className="form-group">
-                  <label>E-mail</label>
+                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                    E-mail
+                    {editId && fEmail.trim() ? <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => sendInvite({ id: editId, name: fName, email: fEmail })}>Отправить приглашение</span> : null}
+                  </label>
                   <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="ivan@example.com" />
                 </div>
               </div>
