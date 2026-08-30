@@ -87,16 +87,38 @@ export default function QuickSale({ onClose }) {
 
   const findPromo = (product) => {
     const today = new Date().toISOString().split('T')[0];
-    return promos.find(p => {
-      if (p.start_date > today || p.end_date < today) return false;
-      if (!p.conditions || !p.conditions.type) return true;
-      const cond = p.conditions;
-      if (cond.type === 'all') return true;
-      if (cond.type === 'category_products') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type !== 'service' && cn && cn === product.cat; }
-      if (cond.type === 'category_services') { const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name; return product.type === 'service' && cn && cn === product.cat; }
-      if (cond.type === 'specific_products' || cond.type === 'specific_services') return cond.productIds && cond.productIds.includes(product.id);
+    // Активные акции (даты в БД — timestamptz, берём только дату)
+    const active = promos.filter(p => {
+      const sd = String(p.start_date || '').slice(0, 10);
+      const ed = String(p.end_date || '').slice(0, 10);
+      return !(sd > today || ed < today);
+    });
+    // Приоритет: конкретный товар → категория → все позиции
+    const specific = active.find(p => {
+      const cond = p.conditions || {};
+      if (cond.type === 'specific_products' || cond.type === 'specific_services') {
+        return cond.productIds && cond.productIds.includes(product.id);
+      }
       return false;
     });
+    if (specific) return specific;
+    const byCat = active.find(p => {
+      const cond = p.conditions || {};
+      if (cond.type === 'category_products') {
+        const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name;
+        return product.type !== 'service' && cn && cn === product.cat;
+      }
+      if (cond.type === 'category_services') {
+        const cn = allCats.find(c => c.id === parseInt(cond.catId))?.name;
+        return product.type === 'service' && cn && cn === product.cat;
+      }
+      return false;
+    });
+    if (byCat) return byCat;
+    return active.find(p => {
+      const cond = p.conditions || {};
+      return !cond.type || cond.type === 'all';
+    }) || null;
   };
 
   const addToCart = (p) => {
