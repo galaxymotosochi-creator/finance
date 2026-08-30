@@ -132,7 +132,6 @@ export default function Products() {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
   const [viewProduct, setViewProduct] = useState(null);
-  const [photoView, setPhotoView] = useState(null);
   const [costMap, setCostMap] = useState({});
   const [cats, setCats] = useState([]);
   const [catsLoaded, setCatsLoaded] = useState(false);
@@ -691,7 +690,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" onClick={e => { e.stopPropagation(); setPhotoView(p.photo_url); }} title="Открыть фото" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px',cursor:'zoom-in'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" title="Открыть карточку" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
@@ -895,34 +894,59 @@ export default function Products() {
         </>}>
       </Modal>
 
-      {/* Лайтбокс: большое фото по клику на миниатюру */}
-      {photoView && (
-        <div onClick={() => setPhotoView(null)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.88)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',cursor:'zoom-out',padding:'20px'}}>
-          <img src={photoView} alt="" style={{maxWidth:'92%',maxHeight:'92%',objectFit:'contain',borderRadius:'8px'}} />
-          <span style={{position:'absolute',top:'16px',right:'22px',color:'#fff',fontSize:'1.6rem',cursor:'pointer',lineHeight:1}} onClick={() => setPhotoView(null)}>&times;</span>
-        </div>
-      )}
-
-      {/* Модалка просмотра товара/услуги (по клику на название) */}
-      <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') + (viewProduct.cat ? ' • ' + (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '') : ''} width="medium">
+      {/* Модалка просмотра товара/услуги: слева информация, справа крупное фото */}
+      <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') : ''} width="wide">
         {viewProduct && (() => {
           const st = stockMap[viewProduct.id] || { qty: 0, cost: 0 };
           const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+          const markPct = costPrice > 0 && viewProduct.price ? Math.round(((viewProduct.price - costPrice) / costPrice) * 100) : 0;
+          const typeLabel = viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар';
+          const rows = [
+            ['Категория', viewProduct.cat ? (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '—'],
+            ['Тип', typeLabel],
+            ['Цена', Number(viewProduct.price || 0).toLocaleString() + ' ' + cur],
+            costPrice > 0 ? ['Себестоимость', costPrice.toLocaleString() + ' ' + cur] : null,
+            markPct > 0 ? ['Наценка', '+' + markPct + '%'] : null,
+            viewProduct.type !== 'service' ? ['Остаток', Math.max(0, st.qty) + (viewProduct.unit ? ' ' + viewProduct.unit : '')] : null,
+            viewProduct.min_qty > 0 ? ['Мин. остаток', viewProduct.min_qty] : null,
+            viewProduct.unit ? ['Ед. измерения', viewProduct.unit] : null,
+            viewProduct.sku ? ['Артикул', viewProduct.sku] : null,
+            viewProduct.barcode ? ['Штрихкод', viewProduct.barcode] : null,
+            (viewProduct.weight && Number(viewProduct.weight) > 0) ? ['Вес', viewProduct.weight + (viewProduct.weight_unit ? ' ' + viewProduct.weight_unit : '')] : null,
+            viewProduct.free_price ? ['Свободная цена', 'Да'] : null,
+            viewProduct.hidden ? ['Статус', 'Скрыт'] : null,
+          ].filter(Boolean);
           return (
-            <div>
-              {viewProduct.photo_url ? (
-                <img src={viewProduct.photo_url} alt={viewProduct.name} style={{width:'100%',maxHeight:'320px',objectFit:'contain',borderRadius:'12px',marginBottom:'12px',background:'#f8f8f8'}} />
-              ) : (
-                <div style={{width:'100%',height:'140px',borderRadius:'12px',background:'#f8f8f8',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.78rem',marginBottom:'12px'}}>Фото не загружено</div>
-              )}
-              <div style={{display:'flex',flexDirection:'column',gap:'.3rem',fontSize:'.82rem'}}>
-                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Цена</span><b>{Number(viewProduct.price||0).toLocaleString()} {cur}</b></div>
-                {costPrice > 0 && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Себестоимость</span><span>{costPrice.toLocaleString()} {cur}</span></div>}
-                {viewProduct.type !== 'service' && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Остаток</span><span>{Math.max(0, st.qty)} {viewProduct.unit || 'шт'}</span></div>}
-                {viewProduct.min_qty > 0 && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Мин. остаток</span><span>{viewProduct.min_qty}</span></div>}
-                {viewProduct.sku && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Артикул</span><span>{viewProduct.sku}</span></div>}
-                {viewProduct.barcode && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Штрихкод</span><span>{viewProduct.barcode}</span></div>}
-                {viewProduct.description && <div style={{paddingTop:'.4rem',borderTop:'1px solid var(--border)',color:'#555'}}>{viewProduct.description}</div>}
+            <div style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>
+              {/* Информация слева */}
+              <div style={{flex:'1 1 280px',display:'flex',flexDirection:'column',gap:'.3rem'}}>
+                {rows.map(function(r, i) {
+                  return (
+                    <div key={i} style={{display:'flex',justifyContent:'space-between',gap:'12px',padding:'.3rem 0',borderBottom:'1px solid #f2f2f2',fontSize:'.82rem'}}>
+                      <span style={{color:'var(--muted)',flexShrink:0}}>{r[0]}</span>
+                      <span style={{fontWeight:600,textAlign:'right'}}>{r[1]}</span>
+                    </div>
+                  );
+                })}
+                {viewProduct.type === 'combo' && Array.isArray(viewProduct.combo_items) && viewProduct.combo_items.length > 0 && (
+                  <div style={{paddingTop:'.4rem'}}>
+                    <div style={{fontSize:'.72rem',color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.03em',fontWeight:600,marginBottom:'.3rem'}}>Состав комбо</div>
+                    {viewProduct.combo_items.map(function(ci, idx) {
+                      return <div key={idx} style={{display:'flex',justifyContent:'space-between',fontSize:'.8rem',padding:'.15rem 0'}}><span>{ci.name}</span><span>{ci.qty} × {Number(ci.price || 0).toLocaleString()} {cur}</span></div>;
+                    })}
+                  </div>
+                )}
+                {viewProduct.description && (
+                  <div style={{paddingTop:'.4rem',color:'#555',fontSize:'.82rem',lineHeight:1.5}}>{viewProduct.description}</div>
+                )}
+              </div>
+              {/* Фото справа */}
+              <div style={{flex:'0 0 300px',width:'300px'}}>
+                {viewProduct.photo_url ? (
+                  <img src={viewProduct.photo_url} alt={viewProduct.name} style={{width:'100%',height:'260px',objectFit:'cover',borderRadius:'12px',border:'1px solid var(--border)',background:'#f8f8f8'}} />
+                ) : (
+                  <div style={{width:'100%',height:'260px',borderRadius:'12px',background:'#f8f8f8',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.78rem'}}>Фото не загружено</div>
+                )}
               </div>
             </div>
           );
