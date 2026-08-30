@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -10,52 +10,40 @@ export default function Shifts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [toastError, setToastError] = useState(false);
 
-  var getCashRegisterBalance = function() {
-    var ac = (accounts||[]).find(function(a){return a.type === 'cash_register';});
-    if (!ac) return 0;
-    var bal = parseFloat(ac.balance) || 0;
-    (transactions||[]).forEach(function(t){if (t.account_id === ac.id) bal += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);});
-    return bal;
+  const showToast = (msg, isError = false) => {
+    setToastError(isError);
+    setToast(msg);
+    setTimeout(() => setToast(null), isError ? 4000 : 2500);
   };
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [sRes, tRes, aRes, rRes] = await Promise.all([
-        supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false }),
-        supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
-        supabase.from('accounts').select('*').order('created_at', { ascending: true }),
-        supabase.from('receipts').select('shift_id,paid_amount').eq('user_id', user.id),
-      ]);
-      setShifts(sRes.data || []);
-      setTransactions(tRes.data || []);
-      setAccounts(aRes.data || []);
-      setReceipts(rRes.data || []);
-      setLoading(false);
+      try {
+        const [sRes, tRes, aRes, rRes] = await Promise.all([
+          supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false }),
+          supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
+          supabase.from('accounts').select('*').order('created_at', { ascending: true }),
+          supabase.from('receipts').select('shift_id,paid_amount').eq('user_id', user.id),
+        ]);
+        if (sRes.error) throw sRes.error;
+        setShifts(sRes.data || []);
+        setTransactions(tRes.data || []);
+        setAccounts(aRes.data || []);
+        setReceipts(rRes.data || []);
+      } catch (e) {
+        showToast('Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'), true);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [user]);
-
-  useEffect(() => {
-    if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }
-  }, [toast]);
-
-  const activeShift = useMemo(() => shifts.find(s => s.status === 'open'), [shifts]);
 
   // Выручка смены = сумма оплаченного по чекам смены (только кассовые чеки, быстрые продажи не входят)
   const getShiftIncome = (s) => {
     return (receipts||[]).filter(r => r.shift_id === s.id).reduce((sum, r) => sum + (Number(r.paid_amount)||0), 0);
-  };
-  const getShiftExpense = (s) => { return 0; };
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2500);
-  };
-
-  const formatDate = (d) => {
-    if (!d) return '—';
-    return new Date(d).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
   };
 
   if (loading) return <div className="empty-products"><div className="big-icon">⏳</div><p>Загрузка...</p></div>;
@@ -63,9 +51,14 @@ export default function Shifts() {
   return (
     <>
       {toast && (
-        <div style={{position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', background:'#fff', border:'1px solid #e5e7eb', borderRadius:'.75rem', padding:'.75rem 1.2rem', fontSize:'.85rem', color:'#333', boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)', zIndex:9999 }}>
-          {toast}
-        </div>
+        <div style={{
+          position:'fixed', bottom:'24px', right:'24px',
+          background: toastError ? '#dc2626' : '#fff',
+          color: toastError ? '#fff' : '#333',
+          border: toastError ? 'none' : '1px solid #e5e7eb',
+          borderRadius:'12px', padding:'.7rem 1.2rem', fontSize:'.85rem',
+          boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.15)', zIndex:9999, maxWidth:'320px'
+        }}>{toast}</div>
       )}
 
       <div className="page-header">
@@ -95,21 +88,21 @@ export default function Shifts() {
           <tbody>
             {shifts.length === 0 ? (
               <tr><td colSpan="9"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
-            ) : shifts.map((s, idx) => {
+            ) : shifts.map((s) => {
               const income = getShiftIncome(s);
-              const expense = getShiftExpense(s);
               const isOpen = s.status === 'open';
-              const d = new Date(s.opened_at);
-              const dateStr = d.toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric' });
-              const timeOpen = d.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+              const opened = s.opened_at ? new Date(s.opened_at) : null;
+              const dateStr = opened ? opened.toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric' }) : '—';
+              const timeOpen = opened ? opened.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '—';
               const timeClose = s.closed_at ? new Date(s.closed_at).toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '—';
               const sCloseBal = parseFloat(s.closing_balance)||0;
+              const cashier = s.current_cashier_name || s.cashier_name;
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',color:'#555',paddingLeft:0}}>{dateStr}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{timeOpen}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{'#'+(shifts.length - idx)}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{s.cashier_name || '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{s.shift_number ? '#'+s.shift_number : '—'}</td>
+                  <td style={{textAlign:'left',color:'#555'}}>{cashier || '—'}</td>
                   <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} ₽</td>
                   <td style={{textAlign:'left',fontWeight:600}}>{income > 0 ? '+'+income.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>

@@ -487,6 +487,8 @@ app.post('/api/:table', auth, async (req, res) => {
       if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
+      // Кассовые смены: opened_at по умолчанию — иначе дата открытия NULL и раздел «Смены» показывает 01.01.1970
+      if (table === 'shifts' && !keys.includes('opened_at') && cols.has('opened_at')) { keys.push('opened_at'); body.opened_at = new Date().toISOString(); }
       const vals = keys.map(k => Array.isArray(body[k]) && typeof body[k][0] === 'object' ? JSON.stringify(body[k]) : body[k]);
       const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
       const { rows } = await q('INSERT INTO ' + table + ' (' + keys.join(', ') + ') VALUES (' + ph + ') RETURNING *', vals);

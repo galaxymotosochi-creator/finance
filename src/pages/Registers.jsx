@@ -495,6 +495,8 @@ export default function Registers({ fullscreen }) {
     const bal = parseFloat(openShiftBal) || 0;
     const { data, error } = await supabase.from('shifts').insert({
       user_id: user.id, opening_balance: bal, status: 'open', cashier_name: openShiftCashier.trim() || userName,
+      // opened_at обязателен — иначе дата открытия не сохраняется (в БД будет NULL, в разделе «Смены» — 01.01.1970)
+      opened_at: new Date().toISOString(),
     }).select().single();
     if (error) return setToast('Ошибка: ' + error.message);
     if (data) setActiveShift(data);
@@ -1453,9 +1455,10 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
                 const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
                 try {
-                  // Номер смены (для описания транзакции): считаем только закрытые + 1
-                  const { count } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'closed');
-                  const shiftNum = (count || 0) + 1;
+                  // Номер смены (для описания транзакции): считаем только закрытые + 1.
+                  // Внимание: кастомный клиент не поддерживает count/head — берём длину списка закрытых смен.
+                  const { data: closedShifts } = await supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'closed');
+                  const shiftNum = (closedShifts?.length || 0) + 1;
                   // Категория «Доход от продаж»
                   let saleCatId = null;
                   const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();
@@ -1470,11 +1473,12 @@ if (loading) return <div style={{position:'fixed',inset:0,display:'flex',flexDir
                     account_id: acId, status: 'paid', category_id: saleCatId,
                   }));
                   if (txList.length > 0) await supabase.from('transactions').insert(txList);
-                  // Закрываем смену
+                  // Закрываем смену (сохраняем номер — чтобы раздел «Смены» показывал реальный №)
                   const { error } = await supabase.from('shifts').update({
                     closed_at: new Date().toISOString(),
                     closing_balance: fact,
                     status: 'closed',
+                    shift_number: shiftNum,
                   }).eq('id', activeShift.id);
                   if (error) return setToast('' + error.message);
                   setShowCloseShift(false); setCloseFactBal(''); setShiftTx([]); setShiftReceipts([]);
