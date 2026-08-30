@@ -469,6 +469,11 @@ app.post('/api/:table', auth, async (req, res) => {
         }
       }
     }
+    // Начальные остатки: только одна запись на пользователя — повторное сохранение заменяет старую
+    // (иначе копятся дубли и загружается неизвестно какая из них)
+    if (table === 'initial_stocks') {
+      await pool.query('DELETE FROM initial_stocks WHERE user_id = $1', [req.user.id]);
+    }
     const results = [];
     for (const body of items) {
       // Атомарная нумерация чеков: игнорируем переданный receipt_number, берём MAX+1 на сервере

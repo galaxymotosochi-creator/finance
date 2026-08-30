@@ -8,7 +8,7 @@ const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]')
 const setProducts = (list) => localStorage.setItem('products88', JSON.stringify(list));
 const INITIAL_KEY = 'initialStock88';
 
-function buildStockMap(supplies, initial) {
+function buildStockMap(supplies, initial, writeoffs) {
   const map = {};
   supplies.forEach(sp => {
     if (!map[sp.prodId]) map[sp.prodId] = { qty: 0, cost: 0 };
@@ -27,6 +27,15 @@ function buildStockMap(supplies, initial) {
       }
     });
   }
+  // Списания (продажи со склада, акты списания) — уменьшают остаток.
+  // Иначе раздел «Остатки» расходится с кассой (та вычитает списания).
+  (writeoffs || []).forEach(wo => {
+    const pid = wo.product_id;
+    if (pid && map[pid]) {
+      map[pid].qty -= (Number(wo.quantity) || 0);
+      if (map[pid].qty < 0) map[pid].qty = 0;
+    }
+  });
   return map;
 }
 
@@ -59,24 +68,30 @@ export default function Stock() {
 
   const load = async () => {
     setLoading(true);
-    const [supRes, prodRes, initRes] = await Promise.all([
-      supabase.from('supplies').select('items').eq('user_id', user.id),
-      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('initial_stocks').select('*').eq('user_id', user.id).single()
-    ]);
-    const items = supRes.data || [];
-    const supplies = [];
-    items.forEach(sp => { (sp.items||[]).forEach(it => { supplies.push(it); }); });
-    setSuppliesCache(supplies);
-    const initial = initRes.data || getInitialStock();
-    if (!initRes.data && initial && initial.done) {
-      const { error } = await supabase.from('initial_stocks').insert({ id: Date.now(), user_id: user.id, items: initial.items || {}, costs: initial.costs || {}, done: initial.done });
-      if (!error) localStorage.removeItem(INITIAL_KEY);
+    try {
+      const [supRes, prodRes, initRes, woRes] = await Promise.all([
+        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('initial_stocks').select('*').eq('user_id', user.id).single(),
+        supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id)
+      ]);
+      if (supRes.error) throw supRes.error;
+      const items = supRes.data || [];
+      const supplies = [];
+      items.forEach(sp => { (sp.items||[]).forEach(it => { supplies.push(it); }); });
+      setSuppliesCache(supplies);
+      const initial = initRes.data || getInitialStock();
+      if (!initRes.data && initial && initial.done) {
+        const { error } = await supabase.from('initial_stocks').insert({ id: Date.now(), user_id: user.id, items: initial.items || {}, costs: initial.costs || {}, done: initial.done });
+        if (!error) localStorage.removeItem(INITIAL_KEY);
+      }
+      setInitialCache(initial);
+      setStockMap(buildStockMap(supplies, initial, woRes.data || []));
+      if (prodRes.data) setProductsState(prodRes.data);
+      setProductsFromDB(prodRes.data || []);
+    } catch (e) {
+      alert('Ошибка загрузки остатков: ' + (e.message || 'неизвестная ошибка'));
     }
-    setInitialCache(initial);
-    setStockMap(buildStockMap(supplies, initial));
-    if (prodRes.data) setProductsState(prodRes.data);
-    setProductsFromDB(prodRes.data || []);
     setLoading(false);
   };
 
@@ -108,19 +123,21 @@ export default function Stock() {
   const totalSum = items.reduce((s, p) => {
     const st = stockMap[p.id];
     if (!st) return s;
-    const costPrice = st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+    const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
     return s + costPrice * st.qty;
   }, 0);
 
-  const editPrice = (id) => {
+  const editPrice = async (id) => {
     const val = prompt('Новая цена продажи:');
     if (val === null || val === '') return;
     const price = parseFloat(val);
     if (isNaN(price) || price < 0) return alert('Некорректная цена');
-    let list = getProducts();
-    list = list.map(x => x.id === id ? { ...x, price } : x);
-    setProducts(list);
-    setProductsState(list);
+    // Раньше цена менялась только в localStorage и пропадала после перезагрузки — теперь сохраняем в БД
+    const { error } = await supabase.from('products').update({ price }).eq('id', id);
+    if (error) return alert('Ошибка сохранения цены: ' + error.message);
+    setProductsState(prev => prev.map(x => x.id === id ? { ...x, price } : x));
+    setProductsFromDB(prev => prev.map(x => x.id === id ? { ...x, price } : x));
+    setToast('Цена обновлена');
   };
 
   const navigateTo = (page) => {
@@ -254,7 +271,7 @@ export default function Stock() {
             ) : items.map(p => {
               const st = stockMap[p.id] || { qty: 0, cost: 0 };
               const qty = st.qty;
-              const costPrice = st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+              const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
               const retailPrice = p.price || 0;
               const sumValue = costPrice * qty;
               const markup = retailPrice - costPrice;
