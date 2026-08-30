@@ -163,9 +163,10 @@ export default function Accounts() {
     if (!pendingDeleteAc) return;
     setShowConfirm(false);
     try {
-      await supabase.from('accounts').delete().eq('id',pendingDeleteAc.id);
+      const { error } = await supabase.from('accounts').delete().eq('id', pendingDeleteAc.id);
+      if (error) return setToast('⚠️ ' + error.message);
       await fetchAccounts();
-    } catch(err) {setToast('⚠️ '+err.message);}
+    } catch(err) { setToast('⚠️ ' + err.message); }
     setPendingDeleteAc(null);
   };
 
