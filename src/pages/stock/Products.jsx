@@ -132,6 +132,7 @@ export default function Products() {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
   const [viewProduct, setViewProduct] = useState(null);
+  const [photoView, setPhotoView] = useState(null);
   const [costMap, setCostMap] = useState({});
   const [cats, setCats] = useState([]);
   const [catsLoaded, setCatsLoaded] = useState(false);
@@ -690,7 +691,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" onClick={e => { e.stopPropagation(); setPhotoView(p.photo_url); }} title="Открыть фото" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px',cursor:'zoom-in'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
@@ -893,6 +894,14 @@ export default function Products() {
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmRemove}>Да</button>
         </>}>
       </Modal>
+
+      {/* Лайтбокс: большое фото по клику на миниатюру */}
+      {photoView && (
+        <div onClick={() => setPhotoView(null)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.88)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',cursor:'zoom-out',padding:'20px'}}>
+          <img src={photoView} alt="" style={{maxWidth:'92%',maxHeight:'92%',objectFit:'contain',borderRadius:'8px'}} />
+          <span style={{position:'absolute',top:'16px',right:'22px',color:'#fff',fontSize:'1.6rem',cursor:'pointer',lineHeight:1}} onClick={() => setPhotoView(null)}>&times;</span>
+        </div>
+      )}
 
       {/* Модалка просмотра товара/услуги (по клику на название) */}
       <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') + (viewProduct.cat ? ' • ' + (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '') : ''} width="medium">
