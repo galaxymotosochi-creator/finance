@@ -369,7 +369,6 @@ export default function Employees() {
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => openEdit(emp)}>Редактировать</button>
-                        {emp.email ? <button onClick={() => sendInvite(emp)}>Отправить приглашение</button> : null}
                         <button onClick={() => remove(emp.id)} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>
