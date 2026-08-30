@@ -353,7 +353,7 @@ export default function Settings() {
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-        <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
+        <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => window.location.reload()}>Отмена</button>
         <button onClick={async () => {
             localStorage.setItem('settings_company', JSON.stringify(company));
             localStorage.setItem('settings_country', country);
@@ -365,13 +365,17 @@ export default function Settings() {
             try {
               var settingsData = { company, country, lang, currency, timezone: tz, notifications };
               const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();
+              let saveErr = null;
               if (existing) {
-                await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData }).eq('user_id', user.id);
+                const r = await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData }).eq('user_id', user.id);
+                saveErr = r.error;
               } else {
-                await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData });
+                const r = await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData });
+                saveErr = r.error;
               }
-            } catch(e) {}
-            setToast('Настройки сохранены');
+              if (saveErr) throw saveErr;
+              setToast('Настройки сохранены');
+            } catch(e) { alert('Ошибка сохранения: ' + (e.message || 'неизвестная ошибка')); }
           }} style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
       </div>
     </div>
