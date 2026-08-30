@@ -940,9 +940,17 @@ export default function Products() {
             viewProduct.hidden ? ['Статус', 'Скрыт'] : null,
           ].filter(Boolean);
           return (
-            <div style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>
-              {/* Информация слева */}
-              <div style={{flex:'1 1 280px',display:'flex',flexDirection:'column',gap:'.3rem'}}>
+            <div>
+              {/* Фото по центру карточки */}
+              <div style={{textAlign:'center',marginBottom:'14px'}}>
+                {viewProduct.photo_url ? (
+                  <img src={viewProduct.photo_url} alt={viewProduct.name} style={{maxWidth:'100%',maxHeight:'280px',objectFit:'contain',borderRadius:'12px',border:'1px solid var(--border)',background:'#f8f8f8'}} />
+                ) : (
+                  <div style={{width:'100%',height:'180px',borderRadius:'12px',background:'#f8f8f8',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.78rem'}}>Фото не загружено</div>
+                )}
+              </div>
+              {/* Информация */}
+              <div style={{display:'flex',flexDirection:'column',gap:'.3rem'}}>
                 {rows.map(function(r, i) {
                   return (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',gap:'12px',padding:'.3rem 0',borderBottom:'1px solid #f2f2f2',fontSize:'.82rem'}}>
@@ -961,14 +969,6 @@ export default function Products() {
                 )}
                 {viewProduct.description && (
                   <div style={{paddingTop:'.4rem',color:'#555',fontSize:'.82rem',lineHeight:1.5}}>{viewProduct.description}</div>
-                )}
-              </div>
-              {/* Фото справа */}
-              <div style={{flex:'0 0 300px',width:'300px'}}>
-                {viewProduct.photo_url ? (
-                  <img src={viewProduct.photo_url} alt={viewProduct.name} style={{width:'100%',height:'260px',objectFit:'cover',borderRadius:'12px',border:'1px solid var(--border)',background:'#f8f8f8'}} />
-                ) : (
-                  <div style={{width:'100%',height:'260px',borderRadius:'12px',background:'#f8f8f8',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.78rem'}}>Фото не загружено</div>
                 )}
               </div>
             </div>
