@@ -55,12 +55,15 @@ export default function Promos() {
 
   const promoDays = (d) => {
     const ds = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    return promos.filter(p => ds >= p.start_date && ds <= p.end_date);
+    // даты в БД — timestamptz (с временем) — берём только дату
+    return promos.filter(p => ds >= String(p.start_date||'').slice(0,10) && ds <= String(p.end_date||'').slice(0,10));
   };
 
   const status = (p) => {
-    if (p.start_date > today) return 'planned';
-    if (p.end_date < today) return 'ended';
+    const sd = String(p.start_date||'').slice(0,10);
+    const ed = String(p.end_date||'').slice(0,10);
+    if (sd > today) return 'planned';
+    if (ed < today) return 'ended';
     return 'active';
   };
 
@@ -86,8 +89,8 @@ export default function Promos() {
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setName(p.name); setDiscount(String(p.discount||'')); setStart(p.start_date);
-    setEnd(p.end_date); setDesc(p.description||'');
+    setEditId(p.id); setName(p.name); setDiscount(String(p.discount||'')); setStart(String(p.start_date||'').slice(0,10));
+    setEnd(String(p.end_date||'').slice(0,10)); setDesc(p.description||'');
     if (p.conditions && p.conditions.type) {
       setTargetType(p.conditions.type);
       setTargetCat(p.conditions.catId || '');

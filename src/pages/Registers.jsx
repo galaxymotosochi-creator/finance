@@ -252,7 +252,10 @@ export default function Registers({ fullscreen }) {
   const findPromo = (product) => {
     const today = new Date().toISOString().split('T')[0];
     return promos.find(p => {
-      if (p.start_date > today || p.end_date < today) return false;
+      // даты в БД — timestamptz (с временем) — берём только дату, иначе акция «с сегодня» не применяется
+      const sd = String(p.start_date || '').slice(0, 10);
+      const ed = String(p.end_date || '').slice(0, 10);
+      if (sd > today || ed < today) return false;
       if (!p.conditions || !p.conditions.type) return true;
       const cond = p.conditions;
       if (cond.type === 'all') return true;
