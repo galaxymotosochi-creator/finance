@@ -120,12 +120,14 @@ export default function Stock() {
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
 
   const totalQty = items.reduce((s, p) => s + (stockMap[p.id]?.qty || 0), 0);
-  const totalSum = items.reduce((s, p) => {
+  // Итоговая сумма закупа (количество × себестоимость) и продажи (количество × цена)
+  const totalCost = items.reduce((s, p) => {
     const st = stockMap[p.id];
     if (!st) return s;
     const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
     return s + costPrice * st.qty;
   }, 0);
+  const totalRetail = items.reduce((s, p) => s + ((stockMap[p.id]?.qty || 0) * (p.price || 0)), 0);
 
   const editPrice = async (id) => {
     const val = prompt('Новая цена продажи:');
@@ -326,10 +328,10 @@ export default function Stock() {
                 <td></td>
                 <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalQty}</td>
                 <td></td>
+                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalCost.toLocaleString()}</td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalSum.toLocaleString()}</td>
+                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalRetail.toLocaleString()}</td>
               </tr>
             )}
           </tbody>
