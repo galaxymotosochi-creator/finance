@@ -215,7 +215,7 @@ export default function Stock() {
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openInitialStock}>Внести остатки (товар уже есть)</button>
+          <button className="btn-mint" onClick={openInitialStock}>+ Ввести начальные остатки</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -272,7 +272,7 @@ export default function Stock() {
                     <p>Склад пока пуст</p>
                     <div style={{maxWidth:'420px',margin:'0 auto',textAlign:'left',fontSize:'.8rem',color:'#555',lineHeight:1.6,marginTop:'.5rem'}}>
                       <b>Как добавить товар на склад:</b><br />
-                      • Товар <b>уже куплен</b> и лежит у вас — нажмите «Внести остатки» и укажите его количество<br />
+                      • Товар <b>уже куплен</b> и лежит у вас — нажмите «Ввести начальные остатки» и укажите его количество<br />
                       • Товар <b>закупаете сейчас</b> — оформите Поставку (раздел «Поставки»)<br />
                       После этого остатки появятся здесь и будут меняться сами при продажах.
                     </div>
@@ -343,7 +343,7 @@ export default function Stock() {
         </>}>
       </Modal>
 
-      <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
+      <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
 
             <div className="stock-search" style={{marginBottom:'.6rem'}}>
               <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
