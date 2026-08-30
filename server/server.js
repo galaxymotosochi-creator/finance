@@ -455,6 +455,13 @@ app.get('/api/:table', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ===== PHOTO UPLOAD (ДОЛЖЕН быть ДО generic /api/:table — иначе перехватывается им) =====
+app.post('/api/upload', auth, upload.single('photo'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file' });
+  const url = '/uploads/' + req.file.filename;
+  res.json({ url });
+});
+
 app.post('/api/:table', auth, async (req, res) => {
   try {
     const { table } = req.params;
@@ -755,13 +762,6 @@ app.post('/api/telegram/prefs', auth, async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-});
-
-// ===== PHOTO UPLOAD =====
-app.post('/api/upload', auth, upload.single('photo'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file' });
-  const url = '/uploads/' + req.file.filename;
-  res.json({ url });
 });
 
 app.listen(PORT, '0.0.0.0', () => { console.log('AtlasPos API running on port ' + PORT); });

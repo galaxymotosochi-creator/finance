@@ -41,6 +41,21 @@ document.body.appendChild(c);
   }).catch(function(){alert('Ошибка загрузки сканера')});
 };
 
+  // Загрузка фото товара/услуги на сервер
+  const uploadPhoto = async (file) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) return alert('Файл больше 10 МБ');
+    try {
+      const fd = new FormData();
+      fd.append('photo', file);
+      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+      const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (s.access_token || '') }, body: fd });
+      const d = await res.json();
+      if (d.url) { setFPhoto(d.url); showToast('Фото загружено'); }
+      else alert('Ошибка загрузки: ' + (d.error || 'неизвестная'));
+    } catch (e) { alert('Ошибка загрузки фото: ' + e.message); }
+  };
+
   const genBarcode = () => {
   let s = '';
   for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
@@ -150,6 +165,7 @@ export default function Products() {
   const [fDesc, setFDesc] = useState('');
   const [fMinQty, setFMinQty] = useState('');
   const [fHidden, setFHidden] = useState(false);
+  const [fPhoto, setFPhoto] = useState('');
   const [fComboItems, setFComboItems] = useState([]);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilterSet, setTypeFilterSet] = useState(new Set());
@@ -229,7 +245,7 @@ export default function Products() {
   };
 
   const openAdd = () => {
-    setEditId(null); setMode('add'); setFHidden(false);
+    setEditId(null); setMode('add'); setFHidden(false); setFPhoto('');
     setFName(''); setFCat(''); setFPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
@@ -238,7 +254,7 @@ export default function Products() {
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false);
+    setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false); setFPhoto(p.photo_url || '');
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
@@ -259,6 +275,7 @@ export default function Products() {
       weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
       min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
       hidden: editId ? fHidden : false,
+      photo_url: fPhoto || null,
       free_price: fFreePrice,
       combo_items: fType === 'combo' ? fComboItems : null
     };
@@ -673,7 +690,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}><div className="prod-name" style={{cursor:'pointer'}}>{p.name}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
@@ -712,6 +729,22 @@ export default function Products() {
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
+              </div>
+              {/* Фото товара/услуги */}
+              <div className="form-group">
+                <label>Фото</label>
+                <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                  {fPhoto ? (
+                    <img src={fPhoto} alt="" style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'10px',border:'1px solid var(--border)',flexShrink:0}} />
+                  ) : (
+                    <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.68rem',textAlign:'center',flexShrink:0}}>без фото</div>
+                  )}
+                  <label style={{cursor:'pointer',padding:'.35rem .8rem',border:'1.5px solid var(--border)',borderRadius:'100px',fontSize:'.75rem',fontWeight:600,color:'#555',fontFamily:'inherit',margin:0}}>
+                    {fPhoto ? 'Заменить' : 'Загрузить'}
+                    <input type="file" accept="image/*" style={{display:'none'}} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
+                  </label>
+                  {fPhoto && <button type="button" onClick={() => setFPhoto('')} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
+                </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -859,6 +892,32 @@ export default function Products() {
           <button className="btn btn-ghost" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmRemove}>Да</button>
         </>}>
+      </Modal>
+
+      {/* Модалка просмотра товара/услуги (по клику на название) */}
+      <Modal open={!!viewProduct} onClose={() => setViewProduct(null)} title={viewProduct ? viewProduct.name : ''} subtitle={viewProduct ? (viewProduct.type === 'service' ? 'Услуга' : viewProduct.type === 'combo' ? 'Комбо-набор' : 'Товар') + (viewProduct.cat ? ' • ' + (CAT_LABELS[viewProduct.cat] || viewProduct.cat) : '') : ''} width="medium">
+        {viewProduct && (() => {
+          const st = stockMap[viewProduct.id] || { qty: 0, cost: 0 };
+          const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+          return (
+            <div>
+              {viewProduct.photo_url ? (
+                <img src={viewProduct.photo_url} alt={viewProduct.name} style={{width:'100%',maxHeight:'320px',objectFit:'contain',borderRadius:'12px',marginBottom:'12px',background:'#f8f8f8'}} />
+              ) : (
+                <div style={{width:'100%',height:'140px',borderRadius:'12px',background:'#f8f8f8',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.78rem',marginBottom:'12px'}}>Фото не загружено</div>
+              )}
+              <div style={{display:'flex',flexDirection:'column',gap:'.3rem',fontSize:'.82rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Цена</span><b>{Number(viewProduct.price||0).toLocaleString()} {cur}</b></div>
+                {costPrice > 0 && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Себестоимость</span><span>{costPrice.toLocaleString()} {cur}</span></div>}
+                {viewProduct.type !== 'service' && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Остаток</span><span>{Math.max(0, st.qty)} {viewProduct.unit || 'шт'}</span></div>}
+                {viewProduct.min_qty > 0 && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Мин. остаток</span><span>{viewProduct.min_qty}</span></div>}
+                {viewProduct.sku && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Артикул</span><span>{viewProduct.sku}</span></div>}
+                {viewProduct.barcode && <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Штрихкод</span><span>{viewProduct.barcode}</span></div>}
+                {viewProduct.description && <div style={{paddingTop:'.4rem',borderTop:'1px solid var(--border)',color:'#555'}}>{viewProduct.description}</div>}
+              </div>
+            </div>
+          );
+        })()}
       </Modal>
 
       {/* Корзина модалка */}
