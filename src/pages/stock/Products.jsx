@@ -160,6 +160,7 @@ export default function Products() {
   const [fHidden, setFHidden] = useState(false);
   const [fPhoto, setFPhoto] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [freshPhotoUrl, setFreshPhotoUrl] = useState(''); // загружено в этой сессии, ещё не сохранено
   const [fComboItems, setFComboItems] = useState([]);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilterSet, setTypeFilterSet] = useState(new Set());
@@ -239,7 +240,7 @@ export default function Products() {
   };
 
   const openAdd = () => {
-    setEditId(null); setMode('add'); setFHidden(false); setFPhoto('');
+    setEditId(null); setMode('add'); setFHidden(false); setFPhoto(''); setFreshPhotoUrl('');
     setFName(''); setFCat(''); setFPrice(''); setFMinPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
@@ -248,7 +249,7 @@ export default function Products() {
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false); setFPhoto(p.photo_url || '');
+    setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false); setFPhoto(p.photo_url || ''); setFreshPhotoUrl('');
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || '')); setFMinPrice(String(p.min_price || ''));
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
@@ -260,6 +261,21 @@ export default function Products() {
   };
 
   // Загрузка фото товара/услуги на сервер
+  // Удаление загруженного, но не сохранённого фото (закрыли форму — файл не должен оставаться на сервере)
+  const deleteUploadedFile = async (url) => {
+    if (!url) return;
+    try {
+      const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+      await fetch('/api/upload/' + encodeURIComponent(url.split('/').pop()), { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + (s.access_token || '') } });
+    } catch (e) {}
+  };
+  const cleanupFreshPhoto = async () => {
+    if (freshPhotoUrl) {
+      await deleteUploadedFile(freshPhotoUrl);
+      setFreshPhotoUrl('');
+    }
+  };
+
   const uploadPhoto = async (file) => {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) return alert('Файл больше 10 МБ');
@@ -270,7 +286,13 @@ export default function Products() {
       const s = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
       const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (s.access_token || '') }, body: fd });
       const d = await res.json();
-      if (d.url) { setFPhoto(d.url); showToast('Фото загружено'); }
+      if (d.url) {
+        // если в этой сессии уже грузили фото (замена без сохранения) — удаляем предыдущий файл
+        if (freshPhotoUrl) await deleteUploadedFile(freshPhotoUrl);
+        setFreshPhotoUrl(d.url);
+        setFPhoto(d.url);
+        showToast('Фото загружено');
+      }
       else alert('Ошибка загрузки: ' + (d.error || 'неизвестная'));
     } catch (e) { alert('Ошибка загрузки фото: ' + e.message); }
     setUploading(false);
@@ -300,6 +322,7 @@ export default function Products() {
     }
     setShowModal(false);
     load();
+    setFreshPhotoUrl(''); // фото сохранено — больше не удаляем
     showToast(editId ? 'Товар успешно сохранён!' : 'Товар успешно добавлен!');
   };
 
@@ -737,7 +760,7 @@ export default function Products() {
       </div>
 
       {/* Модалка товара */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
+      <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
         <form onSubmit={save}>
               <div className="form-group">
                 <label>Название</label>
@@ -763,7 +786,7 @@ export default function Products() {
                     {fPhoto ? 'Заменить' : 'Загрузить'}
                     <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
                   </label>
-                  {fPhoto && !uploading && <button type="button" onClick={() => setFPhoto('')} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
+                  {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
                 </div>
               </div>
               <div className="form-row">

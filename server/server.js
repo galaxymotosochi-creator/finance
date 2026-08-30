@@ -471,6 +471,17 @@ app.post('/api/upload', auth, upload.single('photo'), async (req, res) => {
   res.json({ url });
 });
 
+// Удаление загруженного фото (используется, когда форму закрыли без сохранения)
+app.delete('/api/upload/:file', auth, async (req, res) => {
+  try {
+    const file = path.basename(req.params.file || ''); // защита от путей
+    const full = path.join(uploadDir, file);
+    if (!full.startsWith(uploadDir)) return res.status(400).json({ error: 'Invalid file' });
+    if (fs.existsSync(full)) fs.unlinkSync(full);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.post('/api/:table', auth, async (req, res) => {
   try {
     const { table } = req.params;
