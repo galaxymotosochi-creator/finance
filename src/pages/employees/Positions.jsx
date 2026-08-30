@@ -79,6 +79,9 @@ export default function Positions() {
 
   const [fName, setFName] = useState('');
   const [fPermissions, setFPermissions] = useState([]);
+  const [fSalary, setFSalary] = useState('');
+  const [fBonusType, setFBonusType] = useState('percent');
+  const [fBonusValue, setFBonusValue] = useState('');
   const [expanded, setExpanded] = useState({});
 
   const load = async () => {
@@ -95,12 +98,14 @@ export default function Positions() {
   useEffect(() => { load(); }, [user]);
 
   const openAdd = () => {
-    setEditId(null); setFName(''); setFPermissions([]); setExpanded({});
+    setEditId(null); setFName(''); setFPermissions([]); setFSalary(''); setFBonusType('percent'); setFBonusValue(''); setExpanded({});
     setShow(true);
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setFName(p.name); setFPermissions(p.permissions||[]); setExpanded({});
+    setEditId(p.id); setFName(p.name); setFPermissions(p.permissions||[]);
+    setFSalary(String(p.salary || '')); setFBonusType(p.bonus_type || 'percent'); setFBonusValue(String(p.bonus_value || ''));
+    setExpanded({});
     setShow(true);
   };
 
@@ -127,11 +132,16 @@ export default function Positions() {
       const obj = {
         user_id: user.id, name: fName.trim(),
         permissions: fPermissions,
+        salary: parseFloat(fSalary) || 0,
+        bonus_type: fBonusType,
+        bonus_value: parseFloat(fBonusValue) || 0,
       };
       if (editId) {
-        await supabase.from('position_templates').update(obj).eq('id', editId);
+        const { error } = await supabase.from('position_templates').update(obj).eq('id', editId);
+        if (error) throw error;
       } else {
-        await supabase.from('position_templates').insert(obj);
+        const { error } = await supabase.from('position_templates').insert(obj);
+        if (error) throw error;
       }
       await load();
       setShow(false);
@@ -141,7 +151,8 @@ export default function Positions() {
   const remove = async (id) => {
     if (!confirm('Удалить должность?')) return;
     try {
-      await supabase.from('position_templates').delete().eq('id', id);
+      const { error } = await supabase.from('position_templates').delete().eq('id', id);
+      if (error) return alert('' + error.message);
       await load();
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
@@ -236,9 +247,6 @@ export default function Positions() {
                     <span className="prod-name">{p.name}</span>
                   </td>
                   <td style={{textAlign:'left',color:'#555'}}>{formatPermissions(p)}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>
-                    {formatPermissions(p)}
-                  </td>
                   <td style={{whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
@@ -266,6 +274,26 @@ export default function Positions() {
               <div className="form-group">
                 <label>Название должности</label>
               <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Менеджер по продажам" required />
+              </div>
+
+              {/* Оклад и бонусы должности (подставляются в карточку сотрудника) */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Оклад (₽)</label>
+                  <input type="number" min="0" value={fSalary} onChange={e=>setFSalary(e.target.value)} placeholder="0" />
+                </div>
+                <div className="form-group">
+                  <label>Бонус с продаж</label>
+                  <select value={fBonusType} onChange={e=>setFBonusType(e.target.value)}>
+                    <option value="percent">Процент с продаж (%)</option>
+                    <option value="amount">Фиксированная сумма (₽)</option>
+                    <option value="none">Без бонуса</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Размер бонуса</label>
+                  <input type="number" min="0" value={fBonusValue} onChange={e=>setFBonusValue(e.target.value)} placeholder="0" />
+                </div>
               </div>
 
               {/* ПРАВА ДОСТУПА */}

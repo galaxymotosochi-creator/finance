@@ -588,6 +588,11 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
         if (prod.length > 0) return res.status(400).json({ error: 'Нельзя удалить категорию — в ней есть товары или услуги. Сначала переназначьте их' });
       }
     }
+    // Защита должностей: привязанных к сотрудникам удалять нельзя
+    if (table === 'position_templates') {
+      const { rows: emp } = await pool.query('SELECT id FROM employees WHERE position_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      if (emp.length > 0) return res.status(400).json({ error: 'Нельзя удалить должность — она назначена сотрудникам. Сначала переназначьте их' });
+    }
     // Защита связанных данных: клиент с чеками, товар в чеках/закупках, сотрудник в зарплате и т.д.
     if (table === 'clients') {
       const { rows } = await pool.query('SELECT id FROM receipts WHERE client_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
