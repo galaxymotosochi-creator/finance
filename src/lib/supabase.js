@@ -134,7 +134,15 @@ class PostgrestFilter {
         try { d = await res.json(); } catch(e) {}
         return { data: d, error: null };
       } else if (this.method === 'DELETE') {
-        res = await fetch(url, { method: 'DELETE', headers });
+        // Извлекаем id=eq.XXX из params и переносим в URL (как в PATCH),
+        // иначе сервер (маршрут /api/:table/:id) отвечает 404 и удаление молча не работает
+        var delIdParam = this.params.find(function(p){ return p.startsWith('id=eq.'); });
+        var delUrl = this.url;
+        if (delIdParam) {
+          var delIdVal = decodeURIComponent(delIdParam.split('=')[1].replace('eq.', ''));
+          delUrl = this.url + '/' + delIdVal;
+        }
+        res = await fetch(delUrl, { method: 'DELETE', headers });
         if (!res.ok && res.status !== 204) return { data: null, error: new Error('HTTP ' + res.status) };
         return { data: null, error: null };
       }

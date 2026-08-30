@@ -466,7 +466,8 @@ app.post('/api/:table', auth, async (req, res) => {
       // (чинит дубли: раньше QuickSale считал count+1, касса max+1, плюс гонки)
       if (table === 'receipts') {
         const keys = Object.keys(body).filter(k => body[k] !== undefined && k !== 'receipt_number');
-        if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
+        // user_id всегда берём из токена — не доверяем переданному в payload
+        if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.user.id; }
         if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now() + results.length; }
         // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
         if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
@@ -481,7 +482,8 @@ app.post('/api/:table', auth, async (req, res) => {
       }
 
       const keys = Object.keys(body).filter(k => body[k] !== undefined);
-      if (!keys.includes('user_id') && cols.has('user_id')) { keys.push('user_id'); body.user_id = req.user.id; }
+      // user_id всегда берём из токена — не доверяем переданному в payload
+      if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.user.id; }
       if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
@@ -498,7 +500,8 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
   try {
     const { table, id } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
-    const data = req.body;
+    const data = { ...req.body };
+    delete data.user_id; // user_id всегда берём из токена
     const keys = Object.keys(data).filter(k => data[k] !== undefined);
     const cols = await getTableColumns(table);
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');

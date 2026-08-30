@@ -96,7 +96,7 @@ export default function Dashboard() {
         const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
         const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
         const ce={};(txs||[]).filter(t=>t.type==='expense').forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
-        const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear());const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
+        const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear()).eq('month',now2.getMonth()+1);const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
         const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
         // Доп. данные
         const totalClients = (await supabase.from('clients').select('id',{count:'exact',head:true}).eq('user_id',user.id))?.count||0;
@@ -256,7 +256,7 @@ export default function Dashboard() {
           <div style={{flex:1,background:d.monthProfit>=0?'#f0fdf4':'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
             <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль факт</div>
             <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{Number(d.monthProfit||0).toLocaleString()} ₽</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':''}</div></div>
+            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':'нет плана'}</div></div>
         </div>
       </div>
 
