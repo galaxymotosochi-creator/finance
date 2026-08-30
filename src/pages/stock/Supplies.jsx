@@ -103,20 +103,23 @@ document.body.appendChild(c);
 
 const load = async () => {
     setLoading(true);
-    const [supRes, prodRes, suppRes, accRes, txRes] = await Promise.all([
-      supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('products').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('suppliers').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('accounts').select('*').eq('user_id', user.id),
-      supabase.from('transactions').select('*').eq('user_id', user.id).limit(1000),
-      supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('suppliers').select('*').eq('user_id', user.id).order('created_at')
-    ]);
-    if (supRes.data) setSuppliesState(supRes.data);
-    if (prodRes.data) setProducts(prodRes.data);
-    if (suppRes.data) setSuppliers(suppRes.data);
-    if (accRes.data) setPayAccounts(accRes.data);
-    if (txRes.data) setPayTxList(txRes.data);
+    try {
+      const [supRes, prodRes, suppRes, accRes, txRes] = await Promise.all([
+        supabase.from('supplies').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('products').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('suppliers').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('accounts').select('*').eq('user_id', user.id),
+        supabase.from('transactions').select('*').eq('user_id', user.id).limit(1000),
+      ]);
+      if (supRes.error) throw supRes.error;
+      if (supRes.data) setSuppliesState(supRes.data);
+      if (prodRes.data) setProducts(prodRes.data);
+      if (suppRes.data) setSuppliers(suppRes.data);
+      if (accRes.data) setPayAccounts(accRes.data);
+      if (txRes.data) setPayTxList(txRes.data);
+    } catch (e) {
+      alert('Ошибка загрузки поставок: ' + (e.message || 'неизвестная ошибка'));
+    }
     setLoading(false);
   };
   useEffect(() => {
@@ -178,12 +181,21 @@ const load = async () => {
   const save = async (e) => {
     e.preventDefault();
     const total = fItems.reduce((acc, it) => acc + it.qty * it.cost, 0);
-    const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, paid: 0, date: new Date().toISOString().split('T')[0] };
+    const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, date: new Date().toISOString().split('T')[0] };
     if (editId) {
-      await supabase.from('supplies').update(obj).eq('id', editId);
-    } else { await supabase.from('supplies').insert({ ...obj, id: Date.now() }); }
-    await load(); setShowModal(false);
-    showToast('Поставка проведена');
+      // Не затираем оплату при редактировании (раньше paid сбрасывался в 0 — задолженность росла)
+      const cur = supplies.find(x => x.id === editId);
+      obj.paid = cur?.paid || 0;
+      obj.payments = cur?.payments || [];
+      const { error } = await supabase.from('supplies').update(obj).eq('id', editId).eq('user_id', user.id);
+      if (error) return showToast('Ошибка: ' + error.message);
+    } else {
+      obj.paid = 0;
+      const { error } = await supabase.from('supplies').insert({ ...obj, id: Date.now() });
+      if (error) return showToast('Ошибка: ' + error.message);
+    }
+    await load(); setShowModal(false); setEditId(null);
+    showToast('Поставка сохранена');
   };
 
   const cycleStatus = async (id) => {
@@ -207,6 +219,7 @@ const load = async () => {
   const edit = (id) => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
+    if (s.status === 'received') return alert('Оприходованную поставку редактировать нельзя');
     setEditId(id); setFInvoice(s.invoice||''); setFSupName(s.supplier_name||'');
     setFStatus(s.status||'ordered'); setFPaid(String(s.paid||0));
     setFItems((s.items||[{prodId:s.prodId,name:'Товар',qty:s.qty||0,cost:s.cost||0}]).slice());
@@ -215,13 +228,16 @@ const load = async () => {
 
   const remove = async (id) => {
     if (!confirm('Удалить поставку?')) return;
-    await supabase.from('supplies').delete().eq('id', id); await load();
+    const { error } = await supabase.from('supplies').delete().eq('id', id);
+    if (error) return alert('Ошибка удаления: ' + error.message);
+    await load();
   };
 
   const copy = async (id) => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
-    await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
+    const { error } = await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
+    if (error) return showToast('Ошибка: ' + error.message);
     await load(); showToast('📋 Поставка скопирована');
   };
 
@@ -251,14 +267,16 @@ const load = async () => {
       const acId = document.getElementById('payMethod').value;
       if (amount <= 0) return alert('Введите сумму');
       if (!acId) return alert('Выберите счет');
+      if (amount > debt + 0.01) return alert('Сумма больше задолженности (' + debt.toLocaleString() + ' ₽)');
       var ac = payAccounts.find(function(a){return a.id === acId;});
       var bal = parseFloat(ac?.balance)||0;
       payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
       if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ₽');
-      await supabase.from('transactions').insert({
+      const { error: txErr } = await supabase.from('transactions').insert({
         user_id: user.id, account_id: acId, type: 'expense', amount: amount,
         description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
       });
+      if (txErr) return alert('Ошибка создания операции: ' + txErr.message);
       if (!Array.isArray(s.payments)) s.payments = [];
       s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     }
@@ -382,6 +400,55 @@ const load = async () => {
           </tbody>
         </table>
       </div>
+
+      {/* Модалка редактирования поставки (была потеряна при рефакторинге — кнопка «Редактировать» не работала) */}
+      <Modal open={showModal} onClose={()=>{setShowModal(false);setEditId(null)}} title={editId ? 'Редактировать поставку' : 'Новая поставка'} subtitle="Заказ или поступление товаров от поставщика" width="medium">
+        <form onSubmit={save}>
+          <div style={{display:'flex',gap:'.5rem'}}>
+            <div className="form-group" style={{flex:1}}>
+              <label>Поставщик</label>
+              <input type="text" value={fSupName} onChange={e=>setFSupName(e.target.value)} placeholder="Название поставщика" />
+            </div>
+            <div className="form-group" style={{flex:1}}>
+              <label>Накладная №</label>
+              <input type="text" value={fInvoice} onChange={e=>setFInvoice(e.target.value)} placeholder="Номер документа" />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Статус</label>
+            <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
+              <option value="ordered">Заказано</option>
+              <option value="transit">В пути</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Товары</label>
+            <div style={{border:'1px solid var(--border)',borderRadius:'8px',padding:'.4rem',maxHeight:'180px',overflowY:'auto',display:'flex',flexDirection:'column',gap:'.25rem'}}>
+              {fItems.length === 0 && <div style={{fontSize:'.76rem',color:'var(--muted)',padding:'.3rem'}}>Товары не добавлены</div>}
+              {fItems.map((it,i)=>(
+                <div key={i} style={{display:'flex',alignItems:'center',gap:'.4rem',fontSize:'.8rem'}}>
+                  <span style={{flex:1}}>{it.name}</span>
+                  <span style={{width:'50px',textAlign:'right'}}>{it.qty} × {it.cost}₽</span>
+                  <button type="button" onClick={()=>removeItem(i)} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',padding:'0 .2rem'}}>×</button>
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',gap:'.3rem',marginTop:'.35rem'}}>
+              <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,padding:'.3rem .4rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)'}}>
+                <option value="">— товар —</option>
+                {products.filter(p=>p.type==='product'||p.type==='combo').map(p=><option key={p.id} value={String(p.id)}>{p.name}</option>)}
+              </select>
+              <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Кол-во" style={{width:'70px',padding:'.3rem .4rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)'}} />
+              <input type="number" value={fAddCost} onChange={e=>setFAddCost(e.target.value)} placeholder="Цена" style={{width:'80px',padding:'.3rem .4rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)'}} />
+              <button type="button" onClick={addItem} style={{padding:'.3rem .7rem',fontSize:'.78rem',borderRadius:'8px',border:'none',background:'#ffdd2d',color:'#111',cursor:'pointer',fontFamily:'inherit'}}>+</button>
+            </div>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost" onClick={()=>{setShowModal(false);setEditId(null)}}>Отмена</button>
+            <button type="submit" className="btn btn-primary">Сохранить</button>
+          </div>
+        </form>
+      </Modal>
 
       <Modal open={showStatusConfirm} onClose={()=>setShowStatusConfirm(null)} width="narrow">
         {showStatusConfirm && (() => {

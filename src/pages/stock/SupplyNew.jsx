@@ -111,15 +111,6 @@ export default function SupplyNew() {
     const { error } = await supabase.from('supplies').insert(obj);
     if (error) { showToast('Ошибка: ' + error.message); setSaving(false); return; }
 
-    // Update product stock
-    for (const it of items) {
-      const prod = products.find(p => p.id === it.prodId);
-      if (prod) {
-        const curStock = parseFloat(prod.stock) || 0;
-        await supabase.from('products').update({ stock: curStock + it.qty }).eq('id', it.prodId);
-      }
-    }
-
     setSaving(false);
     showToast('✅ Поставка проведена');
     setTimeout(() => navigate('/stock/supplies'), 1200);

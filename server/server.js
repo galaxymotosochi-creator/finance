@@ -528,13 +528,16 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
       if (oldRows.length && oldRows[0].name !== data.name) oldCatName = oldRows[0].name;
     }
     const sc = keys.map((k, i) => k + ' = $' + (i + 1)).join(', ');
+    // jsonb-колонки (массивы объектов) сериализуем, как в POST — иначе PATCH падает с
+    // «invalid input syntax for type json» (ломало редактирование комбо, смену кассира, права сотрудников, зарплату)
+    const toVal = (v) => Array.isArray(v) && typeof v[0] === 'object' ? JSON.stringify(v) : v;
     let sql;
     let vals;
     if (cols.has('user_id')) {
-      vals = [...keys.map(k => data[k]), id, req.user.id];
+      vals = [...keys.map(k => toVal(data[k])), id, req.user.id];
       sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1) + ' AND user_id = $' + (keys.length + 2);
     } else {
-      vals = [...keys.map(k => data[k]), id];
+      vals = [...keys.map(k => toVal(data[k])), id];
       sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1);
     }
     const { rows } = await q(sql, vals);
