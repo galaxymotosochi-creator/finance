@@ -2,20 +2,28 @@
 // Используется в каталоге товаров и в инвентаризации
 
 // Короткий звуковой сигнал (Web Audio, без файлов)
+// Один общий AudioContext на всю страницу: браузеры ограничивают число контекстов (~6),
+// если создавать новый на каждый пик — звук перестаёт появляться
+let _ac = null;
 export const beep = (freq = 1200, dur = 100, vol = 0.15) => {
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
-    const ac = new AC();
-    const g = ac.createGain();
-    g.connect(ac.destination);
-    g.gain.value = vol;
-    const o = ac.createOscillator();
+    if (!_ac) _ac = new AC();
+    if (_ac.state === 'suspended') _ac.resume();
+    const t0 = _ac.currentTime;
+    const g = _ac.createGain();
+    g.connect(_ac.destination);
+    // Плавный envelope: без резких старт/стоп → нет щелчков и искажений
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur / 1000);
+    const o = _ac.createOscillator();
     o.type = 'sine';
     o.frequency.value = freq;
     o.connect(g);
-    o.start();
-    setTimeout(() => { try { o.stop(); ac.close(); } catch (e) {} }, dur);
+    o.start(t0);
+    o.stop(t0 + dur / 1000 + 0.02);
   } catch (e) { /* звук недоступен — не критично */ }
 };
 
