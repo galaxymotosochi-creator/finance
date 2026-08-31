@@ -235,6 +235,7 @@ export default function Inventory() {
       }).eq('id', id);
       if (error) throw error;
 
+      setEditing(null); // закрываем модалку редактирования
       const completedDoc = { ...doc, totals: result, soldQtyTotal, soldMap };
       if (shAmount > 0) {
         // Есть недостача — спрашиваем, куда её отнести
