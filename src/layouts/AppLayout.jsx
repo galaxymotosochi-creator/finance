@@ -1,6 +1,7 @@
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 import Sidebar from '../components/Sidebar';
+import NetworkIndicator from '../components/NetworkIndicator';
 import QuickSale from '../components/QuickSale';
 import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
@@ -29,6 +30,7 @@ export default function AppLayout({ children }) {
   return (
     <>
       <Sidebar />
+      <NetworkIndicator />
       <div className="main">
         {/* Полоска триала */}
         {!subLoading && !isExpired && daysLeft !== null && daysLeft <= 14 && (
