@@ -337,8 +337,8 @@ export default function Registers({ fullscreen }) {
     });
   };
 
-  const total = cart.reduce((s, i) => s + (i.final_price || i.price) * i.qty, 0);
-  const totalOriginal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.final_price || i.price || 0) * i.qty, 0);
+  const totalOriginal = cart.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
   const discountTotal = totalOriginal - total;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const receiptDiscountAmount = receiptDiscountPercent > 0 ? Math.round(total * receiptDiscountPercent / 100) : (receiptDiscountFixed > 0 ? receiptDiscountFixed : 0);
@@ -440,7 +440,7 @@ export default function Registers({ fullscreen }) {
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
       date, total_amount: finalTotal, comment: receiptComment.trim() || null,
-      discount_sum: cart.reduce((s, i) => s + ((i.price - (i.final_price || i.price)) * i.qty), 0) + (receiptDiscountAmount || 0) + (loyaltyDiscountAmount || 0) + (loyaltyPointsAmount || 0),
+      discount_sum: cart.reduce((s, i) => s + (((i.price || 0) - (i.final_price || i.price || 0)) * i.qty), 0) + (receiptDiscountAmount || 0) + (loyaltyDiscountAmount || 0) + (loyaltyPointsAmount || 0),
       status: receiptStatus,
       paid_amount: receiptStatus === 'paid' ? finalTotal : (receiptStatus === 'partially_paid' ? Math.min(parseFloat(payAmount)||0, finalTotal) : 0),
       payments,
@@ -470,9 +470,9 @@ export default function Registers({ fullscreen }) {
           receipt_id: receiptId,
           product_id: item.id || null, // иначе сервер не может защитить товар от удаления (в чеках product_id всегда NULL)
           product_name: item.name, quantity: item.qty,
-          price: item.price, total: (item.final_price || item.price) * item.qty,
+          price: (item.price || 0), total: (item.final_price || item.price || 0) * item.qty,
           discount_percent: item.discount_percent || 0,
-          discount_amount: ((item.price - (item.final_price || item.price)) * item.qty),
+          discount_amount: (((item.price || 0) - (item.final_price || item.price || 0)) * item.qty),
           promo_id: item.promo_id || null, employee_id: item.employee_id || null,
         };
         if (item.combo_items && item.combo_items.length > 0) {
@@ -886,14 +886,19 @@ if (loading) return <Loader />;
                 </div>
                 <div style={{width:isWide?'80px':'60px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>
                   {item.free_price ? (
-                    <input type="number" min="0" step="0.01" value={item.price} 
-                      onChange={function(e){var v=parseFloat(e.target.value)||0;setCart(function(p){return p.map(function(x){return x.id===item.id?{...x,price:v}:x})})}}
+                    <input type="number" min="0" step="0.01" value={item.price === null || item.price === '' ? '' : item.price} placeholder="0"
+                      onChange={function(e){
+                        var raw = e.target.value;
+                        var v = raw === '' ? null : (parseFloat(raw) || 0);
+                        setCart(function(p){return p.map(function(x){return x.id===item.id?{...x, price: v, final_price: v}:x})})
+                      }}
+                      onFocus={function(e){e.target.select()}}
                       style={{width:'52px',textAlign:'center',border:'1.5px solid var(--border)',borderRadius:'5px',padding:'3px 4px',fontSize:'.80rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
                   ) : (
-                    <span>{(item.final_price || item.price).toLocaleString()} {cur}</span>
+                    <span>{(item.final_price || item.price || 0).toLocaleString()} {cur}</span>
                   )}
                 </div>
-                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price) * item.qty).toLocaleString()} {cur}</div>
+                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
               </div>
               {/* Строка выбора сотрудника */}
               {employees.length > 0 && (
@@ -1219,7 +1224,7 @@ if (loading) return <Loader />;
                     </div>
                     <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:600,color:'#444'}}>{item.qty}</div>
                     <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:500,color:'#555'}}>{(item.price||0).toLocaleString()}</div>
-                    <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:700,color:'#222'}}>{((item.final_price || item.price) * item.qty).toLocaleString()}</div>
+                    <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:700,color:'#222'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()}</div>
                   </div>
                 ))}
                 </div>
