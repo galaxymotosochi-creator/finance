@@ -479,7 +479,7 @@ export default function Inventory() {
       </div>
     
 
-      <Modal open={editing} onClose={cancelEdit} title="Инвентаризация" subtitle={editing ? editing.number + ' · ' + fmtDate(editing.date) : ''} width="wide">
+      <Modal open={editing} onClose={cancelEdit} title="Инвентаризация" subtitle={editing ? editing.number + ' · ' + fmtDate(editing.date) : ''} width={980}>
         {editing && (() => {
           const counted = editing.items.filter(it => it.actual !== null && it.actual !== undefined && it.actual !== '');
           const uncounted = editing.items.filter(it => it.actual === null || it.actual === undefined || it.actual === '');
