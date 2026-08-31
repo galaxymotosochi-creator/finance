@@ -232,6 +232,7 @@ export default function Products() {
     setFName(''); setFCat(''); setFPrice(''); setFMinPrice(''); setFUnit(''); setFSku('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
+    setFFreePrice(false); // новый товар: свободная цена всегда выключена, включается вручную
     setFComboSearch('');
     setShowModal(true);
   };
