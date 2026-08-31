@@ -508,7 +508,7 @@ export default function Inventory() {
                       {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'44px',height:'44px',borderRadius:'10px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'44px',height:'44px',borderRadius:'10px',background:'#f0f2f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
-                        <div style={{fontSize:'.68rem',color:'#999'}}>учтено {it.expected} · {it.sku || '—'}</div>
+                        <div style={{fontSize:'.68rem',color:'#999'}}>учтено {it.expected}{it.sku ? ' · ' + it.sku : ''}</div>
                       </div>
                       <input type="number" min="0" placeholder="0" value={it.actual === null || it.actual === undefined || it.actual === '' ? '' : it.actual}
                         onChange={e => updateItem(editing.id, idx, e.target.value)}
