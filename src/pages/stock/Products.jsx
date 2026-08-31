@@ -96,6 +96,8 @@ const refreshCostMap = async (userId) => {
   return result;
 };
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
+// Лёгкая миниатюра для списков (сервер ресайзит до 120px — вместо тяжёлых оригиналов)
+const thumbUrl = (u) => u ? '/api/thumb?file=' + encodeURIComponent(String(u).split('/').pop()) : u;
 const getCols = () => {
   const def = new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('productsCols');
@@ -773,7 +775,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={p.photo_url} alt="" title="Открыть карточку" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={thumbUrl(p.photo_url)} alt="" title="Открыть карточку" loading="lazy" decoding="async" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }

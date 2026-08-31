@@ -13,6 +13,9 @@ import Loader from '../../components/Loader';
 
 const CAT_LABELS = {material:'Материалы',tool:'Инструменты',equipment:'Оборудование',other:'Прочее'};
 
+// Лёгкая миниатюра для списков (сервер ресайзит до 120px)
+const thumbUrl = (u) => u ? '/api/thumb?file=' + encodeURIComponent(String(u).split('/').pop()) : u;
+
 function recalcTotals(doc) {
   let tb = 0, ta = 0, sh = 0, su = 0;
   doc.items.forEach(it => {
@@ -552,7 +555,7 @@ export default function Inventory() {
                   const idx = editing.items.indexOf(it);
                   return (
                     <div key={it.prodId} style={{display:'flex',alignItems:'center',gap:'.55rem',padding:'.45rem .5rem',border:'1.5px solid #eee',borderRadius:'12px',marginBottom:'.45rem',background:'#fff'}}>
-                      {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'44px',height:'44px',borderRadius:'10px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'44px',height:'44px',borderRadius:'10px',background:'#f0f2f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',color:'#999',flexShrink:0}}>📦</div>}
+                      {it.photo_url ? <img src={thumbUrl(it.photo_url)} alt="" loading="lazy" decoding="async" style={{width:'44px',height:'44px',borderRadius:'10px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'44px',height:'44px',borderRadius:'10px',background:'#f0f2f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
                         <div style={{fontSize:'.68rem',color:'#999'}}>остаток {it.expected}{it.sku ? ' · ' + it.sku : ''}</div>
@@ -582,7 +585,7 @@ export default function Inventory() {
                   return (
                     <div key={it.prodId} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem .5rem',border:'1.5px solid #e5e7eb',borderRadius:'12px',marginBottom:'.45rem',background:'#fff'}}>
                       <span style={{width:'22px',height:'22px',borderRadius:'50%',flexShrink:0,display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.68rem',fontWeight:700,color:'#fff',background: diff === 0 ? '#16a34a' : '#dc2626'}}>{diff === 0 ? '✓' : '!'}</span>
-                      {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'38px',height:'38px',borderRadius:'9px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'38px',height:'38px',borderRadius:'9px',background:'#f5f6f8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',color:'#999',flexShrink:0}}>📦</div>}
+                      {it.photo_url ? <img src={thumbUrl(it.photo_url)} alt="" loading="lazy" decoding="async" style={{width:'38px',height:'38px',borderRadius:'9px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'38px',height:'38px',borderRadius:'9px',background:'#f5f6f8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.76rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
                         <div style={{fontSize:'.66rem',color:'#999'}}>остаток {it.expected}</div>
