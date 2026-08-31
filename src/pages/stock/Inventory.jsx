@@ -349,6 +349,8 @@ export default function Inventory() {
   const assignTotal = Object.values(assignAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0);
   const assignShortage = pendingDoc ? shortageAmount(pendingDoc, assignValuation) : 0;
   const assignRemain = assignShortage - assignTotal;
+  const assignShortageCost = pendingDoc ? shortageAmount(pendingDoc, 'cost') : 0;
+  const assignShortageRetail = pendingDoc ? shortageAmount(pendingDoc, 'retail') : 0;
 
   return (
     <>
@@ -573,18 +575,26 @@ export default function Inventory() {
       {/* Окно: куда отнести недостачу */}
       <Modal open={showAssign} onClose={() => setShowAssign(false)} title="Недостача: куда отнести?" subtitle={pendingDoc ? pendingDoc.number + ' — недостача ' + Math.round(assignShortage).toLocaleString() + ' ' + cur : ''} width="wide">
         {pendingDoc && (<>
-          <div style={{display:'flex',gap:'.5rem',marginBottom:'.8rem',flexWrap:'wrap'}}>
-            <span style={{fontSize:'.8rem',color:'#555',alignSelf:'center'}}>Считать недостачу:</span>
-            {['cost','retail'].map(v => (
-              <button key={v} onClick={() => setAssignValuation(v)}
-                style={{padding:'.3rem .8rem',borderRadius:'100px',border:'1.5px solid ' + (assignValuation === v ? '#111' : 'rgba(0,0,0,.12)'),background:assignValuation === v ? '#111' : 'transparent',color:assignValuation === v ? '#fff' : '#555',fontSize:'.75rem',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
-                {v === 'cost' ? 'По себестоимости' : 'По розничной цене'}
-              </button>
-            ))}
-          </div>
-          <div style={{fontSize:'.78rem',color:'#555',marginBottom:'.6rem'}}>
-            Сумма недостачи: <b style={{color:'#dc2626'}}>{Math.round(assignShortage).toLocaleString()} {cur}</b>
-            {assignValuation === 'retail' && <span style={{color:'var(--muted)'}}> (по рознице, включая упущенную выгоду)</span>}
+          {/* Две оценки недостачи: по закупке и по продаже — выбор кликом */}
+          <div style={{display:'flex',gap:'.6rem',marginBottom:'.8rem',flexWrap:'wrap'}}>
+            <div onClick={() => setAssignValuation('cost')}
+              style={{flex:1,minWidth:'200px',padding:'.6rem .8rem',borderRadius:'12px',cursor:'pointer',border:'1.5px solid ' + (assignValuation === 'cost' ? '#111' : '#e5e7eb'),background:assignValuation === 'cost' ? '#fafafa' : '#fff',transition:'border .12s'}}>
+              <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',display:'flex',alignItems:'center',gap:'.35rem'}}>
+                <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'1.5px solid ' + (assignValuation === 'cost' ? '#111' : '#d1d5db'),display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:'#fff',background:assignValuation === 'cost' ? '#111' : 'transparent'}}>{assignValuation === 'cost' ? '●' : ''}</span>
+                По цене закупа
+              </div>
+              <div style={{fontSize:'1.05rem',fontWeight:700,color:'#dc2626',marginTop:'.2rem'}} className="num">−{Math.round(assignShortageCost).toLocaleString()} {cur}</div>
+              <div style={{fontSize:'.68rem',color:'#999',marginTop:'.1rem'}}>сколько заплатили за пропавшее</div>
+            </div>
+            <div onClick={() => setAssignValuation('retail')}
+              style={{flex:1,minWidth:'200px',padding:'.6rem .8rem',borderRadius:'12px',cursor:'pointer',border:'1.5px solid ' + (assignValuation === 'retail' ? '#111' : '#e5e7eb'),background:assignValuation === 'retail' ? '#fafafa' : '#fff',transition:'border .12s'}}>
+              <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',display:'flex',alignItems:'center',gap:'.35rem'}}>
+                <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'1.5px solid ' + (assignValuation === 'retail' ? '#111' : '#d1d5db'),display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:'#fff',background:assignValuation === 'retail' ? '#111' : 'transparent'}}>{assignValuation === 'retail' ? '●' : ''}</span>
+                По цене продажи
+              </div>
+              <div style={{fontSize:'1.05rem',fontWeight:700,color:'#dc2626',marginTop:'.2rem'}} className="num">−{Math.round(assignShortageRetail).toLocaleString()} {cur}</div>
+              <div style={{fontSize:'.68rem',color:'#999',marginTop:'.1rem'}}>включая упущенную выгоду</div>
+            </div>
           </div>
           {pendingDoc.soldQtyTotal > 0 && (
             <div style={{fontSize:'.76rem',color:'#2563eb',marginBottom:'.6rem',background:'#eff6ff',borderRadius:'.5rem',padding:'.4rem .6rem'}}>
@@ -628,7 +638,7 @@ export default function Inventory() {
               </div>
               {(t.shortageAmount > 0) && (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#dc2626'}}>
-                  <span>Недостача</span><span className="num">−{Math.round(t.shortageAmount).toLocaleString()} {cur}</span>
+                  <span>Недостача <span style={{fontSize:'.68rem',color:'#999',fontWeight:400}}>({t.valuation === 'retail' ? 'по цене продажи' : 'по цене закупа'})</span></span><span className="num">−{Math.round(t.shortageAmount).toLocaleString()} {cur}</span>
                 </div>
               )}
               {(t.surplusAmount > 0) && (
