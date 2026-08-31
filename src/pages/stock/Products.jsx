@@ -10,7 +10,7 @@ import { scanBarcode } from '../../lib/barcodeScanner';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const UNITS = ['шт', 'кг', 'г', 'л', 'м', 'м²', 'м³', 'уп', 'пара', 'комплект', 'мешок', 'ящик', 'рулон', 'лист'];
-const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд'];
+const SERVICE_UNITS = ['шт', 'час', 'чел', 'сеанс', 'выезд', 'за услугу'];
 const genBarcode = () => {
   let s = '';
   for (let i = 0; i < 12; i++) s += Math.floor(Math.random() * 10);
@@ -939,13 +939,13 @@ export default function Products() {
                   </div>}
                 </div>
               </div>}
-              <div className="form-row">
+              {fType !== 'service' && <div className="form-row">
                 <div className="form-group" style={{maxWidth:'250px'}}>
                   <label>Минимальный остаток</label>
                   <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
                 </div>
                 <div className="form-group" style={{border:'none'}}></div>
-              </div>
+              </div>}
               {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',marginBottom:'.75rem',cursor:'pointer'}}>
                 <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
                   <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
