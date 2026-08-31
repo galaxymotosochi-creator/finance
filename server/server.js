@@ -671,8 +671,8 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       try {
         const { rows: rec } = await q('SELECT * FROM ' + table + ' WHERE id = $1' + (cols.has('user_id') ? ' AND user_id = $2' : ''), cols.has('user_id') ? [id, req.user.id] : [id]);
         if (rec.length) {
-          await q('INSERT INTO trash (id, user_id, table_name, record_id, data) VALUES ($1, $2, $3, $4, $5)', [
-            Date.now(), req.user.id, table, String(id), JSON.stringify(rec[0])
+          await q('INSERT INTO trash (id, user_id, table_name, record_id, data, deleted_by) VALUES ($1, $2, $3, $4, $5, $6)', [
+            Date.now(), req.user.id, table, String(id), JSON.stringify(rec[0]), (req.user.name || req.user.email || String(req.user.id))
           ]);
         }
       } catch (e) { /* если не удалось скопировать — удаляем как раньше */ }

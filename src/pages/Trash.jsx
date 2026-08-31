@@ -96,18 +96,20 @@ export default function Trash() {
             <tr>
               <th style={{ color: '#222', fontWeight: 400, fontSize: '.78rem', textAlign: 'left' }}>Тип</th>
               <th style={{ color: '#222', fontWeight: 400, fontSize: '.78rem', textAlign: 'left' }}>Название</th>
+              <th style={{ color: '#222', fontWeight: 400, fontSize: '.78rem', textAlign: 'left' }}>Удалил</th>
               <th style={{ color: '#222', fontWeight: 400, fontSize: '.78rem', textAlign: 'left' }}>Удалена</th>
               <th style={{ width: '170px' }}></th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 ? (
-              <tr><td colSpan="4"><div className="empty-products"><div className="big-icon">🗑️</div><p>Корзина пуста</p>
+              <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">🗑️</div><p>Корзина пуста</p>
                 <p style={{ fontSize: '.82rem', color: 'var(--muted)', margin: '.5rem 0 0' }}>Удалённые записи появятся здесь и будут храниться 30 дней</p></div></td></tr>
             ) : list.map(t => (
               <tr key={t.id}>
                 <td style={{ textAlign: 'left' }}><span className="prod-cat">{TABLE_LABELS[t.table_name] || t.table_name}</span></td>
                 <td style={{ textAlign: 'left', color: '#222', fontSize: '.78rem' }}>{recordName(t.table_name, t) || '—'}</td>
+                <td style={{ textAlign: 'left', color: '#555', fontSize: '.78rem' }}>{t.deleted_by || '—'}</td>
                 <td style={{ textAlign: 'left', color: '#555', fontSize: '.78rem' }}>{new Date(t.deleted_at).toLocaleDateString('ru-RU') + ' ' + new Date(t.deleted_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</td>
                 <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                   <span style={{ display: 'inline-block', padding: '.2rem .6rem', borderRadius: '100px', fontSize: '.78rem', color: '#222', background: '#dcfce7', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' }} onClick={() => restore(t.id)}>↩ Восстановить</span>
