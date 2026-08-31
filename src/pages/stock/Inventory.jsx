@@ -585,8 +585,12 @@ export default function Inventory() {
                       {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'38px',height:'38px',borderRadius:'9px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'38px',height:'38px',borderRadius:'9px',background:'#f5f6f8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.76rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
-                        <div style={{fontSize:'.66rem',color:'#999'}}>факт <b style={{color:'#222'}}>{actual}</b> / остаток {it.expected}</div>
+                        <div style={{fontSize:'.66rem',color:'#999'}}>остаток {it.expected}</div>
                       </div>
+                      {/* Поле факта редактируется прямо здесь — можно исправить ошибку */}
+                      <input type="number" min="0" value={actual}
+                        onChange={e => updateItem(editing.id, idx, e.target.value)}
+                        style={{width:'52px',padding:'.3rem .3rem',fontSize:'.85rem',fontWeight:600,border:'1.5px solid ' + (diff === 0 ? '#d1d5db' : '#fca5a5'),borderRadius:'8px',textAlign:'center',fontFamily:'var(--font)',outline:'none',background: diff === 0 ? '#fff' : '#fef2f2'}} />
                       <span style={{fontSize:'.7rem',fontWeight:700,color: diff === 0 ? '#bbb' : (diff > 0 ? '#16a34a' : '#dc2626')}} className="num">{diff === 0 ? '✓' : (diff > 0 ? '+' + diff : diff)}</span>
                       <button onClick={() => resetItem(idx)}
                         style={{width:'22px',height:'22px',borderRadius:'50%',border:'1px solid #e5e7eb',background:'#fff',color:'#aaa',fontSize:'.8rem',cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0,lineHeight:1}}>×</button>
