@@ -33,6 +33,8 @@ const ALL_COLUMNS = [
   { id:'sku', label:'Артикул' },
   { id:'barcode', label:'Штрихкод' },
   { id:'weight', label:'Вес' },
+  { id:'min_qty', label:'Мин. остаток' },
+  { id:'free_price', label:'Свободная цена' },
   { id:'description', label:'Описание' },
 ];
 
@@ -107,8 +109,8 @@ const getCols = () => {
 };
 const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([...set]));
 
-const COL_ORDER = ['name','type','category','cost','price','min_price','markup','unit','sku','barcode','weight','description'];
-const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', min_price:'Мин. цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', description:'Описание' };
+const COL_ORDER = ['name','type','category','cost','price','min_price','markup','unit','sku','barcode','weight','min_qty','free_price','description'];
+const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', min_price:'Мин. цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', min_qty:'Мин. остаток', free_price:'Свободная цена', description:'Описание' };
 
 export default function Products() {
   const cur = getCurrencySymbol();
@@ -434,6 +436,8 @@ export default function Products() {
       'Артикул': p.sku || '',
       'Штрихкод': p.barcode || '',
       'Вес': p.weight || '',
+      'Мин. остаток': p.min_qty || '',
+      'Свободная цена': p.free_price ? 'да' : '',
       'Описание': p.description || p.desc || '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
@@ -578,6 +582,8 @@ export default function Products() {
         const w = parseFloat(p.weight) || 0;
         return `<span>${w > 0 ? w + (p.weightUnit||p.weight_unit||'кг') : '—'}</span>`;
       }
+      case 'min_qty': return `<span style="color:#b45309">${(p.min_qty||0) > 0 ? p.min_qty + ' шт' : '—'}</span>`;
+      case 'free_price': return p.free_price ? '<span style="color:#16a34a;font-weight:600">✓ Да</span>' : '<span style="color:#999">—</span>';
       case 'description': return `<span style="color:#222">${(p.description||p.desc) ? (p.description||p.desc).substring(0,40)+((p.description||p.desc).length>40?'…':'') : '—'}</span>`;
       default: return '—';
     }
