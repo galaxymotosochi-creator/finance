@@ -358,7 +358,7 @@ app.get('/api/auth/me', auth, async (req, res) => {
 const ALLOWED_TABLES = ['products','categories','accounts','transactions','receipts','receipt_items',
   'shifts','supplies','writeoffs','inventory','suppliers','employees','positions','position_templates',
   'timesheet','timesheet_entries','clients','loyalty','loyalties','loyalty_programs','promos','subscriptions',
-  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts'];
+  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts','trash'];
 
 // --- Схема БД: кеш колонок и типов (чтобы корректно приводить типы фильтров) ---
 const tableColumnsCache = new Map();
@@ -393,6 +393,10 @@ app.get('/api/:table', auth, async (req, res) => {
   try {
     const { table } = req.params;
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
+    // Корзина: записи старше 30 дней удаляем навсегда (автоочистка)
+    if (table === 'trash') {
+      await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.user.id]);
+    }
     let sql = 'SELECT * FROM ' + table + ' WHERE 1=1';
     const params = [];
     var paramIdx = 1;
@@ -661,12 +665,50 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       const { rows: ri } = await pool.query('SELECT id FROM receipt_items WHERE promo_id = $1 LIMIT 1', [id]);
       if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить акцию — она применялась в продажах' });
     }
+    // ===== КОРЗИНА: перед удалением сохраняем полную копию записи =====
+    // (кроме самой корзины и системных таблиц) — восстановление в течение 30 дней
+    if (table !== 'trash' && table !== 'users' && table !== 'user_profiles' && table !== 'telegram_connections' && table !== 'telegram_codes') {
+      try {
+        const { rows: rec } = await q('SELECT * FROM ' + table + ' WHERE id = $1' + (cols.has('user_id') ? ' AND user_id = $2' : ''), cols.has('user_id') ? [id, req.user.id] : [id]);
+        if (rec.length) {
+          await q('INSERT INTO trash (id, user_id, table_name, record_id, data) VALUES ($1, $2, $3, $4, $5)', [
+            Date.now(), req.user.id, table, String(id), JSON.stringify(rec[0])
+          ]);
+        }
+      } catch (e) { /* если не удалось скопировать — удаляем как раньше */ }
+    }
     if (cols.has('user_id')) {
       await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
     } else {
       await q('DELETE FROM ' + table + ' WHERE id = $1', [id]);
     }
     res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ===== КОРЗИНА: восстановление записи =====
+app.post('/api/trash/:id/restore', auth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Автоочистка: записи старше 30 дней удаляем навсегда
+    await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.user.id]);
+    const { rows } = await pool.query('SELECT * FROM trash WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    if (!rows.length) return res.status(404).json({ error: 'Запись не найдена в корзине' });
+    const t = rows[0];
+    const target = t.table_name;
+    const data = typeof t.data === 'string' ? JSON.parse(t.data) : t.data;
+    // Проверка: таблица должна быть разрешённой
+    if (!ALLOWED_TABLES.includes(target)) return res.status(400).json({ error: 'Нельзя восстановить — неизвестная таблица' });
+    // Восстановление: вставляем запись с тем же id (оригинал удалён, конфликта нет)
+    const cols = await getTableColumns(target);
+    const keys = Object.keys(data).filter(k => data[k] !== undefined && cols.has(k));
+    if (!keys.includes('id')) keys.unshift('id');
+    const vals = keys.map(k => Array.isArray(data[k]) ? JSON.stringify(data[k]) : data[k]);
+    const ph = keys.map((_, i) => '$' + (i + 1)).join(', ');
+    await pool.query('INSERT INTO ' + target + ' (' + keys.join(', ') + ') VALUES (' + ph + ')', vals);
+    // Убираем из корзины
+    await pool.query('DELETE FROM trash WHERE id = $1', [id]);
+    res.json({ ok: true, table: target });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

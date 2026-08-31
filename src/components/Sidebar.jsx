@@ -58,6 +58,7 @@ const menu = [
   {
     label: 'Настройки', icon: 'settings', children: [
       { label: 'Общие', path: '/settings' },
+      { label: 'Корзина', path: '/settings/trash' },
       { label: 'Управление подпиской', path: '/settings/subscription' },
     ],
   },

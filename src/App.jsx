@@ -38,6 +38,7 @@ const Health = lazy(() => import('./pages/stock/Health'));
 const Subscription = lazy(() => import('./pages/Subscription'));
 const AiAssistant = lazy(() => import('./pages/AiAssistant'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
+const TrashPage = lazy(() => import('./pages/Trash'));
 const Clients = lazy(() => import('./pages/clients/Clients'));
 const Loyalty = lazy(() => import('./pages/clients/Loyalty'));
 const Positions = lazy(() => import('./pages/employees/Positions'));
@@ -103,8 +104,9 @@ function AppRoutes() {
       <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
+      <Route path="/settings/trash" element={<ProtectedRoute><AppLayout><TrashPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
+      <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
