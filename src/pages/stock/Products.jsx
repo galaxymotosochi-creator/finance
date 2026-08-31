@@ -342,7 +342,8 @@ export default function Products() {
       trash.unshift({ ...items[0], deletedAt: Date.now() });
       setTrash(trash);
     }
-    load();
+    // Убираем товар из списка сразу (без ожидания перезагрузки)
+    setProductsState(prev => prev.filter(x => x.id !== id));
     showToast('Товар успешно удалён!');
     setShowRemoveModal(false);
     setRemoveTarget(null);
