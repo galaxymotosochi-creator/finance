@@ -356,16 +356,16 @@ export default function Inventory() {
               blocks={[
                 { title: 'Как провести инвентаризацию (по шагам)', items: [
                   <>Нажмите «<b>+ Добавить</b>» — создастся документ со списком всех товаров (остатки на момент начала).</>,
-                  <>В колонке «<b>Учтено</b>» — сколько должно быть по данным программы (остатки).</>,
+                  <>В колонке «<b>Остаток</b>» — сколько должно быть по данным программы (остатки).</>,
                   <>В колонке «<b>Факт</b>» — впишите, сколько реально насчитали на складе.</>,
                   <>Не успели досчитать — «<b>Отложить</b>»: черновик сохранится, продолжите позже (кнопка «Продолжить» в списке).</>,
                   <>Нажмите «<b>Завершить</b>» — программа спишет недостачу, оприходует излишек и покажет итог.</>,
                 ]},
                 { title: 'Продажи во время инвентаризации', text: <>Если кассир продаёт товары, пока вы считаете — не страшно: при завершении программа сама добавит проданное к факту и покажет это в итоге. «Факт на начало» = посчитали + продали за время подсчёта.</> },
                 { title: 'Столбцы таблицы', items: [
-                  <><b>Учтено</b> — остаток по данным программы (поставки + начальные остатки − списания).</>,
+                  <><b>Остаток</b> — остаток по данным программы (поставки + начальные остатки − списания).</>,
                   <><b>Факт</b> — реальное количество, которое вы пересчитали. Вводится вручную.</>,
-                  <><b>Разница</b> — факт минус учтено: «−» недостача, «+» излишек.</>,
+                  <><b>Разница</b> — факт минус остаток: «−» недостача, «+» излишек.</>,
                   <><b>Сумма</b> — разница в деньгах, по себестоимости.</>,
                 ]},
                 { title: 'Результат инвентаризации', items: [
@@ -402,7 +402,7 @@ export default function Inventory() {
               <table className="data-table">
                 <thead id="colHeaders"><tr>
                   <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Учтено</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Остаток</th>
                   <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Факт</th>
                   <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Разница</th>
                   <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
@@ -508,7 +508,7 @@ export default function Inventory() {
                       {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'44px',height:'44px',borderRadius:'10px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'44px',height:'44px',borderRadius:'10px',background:'#f0f2f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
-                        <div style={{fontSize:'.68rem',color:'#999'}}>учтено {it.expected}{it.sku ? ' · ' + it.sku : ''}</div>
+                        <div style={{fontSize:'.68rem',color:'#999'}}>остаток {it.expected}{it.sku ? ' · ' + it.sku : ''}</div>
                       </div>
                       <input type="number" min="0" placeholder="0" value={it.actual === null || it.actual === undefined || it.actual === '' ? '' : it.actual}
                         onChange={e => updateItem(editing.id, idx, e.target.value)}
@@ -538,7 +538,7 @@ export default function Inventory() {
                       {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'38px',height:'38px',borderRadius:'9px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'38px',height:'38px',borderRadius:'9px',background:'#f5f6f8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',color:'#999',flexShrink:0}}>📦</div>}
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:'.76rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
-                        <div style={{fontSize:'.66rem',color:'#999'}}>факт <b style={{color:'#222'}}>{actual}</b> / учтено {it.expected}</div>
+                        <div style={{fontSize:'.66rem',color:'#999'}}>факт <b style={{color:'#222'}}>{actual}</b> / остаток {it.expected}</div>
                       </div>
                       <span style={{fontSize:'.7rem',fontWeight:700,color: diff === 0 ? '#bbb' : (diff > 0 ? '#16a34a' : '#dc2626')}} className="num">{diff === 0 ? '✓' : (diff > 0 ? '+' + diff : diff)}</span>
                       <button onClick={() => resetItem(idx)}
