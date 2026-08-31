@@ -28,8 +28,9 @@ export const beep = (freq = 1200, dur = 100, vol = 0.15) => {
 };
 
 // Сканирование: открывает камеру, распознаёт штрихкод, пикает и вызывает onResult(code)
-// lockDelay — пауза между сканами (чтобы один код не сработал 10 раз подряд)
-export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null } = {}) => {
+// continuous: true — окно не закрывается после скана (непрерывный режим для инвентаризации),
+// закрывается только крестиком ✕
+export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continuous = false } = {}) => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert('Камера недоступна — введите штрихкод вручную в поле ввода');
     return;
@@ -76,7 +77,8 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null } = {}) 
         if (onResult) onResult(val.trim());
         setTimeout(function() { lock = false; }, lockDelay);
       }
-      cl();
+      // В непрерывном режиме окно остаётся открытым — закрытие только крестиком
+      if (!continuous) cl();
     };
     var cl = function() { if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
     i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { done(i.value.trim()); } };

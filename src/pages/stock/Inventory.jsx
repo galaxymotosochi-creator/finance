@@ -533,7 +533,7 @@ export default function Inventory() {
                 <option value="">— выберите —</option>
                 {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
               </select>
-              <button onClick={() => scanBarcode(handleScan)} title="Сканировать штрихкоды"
+              <button onClick={() => scanBarcode(handleScan, { continuous: true, lockDelay: 1200 })} title="Сканировать штрихкоды (непрерывно)"
                 style={{marginLeft:'.3rem',display:'inline-flex',alignItems:'center',justifyContent:'center',width:'30px',height:'30px',fontSize:'.95rem',borderRadius:'50%',border:'1.5px solid #d1d5db',background:'#f3f4f6',color:'#555',cursor:'pointer',fontFamily:'var(--font)',flexShrink:0}}>
                 📷
               </button>
