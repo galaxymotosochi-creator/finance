@@ -68,54 +68,60 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       }
     }, 200);
     var q = null;
-    // Простой и надёжный принцип: повторный скан того же кода разрешён всегда,
-    // если прошло >= 1200мс с последнего срабатывания этого кода.
+    // Повторный скан того же кода с камеры разрешён через интервал 1200мс,
+    // но надёжный способ повтора — кнопка «ещё раз» под камерой (не зависит от камеры)
     var lastFire = {}; // code -> ts последнего срабатывания
+    var lastCode = null;
     var emit = function(code) {
       if (!code) return;
       var now = Date.now();
       var last = lastFire[code] || 0;
       if (now - last >= 1200) {
         lastFire[code] = now;
+        lastCode = code;
         fire(code);
       }
     };
-    // Перезапуск детектора: Quagga после первого распознавания «залипает» на коде
-    // и не распознаёт его повторно. Ручное «закрыл-открыл» лечит — делаем то же само.
-    var startQuagga = function() {
-      Quagga.init({
-        inputStream: { name: 'Live', type: 'LiveStream', target: v, targetSize: 1, constraints: { width: 640, height: 480, facingMode: 'environment' } },
-        decoder: { readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader', 'upc_e_reader'] },
-        locate: true
-      }, function(err) {
-        if (!w.isConnected) return; // окно уже закрыли
-        if (err) { alert('Ошибка камеры: ' + (err && err.message ? err.message : 'не удалось запустить')); w.remove(); c.remove(); return; }
-        // Загрузка завершена: убираем полосочку, добавляем ручной ввод, показываем видео
-        if (loadInner.isConnected) loadInner.remove();
-        if (!i.isConnected) w.appendChild(i);
-        v.style.display = 'block';
-        q = Quagga;
-        Quagga.start();
-        setTimeout(function() { if (v.isConnected) v.classList.add('scanner-visible'); }, 50);
-        Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
-      });
+    // Кнопка «ещё раз» — повторный скан последнего кода без камеры (всегда работает)
+    var repeatBtn = document.createElement('div');
+    repeatBtn.style.cssText = 'display:none;margin-top:12px;padding:10px 18px;border-radius:100px;background:#111;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit';
+    repeatBtn.onclick = function() {
+      if (!lastCode) return;
+      beep(1200, 100);
+      if (onResult) onResult(lastCode);
+    };
+    var showRepeat = function(code) {
+      repeatBtn.textContent = '➕ Ещё раз: ' + code + ' (+1)';
+      repeatBtn.style.display = 'block';
     };
     var fire = function(val) {
       beep(1200, 100);
       if (onBeep) onBeep();
       if (onResult) onResult(val.trim());
-      if (!continuous) { cl(); return; }
-      // Непрерывный режим: после каждого скана перезапускаем детектор,
-      // чтобы он «забыл» код и смог распознать его снова (увёл-навёл = новый скан)
-      setTimeout(function() {
-        if (!w.isConnected) return;
-        try { if (q) { q.stop(); q = null; } } catch (e) {}
-        startQuagga();
-      }, 400);
+      if (continuous) {
+        showRepeat(val.trim());
+      } else {
+        cl();
+      }
     };
     var cl = function() { if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
     i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { fire(i.value.trim()); i.value = ''; } };
     c.onclick = cl;
-    startQuagga();
+    Quagga.init({
+      inputStream: { name: 'Live', type: 'LiveStream', target: v, targetSize: 1, constraints: { width: 640, height: 480, facingMode: 'environment' } },
+      decoder: { readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader', 'upc_e_reader'] },
+      locate: true
+    }, function(err) {
+      if (err) { alert('Ошибка камеры: ' + (err && err.message ? err.message : 'не удалось запустить')); w.remove(); c.remove(); return; }
+      // Загрузка завершена: убираем полосочку, добавляем ручной ввод + кнопку повтора, показываем видео
+      loadInner.remove();
+      w.appendChild(i);
+      w.appendChild(repeatBtn);
+      v.style.display = 'block';
+      q = Quagga;
+      Quagga.start();
+      setTimeout(function() { v.classList.add('scanner-visible'); }, 50);
+      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
+    });
   }).catch(function() { alert('Ошибка загрузки сканера'); });
 };
