@@ -68,20 +68,32 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       }
     }, 200);
     var q = null;
-    var lock = false;
-    var done = function(val) {
-      if (val && !lock) {
-        lock = true;
-        beep(1200, 100);
-        if (onBeep) onBeep();
-        if (onResult) onResult(val.trim());
-        setTimeout(function() { lock = false; }, lockDelay);
-      }
+    // Непрерывный режим: один и тот же код можно сканировать повторно,
+    // если он исчез из кадра и появился снова (увёл — навёл — снова пик)
+    var lastCode = null;
+    var goneTimer = null;
+    var fire = function(val) {
+      beep(1200, 100);
+      if (onBeep) onBeep();
+      if (onResult) onResult(val.trim());
       // В непрерывном режиме окно остаётся открытым — закрытие только крестиком
       if (!continuous) cl();
     };
+    var emit = function(code) {
+      if (!code) return;
+      if (code !== lastCode) {
+        // новый код — срабатываем сразу
+        lastCode = code;
+        fire(code);
+      } else if (!goneTimer) {
+        // тот же код, но он успел «исчезнуть» из кадра — срабатываем повторно
+        fire(code);
+      }
+      clearTimeout(goneTimer);
+      goneTimer = setTimeout(function() { goneTimer = null; }, 600); // код убран из кадра
+    };
     var cl = function() { if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
-    i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { done(i.value.trim()); } };
+    i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { fire(i.value.trim()); i.value = ''; } };
     c.onclick = cl;
     Quagga.init({
       inputStream: { name: 'Live', type: 'LiveStream', target: v, targetSize: 1, constraints: { width: 640, height: 480, facingMode: 'environment' } },
@@ -96,7 +108,7 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       q = Quagga;
       Quagga.start();
       setTimeout(function() { v.classList.add('scanner-visible'); }, 50);
-      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { done(data.codeResult.code); } });
+      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
     });
   }).catch(function() { alert('Ошибка загрузки сканера'); });
 };
