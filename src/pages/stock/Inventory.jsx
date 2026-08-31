@@ -15,9 +15,11 @@ const CAT_LABELS = {material:'Материалы',tool:'Инструменты',
 function recalcTotals(doc) {
   let tb = 0, ta = 0, sh = 0, su = 0;
   doc.items.forEach(it => {
-    const cb = it.expected * it.cost, ca = it.actual * it.cost;
+    // actual = null → товар ещё не посчитан, считаем = учтено (без изменений)
+    const actual = (it.actual === null || it.actual === undefined || it.actual === '') ? it.expected : it.actual;
+    const cb = it.expected * it.cost, ca = actual * it.cost;
     tb += cb; ta += ca;
-    const diff = it.actual - it.expected;
+    const diff = actual - it.expected;
     if (diff < 0) sh += Math.abs(diff) * it.cost;
     if (diff > 0) su += diff * it.cost;
   });
@@ -28,7 +30,7 @@ function recalcTotals(doc) {
 // Сумма недостачи в деньгах: по себестоимости или по розничной цене
 function shortageAmount(doc, valuation) {
   return doc.items.reduce((s, it) => {
-    const actual = it.actualEff !== undefined ? it.actualEff : it.actual;
+    const actual = it.actualEff !== undefined ? it.actualEff : ((it.actual === null || it.actual === undefined || it.actual === '') ? it.expected : it.actual);
     if (actual >= it.expected) return s;
     const unit = valuation === 'retail' && it.price > 0 ? it.price : (it.cost || 0);
     return s + (it.expected - actual) * unit;
@@ -124,8 +126,9 @@ export default function Inventory() {
       return {
         prodId: p.id, name: p.name, sku: p.sku || '',
         cat: CAT_LABELS[p.cat] || p.cat || '',
-        expected: qty, actual: qty, cost,
-        price: p.price || 0 // розничная цена — для оценки недостачи «по рознице»
+        expected: qty, actual: null, cost,
+        price: p.price || 0, // розничная цена — для оценки недостачи «по рознице»
+        photo_url: p.photo_url || ''
       };
     });
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
@@ -170,7 +173,28 @@ export default function Inventory() {
   };
 
   const updateItem = (id, idx, actual) => {
-    const items = [...editing.items]; items[idx] = {...items[idx], actual: parseInt(actual) || 0};
+    const items = [...editing.items];
+    // Пустое поле = товар не посчитан (null); число = посчитан
+    items[idx] = {...items[idx], actual: actual === '' || actual === null || actual === undefined ? null : (parseInt(actual) || 0)};
+    const updated = { ...editing, items }; recalcTotals(updated);
+    setEditing(updated);
+  };
+
+  // «+» — добавить товар в посчитанные (если поле пустое — берём учтённое количество)
+  const addItem = (idx) => {
+    const items = [...editing.items];
+    const it = items[idx];
+    if (it.actual === null || it.actual === undefined || it.actual === '') {
+      items[idx] = { ...it, actual: it.expected };
+      const updated = { ...editing, items }; recalcTotals(updated);
+      setEditing(updated);
+    }
+  };
+
+  // «×» — вернуть товар в не посчитанные
+  const resetItem = (idx) => {
+    const items = [...editing.items];
+    items[idx] = { ...items[idx], actual: null };
     const updated = { ...editing, items }; recalcTotals(updated);
     setEditing(updated);
   };
@@ -195,8 +219,11 @@ export default function Inventory() {
           soldQtyTotal += Number(it.quantity) || 0;
         });
       }
-      // Эффективный факт (с учётом проданного)
-      const effItems = doc.items.map(it => ({ ...it, actualEff: it.actual + (soldMap[it.name] || 0) }));
+      // Эффективный факт (с учётом проданного); непосчитанные (null) = учтено, без изменений
+      const effItems = doc.items.map(it => {
+        const base = (it.actual === null || it.actual === undefined || it.actual === '') ? it.expected : it.actual;
+        return { ...it, actualEff: base + (soldMap[it.name] || 0) };
+      });
 
       const shortageItems = effItems.filter(it => it.actualEff < it.expected);
       const surplusItems = effItems.filter(it => it.actualEff > it.expected);
@@ -230,8 +257,10 @@ export default function Inventory() {
         soldQtyTotal, soldMap
       };
 
+      // Сохраняем: непосчитанные товары → учтено (без изменений)
+      const saveItems = doc.items.map(it => (it.actual === null || it.actual === undefined || it.actual === '') ? { ...it, actual: it.expected } : it);
       const { error } = await supabase.from('inventory').update({
-        items: doc.items, result: JSON.stringify(result), status: 'completed', completed_at: new Date().toISOString()
+        items: saveItems, result: JSON.stringify(result), status: 'completed', completed_at: new Date().toISOString()
       }).eq('id', id);
       if (error) throw error;
 
@@ -450,31 +479,89 @@ export default function Inventory() {
       </div>
     
 
-      <Modal open={editing} onClose={cancelEdit} title="Редактирование инвентаризации" subtitle={editing ? editing.number + ' - ' + fmtDate(editing.date) : ''} width="wide">
-        {editing && (<>
-          <div className="product-table" style={{overflowY:'auto',flex:1}}>
-            <table className="data-table">
-              <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Учтено</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Факт</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Разница</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th></tr></thead>
-              <tbody>
-                {editing.items.map(function(it,idx) {
-                  var diff = it.actual - it.expected;
-                  var ds = diff * it.cost;
-                  return <tr key={idx}><td style={{textAlign:'left'}}><div className="prod-name">{it.name}</div><div className="prod-sku">{it.sku||'--'}</div></td>
-                    <td style={{textAlign:'left'}}><span className="num">{it.expected}</span></td>
-                    <td><input type="number" value={it.actual} min="0" onChange={function(e){updateItem(editing.id,idx,e.target.value)}} style={{width:'60px',textAlign:'left',padding:'.25rem',border:'1px solid var(--border)',borderRadius:'4px',fontSize:'.85rem'}} /></td>
-                    <td style={{textAlign:'left'}}><span className="num">{diff>0?'+':''}{diff}</span></td>
-                    <td style={{textAlign:'left'}}><span className="num">{ds>0?'+':''}{ds.toLocaleString()} {cur}</span></td>
-                  </tr>;
+      <Modal open={editing} onClose={cancelEdit} title="Инвентаризация" subtitle={editing ? editing.number + ' · ' + fmtDate(editing.date) : ''} width="wide">
+        {editing && (() => {
+          const counted = editing.items.filter(it => it.actual !== null && it.actual !== undefined && it.actual !== '');
+          const uncounted = editing.items.filter(it => it.actual === null || it.actual === undefined || it.actual === '');
+          const t = editing.totals || {};
+          return (<>
+            {/* Проводит */}
+            <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.8rem'}}>
+              <span style={{fontSize:'.78rem',color:'#888'}}>Проводит:</span>
+              <select value={editing.responsible || ''} onChange={e => setEditing({...editing, responsible: e.target.value})}
+                style={{padding:'.4rem .7rem',fontSize:'.8rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)',outline:'none',background:'#fff',color:'#222',minWidth:'220px'}}>
+                <option value="">— выберите —</option>
+                {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
+              </select>
+            </div>
+
+            <div style={{display:'flex',gap:0,minHeight:'380px',border:'1px solid var(--border)',borderRadius:'14px',overflow:'hidden'}}>
+              {/* ЛЕВО: весь список */}
+              <div style={{flex:1,minWidth:0,padding:'.6rem',borderRight:'1px solid var(--border)',overflowY:'auto',maxHeight:'420px',background:'#fff'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.68rem',fontWeight:700,color:'#999',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:'.5rem'}}>
+                  <span>Товары</span><span style={{background:'#eef0f3',borderRadius:'100px',padding:'.1rem .5rem',color:'#555',fontWeight:600}}>{editing.items.length}</span>
+                </div>
+                {uncounted.map(function(it,ui) {
+                  const idx = editing.items.indexOf(it);
+                  return (
+                    <div key={it.prodId} style={{display:'flex',alignItems:'center',gap:'.55rem',padding:'.45rem .5rem',border:'1.5px solid #eee',borderRadius:'12px',marginBottom:'.45rem',background:'#fff'}}>
+                      {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'44px',height:'44px',borderRadius:'10px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'44px',height:'44px',borderRadius:'10px',background:'#f0f2f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',color:'#999',flexShrink:0}}>📦</div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:'.78rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
+                        <div style={{fontSize:'.68rem',color:'#999'}}>учтено {it.expected} · {it.sku || '—'}</div>
+                      </div>
+                      <input type="number" min="0" placeholder="0" value={it.actual === null || it.actual === undefined || it.actual === '' ? '' : it.actual}
+                        onChange={e => updateItem(editing.id, idx, e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') addItem(idx); }}
+                        style={{width:'52px',padding:'.3rem .3rem',fontSize:'.85rem',fontWeight:600,border:'1.5px solid #d1d5db',borderRadius:'8px',textAlign:'center',fontFamily:'var(--font)',outline:'none'}} />
+                      <button onClick={() => addItem(idx)}
+                        style={{width:'26px',height:'26px',borderRadius:'50%',border:'none',background:'#111',color:'#fff',fontSize:'1rem',cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0,lineHeight:1}}>+</button>
+                    </div>
+                  );
                 })}
-              </tbody>
-            </table>
-          </div>
-          <div className="modal-actions" style={{flexShrink:0,marginTop:'.5rem'}}>
-            <button className="btn btn-ghost" onClick={cancelEdit}>Отмена</button>
-            <button className="btn btn-outline" onClick={saveDraft}>Отложить</button>
-            <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
-          </div>
-        </>)}
+                {uncounted.length === 0 && <div style={{textAlign:'center',padding:'2rem .5rem',color:'#bbb',fontSize:'.78rem'}}>Все товары посчитаны 🎉</div>}
+              </div>
+
+              {/* ПРАВО: посчитанные */}
+              <div style={{flex:1,minWidth:0,padding:'.6rem',overflowY:'auto',maxHeight:'420px',background:'#fafbfc'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.68rem',fontWeight:700,color:'#999',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:'.5rem'}}>
+                  <span>Посчитано</span><span style={{background:'#eef0f3',borderRadius:'100px',padding:'.1rem .5rem',color:'#555',fontWeight:600}}>{counted.length}</span>
+                </div>
+                {counted.map(function(it) {
+                  const idx = editing.items.indexOf(it);
+                  const actual = it.actual;
+                  const diff = actual - it.expected;
+                  const ds = diff * (it.cost || 0);
+                  return (
+                    <div key={it.prodId} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem .5rem',border:'1.5px solid #e5e7eb',borderRadius:'12px',marginBottom:'.45rem',background:'#fff'}}>
+                      <span style={{width:'22px',height:'22px',borderRadius:'50%',flexShrink:0,display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.68rem',fontWeight:700,color:'#fff',background: diff === 0 ? '#16a34a' : '#dc2626'}}>{diff === 0 ? '✓' : '!'}</span>
+                      {it.photo_url ? <img src={it.photo_url} alt="" style={{width:'38px',height:'38px',borderRadius:'9px',objectFit:'cover',flexShrink:0}} /> : <div style={{width:'38px',height:'38px',borderRadius:'9px',background:'#f5f6f8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',color:'#999',flexShrink:0}}>📦</div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:'.76rem',fontWeight:600,color:'#222',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{it.name}</div>
+                        <div style={{fontSize:'.66rem',color:'#999'}}>факт <b style={{color:'#222'}}>{actual}</b> / учтено {it.expected}</div>
+                      </div>
+                      <span style={{fontSize:'.7rem',fontWeight:700,color: diff === 0 ? '#bbb' : (diff > 0 ? '#16a34a' : '#dc2626')}} className="num">{diff === 0 ? '✓' : (diff > 0 ? '+' + diff : diff)}</span>
+                      <button onClick={() => resetItem(idx)}
+                        style={{width:'22px',height:'22px',borderRadius:'50%',border:'1px solid #e5e7eb',background:'#fff',color:'#aaa',fontSize:'.8rem',cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',padding:0,lineHeight:1}}>×</button>
+                    </div>
+                  );
+                })}
+                {counted.length === 0 && <div style={{textAlign:'center',padding:'2rem .5rem',color:'#bbb',fontSize:'.78rem'}}>Введите количество и нажмите «+»</div>}
+                {/* Итог по посчитанным */}
+                <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'10px',padding:'.5rem .7rem',marginTop:'.6rem',fontSize:'.72rem',color:'#555'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'.1rem 0'}}><span>Недостача</span><b className="num" style={{color:'#dc2626'}}>{t.shortage ? '−' + Math.round(t.shortage).toLocaleString() + ' ' + cur : '0 ' + cur}</b></div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'.1rem 0'}}><span>Излишек</span><b className="num" style={{color:'#16a34a'}}>{t.surplus ? '+' + Math.round(t.surplus).toLocaleString() + ' ' + cur : '0 ' + cur}</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{flexShrink:0,marginTop:'.6rem'}}>
+              <button className="btn btn-ghost" onClick={cancelEdit}>Отмена</button>
+              <button className="btn btn-outline" onClick={saveDraft}>Отложить</button>
+              <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
+            </div>
+          </>);
+        })()}
       </Modal>
 
       {/* Окно: куда отнести недостачу */}
