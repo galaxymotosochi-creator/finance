@@ -661,6 +661,8 @@ input:focus, select:focus, textarea:focus {
 .at-table tbody td:last-child { border-right: none; }
 .data-table tbody td:first-child,
 .at-table tbody td:first-child { padding-left: 0; }
+.data-table thead th:first-child,
+.at-table thead th:first-child { padding-left: 0; }
 
 /* Анимация загрузки фото */
 @keyframes loadbar {
