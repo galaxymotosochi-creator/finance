@@ -559,6 +559,10 @@ export default function Inventory() {
                 <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'10px',padding:'.5rem .7rem',marginTop:'.6rem',fontSize:'.72rem',color:'#555'}}>
                   <div style={{display:'flex',justifyContent:'space-between',padding:'.1rem 0'}}><span>Недостача</span><b className="num" style={{color:'#dc2626'}}>{t.shortage ? '−' + Math.round(t.shortage).toLocaleString() + ' ' + cur : '0 ' + cur}</b></div>
                   <div style={{display:'flex',justifyContent:'space-between',padding:'.1rem 0'}}><span>Излишек</span><b className="num" style={{color:'#16a34a'}}>{t.surplus ? '+' + Math.round(t.surplus).toLocaleString() + ' ' + cur : '0 ' + cur}</b></div>
+                  <div style={{display:'flex',justifyContent:'space-between',padding:'.15rem 0 0',borderTop:'1px solid #f0f0f0',marginTop:'.15rem',fontSize:'.8rem'}}>
+                    <span style={{fontWeight:600,color:'#222'}}>Итого</span>
+                    <b className="num" style={{fontWeight:700,color: (t.surplus - t.shortage) >= 0 ? '#16a34a' : '#dc2626'}}>{(t.surplus - t.shortage) >= 0 ? '+' : '−'}{Math.abs(Math.round((t.surplus - t.shortage))).toLocaleString()} {cur}</b>
+                  </div>
                 </div>
               </div>
             </div>
@@ -666,6 +670,10 @@ export default function Inventory() {
                   <span>Отнесено на расходы бизнеса</span><span className="num">{Math.round(t.businessLoss).toLocaleString()} {cur}</span>
                 </div>
               )}
+              <div style={{display:'flex',justifyContent:'space-between',padding:'.5rem 0',fontSize:'.88rem',fontWeight:700}}>
+                <span style={{color:'#222'}}>Итого</span>
+                <span className="num" style={{color: (t.surplusAmount - t.shortageAmount) >= 0 ? '#16a34a' : '#dc2626'}}>{(t.surplusAmount - t.shortageAmount) >= 0 ? '+' : '−'}{Math.abs(Math.round(t.surplusAmount - t.shortageAmount)).toLocaleString()} {cur}</span>
+              </div>
               <div style={{padding:'1rem 0 .2rem',textAlign:'center',fontSize:'.8rem',color:'#555'}}>
                 Остатки на складе обновлены: недостача списана, излишек оприходован.
                 {t.assigned && t.assigned.length > 0 && ' Долги сотрудников ждут удержания в разделе «Зарплата».'}
