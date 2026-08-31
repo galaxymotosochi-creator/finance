@@ -170,7 +170,9 @@ export default function Inventory() {
   // Открыть черновик/документ для продолжения редактирования
   const continueEdit = (doc) => {
     if (doc.status === 'draft') {
-      setEditing({ ...doc, items: doc.items || [] });
+      const d = { ...doc, items: doc.items || [] };
+      recalcTotals(d); // пересчитываем итоги, иначе после «Продолжить» totals пустой → NaN
+      setEditing(d);
     } else {
       view(doc.id);
     }
@@ -598,7 +600,7 @@ export default function Inventory() {
                   <div style={{display:'flex',justifyContent:'space-between',padding:'.1rem 0'}}><span>Излишек</span><b className="num" style={{color:'#16a34a'}}>{t.surplus ? '+' + Math.round(t.surplus).toLocaleString() + ' ' + cur : '0 ' + cur}</b></div>
                   <div style={{display:'flex',justifyContent:'space-between',padding:'.15rem 0 0',borderTop:'1px solid #f0f0f0',marginTop:'.15rem',fontSize:'.8rem'}}>
                     <span style={{fontWeight:600,color:'#222'}}>Итого</span>
-                    <b className="num" style={{fontWeight:700,color: (t.surplus - t.shortage) >= 0 ? '#16a34a' : '#dc2626'}}>{(t.surplus - t.shortage) >= 0 ? '+' : '−'}{Math.abs(Math.round((t.surplus - t.shortage))).toLocaleString()} {cur}</b>
+                    <b className="num" style={{fontWeight:700,color: ((t.surplus || 0) - (t.shortage || 0)) >= 0 ? '#16a34a' : '#dc2626'}}>{((t.surplus || 0) - (t.shortage || 0)) >= 0 ? '+' : '−'}{Math.abs(Math.round((t.surplus || 0) - (t.shortage || 0))).toLocaleString()} {cur}</b>
                   </div>
                 </div>
               </div>
@@ -702,7 +704,7 @@ export default function Inventory() {
               )}
               <div style={{display:'flex',justifyContent:'space-between',padding:'.5rem 0',fontSize:'.88rem',fontWeight:700}}>
                 <span style={{color:'#222'}}>Итого</span>
-                <span className="num" style={{color: (t.surplusAmount - t.shortageAmount) >= 0 ? '#16a34a' : '#dc2626'}}>{(t.surplusAmount - t.shortageAmount) >= 0 ? '+' : '−'}{Math.abs(Math.round(t.surplusAmount - t.shortageAmount)).toLocaleString()} {cur}</span>
+                <span className="num" style={{color: ((t.surplusAmount || 0) - (t.shortageAmount || 0)) >= 0 ? '#16a34a' : '#dc2626'}}>{((t.surplusAmount || 0) - (t.shortageAmount || 0)) >= 0 ? '+' : '−'}{Math.abs(Math.round((t.surplusAmount || 0) - (t.shortageAmount || 0))).toLocaleString()} {cur}</span>
               </div>
               <div style={{padding:'1rem 0 .2rem',textAlign:'center',fontSize:'.8rem',color:'#555'}}>
                 Остатки на складе обновлены: недостача списана, излишек оприходован.
