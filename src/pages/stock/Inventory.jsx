@@ -211,6 +211,7 @@ export default function Inventory() {
     if (!doc.responsible || !doc.responsible.trim()) {
       return alert('Выберите, кто проводит инвентаризацию (поле «Проводит»)');
     }
+    if (!confirm('Провести инвентаризацию ' + doc.number + '?\nОстатки будут обновлены: недостача спишется, излишек оприходуется.')) return;
     const date = doc.date || new Date().toISOString().split('T')[0];
 
     try {
