@@ -30,16 +30,27 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null } = {}) 
     var Quagga = mod.default || mod;
     var w = document.createElement('div');
     w.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center';
+    // Экран загрузки с анимированной полосочкой (как в кассе)
+    var loadInner = document.createElement('div');
+    loadInner.style.cssText = 'background:#fff;border-radius:16px;padding:28px 40px;text-align:center;box-shadow:0 8px 60px rgba(0,0,0,.15)';
+    loadInner.innerHTML = '<div style="width:200px;height:4px;background:#eee;border-radius:2px;overflow:hidden;margin:0 auto"><div style="width:0%;height:100%;background:#222;border-radius:2px;animation:scanLoad 2s ease-in-out forwards"></div></div>';
+    w.appendChild(loadInner);
     var v = document.createElement('div'); v.id = 'qv';
-    v.style.cssText = 'position:relative;width:100%;max-width:500px;overflow:hidden;border-radius:12px;background:#000';
+    v.style.cssText = 'position:relative;width:100%;max-width:500px;overflow:hidden;border-radius:12px;background:#000;display:none';
     var f = document.createElement('div');
     f.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:320px;height:130px;border:2px solid rgba(255,255,255,.5);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4);pointer-events:none';
     var i = document.createElement('input'); i.type = 'text'; i.placeholder = 'Введите штрихкод вручную…';
     i.style.cssText = 'width:80%;max-width:360px;margin-top:16px;padding:12px 16px;border:none;border-radius:12px;font-size:16px;text-align:center;letter-spacing:4px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.2);outline:none;font-family:inherit';
     var c = document.createElement('div'); c.textContent = '✕'; c.title = 'Закрыть';
     c.style.cssText = 'position:fixed;top:20px;right:20px;z-index:10000;width:36px;height:36px;background:rgba(0,0,0,.4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;font-weight:700;line-height:1';
-    v.appendChild(f); w.appendChild(v); w.appendChild(i); document.body.appendChild(w);
+    v.appendChild(f); w.appendChild(v); document.body.appendChild(w);
     document.body.appendChild(c);
+    // CSS-анимации: полосочка загрузки + плавное появление видео
+    if (!document.getElementById('scan-style')) {
+      var ss = document.createElement('style'); ss.id = 'scan-style';
+      ss.textContent = '@keyframes scanLoad{0%{width:0%}50%{width:65%}100%{width:100%}}.scanner-visible video{animation:scanFadeIn .3s ease}@keyframes scanFadeIn{from{opacity:0}to{opacity:1}}';
+      document.head.appendChild(ss);
+    }
     setTimeout(function() {
       var cv = document.getElementById('qv');
       if (cv) {
@@ -68,8 +79,13 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null } = {}) 
       locate: true
     }, function(err) {
       if (err) { alert('Ошибка камеры: ' + (err && err.message ? err.message : 'не удалось запустить')); w.remove(); c.remove(); return; }
+      // Загрузка завершена: убираем полосочку, добавляем ручной ввод, показываем видео
+      loadInner.remove();
+      w.appendChild(i);
+      v.style.display = 'block';
       q = Quagga;
       Quagga.start();
+      setTimeout(function() { v.classList.add('scanner-visible'); }, 50);
       Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { done(data.codeResult.code); } });
     });
   }).catch(function() { alert('Ошибка загрузки сканера'); });
