@@ -28,9 +28,10 @@ function recalcTotals(doc) {
 // Сумма недостачи в деньгах: по себестоимости или по розничной цене
 function shortageAmount(doc, valuation) {
   return doc.items.reduce((s, it) => {
-    if (it.actual >= it.expected) return s;
+    const actual = it.actualEff !== undefined ? it.actualEff : it.actual;
+    if (actual >= it.expected) return s;
     const unit = valuation === 'retail' && it.price > 0 ? it.price : (it.cost || 0);
-    return s + (it.expected - it.actual) * unit;
+    return s + (it.expected - actual) * unit;
   }, 0);
 }
 
@@ -140,8 +141,28 @@ export default function Inventory() {
 
   const cancelEdit = async () => {
     if (showResult) { setShowResult(null); setEditing(null); await load(); return; }
-    if (editing) { await supabase.from('inventory').delete().eq('id', editing.id); await load(); }
+    if (editing) {
+      if (!confirm('Удалить черновик ' + editing.number + '? Введённые данные пропадут.')) return;
+      await supabase.from('inventory').delete().eq('id', editing.id); await load();
+    }
     setEditing(null);
+  };
+
+  // «Отложить» — сохранить черновик и закрыть (можно продолжить позже)
+  const saveDraft = async () => {
+    if (!editing) return;
+    const { error } = await supabase.from('inventory').update({ items: editing.items }).eq('id', editing.id);
+    if (error) return alert('Ошибка: ' + error.message);
+    setEditing(null); await load();
+  };
+
+  // Открыть черновик/документ для продолжения редактирования
+  const continueEdit = (doc) => {
+    if (doc.status === 'draft') {
+      setEditing({ ...doc, items: doc.items || [] });
+    } else {
+      view(doc.id);
+    }
   };
 
   const updateMeta = (id, field, value) => {
@@ -158,22 +179,40 @@ export default function Inventory() {
   const complete = async (id) => {
     const doc = editing; if (!doc) return;
     const date = doc.date || new Date().toISOString().split('T')[0];
-    const shortageItems = doc.items.filter(it => it.actual < it.expected);
-    const surplusItems = doc.items.filter(it => it.actual > it.expected);
 
     try {
+      // Продажи с момента начала инвентаризации (кассир мог продавать параллельно)
+      // Факт на начало = посчитанный факт + проданное за время инвентаризации
+      const startTs = doc.created_at || (doc.date ? new Date(doc.date).toISOString() : new Date().toISOString());
+      const { data: recs } = await supabase.from('receipts').select('id,created_at').eq('user_id', user.id).gte('created_at', startTs);
+      const recIds = (recs || []).map(r => r.id);
+      const soldMap = {};
+      let soldQtyTotal = 0;
+      if (recIds.length) {
+        const { data: rItems } = await supabase.from('receipt_items').select('product_name,quantity').in('receipt_id', recIds);
+        (rItems || []).forEach(it => {
+          soldMap[it.product_name] = (soldMap[it.product_name] || 0) + (Number(it.quantity) || 0);
+          soldQtyTotal += Number(it.quantity) || 0;
+        });
+      }
+      // Эффективный факт (с учётом проданного)
+      const effItems = doc.items.map(it => ({ ...it, actualEff: it.actual + (soldMap[it.name] || 0) }));
+
+      const shortageItems = effItems.filter(it => it.actualEff < it.expected);
+      const surplusItems = effItems.filter(it => it.actualEff > it.expected);
+
       // Недостача → списания (остаток уменьшается)
       if (shortageItems.length) {
         await Promise.all(shortageItems.map(it =>
           supabase.from('writeoffs').insert({
-            product_id: it.prodId, quantity: it.expected - it.actual, cost: it.cost || 0,
+            product_id: it.prodId, quantity: it.expected - it.actualEff, cost: it.cost || 0,
             reason: 'Недостача по инвентаризации ' + doc.number, date
           })
         ));
       }
       // Излишек → оприходование как поставка (остаток увеличивается, себестоимость пересчитается)
       if (surplusItems.length) {
-        const items = surplusItems.map(it => ({ prodId: it.prodId, name: it.name, qty: it.actual - it.expected, cost: it.cost || 0 }));
+        const items = surplusItems.map(it => ({ prodId: it.prodId, name: it.name, qty: it.actualEff - it.expected, cost: it.cost || 0 }));
         const total = items.reduce((s, x) => s + x.qty * x.cost, 0);
         await supabase.from('supplies').insert({
           supplier_name: 'Излишек по инвентаризации ' + doc.number,
@@ -182,12 +221,13 @@ export default function Inventory() {
       }
 
       // Суммы в деньгах (по себестоимости — оценка по умолчанию)
-      const shAmount = shortageAmount(doc, 'cost');
-      const suAmount = doc.items.reduce((s, it) => it.actual > it.expected ? s + (it.actual - it.expected) * (it.cost || 0) : s, 0);
+      const shAmount = shortageAmount({ items: effItems }, 'cost');
+      const suAmount = effItems.reduce((s, it) => it.actualEff > it.expected ? s + (it.actualEff - it.expected) * (it.cost || 0) : s, 0);
       const result = {
         ...doc.totals, valuation: 'cost',
         shortageAmount: shAmount, surplusAmount: suAmount,
-        businessLoss: shAmount, assigned: []
+        businessLoss: shAmount, assigned: [],
+        soldQtyTotal, soldMap
       };
 
       const { error } = await supabase.from('inventory').update({
@@ -195,7 +235,7 @@ export default function Inventory() {
       }).eq('id', id);
       if (error) throw error;
 
-      const completedDoc = { ...doc, totals: result };
+      const completedDoc = { ...doc, totals: result, soldQtyTotal, soldMap };
       if (shAmount > 0) {
         // Есть недостача — спрашиваем, куда её отнести
         setPendingDoc(completedDoc); setAssignValuation('cost'); setAssignAmts({});
@@ -285,12 +325,13 @@ export default function Inventory() {
               intro="Инвентаризация — это сверка: сколько товара должно быть по учёту и сколько реально лежит на складе. Помогает вовремя найти недостачи и излишки."
               blocks={[
                 { title: 'Как провести инвентаризацию (по шагам)', items: [
-                  <>Нажмите «<b>+ Добавить</b>» — создастся документ со списком всех товаров.</>,
+                  <>Нажмите «<b>+ Добавить</b>» — создастся документ со списком всех товаров (остатки на момент начала).</>,
                   <>В колонке «<b>Учтено</b>» — сколько должно быть по данным программы (остатки).</>,
                   <>В колонке «<b>Факт</b>» — впишите, сколько реально насчитали на складе.</>,
-                  <>Разница и суммы пересчитаются сами.</>,
+                  <>Не успели досчитать — «<b>Отложить</b>»: черновик сохранится, продолжите позже (кнопка «Продолжить» в списке).</>,
                   <>Нажмите «<b>Завершить</b>» — программа спишет недостачу, оприходует излишек и покажет итог.</>,
                 ]},
+                { title: 'Продажи во время инвентаризации', text: <>Если кассир продаёт товары, пока вы считаете — не страшно: при завершении программа сама добавит проданное к факту и покажет это в итоге. «Факт на начало» = посчитали + продали за время подсчёта.</> },
                 { title: 'Столбцы таблицы', items: [
                   <><b>Учтено</b> — остаток по данным программы (поставки + начальные остатки − списания).</>,
                   <><b>Факт</b> — реальное количество, которое вы пересчитали. Вводится вручную.</>,
@@ -374,14 +415,20 @@ export default function Inventory() {
               try { totals = JSON.parse(inv.result || '{}'); } catch (e) {}
               const result = totals.result ?? 0;
               const diffCount = inv.items.filter(it => it.actual !== it.expected).length;
+              const isDraft = inv.status === 'draft';
               return (
                 <tr key={inv.id}>
-                  <td style={{textAlign:'left'}}><div className="prod-name">{inv.number}</div></td>
+                  <td style={{textAlign:'left'}}>
+                    <div className="prod-name">{inv.number}</div>
+                    <span style={{display:'inline-block',padding:'.15rem .5rem',borderRadius:'100px',fontSize:'.68rem',fontWeight:600,background:isDraft ? '#fef3c7' : '#dcfce7',color:isDraft ? '#b45309' : '#16a34a',marginTop:'.2rem'}}>
+                      {isDraft ? 'Черновик' : 'Проведена'}
+                    </span>
+                  </td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
-                  <td style={{textAlign:'left'}}><span className="prod-cat">{diffCount} шт.</span></td>
-                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{result > 0 ? '+' : ''}{result.toLocaleString()} {cur}</span></td>
+                  <td style={{textAlign:'left'}}><span className="prod-cat">{isDraft ? '—' : diffCount + ' шт.'}</span></td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{isDraft ? '—' : (result > 0 ? '+' : '') + result.toLocaleString() + ' ' + cur}</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => view(inv.id)}>Открыть</span>
+                    <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => continueEdit(inv)}>{isDraft ? 'Продолжить' : 'Открыть'}</span>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
                         e.stopPropagation();
@@ -390,7 +437,7 @@ export default function Inventory() {
                         dd.classList.toggle('open');
                       }}>⋯</button>
                       <div className="prod-dropdown">
-                        <button onClick={() => remove(inv.id)} style={{color:'#dc3545'}}>Удалить</button>
+                        <button onClick={() => remove(inv.id)} style={{color:'#dc3545'}}>{isDraft ? 'Удалить черновик' : 'Удалить'}</button>
                       </div>
                     </div>
                   </td>
@@ -422,7 +469,8 @@ export default function Inventory() {
             </table>
           </div>
           <div className="modal-actions" style={{flexShrink:0,marginTop:'.5rem'}}>
-            <button className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
+            <button className="btn btn-ghost" onClick={cancelEdit}>Отмена</button>
+            <button className="btn btn-outline" onClick={saveDraft}>Отложить</button>
             <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
           </div>
         </>)}
@@ -444,6 +492,11 @@ export default function Inventory() {
             Сумма недостачи: <b style={{color:'#dc2626'}}>{Math.round(assignShortage).toLocaleString()} {cur}</b>
             {assignValuation === 'retail' && <span style={{color:'var(--muted)'}}> (по рознице, включая упущенную выгоду)</span>}
           </div>
+          {pendingDoc.soldQtyTotal > 0 && (
+            <div style={{fontSize:'.76rem',color:'#2563eb',marginBottom:'.6rem',background:'#eff6ff',borderRadius:'.5rem',padding:'.4rem .6rem'}}>
+              Продано во время инвентаризации: <b>{pendingDoc.soldQtyTotal} шт.</b> — уже учтено в факте.
+            </div>
+          )}
           <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',marginBottom:'.6rem',maxHeight:'260px',overflowY:'auto'}}>
             {employees.length === 0 ? (
               <div style={{padding:'.6rem',color:'var(--muted)',fontSize:'.8rem',textAlign:'center'}}>Сотрудники не добавлены — вся недостача уйдёт в расходы бизнеса</div>
@@ -487,6 +540,11 @@ export default function Inventory() {
               {(t.surplusAmount > 0) && (
                 <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#16a34a'}}>
                   <span>Излишек (оприходован)</span><span className="num">+{Math.round(t.surplusAmount).toLocaleString()} {cur}</span>
+                </div>
+              )}
+              {(t.soldQtyTotal > 0) && (
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.78rem',color:'#2563eb'}}>
+                  <span>Продано во время инвентаризации (учтено в факте)</span><span className="num">{t.soldQtyTotal} шт.</span>
                 </div>
               )}
               {(t.assigned && t.assigned.length > 0) && (
