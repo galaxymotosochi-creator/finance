@@ -70,7 +70,6 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
     var q = null;
     // Простой и надёжный принцип: повторный скан того же кода разрешён всегда,
     // если прошло >= 1200мс с последнего срабатывания этого кода.
-    // Не зависит от того, как Quagga шлёт события (непрерывно или по появлению).
     var lastFire = {}; // code -> ts последнего срабатывания
     var emit = function(code) {
       if (!code) return;
@@ -81,30 +80,42 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
         fire(code);
       }
     };
+    // Перезапуск детектора: Quagga после первого распознавания «залипает» на коде
+    // и не распознаёт его повторно. Ручное «закрыл-открыл» лечит — делаем то же само.
+    var startQuagga = function() {
+      Quagga.init({
+        inputStream: { name: 'Live', type: 'LiveStream', target: v, targetSize: 1, constraints: { width: 640, height: 480, facingMode: 'environment' } },
+        decoder: { readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader', 'upc_e_reader'] },
+        locate: true
+      }, function(err) {
+        if (!w.isConnected) return; // окно уже закрыли
+        if (err) { alert('Ошибка камеры: ' + (err && err.message ? err.message : 'не удалось запустить')); w.remove(); c.remove(); return; }
+        // Загрузка завершена: убираем полосочку, добавляем ручной ввод, показываем видео
+        if (loadInner.isConnected) loadInner.remove();
+        if (!i.isConnected) w.appendChild(i);
+        v.style.display = 'block';
+        q = Quagga;
+        Quagga.start();
+        setTimeout(function() { if (v.isConnected) v.classList.add('scanner-visible'); }, 50);
+        Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
+      });
+    };
     var fire = function(val) {
       beep(1200, 100);
       if (onBeep) onBeep();
       if (onResult) onResult(val.trim());
-      // В непрерывном режиме окно остаётся открытым — закрытие только крестиком
-      if (!continuous) cl();
+      if (!continuous) { cl(); return; }
+      // Непрерывный режим: после каждого скана перезапускаем детектор,
+      // чтобы он «забыл» код и смог распознать его снова (увёл-навёл = новый скан)
+      setTimeout(function() {
+        if (!w.isConnected) return;
+        try { if (q) { q.stop(); q = null; } } catch (e) {}
+        startQuagga();
+      }, 400);
     };
     var cl = function() { if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
     i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { fire(i.value.trim()); i.value = ''; } };
     c.onclick = cl;
-    Quagga.init({
-      inputStream: { name: 'Live', type: 'LiveStream', target: v, targetSize: 1, constraints: { width: 640, height: 480, facingMode: 'environment' } },
-      decoder: { readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader', 'upc_e_reader'] },
-      locate: true
-    }, function(err) {
-      if (err) { alert('Ошибка камеры: ' + (err && err.message ? err.message : 'не удалось запустить')); w.remove(); c.remove(); return; }
-      // Загрузка завершена: убираем полосочку, добавляем ручной ввод, показываем видео
-      loadInner.remove();
-      w.appendChild(i);
-      v.style.display = 'block';
-      q = Quagga;
-      Quagga.start();
-      setTimeout(function() { v.classList.add('scanner-visible'); }, 50);
-      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
-    });
+    startQuagga();
   }).catch(function() { alert('Ошибка загрузки сканера'); });
 };
