@@ -94,14 +94,30 @@ const getCostMap = () => {
   return result;
 };
 const refreshCostMap = async (userId) => {
-  const { data } = await supabase.from('supplies').select('items').eq('user_id', userId);
+  const [suppliesRes, initialRes] = await Promise.all([
+    supabase.from('supplies').select('items').eq('user_id', userId),
+    supabase.from('initial_stocks').select('*').eq('user_id', userId).maybeSingle(),
+  ]);
   const map = {};
-  (data || []).forEach(sp => { (sp.items||[]).forEach(it => {
+  (suppliesRes.data || []).forEach(sp => { (sp.items||[]).forEach(it => {
     if (!it || !it.prodId) return;
     if (!map[it.prodId]) map[it.prodId] = { qty:0, cost:0 };
     map[it.prodId].qty += it.qty || 0;
     map[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
   }); });
+  // Начальные остатки тоже идут в учёт себестоимости (как в кассе/остатках/инвентаризации)
+  const init = initialRes.data;
+  if (init && init.done && init.items) {
+    Object.keys(init.items).forEach(id => {
+      const q = parseInt(init.items[id]) || 0;
+      const c = (init.costs && parseInt(init.costs[id])) || 0;
+      if (q > 0) {
+        if (!map[id]) map[id] = { qty:0, cost:0 };
+        map[id].qty += q;
+        map[id].cost += c * q;
+      }
+    });
+  }
   const result = {};
   Object.keys(map).forEach(id => { result[id] = map[id].qty > 0 ? Math.round(map[id].cost / map[id].qty) : 0; });
   costMapCache = result;
