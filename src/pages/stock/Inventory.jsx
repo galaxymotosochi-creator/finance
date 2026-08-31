@@ -591,12 +591,10 @@ export default function Inventory() {
             <div style={{flex:1,minWidth:'200px',padding:'.6rem .8rem',borderRadius:'12px',border:'1.5px solid #e5e7eb',background:'#fff'}}>
               <div style={{fontSize:'.78rem',fontWeight:600,color:'#222'}}>По цене закупа</div>
               <div style={{fontSize:'1.05rem',fontWeight:700,color:'#dc2626',marginTop:'.2rem'}} className="num">−{Math.round(assignShortageCost).toLocaleString()} {cur}</div>
-              <div style={{fontSize:'.68rem',color:'#999',marginTop:'.1rem'}}>сколько заплатили за пропавшее · идёт в расходы бизнеса</div>
             </div>
             <div style={{flex:1,minWidth:'200px',padding:'.6rem .8rem',borderRadius:'12px',border:'1.5px solid #e5e7eb',background:'#fff'}}>
               <div style={{fontSize:'.78rem',fontWeight:600,color:'#222'}}>По цене продажи</div>
               <div style={{fontSize:'1.05rem',fontWeight:700,color:'#dc2626',marginTop:'.2rem'}} className="num">−{Math.round(assignShortageRetail).toLocaleString()} {cur}</div>
-              <div style={{fontSize:'.68rem',color:'#999',marginTop:'.1rem'}}>включая упущенную выгоду · для сотрудников</div>
             </div>
           </div>
           <div style={{fontSize:'.74rem',color:'#888',marginBottom:'.6rem'}}>
