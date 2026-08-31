@@ -221,11 +221,11 @@ export default function Inventory() {
             <div className="product-table" style={{overflowX:'auto'}}>
               <table className="data-table">
                 <thead id="colHeaders"><tr>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)',textAlign:'left'}}>Товар</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Учтено</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Факт</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Разница</th>
-                  <th style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase',textAlign:'left',padding:'.5rem .5rem',borderBottom:'1px solid var(--border)'}}>Сумма</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Учтено</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Факт</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Разница</th>
+                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
                 </tr></thead>
                 <tbody>
                   {doc.items.map((it,i)=>{
@@ -297,7 +297,7 @@ export default function Inventory() {
         {editing && (<>
           <div className="product-table" style={{overflowY:'auto',flex:1}}>
             <table className="data-table">
-              <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th>Учтено</th><th>Факт</th><th>Разница</th><th>Сумма</th></tr></thead>
+              <thead id="colHeaders"><tr><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Учтено</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Факт</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Разница</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th></tr></thead>
               <tbody>
                 {editing.items.map(function(it,idx) {
                   var diff = it.actual - it.expected;
