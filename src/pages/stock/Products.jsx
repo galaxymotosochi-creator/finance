@@ -687,7 +687,18 @@ export default function Products() {
                   <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
                 </div>
                 <div className="cat-dd-list">
-                  {(catsLoaded ? cats : []).filter(c => !catFilter || c.name.toLowerCase().includes(catFilter.toLowerCase())).map(c => {
+                  {(catsLoaded ? cats : []).filter(c => {
+                    if (catFilter && !c.name.toLowerCase().includes(catFilter.toLowerCase())) return false;
+                    // Если в фильтре «Тип» выбран только один тип — показываем его категории
+                    const st = typeFilterSet;
+                    if (st && st.size > 0) {
+                      const onlyService = st.has('service') && !st.has('product') && !st.has('combo');
+                      const onlyProduct = (st.has('product') || st.has('combo')) && !st.has('service');
+                      if (onlyService) return !c.type || c.type === 'service';
+                      if (onlyProduct) return !c.type || c.type === 'product';
+                    }
+                    return true;
+                  }).map(c => {
                     const checked = selectedCats.has(c.name);
                     return (
                       <div key={c.name} className="cat-dd-item" onClick={() => toggleCat(c.name)}>
@@ -830,12 +841,18 @@ export default function Products() {
                   <label>Категория</label>
                   <select value={fCat} onChange={e => setFCat(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {(catsLoaded ? cats : []).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                    {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (fType === 'service' ? 'service' : 'product')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Тип</label>
-                  <select value={fType} onChange={e => setFType(e.target.value)}>
+                  <select value={fType} onChange={e => {
+                    const t = e.target.value;
+                    setFType(t);
+                    // При смене типа сбрасываем категорию, если она не подходит
+                    const need = t === 'service' ? 'service' : 'product';
+                    if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === need))) setFCat('');
+                  }}>
                     <option value="product">Товар</option>
                     <option value="service">Услуга</option>
                     <option value="combo">Комбо</option>
