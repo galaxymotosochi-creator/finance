@@ -103,18 +103,21 @@ export default function Employees() {
   const [addRuleSearch, setAddRuleSearch] = useState('');
   const [showNoPermsConfirm, setShowNoPermsConfirm] = useState(false);
   const [pendingSave, setPendingSave] = useState(null);
+  const [debts, setDebts] = useState([]); // долги сотрудников (недостачи)
 
   const load = async () => {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const [empRes, posRes] = await Promise.all([
+      const [empRes, posRes, debtRes] = await Promise.all([
         supabase.from('employees').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('position_templates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('employee_debts').select('*').eq('user_id', user.id).eq('status', 'pending'),
       ]);
       if (empRes.error) { alert('Ошибка загрузки: ' + empRes.error.message); return; }
       if (empRes.data) setEmployees(empRes.data);
       if (posRes.data) setPositions(posRes.data);
+      if (debtRes.data) setDebts(debtRes.data);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     setAllCats(getCats());
     setAllProds(getProducts());
@@ -363,6 +366,11 @@ export default function Employees() {
                 <tr key={emp.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>
                     <div className="prod-name" style={{color:'#555'}}>{emp.name}</div>
+                    {debts.filter(d => d.employee_id === emp.id).length > 0 && (
+                      <div style={{fontSize:'.72rem',color:'#dc2626',fontWeight:600,marginTop:'.15rem'}}>
+                        Долг: {debts.filter(d => d.employee_id === emp.id).reduce((s, d) => s + (parseFloat(d.amount)||0), 0).toLocaleString()} ₽
+                      </div>
+                    )}
                     {emp.status === 'inactive' && <span>Уволен</span>}
                   </td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{pos ? pos.name : '—'}</td>

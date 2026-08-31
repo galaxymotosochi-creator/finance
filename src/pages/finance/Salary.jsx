@@ -74,6 +74,8 @@ export default function Salary() {
   const [tsEntries, setTsEntries] = useState([]);
   const [bonusChecks, setBonusChecks] = useState({});
   const [deductChecks, setDeductChecks] = useState({});
+  const [empDebts, setEmpDebts] = useState([]); // долги сотрудника (недостачи по инвентаризации)
+  const [debtChecks, setDebtChecks] = useState({});
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
@@ -124,6 +126,23 @@ export default function Salary() {
     })();
   }, [fEmpId, fPeriodFrom, fPeriodTo, user]);
 
+  // Загрузка долгов сотрудника (недостачи по инвентаризации) — для удержания
+  useEffect(() => {
+    if (!fEmpId) { setEmpDebts([]); setDebtChecks({}); return; }
+    (async () => {
+      const { data } = await supabase
+        .from('employee_debts')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('employee_id', fEmpId)
+        .eq('status', 'pending');
+      setEmpDebts(data || []);
+      const dc = {};
+      (data || []).forEach(d => { dc[d.id] = true; }); // по умолчанию все отмечены
+      setDebtChecks(dc);
+    })();
+  }, [fEmpId, user, show]);
+
   // Подтянуть оклад из сотрудника
   useEffect(() => {
     if (!fEmpId) return;
@@ -162,13 +181,15 @@ export default function Salary() {
   const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
   const checkedBonusTotal = tsBonuses.filter(e => bonusChecks[e.id]).reduce((s,e) => s + Number(e.bonus_amount||0), 0);
   const checkedDeductTotal = tsDeducts.filter(e => deductChecks[e.id]).reduce((s,e) => s + Number(e.deduct_amount||0), 0);
-  const grandTotal = fSalaryTotal + checkedBonusTotal - checkedDeductTotal;
+  const checkedDebtTotal = empDebts.filter(d => debtChecks[d.id]).reduce((s,d) => s + Number(d.amount||0), 0);
+  const grandTotal = fSalaryTotal + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
 
   const openAdd = () => {
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
     setFBaseSalary(0); setFSalaryType('fixed'); setFSalaryTotal(0); setFDays(0);
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
     setExistingDebt(0); setTsEntries([]); setBonusChecks({}); setDeductChecks({});
+    setEmpDebts([]); setDebtChecks({});
     setShow(true);
   };
 
@@ -197,6 +218,8 @@ export default function Salary() {
     try {
       const takeBonus = tsBonuses.filter(e => bonusChecks[e.id]);
       const takeDeduct = tsDeducts.filter(e => deductChecks[e.id]);
+      const takeDebts = empDebts.filter(d => debtChecks[d.id]);
+      const debtItems = takeDebts.map(d => ({ debtId: d.id, amount: d.amount, comment: d.comment || 'Недостача' }));
       const obj = {
         user_id: user.id, employee_id: fEmpId, employee_name: emp ? emp.name : 'Сотрудник',
         period_from: fPeriodFrom, period_to: fPeriodTo, period_start: fPeriodFrom, period_end: fPeriodTo,
@@ -205,11 +228,15 @@ export default function Salary() {
         // иначе зарплата помечалась выплаченной без создания расходной операции
         amount: grandTotal, status: 'pending', pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
-        deduct_amount: checkedDeductTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })),
+        deduct_amount: checkedDeductTotal + checkedDebtTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })).concat(debtItems),
         paid_at: null,
       };
       if (editId) { const { error } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; }
       else { const { error } = await supabase.from('salary').insert(obj); if (error) throw error; }
+      // Помечаем удержанные долги (статус deducted)
+      if (takeDebts.length) {
+        await Promise.all(takeDebts.map(d => supabase.from('employee_debts').update({ status: 'deducted', deducted_at: new Date().toISOString() }).eq('id', d.id)));
+      }
       await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -491,6 +518,39 @@ export default function Salary() {
               )}
               </div>
 
+              {/* Долги по недостачам (инвентаризация) */}
+              {empDebts.length > 0 && (
+                <div style={{border:'1px solid #fed7aa',borderRadius:'12px',overflow:'hidden'}}>
+                  <div style={{padding:'.5rem .65rem',background:'#fff7ed',borderBottom:'1px solid #fed7aa',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                    <span style={{fontSize:'.78rem',fontWeight:600,color:'#ea580c'}}>Долги по недостачам</span>
+                    <span style={{fontSize:'.68rem',color:'#ea580c'}}>-{checkedDebtTotal.toLocaleString()} {cur}</span>
+                  </div>
+                  <div style={{padding:'.5rem .65rem'}}>
+                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
+                      <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
+                        <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
+                        <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>За что</th>
+                      </tr></thead>
+                      <tbody>
+                        {empDebts.map(d => (
+                          <tr key={d.id}>
+                            <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
+                              <span onClick={()=>setDebtChecks(prev => ({...prev, [d.id]: !prev[d.id]}))}
+                                style={{width:'16px',height:'16px',border:'1.5px solid '+(debtChecks[d.id]?'#ea580c':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:debtChecks[d.id]?'#ea580c':'transparent',color:'#fff'}}>
+                                {debtChecks[d.id] ? '✓' : ''}
+                              </span>
+                            </td>
+                            <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#ea580c',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>-{Number(d.amount).toLocaleString()} {cur}</td>
+                            <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{d.comment||'Недостача'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
+                  </div>
+                </div>
+              )}
+
               {/* Долг */}
               {existingDebt !== 0 && (
                 <div style={{background:'#fffbeb',border:'1px solid #f59e0b',borderRadius:'10px',padding:'.5rem .65rem',fontSize:'.78rem',display:'flex',gap:'.5rem',alignItems:'center'}}>
@@ -504,7 +564,7 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(parts.length===3)return parts[0]+' + '+parts[1]+' − '+parts[2];if(parts.length===2&&parts[1].includes('Штраф'))return parts[0]+' − '+parts[1];return parts.join(' + ');})()}
+                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
                 </div>
                 <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} {cur}</div>
               </div>

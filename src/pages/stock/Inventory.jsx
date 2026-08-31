@@ -25,30 +25,47 @@ function recalcTotals(doc) {
   return doc;
 }
 
+// Сумма недостачи в деньгах: по себестоимости или по розничной цене
+function shortageAmount(doc, valuation) {
+  return doc.items.reduce((s, it) => {
+    if (it.actual >= it.expected) return s;
+    const unit = valuation === 'retail' && it.price > 0 ? it.price : (it.cost || 0);
+    return s + (it.expected - it.actual) * unit;
+  }, 0);
+}
+
 export default function Inventory() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [viewing, setViewing] = useState(null);
   const [showResult, setShowResult] = useState(null);
+  // Окно «Куда отнести недостачу»
+  const [showAssign, setShowAssign] = useState(false);
+  const [pendingDoc, setPendingDoc] = useState(null);
+  const [assignValuation, setAssignValuation] = useState('cost');
+  const [assignAmts, setAssignAmts] = useState({});
 
   const load = async () => {
     setLoading(true);
     try {
-      const [invRes, prodRes, supRes, initRes, woRes] = await Promise.all([
+      const [invRes, prodRes, supRes, initRes, woRes, empRes] = await Promise.all([
         supabase.from('inventory').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('supplies').select('items').eq('user_id', user.id),
         supabase.from('initial_stocks').select('*').eq('user_id', user.id).single(),
-        supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id)
+        supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id),
+        supabase.from('employees').select('id,name,status').eq('user_id', user.id)
       ]);
       if (invRes.error) throw invRes.error;
       if (invRes.data) setList(invRes.data);
       if (prodRes.data) setProducts(prodRes.data);
+      if (empRes.data) setEmployees((empRes.data || []).filter(e => e.status !== 'fired'));
       // Остаток = поставки + начальные − списания (как в разделе «Остатки» и кассе)
       const map = {};
       (supRes.data || []).forEach(sp => {
@@ -106,7 +123,8 @@ export default function Inventory() {
       return {
         prodId: p.id, name: p.name, sku: p.sku || '',
         cat: CAT_LABELS[p.cat] || p.cat || '',
-        expected: qty, actual: qty, cost
+        expected: qty, actual: qty, cost,
+        price: p.price || 0 // розничная цена — для оценки недостачи «по рознице»
       };
     });
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
@@ -136,11 +154,99 @@ export default function Inventory() {
     setEditing(updated);
   };
 
+  // ===== Завершение инвентаризации: списание недостачи, оприходование излишка =====
   const complete = async (id) => {
     const doc = editing; if (!doc) return;
-    const { error } = await supabase.from('inventory').update({ items: doc.items, result: JSON.stringify(doc.totals), status: 'completed' }).eq('id', id);
-    if (error) return alert('Ошибка: ' + error.message);
-    setShowResult(doc);
+    const date = doc.date || new Date().toISOString().split('T')[0];
+    const shortageItems = doc.items.filter(it => it.actual < it.expected);
+    const surplusItems = doc.items.filter(it => it.actual > it.expected);
+
+    try {
+      // Недостача → списания (остаток уменьшается)
+      if (shortageItems.length) {
+        await Promise.all(shortageItems.map(it =>
+          supabase.from('writeoffs').insert({
+            product_id: it.prodId, quantity: it.expected - it.actual, cost: it.cost || 0,
+            reason: 'Недостача по инвентаризации ' + doc.number, date
+          })
+        ));
+      }
+      // Излишек → оприходование как поставка (остаток увеличивается, себестоимость пересчитается)
+      if (surplusItems.length) {
+        const items = surplusItems.map(it => ({ prodId: it.prodId, name: it.name, qty: it.actual - it.expected, cost: it.cost || 0 }));
+        const total = items.reduce((s, x) => s + x.qty * x.cost, 0);
+        await supabase.from('supplies').insert({
+          supplier_name: 'Излишек по инвентаризации ' + doc.number,
+          items, total, paid: total, status: 'received', date
+        });
+      }
+
+      // Суммы в деньгах (по себестоимости — оценка по умолчанию)
+      const shAmount = shortageAmount(doc, 'cost');
+      const suAmount = doc.items.reduce((s, it) => it.actual > it.expected ? s + (it.actual - it.expected) * (it.cost || 0) : s, 0);
+      const result = {
+        ...doc.totals, valuation: 'cost',
+        shortageAmount: shAmount, surplusAmount: suAmount,
+        businessLoss: shAmount, assigned: []
+      };
+
+      const { error } = await supabase.from('inventory').update({
+        items: doc.items, result: JSON.stringify(result), status: 'completed', completed_at: new Date().toISOString()
+      }).eq('id', id);
+      if (error) throw error;
+
+      const completedDoc = { ...doc, totals: result };
+      if (shAmount > 0) {
+        // Есть недостача — спрашиваем, куда её отнести
+        setPendingDoc(completedDoc); setAssignValuation('cost'); setAssignAmts({});
+        setShowAssign(true);
+      } else {
+        setShowResult(completedDoc);
+      }
+    } catch (e) {
+      alert('Ошибка завершения: ' + (e.message || 'неизвестная ошибка'));
+    }
+  };
+
+  // Подтверждение распределения недостачи
+  const confirmAssign = async () => {
+    const doc = pendingDoc; if (!doc) return;
+    const totalShortage = shortageAmount(doc, assignValuation);
+    const assigned = [];
+    let totalAssigned = 0;
+    employees.forEach(emp => {
+      const amt = parseFloat(assignAmts[emp.id]) || 0;
+      if (amt > 0) {
+        assigned.push({ employeeId: emp.id, name: emp.name, amount: amt });
+        totalAssigned += amt;
+      }
+    });
+    if (totalAssigned > totalShortage + 0.01) {
+      return alert('Сумма распределения (' + Math.round(totalAssigned).toLocaleString() + ' ' + cur + ') больше недостачи (' + Math.round(totalShortage).toLocaleString() + ' ' + cur + ')');
+    }
+    try {
+      // Создаём долги сотрудникам
+      if (assigned.length) {
+        await Promise.all(assigned.map(a =>
+          supabase.from('employee_debts').insert({
+            employee_id: a.employeeId, employee_name: a.name, inventory_id: doc.id,
+            amount: a.amount, valuation: assignValuation, status: 'pending',
+            comment: 'Недостача по инвентаризации ' + doc.number, date: new Date().toISOString()
+          })
+        ));
+      }
+      const result = {
+        ...doc.totals, valuation: assignValuation,
+        shortageAmount: totalShortage, surplusAmount: doc.totals.surplusAmount,
+        businessLoss: totalShortage - totalAssigned, assigned
+      };
+      const { error } = await supabase.from('inventory').update({ result: JSON.stringify(result) }).eq('id', doc.id);
+      if (error) throw error;
+      setShowAssign(false); setPendingDoc(null);
+      setShowResult({ ...doc, totals: result });
+    } catch (e) {
+      alert('Ошибка: ' + (e.message || 'неизвестная ошибка'));
+    }
   };
 
   const confirmResult = async () => {
@@ -163,7 +269,11 @@ export default function Inventory() {
   };
 
   if (loading) return <Loader />;
-  // Режим редактирования — рендерится как модалка в основном контенте// Режим просмотра списка
+
+  const assignTotal = Object.values(assignAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+  const assignShortage = pendingDoc ? shortageAmount(pendingDoc, assignValuation) : 0;
+  const assignRemain = assignShortage - assignTotal;
+
   return (
     <>
       <div className="page-header">
@@ -179,7 +289,7 @@ export default function Inventory() {
                   <>В колонке «<b>Учтено</b>» — сколько должно быть по данным программы (остатки).</>,
                   <>В колонке «<b>Факт</b>» — впишите, сколько реально насчитали на складе.</>,
                   <>Разница и суммы пересчитаются сами.</>,
-                  <>Нажмите «<b>Завершить</b>» — документ сохранится и покажет итог.</>,
+                  <>Нажмите «<b>Завершить</b>» — программа спишет недостачу, оприходует излишек и покажет итог.</>,
                 ]},
                 { title: 'Столбцы таблицы', items: [
                   <><b>Учтено</b> — остаток по данным программы (поставки + начальные остатки − списания).</>,
@@ -188,9 +298,9 @@ export default function Inventory() {
                   <><b>Сумма</b> — разница в деньгах, по себестоимости.</>,
                 ]},
                 { title: 'Результат инвентаризации', items: [
-                  <><b>Недостача</b> — товара меньше, чем по учёту (потери, ошибки, кражи).</>,
-                  <><b>Излишек</b> — товара больше, чем по учёту (не учли поставку, пересорт).</>,
-                  <>После завершения показывается итог: было, стало, сумма недостачи и излишка.</>,
+                  <><b>Недостача</b> — товара меньше, чем по учёту. Программа спишет её (остаток уменьшится) и спросит: отнести на расходы бизнеса или на сотрудника (повиснет долг, который можно удержать из зарплаты).</>,
+                  <><b>Излишек</b> — товара больше, чем по учёту. Программа оприходует его (остаток увеличится), это доход.</>,
+                  <>После завершения показывается итог: было, стало, сумма недостачи и излишка, куда отнесена недостача.</>,
                 ]},
                 { title: 'Список инвентаризаций', items: [
                   <><b>№</b> — номер документа (INV-001, INV-002...).</>,
@@ -198,7 +308,6 @@ export default function Inventory() {
                   <><b>Результат</b> — итоговая сумма (плюс или минус).</>,
                   <>«<b>Открыть</b>» — посмотреть состав, кнопка ⋯ — удалить документ.</>,
                 ]},
-                { title: 'Важно', text: <>Инвентаризация <b>фиксирует</b> расхождения, но остатки в программе сама не меняет. Нашли недостачу — оформите списание (раздел «Списания»). Нашли излишек — оформите поставку или скорректируйте остатки.</> },
               ]}
             />
           </div>
@@ -319,6 +428,93 @@ export default function Inventory() {
         </>)}
       </Modal>
 
-</>
+      {/* Окно: куда отнести недостачу */}
+      <Modal open={showAssign} onClose={() => setShowAssign(false)} title="Недостача: куда отнести?" subtitle={pendingDoc ? pendingDoc.number + ' — недостача ' + Math.round(assignShortage).toLocaleString() + ' ' + cur : ''} width="wide">
+        {pendingDoc && (<>
+          <div style={{display:'flex',gap:'.5rem',marginBottom:'.8rem',flexWrap:'wrap'}}>
+            <span style={{fontSize:'.8rem',color:'#555',alignSelf:'center'}}>Считать недостачу:</span>
+            {['cost','retail'].map(v => (
+              <button key={v} onClick={() => setAssignValuation(v)}
+                style={{padding:'.3rem .8rem',borderRadius:'100px',border:'1.5px solid ' + (assignValuation === v ? '#111' : 'rgba(0,0,0,.12)'),background:assignValuation === v ? '#111' : 'transparent',color:assignValuation === v ? '#fff' : '#555',fontSize:'.75rem',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
+                {v === 'cost' ? 'По себестоимости' : 'По розничной цене'}
+              </button>
+            ))}
+          </div>
+          <div style={{fontSize:'.78rem',color:'#555',marginBottom:'.6rem'}}>
+            Сумма недостачи: <b style={{color:'#dc2626'}}>{Math.round(assignShortage).toLocaleString()} {cur}</b>
+            {assignValuation === 'retail' && <span style={{color:'var(--muted)'}}> (по рознице, включая упущенную выгоду)</span>}
+          </div>
+          <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',marginBottom:'.6rem',maxHeight:'260px',overflowY:'auto'}}>
+            {employees.length === 0 ? (
+              <div style={{padding:'.6rem',color:'var(--muted)',fontSize:'.8rem',textAlign:'center'}}>Сотрудники не добавлены — вся недостача уйдёт в расходы бизнеса</div>
+            ) : employees.map(emp => (
+              <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0',borderBottom:'1px solid var(--border)'}}>
+                <span style={{flex:1,fontSize:'.82rem',color:'#222'}}>{emp.name}</span>
+                <input type="number" min="0" placeholder="0" value={assignAmts[emp.id] || ''}
+                  onChange={e => setAssignAmts(prev => ({ ...prev, [emp.id]: e.target.value === '' ? '' : Math.max(0, parseFloat(e.target.value) || 0) }))}
+                  style={{width:'110px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+              </div>
+            ))}
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:'.8rem',padding:'.4rem .2rem'}}>
+            <span style={{color:'#555'}}>Распределено на сотрудников: <b>{Math.round(assignTotal).toLocaleString()} {cur}</b></span>
+            <span style={{color:'#555'}}>На расходы бизнеса: <b style={{color:assignRemain > 0 ? '#dc2626' : '#16a34a'}}>{Math.round(Math.max(0, assignRemain)).toLocaleString()} {cur}</b></span>
+          </div>
+          <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
+            <button className="btn btn-ghost" onClick={() => setShowAssign(false)}>Назад</button>
+            <button className="btn btn-primary" onClick={confirmAssign}>Подтвердить</button>
+          </div>
+        </>)}
+      </Modal>
+
+      {/* Окно результата */}
+      <Modal open={showResult} onClose={confirmResult} title="Инвентаризация завершена" subtitle={showResult ? showResult.number : ''} width="medium">
+        {showResult && (() => {
+          const t = showResult.totals || {};
+          return (
+            <>
+              <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#555'}}>
+                <span>Стоимость по учёту (было)</span><span className="num">{Math.round(t.totalBefore||0).toLocaleString()} {cur}</span>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#555'}}>
+                <span>Стоимость по факту (стало)</span><span className="num">{Math.round(t.totalAfter||0).toLocaleString()} {cur}</span>
+              </div>
+              {(t.shortageAmount > 0) && (
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#dc2626'}}>
+                  <span>Недостача</span><span className="num">−{Math.round(t.shortageAmount).toLocaleString()} {cur}</span>
+                </div>
+              )}
+              {(t.surplusAmount > 0) && (
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#16a34a'}}>
+                  <span>Излишек (оприходован)</span><span className="num">+{Math.round(t.surplusAmount).toLocaleString()} {cur}</span>
+                </div>
+              )}
+              {(t.assigned && t.assigned.length > 0) && (
+                <div style={{padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.8rem',color:'#555'}}>
+                  <div style={{fontWeight:600,marginBottom:'.3rem'}}>Недостача повешена на сотрудников:</div>
+                  {t.assigned.map((a, i) => (
+                    <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'.15rem 0'}}>
+                      <span>{a.name}</span><span className="num">{Math.round(a.amount).toLocaleString()} {cur} (долг)</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {(t.businessLoss > 0) && (
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#555'}}>
+                  <span>Отнесено на расходы бизнеса</span><span className="num">{Math.round(t.businessLoss).toLocaleString()} {cur}</span>
+                </div>
+              )}
+              <div style={{padding:'1rem 0 .2rem',textAlign:'center',fontSize:'.8rem',color:'#555'}}>
+                Остатки на складе обновлены: недостача списана, излишек оприходован.
+                {t.assigned && t.assigned.length > 0 && ' Долги сотрудников ждут удержания в разделе «Зарплата».'}
+              </div>
+              <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
+                <button className="btn btn-primary" onClick={confirmResult}>Готово</button>
+              </div>
+            </>
+          );
+        })()}
+      </Modal>
+    </>
   );
 }

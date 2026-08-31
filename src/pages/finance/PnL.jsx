@@ -46,6 +46,7 @@ export default function PnL() {
           { data: accts },
           { data: allTx },
           { data: writeoffs },
+          { data: invRes },
         ] = await Promise.all([
           // Чеки за период
           supabase.from('receipts').select('id,total_amount')
@@ -65,6 +66,8 @@ export default function PnL() {
           supabase.from('transactions').select('account_id,type,amount,date,status')
             .eq('user_id', user.id),
           supabase.from('writeoffs').select('items').eq('user_id', user.id),
+          // Инвентаризации за период — недостачи (расход) и излишки (доход)
+          supabase.from('inventory').select('result').eq('user_id', user.id).eq('status', 'completed').gte('date', dr.from).lte('date', dr.to),
         ]);
 
         // Продажи за период
@@ -126,9 +129,18 @@ export default function PnL() {
         });
         const opList = Object.entries(opByCat).sort((a, b) => b[1] - a[1]);
 
+        // Недостачи и излишки по инвентаризациям за период
+        let shortages = 0, surpluses = 0;
+        (invRes || []).forEach(inv => {
+          let r = {};
+          try { r = JSON.parse(inv.result || '{}'); } catch (e) {}
+          shortages += parseFloat(r.businessLoss) || 0;
+          surpluses += parseFloat(r.surplusAmount) || 0;
+        });
+
         // Чистая прибыль
         const grossProfit = salesRev - totalCogs;
-        const netProfit = grossProfit - opTotal;
+        const netProfit = grossProfit - opTotal - shortages + surpluses;
         const profitability = salesRev > 0 ? Math.round(netProfit / salesRev * 100) : 0;
 
         // Товарный запас (по себестоимости) = приход − списания − продажи
@@ -168,7 +180,8 @@ export default function PnL() {
           grossProfit,
           opList,
           opTotal,
-
+          shortages,
+          surpluses,
           netProfit,
           profitability,
           stockValue: totalStockValue,
@@ -226,6 +239,7 @@ export default function PnL() {
         </div>
         <Row label="Продажи" value={`+${d.salesRev.toLocaleString()} ${cur}`} />
         <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ${cur}`} color="#dc2626" />
+        {d.surpluses > 0 && <Row label="Излишки по инвентаризации" value={`+${Math.round(d.surpluses).toLocaleString()} ${cur}`} color="#16a34a" />}
         <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
         <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ${cur}`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
       </div>
@@ -242,6 +256,7 @@ export default function PnL() {
         {d.opList.map(([name, amt], i) => (
           <Row key={i} label={name} value={`−${amt.toLocaleString()} ${cur}`} color="#dc2626" />
         ))}
+        {d.shortages > 0 && <Row label="Недостачи по инвентаризации" value={`−${Math.round(d.shortages).toLocaleString()} ${cur}`} color="#dc2626" />}
 
       </div>
 
