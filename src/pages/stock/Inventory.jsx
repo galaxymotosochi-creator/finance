@@ -531,11 +531,10 @@ export default function Inventory() {
                 <option value="">— выберите —</option>
                 {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
               </select>
-              <button onClick={() => scanBarcode(handleScan)}
-                style={{marginLeft:'.3rem',display:'inline-flex',alignItems:'center',gap:'.35rem',padding:'.4rem .8rem',fontSize:'.78rem',fontWeight:600,borderRadius:'100px',border:'1.5px solid #111',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'var(--font)'}}>
-                📷 Сканировать штрихкоды
+              <button onClick={() => scanBarcode(handleScan)} title="Сканировать штрихкоды"
+                style={{marginLeft:'.3rem',display:'inline-flex',alignItems:'center',justifyContent:'center',width:'30px',height:'30px',fontSize:'.95rem',borderRadius:'50%',border:'1.5px solid #d1d5db',background:'#f3f4f6',color:'#555',cursor:'pointer',fontFamily:'var(--font)',flexShrink:0}}>
+                📷
               </button>
-              <span style={{fontSize:'.72rem',color:'#999'}}>каждый скан = +1 к количеству</span>
               {scanToast && (
                 <span style={{background:'#111',color:'#fff',borderRadius:'100px',padding:'.3rem .8rem',fontSize:'.75rem',fontWeight:600}}>{scanToast}</span>
               )}
