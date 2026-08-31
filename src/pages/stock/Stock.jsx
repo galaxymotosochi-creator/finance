@@ -30,10 +30,14 @@ function buildStockMap(supplies, initial, writeoffs) {
   }
   // Списания (продажи со склада, акты списания) — уменьшают остаток.
   // Иначе раздел «Остатки» расходится с кассой (та вычитает списания).
+  // Вместе с количеством уменьшаем и стоимость (по средней) — иначе себестоимость завышается.
   (writeoffs || []).forEach(wo => {
     const pid = wo.product_id;
     if (pid && map[pid]) {
-      map[pid].qty -= (Number(wo.quantity) || 0);
+      const avg = map[pid].qty > 0 ? map[pid].cost / map[pid].qty : 0;
+      const q = Number(wo.quantity) || 0;
+      map[pid].qty -= q;
+      map[pid].cost = Math.max(0, map[pid].cost - q * avg);
       if (map[pid].qty < 0) map[pid].qty = 0;
     }
   });

@@ -68,13 +68,17 @@ export default function Health() {
         });
       }
     } catch (e) {}
-    // Write-offs (расход)
+    // Write-offs (расход) — уменьшают и количество, и стоимость (по средней),
+    // иначе средняя себестоимость завышается после списаний
     writeoffs.forEach(wo => {
       const pid = wo.product_id;
       if (pid) {
         if (!map[pid]) map[pid] = { qty: 0, cost: 0 };
         // quantity из БД приходит строкой (numeric) — Number обязателен, иначе вычитание даст NaN-логику
-        map[pid].qty -= (Number(wo.quantity) || 0);
+        const avg = map[pid].qty > 0 ? map[pid].cost / map[pid].qty : 0;
+        const q = Number(wo.quantity) || 0;
+        map[pid].qty -= q;
+        map[pid].cost = Math.max(0, map[pid].cost - q * avg);
         if (map[pid].qty < 0) map[pid].qty = 0;
       }
     });

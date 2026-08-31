@@ -91,7 +91,13 @@ export default function Inventory() {
         });
       }
       (woRes.data || []).forEach(wo => {
-        if (map[wo.product_id]) map[wo.product_id].qty -= (Number(wo.quantity) || 0);
+        if (map[wo.product_id]) {
+          // Списание уменьшает и количество, и стоимость (по средней) — иначе себестоимость завышается
+          const avg = map[wo.product_id].qty > 0 ? map[wo.product_id].cost / map[wo.product_id].qty : 0;
+          const q = Number(wo.quantity) || 0;
+          map[wo.product_id].qty -= q;
+          map[wo.product_id].cost = Math.max(0, map[wo.product_id].cost - q * avg);
+        }
       });
       setSupplies(Object.keys(map).map(k => ({ prodId: parseInt(k), qty: Math.max(0, map[k].qty), cost: map[k].cost })));
     } catch (e) {
