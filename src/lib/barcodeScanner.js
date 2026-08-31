@@ -68,28 +68,23 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       }
     }, 200);
     var q = null;
-    // Непрерывный режим: повторный скан того же кода разрешён, когда код
-    // покинул центральную зону наведения (увёл камеру) и вернулся в неё снова.
-    // Держишь код в рамке — один пик; увёл — можно снова навести и пикнуть.
-    var lastSeen = {}; // code -> { inZone: bool, ts: ms }
-    var inZone = function(box) {
-      if (!box) return true;
-      var cx = (box.x + box.x1) / 2;
-      var cy = (box.y + box.y1) / 2;
-      // Видео Quagga 640x480; центральная зона ≈ рамка наведения
-      return Math.abs(cx - 320) < 150 && Math.abs(cy - 240) < 100;
-    };
-    var emit = function(code, box) {
+    // Непрерывный режим: один и тот же код можно сканировать повторно,
+    // если он пропал из распознавания (увёл камеру) — независимый таймер
+    // чистит «виденные» коды каждые 250мс, поэтому повтор не блокируется.
+    var lastSeen = {}; // code -> ts последней детекции
+    var cleanTimer = setInterval(function() {
+      var now = Date.now();
+      Object.keys(lastSeen).forEach(function(k) { if (now - lastSeen[k] > 700) delete lastSeen[k]; });
+    }, 250);
+    var emit = function(code) {
       if (!code) return;
       var now = Date.now();
-      // Коды, которые не детектились больше 700мс, считаем пропавшими — можно сканировать заново
-      Object.keys(lastSeen).forEach(function(k) { if (now - lastSeen[k].ts > 700) delete lastSeen[k]; });
-      var inZ = inZone(box);
       var prev = lastSeen[code];
-      if (inZ && (!prev || !prev.inZone)) {
+      lastSeen[code] = now;
+      // Срабатываем, если код видим впервые или его не было > 700мс (уводили камеру)
+      if (prev === undefined || now - prev > 700) {
         fire(code);
       }
-      lastSeen[code] = { inZone: inZ, ts: now };
     };
     var fire = function(val) {
       beep(1200, 100);
@@ -98,7 +93,7 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       // В непрерывном режиме окно остаётся открытым — закрытие только крестиком
       if (!continuous) cl();
     };
-    var cl = function() { if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
+    var cl = function() { clearInterval(cleanTimer); if (q) { q.stop(); q = null; } w.remove(); c.remove(); };
     i.onkeydown = function(e) { if (e.key === 'Enter' && i.value.trim()) { fire(i.value.trim()); i.value = ''; } };
     c.onclick = cl;
     Quagga.init({
@@ -114,7 +109,7 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       q = Quagga;
       Quagga.start();
       setTimeout(function() { v.classList.add('scanner-visible'); }, 50);
-      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code, data.codeResult.box); } });
+      Quagga.onDetected(function(data) { if (data && data.codeResult && data.codeResult.code) { emit(data.codeResult.code); } });
     });
   }).catch(function() { alert('Ошибка загрузки сканера'); });
 };
