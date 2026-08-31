@@ -289,32 +289,40 @@ export default function Products() {
     setUploading(false);
   };
 
+  const [saving, setSaving] = useState(false);
+
   const save = async (e) => {
     e.preventDefault();
+    if (saving) return; // защита от двойного нажатия «Сохранить»
     if (!fName.trim()) return alert('Введите название');
-    const price = fType === 'combo' ? (parseFloat(fPrice) || fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0)) : (parseFloat(fPrice) || 0);
-    const productData = {
-      name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
-      sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
-      min_price: parseFloat(fMinPrice) || 0,
-      weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
-      min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
-      hidden: editId ? fHidden : false,
-      photo_url: fPhoto || null,
-      free_price: fFreePrice,
-      combo_items: fType === 'combo' ? fComboItems : null
-    };
-    if (editId) {
-      const { error } = await supabase.from('products').update(productData).eq('id', editId);
-      if (error) return alert(error.message);
-    } else {
-      const { error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
-      if (error) return alert(error.message);
+    setSaving(true);
+    try {
+      const price = fType === 'combo' ? (parseFloat(fPrice) || fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0)) : (parseFloat(fPrice) || 0);
+      const productData = {
+        name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
+        sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
+        min_price: parseFloat(fMinPrice) || 0,
+        weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
+        min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
+        hidden: editId ? fHidden : false,
+        photo_url: fPhoto || null,
+        free_price: fFreePrice,
+        combo_items: fType === 'combo' ? fComboItems : null
+      };
+      if (editId) {
+        const { error } = await supabase.from('products').update(productData).eq('id', editId);
+        if (error) { alert(error.message); return; }
+      } else {
+        const { error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
+        if (error) { alert(error.message); return; }
+      }
+      setShowModal(false);
+      load();
+      setFreshPhotoUrl(''); // фото сохранено — больше не удаляем
+      showToast(editId ? 'Товар успешно сохранён!' : 'Товар успешно добавлен!');
+    } finally {
+      setSaving(false);
     }
-    setShowModal(false);
-    load();
-    setFreshPhotoUrl(''); // фото сохранено — больше не удаляем
-    showToast(editId ? 'Товар успешно сохранён!' : 'Товар успешно добавлен!');
   };
 
   const remove = async (id) => {
@@ -983,7 +991,7 @@ export default function Products() {
                 {editId && fHidden && (
                   <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
                 )}
-                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}}>Сохранить</button>
+                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}} disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
               </div>
             </form>
       </Modal>
