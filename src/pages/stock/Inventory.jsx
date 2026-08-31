@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
+import { scanBarcode, beep } from '../../lib/barcodeScanner';
 import Loader from '../../components/Loader';
 
 
@@ -134,7 +135,8 @@ export default function Inventory() {
         cat: CAT_LABELS[p.cat] || p.cat || '',
         expected: qty, actual: null, cost,
         price: p.price || 0, // розничная цена — для оценки недостачи «по рознице»
-        photo_url: p.photo_url || ''
+        photo_url: p.photo_url || '',
+        barcode: p.barcode || ''
       };
     });
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
@@ -203,6 +205,26 @@ export default function Inventory() {
     items[idx] = { ...items[idx], actual: null };
     const updated = { ...editing, items }; recalcTotals(updated);
     setEditing(updated);
+  };
+
+  // ===== Сканер штрихкодов: каждый скан = +1 к факту товара =====
+  const [scanToast, setScanToast] = useState(null);
+  const handleScan = (code) => {
+    if (!editing) return;
+    const idx = editing.items.findIndex(it => it.barcode && String(it.barcode).trim() === String(code).trim());
+    if (idx === -1) {
+      beep(300, 220, 0.2); // низкий сигнал — не найдено
+      setScanToast('Штрихкод ' + code + ' не найден в списке');
+      setTimeout(() => setScanToast(null), 2000);
+      return;
+    }
+    const items = [...editing.items];
+    const cur = (items[idx].actual === null || items[idx].actual === undefined || items[idx].actual === '') ? 0 : items[idx].actual;
+    items[idx] = { ...items[idx], actual: cur + 1 };
+    const updated = { ...editing, items }; recalcTotals(updated);
+    setEditing(updated);
+    setScanToast('+1: ' + items[idx].name);
+    setTimeout(() => setScanToast(null), 1200);
   };
 
   // ===== Завершение инвентаризации: списание недостачи, оприходование излишка =====
@@ -501,14 +523,22 @@ export default function Inventory() {
           const uncounted = editing.items.filter(it => it.actual === null || it.actual === undefined || it.actual === '');
           const t = editing.totals || {};
           return (<>
-            {/* Проводит */}
-            <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.8rem'}}>
+            {/* Проводит + сканер */}
+            <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.8rem',flexWrap:'wrap'}}>
               <span style={{fontSize:'.78rem',color:'#888'}}>Проводит:</span>
               <select value={editing.responsible || ''} onChange={e => setEditing({...editing, responsible: e.target.value})}
                 style={{padding:'.4rem .7rem',fontSize:'.8rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)',outline:'none',background:'#fff',color:'#222',minWidth:'220px'}}>
                 <option value="">— выберите —</option>
                 {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
               </select>
+              <button onClick={() => scanBarcode(handleScan)}
+                style={{marginLeft:'.3rem',display:'inline-flex',alignItems:'center',gap:'.35rem',padding:'.4rem .8rem',fontSize:'.78rem',fontWeight:600,borderRadius:'100px',border:'1.5px solid #111',background:'#111',color:'#fff',cursor:'pointer',fontFamily:'var(--font)'}}>
+                📷 Сканировать штрихкоды
+              </button>
+              <span style={{fontSize:'.72rem',color:'#999'}}>каждый скан = +1 к количеству</span>
+              {scanToast && (
+                <span style={{background:'#111',color:'#fff',borderRadius:'100px',padding:'.3rem .8rem',fontSize:'.75rem',fontWeight:600}}>{scanToast}</span>
+              )}
             </div>
 
             <div style={{display:'flex',gap:0,minHeight:'380px',border:'1px solid var(--border)',borderRadius:'14px',overflow:'hidden'}}>
