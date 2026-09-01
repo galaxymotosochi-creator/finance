@@ -904,6 +904,15 @@ export default function Products() {
                   <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
                 </div>}
               </div>
+              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',marginBottom:'.75rem',cursor:'pointer'}}>
+                <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
+                  <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
+                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#111':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
+                    <span style={{position:'absolute',content:'',height:'16px',width:'16px',left:'2px',bottom:'2px',background:'#fff',borderRadius:'50%',transition:'transform .2s',transform:fFreePrice?'translateX(14px)':'translateX(0)'}}></span>
+                  </span>
+                </span>
+                Продавать по свободной цене
+              </label>}
               <div className="form-row">
                 <div className="form-group">
                   <label>Артикул</label>
@@ -992,15 +1001,6 @@ export default function Products() {
                   </div>}
                 </div>
               </div>}
-              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',marginBottom:'.75rem',cursor:'pointer'}}>
-                <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
-                  <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
-                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#111':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
-                    <span style={{position:'absolute',content:'',height:'16px',width:'16px',left:'2px',bottom:'2px',background:'#fff',borderRadius:'50%',transition:'transform .2s',transform:fFreePrice?'translateX(14px)':'translateX(0)'}}></span>
-                  </span>
-                </span>
-                Продавать по свободной цене
-              </label>}
               <div className="form-group">
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
