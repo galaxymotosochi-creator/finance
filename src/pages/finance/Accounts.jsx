@@ -20,6 +20,11 @@ const ACC_TYPES = [
   { type: 'custom', icon: '🏦', label: 'Счёт' },
 ];
 const SYSTEM_KEY = 'systemAccountIds';
+// Отметка «начальный остаток введён» (даже если это 0) — чтобы счёт с нулём не просил ввод снова
+const INIT_DONE_KEY = 'atlaspos_init_done';
+const getInitDone = () => { try { return JSON.parse(localStorage.getItem(INIT_DONE_KEY) || '[]'); } catch(e) { return []; } };
+const setInitDoneId = (id) => { const l = getInitDone(); if (id != null && !l.includes(String(id))) { l.push(String(id)); localStorage.setItem(INIT_DONE_KEY, JSON.stringify(l)); } };
+const isInitDone = (id) => getInitDone().includes(String(id));
 
 export default function Accounts() {
   const cur = getCurrencySymbol();
@@ -109,11 +114,12 @@ export default function Accounts() {
   useOptimisticSync({ table: 'accounts', setList: setAccounts, onSynced: reloadAll });
   useOptimisticSync({ table: 'transactions', setList: setTransactions, onSynced: reloadAll });
 
-  // Онбординг: показываем «Первоначальные остатки», пока у пользователя нет учтённых данных
+  // Онбординг: показываем «Первоначальные остатки», пока есть невведённые счета и нет учтённых данных
   useEffect(() => {
     if (initDone && !loading) {
       const hasData = accounts.some(a => parseFloat(a.balance) > 0) || transactions.length > 0;
-      if (!hasData) setShowInit(true);
+      const hasPending = accounts.some(a => parseFloat(a.balance) === 0 && !isInitDone(a.id));
+      if (!hasData && hasPending) setShowInit(true);
     }
   }, [initDone, loading, accounts, transactions]);
 
@@ -182,23 +188,32 @@ export default function Accounts() {
     setPendingDeleteAc(null);
   };
 
+  // Счёт, которому ещё не ввели начальный остаток (баланс 0 и нет отметки о вводе)
+  var notInit = (a) => parseFloat(a.balance) === 0 && !isInitDone(a.id);
+
   var saveInit = async (e) => {
     e.preventDefault();
     try {
-      for (var acId of Object.keys(initAmts)) {
-        var amt = parseFloat(initAmts[acId])||0;
-        if (amt > 0) {
-          await supabase.from('accounts').update({balance:amt}).eq('id',acId);
-        }
+      var anyQueued = false;
+      // Проходим по всем невведённым счетам: 0 — тоже нормальный начальный остаток, сохраняем и помечаем введённым
+      for (var ac of accounts) {
+        if (parseFloat(ac.balance) !== 0 || isInitDone(ac.id)) continue;
+        var amt = parseFloat(initAmts[ac.id]) || 0;
+        var r = await supabase.from('accounts').update({ balance: amt }).eq('id', ac.id);
+        if (r.error) throw r.error;
+        if (r.queued) anyQueued = true;
+        setInitDoneId(ac.id);
       }
       // Новые счета из модалки — каждый добавляется строкой «+ Добавить счёт»
       for (var na of newAccs) {
         if (na.name && na.name.trim()) {
-          await supabase.from('accounts').insert({user_id:user.id, name:na.name.trim(), type:na.type||'custom', balance:parseFloat(na.amt)||0, description:(na.desc||'').trim() || null});
+          var ir = await supabase.from('accounts').insert({user_id:user.id, name:na.name.trim(), type:na.type||'custom', balance:parseFloat(na.amt)||0, description:(na.desc||'').trim() || null}).select();
+          if (ir.error) throw ir.error;
+          if (!ir.queued && ir.data && ir.data[0]) setInitDoneId(ir.data[0].id);
         }
       }
       setShowInit(false); setInitAmts({}); setNewAccs([]);
-      await fetchAccounts();
+      if (!anyQueued) await fetchAccounts();
     } catch(err) {alert(err.message);}
   };
 
@@ -407,9 +422,9 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(a => parseFloat(a.balance)===0).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(a => parseFloat(a.balance)===0).length ? "Введите балансы всех счетов вашего бизнеса — если нужно, добавьте новый. На отчёты не повлияет" : "Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку»"} width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(notInit).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(notInit).length ? "Введите балансы счетов. Если на счету ноль — оставьте 0 и нажмите «Сохранить»: это тоже нормально" : "Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку»"} width="medium">
             <form onSubmit={saveInit}>
-              {sorted.filter(a => parseFloat(a.balance)===0).map(a => {
+              {sorted.filter(notInit).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
                 return (
                   <div key={a.id} className="form-group">
@@ -420,10 +435,10 @@ export default function Accounts() {
                   </div>
                 );
               })}
-              {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
+              {sorted.filter(notInit).length === 0 && (
                 <div style={{padding:'.25rem 0'}}></div>
               )}
-              {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (
+              {sorted.filter(notInit).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.5rem'}}>
                   <label style={{margin:0}}>Новые счета</label>
@@ -453,11 +468,11 @@ export default function Accounts() {
               </div>
               )}
               <div className="modal-actions">
-                {sorted.filter(a => parseFloat(a.balance)===0).length > 0 && (<>
+                {sorted.filter(notInit).length > 0 && (<>
                   <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
                   <button type="submit" className="btn btn-primary">Сохранить</button>
                 </>)}
-                {sorted.filter(a => parseFloat(a.balance)===0).length === 0 && (
+                {sorted.filter(notInit).length === 0 && (
                   <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Закрыть</button>
                 )}
               </div>
