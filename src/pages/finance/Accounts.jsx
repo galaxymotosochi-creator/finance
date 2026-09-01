@@ -247,9 +247,9 @@ export default function Accounts() {
             if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
             return (
               <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',marginLeft:'.6rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #dbeafe',borderRadius:'12px',flexWrap:'wrap'}}>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#2563eb'}}>+{oIn.toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#d97706'}}>-{oOut.toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:(oIn-oOut)>=0?'#111':'#dc2626'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
               </div>
             );
           })()}
@@ -493,7 +493,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{isOwnerTx ? (t.type==='income'?'Взнос своих денег':'Вывод своих денег') : (t.type==='income'?'Доход':'Расход')}</span>
                           </td>
-                          <td style={{textAlign:'left',color:isOwnerTx ? '#2563eb' : '#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>
+                          <td style={{textAlign:'left',color:'#111'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>
                         </tr>
                       );
                     });

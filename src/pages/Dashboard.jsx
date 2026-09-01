@@ -209,15 +209,15 @@ export default function Dashboard() {
         <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
           <div style={{flex:1,minWidth:'130px'}}>
             <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Внесено своих средств</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#2563eb'}}>+{Number(d.ownerIn||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>+{Number(d.ownerIn||0).toLocaleString()} {cur}</div>
           </div>
           <div style={{flex:1,minWidth:'130px'}}>
             <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Выведено</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#d97706'}}>-{Number(d.ownerOut||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>-{Number(d.ownerOut||0).toLocaleString()} {cur}</div>
           </div>
           <div style={{flex:1,minWidth:'130px'}}>
             <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Сейчас в бизнесе</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:Number(d.ownerNet||0)>=0?'#111':'#dc2626'}}>{Number(d.ownerNet||0).toLocaleString()} {cur}</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>{Number(d.ownerNet||0).toLocaleString()} {cur}</div>
           </div>
         </div>
       </div>
