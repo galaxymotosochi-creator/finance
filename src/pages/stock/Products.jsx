@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode } from '../../lib/barcodeScanner';
 
@@ -189,6 +190,10 @@ export default function Products() {
     if (data) setProductsState(data);
   }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-товары фиксируются в реестре и появляются сразу (с красной точкой)
+  // onSynced пустой — перезагрузку при синхронизации уже делает useEffect ниже (atlaspos:synced → load)
+  useOptimisticSync({ table: 'products', setList: setProductsState, onSynced: () => {} });
+
   useEffect(() => { if (user) { migrateLocalData().then(() => load()); } }, [user, load, migrateLocalData]);
 
   // После синхронизации офлайн-очереди — перезагружаем список с сервера
@@ -322,10 +327,9 @@ export default function Products() {
       } else {
         const { data: insData, error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
         if (error) { alert(error.message); return; }
-        // Офлайн: запрос ушёл в очередь Service Worker — показываем товар сразу,
-        // с пометкой «ждёт синхронизации» (не делаем load() — кеш перезатрёт его)
+        // Офлайн: запрос ушёл в очередь Service Worker — товар уже добавил хук
+        // useOptimisticSync (с пометкой «ждёт синхронизации»); не делаем load() — кеш перезатрёт его
         if (insData && insData[0] && insData[0].queued) {
-          setProductsState(prev => [{ ...productData, id: Date.now(), pending: true }, ...prev]);
           setShowModal(false);
           setFreshPhotoUrl('');
           showToast('⏳ Интернета нет — товар добавлен, синхронизируется при появлении связи');
@@ -366,22 +370,22 @@ export default function Products() {
   };
 
   const hide = async (id) => {
-    const { error } = await supabase.from('products').update({ hidden: true }).eq('id', id);
+    const { error, queued } = await supabase.from('products').update({ hidden: true }).eq('id', id);
     if (error) return alert(error.message);
-    load();
+    if (!queued) load();
     showToast('Товар успешно скрыт!');
   };
 
   const unhide = async (id) => {
-    const { error } = await supabase.from('products').update({ hidden: false }).eq('id', id);
+    const { error, queued } = await supabase.from('products').update({ hidden: false }).eq('id', id);
     if (error) return alert(error.message);
-    load();
+    if (!queued) load();
   };
 
   const copyP = async (id) => {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
     if (!data) return showToast('Ошибка копирования');
-    const { error } = await supabase.from('products').insert({
+    const { error, queued } = await supabase.from('products').insert({
       id: Date.now(), name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
@@ -389,7 +393,7 @@ export default function Products() {
       combo_items: data.combo_items || null
     });
     if (error) return showToast('Ошибка: ' + error.message);
-    await load();
+    if (!queued) await load();
     showToast('Товар успешно скопирован!');
   };
 
@@ -398,11 +402,11 @@ export default function Products() {
     const idx = trash.findIndex(x => x.id === id);
     if (idx === -1) return;
     const { deletedAt, id: oldId, ...itemRest } = trash[idx];
-    const { error } = await supabase.from('products').insert({ ...itemRest, user_id: user.id });
+    const { error, queued } = await supabase.from('products').insert({ ...itemRest, user_id: user.id });
     if (error) { console.error('Restore error:', error); showToast('Ошибка: ' + error.message); return; }
     trash.splice(idx, 1);
     setTrash([...trash]);
-    await load();
+    if (!queued) await load();
     setShowModal(false);
     showToast('Товар успешно восстановлен!');
   };
