@@ -72,6 +72,8 @@ export default function Accounts() {
   const [ownerAcct, setOwnerAcct] = useState('');
   const [ownerAmt, setOwnerAmt] = useState('');
   const [ownerDesc, setOwnerDesc] = useState('');
+  // Сколько из стартовых денег — личные вложения владельца (учитывается как «Внесено своих средств»)
+  const [ownerInitAmt, setOwnerInitAmt] = useState('');
 
   const fetchAccounts = async () => {
     try {
@@ -215,8 +217,21 @@ export default function Accounts() {
           if (!ir.queued && ir.data && ir.data[0]) setInitDoneId(ir.data[0].id);
         }
       }
-      setShowInit(false); setInitAmts({}); setNewAccs([]);
-      if (!anyQueued) await fetchAccounts();
+      // Личные вложения среди стартовых денег: фиксируем как «Взнос своих средств»
+      // (без привязки к счёту — баланс не меняется, деньги уже на счетах)
+      var oInit = parseFloat(ownerInitAmt) || 0;
+      if (oInit > 0) {
+        var oir = await supabase.from('transactions').insert({
+          user_id: user.id, account_id: null, type: 'income', amount: oInit,
+          description: 'Взнос своих денег (стартовый вклад)',
+          date: new Date().toISOString().split('T')[0],
+          kind: 'owner_deposit', category_id: null,
+        });
+        if (oir.error) throw oir.error;
+        if (oir.queued) anyQueued = true;
+      }
+      setShowInit(false); setInitAmts({}); setNewAccs([]); setOwnerInitAmt('');
+      if (!anyQueued) await fetchAccounts(); await fetchTx();
     } catch(err) {alert(err.message);}
   };
 
@@ -484,6 +499,12 @@ export default function Accounts() {
                 )}
               </div>
               )}
+              {/* Личные вложения среди стартовых денег */}
+              <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
+                <label>Из этих денег — ваши личные вложения?</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={ownerInitAmt} onChange={e=>setOwnerInitAmt(e.target.value)} />
+                <div style={{fontSize:'.74rem',color:'var(--muted)',marginTop:'.3rem'}}>Укажите сумму, которую вы лично вложили в бизнес раньше. Она будет учтена как «Внесено своих средств», но на баланс счетов и прибыль не повлияет. Можно оставить пустым.</div>
+              </div>
               <div className="modal-actions">
                 {sorted.filter(notInit).length > 0 && (<>
                   <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
@@ -491,6 +512,9 @@ export default function Accounts() {
                 </>)}
                 {sorted.filter(notInit).length === 0 && (
                   <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Закрыть</button>
+                )}
+                {sorted.filter(notInit).length === 0 && ownerInitAmt !== '' && (
+                  <button type="submit" className="btn btn-primary">Сохранить</button>
                 )}
               </div>
             </form>
