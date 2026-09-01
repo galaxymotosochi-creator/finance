@@ -366,7 +366,9 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: расход больше баланса — предупреждаем, что счёт уйдёт в минус
+              if(corType==='expense'){var cb=getBal(ac);if(amt>cb&&!window.confirm('Расход '+amt.toLocaleString()+' '+cur+' больше баланса счёта «'+ac.name+'» ('+Math.round(cb).toLocaleString()+' '+cur+'). Баланс уйдёт в минус. Продолжить?'))return;}
+              await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>>
               <div className="form-group">
                 <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>

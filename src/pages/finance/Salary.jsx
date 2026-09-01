@@ -80,20 +80,24 @@ export default function Salary() {
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
+  // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
+  const [accTxs, setAccTxs] = useState([]);
 
   const load = async () => {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const [salRes, empRes, accRes] = await Promise.all([
+      const [salRes, empRes, accRes, txRes] = await Promise.all([
         supabase.from('salary').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('employees').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         user ? supabase.from('accounts').select('*') : Promise.resolve({data:[]}),
+        user ? supabase.from('transactions').select('account_id,type,amount').eq('user_id', user.id) : Promise.resolve({data:[]}),
       ]);
       if (salRes.error) { alert('Ошибка загрузки: ' + salRes.error.message); setLoading(false); return; }
       if (salRes.data) setList(salRes.data);
       if (empRes.data) setEmployees(empRes.data);
       if (accRes.data) setAccs(accRes.data);
+      if (txRes.data) setAccTxs(txRes.data);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     setLoading(false);
   };
@@ -253,7 +257,12 @@ export default function Salary() {
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
-  const getAccountBalance = (a) => parseFloat(a.balance || a.initial_balance || 0);
+  // Реальный баланс счёта: начальный остаток + все движения (доходы минус расходы)
+  const getAccountBalance = (a) => {
+    var b = parseFloat(a.balance || a.initial_balance || 0);
+    (accTxs || []).forEach(t => { if (t.account_id === a.id) b += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
+    return b;
+  };
 
   const confirmPay = async (accId, splitAmts) => {
     try {
