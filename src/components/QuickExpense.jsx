@@ -58,7 +58,7 @@ export default function QuickExpense({ onClose }) {
         </div>
         <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',gap:'8px',marginTop:'14px'}}>
           <button type="button" className="btn btn-outline" onClick={onClose} style={{flex:1}}>Отмена</button>
-          <button type="button" className="btn btn-account-select" onClick={process} disabled={!amount || !payMode}
+          <button type="button" className="btn btn-dark" onClick={process} disabled={!amount || !payMode}
             style={{flex:1,opacity: (amount && payMode) ? 1 : 0.4}}>Добавить</button>
         </div>
       </div>

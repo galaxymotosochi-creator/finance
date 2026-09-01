@@ -313,7 +313,7 @@ export default function Positions() {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                <button type="submit" className="btn btn-dark">Сохранить</button>
               </div>
             </form>
       </Modal>

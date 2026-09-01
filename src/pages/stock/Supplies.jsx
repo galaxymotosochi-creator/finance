@@ -494,7 +494,7 @@ const load = async () => {
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);setEditId(null)}}>Отмена</button>
-            <button type="submit" className="btn btn-primary">Сохранить</button>
+            <button type="submit" className="btn btn-dark">Сохранить</button>
           </div>
         </form>
       </Modal>

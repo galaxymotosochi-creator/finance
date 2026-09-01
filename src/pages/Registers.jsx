@@ -1227,7 +1227,7 @@ if (loading) return <Loader />;
                 <textarea rows="2" value={addDesc} onChange={e => setAddDesc(e.target.value)} placeholder="Дополнительная информация..." />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Добавить</button>
+                <button type="submit" className="btn btn-dark">Добавить</button>
               </div>
             </form>
           </div>
@@ -1471,7 +1471,7 @@ if (loading) return <Loader />;
                 <input type="text" value={newClientNote2} onChange={e => setNewClientNote2(e.target.value)} placeholder="Номер ПТС, Telegram и т.д." />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-account-select">Добавить</button>
+                <button type="submit" className="btn btn-dark">Добавить</button>
               </div>
             </form>
           </div>

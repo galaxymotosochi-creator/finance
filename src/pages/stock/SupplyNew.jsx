@@ -281,7 +281,7 @@ export default function SupplyNew() {
                 if (!amt || amt <= 0) return showToast('Введите сумму');
                 setPayments(prev => [...prev, { amount: amt, method, date: new Date().toISOString() }]);
                 setShowPayPanel(false);
-              }} style={{ padding: '.45rem .9rem', background: '#fff', color: '#111', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
+              }} className="btn btn-dark" style={{ padding: '.45rem .9rem', borderRadius: 8, fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
             </div>
           </div>
         )}

@@ -487,7 +487,7 @@ export default function Accounts() {
               <div className="modal-actions">
                 {sorted.filter(notInit).length > 0 && (<>
                   <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
-                  <button type="submit" className="btn btn-primary">Сохранить</button>
+                  <button type="submit" className="btn btn-dark">Сохранить</button>
                 </>)}
                 {sorted.filter(notInit).length === 0 && (
                   <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Закрыть</button>

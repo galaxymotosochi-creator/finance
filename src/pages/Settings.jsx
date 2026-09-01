@@ -406,7 +406,7 @@ export default function Settings() {
               if (saveErr) throw saveErr;
               setToast('Настройки сохранены');
             } catch(e) { alert('Ошибка сохранения: ' + (e.message || 'неизвестная ошибка')); }
-          }} style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: 'none', background: '#ffdd2d', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: '#000' }}>Сохранить</button>
+          }} className="btn btn-dark" style={{ borderRadius: 'var(--radius-pill)', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Сохранить</button>
       </div>
     </div>
 
