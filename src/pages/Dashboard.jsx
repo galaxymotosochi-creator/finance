@@ -204,7 +204,7 @@ export default function Dashboard() {
       </div>
 
       {/* Свои деньги владельца — всегда видно, сколько внесено/выведено */}
-      <div style={{...sec,background:'linear-gradient(135deg,#eff6ff,#f0fdf4)'}}>
+      <div style={{...sec,background:'linear-gradient(135deg,#ffdd2d,#fff9db)'}}>
         <div style={st}>Свои деньги владельца</div>
         <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
           <div style={{flex:1,minWidth:'130px'}}>
