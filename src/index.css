@@ -130,7 +130,7 @@ body {
   border: none; border-radius: var(--radius-md);
 }
 .nav-parent:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
-.nav-parent.active { background: var(--sidebar-accent); color: #000; font-weight: 600; }
+.nav-parent.active { background: linear-gradient(135deg, #ffdd2d, #fff9db); color: #000; font-weight: 600; }
 .nav-parent .ic { width: 1.5rem; text-align: center; font-size: 1.1rem; line-height: 1; flex-shrink: 0; opacity: .6; }
 .nav-parent.active .ic { opacity: 1; }
 .nav-parent .arrow { margin-left: auto; font-size: .5rem; opacity: .4; transition: transform var(--transition); }
