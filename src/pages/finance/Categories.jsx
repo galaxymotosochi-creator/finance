@@ -192,7 +192,7 @@ export default function Categories() {
       </Modal>
       <Modal open={showConfirm} onClose={() => { setShowConfirm(false); setPendingDeleteId(null); }} title="Удалить категорию?" subtitle="Это действие нельзя отменить. Категория будет удалена навсегда." width="narrow"
         actions={<>
-          <button className="btn btn-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>Отмена</button>
+          <button type="button" className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteId(null)}}>Отмена</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
         </>}>
       </Modal>

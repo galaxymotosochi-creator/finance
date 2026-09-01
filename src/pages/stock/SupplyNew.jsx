@@ -402,7 +402,7 @@ export default function SupplyNew() {
 
         {/* Buttons */}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 14 }}>
-          <button className="btn btn-ghost" onClick={() => navigate('/stock/supplies')} style={{ fontFamily: 'inherit' }}>Отмена</button>
+          <button type="button" className="btn btn-outline" onClick={() => navigate('/stock/supplies')}>Отмена</button>
           <button onClick={save} disabled={saving}
             style={{
               padding: '.55rem 1.4rem', background: saving ? '#ccc' : '#fff', color: '#111', border: '1.5px solid var(--border)',

@@ -382,7 +382,7 @@ export default function Settings() {
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-        <button style={{ padding: '.5rem 1.5rem', borderRadius: 'var(--radius-pill)', border: '1.5px solid rgba(0,0,0,.12)', background: 'transparent', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => window.location.reload()}>Отмена</button>
+        <button type="button" className="btn btn-outline" onClick={() => window.location.reload()}>Отмена</button>
         <button onClick={async () => {
             localStorage.setItem('settings_company', JSON.stringify(company));
             localStorage.setItem('settings_country', country);

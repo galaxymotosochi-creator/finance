@@ -562,7 +562,7 @@ export default function Accounts() {
 
       <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle={pendingDeleteAc ? 'Счет «'+pendingDeleteAc.name+'» будет удален навсегда.' + ((parseFloat(pendingDeleteAc.balance)||0)>0 ? ' На счету '+(parseFloat(pendingDeleteAc.balance)||0).toLocaleString()+' ₽ — они исчезнут из учёта.' : '') : ''} width="narrow"
         actions={<>
-          <button className="btn btn-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
+          <button type="button" className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
         </>}>
       </Modal>

@@ -617,7 +617,7 @@ export default function Inventory() {
             </div>
 
             <div className="modal-actions" style={{flexShrink:0,marginTop:'.6rem'}}>
-              <button className="btn btn-ghost" onClick={cancelEdit}>Отмена</button>
+              <button type="button" className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
               <button className="btn btn-outline" onClick={saveDraft}>Отложить</button>
               <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
             </div>

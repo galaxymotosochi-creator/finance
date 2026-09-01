@@ -493,7 +493,7 @@ const load = async () => {
             </div>
           </div>
           <div className="modal-actions">
-            <button type="button" className="btn btn-ghost" onClick={()=>{setShowModal(false);setEditId(null)}}>Отмена</button>
+            <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);setEditId(null)}}>Отмена</button>
             <button type="submit" className="btn btn-primary">Сохранить</button>
           </div>
         </form>
@@ -521,8 +521,7 @@ const load = async () => {
               </div>
               <div style={{fontSize:'.76rem',color:'#222',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
               <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
-                <button type="button" onClick={()=>setShowStatusConfirm(null)}
-                  style={{padding:'8px 20px',borderRadius:'100px',border:'1.5px solid #ccc',background:'#fff',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+                <button type="button" className="btn btn-outline" onClick={()=>setShowStatusConfirm(null)}>Отмена</button>
                 <button type="button" onClick={confirmStatusChange}
                   style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
               </div>

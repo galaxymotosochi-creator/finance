@@ -481,7 +481,7 @@ export default function Employees() {
       {/* Модалка: нет прав */}
       <Modal open={showNoPermsConfirm} onClose={() => setShowNoPermsConfirm(false)} title="Доступ не настроен" subtitle="" width="narrow"
         actions={<>
-          <button className="btn btn-ghost" onClick={() => setShowNoPermsConfirm(false)} style={{fontFamily:'inherit'}}>Отмена</button>
+          <button type="button" className="btn btn-outline" onClick={() => setShowNoPermsConfirm(false)}>Отмена</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff',fontFamily:'inherit'}} onClick={async () => { setShowNoPermsConfirm(false); await doSave(); }}>Всё равно сохранить</button>
         </>}>
         <p style={{fontSize:'.85rem',color:'#555',lineHeight:1.5,margin:'.5rem 0'}}>

@@ -781,7 +781,7 @@ if (loading) return <Loader />;
               style={{width:'100%',padding:'.55rem',border:'1.5px solid '+(minPriceError?'#dc2626':'var(--border)'),borderRadius:10,fontSize:'1.1rem',textAlign:'center',letterSpacing:8,fontFamily:'inherit',outline:'none'}} placeholder="••••" />
             {minPriceError && <div style={{color:'#dc2626',fontSize:'.75rem',marginTop:6,textAlign:'center'}}>Неверный пин</div>}
             <div style={{display:'flex',gap:8,marginTop:14}}>
-              <button onClick={()=>setMinPriceConfirm(false)} style={{flex:1,padding:'.5rem',borderRadius:100,border:'1.5px solid var(--border)',background:'#fff',color:'#555',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+              <button type="button" className="btn btn-outline" onClick={()=>setMinPriceConfirm(false)} style={{flex:1}}>Отмена</button>
             </div>
           </div>
         </div>
@@ -1558,7 +1558,7 @@ if (loading) return <Loader />;
               <input type="number" value={transferBalance} onChange={e=>setTransferBalance(e.target.value)} min="0" step="0.01" style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit',boxSizing:'border-box'}} />
             </div>
             <div style={{marginTop:'12px',display:'flex',gap:'8px'}}>
-              <button onClick={() => setEditingCashier(false)} style={{flex:1,padding:'10px',borderRadius:'8px',border:'1px solid #ddd',background:'#fff',fontSize:'.80rem',fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>Отмена</button>
+              <button type="button" className="btn btn-outline" onClick={() => setEditingCashier(false)} style={{flex:1}}>Отмена</button>
               <button onClick={async () => {
                 const newEmpId = transferEmpId;
                 if (!newEmpId) { showToast('Выберите сотрудника', 'warning'); return; }
@@ -1623,7 +1623,7 @@ if (loading) return <Loader />;
               <span>{registerReceipts.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0).toLocaleString()} {cur}</span>
             </div>
             <div className="modal-actions">
-              <button className="btn btn-account-select" onClick={() => setShowReceiptsModal(false)}>Закрыть</button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowReceiptsModal(false)}>Закрыть</button>
             </div>
           </div>
         </div>
