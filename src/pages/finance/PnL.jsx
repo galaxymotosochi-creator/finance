@@ -117,6 +117,8 @@ export default function PnL() {
         const opByCat = {};
         let opTotal = 0;
         (expenses || []).forEach(t => {
+          // Взнос/вывод своих денег владельца — не операционный расход
+          if (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw') return;
           const cat = catMap[t.category_id];
           // Если категория указана, но не найдена или не операционная — пропускаем
           if (t.category_id) {

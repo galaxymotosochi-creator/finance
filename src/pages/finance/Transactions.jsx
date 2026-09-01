@@ -59,6 +59,11 @@ export default function Transactions() {
   const [expCategory, setExpCategory] = useState('');
   const [showActionSelect, setShowActionSelect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
+  const [showOwner, setShowOwner] = useState(false);
+  const [ownerMode, setOwnerMode] = useState('deposit');
+  const [ownerAcct, setOwnerAcct] = useState('');
+  const [ownerAmt, setOwnerAmt] = useState('');
+  const [ownerDesc, setOwnerDesc] = useState('');
   const [trFrom, setTrFrom] = useState('');
   const [trTo, setTrTo] = useState('');
   const [trAmt, setTrAmt] = useState('');
@@ -101,6 +106,14 @@ export default function Transactions() {
   var setTypeFilter = function(t) { setTypeFilterRaw(t); };
 
   const txs = transactions || [];
+
+  // Взнос/вывод своих денег собственника — двигает баланс счёта, но НЕ считается доходом/расходом
+  const isOwner = (t) => {
+    if (t && (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw')) return true;
+    const d = (t && t.description) || '';
+    return d.startsWith('Взнос своих денег') || d.startsWith('Вывод своих денег');
+  };
+
   // Фильтр по дате
   var dateFilter = function(tx) {
     if (period === 'all') return true;
@@ -111,7 +124,7 @@ export default function Transactions() {
     if (period === 'custom') return d >= periodFrom && d <= periodTo;
     return true;
   };
-  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || tx.type===typeFilter) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
+  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || (tx.type===typeFilter && !isOwner(tx))) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   var exportCsv = function(list) {
     // CSV разделяется запятыми — числа без разделителей тысяч (точка для дробной части), валюта по настройкам
@@ -140,9 +153,9 @@ export default function Transactions() {
     const catName = c ? c.name : '';
     return d.startsWith('Перевод со счета') || d.startsWith('Перевод на счет') || d.startsWith('Инкассация') || catName === 'Перевод между счетами' || catName === 'Инкассация';
   };
-  const incomeTotal = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-  const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t));
+  const incomeTotal = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expenseTotal = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
 
@@ -414,9 +427,9 @@ export default function Transactions() {
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                   <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
                   <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[1]||'').slice(0,5) : '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{isOwner(tx) ? <span style={{fontWeight:600}}>{tx.kind === 'owner_deposit' || (tx.description||'').startsWith('Взнос') ? '💰 ' : '🏦 '}{tx.description || '—'}</span> : (tx.description || '—')}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                   <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
-                    {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}
+                    {isOwner(tx) ? <span style={{color:'#2563eb'}}>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span> : <span>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span>}
                   </td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
@@ -468,6 +481,12 @@ export default function Transactions() {
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
               </button>
+              <button onClick={function(){setShowActionSelect(false);setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
+                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
+                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <div><div style={{fontWeight:600}}>💰 Взнос / вывод своих денег</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Личные деньги владельца — не влияют на прибыль</div></div>
+              </button>
             </div>
       </Modal>
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств со счета на счет" width="medium">
@@ -518,6 +537,56 @@ export default function Transactions() {
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary">Перевести</button>
+              </div>
+            </form>
+      </Modal>
+      {/* Модалка «Свои деньги владельца»: взнос/вывод — не влияет на прибыль */}
+      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Свои деньги владельца" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
+            <form onSubmit={async function(e){
+              e.preventDefault();
+              const amt = parseFloat(ownerAmt);
+              if (!amt || amt <= 0) return alert('Введите сумму');
+              const acct = accs.find(a => a.id === ownerAcct);
+              if (!acct) return alert('Выберите счёт');
+              try {
+                const isDeposit = ownerMode === 'deposit';
+                await add({
+                  user_id: user.id,
+                  account_id: acct.id,
+                  type: isDeposit ? 'income' : 'expense',
+                  amount: amt,
+                  description: (isDeposit ? 'Взнос своих денег' : 'Вывод своих денег') + (ownerDesc.trim() ? ' — ' + ownerDesc.trim() : ''),
+                  date: new Date().toISOString().split('T')[0],
+                  kind: isDeposit ? 'owner_deposit' : 'owner_withdraw',
+                  category_id: null,
+                });
+                setShowOwner(false); setOwnerAmt(''); setOwnerDesc('');
+                setToast((isDeposit ? 'Взнос' : 'Вывод') + ' своих денег: ' + amt.toLocaleString() + ' ' + cur);
+              } catch(err) { alert('Ошибка: ' + err.message); }
+            }}>
+              <div className="form-group">
+                <label>Операция</label>
+                <div style={{display:'flex',gap:'.5rem'}}>
+                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='deposit'?'var(--secondary)':'var(--border)'),background:ownerMode==='deposit'?'var(--secondary-light)':'transparent',color:ownerMode==='deposit'?'var(--secondary)':'#555'}}>💰 Взнос (доложить)</button>
+                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='withdraw'?'var(--secondary)':'var(--border)'),background:ownerMode==='withdraw'?'var(--secondary-light)':'transparent',color:ownerMode==='withdraw'?'var(--secondary)':'#555'}}>🏦 Вывод (забрать)</button>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Счёт</label>
+                <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Сумма ({cur})</label>
+                <input type="number" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} placeholder="0" autoFocus />
+              </div>
+              <div className="form-group">
+                <label>Комментарий (необязательно)</label>
+                <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>

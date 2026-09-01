@@ -45,8 +45,8 @@ const ACTION_MAP = {
       .eq('user_id', user.id)
       .gte('date', cutoff.toISOString().split('T')[0]);
     if (!txs || txs.length === 0) return '📭 Нет операций за этот период';
-    const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-    const expense = txs.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
+    const income = txs.filter(t => t.type === 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw').reduce((s, t) => s + Number(t.amount || 0), 0);
+    const expense = txs.filter(t => t.type !== 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw').reduce((s, t) => s + Number(t.amount || 0), 0);
     const profit = income - expense;
     const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
     return `📊 Отчёт за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ${cur}\n- Расходы: −${expense.toLocaleString()} ${cur}\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ${cur}`;
@@ -357,8 +357,8 @@ const ACTION_MAP = {
     if (p.category) query = query.ilike('category', `%${p.category}%`);
     const {data:txs} = await query.order('date',{ascending:false}).limit(limit);
     if (!txs || txs.length === 0) return '📭 Нет операций за выбранный период';
-    const totalIncome = txs.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount||0),0);
-    const totalExpense = txs.filter(t=>t.type!=='income').reduce((s,t)=>s+Number(t.amount||0),0);
+    const totalIncome = txs.filter(t=>t.type==='income'&&t.kind!=='owner_deposit'&&t.kind!=='owner_withdraw').reduce((s,t)=>s+Number(t.amount||0),0);
+    const totalExpense = txs.filter(t=>t.type!=='income'&&t.kind!=='owner_deposit'&&t.kind!=='owner_withdraw').reduce((s,t)=>s+Number(t.amount||0),0);
     let text = `💰 Операции за ${days===1?'сегодня':days===7?'неделю':days===30?'месяц':days+' дн.'}:\n`;
     txs.forEach(t => {
       const sign = t.type === 'income' ? '+' : '−';
@@ -375,8 +375,8 @@ const ACTION_MAP = {
     txs.forEach(t => {
       const m = (t.date||'').slice(0,7);
       if (!months[m]) months[m] = { income: 0, expense: 0 };
-      if (t.type === 'income') months[m].income += Number(t.amount||0);
-      else months[m].expense += Number(t.amount||0);
+      if (t.type === 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw') months[m].income += Number(t.amount||0);
+      else if (t.type !== 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw') months[m].expense += Number(t.amount||0);
     });
     const sorted = Object.entries(months).sort((a,b) => b[0].localeCompare(a[0])).slice(0, 6);
     let text = '📊 Сводка по месяцам:\n';
@@ -494,7 +494,7 @@ export default function AiChat() {
         const md = now.toISOString().slice(5,10);
         const bdays = (emps||[]).filter(() => false); // пока отключено
 
-        const sales = (txs||[]).filter(t => t.type==='income' && t.kind !== 'transfer' && t.kind !== 'collection' && !(t.description||'').startsWith('Перевод со счета') && !(t.description||'').startsWith('Перевод на счет') && !(t.description||'').startsWith('Инкассация')).reduce((s,t)=>s+Number(t.amount||0),0);
+        const sales = (txs||[]).filter(t => t.type==='income' && t.kind !== 'transfer' && t.kind !== 'collection' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw' && !(t.description||'').startsWith('Перевод со счета') && !(t.description||'').startsWith('Перевод на счет') && !(t.description||'').startsWith('Инкассация')).reduce((s,t)=>s+Number(t.amount||0),0);
         const recCount = (recs||[]).length;
         let greet = 'Доброе' + (now.getHours() < 12 ? ' утро' : now.getHours() < 18 ? ' день' : ' вечер') + '!';
         if (shift?.cashier_name && recCount > 0) {

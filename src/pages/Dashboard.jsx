@@ -100,7 +100,7 @@ export default function Dashboard() {
         const ac = (recs||[]).length>0 ? Math.round(tr/(recs||[]).length) : 0; // средний чек = выручка / число чеков
         const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
         const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
-        const ce={};(txs||[]).filter(t=>t.type==='expense').forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
+        const ce={};(txs||[]).filter(t=>t.type==='expense'&&!t.kind).forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
         const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear()).eq('month',now2.getMonth()+1);const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
         const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
         // Доп. данные
