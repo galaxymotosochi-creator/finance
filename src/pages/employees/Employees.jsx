@@ -473,7 +473,7 @@ export default function Employees() {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
+                <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
               </div>
             </form>
       </Modal>

@@ -188,7 +188,7 @@ export default function Suppliers() {
             <div className="form-group"></div>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Добавить'}</button>
+            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'Добавить'}</button>
           </div>
         </form>
       </Modal>

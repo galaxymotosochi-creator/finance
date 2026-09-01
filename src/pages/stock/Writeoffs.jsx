@@ -215,7 +215,7 @@ export default function Writeoffs() {
             </select>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-primary">{editId?'Сохранить':'Списать'}</button>
+            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'Списать'}</button>
           </div>
         </form>
       </Modal>

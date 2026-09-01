@@ -370,7 +370,7 @@ export default function Accounts() {
                 </div>
               )}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{editingId?'Сохранить':'Добавить'}</button>
+                <button type="submit" className="btn btn-dark">{editingId?'Сохранить':'Добавить'}</button>
               </div>
             </form>
       </Modal>

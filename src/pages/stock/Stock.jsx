@@ -423,7 +423,7 @@ export default function Stock() {
             </div>
 
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
-              <button className="btn btn-primary" onClick={saveInitialStock}>Сохранить остатки</button>
+              <button type="button" className="btn btn-dark" onClick={saveInitialStock}>Сохранить остатки</button>
             </div>
       </Modal>
     </>
