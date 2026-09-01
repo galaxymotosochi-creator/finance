@@ -131,7 +131,7 @@ body {
 }
 .nav-parent:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
 .nav-parent.active { background: linear-gradient(135deg, #ffdd2d, #fff9db); color: #000; font-weight: 600; }
-.nav-parent .ic { width: 1.5rem; text-align: center; font-size: 1.1rem; line-height: 1; flex-shrink: 0; opacity: .6; }
+.nav-parent .ic { width: 1.5rem; text-align: center; font-size: 1.1rem; line-height: 1; flex-shrink: 0; opacity: .6; display: inline-flex; align-items: center; justify-content: center; }
 .nav-parent.active .ic { opacity: 1; }
 .nav-parent .arrow { margin-left: auto; font-size: .5rem; opacity: .4; transition: transform var(--transition); }
 .nav-parent.open .arrow { transform: rotate(90deg); }
