@@ -267,7 +267,7 @@ export default function Stock() {
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={openInitialStock}>+ Ввести начальные остатки</button>
+          <button className="btn btn-dark" onClick={openInitialStock} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Ввести начальные остатки</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />

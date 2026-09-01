@@ -187,7 +187,7 @@ export default function Promos() {
     <>
       <div className="page-header">
         <div><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Акции</h1><div className="sub">Управление специальными предложениями и скидками</div></div>
-        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
+        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 

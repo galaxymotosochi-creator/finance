@@ -350,7 +350,7 @@ export default function Salary() {
     <>
       <div className="page-header">
         <div><h1>Зарплата</h1><div className="sub">Расчет начислений с привязкой к табелю</div></div>
-        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Начислить</button></div>
+        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Начислить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 

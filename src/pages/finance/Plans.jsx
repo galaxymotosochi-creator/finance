@@ -175,7 +175,7 @@ export default function Plans() {
           <div className="sub">Цели и бюджеты на {period === 'month' ? 'месяц' : period === 'quarter' ? 'квартал' : 'год'}</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={save} disabled={saving}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
+          <button className="btn btn-dark" onClick={save} disabled={saving} style={{padding:'.5rem .9rem',fontWeight:600}}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
         </div>
       </div>
 

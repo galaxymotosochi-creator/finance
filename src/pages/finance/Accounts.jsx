@@ -265,7 +265,7 @@ export default function Accounts() {
           </div>
           <div className="sub">Управление счетами и учет остатков</div>
         </div>
-        <div className="page-actions"><button className="btn-mint" onClick={openAdd} style={{background:'#111',color:'#fff',border:'none',borderRadius:'100px',padding:'.5rem .9rem',fontWeight:600,fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Добавить</button></div>
+        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 

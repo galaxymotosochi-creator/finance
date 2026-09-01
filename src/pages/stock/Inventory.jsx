@@ -431,7 +431,7 @@ export default function Inventory() {
           <div className="sub">Сверка фактических остатков с учетными</div>
         </div>
         <div className="page-actions">
-          <button className="btn-mint" onClick={startNew}>+ Добавить</button>
+          <button className="btn btn-dark" onClick={startNew} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
