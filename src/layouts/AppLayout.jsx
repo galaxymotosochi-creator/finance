@@ -20,9 +20,9 @@ export default function AppLayout({ children }) {
   <svg id="quick-icons" style="display:none"/>
   const actions = [
     { label: 'Продажа', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#999"/><circle cx="20" cy="21" r="1" fill="#999"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>', action: () => setShowSale(true) },
-    { label: 'Поставка', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="15" height="10" rx="1.5"/><polyline points="16 7 19 7 21 9 21 12 16 12"/><circle cx="5" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/><circle cx="15" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/></svg>', action: () => n('/stock/supplies?add=supply') },
-    { label: 'Доход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V4"/><path d="M12 20V10"/><path d="M6 20v-6"/></svg>', action: () => n('/finance/transactions?add=income') },
-    { label: 'Расход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 4V20"/><path d="M12 4V14"/><path d="M6 4v10"/></svg>', action: () => n('/finance/transactions?add=expense') },
+    { label: 'Поставка', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="19.5" r="1.5"/><circle cx="18.5" cy="19.5" r="1.5"/></svg>', action: () => n('/stock/supplies?add=supply') },
+    { label: 'Доход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', action: () => n('/finance/transactions?add=income') },
+    { label: 'Расход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>', action: () => n('/finance/transactions?add=expense') },
   ];
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
