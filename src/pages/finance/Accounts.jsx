@@ -231,7 +231,7 @@ export default function Accounts() {
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
             onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#2563eb',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
-            onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}>💰 Свои деньги</span>
+            onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}>Свои деньги</span>
         </div>
       </div>
 
@@ -247,7 +247,7 @@ export default function Accounts() {
             if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
             return (
               <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',marginLeft:'.6rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #dbeafe',borderRadius:'12px',flexWrap:'wrap'}}>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>💰 Внесено своих</span><span style={{fontSize:'1rem',fontWeight:800,color:'#2563eb'}}>+{oIn.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#2563eb'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#d97706'}}>-{oOut.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:(oIn-oOut)>=0?'#111':'#dc2626'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
               </div>
@@ -385,8 +385,8 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Операция</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
-                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='deposit'?'var(--secondary)':'var(--border)'),background:ownerMode==='deposit'?'var(--secondary-light)':'transparent',color:ownerMode==='deposit'?'var(--secondary)':'#555'}}>💰 Взнос (доложить)</button>
-                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='withdraw'?'var(--secondary)':'var(--border)'),background:ownerMode==='withdraw'?'var(--secondary-light)':'transparent',color:ownerMode==='withdraw'?'var(--secondary)':'#555'}}>🏦 Вывод (забрать)</button>
+                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='deposit'?'var(--secondary)':'var(--border)'),background:ownerMode==='deposit'?'var(--secondary-light)':'transparent',color:ownerMode==='deposit'?'var(--secondary)':'#555'}}>Взнос (доложить)</button>
+                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='withdraw'?'var(--secondary)':'var(--border)'),background:ownerMode==='withdraw'?'var(--secondary-light)':'transparent',color:ownerMode==='withdraw'?'var(--secondary)':'#555'}}>Вывод (забрать)</button>
                 </div>
               </div>
               <div className="form-group">
@@ -490,7 +490,7 @@ export default function Accounts() {
                         <tr key={t.id}>
                           <td style={{textAlign:'left',color:'#555'}}>{((t.date||t.created_at||'').split('T')[0]||'').split('-').reverse().join('.')}</td>
                           <td style={{textAlign:'left'}}>
-                            <span className="prod-name">{isOwnerTx ? (t.kind === 'owner_deposit' || (t.description||'').startsWith('Взнос') ? '💰 ' : '🏦 ') : ''}{t.description||'—'}</span>
+                            <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{isOwnerTx ? (t.type==='income'?'Взнос своих денег':'Вывод своих денег') : (t.type==='income'?'Доход':'Расход')}</span>
                           </td>
                           <td style={{textAlign:'left',color:isOwnerTx ? '#2563eb' : '#555'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>

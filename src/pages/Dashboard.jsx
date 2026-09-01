@@ -205,10 +205,10 @@ export default function Dashboard() {
 
       {/* Свои деньги владельца — всегда видно, сколько внесено/выведено */}
       <div style={{...sec,background:'linear-gradient(135deg,#eff6ff,#f0fdf4)'}}>
-        <div style={st}>💰 Свои деньги владельца</div>
+        <div style={st}>Свои деньги владельца</div>
         <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
           <div style={{flex:1,minWidth:'130px'}}>
-            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Внесено</div>
+            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Внесено своих средств</div>
             <div style={{fontSize:'1.05rem',fontWeight:800,color:'#2563eb'}}>+{Number(d.ownerIn||0).toLocaleString()} {cur}</div>
           </div>
           <div style={{flex:1,minWidth:'130px'}}>
