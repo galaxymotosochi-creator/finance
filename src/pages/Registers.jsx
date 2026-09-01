@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import useOptimisticSync from '../hooks/useOptimisticSync';
 import QuaggaInit from 'quagga';
 import { getCurrencySymbol } from '../lib/currency';
 import Loader from '../components/Loader';
@@ -132,6 +133,33 @@ export default function Registers({ fullscreen }) {
   const localName = getOwnerName();
   const userName = abbreviateName(ownerName || localName || user?.user_metadata?.full_name) || user?.email?.split('@')[0] || 'Кассир';
   const effectiveName = displayCashierName || userName || activeShift?.cashier_name || 'Кассир';
+
+  // Оптимистичная синхронизация: офлайн-чеки фиксируются в реестре — появятся в разделе «Чеки» сразу
+  useOptimisticSync({ table: 'receipts', onSynced: () => {} });
+  // Офлайн-клиенты, созданные в кассе, тоже фиксируются в реестре
+  useOptimisticSync({ table: 'clients', onSynced: () => {} });
+
+  // После синхронизации офлайн-очереди — обновляем смену, чеки смены, клиентов и остатки
+  useEffect(() => {
+    if (!user) return;
+    const onSync = async () => {
+      try {
+        const [sRes, clRes] = await Promise.all([
+          supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
+          supabase.from('clients').select('*').eq('user_id', user.id).order('name'),
+        ]);
+        if (sRes && sRes.data) {
+          setActiveShift(sRes.data);
+          const { data: sr } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', sRes.data.id);
+          setShiftReceipts(sr || []);
+        }
+        if (clRes && clRes.data) setClients(clRes.data);
+        recalcStockMap();
+      } catch (e) { /* не критично */ }
+    };
+    window.addEventListener('atlaspos:synced', onSync);
+    return () => window.removeEventListener('atlaspos:synced', onSync);
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -432,13 +460,15 @@ export default function Registers({ fullscreen }) {
 
     // Создаём чек
     var receiptId = null;
+    // Локальный id — при офлайне чек и его позиции уходят в очередь вместе и привяжутся друг к другу
+    var localReceiptId = Date.now();
     var clientObj = clients.find(c => c.id === selectedClient);
     // Формируем список товаров для items_json
     var receiptItemsNames = cart.map(function(item){
       return {name: item.name, qty: item.qty};
     });
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
-      user_id: user.id, receipt_number: receiptNum,
+      id: localReceiptId, user_id: user.id, receipt_number: receiptNum,
       date, total_amount: finalTotal, comment: receiptComment.trim() || null,
       discount_sum: cart.reduce((s, i) => s + (((i.price || 0) - (i.final_price || i.price || 0)) * i.qty), 0) + (receiptDiscountAmount || 0) + (loyaltyDiscountAmount || 0) + (loyaltyPointsAmount || 0),
       status: receiptStatus,
@@ -460,9 +490,14 @@ export default function Registers({ fullscreen }) {
       setProcessingPay(false);
       return;
     } else {
-      receiptId = newReceipt.id;
-      // Реальный номер от сервера (атомарный MAX+1) — чтобы транзакции/списания совпадали с чеком
-      receiptNum = newReceipt.receipt_number;
+      if (newReceipt.queued) {
+        // Офлайн: чек ушёл в очередь — используем локальный id и номер (сервер назначит настоящие при синхронизации)
+        receiptId = localReceiptId;
+      } else {
+        receiptId = newReceipt.id;
+        // Реальный номер от сервера (атомарный MAX+1) — чтобы транзакции/списания совпадали с чеком
+        receiptNum = newReceipt.receipt_number;
+      }
       // Сохраняем товары чека
       var receiptItems = [];
       cart.forEach(function(item) {

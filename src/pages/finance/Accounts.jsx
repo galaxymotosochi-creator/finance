@@ -1,5 +1,6 @@
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -97,6 +98,11 @@ export default function Accounts() {
 
   useEffect(() => { fetchAccounts(); fetchTx(); }, []);
 
+  // Оптимистичная синхронизация: счета и операции появляются сразу (с красной точкой), даже офлайн
+  const reloadAll = () => { fetchAccounts(); fetchTx(); };
+  useOptimisticSync({ table: 'accounts', setList: setAccounts, onSynced: reloadAll });
+  useOptimisticSync({ table: 'transactions', setList: setTransactions, onSynced: reloadAll });
+
   // Онбординг: показываем «Первоначальные остатки», пока у пользователя нет учтённых данных
   useEffect(() => {
     if (initDone && !loading) {
@@ -139,13 +145,12 @@ export default function Accounts() {
       if (editingId) {
         var up = await supabase.from('accounts').update({name:modalName.trim(), description:modalDesc.trim()||''}).eq('id',editingId);
         if (up.error) { alert(up.error.message); return; }
-        setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim(), description:modalDesc.trim()||''}:a));
+        if (!up.queued) setAccounts(p=>p.map(a=>a.id===editingId?{...a,name:modalName.trim(), description:modalDesc.trim()||''}:a));
       } else {
         var ins = await supabase.from('accounts').insert({user_id:user.id,name:modalName.trim(),type:modalType,balance:ib, description:modalDesc.trim()||''}).select();
         if (ins.error) { alert(ins.error.message); return; }
       }
-      await fetchAccounts();
-      await fetchTx();
+      if (!((up && up.queued) || (ins && ins.queued))) { await fetchAccounts(); await fetchTx(); }
       setShowModal(false); setEditingId(null);
     } catch(err) {alert(err.message);}
   };
@@ -164,9 +169,9 @@ export default function Accounts() {
     if (!pendingDeleteAc) return;
     setShowConfirm(false);
     try {
-      const { error } = await supabase.from('accounts').delete().eq('id', pendingDeleteAc.id);
+      const { error, queued } = await supabase.from('accounts').delete().eq('id', pendingDeleteAc.id);
       if (error) return setToast('⚠️ ' + error.message);
-      await fetchAccounts();
+      if (!queued) await fetchAccounts();
     } catch(err) { setToast('⚠️ ' + err.message); }
     setPendingDeleteAc(null);
   };

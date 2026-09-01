@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -69,6 +70,9 @@ export default function Timesheet() {
   };
 
   useEffect(() => { load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'timesheet_entries', setList: setEntries, onSynced: load });
 
   // Закрытие дропдаунов при клике вне
   useEffect(() => {
@@ -238,8 +242,8 @@ export default function Timesheet() {
   const deleteEntry = async (id) => {
     if (!confirm('Удалить запись?')) return;
     try {
-      await supabase.from('timesheet_entries').delete().eq('id', id);
-      await load();
+      const res = await supabase.from('timesheet_entries').delete().eq('id', id);
+      if (!res.queued) await load();
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
@@ -498,15 +502,16 @@ export default function Timesheet() {
             <div className="modal-actions">
               <button type="button" className="btn btn-primary" onClick={async () => {
                 setSaving(true);
+                let anyQueued = false;
                 try {
                   for (const empId of Object.keys(localStatuses)) {
                     const entry = entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(showDay));
                     if (entry) {
-                      await supabase.from('timesheet_entries').update({ status: localStatuses[empId] }).eq('id', entry.id);
+                      const r = await supabase.from('timesheet_entries').update({ status: localStatuses[empId] }).eq('id', entry.id); if (r.queued) anyQueued = true;
                     } else if (localStatuses[empId] && localStatuses[empId] !== 'present') {
                       // Создаём запись только если отметили нестандартный статус —
                       // иначе каждый «Сохранить» плодит «Работал» всем сотрудникам
-                      await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] });
+                      const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] }); if (r.queued) anyQueued = true;
                     }
                   }
                   // Бонусы: полная перезапись по сотрудникам дня (идемпотентно — повторное
@@ -516,14 +521,14 @@ export default function Timesheet() {
                   bonusRows.forEach(r => { if (r.empId && r.amount) { bonusByEmp[r.empId] = (bonusByEmp[r.empId]||0) + parseFloat(r.amount); if (r.comment) bonusComments[r.empId] = (bonusComments[r.empId] ? bonusComments[r.empId]+'; ' : '') + r.comment; } });
                   for (const [empId, amount] of Object.entries(bonusByEmp)) {
                     const { data: exB } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
-                    if (exB) await supabase.from('timesheet_entries').update({ bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }).eq('id', exB.id);
-                    else await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', bonus_amount: amount, bonus_comment: bonusComments[empId]||'' });
+                    if (exB) { const r = await supabase.from('timesheet_entries').update({ bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }).eq('id', exB.id); if (r.queued) anyQueued = true; }
+                    else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }); if (r.queued) anyQueued = true; }
                   }
                   // Обнуляем бонусы, если строки убрали из формы
                   const dayEntriesB = entries.filter(e => e.date && e.date.startsWith(showDay));
                   for (const e of dayEntriesB) {
                     if ((Number(e.bonus_amount)||0) > 0 && !bonusByEmp[e.employee_id]) {
-                      await supabase.from('timesheet_entries').update({ bonus_amount: 0, bonus_comment: '' }).eq('id', e.id);
+                      const r = await supabase.from('timesheet_entries').update({ bonus_amount: 0, bonus_comment: '' }).eq('id', e.id); if (r.queued) anyQueued = true;
                     }
                   }
                   // Штрафы: так же — полная перезапись
@@ -532,16 +537,16 @@ export default function Timesheet() {
                   deductRows.forEach(r => { if (r.empId && r.amount) { deductByEmp[r.empId] = (deductByEmp[r.empId]||0) + parseFloat(r.amount); if (r.comment) deductComments[r.empId] = (deductComments[r.empId] ? deductComments[r.empId]+'; ' : '') + r.comment; } });
                   for (const [empId, amount] of Object.entries(deductByEmp)) {
                     const { data: exD } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
-                    if (exD) await supabase.from('timesheet_entries').update({ deduct_amount: amount, deduct_comment: deductComments[empId]||'' }).eq('id', exD.id);
-                    else await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', deduct_amount: amount, deduct_comment: deductComments[empId]||'' });
+                    if (exD) { const r = await supabase.from('timesheet_entries').update({ deduct_amount: amount, deduct_comment: deductComments[empId]||'' }).eq('id', exD.id); if (r.queued) anyQueued = true; }
+                    else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', deduct_amount: amount, deduct_comment: deductComments[empId]||'' }); if (r.queued) anyQueued = true; }
                   }
                   const dayEntriesD = entries.filter(e => e.date && e.date.startsWith(showDay));
                   for (const e of dayEntriesD) {
                     if ((Number(e.deduct_amount)||0) > 0 && !deductByEmp[e.employee_id]) {
-                      await supabase.from('timesheet_entries').update({ deduct_amount: 0, deduct_comment: '' }).eq('id', e.id);
+                      const r = await supabase.from('timesheet_entries').update({ deduct_amount: 0, deduct_comment: '' }).eq('id', e.id); if (r.queued) anyQueued = true;
                     }
                   }
-                  await load();
+                  if (!anyQueued) await load();
                   setShowDay(null);
                 } catch (err) { alert('Ошибка: ' + err.message); }
                 setSaving(false);

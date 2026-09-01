@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -46,6 +47,9 @@ export default function Clients() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'clients', setList: setClientsState, onSynced: load });
+
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
     setFBirthday(''); setFComment(''); setFNote1(''); setFNote2(''); setFLoyalty('auto'); setShow(true);
@@ -65,19 +69,20 @@ export default function Clients() {
     try {
       var saveComment = fNote1 || fNote2 ? JSON.stringify({n1:fNote1.trim(), n2:fNote2.trim()}) : (fComment.trim() || null);
       if (editId) {
-        const { error } = await supabase.from('clients').update({
+        const { error, queued } = await supabase.from('clients').update({
           name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
           birthday: fBirthday || null, comment: saveComment, loyalty_mode: fLoyalty
         }).eq('id', editId);
         if (error) throw error;
+        if (!queued) await load();
       } else {
-        const { error } = await supabase.from('clients').insert({
+        const { error, queued } = await supabase.from('clients').insert({
           user_id: user.id, name: fName.trim(), phone: fPhone.trim(), email: fEmail.trim(),
           birthday: fBirthday || null, comment: saveComment, loyalty_mode: fLoyalty
         });
         if (error) throw error;
+        if (!queued) await load();
       }
-      await load();
       setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -85,9 +90,9 @@ export default function Clients() {
   const remove = async (id) => {
     if (!confirm('Удалить клиента?')) return;
     try {
-      const { error } = await supabase.from('clients').delete().eq('id', id);
+      const { error, queued } = await supabase.from('clients').delete().eq('id', id);
       if (error) return alert('' + error.message);
-      await load();
+      if (!queued) await load();
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
@@ -195,6 +200,7 @@ export default function Clients() {
                   <td style={{textAlign:'left'}}>
                     <div className="prod-name">
                       {c.name}
+                      {c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
                       {isBday && <span style={{color:'#ec4899',fontSize:'.65rem',marginLeft:'.35rem'}}>🎂</span>}
                     </div>
                     <div className="prod-sku">{c.email || ''}</div>

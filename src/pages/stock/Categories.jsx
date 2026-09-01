@@ -3,6 +3,7 @@ import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import Loader from '../../components/Loader';
 
 export default function Categories() {
@@ -29,6 +30,9 @@ export default function Categories() {
   };
 
   useEffect(() => { if (user) load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'stock_categories', setList: setCats, onSynced: load });
 
   // Миграция старых данных из localStorage
   useEffect(() => {
@@ -74,28 +78,31 @@ export default function Categories() {
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
+    let queued = false;
     if (editId) {
-      const { error } = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType }).eq('id', editId);
-      if (error) return alert(error.message);
+      const res = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType }).eq('id', editId);
+      if (res.error) return alert(res.error.message);
+      queued = res.queued;
     } else {
-      const { error } = await supabase.from('stock_categories').insert({
+      const res = await supabase.from('stock_categories').insert({
         id: Date.now(),
         user_id: user.id,
         name: fName.trim(),
         type: fType
       });
-      if (error) return alert(error.message);
+      if (res.error) return alert(res.error.message);
+      queued = res.queued;
     }
-    await load();
+    if (!queued) await load();
     setShowModal(false);
     if (!editId) setToast('Категория успешно добавлена!');
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить категорию?')) return;
-    const { error } = await supabase.from('stock_categories').delete().eq('id', id);
+    const { error, queued } = await supabase.from('stock_categories').delete().eq('id', id);
     if (error) return alert(error.message);
-    await load();
+    if (!queued) await load();
   };
 
   if (loading) return <Loader />;
@@ -159,7 +166,7 @@ export default function Categories() {
               </tr>
             ) : cats.map(c => (
               <tr key={c.id}>
-                <td style={{textAlign:'left'}}><div className="prod-name">{c.name}</div></td>
+                <td style={{textAlign:'left'}}><div className="prod-name">{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                 <td style={{textAlign:'left'}}><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">

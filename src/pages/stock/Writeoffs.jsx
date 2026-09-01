@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
@@ -41,6 +42,9 @@ export default function Writeoffs() {
   };
 
   useEffect(() => { if (user) load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'writeoffs', setList: setList, onSynced: load });
 
   useEffect(() => {
     if (!user || list.length > 0) return;
@@ -102,21 +106,24 @@ export default function Writeoffs() {
     // Себестоимость — средняя из поставок/начальных остатков (раньше бралась розничная цена!)
     const cost = data.avgCost || 0;
 
+    let queued = false;
     if (editId) {
-      const { error } = await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
-      if (error) return alert('Ошибка: ' + error.message);
+      const res = await supabase.from('writeoffs').update({ product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate }).eq('id', editId);
+      if (res.error) return alert('Ошибка: ' + res.error.message);
+      queued = res.queued;
     } else {
-      const { error } = await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
-      if (error) return alert('Ошибка: ' + error.message);
+      const res = await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
+      if (res.error) return alert('Ошибка: ' + res.error.message);
+      queued = res.queued;
     }
-    await load(); setShow(false);
+    if (!queued) await load(); setShow(false);
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить списание?')) return;
-    const { error } = await supabase.from('writeoffs').delete().eq('id', id);
+    const { error, queued } = await supabase.from('writeoffs').delete().eq('id', id);
     if (error) return alert('Ошибка удаления: ' + error.message);
-    await load();
+    if (!queued) await load();
   };
 
   if (loading) return <Loader />;
@@ -152,7 +159,7 @@ export default function Writeoffs() {
                     <p style={{color:'#555',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
             ) : list.map(w => (
               <tr key={w.id}>
-                <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}</div></td>
+                <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}{w.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                 <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{w.quantity}</td>
                 <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}><span className="num">{(w.quantity * (w.cost||0)).toLocaleString()} {cur}</span></td>
                 <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}><span className="prod-cat">{w.reason||'—'}</span></td>

@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import Loader from '../../components/Loader';
 
 const dirTypeLabels = {
@@ -47,6 +48,9 @@ export default function Categories() {
 
   useEffect(() => { if (user) fetch(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'categories', setList: setList, onSynced: fetch });
+
   const openModal = (cat) => {
     if (cat) {
       setEditingId(cat.id);
@@ -75,7 +79,7 @@ export default function Categories() {
       setEditingId(null);
       setDirName('');
       setDirType('income');
-      await fetch();
+      if (!res.queued) await fetch();
     } catch (err) { setToast('⚠️ ' + err.message); }
   };
 
@@ -96,14 +100,14 @@ export default function Categories() {
         setPendingDeleteId(null);
         return;
       }
-      const { error } = await supabase.from('categories').delete().eq('id', pendingDeleteId).eq('user_id', user.id);
+      const { error, queued } = await supabase.from('categories').delete().eq('id', pendingDeleteId).eq('user_id', user.id);
       if (error) {
         if ((error.code === '23503') || (error.message && error.message.includes('foreign key'))) {
           setToast('⚠️ Эта категория используется в транзакциях. Сначала переназначьте транзакции на другую категорию');
         } else { setToast('⚠️ ' + error.message); }
         return;
       }
-      await fetch();
+      if (!queued) await fetch();
     } catch (err) { setToast('⚠️ ' + err.message); }
     setPendingDeleteId(null);
   };
@@ -147,7 +151,7 @@ export default function Categories() {
             {list.map(function (c) {
               return (
                 <tr key={c.id}>
-                  <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}</div></td>
+                  <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
                   <td style={{textAlign:'center',width:'30px'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>

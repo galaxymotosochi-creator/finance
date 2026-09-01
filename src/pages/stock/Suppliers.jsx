@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -36,6 +37,9 @@ export default function Suppliers() {
 
   useEffect(() => { if (user) load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'suppliers', setList: setSuppliersState, onSynced: load });
+
   useEffect(() => {
     if (!user || suppliers.length > 0) return;
     const old = JSON.parse(localStorage.getItem('suppliers88') || '[]');
@@ -68,21 +72,24 @@ export default function Suppliers() {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
     const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contact_method: fMethod };
+    let queued = false;
     if (editId) {
-      const { error } = await supabase.from('suppliers').update(obj).eq('id', editId);
-      if (error) return alert(error.message);
+      const res = await supabase.from('suppliers').update(obj).eq('id', editId);
+      if (res.error) return alert(res.error.message);
+      queued = res.queued;
     } else {
-      const { error } = await supabase.from('suppliers').insert({ ...obj, id: Date.now(), user_id: user.id });
-      if (error) return alert(error.message);
+      const res = await supabase.from('suppliers').insert({ ...obj, id: Date.now(), user_id: user.id });
+      if (res.error) return alert(res.error.message);
+      queued = res.queued;
     }
-    await load(); setShowModal(false);
+    if (!queued) await load(); setShowModal(false);
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить поставщика?')) return;
-    const { error } = await supabase.from('suppliers').delete().eq('id', id);
+    const { error, queued } = await supabase.from('suppliers').delete().eq('id', id);
     if (error) return alert(error.message);
-    await load();
+    if (!queued) await load();
   };
 
   if (loading) return <Loader />;
@@ -124,7 +131,7 @@ export default function Suppliers() {
               const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}</div></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}>{s.phone||'—'}</td>
                   <td style={{textAlign:'left',color:'#555'}}><span className="prod-cat">{label}</span></td>

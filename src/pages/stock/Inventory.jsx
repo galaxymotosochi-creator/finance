@@ -3,6 +3,7 @@ import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode, beep } from '../../lib/barcodeScanner';
@@ -47,8 +48,7 @@ export default function Inventory() {
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [employees, setEmployees] = useState([]);  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [viewing, setViewing] = useState(null);
   const [showResult, setShowResult] = useState(null);
@@ -112,6 +112,9 @@ export default function Inventory() {
   
   useEffect(() => { if (user) load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'inventory', setList: setList, onSynced: load });
+
   const migrate = async () => {
     const old = JSON.parse(localStorage.getItem('inventory88') || '[]');
     if (old.length > 0) {
@@ -148,16 +151,16 @@ export default function Inventory() {
       responsible: '', status: 'draft', items,
       totals: { totalBefore, totalAfter: totalBefore, shortage: 0, surplus: 0, result: 0 }
     };
-    const { error } = await supabase.from('inventory').insert({ id: doc.id, user_id: user.id, number: doc.number, date: doc.date, status: doc.status, items: doc.items, result: JSON.stringify(doc.totals) });
+    const { error, queued } = await supabase.from('inventory').insert({ id: doc.id, user_id: user.id, number: doc.number, date: doc.date, status: doc.status, items: doc.items, result: JSON.stringify(doc.totals) });
     if (error) return alert('Ошибка: ' + error.message);
-    await load(); setEditing(doc);
+    if (!queued) await load(); setEditing(doc);
   };
 
   const cancelEdit = async () => {
     if (showResult) { setShowResult(null); setEditing(null); await load(); return; }
     if (editing) {
       if (!confirm('Удалить черновик ' + editing.number + '? Введённые данные пропадут.')) return;
-      await supabase.from('inventory').delete().eq('id', editing.id); await load();
+      const delRes = await supabase.from('inventory').delete().eq('id', editing.id); if (!delRes.queued) await load();
     }
     setEditing(null);
   };
@@ -165,9 +168,9 @@ export default function Inventory() {
   // «Отложить» — сохранить черновик и закрыть (можно продолжить позже)
   const saveDraft = async () => {
     if (!editing) return;
-    const { error } = await supabase.from('inventory').update({ items: editing.items }).eq('id', editing.id);
+    const { error, queued } = await supabase.from('inventory').update({ items: editing.items }).eq('id', editing.id);
     if (error) return alert('Ошибка: ' + error.message);
-    setEditing(null); await load();
+    setEditing(null); if (!queued) await load();
   };
 
   // Открыть черновик/документ для продолжения редактирования
@@ -372,11 +375,11 @@ export default function Inventory() {
 
   const remove = async (id) => {
     if (!confirm('Удалить инвентаризацию?')) return;
-    const { error } = await supabase.from('inventory').delete().eq('id', id);
+    const { error, queued } = await supabase.from('inventory').delete().eq('id', id);
     if (error) return alert('Ошибка удаления: ' + error.message);
     if (viewing?.id === id) setViewing(null);
     if (editing?.id === id) setEditing(null);
-    await load();
+    if (!queued) await load();
   };
 
   if (loading) return <Loader />;
@@ -492,7 +495,7 @@ export default function Inventory() {
               return (
                 <tr key={inv.id}>
                   <td style={{textAlign:'left'}}>
-                    <div className="prod-name">{inv.number}</div>
+                    <div className="prod-name">{inv.number}{inv.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div>
                     <span style={{display:'inline-block',padding:'.15rem .5rem',borderRadius:'100px',fontSize:'.68rem',fontWeight:600,background:isDraft ? '#fef3c7' : '#dcfce7',color:isDraft ? '#b45309' : '#16a34a',marginTop:'.2rem'}}>
                       {isDraft ? 'Черновик' : 'Проведена'}
                     </span>

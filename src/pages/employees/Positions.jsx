@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import Loader from '../../components/Loader';
 
 const ALL_SECTIONS = [
@@ -98,6 +99,9 @@ export default function Positions() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'position_templates', setList: setPositionsState, onSynced: load });
+
   const openAdd = () => {
     setEditId(null); setFName(''); setFPermissions([]); setFSalary(''); setFBonusType('percent'); setFBonusValue(''); setExpanded({});
     setShow(true);
@@ -137,14 +141,17 @@ export default function Positions() {
         bonus_type: fBonusType,
         bonus_value: parseFloat(fBonusValue) || 0,
       };
+      let queued = false;
       if (editId) {
-        const { error } = await supabase.from('position_templates').update(obj).eq('id', editId);
-        if (error) throw error;
+        const res = await supabase.from('position_templates').update(obj).eq('id', editId);
+        if (res.error) throw res.error;
+        queued = res.queued;
       } else {
-        const { error } = await supabase.from('position_templates').insert(obj);
-        if (error) throw error;
+        const res = await supabase.from('position_templates').insert(obj);
+        if (res.error) throw res.error;
+        queued = res.queued;
       }
-      await load();
+      if (!queued) await load();
       setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
@@ -152,9 +159,9 @@ export default function Positions() {
   const remove = async (id) => {
     if (!confirm('Удалить должность?')) return;
     try {
-      const { error } = await supabase.from('position_templates').delete().eq('id', id);
+      const { error, queued } = await supabase.from('position_templates').delete().eq('id', id);
       if (error) return alert('' + error.message);
-      await load();
+      if (!queued) await load();
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
@@ -245,7 +252,7 @@ export default function Positions() {
               {positions.map(p => (
                 <tr key={p.id}>
                   <td style={{textAlign:'left',paddingLeft:0,color:'#555'}}>
-                    <span className="prod-name">{p.name}</span>
+                    <span className="prod-name">{p.name}{p.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span>
                   </td>
                   <td style={{textAlign:'left',color:'#555'}}>{formatPermissions(p)}</td>
                   <td style={{whiteSpace:'nowrap'}}>

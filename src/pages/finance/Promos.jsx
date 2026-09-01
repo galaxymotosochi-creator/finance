@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 
 
@@ -38,6 +39,9 @@ export default function Promos() {
     try { const { data: prData } = await supabase.from('products').select('*').eq('user_id', user.id).order('name'); if (prData) setProducts(prData); } catch(e) {}
   };
   useEffect(() => { if (user) load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'promos', setList: setPromos, onSynced: load });
 
   useEffect(() => {
     const handler = (e) => {
@@ -126,25 +130,28 @@ export default function Promos() {
       status: 'active', conditions
     };
     try {
+      let queued = false;
       if (editId) {
-        const { error } = await supabase.from('promos').update(data).eq('id', editId);
-        if (error) return alert(error.message);
+        const res = await supabase.from('promos').update(data).eq('id', editId);
+        if (res.error) return alert(res.error.message);
+        queued = res.queued;
       } else {
-        const { error } = await supabase.from('promos').insert(data);
-        if (error) return alert(error.message);
+        const res = await supabase.from('promos').insert(data);
+        if (res.error) return alert(res.error.message);
+        queued = res.queued;
       }
       setEditId(null);
       setShow(false);
-      load();
+      if (!queued) load();
       setToast(editId ? 'Акция успешно сохранена!' : 'Акция успешно добавлена!');
     } catch (err) { alert(err.message); }
   };
 
   const del = async (id) => {
     if (!confirm('Удалить акцию?')) return;
-    const { error } = await supabase.from('promos').delete().eq('id', id);
+    const { error, queued } = await supabase.from('promos').delete().eq('id', id);
     if (error) return alert(error.message);
-    load();
+    if (!queued) load();
   };
 
   const loadStats = async (promo) => {

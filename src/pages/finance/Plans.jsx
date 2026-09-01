@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import Loader from '../../components/Loader';
 
 const TARGET_LABELS = {
@@ -47,8 +48,7 @@ export default function Plans() {
 
   const load = async () => {
     setLoading(true);
-    try {
-      let q = supabase.from('plans').select('*')
+    try {      let q = supabase.from('plans').select('*')
         .eq('user_id', user.id).eq('period', period).eq('year', year);
       // Фильтруем по конкретному месяцу/кварталу, чтобы план прошлого месяца
       // не подхватывался как текущий и не перезаписывался
@@ -80,6 +80,9 @@ export default function Plans() {
   };
 
   useEffect(() => { if (user) load(); }, [user, period]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'plans', setList: setPlans, onSynced: load });
 
   const switchPeriod = (k) => {
     if (k === period) return;
@@ -150,9 +153,11 @@ export default function Plans() {
       const errs = results.filter(r => r && r.error);
       if (errs.length) throw errs[0].error;
 
+      // Офлайн: планы ушли в очередь — показываем сохранённое сразу
+      const anyQueued = results.some(r => r && r.queued);
       showToast('Планы успешно сохранены!');
       setDirty(false);
-      await load();
+      if (!anyQueued) await load();
     } catch (e) {
       showToast('Ошибка сохранения: ' + (e.message || 'неизвестная ошибка'), true);
     } finally {

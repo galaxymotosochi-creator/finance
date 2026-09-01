@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -56,6 +57,9 @@ export default function Loyalty() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'loyalty_programs', setList: setAllProgs, onSynced: load });
+
   const selectCard = (i) => {
     setIdx(i);
     const ap = allProgs;
@@ -97,14 +101,17 @@ export default function Loyalty() {
         description: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+' ₽':'')),
         color:'#1983dd', bg:'#eaf5ff'
       };
+      let queued = false;
       if (editId) {
-        const { error } = await supabase.from('loyalty_programs').update(obj).eq('id', editId);
-        if (error) throw error;
+        const res = await supabase.from('loyalty_programs').update(obj).eq('id', editId);
+        if (res.error) throw res.error;
+        queued = res.queued;
       } else {
-        const { error } = await supabase.from('loyalty_programs').insert(obj);
-        if (error) throw error;
+        const res = await supabase.from('loyalty_programs').insert(obj);
+        if (res.error) throw res.error;
+        queued = res.queued;
       }
-      await load();
+      if (!queued) await load();
       if (allProgs.length > 0) selectCard(0);
       setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
@@ -114,9 +121,9 @@ export default function Loyalty() {
     if (LD_IDS.has(id)) { alert('Встроенную программу нельзя удалить'); return; }
     if (!confirm('Удалить программу "'+(allProgs.find(p=>p.id===id)?.name||'')+'"?')) return;
     try {
-      const { error } = await supabase.from('loyalty_programs').delete().eq('id', id);
+      const { error, queued } = await supabase.from('loyalty_programs').delete().eq('id', id);
       if (error) throw error;
-      await load();
+      if (!queued) await load();
       setIdx(0);
     } catch (err) { alert('Ошибка удаления: ' + err.message); }
   };

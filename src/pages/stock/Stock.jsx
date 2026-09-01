@@ -102,6 +102,13 @@ export default function Stock() {
 
   useEffect(() => { if (user) load(); }, [user]);
 
+  // После синхронизации офлайн-очереди — пересчитываем остатки с сервера
+  useEffect(() => {
+    const onSynced = () => { if (user) load(); };
+    window.addEventListener('atlaspos:synced', onSynced);
+    return () => window.removeEventListener('atlaspos:synced', onSynced);
+  }, [user]);
+
   useEffect(() => {
     if (toast) {
       const t = setTimeout(() => setToast(null), 1800);
@@ -199,11 +206,20 @@ export default function Stock() {
       alert('Введите количество хотя бы для одного товара');
       return;
     }
-    const { error } = await supabase.from('initial_stocks').upsert({ user_id: user.id, items: filtered, costs: filteredCosts, done: true }).eq('user_id', user.id);
+    const { error, queued } = await supabase.from('initial_stocks').upsert({ user_id: user.id, items: filtered, costs: filteredCosts, done: true }).eq('user_id', user.id);
     if (!error) {
       // Синхронизируем и в localStorage, чтобы повторное открытие показывало сохранённые значения
       setInitialStock({ items: filtered, costs: filteredCosts, done: true });
-      setShowInitModal(false); await load(); setToast('Начальные остатки сохранены');
+      setShowInitModal(false);
+      if (queued) {
+        // Офлайн: показываем новые остатки сразу (пересчёт по локальным данным)
+        const init = { user_id: user.id, items: filtered, costs: filteredCosts, done: true };
+        setInitialCache(init);
+        setStockMap(buildStockMap(suppliesCache, init, []));
+        setToast('Начальные остатки сохранены (ждёт синхронизации)');
+      } else {
+        await load(); setToast('Начальные остатки сохранены');
+      }
     }
     else alert(error.message);
   };

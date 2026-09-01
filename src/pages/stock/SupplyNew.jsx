@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
@@ -11,6 +12,9 @@ export default function SupplyNew() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Офлайн-поставка фиксируется в реестре — на странице списка появится сразу с красной точкой
+  useOptimisticSync({ table: 'supplies', onSynced: () => {} });
 
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);

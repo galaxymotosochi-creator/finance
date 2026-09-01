@@ -6,6 +6,24 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.anon';
 let currentSession = null;
 let authListeners = [];
 
+// ===== Оптимистичные мутации: событие для всех страниц =====
+// После любой успешной мутации (в т.ч. ушедшей в офлайн-очередь) сообщаем
+// страницам, чтобы они могли сразу показать запись (с пометкой «ждёт синхронизации»).
+function emitMutation(table, method, body, queued, data, id) {
+  try {
+    window.dispatchEvent(new CustomEvent('atlaspos:mutated', {
+      detail: { table, method, body, queued, data, id },
+    }));
+  } catch (e) { /* событие не критично */ }
+}
+
+// Извлекает id из параметров вида 'id=eq.XXX' (PATCH/DELETE)
+function paramId(params) {
+  const p = (params || []).find(function (x) { return x.startsWith('id=eq.'); });
+  if (!p) return null;
+  try { return decodeURIComponent(p.split('=')[1].replace('eq.', '')); } catch (e) { return null; }
+}
+
 class PostgrestFilter {
   constructor(url, headers, method = 'GET', body = null) {
     this.url = url;
@@ -112,7 +130,10 @@ class PostgrestFilter {
         if (!res.ok) return { data: null, error: new Error('HTTP ' + res.status) };
         const d = await res.json();
         const pData = Array.isArray(d) ? d : [d];
-        return { data: this.limitVal === 1 ? (pData[0] || null) : pData, error: null };
+        // Офлайн: SW отвечает {ok:true, queued:true} — запись ушла в очередь
+        const queued = !!(pData[0] && pData[0].queued === true);
+        emitMutation(this.url.split('/').pop(), 'POST', this.body, queued, pData, null);
+        return { data: this.limitVal === 1 ? (pData[0] || null) : pData, error: null, queued };
       } else if (this.method === 'PATCH') {
         headers['Prefer'] = 'return=representation';
         // Извлекаем id=eq.XXX из params и переносим в URL
@@ -132,7 +153,10 @@ class PostgrestFilter {
         if (!res.ok) return { data: null, error: new Error('HTTP ' + res.status) };
         let d = null;
         try { d = await res.json(); } catch(e) {}
-        return { data: d, error: null };
+        let queued = false;
+        if (d && (d.queued === true || (Array.isArray(d) && d[0] && d[0].queued === true))) queued = true;
+        emitMutation(this.url.split('/').pop(), 'PATCH', this.body, queued, d, paramId(this.params));
+        return { data: d, error: null, queued };
       } else if (this.method === 'DELETE') {
         // Извлекаем id=eq.XXX из params и переносим в URL (как в PATCH),
         // иначе сервер (маршрут /api/:table/:id) отвечает 404 и удаление молча не работает
@@ -143,8 +167,13 @@ class PostgrestFilter {
           delUrl = this.url + '/' + delIdVal;
         }
         res = await fetch(delUrl, { method: 'DELETE', headers });
+        let queued = false;
+        if (res.status === 200) {
+          try { const j = await res.json(); queued = !!(j && j.queued === true); } catch(e) {}
+        }
         if (!res.ok && res.status !== 204) return { data: null, error: new Error('HTTP ' + res.status) };
-        return { data: null, error: null };
+        emitMutation(this.url.split('/').pop(), 'DELETE', this.body, queued, null, delIdParam ? delIdVal : null);
+        return { data: null, error: null, queued };
       }
     } catch(e) {
       return { data: null, error: e };

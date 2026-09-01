@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -68,6 +69,9 @@ export default function Receipts() {
   };
 
   useEffect(() => { load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-чеки появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'receipts', setList: setReceipts, onSynced: load });
 
   // Close period dropdown on outside click
   useEffect(() => {
@@ -140,8 +144,7 @@ export default function Receipts() {
       const newPaid = (Number(payReceipt.paid_amount)||0) + amt;
       const newStatus = newPaid >= Number(payReceipt.total_amount) ? 'paid' : 'partially_paid';
       const updRes = await supabase.from('receipts').update({ status: newStatus, paid_amount: newPaid }).eq('id', payReceipt.id);
-      if (updRes.error) throw updRes.error;
-      // Транзакция оплаты долга
+      if (updRes.error) throw updRes.error;      // Транзакция оплаты долга
       const txRes = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: amt,
         description: 'Оплата долга по чеку № ' + payReceipt.receipt_number,
@@ -155,7 +158,7 @@ export default function Receipts() {
         await supabase.from('clients').update({ debt: (parseFloat(cl?.debt)||0) + amt }).eq('id', payReceipt.client_id);
       }
       setPayReceipt(null); setPayAc(''); setPayAmt('');
-      await load();
+      if (!updRes.queued) await load();
       setToast('Долг по чеку № ' + payReceipt.receipt_number + ' оплачен: ' + amt.toLocaleString() + ' ₽');
     } catch (err) { alert(err.message); }
   };
@@ -259,7 +262,7 @@ export default function Receipts() {
                 style={{ cursor: 'pointer', transition: 'background .1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
-                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}</td>
+                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>

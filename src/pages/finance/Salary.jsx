@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -98,6 +99,9 @@ export default function Salary() {
   };
 
   useEffect(() => { load(); }, [user]);
+
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'salary', setList: setList, onSynced: load });
 
   // Загрузка табеля при выборе сотрудника + периода
   useEffect(() => {
@@ -216,6 +220,7 @@ export default function Salary() {
     if (!user) return alert('Ошибка: пользователь не авторизован');
     const emp = employees.find(e => e.id === fEmpId);
     try {
+      let saveQueued = false;
       const takeBonus = tsBonuses.filter(e => bonusChecks[e.id]);
       const takeDeduct = tsDeducts.filter(e => deductChecks[e.id]);
       const takeDebts = empDebts.filter(d => debtChecks[d.id]);
@@ -231,19 +236,20 @@ export default function Salary() {
         deduct_amount: checkedDeductTotal + checkedDebtTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })).concat(debtItems),
         paid_at: null,
       };
-      if (editId) { const { error } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; }
-      else { const { error } = await supabase.from('salary').insert(obj); if (error) throw error; }
+      if (editId) { const { error, queued } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; saveQueued = queued; }
+      else { const { error, queued } = await supabase.from('salary').insert(obj); if (error) throw error; saveQueued = queued; }
       // Помечаем удержанные долги (статус deducted)
       if (takeDebts.length) {
-        await Promise.all(takeDebts.map(d => supabase.from('employee_debts').update({ status: 'deducted', deducted_at: new Date().toISOString() }).eq('id', d.id)));
+        const debtRes = await Promise.all(takeDebts.map(d => supabase.from('employee_debts').update({ status: 'deducted', deducted_at: new Date().toISOString() }).eq('id', d.id)));
+        if (debtRes.some(r => r && r.queued)) saveQueued = true;
       }
-      await load(); setShow(false);
+      if (!saveQueued) await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
 
   const remove = async (id) => {
     if (!confirm('Удалить начисление?')) return;
-    try { await supabase.from('salary').delete().eq('id', id); await load(); }
+    try { const res = await supabase.from('salary').delete().eq('id', id); if (!res.queued) await load(); }
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
@@ -311,9 +317,9 @@ export default function Salary() {
         });
         if (error) throw error;
       }
-      const { error: updErr } = await supabase.from('salary').update({ status: 'paid', paid_at: payDate }).eq('id', pendingPayId);
+      const { error: updErr, queued: payQueued } = await supabase.from('salary').update({ status: 'paid', paid_at: payDate }).eq('id', pendingPayId);
       if (updErr) throw updErr;
-      await load(); setShowAcc(false); setPendingPayId(null); setSalarySplitMode(false); setSalarySplitAmounts({});
+      if (!payQueued) await load(); setShowAcc(false); setPendingPayId(null); setSalarySplitMode(false); setSalarySplitAmounts({});
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
 
@@ -354,7 +360,7 @@ export default function Salary() {
                     <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
             ) : list.map(s => (
               <tr key={s.id}>
-                <td style={{textAlign:'left'}}><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}</div></td>
+                <td style={{textAlign:'left'}}><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>

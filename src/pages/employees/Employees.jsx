@@ -2,6 +2,7 @@ import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
 
@@ -126,6 +127,9 @@ export default function Employees() {
 
   useEffect(() => { load(); }, [user]);
 
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'employees', setList: setEmployees, onSynced: load });
+
   // Закрытие дропдауна «⋯» при клике в любом месте экрана
   useEffect(() => {
     const handler = (e) => {
@@ -185,14 +189,17 @@ export default function Employees() {
       };
 
       var savedId;
+      let queued = false;
       if (editId) {
-        const { error: updErr } = await supabase.from('employees').update(obj).eq('id', editId);
-        if (updErr) throw updErr;
+        const res = await supabase.from('employees').update(obj).eq('id', editId);
+        if (res.error) throw res.error;
         savedId = editId;
+        queued = res.queued;
       } else {
         var ins = await supabase.from('employees').insert(obj).select('id').single();
         if (ins.error) throw ins.error;
         savedId = ins.data.id;
+        queued = ins.queued;
       }
 
       // Приглашение отправляется явно кнопкой «Отправить приглашение» (повторно — тоже)
@@ -208,7 +215,7 @@ export default function Employees() {
         } catch(e) { console.error('Invite error:', e); }
       }
 
-      await load(); setShow(false);
+      if (!queued) await load(); setShow(false);
     } catch (err) { alert('Ошибка сохранения: ' + err.message); }
   };
 
@@ -245,9 +252,9 @@ export default function Employees() {
   const remove = async (id) => {
     if (!confirm('Удалить сотрудника?')) return;
     try {
-      const { error } = await supabase.from('employees').delete().eq('id', id);
+      const { error, queued } = await supabase.from('employees').delete().eq('id', id);
       if (error) return alert('' + error.message);
-      await load();
+      if (!queued) await load();
     }
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
@@ -365,7 +372,7 @@ export default function Employees() {
               return (
                 <tr key={emp.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>
-                    <div className="prod-name" style={{color:'#555'}}>{emp.name}</div>
+                    <div className="prod-name" style={{color:'#555'}}>{emp.name}{emp.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div>
                     {debts.filter(d => d.employee_id === emp.id).length > 0 && (
                       <div style={{fontSize:'.72rem',color:'#dc2626',fontWeight:600,marginTop:'.15rem'}}>
                         Долг: {debts.filter(d => d.employee_id === emp.id).reduce((s, d) => s + (parseFloat(d.amount)||0), 0).toLocaleString()} ₽

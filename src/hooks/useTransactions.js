@@ -19,22 +19,33 @@ export function useTransactions() {
   useEffect(() => { fetch(); }, []);
 
   const add = async (tx) => {
-    const { error } = await supabase.from('transactions').insert(tx);
+    const { error, queued } = await supabase.from('transactions').insert(tx);
     if (error) throw error;
-    await fetch();
+    // Офлайн: запись ушла в очередь — показываем сразу с пометкой «ждёт синхронизации»
+    if (queued) setTransactions(prev => [{ ...tx, id: Date.now(), pending: true }, ...(prev || [])]);
+    else await fetch();
   };
 
   const remove = async (id) => {
-    const { error } = await supabase.from('transactions').delete().eq('id', id);
+    const { error, queued } = await supabase.from('transactions').delete().eq('id', id);
     if (error) throw error;
-    await fetch();
+    if (queued) setTransactions(prev => (prev || []).filter(x => String(x.id) !== String(id)));
+    else await fetch();
   };
 
   const update = async (id, tx) => {
-    const { error } = await supabase.from('transactions').update(tx).eq('id', id);
+    const { error, queued } = await supabase.from('transactions').update(tx).eq('id', id);
     if (error) throw error;
-    await fetch();
+    if (queued) setTransactions(prev => (prev || []).map(x => String(x.id) === String(id) ? { ...x, ...tx, pending: true } : x));
+    else await fetch();
   };
+
+  // После синхронизации офлайн-очереди — перезагружаем список с сервера
+  useEffect(() => {
+    const onSync = () => fetch();
+    window.addEventListener('atlaspos:synced', onSync);
+    return () => window.removeEventListener('atlaspos:synced', onSync);
+  }, []);
 
   return { transactions, loading, add, remove, update, refresh: fetch };
 }

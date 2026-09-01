@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import Loader from '../../components/Loader';
@@ -140,7 +141,9 @@ const load = async () => {
 
   useEffect(() => { if (user) load(); }, [user]);
 
-  // Миграция из localStorage
+  // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
+  useOptimisticSync({ table: 'supplies', setList: setSuppliesState, onSynced: load });
+  useOptimisticSync({ table: 'transactions', setList: setPayTxList, onSynced: load });
   useEffect(() => {
     const handler = (e) => {
       if (!e.target.closest('.prod-more-wrap')) {
@@ -188,19 +191,22 @@ const load = async () => {
     e.preventDefault();
     const total = fItems.reduce((acc, it) => acc + it.qty * it.cost, 0);
     const obj = { user_id: user.id, supplier_name: fSupName.trim(), invoice: fInvoice.trim(), items: fItems, total, status: fStatus, date: new Date().toISOString().split('T')[0] };
+    let queued = false;
     if (editId) {
       // Не затираем оплату при редактировании (раньше paid сбрасывался в 0 — задолженность росла)
       const cur = supplies.find(x => x.id === editId);
       obj.paid = cur?.paid || 0;
       obj.payments = cur?.payments || [];
-      const { error } = await supabase.from('supplies').update(obj).eq('id', editId).eq('user_id', user.id);
-      if (error) return showToast('Ошибка: ' + error.message);
+      const res = await supabase.from('supplies').update(obj).eq('id', editId).eq('user_id', user.id);
+      if (res.error) return showToast('Ошибка: ' + res.error.message);
+      queued = res.queued;
     } else {
       obj.paid = 0;
-      const { error } = await supabase.from('supplies').insert({ ...obj, id: Date.now() });
-      if (error) return showToast('Ошибка: ' + error.message);
+      const res = await supabase.from('supplies').insert({ ...obj, id: Date.now() });
+      if (res.error) return showToast('Ошибка: ' + res.error.message);
+      queued = res.queued;
     }
-    await load(); setShowModal(false); setEditId(null);
+    if (!queued) await load(); setShowModal(false); setEditId(null);
     showToast('Поставка сохранена');
   };
 
@@ -217,9 +223,9 @@ const load = async () => {
     const { id, nextStatus } = showStatusConfirm;
     const s = supplies.find(x => x.id === id);
     if (!s) return;
-    await supabase.from('supplies').update({ status: nextStatus }).eq('id', id).eq('user_id', user.id);
+    const res = await supabase.from('supplies').update({ status: nextStatus }).eq('id', id).eq('user_id', user.id);
     setShowStatusConfirm(null);
-    await load();
+    if (!res.queued) await load();
   };
 
   const edit = (id) => {
@@ -234,17 +240,17 @@ const load = async () => {
 
   const remove = async (id) => {
     if (!confirm('Удалить поставку?')) return;
-    const { error } = await supabase.from('supplies').delete().eq('id', id);
+    const { error, queued } = await supabase.from('supplies').delete().eq('id', id);
     if (error) return alert('Ошибка удаления: ' + error.message);
-    await load();
+    if (!queued) await load();
   };
 
   const copy = async (id) => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
-    const { error } = await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
+    const { error, queued } = await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
     if (error) return showToast('Ошибка: ' + error.message);
-    await load(); showToast('📋 Поставка скопирована');
+    if (!queued) await load(); showToast('📋 Поставка скопирована');
   };
 
   const confirmPay = async (e) => {
@@ -287,8 +293,8 @@ const load = async () => {
       s.payments.push({ amount, method: ac?.name||'', date: new Date().toLocaleDateString('ru-RU') });
     }
     const totalPaid = (s.payments||[]).reduce((sum,p) => sum + (parseFloat(p.amount)||0), 0);
-    const { error: payUpdateErr } = await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay).eq('user_id', user.id); if (payUpdateErr) { showToast('Ошибка обновления: ' + payUpdateErr.message); return; }
-    await load(); setShowPay(null); setPaySplit(false); setSplitAmts({});
+    const { error: payUpdateErr, queued: payQueued } = await supabase.from('supplies').update({ paid: totalPaid }).eq('id', showPay).eq('user_id', user.id); if (payUpdateErr) { showToast('Ошибка обновления: ' + payUpdateErr.message); return; }
+    if (!payQueued) await load(); setShowPay(null); setPaySplit(false); setSplitAmts({});
     showToast('Оплата проведена');
   };
 
@@ -377,7 +383,7 @@ const load = async () => {
                 <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{i + 1}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
