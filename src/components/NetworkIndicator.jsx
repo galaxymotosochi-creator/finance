@@ -96,11 +96,11 @@ export default function NetworkIndicator() {
         }}>{toast}</div>
       )}
       <div
-        title={online ? 'Онлайн — подключение есть' : 'Офлайн — изменения сохраняются и синхронизируются'}
+        title={online ? 'Онлайн — подключение есть' : 'Нет интернета или плохое соединение'}
         style={{
           position: 'fixed', bottom: '14px', right: '14px', zIndex: 99998,
           width: '12px', height: '12px', borderRadius: '50%', cursor: 'pointer',
-          background: online ? (syncing ? '#f59e0b' : '#16a34a') : '#dc2626',
+          background: online ? '#16a34a' : '#dc2626',
           boxShadow: online ? '0 0 8px rgba(22,163,74,.6)' : '0 0 8px rgba(220,38,38,.6)',
           transition: 'background .2s'
         }}
