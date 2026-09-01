@@ -248,8 +248,6 @@ export default function Accounts() {
             onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}}>Инкассация</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
             onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#2563eb',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
-            onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}>Взнос / вывод</span>
         </div>
       </div>
 
@@ -266,6 +264,12 @@ export default function Accounts() {
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'.5rem'}}>
+                  <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                    style={{padding:'.3rem .8rem',borderRadius:'100px',border:'1.5px solid #2563eb',background:'#fff',color:'#2563eb',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
+                  <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                    style={{padding:'.3rem .8rem',borderRadius:'100px',border:'1.5px solid #d97706',background:'#fff',color:'#d97706',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>− Забрать</button>
+                </div>
               </div>
             );
           })()}
