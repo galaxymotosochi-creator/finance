@@ -246,7 +246,7 @@ export default function Accounts() {
             onClick={()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка</span>
           <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#dc2626',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
             onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}}>Инкассация</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
+          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',lineHeight:1}}
             onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
         </div>
       </div>
