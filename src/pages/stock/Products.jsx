@@ -190,6 +190,13 @@ export default function Products() {
   }, [user]);
 
   useEffect(() => { if (user) { migrateLocalData().then(() => load()); } }, [user, load, migrateLocalData]);
+
+  // После синхронизации офлайн-очереди — перезагружаем список с сервера
+  useEffect(() => {
+    const onSynced = () => { if (user) load(); };
+    window.addEventListener('atlaspos:synced', onSynced);
+    return () => window.removeEventListener('atlaspos:synced', onSynced);
+  }, [user, load]);
   
   useEffect(() => { if (user) { refreshCostMap(user.id).then(m => setCostMap(m)); } }, [user]);
   
@@ -313,8 +320,17 @@ export default function Products() {
         const { error } = await supabase.from('products').update(productData).eq('id', editId);
         if (error) { alert(error.message); return; }
       } else {
-        const { error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
+        const { data: insData, error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
         if (error) { alert(error.message); return; }
+        // Офлайн: запрос ушёл в очередь Service Worker — показываем товар сразу,
+        // с пометкой «ждёт синхронизации» (не делаем load() — кеш перезатрёт его)
+        if (insData && insData[0] && insData[0].queued) {
+          setProductsState(prev => [{ ...productData, id: Date.now(), pending: true }, ...prev]);
+          setShowModal(false);
+          setFreshPhotoUrl('');
+          showToast('⏳ Интернета нет — товар добавлен, синхронизируется при появлении связи');
+          return;
+        }
       }
       setShowModal(false);
       load();
@@ -784,7 +800,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={thumbUrl(p.photo_url)} alt="" title="Открыть карточку" loading="lazy" decoding="async" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={thumbUrl(p.photo_url)} alt="" title="Открыть карточку" loading="lazy" decoding="async" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}{p.pending ? <span style={{marginLeft:'6px',fontSize:'.62rem',fontWeight:600,color:'#b45309',background:'#fef3c7',borderRadius:'100px',padding:'2px 8px',verticalAlign:'middle'}}>⏳ синхронизация</span> : null}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }

@@ -58,21 +58,24 @@ async function queueCount() {
 // ===== Синхронизация очереди =====
 async function syncQueue() {
   const items = await queueAll();
-  if (!items.length) return;
   let done = 0;
-  for (const item of items) {
-    try {
-      const res = await fetch(item.url, { method: item.method, headers: item.headers, body: item.body });
-      if (res.ok || (res.status >= 400 && res.status < 500)) {
-        // 2xx — успех; 4xx — ошибка данных (не зацикливаемся), убираем из очереди
-        await queueRemove(item.id);
-        done++;
+  if (items.length) {
+    for (const item of items) {
+      try {
+        const res = await fetch(item.url, { method: item.method, headers: item.headers, body: item.body });
+        if (res.ok || (res.status >= 400 && res.status < 500)) {
+          // 2xx — успех; 4xx — ошибка данных (не зацикливаемся), убираем из очереди
+          await queueRemove(item.id);
+          done++;
+        }
+        // 5xx — серверная ошибка, пробуем позже
+      } catch (e) {
+        break; // сети ещё нет — останавливаемся
       }
-      // 5xx — серверная ошибка, пробуем позже
-    } catch (e) {
-      break; // сети ещё нет — останавливаемся
     }
   }
+  // Всегда сообщаем странице об окончании (даже если очередь пуста),
+  // чтобы спиннер «Синхронизация» гарантированно закрылся
   const left = await queueCount();
   self.clients.matchAll().then((clients) => {
     clients.forEach((c) => c.postMessage({ type: 'sync-done', done, left }));
@@ -145,9 +148,12 @@ self.addEventListener('fetch', (e) => {
 });
 
 async function handleMutation(request) {
-  // Пробуем отправить сразу
+  // Пробуем отправить сразу (с таймаутом: плохой интернет не должен вешать страницу)
   try {
-    const res = await fetch(request.clone());
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(request.clone(), { signal: ctrl.signal });
+    clearTimeout(t);
     return res;
   } catch (e) {
     // Сети нет — сохраняем запрос в очередь и отвечаем «успех»,

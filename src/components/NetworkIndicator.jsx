@@ -10,33 +10,54 @@ export default function NetworkIndicator() {
   const [toast, setToast] = useState(null);
   const timerRef = useRef(null);
   const toastTimer = useRef(null);
+  const syncTimer = useRef(null);
+  const wasOnlineRef = useRef(navigator.onLine !== false);
+
+  // Запуск синхронизации офлайн-очереди
+  const startSync = () => {
+    setSyncing(true);
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage('sync');
+    }
+    // Страховка: если ответ SW не придёт — закрываем окно через 12 сек
+    if (syncTimer.current) clearTimeout(syncTimer.current);
+    syncTimer.current = setTimeout(() => setSyncing(false), 12000);
+  };
 
   // Проверка реальной связи с сервером (не только navigator.onLine)
   const check = async () => {
     // Браузер уже знает, что сети нет — не ждём fetch
     if (navigator.onLine === false) {
       setOnline(false);
+      wasOnlineRef.current = false;
       return;
     }
+    let ok = false;
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 5000);
       const res = await fetch('/api/health', { cache: 'no-store', signal: ctrl.signal });
       clearTimeout(t);
-      setOnline(res.ok);
+      ok = res.ok;
     } catch (e) {
-      setOnline(false);
+      ok = false;
     }
+    // Переход офлайн → онлайн (обнаружен проверкой): запускаем синхронизацию
+    if (ok && !wasOnlineRef.current) {
+      startSync();
+      setToast('🟢 Интернет появился — синхронизирую…');
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setToast(null), 2500);
+    }
+    setOnline(ok);
+    wasOnlineRef.current = ok;
   };
 
   useEffect(() => {
     const onOnline = () => {
       setOnline(true);
-      setSyncing(true);
-      // Сообщаем SW — пусть синхронизирует офлайн-очередь
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('sync');
-      }
+      wasOnlineRef.current = true;
+      startSync();
       setToast('🟢 Интернет появился — синхронизирую…');
       if (toastTimer.current) clearTimeout(toastTimer.current);
       toastTimer.current = setTimeout(() => setToast(null), 2500);
@@ -45,6 +66,8 @@ export default function NetworkIndicator() {
     };
     const onOffline = () => {
       setOnline(false);
+      wasOnlineRef.current = false;
+      setSyncing(false);
       setToast('🔴 Нет интернета — изменения сохранятся и синхронизируются');
       if (toastTimer.current) clearTimeout(toastTimer.current);
       toastTimer.current = setTimeout(() => setToast(null), 3500);
@@ -61,12 +84,15 @@ export default function NetworkIndicator() {
     const onMessage = (e) => {
       if (e.data && e.data.type === 'sync-done') {
         setSyncing(false);
+        if (syncTimer.current) clearTimeout(syncTimer.current);
         const msg = e.data.done > 0
           ? '✅ Синхронизировано записей: ' + e.data.done + (e.data.left > 0 ? ' (осталось: ' + e.data.left + ')' : '')
           : '✅ Всё синхронизировано';
         setToast(msg);
         if (toastTimer.current) clearTimeout(toastTimer.current);
         toastTimer.current = setTimeout(() => setToast(null), 3000);
+        // Сообщаем страницам: данные на сервере обновились — перезагрузите списки
+        window.dispatchEvent(new CustomEvent('atlaspos:synced', { detail: { done: e.data.done, left: e.data.left } }));
       }
     };
     navigator.serviceWorker?.addEventListener('message', onMessage);
@@ -82,11 +108,27 @@ export default function NetworkIndicator() {
       navigator.serviceWorker?.removeEventListener('message', onMessage);
       clearInterval(timerRef.current);
       if (toastTimer.current) clearTimeout(toastTimer.current);
+      if (syncTimer.current) clearTimeout(syncTimer.current);
     };
   }, []);
 
   return (
     <>
+      {/* Окно синхронизации со спиннером */}
+      {syncing && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '14px',
+          background: 'rgba(17,17,17,.45)', backdropFilter: 'blur(2px)'
+        }}>
+          <div style={{
+            width: '44px', height: '44px', borderRadius: '50%',
+            border: '4px solid rgba(255,255,255,.3)', borderTopColor: '#fff',
+            animation: 'spin .8s linear infinite'
+          }} />
+          <div style={{ color: '#fff', fontSize: '1rem', fontWeight: 600, fontFamily: "'Golos Text',system-ui,sans-serif" }}>Синхронизация…</div>
+        </div>
+      )}
       {toast && (
         <div style={{
           position: 'fixed', bottom: '16px', left: '50%', transform: 'translateX(-50%)', zIndex: 99999,
