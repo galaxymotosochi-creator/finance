@@ -130,6 +130,12 @@ self.addEventListener('fetch', (e) => {
 
   // ===== API GET: сеть → кеш (данные видны офлайн) =====
   if (url.pathname.startsWith('/api/')) {
+    // /api/health — живая проверка связи: НИКОГДА не отвечаем из кеша,
+    // иначе индикатор не увидит, что интернета нет
+    if (url.pathname === '/api/health') {
+      e.respondWith(fetch(e.request).catch(() => new Response('offline', { status: 503 })));
+      return;
+    }
     e.respondWith(networkFirst(e.request));
     return;
   }

@@ -13,6 +13,11 @@ export default function NetworkIndicator() {
 
   // Проверка реальной связи с сервером (не только navigator.onLine)
   const check = async () => {
+    // Браузер уже знает, что сети нет — не ждём fetch
+    if (navigator.onLine === false) {
+      setOnline(false);
+      return;
+    }
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 5000);
@@ -47,6 +52,10 @@ export default function NetworkIndicator() {
 
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
+    // При возврате на вкладку — сразу перепроверяем связь
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) check();
+    });
 
     // Ответ SW о завершении синхронизации
     const onMessage = (e) => {
@@ -62,13 +71,14 @@ export default function NetworkIndicator() {
     };
     navigator.serviceWorker?.addEventListener('message', onMessage);
 
-    // Периодическая проверка связи (каждые 20 сек)
+    // Периодическая проверка связи (каждые 10 сек)
     check();
-    timerRef.current = setInterval(check, 20000);
+    timerRef.current = setInterval(check, 10000);
 
     return () => {
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
+      document.removeEventListener('visibilitychange', check);
       navigator.serviceWorker?.removeEventListener('message', onMessage);
       clearInterval(timerRef.current);
       if (toastTimer.current) clearTimeout(toastTimer.current);
