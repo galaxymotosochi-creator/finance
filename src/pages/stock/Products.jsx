@@ -1009,7 +1009,7 @@ export default function Products() {
                 {editId && fHidden && (
                   <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
                 )}
-                <button type="submit" className="btn btn-account-select" style={{color:'#222',fontWeight:400}} disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
+                <button type="submit" className="btn btn-dark" style={{fontWeight:600}} disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
               </div>
             </form>
       </Modal>
