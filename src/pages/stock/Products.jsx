@@ -573,7 +573,15 @@ export default function Products() {
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
   if (typeFilterSet.size > 0) filtered = filtered.filter(p => typeFilterSet.has(p.type));
-  filtered = filtered.sort((a, b) => (a.hidden ? 1 : 0) - (b.hidden ? 1 : 0));
+  // Сортировка: сначала совпадения по названию, потом по артикулу; скрытые — всегда в конце
+  filtered = filtered.sort((a, b) => {
+    const rank = (p) => {
+      const nameHit = q && p.name.toLowerCase().includes(q) ? 0 : 1;
+      const hiddenRank = p.hidden ? 2 : 0;
+      return nameHit + hiddenRank;
+    };
+    return rank(a) - rank(b);
+  });
 
   const costPrice = (p) => {
     if (p.type === 'combo' && p.combo_items && p.combo_items.length > 0) {

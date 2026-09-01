@@ -127,9 +127,19 @@ export default function Stock() {
   if (selectedCats && selectedCats.size > 0) {
     items = items.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || 'Без категории'));
   }
-  items = items.sort((a, b) => { const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0; if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1; return 0; });
   const q = search.toLowerCase().trim();
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
+  // Сортировка: сначала совпадения по названию, потом по артикулу (по остаткам — как было)
+  items = items.sort((a, b) => {
+    const qa = stockMap[a.id]?.qty || 0; const qb = stockMap[b.id]?.qty || 0;
+    if (qa > 0 && qb <= 0) return -1; if (qa <= 0 && qb > 0) return 1;
+    if (q) {
+      const nameHit = (p) => p.name.toLowerCase().includes(q) ? 0 : 1;
+      const d = nameHit(a) - nameHit(b);
+      if (d !== 0) return d;
+    }
+    return 0;
+  });
 
   const totalQty = items.reduce((s, p) => s + (stockMap[p.id]?.qty || 0), 0);
   // Итоговая сумма закупа (количество × себестоимость) и продажи (количество × цена)
