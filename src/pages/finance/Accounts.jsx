@@ -86,7 +86,7 @@ export default function Accounts() {
         if (need.cash_register) cr.push({user_id:user.id,name:'Кассовый ящик',type:'cash_register',balance:0,description:'Наличные от продаж — лежат в ящике кассы'});
         if (cr.length > 0) {
           var r = await supabase.from('accounts').insert(cr).select();
-          if (r.data) {
+          if (r.data && !r.queued) {
             cl = cl.concat(r.data);
             var ids = r.data.map(x => x.id);
             var prev = JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]');
