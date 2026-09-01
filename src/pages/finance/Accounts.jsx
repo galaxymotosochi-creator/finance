@@ -368,7 +368,7 @@ export default function Accounts() {
       <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
             <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: баланс не может уйти в минус
               if(corType==='expense'){var cb=getBal(ac);if(amt>cb)return alert('На счёте «'+ac.name+'» недостаточно средств (доступно '+Math.round(cb).toLocaleString()+' '+cur+'). Баланс не может уйти в минус — выберите другой счёт или сначала пополните этот.');}
-              await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>>>
+              await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
