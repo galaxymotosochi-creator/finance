@@ -195,10 +195,13 @@ export default function Accounts() {
     e.preventDefault();
     try {
       var anyQueued = false;
-      // Проходим по всем невведённым счетам: 0 — тоже нормальный начальный остаток, сохраняем и помечаем введённым
+      // Считаем введённым только то, что реально заполнено: «0» — это введённый ноль,
+      // пустое поле — предприниматель ничего не вводил (счёт остаётся невведённым)
       for (var ac of accounts) {
         if (parseFloat(ac.balance) !== 0 || isInitDone(ac.id)) continue;
-        var amt = parseFloat(initAmts[ac.id]) || 0;
+        var raw = initAmts[ac.id];
+        if (raw === undefined || raw === '') continue;
+        var amt = parseFloat(raw) || 0;
         var r = await supabase.from('accounts').update({ balance: amt }).eq('id', ac.id);
         if (r.error) throw r.error;
         if (r.queued) anyQueued = true;
@@ -431,7 +434,7 @@ export default function Accounts() {
                     <label>{a.name}</label>
                     <input type="number" placeholder="0" min="0" step="0.01"
                       value={initAmts[a.id]||""}
-                      onChange={function(e){var v=parseFloat(e.target.value)||0;setInitAmts(p=>{var r=Object.assign({},p);r[a.id]=v;return r;})}} />
+                      onChange={function(e){setInitAmts(p=>{var r=Object.assign({},p);r[a.id]=e.target.value;return r;})}} />
                   </div>
                 );
               })}
