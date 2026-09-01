@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import Loader from '../../components/Loader';
 
 
 export default function PnL() {
