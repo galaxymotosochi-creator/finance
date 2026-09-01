@@ -45,9 +45,6 @@ export default function NetworkIndicator() {
     // Переход офлайн → онлайн (обнаружен проверкой): запускаем синхронизацию
     if (ok && !wasOnlineRef.current) {
       startSync();
-      setToast('🟢 Интернет появился — синхронизирую…');
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-      toastTimer.current = setTimeout(() => setToast(null), 2500);
     }
     setOnline(ok);
     wasOnlineRef.current = ok;
@@ -58,9 +55,6 @@ export default function NetworkIndicator() {
       setOnline(true);
       wasOnlineRef.current = true;
       startSync();
-      setToast('🟢 Интернет появился — синхронизирую…');
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-      toastTimer.current = setTimeout(() => setToast(null), 2500);
       // Через пару секунд подтвердим реальную связь
       setTimeout(check, 1500);
     };
@@ -85,12 +79,6 @@ export default function NetworkIndicator() {
       if (e.data && e.data.type === 'sync-done') {
         setSyncing(false);
         if (syncTimer.current) clearTimeout(syncTimer.current);
-        const msg = e.data.done > 0
-          ? '✅ Синхронизировано записей: ' + e.data.done + (e.data.left > 0 ? ' (осталось: ' + e.data.left + ')' : '')
-          : '✅ Всё синхронизировано';
-        setToast(msg);
-        if (toastTimer.current) clearTimeout(toastTimer.current);
-        toastTimer.current = setTimeout(() => setToast(null), 3000);
         // Сообщаем страницам: данные на сервере обновились — перезагрузите списки
         window.dispatchEvent(new CustomEvent('atlaspos:synced', { detail: { done: e.data.done, left: e.data.left } }));
       }
@@ -114,19 +102,19 @@ export default function NetworkIndicator() {
 
   return (
     <>
-      {/* Окно синхронизации со спиннером */}
+      {/* Окно синхронизации: кружок как при загрузке, без фона, вместо «AtlasPos» — «Синхронизация данных» */}
       {syncing && (
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 99999,
+          position: 'fixed', inset: 0, zIndex: 99999, pointerEvents: 'none',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '14px',
-          background: 'rgba(17,17,17,.45)', backdropFilter: 'blur(2px)'
+          background: 'transparent'
         }}>
           <div style={{
-            width: '44px', height: '44px', borderRadius: '50%',
-            border: '4px solid rgba(255,255,255,.3)', borderTopColor: '#fff',
+            width: '34px', height: '34px', borderRadius: '50%',
+            border: '3px solid #eee', borderTopColor: '#111',
             animation: 'spin .8s linear infinite'
           }} />
-          <div style={{ color: '#fff', fontSize: '1rem', fontWeight: 600, fontFamily: "'Golos Text',system-ui,sans-serif" }}>Синхронизация…</div>
+          <div style={{ fontWeight: 700, fontSize: '1rem', letterSpacing: '-.02em', color: '#111', fontFamily: "'Golos Text',system-ui,sans-serif" }}>Синхронизация данных</div>
         </div>
       )}
       {toast && (

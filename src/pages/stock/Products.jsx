@@ -800,7 +800,7 @@ export default function Products() {
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
-                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={thumbUrl(p.photo_url)} alt="" title="Открыть карточку" loading="lazy" decoding="async" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}{p.pending ? <span style={{marginLeft:'6px',fontSize:'.62rem',fontWeight:600,color:'#b45309',background:'#fef3c7',borderRadius:'100px',padding:'2px 8px',verticalAlign:'middle'}}>⏳ синхронизация</span> : null}</div></td>;
+                      return <td key={col} style={{cursor:'pointer',textAlign:'left',whiteSpace:'nowrap'}} onClick={() => setViewProduct(p)}>{p.photo_url ? <img src={thumbUrl(p.photo_url)} alt="" title="Открыть карточку" loading="lazy" decoding="async" style={{width:'28px',height:'28px',objectFit:'cover',borderRadius:'6px',verticalAlign:'middle',marginRight:'6px'}} /> : null}<div className="prod-name" style={{cursor:'pointer',display:'inline-block'}}>{p.name}{p.pending ? <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} /> : null}</div></td>;
                     }
                     return <td key={col} style={{textAlign:'left'}} dangerouslySetInnerHTML={{__html: cellHtml(col, p)}} />;
                   }
