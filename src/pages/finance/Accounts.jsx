@@ -234,7 +234,7 @@ export default function Accounts() {
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
       <div className="page-header">
         <div><h1>Счета</h1><div className="sub">Управление счетами и учет остатков</div></div>
-        <div className="page-actions"><button className="btn-mint" onClick={openAdd}>+ Добавить</button></div>
+        <div className="page-actions"><button className="btn-mint" onClick={openAdd} style={{background:'#111',color:'#fff',border:'none',borderRadius:'100px',padding:'.5rem .9rem',fontWeight:600,fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
