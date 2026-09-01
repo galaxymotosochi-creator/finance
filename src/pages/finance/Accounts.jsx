@@ -1,6 +1,7 @@
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
+import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -233,7 +234,37 @@ export default function Accounts() {
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
       <div className="page-header">
-        <div><h1>Счета</h1><div className="sub">Управление счетами и учет остатков</div></div>
+        <div>
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Счета</h1>
+            <SectionHelp
+              title="Раздел «Счета»"
+              intro="Счета — где лежат деньги бизнеса: наличные, кассовый ящик, карты, банковские счета. Здесь виден общий баланс, остаток по каждому счёту и история движений."
+              blocks={[
+                { title: 'Плашка «Общий баланс счетов»', items: [
+                  <>Общая сумма денег бизнеса на всех счетах (начальные остатки + все операции).</>,
+                ]},
+                { title: '«Свои деньги владельца»', items: [
+                  <>Личные средства владельца, вложенные в бизнес. Не считаются доходом и не влияют на прибыль.</>,
+                  <><b>+ Внести</b> — доложить свои деньги в бизнес; <b>− Забрать</b> — вернуть себе.</>,
+                  <><b>Сейчас в бизнесе</b> — сколько из вложенного ещё в деле (внесено − выведено).</>,
+                ]},
+                { title: 'Действия над счетами', items: [
+                  <><b>Начальные остатки</b> — деньги, которые уже были у бизнеса до начала учёта (например, прибыль прошлых месяцев). В прибыль не попадают.</>,
+                  <><b>Корректировка</b> — исправить остаток на счёте. Баланс не может уйти в минус.</>,
+                  <><b>Инкассация</b> — изъять наличные из кассового ящика и зачислить на другой счёт.</>,
+                  <><b>Перевод между счетами</b> — переместить средства со счёта на счёт.</>,
+                ]},
+                { title: 'Таблица счетов', items: [
+                  <><b>Начальный остаток</b> — баланс счёта на старте учёта.</>,
+                  <><b>Поступления / Расходы</b> — движения по счёту за всё время.</>,
+                  <><b>Баланс</b> — текущий остаток (начальный + поступления − расходы). Клик по строке — история операций.</>,
+                ]},
+              ]}
+            />
+          </div>
+          <div className="sub">Управление счетами и учет остатков</div>
+        </div>
         <div className="page-actions"><button className="btn-mint" onClick={openAdd} style={{background:'#111',color:'#fff',border:'none',borderRadius:'100px',padding:'.5rem .9rem',fontWeight:600,fontFamily:'var(--font)',cursor:'pointer',fontSize:'.78rem'}}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -253,8 +284,8 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          {/* Общий баланс счетов — отдельная плашка */}
-          <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'.5rem',padding:'.8rem 1.1rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)'}}>
+          {/* Общий баланс счетов — отдельная плашка (жёлтый градиент) */}
+          <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'.5rem',padding:'.8rem 1.1rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px'}}>
             <div style={{display:'flex',flexDirection:'column'}}>
               <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Общий баланс счетов</span>
               <span style={{fontSize:'1.2rem',fontWeight:800,color:'#111'}}>{(total||0).toLocaleString()} {cur}</span>
@@ -266,7 +297,7 @@ export default function Accounts() {
             (transactions||[]).forEach(function(t){if(t.kind==='owner_deposit')oIn+=Number(t.amount||0);else if(t.kind==='owner_withdraw')oOut+=Number(t.amount||0);});
             if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
             return (
-              <div style={{display:'flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px',flexWrap:'wrap',width:'100%'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)',flexWrap:'wrap',width:'100%'}}>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
