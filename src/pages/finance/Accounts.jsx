@@ -266,11 +266,11 @@ export default function Accounts() {
             (transactions||[]).forEach(function(t){if(t.kind==='owner_deposit')oIn+=Number(t.amount||0);else if(t.kind==='owner_withdraw')oOut+=Number(t.amount||0);});
             if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
             return (
-              <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px',flexWrap:'wrap'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px',flexWrap:'wrap',width:'100%'}}>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'.5rem'}}>
+                <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'auto'}}>
                   <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
                     style={{padding:'.3rem .8rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
                   <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
