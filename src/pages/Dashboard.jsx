@@ -133,7 +133,20 @@ export default function Dashboard() {
         const yS = new Date().getFullYear() + '-01-01';
         const sumR = (from, to) => recAll.filter(r => r.d >= from && r.d <= to).reduce((s, r) => s + r.amt, 0);
         const cmp = { today: sumR(tStr, tStr), yesterday: sumR(yStr, yStr), week: sumR(wStr, tStr), month: sumR(mStr, tStr), year: sumR(yS, tStr) };
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3),cmp});
+        // Свои деньги владельца (за всё время): внесено / выведено / остаток в бизнесе
+        let ownerIn = 0, ownerOut = 0;
+        (allTx || []).forEach(t => {
+          if (t.kind === 'owner_deposit') ownerIn += Number(t.amount || 0);
+          else if (t.kind === 'owner_withdraw') ownerOut += Number(t.amount || 0);
+        });
+        if (ownerIn === 0 && ownerOut === 0) {
+          (allTx || []).forEach(t => {
+            const dd = (t.description || '');
+            if (dd.startsWith('Взнос своих денег')) ownerIn += Number(t.amount || 0);
+            else if (dd.startsWith('Вывод своих денег')) ownerOut += Number(t.amount || 0);
+          });
+        }
+        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3),cmp,ownerIn,ownerOut,ownerNet:ownerIn-ownerOut});
       } catch(e) { console.error('Dashboard error:',e); }
       setLoading(false);
     })();
@@ -187,6 +200,25 @@ export default function Dashboard() {
             return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{Number(a.balance||0).toLocaleString()} {cur}</b></span>;
           }):<span>Нет счетов</span>}
           <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{Number(d.debt||0).toLocaleString()} {cur}</b></span>
+        </div>
+      </div>
+
+      {/* Свои деньги владельца — всегда видно, сколько внесено/выведено */}
+      <div style={{...sec,background:'linear-gradient(135deg,#eff6ff,#f0fdf4)'}}>
+        <div style={st}>💰 Свои деньги владельца</div>
+        <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
+          <div style={{flex:1,minWidth:'130px'}}>
+            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Внесено</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#2563eb'}}>+{Number(d.ownerIn||0).toLocaleString()} {cur}</div>
+          </div>
+          <div style={{flex:1,minWidth:'130px'}}>
+            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Выведено</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#d97706'}}>-{Number(d.ownerOut||0).toLocaleString()} {cur}</div>
+          </div>
+          <div style={{flex:1,minWidth:'130px'}}>
+            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Сейчас в бизнесе</div>
+            <div style={{fontSize:'1.05rem',fontWeight:800,color:Number(d.ownerNet||0)>=0?'#111':'#dc2626'}}>{Number(d.ownerNet||0).toLocaleString()} {cur}</div>
+          </div>
         </div>
       </div>
 
