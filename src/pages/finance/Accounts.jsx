@@ -366,13 +366,13 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: расход больше баланса — предупреждаем, что счёт уйдёт в минус
-              if(corType==='expense'){var cb=getBal(ac);if(amt>cb&&!window.confirm('Расход '+amt.toLocaleString()+' '+cur+' больше баланса счёта «'+ac.name+'» ('+Math.round(cb).toLocaleString()+' '+cur+'). Баланс уйдёт в минус. Продолжить?'))return;}
-              await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>>
+            <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: баланс не может уйти в минус
+              if(corType==='expense'){var cb=getBal(ac);if(amt>cb)return alert('На счёте «'+ac.name+'» недостаточно средств (доступно '+Math.round(cb).toLocaleString()+' '+cur+'). Баланс не может уйти в минус — выберите другой счёт или сначала пополните этот.');}
+              await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>>>
               <div className="form-group">
                 <label>Счет</label>
                 <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{''} {a.name}</option>})}
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{''} {a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-row">
@@ -530,14 +530,14 @@ export default function Accounts() {
                 <label>Откуда</label>
                 <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
                   <option value="">— выберите —</option>
-                  {accounts.filter(a=>a.id!==trTo).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+                  {accounts.filter(a=>a.id!==trTo).map(a=><option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label>Куда</label>
                 <select value={trTo} onChange={e=>setTrTo(e.target.value)} required>
                   <option value="">— выберите —</option>
-                  {accounts.filter(a=>a.id!==trFrom).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
+                  {accounts.filter(a=>a.id!==trFrom).map(a=><option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -611,7 +611,7 @@ export default function Accounts() {
                   <label>Куда зачислить</label>
                   <select value={colTo} onChange={function(e){setColTo(e.target.value)}} required>
                     <option value="">— выберите счёт —</option>
-                    {otherAccs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                    {otherAccs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
                   </select>
                 </div>
                 <div className="modal-actions">

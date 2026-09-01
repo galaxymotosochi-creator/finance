@@ -80,6 +80,7 @@ export default function Registers({ fullscreen }) {
   const [receiptDiscountFixed, setReceiptDiscountFixed] = useState(0);
   const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
   const [shiftReceipts, setShiftReceipts] = useState([]);
+  const [accTxList, setAccTxList] = useState([]); // транзакции по счетам — для показа реальных балансов в кассе
   const [receiptDropdownOpen, setReceiptDropdownOpen] = useState(false);
   const [activeReceiptId, setActiveReceiptId] = useState(null);
   const [viewingReceipt, setViewingReceipt] = useState(null);
@@ -101,6 +102,14 @@ export default function Registers({ fullscreen }) {
     const surname = parts[0];
     const initials = parts.slice(1).map(p => p.charAt(0) + '.').join(' ');
     return surname + ' ' + initials;
+  };
+
+  // Реальный баланс счёта: начальный остаток + все движения (доходы минус расходы)
+  const accBal = (a) => {
+    if (!a) return 0;
+    var b = parseFloat(a.balance) || 0;
+    (accTxList || []).forEach(t => { if (t.account_id === a.id) b += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
+    return b;
   };
 
   const getOwnerName = () => {
@@ -164,7 +173,7 @@ export default function Registers({ fullscreen }) {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [pRes, cRes, sRes, aRes, clRes, proRes, empRes, loyRes] = await Promise.all([
+      const [pRes, cRes, sRes, aRes, clRes, proRes, empRes, loyRes, txRes] = await Promise.all([
         supabase.from('products').select('*').eq('user_id', user.id).order('name'),
         supabase.from('stock_categories').select('*').eq('user_id', user.id).order('name'),
         supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'open').maybeSingle(),
@@ -173,6 +182,7 @@ export default function Registers({ fullscreen }) {
         supabase.from('promos').select('*').eq('user_id', user.id),
         supabase.from('employees').select('id, name, pin, permissions').eq('user_id', user.id).order('name'),
         supabase.from('loyalty_programs').select('*').eq('user_id', user.id),
+        supabase.from('transactions').select('account_id,type,amount').eq('user_id', user.id),
       ]);
       if (pRes.data) setProducts(pRes.data);
       if (cRes.data) { setCategories(cRes.data.filter(c => c.type === 'product')); setAllCats(cRes.data); }
@@ -181,6 +191,7 @@ export default function Registers({ fullscreen }) {
       if (proRes?.data) setPromos(proRes.data);
       if (empRes?.data) setEmployees(empRes.data);
       if (loyRes && !loyRes.error && loyRes.data) setLoyaltyPrograms(loyRes.data);
+      if (txRes && txRes.data) setAccTxList(txRes.data);
       if (sRes.data) {
         setActiveShift(sRes.data);
         // Загружаем чеки открытой смены (для баланса кассы и закрытия)
@@ -1293,7 +1304,10 @@ if (loading) return <Loader />;
                   {accounts.filter(a => a.type !== 'cash').map(a => (
                     <button key={a.id} onClick={() => {setPayMode(a.id); if (payMode !== a.id) setPayUnpaid(false)}}
                       style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (payMode === a.id ? '#ddd' : '#eee'),borderRadius:'12px',background: payMode === a.id ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: payMode === a.id ? '#222' : '#444',textAlign:'left'}}>
-                      {a.type === 'cash_register' ? 'Наличные' : a.name}
+                      <span style={{display:'flex',flexDirection:'column',gap:'2px'}}>
+                        <span>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
+                        <span style={{fontSize:'.68rem',fontWeight:400,color:'var(--muted)'}}>{Math.round(accBal(a)).toLocaleString()} {cur}</span>
+                      </span>
                       <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'2px solid ' + (payMode === a.id ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payMode === a.id ? '#555' : 'transparent',background: payMode === a.id ? '#e8e8e8' : 'transparent'}}>{payMode === a.id ? '\u2713' : ''}</span>
                     </button>
                   ))}

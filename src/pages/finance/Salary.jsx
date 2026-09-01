@@ -292,7 +292,7 @@ export default function Salary() {
           const acct = accs.find(a => a.id === aid);
           const balance = acct ? getAccountBalance(acct) : 0;
           if (balance < amt) {
-            return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + balance.toLocaleString() + ' ₽, нужно: ' + amt.toLocaleString() + ' ₽');
+            return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + ', нужно: ' + amt.toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов или выберите другой счёт.');
           }
         }
         if (Math.abs(totalSplit - Number(s.amount)) > 0.01) {
@@ -302,7 +302,7 @@ export default function Salary() {
         const acct = accs.find(a => a.id === accId);
         const balance = acct ? getAccountBalance(acct) : 0;
         if (balance < s.amount) {
-          return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + balance.toLocaleString() + ' ₽, нужно: ' + Number(s.amount).toLocaleString() + ' ₽');
+          return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов (кнопка «+ Разделить») или выберите другой счёт.');
         }
       }
 
@@ -609,11 +609,12 @@ export default function Salary() {
                     onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
                     onMouseLeave={e=>{e.currentTarget.style.background='var(--body-bg)';e.currentTarget.style.borderColor='var(--border)'}}>
                     <span style={{fontWeight:500}}>{a.name}</span>
-                    <span style={{marginLeft:'auto',color:'#111'}}>{Number(a.balance||0).toLocaleString()} {cur}</span>
+                    <span style={{marginLeft:'auto',color:'#111'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                   </div>
                 )) : accsList.map(a => (
                   <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
                     <span style={{flex:1,fontSize:'.8rem',fontWeight:500}}>{a.name}</span>
+                    <span style={{fontSize:'.72rem',color:'var(--muted)'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                     <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
                       style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
                   </div>

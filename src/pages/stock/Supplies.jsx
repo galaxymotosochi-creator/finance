@@ -266,7 +266,7 @@ const load = async () => {
         if (amt <= 0) continue;
         var bal = parseFloat(ac.balance)||0;
         payTxList.forEach(function(t){if(t.account_id===ac.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
-        if (bal < amt) return alert('Недостаточно средств на '+ac.name+'. Доступно: ' + bal.toLocaleString() + ' ₽');
+        if (bal < amt) return alert('Недостаточно средств на ' + ac.name + '. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счёт.');
         await supabase.from('transactions').insert({
           user_id: user.id, account_id: ac.id, type: 'expense', amount: amt,
           description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
@@ -283,7 +283,7 @@ const load = async () => {
       var ac = payAccounts.find(function(a){return a.id === acId;});
       var bal = parseFloat(ac?.balance)||0;
       payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
-      if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ₽');
+      if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счёт.');
       const { error: txErr } = await supabase.from('transactions').insert({
         user_id: user.id, account_id: acId, type: 'expense', amount: amount,
         description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]

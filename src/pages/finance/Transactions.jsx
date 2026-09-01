@@ -249,10 +249,14 @@ export default function Transactions() {
           alert('Нет доступных счетов. Сначала создайте счёт в разделе "Финансовые счета".');
           return;
         }
-        // Предупреждение, если расход уводит счёт в минус
+        // Защита от ухода в минус: списать можно только в пределах баланса счёта.
+        // Если не хватает — разделите сумму на несколько счетов или выберите другой счёт.
         if (pendingTx.type === 'expense') {
           var curBal = accBalance[acct.id] || 0;
-          if (pendingTx.amount > curBal && !window.confirm('На счёте «' + acct.name + '» недостаточно средств (' + Math.round(curBal).toLocaleString() + ' ₽). Списать ' + Math.round(pendingTx.amount).toLocaleString() + ' ₽?')) return;
+          if (pendingTx.amount > curBal) {
+            alert('На счёте «' + acct.name + '» недостаточно средств (доступно ' + Math.round(curBal).toLocaleString() + ' ' + cur + ').\nРазделите сумму на несколько счетов (кнопка «+ Разделить») или выберите другой счёт.');
+            return;
+          }
         }
         if (isEdit) await update(pendingTx.id, { ...txData, account_id: acct.id });
         else await add({ ...txData, account_id: acct.id });
