@@ -626,7 +626,7 @@ export default function Accounts() {
                 </div>
                 <div className="modal-actions">
                   <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
-                  <button type="submit" style={{padding:'.5rem 1.2rem',fontSize:'.82rem',fontWeight:600,borderRadius:'8px',border:'none',cursor:'pointer',background:'#e65100',color:'#fff',fontFamily:'inherit'}}>Инкассировать</button>
+                  <button type="submit" className="btn btn-danger" style={{fontWeight:600}}>Инкассировать</button>
                 </div>
               </form>
         </>
