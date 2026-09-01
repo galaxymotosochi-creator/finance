@@ -237,16 +237,13 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem',padding:'.85rem 1rem',background:'#ffdd2d',borderRadius:'12px',width:'fit-content'}}>
-            <div style={{fontSize:'1.2rem',fontWeight:800}}>{(total||0).toLocaleString()} {cur}</div>
-          </div>
           {/* Свои деньги владельца — всегда видно, сколько внесено/выведено */}
           {(()=>{
             var oIn=0,oOut=0;
             (transactions||[]).forEach(function(t){if(t.kind==='owner_deposit')oIn+=Number(t.amount||0);else if(t.kind==='owner_withdraw')oOut+=Number(t.amount||0);});
             if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
             return (
-              <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',marginLeft:'.6rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #dbeafe',borderRadius:'12px',flexWrap:'wrap'}}>
+              <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #dbeafe',borderRadius:'12px',flexWrap:'wrap'}}>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Общий баланс счетов</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(total||0).toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
