@@ -540,7 +540,7 @@ export default function Transactions() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Перевести</button>
+                <button type="submit" className="btn btn-dark">Перевести</button>
               </div>
             </form>
       </Modal>
@@ -595,7 +595,7 @@ export default function Transactions() {
                 <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
+                <button type="submit" className="btn btn-dark">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>
@@ -727,8 +727,7 @@ export default function Transactions() {
               })}
             </div>}
             <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end",width:'100%'}}>
-              <button onClick={function(){confirmTx()}}
-                style={{padding:".45rem 1.2rem",fontSize:".8rem",fontWeight:700,borderRadius:"100px",border:"none",cursor:"pointer",background:"#ffdd2d",color:"#111",fontFamily:"var(--font)"}}>
+              <button type="button" className="btn btn-dark" onClick={function(){confirmTx()}} style={{fontSize:".8rem",fontWeight:700}}>
                 {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
               </button>
             </div>

@@ -403,7 +403,7 @@ export default function Accounts() {
                 <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Применить</button>
+                <button type="submit" className="btn btn-dark">Применить</button>
               </div>
             </form>
       </Modal>
@@ -434,7 +434,7 @@ export default function Accounts() {
                 <input type="text" placeholder="Например: аренда за сентябрь" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
+                <button type="submit" className="btn btn-dark">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>
@@ -555,7 +555,7 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-primary">Перевести</button>
+                <button type="submit" className="btn btn-dark">Перевести</button>
               </div>
             </form>
       </Modal>

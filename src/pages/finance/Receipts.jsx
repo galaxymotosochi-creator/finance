@@ -377,7 +377,7 @@ export default function Receipts() {
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={() => setPayReceipt(null)}>Отмена</button>
-            <button type="button" className="btn btn-primary" onClick={payDebt}>Оплатить</button>
+            <button type="button" className="btn btn-dark" onClick={payDebt}>Оплатить</button>
           </div>
         </>)}
       </Modal>

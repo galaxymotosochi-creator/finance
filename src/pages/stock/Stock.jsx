@@ -391,7 +391,7 @@ export default function Stock() {
       <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow"
         actions={<>
           <button className="btn btn-ghost" onClick={cancelCorrection}>Нет</button>
-          <button className="btn btn-primary" onClick={confirmCorrection}>Да, откорректировать</button>
+          <button type="button" className="btn btn-dark" onClick={confirmCorrection}>Да, откорректировать</button>
         </>}>
       </Modal>
 

@@ -619,7 +619,7 @@ export default function Inventory() {
             <div className="modal-actions" style={{flexShrink:0,marginTop:'.6rem'}}>
               <button type="button" className="btn btn-outline" onClick={cancelEdit}>Отмена</button>
               <button className="btn btn-outline" onClick={saveDraft}>Отложить</button>
-              <button className="btn btn-primary" onClick={function(){complete(editing.id)}}>Завершить</button>
+              <button type="button" className="btn btn-dark" onClick={function(){complete(editing.id)}}>Завершить</button>
             </div>
           </>);
         })()}
@@ -665,7 +665,7 @@ export default function Inventory() {
           </div>
           <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
             <button className="btn btn-ghost" onClick={() => setShowAssign(false)}>Назад</button>
-            <button className="btn btn-primary" onClick={confirmAssign}>Подтвердить</button>
+            <button type="button" className="btn btn-dark" onClick={confirmAssign}>Подтвердить</button>
           </div>
         </>)}
       </Modal>
@@ -721,7 +721,7 @@ export default function Inventory() {
                 {t.assigned && t.assigned.length > 0 && ' Долги сотрудников ждут удержания в разделе «Зарплата».'}
               </div>
               <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
-                <button className="btn btn-primary" onClick={confirmResult}>Готово</button>
+                <button type="button" className="btn btn-dark" onClick={confirmResult}>Готово</button>
               </div>
             </>
           );

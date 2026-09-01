@@ -522,8 +522,7 @@ const load = async () => {
               <div style={{fontSize:'.76rem',color:'#222',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
               <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
                 <button type="button" className="btn btn-outline" onClick={()=>setShowStatusConfirm(null)}>Отмена</button>
-                <button type="button" onClick={confirmStatusChange}
-                  style={{padding:'8px 20px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#222',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Подтвердить</button>
+                <button type="button" className="btn btn-dark" onClick={confirmStatusChange}>Подтвердить</button>
               </div>
         </>);})()}
       </Modal>
@@ -569,7 +568,7 @@ const load = async () => {
                   })}
                 </div>}
                 <div style={{textAlign:'right'}}>
-                  <button type="submit" style={{padding:'10px 24px',borderRadius:'100px',border:'none',background:'#ffdd2d',color:'#111',fontSize:'.78rem',cursor:'pointer',fontFamily:'inherit'}}>Провести оплату</button>
+                  <button type="submit" className="btn btn-dark">Провести оплату</button>
                 </div>
               </form>
         </>);

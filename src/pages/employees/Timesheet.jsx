@@ -500,7 +500,7 @@ export default function Timesheet() {
             })()}
 
             <div className="modal-actions">
-              <button type="button" className="btn btn-primary" onClick={async () => {
+              <button type="button" className="btn btn-dark" onClick={async () => {
                 setSaving(true);
                 let anyQueued = false;
                 try {
