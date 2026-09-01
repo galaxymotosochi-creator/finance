@@ -925,21 +925,27 @@ export default function Products() {
                   </label>
                   <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
                 </div>}
-                {fType === 'service' && <div className="form-group"></div>}
+                {fType === 'service' && <div className="form-group">
+                  <label>Ед. измерения</label>
+                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {SERVICE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>}
               </div>
-              <div className="form-row">
+              {fType !== 'service' && <div className="form-row">
                 <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {(fType === 'service' ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
+                    {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
-                {fType !== 'service' && fType !== 'combo' && <div className="form-group">
+                {fType !== 'combo' && <div className="form-group">
                   <label>Вес</label>
                   <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
                 </div>}
-                {fType !== 'service' && fType !== 'combo' && <div className="form-group">
+                {fType !== 'combo' && <div className="form-group">
                   <label>Ед. веса</label>
                   <select value={fWeightUnit} onChange={e => setFWeightUnit(e.target.value)}>
                     <option value="г">г</option>
@@ -947,7 +953,7 @@ export default function Products() {
                     <option value="т">т</option>
                   </select>
                 </div>}
-              </div>
+              </div>}
               {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
                 <label>Состав комбо</label>
                 <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
