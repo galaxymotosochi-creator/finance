@@ -840,10 +840,6 @@ export default function Products() {
       {/* Модалка товара */}
       <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
         <form onSubmit={save}>
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
-              </div>
               {/* Фото товара/услуги */}
               <div className="form-group">
                 <label>Фото</label>
@@ -867,14 +863,11 @@ export default function Products() {
                   {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
                 </div>
               </div>
+              <div className="form-group">
+                <label>Название</label>
+                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
+              </div>
               <div className="form-row">
-                <div className="form-group">
-                  <label>Категория</label>
-                  <select value={fCat} onChange={e => setFCat(e.target.value)}>
-                    <option value="">— выберите —</option>
-                    {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (fType === 'service' ? 'service' : 'product')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                  </select>
-                </div>
                 <div className="form-group">
                   <label>Тип</label>
                   <select value={fType} onChange={e => {
@@ -889,6 +882,13 @@ export default function Products() {
                     <option value="combo">Комбо</option>
                   </select>
                 </div>
+                <div className="form-group">
+                  <label>Категория</label>
+                  <select value={fCat} onChange={e => setFCat(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (fType === 'service' ? 'service' : 'product')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                  </select>
+                </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -899,13 +899,10 @@ export default function Products() {
                   <label>Минимальная цена</label>
                   <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0" />
                 </div>
-                <div className="form-group">
-                  <label>Ед. измерения</label>
-                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
-                    <option value="">— выберите —</option>
-                    {(fType === 'service' ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
-                  </select>
-                </div>
+                {fType !== 'service' && <div className="form-group">
+                  <label>Минимальный остаток</label>
+                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
+                </div>}
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -921,20 +918,27 @@ export default function Products() {
                 </div>}
                 {fType === 'service' && <div className="form-group"></div>}
               </div>
-              {fType !== 'service' && fType !== 'combo' && <div className="form-row">
+              <div className="form-row">
                 <div className="form-group">
+                  <label>Ед. измерения</label>
+                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
+                    <option value="">— выберите —</option>
+                    {(fType === 'service' ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+                {fType !== 'service' && fType !== 'combo' && <div className="form-group">
                   <label>Вес</label>
                   <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
-                </div>
-                <div className="form-group">
+                </div>}
+                {fType !== 'service' && fType !== 'combo' && <div className="form-group">
                   <label>Ед. веса</label>
                   <select value={fWeightUnit} onChange={e => setFWeightUnit(e.target.value)}>
                     <option value="г">г</option>
                     <option value="кг">кг</option>
                     <option value="т">т</option>
                   </select>
-                </div>
-              </div>}
+                </div>}
+              </div>
               {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
                 <label>Состав комбо</label>
                 <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
@@ -987,13 +991,6 @@ export default function Products() {
                     </div>
                   </div>}
                 </div>
-              </div>}
-              {fType !== 'service' && <div className="form-row">
-                <div className="form-group" style={{maxWidth:'250px'}}>
-                  <label>Минимальный остаток</label>
-                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
-                </div>
-                <div className="form-group" style={{border:'none'}}></div>
               </div>}
               {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',marginBottom:'.75rem',cursor:'pointer'}}>
                 <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
