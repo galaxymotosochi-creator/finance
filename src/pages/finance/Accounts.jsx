@@ -397,7 +397,9 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Свои деньги владельца" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();var amt=parseFloat(ownerAmt);if(!amt||amt<=0)return alert('Введите сумму');try{var ac=accounts.find(a=>a.id===ownerAcct);if(!ac)return alert('Выберите счёт');var isDeposit=ownerMode==='deposit';var res=await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:isDeposit?'income':'expense',amount:amt,description:(isDeposit?'Взнос своих денег':'Вывод своих денег')+(ownerDesc.trim()?' — '+ownerDesc.trim():''),date:new Date().toISOString().split('T')[0],kind:isDeposit?'owner_deposit':'owner_withdraw',category_id:null});if(res.error)throw res.error;setShowOwner(false);setOwnerAmt('');setOwnerDesc('');if(!res.queued)await fetchTx();setToast((isDeposit?'Взнос':'Вывод')+' своих денег: '+amt.toLocaleString()+' '+cur);}catch(err){alert(err.message);}}}>
+            <form onSubmit={async (e)=>{e.preventDefault();var amt=parseFloat(ownerAmt);if(!amt||amt<=0)return alert('Введите сумму');try{var ac=accounts.find(a=>a.id===ownerAcct);if(!ac)return alert('Выберите счёт');// Нельзя вывести больше, чем есть на счёте
+              if(ownerMode==='withdraw'){var bal=getBal(ac);if(amt>bal)return alert('Недостаточно средств на счёте «'+ac.name+'». Доступно: '+Math.round(bal).toLocaleString()+' '+cur);}
+              var isDeposit=ownerMode==='deposit';var res=await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:isDeposit?'income':'expense',amount:amt,description:(isDeposit?'Взнос своих денег':'Вывод своих денег')+(ownerDesc.trim()?' — '+ownerDesc.trim():''),date:new Date().toISOString().split('T')[0],kind:isDeposit?'owner_deposit':'owner_withdraw',category_id:null});if(res.error)throw res.error;setShowOwner(false);setOwnerAmt('');setOwnerDesc('');if(!res.queued)await fetchTx();setToast((isDeposit?'Взнос':'Вывод')+' своих денег: '+amt.toLocaleString()+' '+cur);}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Операция</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
@@ -408,7 +410,7 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Счет</label>
                 <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{m?m.icon+' ':''}{a.name}</option>})}
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{m?m.icon+' ':''}{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-group">

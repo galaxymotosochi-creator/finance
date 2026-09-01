@@ -548,6 +548,11 @@ export default function Transactions() {
               if (!amt || amt <= 0) return alert('Введите сумму');
               const acct = accs.find(a => a.id === ownerAcct);
               if (!acct) return alert('Выберите счёт');
+              // Нельзя вывести больше, чем есть на счёте
+              if (ownerMode === 'withdraw') {
+                const bal = accBalance[acct.id] || 0;
+                if (amt > bal) return alert('Недостаточно средств на счёте «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
+              }
               try {
                 const isDeposit = ownerMode === 'deposit';
                 await add({
@@ -574,7 +579,7 @@ export default function Transactions() {
               <div className="form-group">
                 <label>Счёт</label>
                 <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name}</option>})}
+                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-group">
