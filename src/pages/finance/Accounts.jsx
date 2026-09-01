@@ -528,16 +528,16 @@ export default function Accounts() {
       </Modal>
 
       <Modal open={viewAcTx} onClose={()=>setViewAcTx(null)} title={viewAcTx?.name||''}
-        subtitle={viewAcTx?.description||''} width="medium">
+        subtitle={viewAcTx?.description||''} width={640}>
         {viewAcTx && (<>
             <div style={{fontSize:'.8rem',color:'var(--muted)',marginBottom:'.5rem'}}>История операций по счету</div>
             <div className="product-table" style={{flex:1,overflowY:'auto'}}>
               <table className="data-table">
                 <thead id="colHeaders">
                   <tr>
-                    <th style={{textAlign:'left',paddingLeft:0,minWidth:'100px'}}>Дата</th>
+                    <th style={{textAlign:'left',paddingLeft:0,minWidth:'90px'}}>Дата</th>
                     <th style={{textAlign:'left'}}>Описание</th>
-                    <th style={{width:'80px'}}>Сумма</th>
+                    <th style={{width:'90px',textAlign:'right'}}>Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -554,7 +554,7 @@ export default function Accounts() {
                             <span className="prod-name">{t.description||'—'}</span>
                             <span className="prod-sku">{isOwnerTx ? (t.type==='income'?'Взнос своих денег':'Вывод своих денег') : (t.type==='income'?'Доход':'Расход')}</span>
                           </td>
-                          <td style={{textAlign:'left',color:'#111'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>
+                          <td style={{textAlign:'left',color:'#111',whiteSpace:'nowrap'}}>{t.type==='income'?'+':'-'}{amt.toLocaleString()} {cur}</td>
                         </tr>
                       );
                     });
