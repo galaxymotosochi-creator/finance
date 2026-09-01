@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const svgIcons = {
   dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
-  ai: '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:10px;font-weight:800;letter-spacing:.02em;color:#999">AI</span>',
+  ai: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;font-size:13px;font-weight:800;letter-spacing:.02em;color:#999">AI</span>',
   registers: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#999"/><circle cx="20" cy="21" r="1" fill="#999"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
   finance: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>',
   stock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="15" height="10" rx="1.5"/><polyline points="16 7 19 7 21 9 21 12 16 12"/><circle cx="5" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/><circle cx="15" cy="16" r="3" fill="none" stroke="#999" stroke-width="1.5"/></svg>',
