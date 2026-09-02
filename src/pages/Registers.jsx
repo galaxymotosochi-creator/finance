@@ -1043,19 +1043,14 @@ if (loading) return <CenterSpinner />;
       {/* Панель чека — отдельная плашка */}
       <div style={{width:isWide?'420px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
-        {/* Список товаров в чеке — как таблица */}
-        <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
-          {/* Шапка таблицы */}
-          {cart.length > 0 && (
-            <div style={{display:'flex',alignItems:'center',padding:'12px 0',fontSize:'.76rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.3px',gap:isWide?'6px':'3px'}}>
-              <span style={{flex:1,minWidth:0,paddingRight:'8px'}}>Наименование</span>
-              <span style={{width:isWide?'80px':'60px',textAlign:'center',display:'inline-block'}}>Кол-во</span>
-              <span style={{width:isWide?'80px':'60px',textAlign:'center',display:'inline-block'}}>Цена</span>
-              <span style={{width:isWide?'90px':'70px',textAlign:'center',display:'inline-block'}}>Итого</span>
-            </div>
-          )}
-          {/* Разделитель */}
-          {cart.length > 0 && <div style={{height:'1px',background:'#eee',margin:0}} />}
+        {/* Шапка чека: номер + счётчик, тонкая полоса */}
+        <div style={{padding:'12px 16px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+          <span style={{fontSize:'14px',fontWeight:800,color:'#222',letterSpacing:'-.01em'}}>Чек № {currentReceiptNum || 1}</span>
+          <span style={{fontSize:'11.5px',color:'#999',fontWeight:600}}>{cart.length ? cart.reduce(function(a,x){return a+x.qty;},0) + ' поз.' : ''}</span>
+        </div>
+
+        {/* Содержимое чека */}
+        <div style={{flex:1,overflowY:'auto',padding:'2px 14px'}}>
           {/* Строки товаров */}
           {cart.length === 0 ? (
             <div style={{textAlign:'center',padding:'2rem 1rem',color:'var(--muted)',fontSize:'.80rem',marginTop:'1rem'}}>Выберите товары</div>
