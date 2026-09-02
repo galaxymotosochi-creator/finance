@@ -288,7 +288,7 @@ export default function Receipts() {
                 style={{ cursor: 'pointer', transition: 'background .1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
                 onMouseLeave={e => e.currentTarget.style.background = ''}>
-                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>#{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
