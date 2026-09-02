@@ -494,6 +494,7 @@ export default function Receipts() {
               <th style={{ textAlign: 'left', paddingLeft: 0 }}>№ чека</th>
               <th style={{ textAlign: 'left' }}>Дата</th>
               <th style={{ textAlign: 'left' }}>Сумма</th>
+              <th style={{ textAlign: 'left' }}>Возврат</th>
               <th style={{ textAlign: 'left' }}>Скидка</th>
               <th style={{ textAlign: 'left' }}>Оплата</th>
               <th style={{ textAlign: 'left' }}>Клиент</th>
@@ -504,7 +505,7 @@ export default function Receipts() {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="9"><div className="empty-products" style={{ padding: '1rem' }}><div className="big-icon">🔍</div><p>Ничего не найдено</p></div></td></tr>
+              <tr><td colSpan="10"><div className="empty-products" style={{ padding: '1rem' }}><div className="big-icon">🔍</div><p>Ничего не найдено</p></div></td></tr>
             ) : filtered.map(r => (
               <tr key={r.id} onClick={() => openReceipt(r)}
                 style={{ cursor: 'pointer', transition: 'background .1s' }}
@@ -513,6 +514,9 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'left', fontSize: '.78rem', color: Number(r.refund_amount) > 0 ? '#ea580c' : '#bbb' }}>
+                  {Number(r.refund_amount) > 0 ? '−' + Number(r.refund_amount).toLocaleString() + ' ' + cur : '—'}
+                </td>
                 <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
                   {parseInt(r.discount_sum) > 0
                     ? '-' + parseInt(r.discount_sum).toLocaleString() + ' ' + cur
@@ -527,9 +531,6 @@ export default function Receipts() {
                       <>
                       <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid') { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
                         style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: payColor, background: payColor + '18', cursor: r.status !== 'paid' ? 'pointer' : 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{paySt}</span>
-                      {Number(r.refund_amount) > 0 && (
-                        <span style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: '#ea580c', background: '#ea580c18', fontFamily: 'inherit', whiteSpace: 'nowrap', marginLeft: '4px' }}>↩ −{Number(r.refund_amount).toLocaleString()} {cur}</span>
-                      )}
                       </>
                     );
                   })()}
