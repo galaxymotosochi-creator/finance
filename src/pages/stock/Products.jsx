@@ -7,7 +7,6 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode } from '../../lib/barcodeScanner';
-import Loader from '../../components/Loader';
 
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
@@ -115,17 +114,6 @@ const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([..
 
 const COL_ORDER = ['name','type','category','cost','price','min_price','markup','unit','sku','barcode','weight','min_qty','free_price','description'];
 const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', min_price:'Мин. цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', min_qty:'Мин. остаток', free_price:'Свободная цена', description:'Описание' };
-
-// Кружок загрузки с задержкой: не дублирует системный экран загрузки при быстрой загрузке данных
-function DelayedLoader() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setShow(true), 180);
-    return () => clearTimeout(t);
-  }, []);
-  if (!show) return <div style={{flex:1}} />;
-  return <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}><Loader /></div>;
-}
 
 export default function Products() {
   const cur = getCurrencySymbol();
@@ -798,7 +786,9 @@ export default function Products() {
       </div>
       {/* Таблица */}
       {!loaded ? (
-        <DelayedLoader />
+        <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}>
+          <div style={{width:'26px',height:'26px',border:'3px solid #eee',borderTopColor:'#111',borderRadius:'50%',animation:'spin 0.8s linear infinite'}} />
+        </div>
       ) : (
       <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
         <table className="data-table">
