@@ -988,10 +988,10 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
-        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f2f3f5',borderRadius:'22px',padding:'14px'}}>
+        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'14px'}}>
 
       {/* Панель товаров — плашка */}
-      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'14px 16px',overflow:'auto',width:'100%',minWidth:0,background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)'}}>
+      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
@@ -1042,7 +1042,7 @@ if (loading) return <CenterSpinner />;
       </div>
 
       {/* Панель чека — отдельная плашка */}
-      <div style={{width:isWide?'460px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
+      <div style={{width:isWide?'420px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
         {/* Список товаров в чеке — как таблица */}
         <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
