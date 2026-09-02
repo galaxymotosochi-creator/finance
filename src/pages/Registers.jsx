@@ -329,6 +329,21 @@ export default function Registers({ fullscreen }) {
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2000); return () => clearTimeout(t); } }, [toast]);
 
+  // Касса — полноэкранный инструмент: блокируем прокрутку страницы,
+  // чтобы скроллились только внутренние списки (товары/чек), как в прототипе
+  useEffect(() => {
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.height = '100%';
+    return () => {
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
+      document.documentElement.style.height = '';
+    };
+  }, []);
+
   const filtered = useMemo(() => {
     let items = products;
     if (catFilter !== 'all') items = items.filter(p => (p.cat || '') === catFilter);
@@ -779,7 +794,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
+    <div style={{background:'#f5f5f7',height:'100dvh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
