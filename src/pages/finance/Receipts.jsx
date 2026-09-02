@@ -663,11 +663,11 @@ export default function Receipts() {
               <span style={{ color: 'var(--muted)' }}>Статус:</span>
               <span style={{
                 fontSize: '.75rem', fontWeight: 600, padding: '2px 8px', borderRadius: '100px',
-                background: STATUS_BG[selectedReceipt.status] || '#f5f5f5',
-                color: STATUS_COLORS[selectedReceipt.status] || '#999',
+                background: '#e9e9e9',
+                color: '#222',
               }}>{STATUS_LABELS[selectedReceipt.status] || selectedReceipt.status}</span>
               {Number(selectedReceipt.refund_amount) > 0 && (
-                <span style={{ fontSize: '.75rem', fontWeight: 600, padding: '2px 8px', borderRadius: '100px', background: '#fff7ed', color: '#ea580c' }}>
+                <span style={{ fontSize: '.75rem', fontWeight: 600, padding: '2px 8px', borderRadius: '100px', background: '#e9e9e9', color: '#222' }}>
                   Возврат: −{Number(selectedReceipt.refund_amount).toLocaleString()} {cur}
                 </span>
               )}
