@@ -779,7 +779,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100vh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
+    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
@@ -884,7 +884,7 @@ if (loading) return <CenterSpinner />;
         </div>
       )}
         {/* Единая плашка — Фамилия И. 🔒 | Чек № ▼ | ⚙ | 🔍 | +Добавить */}
-        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative',flexShrink:0}}>
+        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative'}}>
           <span style={{fontSize:'.80rem',fontWeight:600,color:'#444',whiteSpace:'nowrap'}}>{effectiveName}</span>
           <span onClick={()=>setPinLocked(true)} style={{fontSize:'.80rem',cursor:'pointer',color:'#777',userSelect:'none',lineHeight:1}} title="Заблокировать кассу">🔒</span>
 
@@ -989,7 +989,7 @@ if (loading) return <CenterSpinner />;
         <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
+      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
