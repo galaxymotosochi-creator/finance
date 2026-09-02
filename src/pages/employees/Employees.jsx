@@ -232,6 +232,17 @@ export default function Employees() {
     setFBonusRules(prev => [...prev, { scope, ref: id, vt: itemVt, val: parseFloat(itemVal) }]);
     setShowItemForm(false); setItemRef(''); setItemVal('');
   };
+  // Правило «от всей выручки» (управленческий процент — не привязан к исполнителю в чеке)
+  const storeRule = () => fBonusRules.find(r => r.scope === 'store_sales') || null;
+  const setStoreRule = (vt, val) => {
+    if (!val || parseFloat(val) <= 0) { setFBonusRules(prev => prev.filter(r => r.scope !== 'store_sales')); return; }
+    setFBonusRules(prev => {
+      const ex = prev.find(r => r.scope === 'store_sales');
+      if (ex) return prev.map(r => r.scope === 'store_sales' ? { ...r, vt, val: parseFloat(val) } : r);
+      return [...prev, { scope: 'store_sales', ref: null, vt, val: parseFloat(val), stack: true }];
+    });
+  };
+  const toggleStoreStack = () => setFBonusRules(prev => prev.map(r => r.scope === 'store_sales' ? { ...r, stack: !r.stack } : r));
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
@@ -534,6 +545,37 @@ export default function Employees() {
                 <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', margin: '.7rem 0 .15rem' }}>Бонусы с продаж</div>
                 <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginBottom: '.55rem', lineHeight: 1.5 }}>
                   Начисляются за позиции в чеках, где сотрудник указан Продавцом/Исполнителем. Оставьте поле пустым (0), чтобы не начислять.
+                </div>
+
+                {/* От всей выручки */}
+                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '.76rem', fontWeight: 700, color: '#333', marginBottom: '1px' }}>От всей выручки</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>процент от всех продаж за период — для управляющего (не нужно указывать его в чеках)</div>
+                  <div style={{ background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '13px' }}>🏪</span>
+                      <span style={{ fontSize: '.76rem', fontWeight: 600, flex: 1 }}>Процент от всей выручки</span>
+                      {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                      <select value={storeRule() ? storeRule().vt : 'percent'} onChange={e => setStoreRule(e.target.value, storeRule() ? storeRule().val : 0)}
+                        style={{ border: '1px solid var(--border)', borderRadius: '7px', padding: '4px 4px', fontSize: '.72rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                        <option value="percent">%</option>
+                        <option value="fixed">₽/период</option>
+                      </select>
+                      <input type="number" min="0" value={storeRule() ? storeRule().val : ''} placeholder="0"
+                        onChange={e => setStoreRule(storeRule() ? storeRule().vt : 'percent', e.target.value)}
+                        style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                    </div>
+                    {storeRule() && (
+                      <div onClick={toggleStoreStack} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '7px', cursor: 'pointer', userSelect: 'none' }}>
+                        <span style={{ width: '30px', height: '17px', borderRadius: '100px', background: storeRule().stack ? '#111' : '#d1d5db', position: 'relative', flexShrink: 0, transition: '.15s' }}>
+                          <span style={{ position: 'absolute', top: '2px', left: storeRule().stack ? '15px' : '2px', width: '13px', height: '13px', borderRadius: '50%', background: '#fff', transition: '.15s' }}></span>
+                        </span>
+                        <span style={{ fontSize: '.72rem', color: '#555' }}>{storeRule().stack ? 'Суммировать с бонусами за свои продажи' : 'Только процент от выручки (бонусы за свои продажи не начислять)'}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* По типу */}

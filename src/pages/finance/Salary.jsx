@@ -120,6 +120,7 @@ export default function Salary() {
   const [salesLoaded, setSalesLoaded] = useState(false);
   const [prodRef, setProdRef] = useState([]);
   const [catRef, setCatRef] = useState([]);
+  const [storeInfo, setStoreInfo] = useState(null); // {revenue, bonus, stack} — бонус от всей выручки
 
   const load = async () => {
     setLoading(true);
@@ -198,7 +199,7 @@ export default function Salary() {
 
   // Продажи и услуги сотрудника за период (для авто-бонусов)
   useEffect(() => {
-    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setSalesLoaded(false); return; }
+    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setStoreInfo(null); setSalesLoaded(false); return; }
     (async () => {
       setSalesLoaded(false);
       try {
@@ -232,6 +233,16 @@ export default function Salary() {
         const bonus = {};
         rows.forEach(row => { const c = calcSalesBonus(rules, row, pr, cr); bonus[row.itemId] = { rub: c.rub, pct: c.pct }; });
         setSalesBonus(bonus);
+        // Бонус от всей выручки (управленческий процент): выручка = сумма чеков периода − возвраты
+        const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
+        const st = rules.find(r => r.scope === 'store_sales');
+        if (st) {
+          const v = Number(st.val) || 0;
+          const stBonus = st.vt === 'fixed' ? v : Math.round(revenue * v / 100);
+          setStoreInfo({ revenue, bonus: stBonus, stack: st.stack !== false, pct: st.vt === 'fixed' ? null : v });
+        } else {
+          setStoreInfo(null);
+        }
       } catch (e) {}
       setSalesLoaded(true);
     })();
@@ -271,7 +282,10 @@ export default function Salary() {
   const checkedDeductTotal = tsDeducts.filter(e => deductChecks[e.id]).reduce((s,e) => s + Number(e.deduct_amount||0), 0);
   const checkedDebtTotal = empDebts.filter(d => debtChecks[d.id]).reduce((s,d) => s + Number(d.amount||0), 0);
   const salesBonusTotal = Object.values(salesBonus).reduce((s2, b) => s2 + (Number(b.rub) || 0), 0);
-  const grandTotal = fSalaryTotal + checkedBonusTotal + salesBonusTotal - checkedDeductTotal - checkedDebtTotal;
+  // Если включён «% от всей выручки» без суммирования — позиционные бонусы не учитываются
+  const itemsBonusTotal = (storeInfo && storeInfo.stack === false) ? 0 : salesBonusTotal;
+  const storeBonus = (storeInfo && storeInfo.bonus) || 0;
+  const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
 
   const openAdd = () => {
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
@@ -533,14 +547,23 @@ export default function Salary() {
               <div style={{border:'1px solid #bfdbfe',borderRadius:'12px',overflow:'hidden',marginTop:'.65rem'}}>
                 <div style={{padding:'.5rem .65rem',background:'#eff6ff',borderBottom:'1px solid #bfdbfe',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                   <span style={{fontSize:'.78rem',fontWeight:600,color:'#2563eb'}}>Продажи и услуги сотрудника</span>
-                  <span style={{fontSize:'.68rem',color:'#2563eb',fontWeight:600}}>+{salesBonusTotal.toLocaleString()} {cur}</span>
+                  <span style={{fontSize:'.68rem',color:'#2563eb',fontWeight:600}}>+{(itemsBonusTotal + storeBonus).toLocaleString()} {cur}</span>
                 </div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {!fEmpId ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>
                   ) : !salesLoaded ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Загрузка...</div>
-                  ) : salesRows.length === 0 ? (
+                  ) : storeInfo && storeInfo.bonus > 0 ? (
+                    <div style={{background:'#fff',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'8px 10px',marginBottom:'8px',fontSize:'.76rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                      <span style={{color:'#2563eb',fontWeight:600}}>🏪 От всей выручки</span>
+                      <span style={{color:'#555'}}>{storeInfo.pct != null ? storeInfo.pct + '% от ' : ''}{storeInfo.revenue.toLocaleString()} {cur} = <b style={{color:'#2563eb'}}>+{storeInfo.bonus.toLocaleString()} {cur}</b></span>
+                    </div>
+                  ) : null}
+                  {storeInfo && storeInfo.stack === false && salesRows.length > 0 && (
+                    <div style={{fontSize:'.7rem',color:'#d97706',marginBottom:'6px'}}>⚠️ Включён процент от всей выручки без суммирования — бонусы за свои продажи ниже не начисляются</div>
+                  )}
+                  {salesRows.length === 0 ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Нет продаж/услуг за этот период</div>
                   ) : (
                     <>
@@ -576,7 +599,7 @@ export default function Salary() {
                       </table>
                       <div style={{display:'flex',justifyContent:'space-between',fontSize:'.75rem',fontWeight:600,color:'#2563eb',paddingTop:'.4rem'}}>
                         <span>Бонус с продаж за период</span>
-                        <span>+{salesBonusTotal.toLocaleString()} {cur}</span>
+                        <span>+{(itemsBonusTotal + storeBonus).toLocaleString()} {cur}</span>
                       </div>
                     </>
                   )}
@@ -715,7 +738,7 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(salesBonusTotal>0)parts.push('С продаж +'+salesBonusTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
+                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(storeBonus>0)parts.push('С выручки +'+storeBonus.toLocaleString()+' ₽');if(itemsBonusTotal>0)parts.push('С продаж +'+itemsBonusTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
                 </div>
                 <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} {cur}</div>
               </div>

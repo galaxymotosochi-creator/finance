@@ -18,6 +18,7 @@ export default function SalesReport() {
   const [prods, setProds] = useState([]);
   const [cats, setCats] = useState([]);
   const [empSales, setEmpSales] = useState([]); // [{empId, name, qty, prodQty, svcQty, sum, bonus, items:[...]}]
+  const [revenue, setRevenue] = useState(0);
   const [expanded, setExpanded] = useState(null);
 
   const load = async () => {
@@ -67,9 +68,21 @@ export default function SalesReport() {
           E.items.push({ date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
         });
       }
-      const list = Object.values(byEmp).map(e => ({ ...e, items: e.items.sort((a, b) => (a.date < b.date ? 1 : -1)) }));
+      const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
+      const list = Object.values(byEmp).map(e => {
+        const st = (e.rules || []).find(r => r.scope === 'store_sales');
+        let storeBonus = 0, storePct = null;
+        if (st) {
+          const v = Number(st.val) || 0;
+          storeBonus = st.vt === 'fixed' ? v : Math.round(revenue * v / 100);
+          storePct = st.vt === 'fixed' ? null : v;
+        }
+        const itemsBonus = (st && st.stack === false) ? 0 : e.bonus;
+        return { ...e, items: e.items.sort((a, b) => (a.date < b.date ? 1 : -1)), itemsBonus, storeBonus, storePct, bonus: itemsBonus + storeBonus };
+      });
       list.sort((a, b) => b.sum - a.sum);
       setEmpSales(list);
+      setRevenue(revenue);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -135,6 +148,11 @@ export default function SalesReport() {
               </tr>
             </tbody>
           </table>
+          {revenue > 0 && (
+            <div style={{ textAlign: 'right', padding: '.5rem .3rem 0', fontSize: '.78rem', color: '#777' }}>
+              Выручка за период (чеки − возвраты): <b>{revenue.toLocaleString()} {cur}</b>
+            </div>
+          )}
         </div>
       )}
     </div>
