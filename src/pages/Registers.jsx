@@ -988,7 +988,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
-        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch'}}>
+        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f2f3f5',borderRadius:'22px',padding:'14px'}}>
 
       {/* Панель товаров — плашка */}
       <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'14px 16px',overflow:'auto',width:'100%',minWidth:0,background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)'}}>
@@ -1011,7 +1011,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat('+(window.innerWidth>1100?4:3)+',1fr)',gridAutoRows:'auto',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gridAutoRows:'auto',gap:'10px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
           ) : filtered.map(p => {
@@ -1042,7 +1042,7 @@ if (loading) return <CenterSpinner />;
       </div>
 
       {/* Панель чека — отдельная плашка */}
-      <div style={{width:isWide?'560px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
+      <div style={{width:isWide?'460px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
         {/* Список товаров в чеке — как таблица */}
         <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
