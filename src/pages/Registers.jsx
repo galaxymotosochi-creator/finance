@@ -779,7 +779,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
+    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
@@ -986,7 +986,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
-        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px',overflow:'hidden'}}>
+        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
       <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
@@ -1048,7 +1048,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Содержимое чека */}
-        <div style={{flex:1,overflowY:'auto',padding:'2px 14px'}}>
+        <div style={{flex:1,overflowY:'auto',padding:'2px 14px',minHeight:0}}>
           {/* Строки товаров */}
           {cart.length === 0 ? (
             <div style={{textAlign:'center',padding:'2rem 1rem',color:'var(--muted)',fontSize:'.80rem',marginTop:'1rem'}}>Выберите товары</div>
@@ -1119,7 +1119,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Итого и оплата */}
-        <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
+        <div style={{padding:'12px 16px 14px',borderTop:'1px solid #f0f0f0',display:'flex',flexDirection:'column',gap:'8px',flexShrink:0}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.78rem',color:'#777'}}>
               <span>Мастерам:</span>
               <span style={{fontWeight:700}}>{Math.round(cart.reduce(function(s2, x){return s2 + spSum(x);}, 0)).toLocaleString()} {cur}</span>
