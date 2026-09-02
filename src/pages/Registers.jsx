@@ -393,7 +393,7 @@ export default function Registers({ fullscreen }) {
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
       const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, ...comboData }];
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, sp: [], discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, ...comboData }];
     });
   };
 
@@ -406,6 +406,28 @@ export default function Registers({ fullscreen }) {
       return prev.map(x => x.id === id ? { ...x, qty: n } : x);
     });
   };
+
+  // ===== Исполнители/продавцы с долями (несколько на позицию) =====
+  const [pickEmpFor, setPickEmpFor] = useState(null); // item.id — для кого открыт выбор
+  const spSum = (item) => (item.sp || []).reduce((s2, x) => s2 + (parseFloat(x.amt) || 0), 0);
+  const itemTotalPrice = (item) => ((item.final_price || item.price || 0)) * item.qty;
+  const addSplit = (itemId, emp) => {
+    setCart(prev => prev.map(x => x.id === itemId && !(x.sp || []).some(y => y.empId === emp.id)
+      ? { ...x, sp: [...(x.sp || []), { empId: emp.id, name: emp.name, amt: '' }], employee_id: (x.sp || []).length === 0 ? emp.id : x.employee_id }
+      : x));
+  };
+  const setSplitAmt = (itemId, empId, v) => {
+    setCart(prev => prev.map(x => x.id === itemId ? { ...x, sp: (x.sp || []).map(y => y.empId === empId ? { ...y, amt: v } : y) } : x));
+  };
+  const delSplit = (itemId, empId) => {
+    setCart(prev => prev.map(x => {
+      if (x.id !== itemId) return x;
+      const sp = (x.sp || []).filter(y => y.empId !== empId);
+      return { ...x, sp, employee_id: sp.length ? sp[0].empId : null };
+    }));
+  };
+  const spOver = (item) => spSum(item) > itemTotalPrice(item) + 0.01;
+  const empShort = (name) => { if (!name) return ''; const parts = name.trim().split(/\s+/); return parts.length > 1 ? parts[0] + ' ' + parts.slice(1).map(pp => pp[0] + '.').join(' ') : name; };
 
   const total = cart.reduce((s, i) => s + (i.final_price || i.price || 0) * i.qty, 0);
   const totalOriginal = cart.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
@@ -460,6 +482,9 @@ export default function Registers({ fullscreen }) {
     // Проверки до создания чека (клиент обязателен только для продажи в долг)
     if (!selectedClient && payUnpaid) { setProcessingPay(false); return setToast('⚠️ Для продажи в долг выберите клиента'); }
     if (!payUnpaid && !payMode) { setProcessingPay(false); return setToast('⚠️ Выберите способ оплаты'); }
+    // Доли исполнителей не могут превышать стоимость позиций
+    const overItem = cart.find(function(x){ return spSum(x) > itemTotalPrice(x) + 0.01; });
+    if (overItem) { setProcessingPay(false); return setToast('⚠️ «' + overItem.name + '»: сумма исполнителям больше стоимости — уменьшите доли'); }
 
     // Минимальная цена: итог чека ниже суммы минимальных цен позиций — нужно подтверждение руководителя
     const sumMinPrice = cart.reduce((s, i) => s + ((Number(i.min_price) || 0) * (i.qty || 1)), 0);
@@ -551,6 +576,7 @@ export default function Registers({ fullscreen }) {
           discount_percent: item.discount_percent || 0,
           discount_amount: (((item.price || 0) - (item.final_price || item.price || 0)) * item.qty),
           promo_id: item.promo_id || null, employee_id: item.employee_id || null,
+          employee_splits: (item.sp || []).map(function(spd){ return { employee_id: spd.empId, name: spd.name, amount: parseFloat(spd.amt) || 0 }; }),
         };
         if (item.combo_items && item.combo_items.length > 0) {
           entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
@@ -818,6 +844,42 @@ if (loading) return <CenterSpinner />;
         </div>
       )}
 
+      {/* Выбор исполнителя/продавца для позиции */}
+      {pickEmpFor !== null && (function(){
+        const it = cart.find(function(x){return x.id === pickEmpFor;});
+        if (!it) return null;
+        const avail = employees.filter(function(e){return !(it.sp || []).some(function(y){return y.empId === e.id;});});
+        const total = itemTotalPrice(it);
+        return (
+          <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setPickEmpFor(null);}}>
+            <div className="modal-box" style={{maxWidth:'400px',maxHeight:'80vh',display:'flex',flexDirection:'column'}}>
+              <button className="modal-close" onClick={function(){setPickEmpFor(null);}}>&times;</button>
+              <h2 style={{fontSize:'1rem',fontWeight:700,marginBottom:'2px'}}>{it.type === 'service' ? 'Добавить исполнителя' : 'Добавить продавца'}</h2>
+              <div style={{fontSize:'.78rem',color:'var(--muted)',marginBottom:'10px'}}>{it.name} · {Math.round(total).toLocaleString()} {cur}</div>
+              <div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:'2px',paddingBottom:'8px'}}>
+                {avail.length === 0 ? (
+                  <div style={{fontSize:'.8rem',color:'#999',textAlign:'center',padding:'1rem 0'}}>Все сотрудники уже добавлены</div>
+                ) : avail.map(function(e){
+                  return (
+                    <div key={e.id} onClick={function(){addSplit(pickEmpFor, {id: e.id, name: e.name});}}
+                      style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 10px',borderRadius:'10px',cursor:'pointer',fontSize:'.84rem'}}
+                      onMouseEnter={function(ev){ev.currentTarget.style.background='#f5f5f8';}}
+                      onMouseLeave={function(ev){ev.currentTarget.style.background='transparent';}}>
+                      <span style={{width:'30px',height:'30px',borderRadius:'50%',background:'#e9e9f2',display:'inline-flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'.72rem',color:'#555',flexShrink:0}}>{e.name.charAt(0)}</span>
+                      <span style={{flex:1,fontWeight:600}}>{e.name}</span>
+                      <span style={{color:'#bbb',fontSize:'1rem'}}>+</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{borderTop:'1px solid #f0f0f0',paddingTop:'10px',display:'flex',justifyContent:'flex-end'}}>
+                <button type="button" onClick={function(){setPickEmpFor(null);}} style={{padding:'8px 18px',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Готово</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',padding:'1rem 1.5rem',fontSize:'.95rem',color:'#444',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
@@ -977,26 +1039,34 @@ if (loading) return <CenterSpinner />;
                 </div>
                 <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
               </div>
-              {/* Строка выбора сотрудника */}
+              {/* Исполнители/продавцы с долями */}
               {employees.length > 0 && (
-                <div style={{paddingTop:'12px',display:'flex',alignItems:'center',gap:'4px',paddingLeft:0}}>
-                  <span style={{fontSize:".76rem",fontWeight:500,color:"var(--muted)",whiteSpace:"nowrap"}}>{item.type === 'service' ? 'Исполнитель:' : 'Продавец:'}</span>
-                  <span onClick={function(){
-                    var curEmpId = item.employee_id;
-                    if (curEmpId === null) {
-                      setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[0]?.id || null} : x;});});
-                    } else {
-                      var idx = employees.findIndex(function(e){return e.id === curEmpId;});
-                      var nextIdx = (idx + 1) % employees.length;
-                      if (nextIdx === 0) {
-                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: null} : x;});});
-                      } else {
-                        setCart(function(prev){return prev.map(function(x){return x.id === item.id ? {...x, employee_id: employees[nextIdx].id} : x;});});
-                      }
-                    }
-                  }} style={{fontSize:".76rem",fontWeight:500,color:"#777",cursor:"pointer",whiteSpace:"nowrap",borderBottom:"1px dashed #ddd"}}>
-                    {item.employee_id ? abbreviateName(employees.find(function(e){return e.id === item.employee_id;})?.name || '') : effectiveName}
-                  </span>
+                <div style={{paddingTop:'8px',display:'flex',flexDirection:'column',gap:'5px'}}>
+                  {(item.sp || []).map(function(spd, si){
+                    return (
+                      <div key={si} style={{display:'flex',alignItems:'center',gap:'6px',background:'#f6f7fb',borderRadius:'9px',padding:'4px 8px',fontSize:'.74rem'}}>
+                        <span style={{width:'18px',height:'18px',borderRadius:'50%',background:'#e3e6f0',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.62rem',fontWeight:700,color:'#555',flexShrink:0}}>{spd.name.charAt(0)}</span>
+                        <span style={{flex:1,fontWeight:600,color:'#333',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{spd.name}</span>
+                        <input type="number" min="0" placeholder="0" value={spd.amt}
+                          onChange={function(e){setSplitAmt(item.id, spd.empId, e.target.value);}}
+                          style={{width:'64px',border:'1px solid #e0e0e0',borderRadius:'7px',padding:'3px 5px',fontSize:'.74rem',textAlign:'center',fontFamily:'inherit',outline:'none'}} />
+                        <span style={{fontSize:'.68rem',color:'#999'}}>{cur}</span>
+                        <span onClick={function(){delSplit(item.id, spd.empId);}} style={{cursor:'pointer',color:'#ccc',fontSize:'.8rem',lineHeight:1}}>✕</span>
+                      </div>
+                    );
+                  })}
+                  {spSum(item) > 0 && (
+                    <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a'}}>
+                      {spOver(item) ? '⚠️ Сумма исполнителям ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur + ' больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : '✓ Исполнителям: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
+                    </div>
+                  )}
+                  <div style={{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
+                    <span onClick={function(){setPickEmpFor(item.id);}}
+                      style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'1.5px dashed #c9ccd6',color:'#8a8f9c',borderRadius:'100px',padding:'2px 10px',fontSize:'.68rem',fontWeight:600,cursor:'pointer',background:'#fff'}}>+ {item.type === 'service' ? 'Исполнитель' : 'Продавец'}</span>
+                    {item.type === 'service' && (item.sp || []).length === 0 && (
+                      <span style={{fontSize:'.66rem',color:'#d97706'}}>не указан</span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1005,6 +1075,12 @@ if (loading) return <CenterSpinner />;
 
         {/* Итого и оплата */}
         <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
+            {cart.reduce(function(s2, x){return s2 + spSum(x);}, 0) > 0 && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.78rem',color:'#777'}}>
+                <span>Исполнителям:</span>
+                <span style={{fontWeight:700}}>{Math.round(cart.reduce(function(s2, x){return s2 + spSum(x);}, 0)).toLocaleString()} {cur}</span>
+              </div>
+            )}
             {discountTotal > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'var(--muted)'}}>
                 <span>Итого:</span>
