@@ -50,7 +50,6 @@ export default function Receipts() {
   // Возврат
   const [refundReceipt, setRefundReceipt] = useState(null);
   const [refundQty, setRefundQty] = useState({});
-  const [refundMode, setRefundMode] = useState('as_paid');
   const [refundAc, setRefundAc] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [refunding, setRefunding] = useState(false);
@@ -280,8 +279,8 @@ export default function Receipts() {
     const payList = Array.isArray(r.payments) ? r.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
     const totalPaid = payList.reduce((s2, p) => s2 + (Number(p.amount) || 0), 0);
     const paidAvail = Math.max(0, (Number(r.paid_amount) || 0) - (Number(r.refund_amount) || 0));
-    const money = refundMode === 'none' ? 0 : Math.min(sumItems, paidAvail);
-    const diff = refundMode === 'none' ? 0 : (sumItems - money);
+    const money = Math.min(sumItems, paidAvail);
+    const diff = sumItems - money;
     const splits = [];
     if (money > 0) {
       if (totalPaid > 0) {
@@ -378,7 +377,7 @@ export default function Receipts() {
       setSelectedReceipt(null);
       setReceiptItems([]);
       if (!updRes.queued) await load();
-      setToast('Возврат по чеку № ' + r.receipt_number + ' оформлен: −' + sumItems.toLocaleString() + ' ' + cur + (money > 0 ? ', возвращено денег: ' + money.toLocaleString() + ' ' + cur : ', без возврата денег'));
+      setToast('Возврат по чеку № ' + r.receipt_number + ' оформлен: −' + sumItems.toLocaleString() + ' ' + cur + ', возвращено денег: ' + money.toLocaleString() + ' ' + cur + (diff > 0 ? ', долг клиента уменьшен на ' + diff.toLocaleString() + ' ' + cur : ''));
     } catch (err) { setRefunding(false); alert(err.message); }
   };
 
@@ -656,7 +655,7 @@ export default function Receipts() {
                     const q = {};
                     receiptItems.forEach(it => { q[it.id] = refundableQty(selectedReceipt, it); });
                     setRefundQty(q);
-                    setRefundMode('as_paid'); setRefundAc(''); setRefundReason('');
+                    setRefundAc(''); setRefundReason('');
                   }} style={{ width: '100%', padding: '11px', borderRadius: '100px', border: '1.5px solid #ea580c', background: '#fff', color: '#ea580c', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                     ↩ Оформить возврат
                   </button>
@@ -696,18 +695,11 @@ export default function Receipts() {
             <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошёл размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
           </div>
           <div className="form-group">
-            <label>Возврат денег</label>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              <button type="button" onClick={() => setRefundMode('as_paid')}
-                style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === 'as_paid' ? '#111' : 'var(--border)'), background: refundMode === 'as_paid' ? '#111' : '#fff', color: refundMode === 'as_paid' ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>💵 Вернуть, как было оплачено</button>
-              <button type="button" onClick={() => setRefundMode('none')}
-                style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === 'none' ? '#111' : 'var(--border)'), background: refundMode === 'none' ? '#111' : '#fff', color: refundMode === 'none' ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 Без денег (обмен)</button>
-            </div>
+            <label>Возврат денег — как было оплачено</label>
             {(() => {
               const acName = (id) => { const a = accounts.find(x => x.id === id); return a ? a.name : 'Счёт'; };
               const payList = (refundReceipt && Array.isArray(refundReceipt.payments)) ? refundReceipt.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
-              if (refundMode === 'none') return <div style={{ fontSize: '.72rem', color: '#999', marginTop: '5px', lineHeight: 1.5 }}>Товар вернётся на склад, деньги не возвращаем (например, при обмене — новый чек пробьёте отдельно)</div>;
-              if (payList.length > 0) return <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px', lineHeight: 1.6 }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}<br />Вернём с этих же счетов пропорционально — путаницы в финансах не будет</div>;
+              if (payList.length > 0) return <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px', lineHeight: 1.6 }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}<br />Вернём с этих же счетов пропорционально. Если клиент возьмёт другой товар — пробьёте новый чек</div>;
               return (
                 <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px' }}>
                   По чеку нет разбивки оплаты — выберите счёт возврата:
