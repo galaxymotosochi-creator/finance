@@ -1011,7 +1011,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gridAutoRows:'auto',gap:'10px',alignContent:'start',minHeight:0,width:'100%'}}>
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gridAutoRows:'auto',gap:'10px',alignContent:'start',minHeight:0,width:'100%'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
           ) : filtered.map(p => {
@@ -1021,20 +1021,19 @@ if (loading) return <CenterSpinner />;
               style={{background: oos ? '#fafafa' : '#fff', borderRadius:'16px', padding:'12px 12px 10px', cursor: oos ? 'default' : 'pointer', transition:'all .15s', display:'flex', flexDirection:'column', border:'1px solid ' + (oos ? '#f0f0f0' : '#eee'), boxShadow:'0 1px 4px rgba(0,0,0,.04)', height:'100%', opacity: oos ? .55 : 1}}
               onMouseEnter={e => { if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 6px 16px rgba(0,0,0,.08)'; e.currentTarget.style.borderColor='#ffdd2d';}} }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)'; e.currentTarget.style.borderColor= oos ? '#f0f0f0' : '#eee'; } }>
-              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'6px'}}>
-                <div style={{fontSize:'13px',fontWeight:600,color: oos ? '#999' : '#222',lineHeight:1.35,flex:1,minWidth:0}}>{p.name}</div>
-                <span style={{flexShrink:0,fontSize:'9px',fontWeight:700,padding:'2px 8px',borderRadius:'100px',background: p.type === 'service' ? '#fff4c2' : '#eef1f5',color: p.type === 'service' ? '#8a6a00' : '#666',marginTop:'1px'}}>{p.type === 'service' ? 'Услуга' : 'Товар'}</span>
+              <div style={{fontSize:'20px',lineHeight:1}}>{p.type === 'service' ? '🔧' : '📦'}</div>
+              <div style={{fontSize:'13px',fontWeight:600,color: oos ? '#999' : '#222',lineHeight:1.3,margin:'6px 0 2px',minHeight:'34px'}}>{p.name}</div>
+              <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:'6px'}}>
+                <span style={{fontSize:'12.5px',fontWeight:500,color: oos ? '#ccc' : '#999'}}>{(p.price||0).toLocaleString()} {cur}</span>
+                {p.type !== 'service' && (
+                  <span style={{fontSize:'10px',fontWeight:600,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>{stockMap[p.id] || 0} шт</span>
+                )}
               </div>
-              <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'2px',paddingTop:'6px'}}>
-                {p.cat && <div style={{fontSize:'11.5px',color: oos ? '#ccc' : '#999',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.cat}</div>}
-                <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:'6px'}}>
-                  <span style={{fontSize:'15px',fontWeight:700,color: oos ? '#bbb' : '#111'}}>{(p.price||0).toLocaleString()} {cur}</span>
-                  {p.type !== 'service' ? (
-                    <span style={{fontSize:'11px',fontWeight:600,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>{stockMap[p.id] || 0} шт</span>
-                  ) : null}
-                </div>
-                {p.min_price > 0 && <div style={{fontSize:'10.5px',fontWeight:600,color:'#b45309'}}>мин. {Number(p.min_price).toLocaleString()} {cur}</div>}
+              <div style={{marginTop:'6px',display:'flex',alignItems:'center',gap:'5px'}}>
+                <span style={{fontSize:'9.5px',fontWeight:700,padding:'2px 10px',borderRadius:'100px',background:'#fff4c2',color:'#8a6a00',whiteSpace:'nowrap'}}>{p.type === 'service' ? 'Услуга' : 'Товар'}</span>
+                {p.cat && <span style={{fontSize:'10px',color:'#bbb',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1,minWidth:0}}>{p.cat}</span>}
               </div>
+              {p.min_price > 0 && <div style={{fontSize:'10px',fontWeight:600,color:'#b45309',marginTop:'3px'}}>мин. {Number(p.min_price).toLocaleString()} {cur}</div>}
             </div>
             );
           })}
