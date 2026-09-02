@@ -1119,13 +1119,11 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Итого и оплата */}
-        <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
-            {cart.reduce(function(s2, x){return s2 + spSum(x);}, 0) > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.78rem',color:'#777'}}>
-                <span>Исполнителям:</span>
-                <span style={{fontWeight:700}}>{Math.round(cart.reduce(function(s2, x){return s2 + spSum(x);}, 0)).toLocaleString()} {cur}</span>
-              </div>
-            )}
+        <div style={{padding:'12px 16px 14px',borderTop:'1px solid #f0f0f0',display:'flex',flexDirection:'column',gap:'8px',flexShrink:0}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.78rem',color:'#777'}}>
+              <span>Мастерам:</span>
+              <span style={{fontWeight:700}}>{Math.round(cart.reduce(function(s2, x){return s2 + spSum(x);}, 0)).toLocaleString()} {cur}</span>
+            </div>
             {discountTotal > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.80rem',color:'var(--muted)'}}>
                 <span>Итого:</span>
@@ -1169,52 +1167,45 @@ if (loading) return <CenterSpinner />;
                 </div>
               );
             })()}
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'.80rem',color:'var(--muted)'}}>К оплате:</span>
-              <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} {cur}</span>
-            </div>
-            {/* Строка скидки — всегда видна */}
+            {/* Плашка скидки — как в прототипе */}
             {cart.length > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:'.80rem',color:'var(--muted)'}}>Скидка:</span>
-                <div className="discount-dropdown-wrap" style={{display:'flex',alignItems:'center',gap:'6px',position:'relative'}}>
-                  <span onClick={()=>{setDiscountDropdownOpen(!discountDropdownOpen)}}
-                    style={{fontSize:'.95rem',fontWeight:700,cursor:'pointer',color:'#444',padding:'2px 8px',borderRadius:'6px',background:'transparent',userSelect:'none'}}>
-                    {receiptDiscountPercent > 0 ? receiptDiscountPercent + '%' : receiptDiscountFixed > 0 ? receiptDiscountFixed + ' ₽' : '0%'} <span style={{fontSize:'.68rem',color:'#999'}}>▼</span>
-                  </span>
-                  {receiptDiscountAmount > 0 && <span style={{fontSize:'.95rem',color:'#444',fontWeight:700}}>−{receiptDiscountAmount.toLocaleString()} {cur}</span>}
-                  {discountDropdownOpen && (
-                    <div style={{position:'absolute',bottom:'100%',right:0,marginBottom:'4px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 30px rgba(0,0,0,.12)',padding:'10px',minWidth:'280px',zIndex:100,border:'1px solid #f0f0f0'}}>
-                      <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'8px'}}>
-                        {[0,5,10,15,20].map(function(pct){
-                          return (
-                            <span key={pct} onClick={function(){setReceiptDiscountPercent(pct);setReceiptDiscountFixed(0);setDiscountDropdownOpen(false)}}
-                              style={{padding:'4px 10px',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',background:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#111':'#f5f5f5',color:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#fff':'#444',userSelect:'none'}}>{pct === 0 ? '0%' : pct + '%'}</span>
-                          );
-                        })}
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:'6px',borderTop:'1px solid #eee',paddingTop:'8px'}}>
-                        <span style={{fontSize:'.80rem',color:'#444',whiteSpace:'nowrap'}}>Своя:</span>
-                        <input type="number" min="0" value={receiptDiscountPercent||''} placeholder="%"
-                          onChange={function(e){var v=parseInt(e.target.value)||0;setReceiptDiscountPercent(Math.min(99,v));setReceiptDiscountFixed(0)}}
-                          style={{width:'46px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
-                        <span style={{fontSize:'.80rem',color:'#444'}}>или</span>
-                        <input type="number" min="0" placeholder="₽"
-                          onChange={function(e){var v=parseFloat(e.target.value);if(isNaN(v)||v<0)v=0;setReceiptDiscountFixed(Math.min(total,Math.round(v)));setReceiptDiscountPercent(0)}}
-                          style={{width:'60px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
-                      </div>
-                    </div>
-                  )}
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px',background:'#f6f7f9',border:'1px solid #e8e8ec',borderRadius:'12px',padding:'6px 9px'}}>
+                <span style={{fontSize:'.72rem',fontWeight:700,color:'#555',whiteSpace:'nowrap'}}>Скидка на чек</span>
+                <div style={{display:'flex',gap:'4px',overflowX:'auto',paddingBottom:'1px'}}>
+                  {[0,5,10,15,20].map(function(pct){
+                    const on = receiptDiscountFixed === 0 && receiptDiscountPercent === pct;
+                    return (
+                      <button key={pct} type="button" onClick={function(){setReceiptDiscountPercent(pct);setReceiptDiscountFixed(0);}}
+                        style={{border:'none',borderRadius:'100px',padding:'4px 10px',fontSize:'.68rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',
+                          background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#fff', color: on ? '#111' : '#777', border: on ? 'none' : '1.5px solid #e3e3e8', boxShadow: on ? '0 1px 5px rgba(255,205,0,.4)' : 'none'}}>{pct === 0 ? '0%' : '−' + pct + '%'}</button>
+                    );
+                  })}
+                  {(() => {
+                    const onOwn = receiptDiscountPercent > 0 && ![0,5,10,15,20].includes(receiptDiscountPercent);
+                    return (
+                      <span style={{display:'inline-flex',alignItems:'center',borderRadius:'100px',padding:'2px 4px 2px 9px',border:'1.5px solid ' + (onOwn ? '#e8b800' : '#e3e3e8'),background: onOwn ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#fff'}}>
+                        <input type="number" min="0" max="99" value={onOwn ? receiptDiscountPercent : ''} placeholder="своя %"
+                          onChange={function(e){var v=parseInt(e.target.value)||0;setReceiptDiscountPercent(Math.min(99,v));setReceiptDiscountFixed(0);}}
+                          style={{width:'34px',border:'none',outline:'none',fontSize:'.66rem',fontWeight:700,fontFamily:'inherit',textAlign:'center',background:'transparent',color:'#222'}} />
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
             )}
-            {/* Итого со скидкой */}
-            {receiptDiscountAmount > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid #eee',paddingTop:'8px'}}>
-                <span style={{fontSize:'.80rem',color:'var(--muted)',fontWeight:600}}>Итого:</span>
-                <span style={{fontSize:'.95rem',fontWeight:700}}>{finalTotal.toLocaleString()} {cur}</span>
+            {/* Скидка и Итого */}
+            <div style={{display:'flex',flexDirection:'column',gap:'2px'}}>
+              {receiptDiscountAmount > 0 && (
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.76rem',color:'#16a34a',fontWeight:600}}>
+                  <span>Скидка:</span>
+                  <span>−{receiptDiscountAmount.toLocaleString()} {cur}</span>
+                </div>
+              )}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:'.86rem',fontWeight:700,color:'#222'}}>Итого:</span>
+                <span style={{fontSize:'1.1rem',fontWeight:800,color:'#111'}}>{finalTotal.toLocaleString()} {cur}</span>
               </div>
-            )}
+            </div>
             {viewingReceipt ? (
               <>
                 {/* Режим просмотра оплаченного чека */}
