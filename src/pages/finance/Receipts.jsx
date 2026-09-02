@@ -326,7 +326,7 @@ export default function Receipts() {
             <span style={{ display: 'block' }}>Кассир: {selectedReceipt.cashier_name || '—'}</span>
             {selectedReceipt.client_name ? <span style={{ display: 'block' }}>Клиент: {selectedReceipt.client_name}</span> : null}
           </span>
-        ) : ''} width={700}>
+        ) : ''} width={780}>
         {selectedReceipt && (<>
         {selectedReceipt.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
@@ -350,6 +350,7 @@ export default function Receipts() {
                   <span style={{ flex: 1 }}>Товар</span>
                   <span style={{ width: '55px', textAlign: 'left' }}>Кол-во</span>
                   <span style={{ width: '90px', textAlign: 'left' }}>Цена</span>
+                  <span style={{ width: '90px', textAlign: 'left' }}>Скидка</span>
                   <span style={{ width: '100px', textAlign: 'left' }}>Сумма</span>
                   <span style={{ width: '190px', textAlign: 'left', paddingLeft: '16px' }}>Продавец/Исполнитель</span>
                 </div>
@@ -361,6 +362,9 @@ export default function Receipts() {
                         <span style={{ flex: 1, fontWeight: 500 }}>{item.product_name}</span>
                         <span style={{ width: '55px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '90px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()} {cur}</span>
+                        <span style={{ width: '90px', textAlign: 'left', color: '#16a34a', fontSize: '.78rem', fontWeight: 600 }}>
+                          {Number(item.discount_amount) > 0 ? '−' + Number(item.discount_amount).toLocaleString() + ' ' + cur : ''}
+                        </span>
                         <span style={{ width: '100px', textAlign: 'left', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
                         <span style={{ width: '190px', textAlign: 'left', paddingLeft: '16px', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {item.employee_id ? empShort(item.employee_id) : '—'}
@@ -373,11 +377,6 @@ export default function Receipts() {
                           })}
                         </div>
                       )}
-                      {Number(item.discount_amount) > 0 && (
-                        <div style={{ padding: '0 .75rem .45rem 1.2rem', fontSize: '.72rem', color: '#16a34a', fontWeight: 600 }}>
-                          Скидка: −{Number(item.discount_amount).toLocaleString()} {cur}{Number(item.discount_percent) > 0 ? ' (' + Number(item.discount_percent) + '%)' : ''}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -386,6 +385,7 @@ export default function Receipts() {
                     <span style={{ flex: 1 }}>Скидка:</span>
                     <span style={{ width: '55px', textAlign: 'left' }}></span>
                     <span style={{ width: '90px', textAlign: 'left' }}></span>
+                    <span style={{ width: '90px', textAlign: 'left' }}></span>
                     <span style={{ width: '100px', textAlign: 'left' }}>−{Number(selectedReceipt.discount_sum).toLocaleString()} {cur}</span>
                     <span style={{ width: '190px' }}></span>
                   </div>
@@ -393,6 +393,7 @@ export default function Receipts() {
                 <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '55px', textAlign: 'left' }}></span>
+                  <span style={{ width: '90px', textAlign: 'left' }}></span>
                   <span style={{ width: '90px', textAlign: 'left' }}></span>
                   <span style={{ width: '100px', textAlign: 'left' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</span>
                   <span style={{ width: '190px' }}></span>
