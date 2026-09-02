@@ -70,6 +70,16 @@ function Toggle({ checked, onChange, disabled }) {
   );
 }
 
+// Уровни авто-бонусов с продаж (приоритет: конкретная позиция → категория → тип)
+const BONUS_SCOPES = [
+  { v: 'all_services', l: 'Все услуги' },
+  { v: 'all_products', l: 'Все товары' },
+  { v: 'service_category', l: 'Категория услуг' },
+  { v: 'product_category', l: 'Категория товаров' },
+  { v: 'service', l: 'Конкретная услуга' },
+  { v: 'product', l: 'Конкретный товар' },
+];
+
 const getCats = () => JSON.parse(localStorage.getItem('allCats88') || '[]');
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
 
@@ -102,6 +112,10 @@ export default function Employees() {
   const [expanded, setExpanded] = useState({});
   const [showAddRule, setShowAddRule] = useState(false);
   const [addRuleSearch, setAddRuleSearch] = useState('');
+  const [nrScope, setNrScope] = useState('all_services');
+  const [nrRef, setNrRef] = useState('');
+  const [nrVt, setNrVt] = useState('percent');
+  const [nrVal, setNrVal] = useState('');
   const [showNoPermsConfirm, setShowNoPermsConfirm] = useState(false);
   const [pendingSave, setPendingSave] = useState(null);
   const [debts, setDebts] = useState([]); // долги сотрудников (недостачи)
@@ -153,6 +167,27 @@ export default function Employees() {
       setFBonusValue(String(pos.bonus_value || ''));
       if (pos.permissions && pos.permissions.length > 0) setFPermissions(pos.permissions);
     }
+  };
+
+  // Хелперы авто-бонусов
+  const scopeLabel = (v) => { const f = BONUS_SCOPES.find(x => x.v === v); return f ? f.l : v; };
+  const refName = (rule) => {
+    if (!rule) return '';
+    if (rule.scope === 'service' || rule.scope === 'product') {
+      const p = allProds.find(x => String(x.id) === String(rule.ref));
+      return p ? p.name : '—';
+    }
+    const c = allCats.find(x => String(x.id) === String(rule.ref));
+    return c ? c.name : '—';
+  };
+  const updRule = (i, patch) => setFBonusRules(prev => prev.map((x, j) => j === i ? { ...x, ...patch } : x));
+  const delRule = (i) => setFBonusRules(prev => prev.filter((_, j) => j !== i));
+  const addRule = () => {
+    if (!nrVal || parseFloat(nrVal) <= 0) return alert('Укажите значение бонуса');
+    const needsRef = nrScope === 'service_category' || nrScope === 'product_category' || nrScope === 'service' || nrScope === 'product';
+    if (needsRef && !nrRef) return alert('Выберите категорию или позицию');
+    setFBonusRules(prev => [...prev, { scope: nrScope, ref: needsRef ? nrRef : null, vt: nrVt, val: parseFloat(nrVal) }]);
+    setNrScope('all_services'); setNrRef(''); setNrVt('percent'); setNrVal(''); setShowAddRule(false);
   };
 
   const openAdd = () => {
@@ -275,21 +310,13 @@ export default function Employees() {
   };
 
   const genPin = () => setFPin(String(1000 + Math.floor(Math.random() * 9000)));
-  const addBonusRule = (scope, type, rate = 0) => setFBonusRules(prev => [...prev, { scope, type, rate, name: '', catId: '', catName: '', itemId: '', itemName: '' }]);
-  const updRule = (idx, field, val) => setFBonusRules(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: val }; return n; });
-  const rmRule = (idx) => setFBonusRules(prev => prev.filter((_, i) => i !== idx));
 
   const fmtDate = (d) => { if (!d) return '—'; const datePart = d.split('T')[0]; const p = datePart.split('-'); return p.length === 3 ? p[2]+'.'+p[1]+'.'+p[0].slice(2) : d; };
 
   const getRulesSummary = (emp) => {
-    const rules = emp.bonus_rules || []; const parts = [];
-    const allP = rules.find(r => r.scope === 'all' && r.type === 'product');
-    const allS = rules.find(r => r.scope === 'all' && r.type === 'service');
-    if (allP) parts.push('товар '+allP.rate+'%');
-    if (allS) parts.push('услуги '+allS.rate+'%');
-    rules.filter(r => r.scope === 'category').forEach(c => parts.push(c.catName+' '+c.rate+'%'));
-    rules.filter(r => r.scope === 'item').forEach(i => parts.push(i.itemName+' '+i.rate+'%'));
-    return parts.length ? parts.join(', ') : '—';
+    const rules = emp.bonus_rules || [];
+    if (!rules.length) return '—';
+    return rules.map(r => scopeLabel(r.scope) + (r.ref ? ': ' + refName(r) : '') + ' — ' + (r.vt === 'fixed' ? r.val + ' ₽/шт' : r.val + '%')).join(', ');
   };
 
   const q = search.toLowerCase().trim();
@@ -448,6 +475,75 @@ export default function Employees() {
                   <label>Дата приема</label>
                   <input type="date" value={fHireDate} onChange={e=>setFHireDate(e.target.value)} />
                 </div>
+              </div>
+
+              {/* ОПЛАТА И АВТО-БОНУСЫ */}
+              <div style={{ borderTop: '1px solid var(--border)', marginTop: '1rem', paddingTop: '1rem' }}>
+                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', marginBottom: '.6rem' }}>Оплата</div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Оклад (₽/мес)</label>
+                    <input type="number" min="0" value={fBaseSalary} onChange={e => setFBaseSalary(e.target.value)} placeholder="0" />
+                  </div>
+                  <div className="form-group"></div>
+                </div>
+
+                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', margin: '.4rem 0 .1rem' }}>Авто-бонусы с продаж</div>
+                <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginBottom: '.5rem', lineHeight: 1.5 }}>
+                  Начисляются за позиции в чеках, где сотрудник указан Продавцом/Исполнителем. Приоритет: конкретная позиция → категория → тип (услуги/товары).
+                </div>
+                {fBonusRules.length === 0 && !showAddRule && (
+                  <div style={{ fontSize: '.78rem', color: '#999', padding: '.35rem 0' }}>Правил нет — бонусы не начисляются</div>
+                )}
+                {fBonusRules.map((rule, ri) => (
+                  <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.3rem 0', borderBottom: '1px solid #f2f2f2' }}>
+                    <span style={{ flex: 1, fontSize: '.78rem', color: '#333', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <b>{scopeLabel(rule.scope)}</b>{rule.ref ? ': ' + refName(rule) : ''}
+                    </span>
+                    <select value={rule.vt} onChange={e => updRule(ri, { vt: e.target.value })}
+                      style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.76rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                      <option value="percent">%</option>
+                      <option value="fixed">₽/шт</option>
+                    </select>
+                    <input type="number" min="0" value={rule.val} onChange={e => updRule(ri, { val: parseFloat(e.target.value) || 0 })}
+                      style={{ width: '70px', border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                    <span onClick={() => delRule(ri)} style={{ cursor: 'pointer', color: '#bbb', fontSize: '.85rem', padding: '0 2px', lineHeight: 1 }}>✕</span>
+                  </div>
+                ))}
+                {showAddRule && (
+                  <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '.5rem', marginTop: '.4rem', background: '#fafafa' }}>
+                    <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <select value={nrScope} onChange={e => { setNrScope(e.target.value); setNrRef(''); }}
+                        style={{ flex: '1 1 160px', border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                        {BONUS_SCOPES.map(sc => <option key={sc.v} value={sc.v}>{sc.l}</option>)}
+                      </select>
+                      {(nrScope === 'service_category' || nrScope === 'product_category') && (
+                        <select value={nrRef} onChange={e => setNrRef(e.target.value)} style={{ flex: '1 1 160px', border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                          <option value="">— категория —</option>
+                          {allCats.filter(c => (nrScope === 'service_category' ? c.type === 'service' : c.type !== 'service')).map(c => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
+                        </select>
+                      )}
+                      {(nrScope === 'service' || nrScope === 'product') && (
+                        <select value={nrRef} onChange={e => setNrRef(e.target.value)} style={{ flex: '1 1 160px', border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                          <option value="">— позиция —</option>
+                          {allProds.filter(pp => (nrScope === 'service' ? pp.type === 'service' : pp.type !== 'service')).map(pp => <option key={pp.id} value={String(pp.id)}>{pp.name}</option>)}
+                        </select>
+                      )}
+                      <select value={nrVt} onChange={e => setNrVt(e.target.value)} style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                        <option value="percent">%</option>
+                        <option value="fixed">₽/шт</option>
+                      </select>
+                      <input type="number" min="0" placeholder="0" value={nrVal} onChange={e => setNrVal(e.target.value)} style={{ width: '80px', border: '1px solid var(--border)', borderRadius: '6px', padding: '5px 6px', fontSize: '.78rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '.5rem', marginTop: '.5rem' }}>
+                      <button type="button" onClick={addRule} className="btn btn-dark" style={{ padding: '.35rem .9rem', fontSize: '.75rem' }}>Добавить правило</button>
+                      <button type="button" onClick={() => { setShowAddRule(false); setNrVal(''); }} style={{ padding: '.35rem .9rem', borderRadius: '100px', border: 'none', background: '#f0f0f0', color: '#666', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Отмена</button>
+                    </div>
+                  </div>
+                )}
+                {!showAddRule && (
+                  <button type="button" onClick={() => setShowAddRule(true)} style={{ marginTop: '.5rem', padding: '.3rem .8rem', borderRadius: '100px', border: '1.5px solid var(--border)', background: '#fff', color: '#444', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ Добавить правило</button>
+                )}
               </div>
 
               {fPermissions.includes('registers') && <div className="form-row">
