@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 const TARGET_LABELS = {
   revenue: { label: 'Выручка', icon: '💰', unit: '₽', color: '#16a34a' },
@@ -165,7 +165,7 @@ export default function Plans() {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   return (
     <div>

@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 export default function Transactions() {
@@ -306,7 +306,7 @@ export default function Transactions() {
         style={{marginTop:'.75rem',padding:'.5rem 1.2rem',borderRadius:'100px',border:'none',background:'#000',color:'#fff',fontWeight:600,cursor:'pointer',fontSize:'.82rem',fontFamily:'inherit'}}>Повторить</button>
     </div>
   );
-   if (loading) return <Loader />;
+   if (loading) return <CenterSpinner />;
    return (
     <div>
       <div className="page-header">

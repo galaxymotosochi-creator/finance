@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
@@ -355,7 +355,7 @@ export default function Salary() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
-        <Loader />
+        <CenterSpinner />
       ) : (
       <div className="product-table" style={{overflowX:'auto'}}>
         <table className="data-table">

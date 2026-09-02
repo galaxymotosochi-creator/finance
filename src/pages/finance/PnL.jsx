@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 export default function PnL() {
@@ -212,7 +212,7 @@ export default function PnL() {
   );
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const d = data;

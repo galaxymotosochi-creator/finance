@@ -5,7 +5,7 @@ import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const ACC_TYPES = [
@@ -229,7 +229,7 @@ export default function Accounts() {
     balById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
   });
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
-   if (loading || !initDone) return <Loader />;
+   if (loading || !initDone) return <CenterSpinner />;
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}

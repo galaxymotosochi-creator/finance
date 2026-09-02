@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 export default function Shifts() {
@@ -50,7 +50,7 @@ export default function Shifts() {
     return (receipts||[]).filter(r => r.shift_id === s.id).reduce((sum, r) => sum + (Number(r.paid_amount)||0), 0);
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   return (
     <>

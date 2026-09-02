@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const HEALTH = { critical: 'critical', warning: 'warning', healthy: 'healthy' };
@@ -171,7 +171,7 @@ export default function Health() {
     window.dispatchEvent(new Event('hashchange'));
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   return (
     <>

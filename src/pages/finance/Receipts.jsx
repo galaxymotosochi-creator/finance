@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const STATUS_LABELS = {
@@ -164,7 +164,7 @@ export default function Receipts() {
   };
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   if (!loading && receipts.length === 0 && statusFilter === null && search === '') {

@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const LD = [
@@ -141,7 +141,7 @@ export default function Loyalty() {
           </div>
         </div>
         <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-        <Loader />
+        <CenterSpinner />
       </>
     );
   }

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления' },
@@ -231,7 +231,7 @@ export default function Positions() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
-        <Loader />
+        <CenterSpinner />
       ) : positions.length === 0 ? (
         <div className="empty-products">
           <div className="big-icon">👤</div>

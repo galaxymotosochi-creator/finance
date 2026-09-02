@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 const REASONS = ['Списание','Брак','Потеря','Порча','Окончание срока','Инвентаризация','Прочее'];
@@ -126,7 +126,7 @@ export default function Writeoffs() {
     if (!queued) await load();
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   return (
     <>

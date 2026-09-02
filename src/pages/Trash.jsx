@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
-import Loader from '../components/Loader';
+import CenterSpinner from '../components/CenterSpinner';
 
 // Человеческие названия таблиц для корзины
 const TABLE_LABELS = {
@@ -77,7 +77,7 @@ export default function Trash() {
     } catch (e) { alert('Ошибка: ' + e.message); }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   return (
     <>

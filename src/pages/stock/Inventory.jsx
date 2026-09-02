@@ -7,7 +7,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode, beep } from '../../lib/barcodeScanner';
-import Loader from '../../components/Loader';
+import CenterSpinner from '../../components/CenterSpinner';
 
 
 
@@ -382,7 +382,7 @@ export default function Inventory() {
     if (!queued) await load();
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <CenterSpinner />;
 
   const assignTotal = Object.values(assignAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0);
   const assignShortageCost = pendingDoc ? shortageAmount(pendingDoc, 'cost') : 0;

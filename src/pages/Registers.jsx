@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import useOptimisticSync from '../hooks/useOptimisticSync';
 import QuaggaInit from 'quagga';
 import { getCurrencySymbol } from '../lib/currency';
-import Loader from '../components/Loader';
+import CenterSpinner from '../components/CenterSpinner';
 
 
 export default function Registers({ fullscreen }) {
@@ -715,7 +715,7 @@ document.body.appendChild(c);
     });
 };
 
-if (loading) return <Loader />;
+if (loading) return <CenterSpinner />;
 
   return (
     <>
