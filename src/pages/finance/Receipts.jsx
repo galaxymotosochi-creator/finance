@@ -614,7 +614,7 @@ export default function Receipts() {
                               </div>
                             )}
                             {isRefunded && (
-                              <div style={{ paddingTop: '2px', fontSize: '.72rem', color: '#ea580c', fontWeight: 600 }}>
+                              <div style={{ paddingTop: '2px', fontSize: '.72rem', color: '#dc2626', fontWeight: 600 }}>
                                 ↩ Возвращено: {retQty}{retQty < itemQty ? ' из ' + itemQty : ''}
                               </div>
                             )}
