@@ -47,6 +47,15 @@ export default function Receipts() {
   const [toast, setToast] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  // Возврат
+  const [refundReceipt, setRefundReceipt] = useState(null);
+  const [refundQty, setRefundQty] = useState({});
+  const [refundMode, setRefundMode] = useState('cash');
+  const [refundAc, setRefundAc] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refunding, setRefunding] = useState(false);
+  const [productTypes, setProductTypes] = useState({});
+  const [productNames, setProductNames] = useState({});
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   // Сколько чеков подгружаем за раз (кнопка «Показать ещё»)
@@ -78,6 +87,11 @@ export default function Receipts() {
       // Сотрудники (продавцы/исполнители) — для деталей чека
       const { data: emps } = await supabase.from('employees').select('id,name').eq('user_id', user.id);
       setEmployees(emps || []);
+      // Товары (тип, имя) — чтобы при возврате вернуть на склад только товары (не услуги)
+      const { data: prods } = await supabase.from('products').select('id,name,type').eq('user_id', user.id);
+      const pt = {}, pn = {};
+      (prods || []).forEach(pp => { pt[pp.id] = pp.type; pn[pp.id] = pp.name; });
+      setProductTypes(pt); setProductNames(pn);
     } catch (e) {}
     setLoading(false);
   };
@@ -142,7 +156,8 @@ export default function Receipts() {
   const filtered = receipts.filter(r => {
     // «Долги» = не оплачен полностью (включая частично оплаченные)
     if (statusFilter === 'unpaid' && r.status !== 'unpaid' && r.status !== 'partially_paid') return false;
-    if (statusFilter && statusFilter !== 'unpaid' && r.status !== statusFilter) return false;
+    if (statusFilter === 'refunded' && !((r.refund_amount || 0) > 0)) return false;
+    if (statusFilter && statusFilter !== 'unpaid' && statusFilter !== 'refunded' && r.status !== statusFilter) return false;
     // Фильтр по периоду
     const d = (r.date || r.created_at || '').split('T')[0];
     if (period === 'today' && d !== tzToday()) return false;
@@ -185,6 +200,24 @@ export default function Receipts() {
   };
   const empShort = (id) => abbreviateName(employees.find(e => e.id === id)?.name);
 
+  // Сколько уже возвращено по позиции чека (по refund_items)
+  const returnedQtyByItem = (r, itemId) => {
+    const ri = (r && r.refund_items) || [];
+    return ri.filter(x => String(x.item_id) === String(itemId)).reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
+  };
+  // Остаток к возврату по позиции
+  const refundableQty = (r, item) => Math.max(0, (Number(item.quantity) || 0) - returnedQtyByItem(r, item.id));
+  // Можно ли ещё оформить возврат по чеку
+  const canRefund = (r) => {
+    if (!r || r.status === 'unpaid') return false;
+    return receiptItems.some(it => refundableQty(r, it) > 0);
+  };
+  // Цена единицы из чека (уже со скидкой по акции)
+  const unitPrice = (item) => {
+    const q = Number(item.quantity) || 1;
+    return q > 0 ? (Number(item.total) || 0) / q : 0;
+  };
+
   // Сумма долга по чеку (не оплачено)
   const receiptRemain = (r) => Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0));
 
@@ -222,6 +255,116 @@ export default function Receipts() {
       if (!updRes.queued) await load();
       setToast('Долг по чеку № ' + payReceipt.receipt_number + ' оплачен: ' + amt.toLocaleString() + ' ₽');
     } catch (err) { alert(err.message); }
+  };
+
+  // ===== Оформление возврата по чеку =====
+  const doRefund = async () => {
+    const r = refundReceipt;
+    if (!r) return;
+    const reason = (refundReason || '').trim();
+    if (!reason) return alert('Укажите причину возврата');
+    // Выбранные позиции (сколько возвращаем)
+    const rows = [];
+    receiptItems.forEach(it => {
+      const avail = refundableQty(r, it);
+      if (avail <= 0) return;
+      const qty = Math.min(Number(refundQty[it.id]) || 0, avail);
+      if (qty <= 0) return;
+      rows.push({ item_id: it.id, product_id: it.product_id, product_name: it.product_name, qty, total: Math.round(unitPrice(it) * qty) });
+    });
+    if (rows.length === 0) return alert('Укажите количество для возврата');
+    const sumItems = rows.reduce((s2, x) => s2 + x.total, 0);
+    if (sumItems <= 0) return alert('Сумма возврата равна нулю');
+    // Способ возврата денег
+    let acId = null;
+    if (refundMode === 'cash') {
+      const cashAc = accounts.find(a => a.type === 'cash_register');
+      if (!cashAc) return alert('Нет кассового счёта. Выберите способ «На счёт / карту» или «Без денег»');
+      acId = cashAc.id;
+    } else if (refundMode === 'account') {
+      if (!refundAc) return alert('Выберите счёт для возврата');
+      acId = refundAc;
+    }
+    const paidAvail = Math.max(0, (Number(r.paid_amount) || 0) - (Number(r.refund_amount) || 0));
+    const money = refundMode === 'none' ? 0 : Math.min(sumItems, paidAvail);
+    const diff = refundMode === 'none' ? 0 : (sumItems - money);
+    try {
+      setRefunding(true);
+      // 1) Деньги: если смена ещё открыта — правим payments чека (закроется сменой),
+      //    если закрыта/вне смены — создаём транзакцию «Возврат»
+      const shiftRes = r.shift_id ? await supabase.from('shifts').select('status').eq('id', r.shift_id).maybeSingle() : { data: null };
+      const shiftOpen = !!(shiftRes.data && shiftRes.data.status === 'open');
+      const newPayments = Array.isArray(r.payments) ? r.payments.slice() : [];
+      const upd = {
+        refund_amount: (Number(r.refund_amount) || 0) + sumItems,
+        refund_reason: reason,
+        refund_date: tzToday(),
+        refund_items: [...((r.refund_items) || []), ...rows],
+      };
+      if (shiftOpen && money > 0 && acId) {
+        newPayments.push({ account_id: acId, amount: -money });
+        upd.payments = newPayments;
+      }
+      const updRes = await supabase.from('receipts').update(upd).eq('id', r.id);
+      if (updRes.error) throw updRes.error;
+      if (!shiftOpen && money > 0 && acId) {
+        // Категория «Возврат»
+        let catId = null;
+        const { data: cat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Возврат').maybeSingle();
+        if (cat) catId = cat.id;
+        else {
+          const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Возврат', type: 'expense' }).select('id').single();
+          if (newCat && newCat.id) catId = newCat.id;
+        }
+        await supabase.from('transactions').insert({
+          user_id: user.id, type: 'expense', amount: money,
+          description: 'Возврат по чеку № ' + r.receipt_number + ' — ' + reason,
+          date: tzToday(), account_id: acId, kind: 'refund', status: 'paid', category_id: catId,
+        });
+      }
+      // 2) Склад: возвращаем товары (отрицательное списание — остатки восстановятся сами)
+      const woInserts = [];
+      rows.forEach(row => {
+        const item = receiptItems.find(it => it.id === row.item_id);
+        if (!item) return;
+        const combo = item.combo_items;
+        if (combo && Array.isArray(combo) && combo.length > 0) {
+          combo.forEach(ci => {
+            const pid = Object.keys(productTypes).find(pp => productNames[pp] === ci.name && productTypes[pp] !== 'service');
+            if (pid != null) {
+              const q = Math.round((Number(ci.qty) || 0) * row.qty / ((Number(item.quantity) || 1)));
+              if (q > 0) woInserts.push({ id: Date.now() + woInserts.length, user_id: user.id, product_id: parseInt(pid), quantity: -q, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
+            }
+          });
+        } else if (row.product_id != null && productTypes[row.product_id] !== 'service') {
+          woInserts.push({ id: Date.now() + woInserts.length, user_id: user.id, product_id: parseInt(row.product_id), quantity: -row.qty, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
+        }
+      });
+      if (woInserts.length > 0) await supabase.from('writeoffs').insert(woInserts);
+      // 3) Долг клиента: часть возврата, купленная в долг, — уменьшаем долг
+      if (r.client_id && diff > 0) {
+        const { data: cl } = await supabase.from('clients').select('debt').eq('id', r.client_id).maybeSingle();
+        await supabase.from('clients').update({ debt: (parseFloat(cl?.debt) || 0) + diff }).eq('id', r.client_id);
+      }
+      // 4) Баллы лояльности: списываем начисленные за чек (пропорционально возврату)
+      if (r.client_id && Number(r.points_earned) > 0 && sumItems > 0) {
+        const totalAmt = Number(r.total_amount) || 1;
+        const pointsForRefund = Math.round(Number(r.points_earned) * sumItems / totalAmt);
+        const alreadySpentRefund = Number(r.refund_points) || 0;
+        const pointsNow = Math.max(0, pointsForRefund - alreadySpentRefund);
+        if (pointsNow > 0) {
+          const { data: cl } = await supabase.from('clients').select('points').eq('id', r.client_id).maybeSingle();
+          await supabase.from('clients').update({ points: Math.max(0, (Number(cl?.points) || 0) - pointsNow) }).eq('id', r.client_id);
+          await supabase.from('receipts').update({ refund_points: alreadySpentRefund + pointsNow }).eq('id', r.id);
+        }
+      }
+      setRefunding(false);
+      setRefundReceipt(null);
+      setSelectedReceipt(null);
+      setReceiptItems([]);
+      if (!updRes.queued) await load();
+      setToast('Возврат по чеку № ' + r.receipt_number + ' оформлен: −' + sumItems.toLocaleString() + ' ' + cur + (money > 0 ? ', возвращено денег: ' + money.toLocaleString() + ' ' + cur : ', без возврата денег'));
+    } catch (err) { setRefunding(false); alert(err.message); }
   };
 
   if (loading) {
@@ -295,7 +438,8 @@ export default function Receipts() {
           </div>
           <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='paid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Оплачен</span>
           <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='partially_paid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Частично</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='unpaid'?600:400,color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}>Долги</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='unpaid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Долги</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='refunded'?600:400,color:'#ea580c',cursor:'pointer',borderRight:'none',lineHeight:1}}>Возвраты</span>
         </div>
       </div>
 
@@ -337,8 +481,13 @@ export default function Receipts() {
                     const paySt = r.status === 'paid' ? 'Оплачено' : 'Долг ' + remain.toLocaleString() + ' ₽';
                     const payColor = r.status === 'paid' ? '#16a34a' : (r.status === 'partially_paid' ? '#d97706' : '#dc2626');
                     return (
+                      <>
                       <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid') { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
                         style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: payColor, background: payColor + '18', cursor: r.status !== 'paid' ? 'pointer' : 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{paySt}</span>
+                      {Number(r.refund_amount) > 0 && (
+                        <span style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: '#ea580c', background: '#ea580c18', fontFamily: 'inherit', whiteSpace: 'nowrap', marginLeft: '4px' }}>↩ −{Number(r.refund_amount).toLocaleString()} {cur}</span>
+                      )}
+                      </>
                     );
                   })()}
                 </td>
@@ -464,7 +613,93 @@ export default function Receipts() {
                 background: STATUS_BG[selectedReceipt.status] || '#f5f5f5',
                 color: STATUS_COLORS[selectedReceipt.status] || '#999',
               }}>{STATUS_LABELS[selectedReceipt.status] || selectedReceipt.status}</span>
+              {Number(selectedReceipt.refund_amount) > 0 && (
+                <span style={{ fontSize: '.75rem', fontWeight: 600, padding: '2px 8px', borderRadius: '100px', background: '#fff7ed', color: '#ea580c' }}>
+                  Возврат: −{Number(selectedReceipt.refund_amount).toLocaleString()} {cur}
+                </span>
+              )}
             </div>
+
+            {/* Возврат: детали + кнопка оформления */}
+            {(Number(selectedReceipt.refund_amount) > 0 || (selectedReceipt.status !== 'unpaid' && !itemsLoading && receiptItems.length > 0 && canRefund(selectedReceipt))) && (
+              <div style={{ marginTop: '.75rem', borderTop: '1px solid #f0f0f0', paddingTop: '.75rem' }}>
+                {Number(selectedReceipt.refund_amount) > 0 && (
+                  <div style={{ fontSize: '.78rem', color: '#ea580c', background: '#fff7ed', borderRadius: '8px', padding: '8px 10px', marginBottom: '.6rem', lineHeight: 1.6 }}>
+                    <div style={{ fontWeight: 600 }}>↩ Возврат оформлен: −{Number(selectedReceipt.refund_amount).toLocaleString()} {cur}</div>
+                    {selectedReceipt.refund_date && <div>Дата: {fmtDate(selectedReceipt.refund_date)}</div>}
+                    {selectedReceipt.refund_reason && <div>Причина: {selectedReceipt.refund_reason}</div>}
+                    {(selectedReceipt.refund_items || []).length > 0 && (
+                      <div style={{ marginTop: '2px', color: '#9a6a3a' }}>
+                        Возвращено: {(selectedReceipt.refund_items || []).map((x, i) => <span key={i}>{x.product_name} x{x.qty}{i < (selectedReceipt.refund_items || []).length - 1 ? ', ' : ''}</span>)}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {selectedReceipt.status !== 'unpaid' && !itemsLoading && receiptItems.length > 0 && canRefund(selectedReceipt) && (
+                  <button type="button" onClick={() => {
+                    setRefundReceipt(selectedReceipt);
+                    const q = {};
+                    receiptItems.forEach(it => { q[it.id] = refundableQty(selectedReceipt, it); });
+                    setRefundQty(q);
+                    setRefundMode('cash'); setRefundAc(''); setRefundReason('');
+                  }} style={{ width: '100%', padding: '11px', borderRadius: '100px', border: '1.5px solid #ea580c', background: '#fff', color: '#ea580c', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    ↩ Оформить возврат
+                  </button>
+                )}
+              </div>
+            )}
+        </>)}
+      </Modal>
+
+      {/* Модалка возврата по чеку */}
+      <Modal open={!!refundReceipt} onClose={() => setRefundReceipt(null)} title={refundReceipt ? 'Возврат по чеку № ' + refundReceipt.receipt_number : ''} subtitle="Укажите количество, причину и способ возврата" width={640}>
+        {refundReceipt && (<>
+          <div style={{ border: '1px solid #eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '.7rem' }}>
+            <div style={{ display: 'flex', padding: '6px 10px', fontSize: '.7rem', fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '.3px', background: '#fafafa', borderBottom: '1px solid #eee' }}>
+              <span style={{ width: '70px' }}>Кол-во</span>
+              <span style={{ flex: 1 }}>Товар</span>
+              <span style={{ width: '110px', textAlign: 'right' }}>Сумма</span>
+            </div>
+            {receiptItems.map(it => {
+              const avail = refundableQty(refundReceipt, it);
+              if (avail <= 0) return null;
+              return (
+                <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 10px', borderBottom: '1px solid #f5f5f5', fontSize: '.82rem' }}>
+                  <input type="number" min="0" max={avail} value={refundQty[it.id] || 0}
+                    onChange={e => { const v = Math.min(avail, Math.max(0, parseInt(e.target.value) || 0)); setRefundQty(q => ({ ...q, [it.id]: v })); }}
+                    style={{ width: '58px', padding: '4px 6px', border: '1.5px solid var(--border)', borderRadius: '6px', textAlign: 'center', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none' }} />
+                  <span style={{ flex: 1, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product_name}</span>
+                  <span style={{ fontSize: '.72rem', color: '#999', width: '110px', textAlign: 'right' }}>
+                    {avail < (Number(it.quantity) || 1) ? 'осталось ' : ''}{Math.round(unitPrice(it) * (Number(refundQty[it.id]) || 0)).toLocaleString()} {cur}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="form-group">
+            <label>Причина возврата *</label>
+            <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошёл размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
+          </div>
+          <div className="form-group">
+            <label>Как возвращаем деньги</label>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {[{ k: 'cash', l: '💵 Наличными' }, { k: 'account', l: '🏦 На счёт / карту' }, { k: 'none', l: '🔄 Без денег (обмен)' }].map(m => (
+                <button key={m.k} type="button" onClick={() => setRefundMode(m.k)}
+                  style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === m.k ? '#111' : 'var(--border)'), background: refundMode === m.k ? '#111' : '#fff', color: refundMode === m.k ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{m.l}</button>
+              ))}
+            </div>
+            {refundMode === 'account' && (
+              <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '6px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
+                <option value="">— выберите счёт —</option>
+                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            )}
+            {refundMode === 'cash' && <div style={{ fontSize: '.72rem', color: '#999', marginTop: '4px' }}>Деньги вернутся из кассы (учтётся при закрытии смены)</div>}
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-outline" onClick={() => setRefundReceipt(null)}>Отмена</button>
+            <button type="button" className="btn btn-dark" onClick={doRefund} disabled={refunding} style={{ background: '#ea580c' }}>{refunding ? 'Оформляем...' : '↩ Оформить возврат'}</button>
+          </div>
         </>)}
       </Modal>
 
