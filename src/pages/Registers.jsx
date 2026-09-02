@@ -1057,16 +1057,6 @@ if (loading) return <CenterSpinner />;
               <div style={{display:'flex',alignItems:'center',gap:isWide?'6px':'3px'}}>
                 <div style={{flex:1,minWidth:0,paddingRight:"8px"}}>
                   <div style={{fontSize:'.82rem',fontWeight:500,color:'#222',lineHeight:1.3}}>{item.name}</div>
-                  {item.free_price ? (
-                    <input type="number" min="0" step="0.01" value={item.price === null || item.price === '' ? '' : item.price} placeholder="Цена"
-                      onChange={function(e){
-                        var raw = e.target.value;
-                        var v = raw === '' ? null : (parseFloat(raw) || 0);
-                        setCart(function(p){return p.map(function(x){return x.id===item.id?{...x, price: v, final_price: v}:x})})
-                      }}
-                      onFocus={function(e){e.target.select()}}
-                      style={{width:'90px',marginTop:'4px',border:'1.5px solid var(--border)',borderRadius:'7px',padding:'3px 6px',fontSize:'.8rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
-                  ) : null}
                   {item.combo_items && item.combo_items.length > 0 ? (
                     <div style={{fontSize:'.76rem',color:'var(--muted)',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
                   ) : null}
@@ -1076,7 +1066,21 @@ if (loading) return <CenterSpinner />;
                   <span style={{fontWeight:600,minWidth:'18px',textAlign:'center',fontSize:'.82rem'}}>{item.qty}</span>
                   <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, 1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'none',background:'transparent',fontSize:'.85rem',cursor:'pointer',color:'#444',fontFamily:'inherit',padding:0,lineHeight:1}}>+</button>
                 </div>
-                <div style={{fontWeight:700,fontSize:'.85rem',whiteSpace:'nowrap',flexShrink:0}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
+                {item.free_price ? (
+                  <div style={{display:'flex',alignItems:'center',gap:'4px',flexShrink:0}}>
+                    <input type="number" min="0" step="0.01" value={item.price === null || item.price === '' ? '' : item.price} placeholder="0"
+                      onChange={function(e){
+                        var raw = e.target.value;
+                        var v = raw === '' ? null : (parseFloat(raw) || 0);
+                        setCart(function(p){return p.map(function(x){return x.id===item.id?{...x, price: v, final_price: v}:x})})
+                      }}
+                      onFocus={function(e){e.target.select()}}
+                      style={{width:'78px',border:'1.5px solid #e8b800',borderRadius:'8px',padding:'4px 5px',fontSize:'.82rem',fontWeight:600,textAlign:'center',fontFamily:'inherit',outline:'none'}} />
+                    <span style={{fontSize:'.8rem',color:'#555'}}>{cur}</span>
+                  </div>
+                ) : (
+                  <div style={{fontWeight:700,fontSize:'.85rem',whiteSpace:'nowrap',flexShrink:0}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
+                )}
               </div>
               {/* Мастера/продавец — как в прототипе */}
               {employees.length > 0 && (
