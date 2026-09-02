@@ -990,8 +990,53 @@ if (loading) return <CenterSpinner />;
         {/* Карточка с панелями (белый блок с тенью) */}
         <div style={{display:'flex',flex:1,background:'#fff',borderRadius:'24px',boxShadow:'0 8px 60px rgba(0,0,0,.06)',overflow:'hidden'}}>
 
+      {/* Правая панель — товары */}
+      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
+        {/* Категории */}
+        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
+          <button onClick={() => setCatFilter('all')} style={{
+            padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
+            fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
+            background: catFilter === 'all' ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+            color: catFilter === 'all' ? '#111' : '#666', fontFamily:'inherit',
+          }}>Все</button>
+          {categories.map(c => (
+            <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
+              padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
+              fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
+              background: catFilter === c.name ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+              color: catFilter === c.name ? '#111' : '#666', fontFamily:'inherit',
+            }}>{c.name}</button>
+          ))}
+        </div>
+
+        {/* Сетка товаров */}
+        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat('+(window.innerWidth>1100?4:3)+',1fr)',gridAutoRows:'auto',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
+          {filtered.length === 0 ? (
+            <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
+          ) : filtered.map(p => (
+            <div key={p.id} onClick={function(){var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos)addToCart(p)}}
+              style={{background: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#fafafa':'#fff',borderRadius:'14px',padding:'10px',cursor:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?'default':'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid '+( (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#f0f0f0':'#eee' ),boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%',opacity:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?.5:1}}
+              onMouseEnter={e => { var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'}} }
+              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
+              <div style={{fontSize:'.80rem',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3}}>{p.name}</div>
+              <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
+                {p.cat && <div style={{fontSize:'.76rem',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'var(--muted)'}}>{p.cat}</div>}
+                <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
+                <span style={{fontSize:'.95rem',fontWeight:700,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} {cur}</span>
+                {p.type !== 'service' ? (
+                  <span style={{fontSize:'.76rem',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
+                ) : null}
+              </div>
+                {p.min_price > 0 && <div style={{fontSize:'.7rem',fontWeight:600,color:'#b45309'}}>Мин. цена: {Number(p.min_price).toLocaleString()} {cur}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Левая панель — чек */}
-      <div style={{width:isWide?'560px':'320px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRight:'1px solid #eee',overflow:'hidden'}}>
+      <div style={{width:isWide?'560px':'320px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderLeft:'1px solid #eee',overflow:'hidden'}}>
 
         {/* Список товаров в чеке — как таблица */}
         <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
@@ -1212,51 +1257,6 @@ if (loading) return <CenterSpinner />;
               </div>
             )}
           </div>
-      </div>
-
-      {/* Правая панель — товары */}
-      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
-        {/* Категории */}
-        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
-          <button onClick={() => setCatFilter('all')} style={{
-            padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
-            fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-            background: catFilter === 'all' ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
-            color: catFilter === 'all' ? '#111' : '#666', fontFamily:'inherit',
-          }}>Все</button>
-          {categories.map(c => (
-            <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
-              padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
-              fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-              background: catFilter === c.name ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
-              color: catFilter === c.name ? '#111' : '#666', fontFamily:'inherit',
-            }}>{c.name}</button>
-          ))}
-        </div>
-
-        {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat('+(window.innerWidth>1100?4:3)+',1fr)',gridAutoRows:'auto',gap:'8px',alignContent:'start',minHeight:0,width:'100%'}}>
-          {filtered.length === 0 ? (
-            <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
-          ) : filtered.map(p => (
-            <div key={p.id} onClick={function(){var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos)addToCart(p)}}
-              style={{background: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#fafafa':'#fff',borderRadius:'14px',padding:'10px',cursor:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?'default':'pointer',transition:'all .12s',display:'flex',flexDirection:'column',border:'1px solid '+( (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#f0f0f0':'#eee' ),boxShadow:'0 1px 4px rgba(0,0,0,.05)',height:'100%',opacity:(p.type!=='service'&&(stockMap[p.id]||0)<=0)?.5:1}}
-              onMouseEnter={e => { var oos=p.type!=='service'&&(stockMap[p.id]||0)<=0;if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'}} }
-              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)' } }>
-              <div style={{fontSize:'.80rem',fontWeight:600,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#999':'#222',lineHeight:1.3}}>{p.name}</div>
-              <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:'1px'}}>
-                {p.cat && <div style={{fontSize:'.76rem',color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#ccc':'var(--muted)'}}>{p.cat}</div>}
-                <div style={{display:'flex',alignItems:'baseline',gap:'8px'}}>
-                <span style={{fontSize:'.95rem',fontWeight:700,color: (p.type!=='service'&&(stockMap[p.id]||0)<=0)?'#bbb':'#000'}}>{(p.price||0).toLocaleString()} {cur}</span>
-                {p.type !== 'service' ? (
-                  <span style={{fontSize:'.76rem',fontWeight:500,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>остаток: {stockMap[p.id] || 0}</span>
-                ) : null}
-              </div>
-                {p.min_price > 0 && <div style={{fontSize:'.7rem',fontWeight:600,color:'#b45309'}}>Мин. цена: {Number(p.min_price).toLocaleString()} {cur}</div>}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       </div>
