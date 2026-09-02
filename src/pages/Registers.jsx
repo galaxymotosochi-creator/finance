@@ -779,7 +779,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100vh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
+    <div style={{background:'#f5f5f7',height:'100vh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
@@ -884,7 +884,7 @@ if (loading) return <CenterSpinner />;
         </div>
       )}
         {/* Единая плашка — Фамилия И. 🔒 | Чек № ▼ | ⚙ | 🔍 | +Добавить */}
-        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative'}}>
+        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative',flexShrink:0}}>
           <span style={{fontSize:'.80rem',fontWeight:600,color:'#444',whiteSpace:'nowrap'}}>{effectiveName}</span>
           <span onClick={()=>setPinLocked(true)} style={{fontSize:'.80rem',cursor:'pointer',color:'#777',userSelect:'none',lineHeight:1}} title="Заблокировать кассу">🔒</span>
 
