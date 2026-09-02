@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
+import { tzToday, tzOffsetDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 
 
@@ -44,7 +45,12 @@ export default function Receipts() {
   const [payAc, setPayAc] = useState('');
   const [payAmt, setPayAmt] = useState('');
   const [toast, setToast] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
+
+  // Сколько чеков подгружаем за раз (кнопка «Показать ещё»)
+  const PAGE_SIZE = 500;
 
   const load = async () => {
     if (!user) return;
@@ -55,11 +61,13 @@ export default function Receipts() {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(500);
+        .limit(PAGE_SIZE);
       setReceipts(data || []);
+      setHasMore((data || []).length === PAGE_SIZE);
     } catch (e) {
       // Таблица может ещё не существовать
       setReceipts([]);
+      setHasMore(false);
       console.warn('Таблица receipts недоступна. Выполните SQL миграцию в Supabase.');
     }
     try {
@@ -75,6 +83,33 @@ export default function Receipts() {
   };
 
   useEffect(() => { load(); }, [user]);
+
+  // Подгрузка следующих чеков («Показать ещё»): берём старше последнего загруженного
+  const loadMore = async () => {
+    if (loadingMore || !hasMore || !user) return;
+    setLoadingMore(true);
+    try {
+      const withDate = receipts.filter(r => r.created_at);
+      const last = withDate[withDate.length - 1];
+      if (!last) { setHasMore(false); return; }
+      const { data } = await supabase
+        .from('receipts')
+        .select('*')
+        .eq('user_id', user.id)
+        .lt('created_at', last.created_at)
+        .order('created_at', { ascending: false })
+        .limit(PAGE_SIZE);
+      const more = data || [];
+      if (more.length > 0) {
+        setReceipts(prev => {
+          const seen = new Set(prev.map(r => r.id));
+          return [...prev, ...more.filter(r => !seen.has(r.id))];
+        });
+      }
+      setHasMore(more.length === PAGE_SIZE);
+    } catch (e) {}
+    setLoadingMore(false);
+  };
 
   // Оптимистичная синхронизация: офлайн-чеки появляются сразу (с красной точкой)
   useOptimisticSync({ table: 'receipts', setList: setReceipts, onSynced: load });
@@ -110,9 +145,9 @@ export default function Receipts() {
     if (statusFilter && statusFilter !== 'unpaid' && r.status !== statusFilter) return false;
     // Фильтр по периоду
     const d = (r.date || r.created_at || '').split('T')[0];
-    if (period === 'today' && d !== new Date().toISOString().split('T')[0]) return false;
-    if (period === 'yesterday') { const y = new Date(); y.setDate(y.getDate()-1); if (d !== y.toISOString().split('T')[0]) return false; }
-    if (period === 'week') { const w = new Date(); w.setDate(w.getDate()-7); if (d < w.toISOString().split('T')[0]) return false; }
+    if (period === 'today' && d !== tzToday()) return false;
+    if (period === 'yesterday' && d !== tzOffsetDate(1)) return false;
+    if (period === 'week' && d < tzOffsetDate(7)) return false;
     if (period === 'custom' && !(d >= periodFrom && d <= periodTo)) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -174,7 +209,7 @@ export default function Receipts() {
       const txRes = await supabase.from('transactions').insert({
         user_id: user.id, type: 'income', amount: amt,
         description: 'Оплата долга по чеку № ' + payReceipt.receipt_number,
-        date: new Date().toISOString().split('T')[0],
+        date: tzToday(),
         account_id: payAc, status: 'paid', category_id: saleCatId,
       });
       if (txRes.error) throw txRes.error;
@@ -318,6 +353,16 @@ export default function Receipts() {
           </tbody>
         </table>
       </div>
+
+      {/* Показать ещё (если чеков больше, чем загружено) */}
+      {hasMore && (
+        <div style={{ textAlign: 'center', padding: '1rem 0 .5rem' }}>
+          <button onClick={loadMore} disabled={loadingMore} style={{ padding: '.5rem 1.4rem', borderRadius: '100px', border: '1.5px solid var(--border)', background: '#fff', color: '#444', fontSize: '.8rem', fontWeight: 600, cursor: loadingMore ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+            {loadingMore ? 'Загрузка...' : 'Показать ещё'}
+          </button>
+          <div style={{ fontSize: '.72rem', color: '#999', marginTop: '.35rem' }}>Показано чеков: {receipts.length}</div>
+        </div>
+      )}
 
       {/* Модалка состава чека */}
       <Modal open={!!selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={selectedReceipt ? 'Чек № ' + selectedReceipt.receipt_number : ''} subtitle={selectedReceipt ? (

@@ -23,6 +23,25 @@ export function fmtDate(d) {
 }
 
 /**
+ * Часовой пояс программы — из настроек (localStorage 'settings_tz'), по умолчанию Europe/Moscow
+ */
+export function getSettingsTz() {
+  try { return localStorage.getItem('settings_tz') || 'Europe/Moscow'; } catch (e) { return 'Europe/Moscow'; }
+}
+
+// Дата YYYY-MM-DD в часовом поясе настроек программы
+function tzDateStr(dt) {
+  try { return dt.toLocaleDateString('en-CA', { timeZone: getSettingsTz() }); }
+  catch (e) { return dt.toISOString().split('T')[0]; }
+}
+
+/** Сегодня в часовом поясе программы: "2026-09-02" */
+export function tzToday() { return tzDateStr(new Date()); }
+
+/** Дата со сдвигом на N дней назад (в поясе программы): "2026-08-26" */
+export function tzOffsetDate(days) { return tzDateStr(new Date(Date.now() - days * 86400000)); }
+
+/**
  * Форматирование суммы в рублях
  */
 export function fmtMoney(n) {

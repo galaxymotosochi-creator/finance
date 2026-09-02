@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrencySymbol } from '../lib/currency';
+import { tzToday } from '../lib/dates';
 
 
 export default function QuickSale({ onClose }) {
@@ -89,7 +90,7 @@ export default function QuickSale({ onClose }) {
   const total = cart.reduce((s, i) => s + (i.final_price || i.price) * i.qty, 0);
 
   const findPromo = (product) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = tzToday();
     // Активные акции (даты в БД — timestamptz, берём только дату)
     const active = promos.filter(p => {
       const sd = String(p.start_date || '').slice(0, 10);
@@ -178,7 +179,7 @@ export default function QuickSale({ onClose }) {
 
   const processSale = async () => {
     if (!cart.length || !selectedClient) return setToast('⚠️ Добавьте товары и выберите клиента');
-    const date = new Date().toISOString().split('T')[0];
+    const date = tzToday();
     
     let saleCatId = null;
     const { data: cats } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Доход от продаж').maybeSingle();

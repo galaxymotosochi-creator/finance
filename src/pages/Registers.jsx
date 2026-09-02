@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import useOptimisticSync from '../hooks/useOptimisticSync';
 import QuaggaInit from 'quagga';
 import { getCurrencySymbol } from '../lib/currency';
+import { tzToday } from '../lib/dates';
 import CenterSpinner from '../components/CenterSpinner';
 
 
@@ -315,7 +316,7 @@ export default function Registers({ fullscreen }) {
   }, [products, search, catFilter, stockMap]);
 
   const findPromo = (product) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = tzToday();
     // Активные акции (даты в БД — timestamptz, берём только дату)
     const active = promos.filter(p => {
       const sd = String(p.start_date || '').slice(0, 10);
@@ -424,7 +425,7 @@ export default function Registers({ fullscreen }) {
 
   const processPay = async () => {
     if (!cart.length) return;
-    const date = new Date().toISOString().split('T')[0];
+    const date = tzToday();
 
     // Проверки до создания чека (клиент обязателен только для продажи в долг)
     if (!selectedClient && payUnpaid) { setProcessingPay(false); return setToast('⚠️ Для продажи в долг выберите клиента'); }
@@ -1712,7 +1713,7 @@ if (loading) return <CenterSpinner />;
                   const txList = Object.entries(byAc).filter(([, amt]) => amt > 0).map(([acId, amt]) => ({
                     user_id: user.id, type: 'income', amount: Math.round(amt),
                     description: 'Кассовая смена №' + shiftNum,
-                    date: new Date().toISOString().split('T')[0],
+                    date: tzToday(),
                     account_id: acId, status: 'paid', category_id: saleCatId,
                   }));
                   if (txList.length > 0) await supabase.from('transactions').insert(txList);
