@@ -49,7 +49,7 @@ const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
 
 function FullKassa() {
   return (
-    <div style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f5f5f7'}}>
+    <div style={{height:'100dvh',display:'flex',flexDirection:'column',background:'#f5f5f7',overflow:'hidden'}}>
       <div style={{flex:1,overflow:'hidden'}}>
         <RegistersPage fullscreen />
       </div>

@@ -779,7 +779,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100vh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
+    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100%',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative',overflow:'hidden'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
