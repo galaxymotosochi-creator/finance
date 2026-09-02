@@ -374,8 +374,10 @@ export default function Receipts() {
                           </td>
                           <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: 'var(--muted)', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.quantity).toLocaleString()}</td>
                           <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: 'var(--muted)', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.price).toLocaleString()} {cur}</td>
-                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: '#16a34a', fontSize: '.78rem', fontWeight: 600, whiteSpace: 'nowrap', verticalAlign: 'top' }}>
-                            {Number(item.discount_amount) > 0 ? '\u2212' + Number(item.discount_amount).toLocaleString() + ' ' + cur : ''}
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', whiteSpace: 'nowrap', verticalAlign: 'top' }}>
+                            {Number(item.discount_amount) > 0
+                              ? <span style={{ color: '#16a34a', fontSize: '.78rem', fontWeight: 600 }}>\u2212{Number(item.discount_amount).toLocaleString()} {cur}</span>
+                              : <span style={{ color: '#bbb' }}>\u2014</span>}
                           </td>
                           <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', fontWeight: 600, whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.total).toLocaleString()} {cur}</td>
                           <td style={{ textAlign: 'left', padding: '7px 0 7px 0', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', verticalAlign: 'top' }}>
