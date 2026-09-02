@@ -38,6 +38,7 @@ export default function SalesReport() {
       const byEmp = {};
       if (rlist.length > 0) {
         const { data: items } = await supabase.from('receipt_items').select('*').in('receipt_id', rlist.map(r => r.id));
+        const prData = prRes.data || [], crData = crRes.data || [];
         (items || []).forEach(it => {
           const eid = it.employee_id;
           if (eid == null) return;
@@ -50,14 +51,15 @@ export default function SalesReport() {
           if (qty <= 0) return;
           const unit = qtyAll > 0 ? (Number(it.total) || 0) / qtyAll : 0;
           const total = Math.round(unit * qty);
-          const p = prods.concat(prRes.data || []).find(x => String(x.id) === String(it.product_id));
-          const type = p ? p.type : 'product';
-          const bonus = calcSalesBonus(byEmp[eid]?.rules || [], { product_id: it.product_id, total, qty }, prRes.data || [], crRes.data || []).rub;
-          if (!byEmp[eid]) {
+          const prod = prData.find(x => String(x.id) === String(it.product_id));
+          const type = prod ? prod.type : 'product';
+          let E = byEmp[eid];
+          if (!E) {
             const emp = (empRes.data || []).find(x => x.id === eid);
-            byEmp[eid] = { empId: eid, name: emp ? emp.name : 'Сотрудник', rules: emp ? (emp.bonus_rules || []) : [], qty: 0, prodQty: 0, svcQty: 0, sum: 0, bonus: 0, items: [] };
+            E = { empId: eid, name: emp ? emp.name : 'Сотрудник', rules: emp ? (emp.bonus_rules || []) : [], qty: 0, prodQty: 0, svcQty: 0, sum: 0, bonus: 0, items: [] };
+            byEmp[eid] = E;
           }
-          const E = byEmp[eid];
+          const bonus = calcSalesBonus(E.rules, { product_id: it.product_id, total, qty }, prData, crData).rub;
           E.qty += qty;
           if (type === 'service') E.svcQty += qty; else E.prodQty += qty;
           E.sum += total;

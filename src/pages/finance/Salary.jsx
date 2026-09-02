@@ -202,10 +202,12 @@ export default function Salary() {
     (async () => {
       setSalesLoaded(false);
       try {
-        if (prodRef.length === 0) {
+        let pr = prodRef, cr = catRef;
+        if (pr.length === 0) {
           const prRes = await supabase.from('products').select('id,name,type,cat').eq('user_id', user.id);
           const crRes = await supabase.from('stock_categories').select('id,name,type').eq('user_id', user.id);
-          setProdRef(prRes.data || []); setCatRef(crRes.data || []);
+          pr = prRes.data || []; cr = crRes.data || [];
+          setProdRef(pr); setCatRef(cr);
         }
         const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', fPeriodFrom).lte('date', fPeriodTo).order('created_at', { ascending: false });
         const rlist = recs || [];
@@ -228,7 +230,7 @@ export default function Salary() {
         const emp = employees.find(e => e.id === fEmpId);
         const rules = (emp && emp.bonus_rules) || [];
         const bonus = {};
-        rows.forEach(row => { const c = calcSalesBonus(rules, row, prodRef, catRef); bonus[row.itemId] = { rub: c.rub, pct: c.pct }; });
+        rows.forEach(row => { const c = calcSalesBonus(rules, row, pr, cr); bonus[row.itemId] = { rub: c.rub, pct: c.pct }; });
         setSalesBonus(bonus);
       } catch (e) {}
       setSalesLoaded(true);

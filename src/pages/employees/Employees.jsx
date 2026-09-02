@@ -40,6 +40,9 @@ const ALL_SECTIONS = [
     { id: 'team.positions', label: 'Должности' },
     { id: 'team.timesheet', label: 'Табель' },
   ]},
+  { id: 'reports', label: 'Отчёты', children: [
+    { id: 'reports.sales', label: 'Продажи по сотрудникам' },
+  ]},
   { id: 'settings', label: 'Настройки', children: [
     { id: 'settings.general', label: 'Общие' },
     { id: 'settings.venues', label: 'Заведения' },
@@ -134,8 +137,20 @@ export default function Employees() {
       if (posRes.data) setPositions(posRes.data);
       if (debtRes.data) setDebts(debtRes.data);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
-    setAllCats(getCats());
-    setAllProds(getProducts());
+    // Категории/товары для выбора в правилах бонусов: из кеша, при пустоте — из БД
+    let cats = getCats(), prods = getProducts();
+    if (cats.length === 0 || prods.length === 0) {
+      try {
+        const [crRes, prRes] = await Promise.all([
+          supabase.from('stock_categories').select('id,name,type').eq('user_id', user.id),
+          supabase.from('products').select('id,name,type,cat').eq('user_id', user.id),
+        ]);
+        if (crRes.data && cats.length === 0) cats = crRes.data;
+        if (prRes.data && prods.length === 0) prods = prRes.data;
+      } catch (e) {}
+    }
+    setAllCats(cats);
+    setAllProds(prods);
     setLoading(false);
   };
 
