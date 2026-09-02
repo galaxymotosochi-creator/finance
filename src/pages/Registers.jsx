@@ -106,7 +106,7 @@ export default function Registers({ fullscreen }) {
   const [employees, setEmployees] = useState([]);
   const [stockMap, setStockMap] = useState({});
   const [avgCostMap, setAvgCostMap] = useState({}); // средняя себестоимость: prodId -> цена за шт
-  const [isWide, setIsWide] = useState(window.innerWidth > 900);
+  const [isWide, setIsWide] = useState(window.innerWidth > 700);
   const [receiptDiscountPercent, setReceiptDiscountPercent] = useState(0);
   const [receiptDiscountFixed, setReceiptDiscountFixed] = useState(0);
   const [discountDropdownOpen, setDiscountDropdownOpen] = useState(false);
@@ -988,7 +988,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
-        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'6px 18px 18px'}}>
+        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
       <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
