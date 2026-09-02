@@ -689,6 +689,7 @@ export default function Receipts() {
                   </div>
                 )}
                 {selectedReceipt.status !== 'unpaid' && !itemsLoading && receiptItems.length > 0 && canRefund(selectedReceipt) && (
+                  <div style={{ textAlign: 'right' }}>
                   <button type="button" onClick={() => {
                     setRefundReceipt(selectedReceipt);
                     const q = {};
@@ -698,6 +699,7 @@ export default function Receipts() {
                   }} style={{ padding: '8px 20px', borderRadius: '100px', border: '1.5px solid #dc2626', background: '#fff', color: '#dc2626', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'inline-block', whiteSpace: 'nowrap' }}>
                     ↩ Оформить возврат
                   </button>
+                  </div>
                 )}
               </div>
             )}
