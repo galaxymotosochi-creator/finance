@@ -695,7 +695,7 @@ export default function Receipts() {
                     receiptItems.forEach(it => { q[it.id] = refundableQty(selectedReceipt, it); });
                     setRefundQty(q);
                     setRefundAc(''); setRefundReason('');
-                  }} style={{ width: '100%', padding: '11px', borderRadius: '100px', border: '1.5px solid #ea580c', background: '#fff', color: '#ea580c', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  }} style={{ padding: '8px 20px', borderRadius: '100px', border: '1.5px solid #dc2626', background: '#fff', color: '#dc2626', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'inline-block', whiteSpace: 'nowrap' }}>
                     ↩ Оформить возврат
                   </button>
                 )}
