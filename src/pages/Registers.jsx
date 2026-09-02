@@ -779,7 +779,7 @@ if (loading) return <CenterSpinner />;
       <style>{`
         .receipt-qty-btn { opacity: 1; }
       `}</style>
-    <div style={{background:'#f5f5f7',height:'100%',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
+    <div style={{background:'#f5f5f7',height:'100vh',display:'flex',flexDirection:'column',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
       {/* Экран блокировки */}
       {pinLocked && (
         <div style={{position:'absolute',inset:0,zIndex:1000,background:'#f5f5f7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:'24px'}}>
@@ -989,7 +989,7 @@ if (loading) return <CenterSpinner />;
         <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
+      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
@@ -1039,7 +1039,7 @@ if (loading) return <CenterSpinner />;
       </div>
 
       {/* Панель чека — отдельная плашка */}
-      <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),maxWidth:'46vw',display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
+      <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),maxWidth:'46vw',display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden',minHeight:0}}>
 
         {/* Шапка чека: номер + счётчик, тонкая полоса */}
         <div style={{padding:'12px 16px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
@@ -1048,7 +1048,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Содержимое чека */}
-        <div style={{flex:1,overflowY:'auto',padding:'2px 14px'}}>
+        <div style={{flex:1,overflowY:'auto',padding:'2px 14px',minHeight:0}}>
           {/* Строки товаров */}
           {cart.length === 0 ? (
             <div style={{textAlign:'center',padding:'2rem 1rem',color:'var(--muted)',fontSize:'.80rem',marginTop:'1rem'}}>Выберите товары</div>
