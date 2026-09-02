@@ -705,19 +705,28 @@ export default function Receipts() {
             </div>
             {receiptItems.map(it => {
               const avail = refundableQty(refundReceipt, it);
+              const qty = Number(refundQty[it.id]) || 0;
               if (avail <= 0) return null;
               return (
-                <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 10px', borderBottom: '1px solid #f5f5f5', fontSize: '.82rem' }}>
-                  <input type="number" min="0" max={avail} value={refundQty[it.id] || 0}
-                    onChange={e => { const v = Math.min(avail, Math.max(0, parseInt(e.target.value) || 0)); setRefundQty(q => ({ ...q, [it.id]: v })); }}
+                <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 10px', borderBottom: '1px solid #f5f5f5', fontSize: '.82rem', opacity: qty > 0 ? 1 : .45 }}>
+                  <input type="number" min="0" max={avail} value={qty}
+                    onChange={e => { const v = Math.min(avail, Math.max(0, parseInt(e.target.value) || 0)); setRefundQty(q2 => ({ ...q2, [it.id]: v })); }}
                     style={{ width: '58px', padding: '4px 6px', border: '1.5px solid var(--border)', borderRadius: '6px', textAlign: 'center', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none' }} />
                   <span style={{ flex: 1, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.product_name}</span>
-                  <span style={{ fontSize: '.72rem', color: '#999', width: '110px', textAlign: 'right' }}>
-                    {avail < (Number(it.quantity) || 1) ? 'осталось ' : ''}{Math.round(unitPrice(it) * (Number(refundQty[it.id]) || 0)).toLocaleString()} {cur}
+                  <span style={{ fontSize: '.72rem', color: '#999', width: '110px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    {avail < (Number(it.quantity) || 1) ? 'осталось ' : ''}{Math.round(unitPrice(it) * qty).toLocaleString()} {cur}
                   </span>
+                  <button type="button" title="Убрать позицию из возврата" onClick={() => setRefundQty(q2 => ({ ...q2, [it.id]: 0 }))}
+                    style={{ width: '24px', height: '24px', borderRadius: '6px', border: 'none', background: qty > 0 ? '#f5f5f5' : '#ea580c', color: qty > 0 ? '#999' : '#fff', fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, lineHeight: 1 }}>✕</button>
                 </div>
               );
             })}
+            {receiptItems.some(it => refundableQty(refundReceipt, it) > 0 && !((Number(refundQty[it.id]) || 0) > 0)) && (
+              <div style={{ textAlign: 'center', padding: '6px' }}>
+                <span onClick={() => { const n = {}; receiptItems.forEach(it => { const a = refundableQty(refundReceipt, it); if (a > 0) n[it.id] = a; }); setRefundQty(n); }}
+                  style={{ fontSize: '.72rem', color: '#ea580c', cursor: 'pointer', fontWeight: 600 }}>↺ Вернуть все позиции</span>
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label>Причина возврата *</label>
