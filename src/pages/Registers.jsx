@@ -57,7 +57,37 @@ export default function Registers({ fullscreen }) {
   const [payAmount, setPayAmount] = useState('');
   const [splitAmts, setSplitAmts] = useState({});
   const [processingPay, setProcessingPay] = useState(false);
+  const [refundToday, setRefundToday] = useState([]); // возвраты наличными за сегодня (по закрытым чекам)
   const showToast = (msg) => { setToast(msg); };
+
+  // Возвраты наличными, оформленные сегодня по чекам из ЗАКРЫТЫХ смен:
+  // деньги отданы из текущего ящика — показываем при закрытии смены и учитываем в остатке
+  const loadRefundToday = async () => {
+    try {
+      const cashAc = accounts.find(a => a.type === 'cash_register');
+      if (!cashAc) { setRefundToday([]); return; }
+      const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).eq('account_id', cashAc.id).order('created_at', { ascending: false });
+      const today = tzToday();
+      const list = (data || []).filter(t => t && (t.kind === 'refund' || (t.description || '').startsWith('Возврат по чеку')) && String(t.date || '').split('T')[0] === today);
+      const items = [];
+      for (const t of list) {
+        const m = (t.description || '').match(/Возврат по чеку №\s*(\d+)/);
+        let date = null;
+        if (m) {
+          const { data: rc } = await supabase.from('receipts').select('date').eq('user_id', user.id).eq('receipt_number', parseInt(m[1])).maybeSingle();
+          if (rc) date = rc.date;
+        }
+        items.push({
+          receipt_number: m ? m[1] : '—',
+          date: date || null,
+          amount: Number(t.amount) || 0,
+          reason: (t.description || '').replace(/^Возврат по чеку №\s*\d+\s*[—-]?\s*/, ''),
+        });
+      }
+      setRefundToday(items);
+    } catch (e) { setRefundToday([]); }
+  };
+  const refundSum = (refundToday || []).reduce((s2, rf) => s2 + (Number(rf.amount) || 0), 0);
   const [showActions, setShowActions] = useState(false);
   const [editingCashier, setEditingCashier] = useState(false);
   const [displayCashierName, setDisplayCashierName] = useState('');
@@ -1529,6 +1559,7 @@ if (loading) return <CenterSpinner />;
                 setShowActions(false);
                 const { data } = await supabase.from('receipts').select('*').eq('user_id', user.id).eq('shift_id', activeShift.id);
                 setShiftReceipts(data || []);
+                loadRefundToday();
                 setShowCloseShift(true);
               }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Закрыть смену</button>
               <button onClick={() => { setShowActions(false); setEditingCashier(true); }} style={{padding:'12px 16px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#222',fontSize:'.80rem',fontWeight:600,cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>Сменить кассира</button>
@@ -1545,7 +1576,7 @@ if (loading) return <CenterSpinner />;
             <h2>Сменить кассира</h2>
             <div style={{background:'#f9f9f9',borderRadius:'8px',padding:'10px',marginBottom:'12px',fontSize:'.80rem',lineHeight:1.7}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#777'}}>Текущий:</span><span style={{fontWeight:600}}>{activeShift?.cashier_name || effectiveName || 'Кассир'}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;(shiftReceipts||[]).forEach(function(r){(r.payments||[]).forEach(function(p){if(p.account_id===ca.id)b+=Number(p.amount||0)});});}return Math.round(b).toLocaleString()})()} {cur}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#777"}}>&#x41E;&#x441;&#x442;&#x430;&#x442;&#x43E;&#x43A; &#x432; &#x43A;&#x430;&#x441;&#x441;&#x435;:</span><span style={{fontWeight:700}}>{(function(){var b=0;var ca=accounts.find(function(a){return a.type==="cash_register"});if(ca){b=parseFloat(ca.balance)||0;(shiftReceipts||[]).forEach(function(r){(r.payments||[]).forEach(function(p){if(p.account_id===ca.id)b+=Number(p.amount||0)});});}return Math.round(b - refundSum).toLocaleString()})()} {cur}</span></div>
             </div>
             <div className="form-group">
               <label>Новый кассир</label>
@@ -1670,10 +1701,23 @@ if (loading) return <CenterSpinner />;
                   </div>
                 ) : null;
               })()}
+              {refundSum > 0 && (
+                <>
+                  <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
+                  <div style={{fontWeight:700,color:'#ea580c',padding:'2px 0'}}>↩ Возвраты наличными за смену</div>
+                  {refundToday.map((rf, i) => (
+                    <div key={i} style={{display:'flex',padding:'2px 0',color:'#ea580c'}}>
+                      <span style={{flex:1}}>Чек №{rf.receipt_number}{rf.date ? ' от ' + String(rf.date).split('T')[0].split('-').reverse().join('.') : ''}{rf.reason ? ' — ' + rf.reason : ''}</span>
+                      <span>−{rf.amount.toLocaleString()} {cur}</span>
+                    </div>
+                  ))}
+                  <div style={{fontSize:'.70rem',color:'#c97a3d',padding:'2px 0'}}>Деньги отданы из кассы по возвратам (по чекам прошлых дней) — учтены в расчётном остатке</div>
+                </>
+              )}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:700}}>
                 <span style={{flex:1}}>Расчётный остаток</span>
-                <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) ).toLocaleString()} {cur}</span>
+                <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) - refundSum ).toLocaleString()} {cur}</span>
               </div>
             </div>
 
@@ -1682,7 +1726,7 @@ if (loading) return <CenterSpinner />;
               <input type="number" min="0" step="0.01" placeholder="0" value={closeFactBal} onChange={e => setCloseFactBal(e.target.value)} autoFocus />
             </div>
             {closeFactBal && (() => {
-              const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
+              const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) - refundSum;
               const fact = parseFloat(closeFactBal) || 0;
               const diff = fact - calcBal;
               if (Math.abs(diff) < 0.01) {
@@ -1697,7 +1741,7 @@ if (loading) return <CenterSpinner />;
               <button type="button" className="btn btn-account-select" style={{background:'#dc2626',color:'#fff'}} onClick={async () => {
                 const fact = parseFloat(closeFactBal);
                 if (isNaN(fact)) return setToast('⚠️ Введите фактический остаток');
-                const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0);
+                const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) - refundSum;
                 try {
                   // Номер смены (для описания транзакции): считаем только закрытые + 1.
                   // Внимание: кастомный клиент не поддерживает count/head — берём длину списка закрытых смен.

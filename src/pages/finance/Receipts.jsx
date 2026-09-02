@@ -55,6 +55,8 @@ export default function Receipts() {
   const [refunding, setRefunding] = useState(false);
   const [productTypes, setProductTypes] = useState({});
   const [productNames, setProductNames] = useState({});
+  const [txs, setTxs] = useState([]);
+  const [refundAltAc, setRefundAltAc] = useState('');
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   // Сколько чеков подгружаем за раз (кнопка «Показать ещё»)
@@ -81,6 +83,9 @@ export default function Receipts() {
     try {
       const { data: ac } = await supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id);
       setAccounts(ac || []);
+      // Транзакции — чтобы проверять остатки на счетах при возврате
+      const { data: txData } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+      setTxs(txData || []);
     } catch (e) { setAccounts([]); }
     try {
       // Сотрудники (продавцы/исполнители) — для деталей чека
@@ -217,6 +222,39 @@ export default function Receipts() {
     return q > 0 ? (Number(item.total) || 0) / q : 0;
   };
 
+  // Текущий остаток счёта: начальный баланс + все движения
+  const accBalance = (acId) => {
+    const ac = accounts.find(a => a.id === acId);
+    let b = parseFloat(ac?.balance) || 0;
+    (txs || []).forEach(t => { if (t.account_id === acId) b += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
+    return b;
+  };
+  // Куда и сколько вернуть денег (пропорционально счетам оплаты)
+  const calcRefundSplits = (r, sumItems) => {
+    const paidAvail = Math.max(0, (Number(r.paid_amount) || 0) - (Number(r.refund_amount) || 0));
+    const money = Math.min(sumItems, paidAvail);
+    const payList = (Array.isArray(r.payments) ? r.payments : []).filter(p => p && p.account_id && Number(p.amount) > 0);
+    const totalPaid = payList.reduce((s2, p) => s2 + (Number(p.amount) || 0), 0);
+    const splits = [];
+    if (money > 0 && totalPaid > 0) {
+      let rest = money;
+      payList.forEach((p, idx) => {
+        if (rest <= 0) return;
+        const isLast = idx === payList.length - 1;
+        let share = isLast ? rest : Math.round((Number(p.amount) || 0) * money / totalPaid);
+        share = Math.max(0, Math.min(share, rest));
+        if (share > 0) splits.push({ account_id: p.account_id, amount: share });
+        rest -= share;
+      });
+    }
+    return { splits, money, hasPayList: totalPaid > 0 };
+  };
+  // Не хватает ли денег на счетах оплаты
+  const refundShortage = (r, sumItems) => {
+    const { splits } = calcRefundSplits(r, sumItems);
+    return splits.some(sp => accBalance(sp.account_id) < sp.amount - 0.01);
+  };
+
   // Сумма долга по чеку (не оплачено)
   const receiptRemain = (r) => Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0));
 
@@ -274,29 +312,20 @@ export default function Receipts() {
     if (rows.length === 0) return alert('Укажите количество для возврата');
     const sumItems = rows.reduce((s2, x) => s2 + x.total, 0);
     if (sumItems <= 0) return alert('Сумма возврата равна нулю');
-    // Возврат денег — строго с тех же счетов, которыми оплачен чек (пропорционально),
-    // чтобы одни и те же деньги не путались между счетами
-    const payList = Array.isArray(r.payments) ? r.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
-    const totalPaid = payList.reduce((s2, p) => s2 + (Number(p.amount) || 0), 0);
-    const paidAvail = Math.max(0, (Number(r.paid_amount) || 0) - (Number(r.refund_amount) || 0));
-    const money = Math.min(sumItems, paidAvail);
+    // Возврат денег — с тех же счетов, которыми оплачен чек (пропорционально).
+    // Если на них не хватает — кассир выбирает другой счёт (например, куда инкассировали)
+    const { splits: autoSplits, money, hasPayList } = calcRefundSplits(r, sumItems);
     const diff = sumItems - money;
-    const splits = [];
+    let splits = autoSplits;
     if (money > 0) {
-      if (totalPaid > 0) {
-        // Распределяем пропорционально счетам оплаты (остаток от округления — первому)
-        let rest = money;
-        payList.forEach((p, idx) => {
-          if (rest <= 0) return;
-          const isLast = idx === payList.length - 1;
-          let share = isLast ? rest : Math.round((Number(p.amount) || 0) * money / totalPaid);
-          share = Math.max(0, Math.min(share, rest));
-          if (share > 0) splits.push({ account_id: p.account_id, amount: share });
-          rest -= share;
-        });
-      } else if (refundAc) {
-        // Нет разбивки оплаты (старые/быстрые чеки) — возврат на выбранный счёт
-        splits.push({ account_id: refundAc, amount: money });
+      const shortage = autoSplits.some(sp => accBalance(sp.account_id) < sp.amount - 0.01);
+      if (shortage) {
+        if (!refundAltAc) return alert('На счетах оплаты недостаточно средств — выберите счёт, с которого вернуть деньги');
+        if (accBalance(refundAltAc) < money - 0.01) return alert('На выбранном счёте недостаточно средств (доступно ' + Math.max(0, Math.round(accBalance(refundAltAc))).toLocaleString() + ' ' + cur + ')');
+        splits = [{ account_id: refundAltAc, amount: money }];
+      } else if (!hasPayList) {
+        if (!refundAc) return alert('По чеку нет разбивки оплаты — выберите счёт для возврата');
+        splits = [{ account_id: refundAc, amount: money }];
       }
       if (splits.length === 0) return alert('Не удалось определить счёт возврата — выберите счёт');
     }
@@ -695,18 +724,40 @@ export default function Receipts() {
             <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошёл размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
           </div>
           <div className="form-group">
-            <label>Возврат денег — как было оплачено</label>
+            <label>Возврат денег</label>
             {(() => {
               const acName = (id) => { const a = accounts.find(x => x.id === id); return a ? a.name : 'Счёт'; };
               const payList = (refundReceipt && Array.isArray(refundReceipt.payments)) ? refundReceipt.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
-              if (payList.length > 0) return <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px', lineHeight: 1.6 }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}<br />Вернём с этих же счетов пропорционально. Если клиент возьмёт другой товар — пробьёте новый чек</div>;
-              return (
+              // Считаем сумму возврата по выбранным позициям
+              let selSum = 0;
+              receiptItems.forEach(it => { const q = Number(refundQty[it.id]) || 0; if (q > 0) selSum += Math.round(unitPrice(it) * q); });
+              if (selSum <= 0) return <div style={{ fontSize: '.72rem', color: '#999', marginTop: '5px' }}>Укажите количество возвращаемых позиций выше</div>;
+              const { splits, money } = calcRefundSplits(refundReceipt, selSum);
+              const shortage = splits.some(sp => accBalance(sp.account_id) < sp.amount - 0.01);
+              const withMoney = accounts.filter(a => accBalance(a.id) > 0);
+              if (payList.length === 0) return (
                 <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px' }}>
                   По чеку нет разбивки оплаты — выберите счёт возврата:
                   <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
                     <option value="">— выберите счёт —</option>
-                    {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                    {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.max(0, Math.round(accBalance(a.id))).toLocaleString()} {cur}</option>)}
                   </select>
+                </div>
+              );
+              return (
+                <div style={{ fontSize: '.72rem', marginTop: '5px', lineHeight: 1.7 }}>
+                  <div style={{ color: '#777' }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}. Вернём: <b>{money.toLocaleString()} {cur}</b></div>
+                  {shortage ? (
+                    <>
+                      <div style={{ color: '#dc2626', marginTop: '2px' }}>⚠️ На счетах оплаты недостаточно средств (касса могла быть инкассирована). Выберите счёт, с которого вернуть:</div>
+                      <select value={refundAltAc} onChange={e => setRefundAltAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid #fca5a5', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
+                        <option value="">— выберите счёт —</option>
+                        {withMoney.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.round(accBalance(a.id)).toLocaleString()} {cur}</option>)}
+                      </select>
+                    </>
+                  ) : (
+                    <div style={{ color: '#777' }}>Вернём с этих же счетов пропорционально. Если клиент возьмёт другой товар — пробьёте новый чек</div>
+                  )}
                 </div>
               );
             })()}
