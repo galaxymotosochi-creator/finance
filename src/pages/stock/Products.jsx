@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode } from '../../lib/barcodeScanner';
+import Loader from '../../components/Loader';
 
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
@@ -119,6 +120,7 @@ export default function Products() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
+  const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
   const [activeCols, setActiveColsState] = useState(getCols);
   const [selectedCats, setSelectedCats] = useState(new Set());
@@ -188,6 +190,7 @@ export default function Products() {
     if (!user) return;
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     if (data) setProductsState(data);
+    setLoaded(true);
   }, [user]);
 
   // Оптимистичная синхронизация: офлайн-товары фиксируются в реестре и появляются сразу (с красной точкой)
@@ -783,6 +786,9 @@ export default function Products() {
 
       </div>
       {/* Таблица */}
+      {!loaded ? (
+        <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}><Loader /></div>
+      ) : (
       <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
         <table className="data-table">
           <thead id="colHeaders">
@@ -844,6 +850,7 @@ export default function Products() {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Модалка товара */}
       <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
