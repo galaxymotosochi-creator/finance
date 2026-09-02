@@ -786,9 +786,7 @@ export default function Products() {
       </div>
       {/* Таблица */}
       {!loaded ? (
-        <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',minHeight:0}}>
-          <div style={{width:'26px',height:'26px',border:'3px solid #eee',borderTopColor:'#111',borderRadius:'50%',animation:'spin 0.8s linear infinite'}} />
-        </div>
+        <div style={{flex:1,minHeight:0}} />
       ) : (
       <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
         <table className="data-table">
@@ -851,6 +849,13 @@ export default function Products() {
           </tbody>
         </table>
       </div>
+      )}
+
+      {/* Кружок по центру экрана, пока грузятся товары (не перекрывает интерфейс, без надписи) */}
+      {!loaded && (
+        <div style={{position:'fixed',inset:0,zIndex:999,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
+          <div style={{width:'26px',height:'26px',border:'3px solid #eee',borderTopColor:'#111',borderRadius:'50%',animation:'spin 0.8s linear infinite',background:'#fff',boxShadow:'0 0 0 6px #fff'}} />
+        </div>
       )}
 
       {/* Модалка товара */}
