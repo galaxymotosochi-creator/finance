@@ -922,7 +922,7 @@ if (loading) return <CenterSpinner />;
             if(found){addToCart(found);setToast('Найден: '+found.name)}else setToast('Товар со штрихкодом '+bc+' не найден');
           })}} title="Сканировать штрихкод"
             style={{padding:'8px 10px',borderRadius:'8px',cursor:'pointer',fontSize:'1rem',color:'#777',lineHeight:1,userSelect:'none',display:'inline-flex',alignItems:'center'}}><svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M3 7V5a2 2 0 0 1 2-2h2'/><path d='M17 3h2a2 2 0 0 1 2 2v2'/><path d='M21 17v2a2 2 0 0 1-2 2h-2'/><path d='M7 21H5a2 2 0 0 1-2-2v-2'/><rect x='7' y='7' width='10' height='10' rx='2' fill='currentColor' fill-opacity='.15'/><path d='M10 9h.5' stroke-width='2.5'/><path d='M13 9h.5' stroke-width='2.5'/><path d='M10 12h3'/><path d='M10 15h2' stroke-width='2.5'/></svg></span>
-          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'#000',color:'#fff',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
+          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
         </div>
 
         {/* Карточка с панелями (белый блок с тенью) */}
@@ -1128,9 +1128,10 @@ if (loading) return <CenterSpinner />;
                 )}
                 <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
                   flex:1, padding:'13px', borderRadius:'100px', border:'none',
-                  background: cart.length ? '#ffdd2d' : '#ddd',
+                  background: cart.length ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#ddd',
                   color: cart.length ? '#111' : '#fff', fontSize:'.80rem', fontWeight:700,
                   cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
+                  boxShadow: cart.length ? '0 2px 10px rgba(255,205,0,.35)' : 'none',
                 }}>Продажа</button>
               </div>
             )}
@@ -1144,15 +1145,15 @@ if (loading) return <CenterSpinner />;
           <button onClick={() => setCatFilter('all')} style={{
             padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-            background: catFilter === 'all' ? '#000' : '#e8e8ed',
-            color: catFilter === 'all' ? '#fff' : '#666', fontFamily:'inherit',
+            background: catFilter === 'all' ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+            color: catFilter === 'all' ? '#111' : '#666', fontFamily:'inherit',
           }}>Все</button>
           {categories.map(c => (
             <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
               padding:'5px 12px', borderRadius:'6px', border:'none', fontSize:'.76rem',
               fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-              background: catFilter === c.name ? '#000' : '#e8e8ed',
-              color: catFilter === c.name ? '#fff' : '#666', fontFamily:'inherit',
+              background: catFilter === c.name ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+              color: catFilter === c.name ? '#111' : '#666', fontFamily:'inherit',
             }}>{c.name}</button>
           ))}
         </div>
