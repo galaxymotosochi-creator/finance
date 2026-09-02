@@ -884,7 +884,7 @@ if (loading) return <CenterSpinner />;
         </div>
       )}
         {/* Единая плашка — Фамилия И. 🔒 | Чек № ▼ | ⚙ | 🔍 | +Добавить */}
-        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative'}}>
+        <div style={{margin:'0 18px 8px',padding:'8px 14px',background:'#fff',borderRadius:'12px',display:'flex',alignItems:'center',gap:'10px',boxShadow:'0 2px 10px rgba(0,0,0,.08)',position:'relative',flexShrink:0}}>
           <span style={{fontSize:'.80rem',fontWeight:600,color:'#444',whiteSpace:'nowrap'}}>{effectiveName}</span>
           <span onClick={()=>setPinLocked(true)} style={{fontSize:'.80rem',cursor:'pointer',color:'#777',userSelect:'none',lineHeight:1}} title="Заблокировать кассу">🔒</span>
 
@@ -989,7 +989,7 @@ if (loading) return <CenterSpinner />;
         <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
+      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
@@ -1039,7 +1039,7 @@ if (loading) return <CenterSpinner />;
       </div>
 
       {/* Панель чека — отдельная плашка */}
-      <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
+      <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),maxWidth:'46vw',display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
         {/* Шапка чека: номер + счётчик, тонкая полоса */}
         <div style={{padding:'12px 16px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
