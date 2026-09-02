@@ -777,9 +777,7 @@ if (loading) return <CenterSpinner />;
   return (
     <>
       <style>{`
-        .receipt-qty-btn { opacity: 0; transition: opacity .12s; }
-        .receipt-qty:hover .receipt-qty-btn { opacity: 1; }
-        .receipt-qty-btn:active { opacity: 1; }
+        .receipt-qty-btn { opacity: 1; }
       `}</style>
     <div style={{background:'#f5f5f7',height:'100%',display:'flex',padding:'12px 0 0',width:'100vw',boxSizing:'border-box',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,sans-serif',position:'relative'}}>
       {/* Экран блокировки */}
@@ -1058,60 +1056,58 @@ if (loading) return <CenterSpinner />;
             <div key={item.id} style={{padding:'12px 0',borderBottom:'1px solid #f0f0f0'}}>
               <div style={{display:'flex',alignItems:'center',gap:isWide?'6px':'3px'}}>
                 <div style={{flex:1,minWidth:0,paddingRight:"8px"}}>
-                  <div style={{fontSize:'.80rem',fontWeight:500}}>{item.name}</div>
-                  {item.combo_items && item.combo_items.length > 0 ? (
-                    <div style={{fontSize:'.76rem',color:'var(--muted)',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
-                  ) : null}
-                </div>
-                <div className="receipt-qty" style={{width:isWide?'80px':'60px',display:'flex',alignItems:'center',justifyContent:'center',gap:'4px',alignSelf:'stretch'}}>
-                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, -1)}} style={{width:'18px',height:'20px',borderRadius:'4px',border:'1px solid var(--border)',background:'#fff',fontSize:'.76rem',cursor:'pointer',color:'#444',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',padding:0,lineHeight:1}}>-</button>
-                  <span style={{fontWeight:600,minWidth:'20px',textAlign:'center',fontSize:'.80rem',display:'inline-block'}}>{item.qty}</span>
-                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, 1)}} style={{width:'18px',height:'20px',borderRadius:'4px',border:'1px solid var(--border)',background:'#fff',fontSize:'.76rem',cursor:'pointer',color:'#444',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',padding:0,lineHeight:1}}>+</button>
-                </div>
-                <div style={{width:isWide?'80px':'60px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>
+                  <div style={{fontSize:'.82rem',fontWeight:500,color:'#222',lineHeight:1.3}}>{item.name}</div>
                   {item.free_price ? (
-                    <input type="number" min="0" step="0.01" value={item.price === null || item.price === '' ? '' : item.price} placeholder="0"
+                    <input type="number" min="0" step="0.01" value={item.price === null || item.price === '' ? '' : item.price} placeholder="Цена"
                       onChange={function(e){
                         var raw = e.target.value;
                         var v = raw === '' ? null : (parseFloat(raw) || 0);
                         setCart(function(p){return p.map(function(x){return x.id===item.id?{...x, price: v, final_price: v}:x})})
                       }}
                       onFocus={function(e){e.target.select()}}
-                      style={{width:'52px',textAlign:'center',border:'1.5px solid var(--border)',borderRadius:'5px',padding:'3px 4px',fontSize:'.80rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
-                  ) : (
-                    <span>{(item.final_price || item.price || 0).toLocaleString()} {cur}</span>
-                  )}
+                      style={{width:'90px',marginTop:'4px',border:'1.5px solid var(--border)',borderRadius:'7px',padding:'3px 6px',fontSize:'.8rem',fontWeight:600,fontFamily:'inherit',outline:'none'}} />
+                  ) : null}
+                  {item.combo_items && item.combo_items.length > 0 ? (
+                    <div style={{fontSize:'.76rem',color:'var(--muted)',marginTop:'2px'}}>Cocтaв: {item.combo_items.map(function(ci, j){return <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>;})}</div>
+                  ) : null}
                 </div>
-                <div style={{width:isWide?'90px':'70px',textAlign:'center',fontSize:'.80rem',fontWeight:600,display:'inline-block'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
+                <div className="receipt-qty" style={{display:'flex',alignItems:'center',background:'#f4f4f6',borderRadius:'8px',padding:'2px 2px',flexShrink:0}}>
+                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, -1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'none',background:'transparent',fontSize:'.85rem',cursor:'pointer',color:'#444',fontFamily:'inherit',padding:0,lineHeight:1}}>-</button>
+                  <span style={{fontWeight:600,minWidth:'18px',textAlign:'center',fontSize:'.82rem'}}>{item.qty}</span>
+                  <button class="receipt-qty-btn" onClick={function(){updateQty(item.id, 1)}} style={{width:'24px',height:'24px',borderRadius:'6px',border:'none',background:'transparent',fontSize:'.85rem',cursor:'pointer',color:'#444',fontFamily:'inherit',padding:0,lineHeight:1}}>+</button>
+                </div>
+                <div style={{fontWeight:700,fontSize:'.85rem',whiteSpace:'nowrap',flexShrink:0}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
               </div>
-              {/* Исполнители/продавцы с долями */}
+              {/* Мастера/продавец — как в прототипе */}
               {employees.length > 0 && (
-                <div style={{paddingTop:'8px',display:'flex',flexDirection:'column',gap:'5px'}}>
-                  {(item.sp || []).map(function(spd, si){
-                    return (
-                      <div key={si} style={{display:'flex',alignItems:'center',gap:'6px',background:'#f6f7fb',borderRadius:'9px',padding:'4px 8px',fontSize:'.74rem'}}>
-                        <span style={{width:'18px',height:'18px',borderRadius:'50%',background:'#e3e6f0',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.62rem',fontWeight:700,color:'#555',flexShrink:0}}>{spd.name.charAt(0)}</span>
-                        <span style={{flex:1,fontWeight:600,color:'#333',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{spd.name}</span>
-                        <input type="number" min="0" placeholder="0" value={spd.amt}
-                          onChange={function(e){setSplitAmt(item.id, spd.empId, e.target.value);}}
-                          style={{width:'64px',border:'1px solid #e0e0e0',borderRadius:'7px',padding:'3px 5px',fontSize:'.74rem',textAlign:'center',fontFamily:'inherit',outline:'none'}} />
-                        <span style={{fontSize:'.68rem',color:'#999'}}>{cur}</span>
-                        <span onClick={function(){delSplit(item.id, spd.empId);}} style={{cursor:'pointer',color:'#ccc',fontSize:'.8rem',lineHeight:1}}>✕</span>
-                      </div>
-                    );
-                  })}
-                  {spSum(item) > 0 && (
-                    <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a'}}>
-                      {spOver(item) ? '⚠️ Сумма исполнителям ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur + ' больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : '✓ Исполнителям: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
+                <div style={{marginTop:'9px',border:'1px solid #eee',borderRadius:'12px',background:'#fafbfc',overflow:'hidden'}}>
+                  <div onClick={function(){setPickEmpFor(item.id);}}
+                    style={{padding:'7px 11px',fontSize:'.74rem',color:'#777',display:'flex',justifyContent:'space-between',cursor:'pointer',fontWeight:600,userSelect:'none'}}>
+                    <span>{item.type === 'service' ? 'Мастера' : 'Продавец'}</span>
+                    <span style={{color: (item.sp || []).length ? '#222' : '#8a8f9c'}}>{(item.sp || []).length ? Math.round(spSum(item)).toLocaleString() + ' ' + cur : '+ добавить'}</span>
+                  </div>
+                  {(item.sp || []).length > 0 && (
+                    <div style={{padding:'0 10px 9px',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'6px'}}>
+                      {(item.sp || []).map(function(spd, si){
+                        return (
+                          <div key={si} style={{display:'flex',alignItems:'center',gap:'7px',fontSize:'.76rem'}}>
+                            <span style={{width:'20px',height:'20px',borderRadius:'50%',background:'#e3e6f0',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.64rem',fontWeight:700,color:'#555',flexShrink:0}}>{spd.name.charAt(0)}</span>
+                            <span style={{flex:1,fontWeight:600,color:'#333',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{spd.name}</span>
+                            <input type="number" min="0" placeholder="0" value={spd.amt}
+                              onChange={function(e){setSplitAmt(item.id, spd.empId, e.target.value);}}
+                              style={{width:'64px',border:'1px solid #e0e0e0',borderRadius:'7px',padding:'3px 5px',fontSize:'.76rem',textAlign:'center',fontFamily:'inherit',outline:'none'}} />
+                            <span style={{fontSize:'.68rem',color:'#999'}}>{cur}</span>
+                            <span onClick={function(){delSplit(item.id, spd.empId);}} style={{cursor:'pointer',color:'#ccc',fontSize:'.82rem',lineHeight:1}}>✕</span>
+                          </div>
+                        );
+                      })}
+                      {spSum(item) > 0 && (
+                        <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a'}}>
+                          {spOver(item) ? '⚠️ Больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : '✓ Распределено: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
+                        </div>
+                      )}
                     </div>
                   )}
-                  <div style={{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
-                    <span onClick={function(){setPickEmpFor(item.id);}}
-                      style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'1.5px dashed #c9ccd6',color:'#8a8f9c',borderRadius:'100px',padding:'2px 10px',fontSize:'.68rem',fontWeight:600,cursor:'pointer',background:'#fff'}}>+ {item.type === 'service' ? 'Исполнитель' : 'Продавец'}</span>
-                    {item.type === 'service' && (item.sp || []).length === 0 && (
-                      <span style={{fontSize:'.66rem',color:'#d97706'}}>не указан</span>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
