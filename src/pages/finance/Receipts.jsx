@@ -351,7 +351,7 @@ export default function Receipts() {
                   <span style={{ width: '50px', textAlign: 'left' }}>Кол-во</span>
                   <span style={{ width: '70px', textAlign: 'right' }}>Цена</span>
                   <span style={{ width: '80px', textAlign: 'right' }}>Сумма</span>
-                  <span style={{ width: '190px', textAlign: 'left' }}>Продавец/Исполнитель</span>
+                  <span style={{ width: '190px', textAlign: 'left', paddingLeft: '16px' }}>Продавец/Исполнитель</span>
                 </div>
                 {receiptItems.map(function(item) {
                   var combo = item.combo_items;
@@ -362,7 +362,7 @@ export default function Receipts() {
                         <span style={{ width: '50px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
                         <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
-                        <span style={{ width: '190px', textAlign: 'left', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{ width: '190px', textAlign: 'left', paddingLeft: '16px', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {item.employee_id ? empShort(item.employee_id) : '—'}
                         </span>
                       </div>
