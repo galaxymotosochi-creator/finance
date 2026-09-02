@@ -1039,7 +1039,7 @@ if (loading) return <CenterSpinner />;
       </div>
 
       {/* Панель чека — отдельная плашка */}
-      <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),maxWidth:'46vw',display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
+      <div style={{flex:'0 0 420px',display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
         {/* Шапка чека: номер + счётчик, тонкая полоса */}
         <div style={{padding:'12px 16px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
