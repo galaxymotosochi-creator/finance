@@ -598,15 +598,24 @@ export default function Receipts() {
                   <tbody>
                     {receiptItems.map(function(item) {
                       var combo = item.combo_items;
+                      // Сколько по этой позиции уже возвращено (для зачёркивания)
+                      var retQty = returnedQtyByItem(selectedReceipt, item.id);
+                      var itemQty = Number(item.quantity) || 1;
+                      var isRefunded = retQty > 0;
                       return (
                         <tr key={item.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                           <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', fontWeight: 500, verticalAlign: 'top' }}>
-                            {item.product_name}
+                            <span style={{ textDecoration: isRefunded ? 'line-through' : 'none', color: isRefunded ? '#aaa' : 'inherit' }}>{item.product_name}</span>
                             {combo && Array.isArray(combo) && combo.length > 0 && (
                               <div style={{ paddingTop: '2px', fontSize: '.72rem', color: '#999', fontWeight: 400 }}>
                                 Cocтaв: {combo.map(function(ci, idx) {
                                   return <span key={idx}>{ci.name} x{ci.qty}{idx < combo.length - 1 ? ', ' : ''}</span>;
                                 })}
+                              </div>
+                            )}
+                            {isRefunded && (
+                              <div style={{ paddingTop: '2px', fontSize: '.72rem', color: '#ea580c', fontWeight: 600 }}>
+                                ↩ Возвращено: {retQty}{retQty < itemQty ? ' из ' + itemQty : ' (полностью)'}
                               </div>
                             )}
                           </td>
