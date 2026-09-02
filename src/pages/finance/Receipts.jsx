@@ -50,7 +50,7 @@ export default function Receipts() {
   // Возврат
   const [refundReceipt, setRefundReceipt] = useState(null);
   const [refundQty, setRefundQty] = useState({});
-  const [refundMode, setRefundMode] = useState('cash');
+  const [refundMode, setRefundMode] = useState('as_paid');
   const [refundAc, setRefundAc] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [refunding, setRefunding] = useState(false);
@@ -275,19 +275,32 @@ export default function Receipts() {
     if (rows.length === 0) return alert('Укажите количество для возврата');
     const sumItems = rows.reduce((s2, x) => s2 + x.total, 0);
     if (sumItems <= 0) return alert('Сумма возврата равна нулю');
-    // Способ возврата денег
-    let acId = null;
-    if (refundMode === 'cash') {
-      const cashAc = accounts.find(a => a.type === 'cash_register');
-      if (!cashAc) return alert('Нет кассового счёта. Выберите способ «На счёт / карту» или «Без денег»');
-      acId = cashAc.id;
-    } else if (refundMode === 'account') {
-      if (!refundAc) return alert('Выберите счёт для возврата');
-      acId = refundAc;
-    }
+    // Возврат денег — строго с тех же счетов, которыми оплачен чек (пропорционально),
+    // чтобы одни и те же деньги не путались между счетами
+    const payList = Array.isArray(r.payments) ? r.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
+    const totalPaid = payList.reduce((s2, p) => s2 + (Number(p.amount) || 0), 0);
     const paidAvail = Math.max(0, (Number(r.paid_amount) || 0) - (Number(r.refund_amount) || 0));
     const money = refundMode === 'none' ? 0 : Math.min(sumItems, paidAvail);
     const diff = refundMode === 'none' ? 0 : (sumItems - money);
+    const splits = [];
+    if (money > 0) {
+      if (totalPaid > 0) {
+        // Распределяем пропорционально счетам оплаты (остаток от округления — первому)
+        let rest = money;
+        payList.forEach((p, idx) => {
+          if (rest <= 0) return;
+          const isLast = idx === payList.length - 1;
+          let share = isLast ? rest : Math.round((Number(p.amount) || 0) * money / totalPaid);
+          share = Math.max(0, Math.min(share, rest));
+          if (share > 0) splits.push({ account_id: p.account_id, amount: share });
+          rest -= share;
+        });
+      } else if (refundAc) {
+        // Нет разбивки оплаты (старые/быстрые чеки) — возврат на выбранный счёт
+        splits.push({ account_id: refundAc, amount: money });
+      }
+      if (splits.length === 0) return alert('Не удалось определить счёт возврата — выберите счёт');
+    }
     try {
       setRefunding(true);
       // 1) Деньги: если смена ещё открыта — правим payments чека (закроется сменой),
@@ -301,13 +314,13 @@ export default function Receipts() {
         refund_date: tzToday(),
         refund_items: [...((r.refund_items) || []), ...rows],
       };
-      if (shiftOpen && money > 0 && acId) {
-        newPayments.push({ account_id: acId, amount: -money });
+      if (shiftOpen && splits.length > 0) {
+        splits.forEach(sp => newPayments.push({ account_id: sp.account_id, amount: -sp.amount }));
         upd.payments = newPayments;
       }
       const updRes = await supabase.from('receipts').update(upd).eq('id', r.id);
       if (updRes.error) throw updRes.error;
-      if (!shiftOpen && money > 0 && acId) {
+      if (!shiftOpen && splits.length > 0) {
         // Категория «Возврат»
         let catId = null;
         const { data: cat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Возврат').maybeSingle();
@@ -316,11 +329,13 @@ export default function Receipts() {
           const { data: newCat } = await supabase.from('categories').insert({ user_id: user.id, name: 'Возврат', type: 'expense' }).select('id').single();
           if (newCat && newCat.id) catId = newCat.id;
         }
-        await supabase.from('transactions').insert({
-          user_id: user.id, type: 'expense', amount: money,
-          description: 'Возврат по чеку № ' + r.receipt_number + ' — ' + reason,
-          date: tzToday(), account_id: acId, kind: 'refund', status: 'paid', category_id: catId,
-        });
+        for (const sp of splits) {
+          await supabase.from('transactions').insert({
+            user_id: user.id, type: 'expense', amount: sp.amount,
+            description: 'Возврат по чеку № ' + r.receipt_number + ' — ' + reason,
+            date: tzToday(), account_id: sp.account_id, kind: 'refund', status: 'paid', category_id: catId,
+          });
+        }
       }
       // 2) Склад: возвращаем товары (отрицательное списание — остатки восстановятся сами)
       const woInserts = [];
@@ -641,7 +656,7 @@ export default function Receipts() {
                     const q = {};
                     receiptItems.forEach(it => { q[it.id] = refundableQty(selectedReceipt, it); });
                     setRefundQty(q);
-                    setRefundMode('cash'); setRefundAc(''); setRefundReason('');
+                    setRefundMode('as_paid'); setRefundAc(''); setRefundReason('');
                   }} style={{ width: '100%', padding: '11px', borderRadius: '100px', border: '1.5px solid #ea580c', background: '#fff', color: '#ea580c', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                     ↩ Оформить возврат
                   </button>
@@ -681,20 +696,28 @@ export default function Receipts() {
             <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошёл размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
           </div>
           <div className="form-group">
-            <label>Как возвращаем деньги</label>
+            <label>Возврат денег</label>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              {[{ k: 'cash', l: '💵 Наличными' }, { k: 'account', l: '🏦 На счёт / карту' }, { k: 'none', l: '🔄 Без денег (обмен)' }].map(m => (
-                <button key={m.k} type="button" onClick={() => setRefundMode(m.k)}
-                  style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === m.k ? '#111' : 'var(--border)'), background: refundMode === m.k ? '#111' : '#fff', color: refundMode === m.k ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{m.l}</button>
-              ))}
+              <button type="button" onClick={() => setRefundMode('as_paid')}
+                style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === 'as_paid' ? '#111' : 'var(--border)'), background: refundMode === 'as_paid' ? '#111' : '#fff', color: refundMode === 'as_paid' ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>💵 Вернуть, как было оплачено</button>
+              <button type="button" onClick={() => setRefundMode('none')}
+                style={{ padding: '6px 12px', borderRadius: '100px', border: '1.5px solid ' + (refundMode === 'none' ? '#111' : 'var(--border)'), background: refundMode === 'none' ? '#111' : '#fff', color: refundMode === 'none' ? '#fff' : '#444', fontSize: '.76rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 Без денег (обмен)</button>
             </div>
-            {refundMode === 'account' && (
-              <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '6px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
-                <option value="">— выберите счёт —</option>
-                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            )}
-            {refundMode === 'cash' && <div style={{ fontSize: '.72rem', color: '#999', marginTop: '4px' }}>Деньги вернутся из кассы (учтётся при закрытии смены)</div>}
+            {(() => {
+              const acName = (id) => { const a = accounts.find(x => x.id === id); return a ? a.name : 'Счёт'; };
+              const payList = (refundReceipt && Array.isArray(refundReceipt.payments)) ? refundReceipt.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
+              if (refundMode === 'none') return <div style={{ fontSize: '.72rem', color: '#999', marginTop: '5px', lineHeight: 1.5 }}>Товар вернётся на склад, деньги не возвращаем (например, при обмене — новый чек пробьёте отдельно)</div>;
+              if (payList.length > 0) return <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px', lineHeight: 1.6 }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}<br />Вернём с этих же счетов пропорционально — путаницы в финансах не будет</div>;
+              return (
+                <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px' }}>
+                  По чеку нет разбивки оплаты — выберите счёт возврата:
+                  <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
+                    <option value="">— выберите счёт —</option>
+                    {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </select>
+                </div>
+              );
+            })()}
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={() => setRefundReceipt(null)}>Отмена</button>
