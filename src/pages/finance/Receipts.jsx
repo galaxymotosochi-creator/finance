@@ -40,7 +40,6 @@ export default function Receipts() {
   const [itemsLoading, setItemsLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [productTypes, setProductTypes] = useState({});
   const [payReceipt, setPayReceipt] = useState(null);
   const [payAc, setPayAc] = useState('');
   const [payAmt, setPayAmt] = useState('');
@@ -68,12 +67,9 @@ export default function Receipts() {
       setAccounts(ac || []);
     } catch (e) { setAccounts([]); }
     try {
-      // Сотрудники (продавцы/исполнители) и типы товаров — для деталей чека
+      // Сотрудники (продавцы/исполнители) — для деталей чека
       const { data: emps } = await supabase.from('employees').select('id,name').eq('user_id', user.id);
       setEmployees(emps || []);
-      const { data: prods } = await supabase.from('products').select('id,type').eq('user_id', user.id);
-      const pt = {}; (prods || []).forEach(p => { pt[p.id] = p.type; });
-      setProductTypes(pt);
     } catch (e) {}
     setLoading(false);
   };
@@ -143,8 +139,16 @@ export default function Receipts() {
       + ' ' + dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Имя сотрудника (продавца/исполнителя)
-  const empName = (id) => employees.find(e => e.id === id)?.name || '—';
+  // Сотрудник коротко: «Фамилия И.» (как в кассе)
+  const abbreviateName = (name) => {
+    if (!name) return '—';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length <= 1) return name;
+    const surname = parts[0];
+    const initials = parts.slice(1).map(p => p.charAt(0) + '.').join(' ');
+    return surname + ' ' + initials;
+  };
+  const empShort = (id) => abbreviateName(employees.find(e => e.id === id)?.name);
 
   // Сумма долга по чеку (не оплачено)
   const receiptRemain = (r) => Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0));
@@ -322,7 +326,7 @@ export default function Receipts() {
             <span style={{ display: 'block' }}>Кассир: {selectedReceipt.cashier_name || '—'}</span>
             {selectedReceipt.client_name ? <span style={{ display: 'block' }}>Клиент: {selectedReceipt.client_name}</span> : null}
           </span>
-        ) : ''} width={640}>
+        ) : ''} width={700}>
         {selectedReceipt && (<>
         {selectedReceipt.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
@@ -347,7 +351,7 @@ export default function Receipts() {
                   <span style={{ width: '50px', textAlign: 'left' }}>Кол-во</span>
                   <span style={{ width: '70px', textAlign: 'right' }}>Цена</span>
                   <span style={{ width: '80px', textAlign: 'right' }}>Сумма</span>
-                  <span style={{ width: '150px', textAlign: 'right' }}>Продавец/Исполнитель</span>
+                  <span style={{ width: '190px', textAlign: 'left' }}>Продавец/Исполнитель</span>
                 </div>
                 {receiptItems.map(function(item) {
                   var combo = item.combo_items;
@@ -358,8 +362,8 @@ export default function Receipts() {
                         <span style={{ width: '50px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
                         <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
-                        <span style={{ width: '150px', textAlign: 'right', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {item.employee_id ? (productTypes[item.product_id] === 'service' ? 'Исполнитель: ' : 'Продавец: ') + empName(item.employee_id) : '—'}
+                        <span style={{ width: '190px', textAlign: 'left', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {item.employee_id ? empShort(item.employee_id) : '—'}
                         </span>
                       </div>
                       {combo && Array.isArray(combo) && combo.length > 0 && (
@@ -377,7 +381,7 @@ export default function Receipts() {
                   <span style={{ width: '50px', textAlign: 'left' }}></span>
                   <span style={{ width: '70px', textAlign: 'right' }}></span>
                   <span style={{ width: '80px', textAlign: 'right' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</span>
-                  <span style={{ width: '150px' }}></span>
+                  <span style={{ width: '190px' }}></span>
                 </div>
               </div>
             )}
