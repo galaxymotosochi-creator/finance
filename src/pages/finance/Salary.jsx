@@ -238,8 +238,7 @@ export default function Salary() {
         const st = rules.find(r => r.scope === 'store_sales');
         if (st) {
           const v = Number(st.val) || 0;
-          const stBonus = st.vt === 'fixed' ? v : Math.round(revenue * v / 100);
-          setStoreInfo({ revenue, bonus: stBonus, stack: st.stack !== false, pct: st.vt === 'fixed' ? null : v });
+          setStoreInfo({ revenue, pct: st.vt === 'fixed' ? null : v, fixed: st.vt === 'fixed' ? v : null, stack: st.stack !== false });
         } else {
           setStoreInfo(null);
         }
@@ -284,7 +283,16 @@ export default function Salary() {
   const salesBonusTotal = Object.values(salesBonus).reduce((s2, b) => s2 + (Number(b.rub) || 0), 0);
   // Если включён «% от всей выручки» без суммирования — позиционные бонусы не учитываются
   const itemsBonusTotal = (storeInfo && storeInfo.stack === false) ? 0 : salesBonusTotal;
-  const storeBonus = (storeInfo && storeInfo.bonus) || 0;
+  // Бонус от выручки пропорционален отработанным дням (по табелю): если табель за период заполнен —
+  // умножаем на (рабочие дни / дни периода), если нет — полный процент
+  const tsWorked = tsEntries.filter(en => en.status === 'present' || en.status === 'remote').length;
+  const hasTs = tsEntries.length > 0;
+  const periodDays = Math.max(1, calcDays(fPeriodFrom, fPeriodTo) || 1);
+  const dayFactor = hasTs ? Math.min(1, tsWorked / periodDays) : 1;
+  const storeBonus = storeInfo ? (storeInfo.pct != null
+    ? Math.round(storeInfo.revenue * storeInfo.pct / 100 * dayFactor)
+    : Math.round((storeInfo.fixed || 0) * dayFactor)) : 0;
+  const storeNote = (storeInfo && hasTs && dayFactor < 1) ? ' × ' + tsWorked + '/' + periodDays + ' дн.' : '';
   const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
 
   const openAdd = () => {
@@ -557,7 +565,7 @@ export default function Salary() {
                   ) : storeInfo && storeInfo.bonus > 0 ? (
                     <div style={{background:'#fff',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'8px 10px',marginBottom:'8px',fontSize:'.76rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                       <span style={{color:'#2563eb',fontWeight:600}}>🏪 От всей выручки</span>
-                      <span style={{color:'#555'}}>{storeInfo.pct != null ? storeInfo.pct + '% от ' : ''}{storeInfo.revenue.toLocaleString()} {cur} = <b style={{color:'#2563eb'}}>+{storeInfo.bonus.toLocaleString()} {cur}</b></span>
+                      <span style={{color:'#555'}}>{storeInfo.pct != null ? storeInfo.pct + '% от ' : ''}{storeInfo.revenue.toLocaleString()} {cur}{storeNote} = <b style={{color:'#2563eb'}}>+{storeBonus.toLocaleString()} {cur}</b></span>
                     </div>
                   ) : null}
                   {storeInfo && storeInfo.stack === false && salesRows.length > 0 && (

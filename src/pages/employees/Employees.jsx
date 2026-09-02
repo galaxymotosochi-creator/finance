@@ -576,6 +576,10 @@ export default function Employees() {
                       </div>
                     )}
                   </div>
+                  <div style={{ marginTop: '8px', background: '#fefce8', border: '1px solid #fde68a', borderRadius: '9px', padding: '7px 10px', fontSize: '.7rem', color: '#92600a', lineHeight: 1.55 }}>
+                    ℹ️ Бонус от выручки начисляется за отработанные дни: выручка × % × (дни по табелю ÷ дни периода).<br />
+                    Для корректного начисления заполняйте <b>табель</b> за период. Если табель не заполнен — начислится полный процент.
+                  </div>
                 </div>
 
                 {/* По типу */}
