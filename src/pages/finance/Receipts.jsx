@@ -345,59 +345,67 @@ export default function Receipts() {
             ) : receiptItems.length === 0 ? (
               <div style={{ textAlign: 'left', padding: '1rem', color: 'var(--muted)', fontSize: '.82rem' }}>Нет позиций</div>
             ) : (
-              <div style={{ background: '#f9f9f9', borderRadius: '.5rem', padding: '.5rem 0', marginBottom: '.5rem' }}>
-                <div style={{ display: 'flex', gap: '14px', padding: '.35rem .75rem', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px' }}>
-                  <span style={{ flex: 1, minWidth: 0 }}>Товар</span>
-                  <span style={{ width: '55px', flexShrink: 0, textAlign: 'left' }}>Кол-во</span>
-                  <span style={{ width: '90px', flexShrink: 0, textAlign: 'left' }}>Цена</span>
-                  <span style={{ width: '90px', flexShrink: 0, textAlign: 'left' }}>Скидка</span>
-                  <span style={{ width: '100px', flexShrink: 0, textAlign: 'left' }}>Сумма</span>
-                  <span style={{ width: '190px', flexShrink: 0, textAlign: 'left' }}>Продавец/Исполнитель</span>
-                </div>
-                {receiptItems.map(function(item) {
-                  var combo = item.combo_items;
-                  return (
-                    <div key={item.id}>
-                      <div style={{ display: 'flex', gap: '14px', padding: '.35rem .75rem', fontSize: '.82rem', borderTop: '1px solid #f0f0f0' }}>
-                        <span style={{ flex: 1, minWidth: 0, fontWeight: 500 }}>{item.product_name}</span>
-                        <span style={{ width: '55px', flexShrink: 0, textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
-                        <span style={{ width: '90px', flexShrink: 0, textAlign: 'left', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()} {cur}</span>
-                        <span style={{ width: '90px', flexShrink: 0, textAlign: 'left', color: '#16a34a', fontSize: '.78rem', fontWeight: 600 }}>
-                          {Number(item.discount_amount) > 0 ? '−' + Number(item.discount_amount).toLocaleString() + ' ' + cur : ''}
-                        </span>
-                        <span style={{ width: '100px', flexShrink: 0, textAlign: 'left', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
-                        <span style={{ width: '190px', flexShrink: 0, textAlign: 'left', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {item.employee_id ? empShort(item.employee_id) : '—'}
-                        </span>
-                      </div>
-                      {combo && Array.isArray(combo) && combo.length > 0 && (
-                        <div style={{ padding: '0 .75rem .35rem 1.2rem', fontSize: '.72rem', color: '#999' }}>
-                          Cocтaв: {combo.map(function(ci, idx) {
-                            return <span key={idx}>{ci.name} x{ci.qty}{idx < combo.length - 1 ? ', ' : ''}</span>;
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                {Number(selectedReceipt.discount_sum) > 0 && (
-                  <div style={{ display: 'flex', gap: '14px', padding: '.35rem .75rem', fontSize: '.82rem', color: '#16a34a', fontWeight: 600 }}>
-                    <span style={{ flex: 1, minWidth: 0 }}>Скидка:</span>
-                    <span style={{ width: '55px', flexShrink: 0 }}></span>
-                    <span style={{ width: '90px', flexShrink: 0 }}></span>
-                    <span style={{ width: '90px', flexShrink: 0 }}></span>
-                    <span style={{ width: '100px', flexShrink: 0, textAlign: 'left' }}>−{Number(selectedReceipt.discount_sum).toLocaleString()} {cur}</span>
-                    <span style={{ width: '190px', flexShrink: 0 }}></span>
-                  </div>
-                )}
-                <div style={{ display: 'flex', gap: '14px', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
-                  <span style={{ flex: 1, minWidth: 0 }}>ИТОГО:</span>
-                  <span style={{ width: '55px', flexShrink: 0 }}></span>
-                  <span style={{ width: '90px', flexShrink: 0 }}></span>
-                  <span style={{ width: '90px', flexShrink: 0 }}></span>
-                  <span style={{ width: '100px', flexShrink: 0, textAlign: 'left' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</span>
-                  <span style={{ width: '190px', flexShrink: 0 }}></span>
-                </div>
+                            <div style={{ background: '#f9f9f9', borderRadius: '.5rem', padding: '.5rem .75rem', marginBottom: '.5rem', overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.82rem' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: '0 14px 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Товар</th>
+                      <th style={{ textAlign: 'left', padding: '0 14px 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Кол-во</th>
+                      <th style={{ textAlign: 'left', padding: '0 14px 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Цена</th>
+                      <th style={{ textAlign: 'left', padding: '0 14px 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Скидка</th>
+                      <th style={{ textAlign: 'left', padding: '0 14px 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Сумма</th>
+                      <th style={{ textAlign: 'left', padding: '0 0 6px 0', fontSize: '.72rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '.3px', whiteSpace: 'nowrap' }}>Продавец/Исполнитель</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {receiptItems.map(function(item) {
+                      var combo = item.combo_items;
+                      return (
+                        <tr key={item.id} style={{ borderTop: '1px solid #f0f0f0' }}>
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', fontWeight: 500, verticalAlign: 'top' }}>
+                            {item.product_name}
+                            {combo && Array.isArray(combo) && combo.length > 0 && (
+                              <div style={{ paddingTop: '2px', fontSize: '.72rem', color: '#999', fontWeight: 400 }}>
+                                Cocтaв: {combo.map(function(ci, idx) {
+                                  return <span key={idx}>{ci.name} x{ci.qty}{idx < combo.length - 1 ? ', ' : ''}</span>;
+                                })}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: 'var(--muted)', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.quantity).toLocaleString()}</td>
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: 'var(--muted)', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.price).toLocaleString()} {cur}</td>
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', color: '#16a34a', fontSize: '.78rem', fontWeight: 600, whiteSpace: 'nowrap', verticalAlign: 'top' }}>
+                            {Number(item.discount_amount) > 0 ? '\u2212' + Number(item.discount_amount).toLocaleString() + ' ' + cur : ''}
+                          </td>
+                          <td style={{ textAlign: 'left', padding: '7px 14px 7px 0', fontWeight: 600, whiteSpace: 'nowrap', verticalAlign: 'top' }}>{Number(item.total).toLocaleString()} {cur}</td>
+                          <td style={{ textAlign: 'left', padding: '7px 0 7px 0', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', verticalAlign: 'top' }}>
+                            {item.employee_id ? empShort(item.employee_id) : '\u2014'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    {Number(selectedReceipt.discount_sum) > 0 && (
+                      <tr style={{ color: '#16a34a', fontWeight: 600 }}>
+                        <td style={{ textAlign: 'left', padding: '6px 14px 0 0' }}>Скидка:</td>
+                        <td style={{ padding: '6px 14px 0 0' }}></td>
+                        <td style={{ padding: '6px 14px 0 0' }}></td>
+                        <td style={{ padding: '6px 14px 0 0' }}></td>
+                        <td style={{ textAlign: 'left', padding: '6px 14px 0 0', whiteSpace: 'nowrap' }}>\u2212{Number(selectedReceipt.discount_sum).toLocaleString()} {cur}</td>
+                        <td style={{ padding: 0 }}></td>
+                      </tr>
+                    )}
+                    <tr style={{ fontWeight: 700, borderTop: '1px solid #ddd' }}>
+                      <td style={{ textAlign: 'left', padding: '8px 14px 0 0' }}>ИТОГО:</td>
+                      <td style={{ padding: '8px 14px 0 0' }}></td>
+                      <td style={{ padding: '8px 14px 0 0' }}></td>
+                      <td style={{ padding: '8px 14px 0 0' }}></td>
+                      <td style={{ textAlign: 'left', padding: '8px 14px 0 0', whiteSpace: 'nowrap' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</td>
+                      <td style={{ padding: 0 }}></td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             )}
 
