@@ -39,6 +39,8 @@ export default function Receipts() {
   const [receiptItems, setReceiptItems] = useState([]);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [productTypes, setProductTypes] = useState({});
   const [payReceipt, setPayReceipt] = useState(null);
   const [payAc, setPayAc] = useState('');
   const [payAmt, setPayAmt] = useState('');
@@ -65,6 +67,14 @@ export default function Receipts() {
       const { data: ac } = await supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id);
       setAccounts(ac || []);
     } catch (e) { setAccounts([]); }
+    try {
+      // Сотрудники (продавцы/исполнители) и типы товаров — для деталей чека
+      const { data: emps } = await supabase.from('employees').select('id,name').eq('user_id', user.id);
+      setEmployees(emps || []);
+      const { data: prods } = await supabase.from('products').select('id,type').eq('user_id', user.id);
+      const pt = {}; (prods || []).forEach(p => { pt[p.id] = p.type; });
+      setProductTypes(pt);
+    } catch (e) {}
     setLoading(false);
   };
 
@@ -123,6 +133,18 @@ export default function Receipts() {
     const p = (d.split('T')[0]||'').split('-');
     return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : d;
   };
+
+  // Дата + время (время создания/закрытия чека)
+  const fmtDateTime = (d) => {
+    if (!d) return '—';
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    return dt.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      + ' ' + dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Имя сотрудника (продавца/исполнителя)
+  const empName = (id) => employees.find(e => e.id === id)?.name || '—';
 
   // Сумма долга по чеку (не оплачено)
   const receiptRemain = (r) => Math.max(0, (Number(r.total_amount)||0) - (Number(r.paid_amount)||0));
@@ -294,7 +316,13 @@ export default function Receipts() {
       </div>
 
       {/* Модалка состава чека */}
-      <Modal open={!!selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={selectedReceipt ? 'Чек #'+selectedReceipt.receipt_number : ''} subtitle={selectedReceipt ? fmtDate(selectedReceipt.date) + (selectedReceipt.cashier_name ? ' • Кассир: '+selectedReceipt.cashier_name : '') + (selectedReceipt.client_name ? ' • Клиент: '+selectedReceipt.client_name : '') : ''} width="medium">
+      <Modal open={!!selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={selectedReceipt ? 'Чек № ' + selectedReceipt.receipt_number : ''} subtitle={selectedReceipt ? (
+          <span style={{ display: 'block', lineHeight: 1.8 }}>
+            <span style={{ display: 'block' }}>Дата: {fmtDateTime(selectedReceipt.created_at || selectedReceipt.date)}</span>
+            <span style={{ display: 'block' }}>Кассир: {selectedReceipt.cashier_name || '—'}</span>
+            {selectedReceipt.client_name ? <span style={{ display: 'block' }}>Клиент: {selectedReceipt.client_name}</span> : null}
+          </span>
+        ) : ''} width={640}>
         {selectedReceipt && (<>
         {selectedReceipt.comment ? <div style={{marginBottom:'.75rem',fontSize:'.75rem',color:'#888',background:'#f9f9f9',padding:'4px 8px',borderRadius:'6px'}}>💬 {selectedReceipt.comment}</div> : ''}
 
@@ -319,6 +347,7 @@ export default function Receipts() {
                   <span style={{ width: '50px', textAlign: 'left' }}>Кол-во</span>
                   <span style={{ width: '70px', textAlign: 'right' }}>Цена</span>
                   <span style={{ width: '80px', textAlign: 'right' }}>Сумма</span>
+                  <span style={{ width: '150px', textAlign: 'right' }}>Продавец/Исполнитель</span>
                 </div>
                 {receiptItems.map(function(item) {
                   var combo = item.combo_items;
@@ -329,6 +358,9 @@ export default function Receipts() {
                         <span style={{ width: '50px', textAlign: 'left', color: 'var(--muted)' }}>{Number(item.quantity).toLocaleString()}</span>
                         <span style={{ width: '70px', textAlign: 'right', color: 'var(--muted)' }}>{Number(item.price).toLocaleString()}</span>
                         <span style={{ width: '80px', textAlign: 'right', fontWeight: 600 }}>{Number(item.total).toLocaleString()} {cur}</span>
+                        <span style={{ width: '150px', textAlign: 'right', color: '#555', fontSize: '.76rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {item.employee_id ? (productTypes[item.product_id] === 'service' ? 'Исполнитель: ' : 'Продавец: ') + empName(item.employee_id) : '—'}
+                        </span>
                       </div>
                       {combo && Array.isArray(combo) && combo.length > 0 && (
                         <div style={{ padding: '0 .75rem .35rem 1.2rem', fontSize: '.72rem', color: '#999' }}>
@@ -339,12 +371,13 @@ export default function Receipts() {
                       )}
                     </div>
                   );
-                })})
+                })}
                 <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '50px', textAlign: 'left' }}></span>
                   <span style={{ width: '70px', textAlign: 'right' }}></span>
                   <span style={{ width: '80px', textAlign: 'right' }}>{Number(selectedReceipt.total_amount).toLocaleString()} {cur}</span>
+                  <span style={{ width: '150px' }}></span>
                 </div>
               </div>
             )}
