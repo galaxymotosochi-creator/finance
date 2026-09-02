@@ -373,9 +373,23 @@ export default function Receipts() {
                           })}
                         </div>
                       )}
+                      {Number(item.discount_amount) > 0 && (
+                        <div style={{ padding: '0 .75rem .45rem 1.2rem', fontSize: '.72rem', color: '#16a34a', fontWeight: 600 }}>
+                          Скидка: −{Number(item.discount_amount).toLocaleString()} {cur}{Number(item.discount_percent) > 0 ? ' (' + Number(item.discount_percent) + '%)' : ''}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
+                {Number(selectedReceipt.discount_sum) > 0 && (
+                  <div style={{ display: 'flex', padding: '.35rem .75rem', fontSize: '.82rem', color: '#16a34a', fontWeight: 600 }}>
+                    <span style={{ flex: 1 }}>Скидка:</span>
+                    <span style={{ width: '50px', textAlign: 'left' }}></span>
+                    <span style={{ width: '70px', textAlign: 'right' }}></span>
+                    <span style={{ width: '80px', textAlign: 'right' }}>−{Number(selectedReceipt.discount_sum).toLocaleString()} {cur}</span>
+                    <span style={{ width: '190px' }}></span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', padding: '.5rem .75rem', borderTop: '1px solid #ddd', fontSize: '.82rem' }}>
                   <span style={{ flex: 1 }}>ИТОГО:</span>
                   <span style={{ width: '50px', textAlign: 'left' }}></span>
