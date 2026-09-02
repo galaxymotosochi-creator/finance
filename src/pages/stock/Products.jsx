@@ -943,6 +943,7 @@ export default function Products() {
                   <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                     Штрихкод
                     <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => setFBarcode(genBarcode())}>Сгенерировать</span>
+                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#fff',background:'#111',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => scanBarcode(code => { setFBarcode(code); showToast('Штрихкод распознан: ' + code); })}>Распознать</span>
                   </label>
                   <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
                 </div>}
