@@ -130,9 +130,17 @@ export default function Accounts() {
     (transactions||[]).forEach(t=>{if(t.account_id===ac.id)b+=Number(t.amount||0)*(t.type==='income'?1:-1);});
     return b;
   };
+  // Внутренние движения (переводы/инкассация между своими счетами) и свои деньги владельца —
+  // двигают баланс счёта, но НЕ считаются поступлениями/расходами (как в «Движении денег»)
+  var isInternalTx = (t) => {
+    if (!t) return false;
+    if (t.kind === 'transfer' || t.kind === 'collection' || t.kind === 'owner_deposit' || t.kind === 'owner_withdraw') return true;
+    var d = t.description || '';
+    return d.startsWith('Перевод со счета') || d.startsWith('Перевод на счет') || d.startsWith('Инкассация') || d.startsWith('Взнос своих денег') || d.startsWith('Вывод своих денег');
+  };
   var getMv = (ac) => {
     if (!ac) return {i:0,e:0};
-    var i=0,e=0; (transactions||[]).forEach(t=>{if(t.account_id===ac.id){if(t.type==='income')i+=Number(t.amount||0);else e+=Number(t.amount||0);}});
+    var i=0,e=0; (transactions||[]).forEach(t=>{if(t.account_id===ac.id && !isInternalTx(t)){if(t.type==='income')i+=Number(t.amount||0);else e+=Number(t.amount||0);}});
     return {i,e};
   };
   var getTypeMeta = (ac) => {
@@ -257,7 +265,7 @@ export default function Accounts() {
                 ]},
                 { title: 'Таблица счетов', items: [
                   <><b>Начальный остаток</b> — баланс счёта на старте учёта.</>,
-                  <><b>Поступления / Расходы</b> — движения по счёту за всё время.</>,
+                  <><b>Поступления / Расходы</b> — внешние доходы и расходы по счёту (переводы между своими счетами и свои деньги не входят, чтобы не считать их дважды).</>,
                   <><b>Баланс</b> — текущий остаток (начальный + поступления − расходы). Клик по строке — история операций.</>,
                 ]},
               ]}
