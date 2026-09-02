@@ -987,11 +987,11 @@ if (loading) return <CenterSpinner />;
           <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
         </div>
 
-        {/* Карточка с панелями (белый блок с тенью) */}
-        <div style={{display:'flex',flex:1,background:'#fff',borderRadius:'24px',boxShadow:'0 8px 60px rgba(0,0,0,.06)',overflow:'hidden'}}>
+        {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
+        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch'}}>
 
-      {/* Правая панель — товары */}
-      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'16px',overflow:'auto',width:'100%',minWidth:0}}>
+      {/* Панель товаров — плашка */}
+      <div style={{flex:'1 1 auto',display:'flex',flexDirection:'column',padding:'14px 16px',overflow:'auto',width:'100%',minWidth:0,background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)'}}>
         {/* Категории */}
         <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
           <button onClick={() => setCatFilter('all')} style={{
@@ -1041,8 +1041,8 @@ if (loading) return <CenterSpinner />;
         </div>
       </div>
 
-      {/* Левая панель — чек */}
-      <div style={{width:isWide?'560px':'320px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderLeft:'1px solid #eee',overflow:'hidden'}}>
+      {/* Панель чека — отдельная плашка */}
+      <div style={{width:isWide?'560px':'340px',flexShrink:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
         {/* Список товаров в чеке — как таблица */}
         <div style={{flex:1,overflowY:'auto',padding:'0 14px'}}>
