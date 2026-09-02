@@ -677,12 +677,12 @@ export default function Receipts() {
             {(Number(selectedReceipt.refund_amount) > 0 || (selectedReceipt.status !== 'unpaid' && !itemsLoading && receiptItems.length > 0 && canRefund(selectedReceipt))) && (
               <div style={{ marginTop: '.75rem', borderTop: '1px solid #f0f0f0', paddingTop: '.75rem' }}>
                 {Number(selectedReceipt.refund_amount) > 0 && (
-                  <div style={{ fontSize: '.78rem', color: '#ea580c', background: '#fff7ed', borderRadius: '8px', padding: '8px 10px', marginBottom: '.6rem', lineHeight: 1.6 }}>
-                    <div style={{ fontWeight: 600 }}>↩ Возврат оформлен: −{Number(selectedReceipt.refund_amount).toLocaleString()} {cur}</div>
-                    {selectedReceipt.refund_date && <div>Дата: {fmtDate(selectedReceipt.refund_date)}</div>}
-                    {selectedReceipt.refund_reason && <div>Причина: {selectedReceipt.refund_reason}</div>}
+                  <div style={{ background: '#f9f9f9', borderRadius: '10px', padding: '10px 12px', marginBottom: '.6rem', fontSize: '.8rem', lineHeight: 1.8 }}>
+                    <div style={{ fontWeight: 700, color: '#222' }}>↩ Возврат оформлен: −{Number(selectedReceipt.refund_amount).toLocaleString()} {cur}</div>
+                    {selectedReceipt.refund_date && <div style={{ color: '#666' }}>Дата: {fmtDate(selectedReceipt.refund_date)}</div>}
+                    {selectedReceipt.refund_reason && <div style={{ color: '#666' }}>Причина: {selectedReceipt.refund_reason}</div>}
                     {(selectedReceipt.refund_items || []).length > 0 && (
-                      <div style={{ marginTop: '2px', color: '#9a6a3a' }}>
+                      <div style={{ color: '#666' }}>
                         Возвращено: {(selectedReceipt.refund_items || []).map((x, i) => <span key={i}>{x.product_name} x{x.qty}{i < (selectedReceipt.refund_items || []).length - 1 ? ', ' : ''}</span>)}
                       </div>
                     )}
