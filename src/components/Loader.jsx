@@ -1,4 +1,4 @@
-// Красивый экран загрузки — спиннер по центру экрана
+// Экран загрузки — один кружок по центру, под ним «AtlasPos»
 export default function Loader({ label }) {
   return (
     <div style={{
@@ -7,7 +7,7 @@ export default function Loader({ label }) {
       background:'#fff', gap:'14px'
     }}>
       <div style={{ width:'34px', height:'34px', border:'3px solid #eee', borderTopColor:'#111', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
-      {label ? <div style={{ fontSize:'.8rem', color:'#999' }}>{label}</div> : null}
+      <div style={{ fontWeight:700, fontSize:'1rem', letterSpacing:'-.02em', color:'#111', fontFamily:"'Golos Text',system-ui,sans-serif" }}>{label || 'AtlasPos'}</div>
     </div>
   );
 }
