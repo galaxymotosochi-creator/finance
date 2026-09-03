@@ -1045,7 +1045,7 @@ if (loading) return <CenterSpinner />;
               <div style={{fontSize:'20px',lineHeight:1}}>{p.type === 'service' ? '🔧' : '📦'}</div>
               <div style={{fontSize:'13px',fontWeight:600,color: oos ? '#999' : '#222',lineHeight:1.3,margin:'6px 0 2px',minHeight:'34px'}}>{p.name}</div>
               <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:'6px'}}>
-                <span style={{fontSize:'12.5px',fontWeight:500,color: oos ? '#ccc' : '#999'}}>{(p.price||0).toLocaleString()} {cur}</span>
+                <span style={{fontSize:'12.5px',fontWeight:500,color: oos ? '#ccc' : '#999'}}>{(p.price||0).toLocaleString()} {cur}{p.min_price > 0 && <span style={{fontSize:'10.5px',fontWeight:600,color:'#b45309'}}> / мин. {Number(p.min_price).toLocaleString()} {cur}</span>}</span>
                 {p.type !== 'service' && (
                   <span style={{fontSize:'10px',fontWeight:600,color: (stockMap[p.id]||0) > 0 ? '#16a34a' : '#bbb'}}>{stockMap[p.id] || 0} шт</span>
                 )}
@@ -1053,8 +1053,7 @@ if (loading) return <CenterSpinner />;
               <div style={{marginTop:'6px',display:'flex',alignItems:'center',gap:'5px'}}>
                 <span style={{fontSize:'9.5px',fontWeight:700,padding:'2px 10px',borderRadius:'100px',background:'#fff4c2',color:'#8a6a00',whiteSpace:'nowrap'}}>{p.type === 'service' ? 'Услуга' : 'Товар'}</span>
                 {p.cat && <span style={{fontSize:'10px',color:'#bbb',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1,minWidth:0}}>{p.cat}</span>}
-              </div>
-              {p.min_price > 0 && <div style={{fontSize:'10px',fontWeight:600,color:'#b45309',marginTop:'3px'}}>мин. {Number(p.min_price).toLocaleString()} {cur}</div>}
+            </div>
             </div>
             );
           })}
