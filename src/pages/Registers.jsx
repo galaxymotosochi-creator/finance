@@ -153,6 +153,24 @@ export default function Registers({ fullscreen }) {
     } catch(e) {}
     return null;
   };
+  // Касса — полноэкранный инструмент: жёстко блокируем прокрутку страницы
+  // (скролл возможен только внутри колонок каталога и чека)
+  useEffect(() => {
+    const prevB = document.body.style.overflow;
+    const prevH = document.documentElement.style.overflow;
+    const prevO = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    return () => {
+      document.body.style.overflow = prevB;
+      document.documentElement.style.overflow = prevH;
+      document.body.style.overscrollBehavior = prevO;
+      document.documentElement.style.overscrollBehavior = '';
+    };
+  }, []);
+
   // Асинхронно загружаем ФИО из Supabase при монтировании
   const [ownerName, setOwnerName] = useState(null);
   useEffect(() => {
