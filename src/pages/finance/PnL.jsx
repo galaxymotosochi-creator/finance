@@ -74,6 +74,20 @@ export default function PnL() {
         // Продажи за период (total_amount уже с учётом скидок) + сумма скидок (аналитика)
         const salesRev = (recs || []).reduce((s, r) => s + (r.total_amount || 0), 0);
         const discounts = (recs || []).reduce((s, r) => s + (Number(r.discount_sum) || 0), 0);
+        // Прочие доходы = поступления за период, не связанные с продажами (не переводы, не свои деньги владельца)
+        const saleCatIdPnl = ((cats || []).find(c => c && c.type === 'income' && c.name === 'Доход от продаж') || {}).id || null;
+        let otherIncome = 0;
+        (allTx || []).forEach(t => {
+          if (!t || t.type !== 'income') return;
+          if (t.status && t.status !== 'paid') return;
+          const ds = String(t.date || '').split('T')[0];
+          if (!ds || ds < dr.from || ds > dr.to) return;
+          if (t.kind === 'transfer' || t.kind === 'collection' || t.kind === 'owner_deposit' || t.kind === 'owner_withdraw') return;
+          const dsc = String(t.description || '');
+          if (dsc.indexOf('Кассовая смена') === 0 || dsc.indexOf('по чеку') >= 0 || dsc.indexOf('Перевод') === 0 || dsc.indexOf('перевод') === 0) return;
+          if (saleCatIdPnl && String(t.category_id) === String(saleCatIdPnl)) return;
+          otherIncome += Number(t.amount) || 0;
+        });
 
         // Позиции чеков ЗА ПЕРИОД (для себестоимости) — только чеки периода
         const periodRecIds = (recs || []).map(r => r.id);
@@ -144,7 +158,7 @@ export default function PnL() {
 
         // Чистая прибыль
         const grossProfit = salesRev - totalCogs;
-        const netProfit = grossProfit - opTotal - shortages + surpluses;
+        const netProfit = grossProfit + otherIncome - opTotal - shortages + surpluses;
         const profitability = salesRev > 0 ? Math.round(netProfit / salesRev * 100) : 0;
 
         // Товарный запас (по себестоимости) = приход − списания − продажи
@@ -181,6 +195,7 @@ export default function PnL() {
         setData({
           salesRev,
           discounts,
+          otherIncome,
           totalCogs,
           grossProfit,
           opList,
@@ -242,12 +257,13 @@ export default function PnL() {
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#16a34a' }}></span>
           Доходы
         </div>
-        <Row label="Продажи" value={`+${(d.salesRev + d.discounts).toLocaleString()} ${cur}`} />
+        <Row label="Выручка от продаж" value={`+${(d.salesRev + d.discounts).toLocaleString()} ${cur}`} />
         {d.discounts > 0 && <Row label="Скидки с продаж" value={`−${d.discounts.toLocaleString()} ${cur}`} color="#d97706" />}
         <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ${cur}`} color="#dc2626" />
         {d.surpluses > 0 && <Row label="Излишки по инвентаризации" value={`+${Math.round(d.surpluses).toLocaleString()} ${cur}`} color="#16a34a" />}
         <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
         <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ${cur}`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
+        {d.otherIncome > 0 && <Row label="Прочие доходы" value={`+${Math.round(d.otherIncome).toLocaleString()} ${cur}`} color="#16a34a" />}
       </div>
 
       {/* Карточка: Расходы */}
