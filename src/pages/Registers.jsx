@@ -525,7 +525,7 @@ export default function Registers({ fullscreen }) {
     // Определяем статус чека
     var receiptStatus = 'paid';
     if (payUnpaid) receiptStatus = 'unpaid';
-    else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total) receiptStatus = 'partially_paid';
+    else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < finalTotal) receiptStatus = 'partially_paid';
 
     // Разбивка оплаты по счетам (для агрегации «Кассовая смена» при закрытии)
     var payments = [];
@@ -533,14 +533,14 @@ export default function Registers({ fullscreen }) {
       const entries = Object.entries(splitAmts).filter(([, v]) => v && parseFloat(v) > 0);
       if (entries.length === 0) { setProcessingPay(false); return setToast('⚠️ Укажите суммы для оплаты'); }
       const sum = entries.reduce((s, [, v]) => s + parseFloat(v), 0);
-      if (Math.abs(sum - total) > 0.01) { setProcessingPay(false); return setToast('⚠️ Сумма оплаты не совпадает с итогом'); }
+      if (Math.abs(sum - finalTotal) > 0.01) { setProcessingPay(false); return setToast('⚠️ Сумма оплаты не совпадает с итогом'); }
       entries.forEach(([acId, amt]) => payments.push({ account_id: acId, amount: parseFloat(amt) }));
     } else if (!payUnpaid) {
       const selAc = accounts.find(a => a.id === payMode);
       var tgt = selAc;
       if (selAc && selAc.type === 'cash') tgt = accounts.find(a => a.type === 'cash_register') || selAc;
-      const paidAmt = payAmount ? parseFloat(payAmount) : total;
-      if (paidAmt > 0) payments.push({ account_id: tgt?.id || null, amount: Math.min(paidAmt, total) });
+      const paidAmt = payAmount ? parseFloat(payAmount) : finalTotal;
+      if (paidAmt > 0) payments.push({ account_id: tgt?.id || null, amount: Math.min(paidAmt, finalTotal) });
     }
 
     // Баллы лояльности: начисление за оплату (1 {cur} = 1 балл) и списание как скидка — считаем до создания чека
@@ -620,11 +620,11 @@ export default function Registers({ fullscreen }) {
       const client = clients.find(c => c.id === selectedClient);
       const curDebt = parseFloat(client?.debt) || 0;
       if (payUnpaid) {
-        await supabase.from('clients').update({debt: curDebt - total}).eq('id', selectedClient);
+        await supabase.from('clients').update({debt: curDebt - finalTotal}).eq('id', selectedClient);
       } else {
-        const paidAmt = payAmount ? parseFloat(payAmount) : total;
-        if (paidAmt > 0 && paidAmt < total) {
-          await supabase.from('clients').update({debt: curDebt - (total - paidAmt)}).eq('id', selectedClient);
+        const paidAmt = payAmount ? parseFloat(payAmount) : finalTotal;
+        if (paidAmt > 0 && paidAmt < finalTotal) {
+          await supabase.from('clients').update({debt: curDebt - (finalTotal - paidAmt)}).eq('id', selectedClient);
         }
       }
       // Лояльность: начисление баллов за оплату (1 {cur} = 1 балл) и списание использованных баллов
@@ -639,9 +639,9 @@ export default function Registers({ fullscreen }) {
     minPriceApprovedRef.current = false;
     setProcessingPay(false);
     const msg = receiptStatus === 'paid'
-      ? 'Чек № ' + receiptNum + ' — ' + total.toLocaleString() + ' ₽'
+      ? 'Чек № ' + receiptNum + ' — ' + finalTotal.toLocaleString() + ' ₽'
       : (receiptStatus === 'partially_paid'
-        ? 'Чек № ' + receiptNum + ' — оплачено ' + (payAmount ? parseFloat(payAmount).toLocaleString() : '0') + ' ₽, долг ' + (total - (payAmount ? parseFloat(payAmount) : 0)).toLocaleString() + ' ₽'
+        ? 'Чек № ' + receiptNum + ' — оплачено ' + (payAmount ? parseFloat(payAmount).toLocaleString() : '0') + ' ₽, долг ' + (finalTotal - (payAmount ? parseFloat(payAmount) : 0)).toLocaleString() + ' ₽'
         : 'Чек № ' + receiptNum + ' сохранён (не оплачен)');
     setToast(msg);
     
@@ -1508,7 +1508,7 @@ if (loading) return <CenterSpinner />;
               {paySplit && (
                 <div style={{background:'#fafafa',border:'1px solid #f0f0f0',borderRadius:'10px',padding:'12px 14px',marginBottom:'14px'}}>
                   {accounts.filter(a => a.type !== 'cash').map(a => {
-                    const remain = total - Object.entries(splitAmts).filter(e => e[0] !== a.id).reduce((s, e) => s + (parseFloat(e[1]) || 0), 0);
+                    const remain = finalTotal - Object.entries(splitAmts).filter(e => e[0] !== a.id).reduce((s, e) => s + (parseFloat(e[1]) || 0), 0);
                     return (
                       <div key={a.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px',marginBottom:'6px',fontSize:'.76rem',color:'#444'}}>
                         <span style={{fontWeight:500,color:'#444'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
@@ -1521,27 +1521,27 @@ if (loading) return <CenterSpinner />;
                   })}
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px',fontSize:'.76rem',color:'#444',borderTop:'1px solid #eee',marginTop:'4px',paddingTop:'6px'}}>
                     <span style={{fontWeight:500,color:'#444'}}>Остаток</span>
-                    <span style={{fontWeight:500,color:'#444',width:'72px',textAlign:'right'}}>{(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} {cur}</span>
+                    <span style={{fontWeight:500,color:'#444',width:'72px',textAlign:'right'}}>{(finalTotal - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} {cur}</span>
                   </div>
                 </div>
               )}
               
               {/* Сумма */}
               <div style={{marginBottom:'16px'}}>
-                <input type="number" min="0" step="0.01" placeholder={total.toString()} 
+                <input type="number" min="0" step="0.01" placeholder={finalTotal.toString()} 
                   value={payAmount} 
                   onChange={e => setPayAmount(e.target.value)}
                   style={{width:'100%',padding:'10px 14px',border:'1.5px solid #eee',borderRadius:'10px',fontSize:'.95rem',fontWeight:700,textAlign:'center',outline:'none',fontFamily:'inherit',marginBottom:'6px'}} />
                 <div style={{display:'flex',justifyContent:'space-between',fontSize:'.76rem',color: payUnpaid ? '#dc2626' : '#16a34a',fontWeight:600}}>
                   {payUnpaid ? (
                     <span>Оплата не производится</span>
-                  ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= total ? (
+                  ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) >= finalTotal ? (
                     <span>Оплачено полностью</span>
-                  ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total ? (
-                    <span style={{color:'#92400e'}}>Не оплачено: {(total - parseFloat(payAmount)).toLocaleString()} {cur}</span>
+                  ) : payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < finalTotal ? (
+                    <span style={{color:'#92400e'}}>Не оплачено: {(finalTotal - parseFloat(payAmount)).toLocaleString()} {cur}</span>
                   ) : null}
-                  {payAmount && parseFloat(payAmount) > total && (
-                    <span style={{color:'#999',fontWeight:500}}>Сдача: {(parseFloat(payAmount) - total).toLocaleString()} {cur}</span>
+                  {payAmount && parseFloat(payAmount) > finalTotal && (
+                    <span style={{color:'#999',fontWeight:500}}>Сдача: {(parseFloat(payAmount) - finalTotal).toLocaleString()} {cur}</span>
                   )}
                 </div>
               </div>
