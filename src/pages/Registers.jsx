@@ -1053,7 +1053,7 @@ if (loading) return <CenterSpinner />;
               <div style={{marginTop:'6px',display:'flex',alignItems:'center',gap:'5px'}}>
                 <span style={{fontSize:'9.5px',fontWeight:700,padding:'2px 10px',borderRadius:'100px',background:'#fff4c2',color:'#8a6a00',whiteSpace:'nowrap'}}>{p.type === 'service' ? 'Услуга' : 'Товар'}</span>
                 {p.cat && <span style={{fontSize:'10px',color:'#bbb',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1,minWidth:0}}>{p.cat}</span>}
-            </div>
+              </div>
             </div>
             );
           })}
