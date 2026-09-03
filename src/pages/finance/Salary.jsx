@@ -116,6 +116,7 @@ export default function Salary() {
   const [accTxs, setAccTxs] = useState([]);
   // Продажи сотрудника (бонусы с продаж)
   const [salesRows, setSalesRows] = useState([]);
+  const [rewardRows, setRewardRows] = useState([]); // вознаграждение исполнителю из чеков (employee_splits)
   const [salesBonus, setSalesBonus] = useState({});
   const [salesLoaded, setSalesLoaded] = useState(false);
   const [prodRef, setProdRef] = useState([]);
@@ -199,7 +200,7 @@ export default function Salary() {
 
   // Продажи и услуги сотрудника за период (для авто-бонусов)
   useEffect(() => {
-    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setStoreInfo(null); setSalesLoaded(false); return; }
+    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setStoreInfo(null); setRewardRows([]); setSalesLoaded(false); return; }
     (async () => {
       setSalesLoaded(false);
       try {
@@ -212,7 +213,7 @@ export default function Salary() {
         }
         const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', fPeriodFrom).lte('date', fPeriodTo).order('created_at', { ascending: false });
         const rlist = recs || [];
-        if (rlist.length === 0) { setSalesRows([]); setSalesBonus({}); setSalesLoaded(true); return; }
+        if (rlist.length === 0) { setSalesRows([]); setSalesBonus({}); setRewardRows([]); setSalesLoaded(true); return; }
         const { data: items } = await supabase.from('receipt_items').select('*').in('receipt_id', rlist.map(r => r.id));
         const rows = [];
         (items || []).forEach(it => {
@@ -227,7 +228,27 @@ export default function Salary() {
           const unit = qty > 0 ? (Number(it.total) || 0) / qty : 0;
           rows.push({ itemId: it.id, date: String(r.date || '').split('T')[0], name: it.product_name, product_id: it.product_id, qty: availQty, total: Math.round(unit * availQty) });
         });
+        // Вознаграждение исполнителю: суммы из employee_splits чеков (сколько указано мастеру в кассе)
+        const rewRows = [];
+        (items || []).forEach(it => {
+          const sps = it.employee_splits || [];
+          if (!sps.length) return;
+          const mine = sps.filter(function(s){ return String(s.employee_id || '') === String(fEmpId); });
+          if (!mine.length) return;
+          const r = rlist.find(x => x.id === it.receipt_id);
+          if (!r) return;
+          const qty = Number(it.quantity) || 1;
+          let retQty = 0;
+          ((r.refund_items) || []).forEach(rf => { if (String(rf.item_id) === String(it.id)) retQty += Number(rf.qty) || 0; });
+          const availQty = Math.max(0, qty - retQty);
+          if (availQty <= 0) return;
+          const factor = qty > 0 ? availQty / qty : 1;
+          const amt = Math.round(mine.reduce(function(s2, sp){ return s2 + (parseFloat(sp.amount) || 0); }, 0) * factor);
+          if (amt <= 0) return;
+          rewRows.push({ itemId: it.id, date: String(r.date || '').split('T')[0], name: it.product_name, amount: amt });
+        });
         setSalesRows(rows);
+        setRewardRows(rewRows);
         const emp = employees.find(e => e.id === fEmpId);
         const rules = (emp && emp.bonus_rules) || [];
         const bonus = {};
@@ -281,6 +302,7 @@ export default function Salary() {
   const checkedDeductTotal = tsDeducts.filter(e => deductChecks[e.id]).reduce((s,e) => s + Number(e.deduct_amount||0), 0);
   const checkedDebtTotal = empDebts.filter(d => debtChecks[d.id]).reduce((s,d) => s + Number(d.amount||0), 0);
   const salesBonusTotal = Object.values(salesBonus).reduce((s2, b) => s2 + (Number(b.rub) || 0), 0);
+  const rewardTotal = rewardRows.reduce((s2, x) => s2 + (Number(x.amount) || 0), 0);
   // Если включён «% от всей выручки» без суммирования — позиционные бонусы не учитываются
   const itemsBonusTotal = (storeInfo && storeInfo.stack === false) ? 0 : salesBonusTotal;
   // Бонус от выручки пропорционален отработанным дням (по табелю): если табель за период заполнен —
@@ -293,7 +315,7 @@ export default function Salary() {
     ? Math.round(storeInfo.revenue * storeInfo.pct / 100 * dayFactor)
     : Math.round((storeInfo.fixed || 0) * dayFactor)) : 0;
   const storeNote = (storeInfo && hasTs && dayFactor < 1) ? ' × ' + tsWorked + '/' + periodDays + ' дн.' : '';
-  const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
+  const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + rewardTotal + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
 
   const openAdd = () => {
     setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
@@ -341,6 +363,7 @@ export default function Salary() {
         amount: grandTotal, status: 'pending', pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
         sales_bonus: salesBonusTotal, sales_items: salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: Number(salesBonus[row.itemId]?.rub) || 0 })),
+        reward_amount: rewardTotal, reward_items: rewardRows.map(row => ({ date: row.date, name: row.name, amount: row.amount })),
         deduct_amount: checkedDeductTotal + checkedDebtTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })).concat(debtItems),
         paid_at: null,
       };
@@ -614,6 +637,42 @@ export default function Salary() {
                 </div>
               </div>
 
+              {/* Вознаграждение исполнителю из чеков */}
+              <div style={{border:'1px solid #fde68a',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{padding:'.5rem .65rem',background:'#fffbeb',borderBottom:'1px solid #fde68a',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#b45309'}}>Вознаграждение исполнителю (из чеков)</span>
+                  <span style={{fontSize:'.68rem',color:'#b45309',fontWeight:600}}>+{rewardTotal.toLocaleString()} {cur}</span>
+                </div>
+                <div style={{padding:'.5rem .65rem'}}>
+                  {!fEmpId ? (
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>
+                  ) : !salesLoaded ? (
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Загрузка...</div>
+                  ) : rewardRows.length === 0 ? (
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
+                  ) : (
+                    <>
+                      <div style={{fontSize:'.7rem',color:'#b45309',marginBottom:'.3rem'}}>Суммы, указанные исполнителю в чеках кассы (раздел «Мастера»)</div>
+                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.74rem',tableLayout:'fixed'}}>
+                        <tbody>
+                          {rewardRows.map(row => (
+                            <tr key={row.itemId}>
+                              <td style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--muted)',fontSize:'.7rem',textAlign:'left'}}>{fmtDate(row.date)}</td>
+                              <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--body-color)',fontSize:'.72rem',textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.name}</td>
+                              <td style={{width:'80px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'#b45309',fontWeight:600,fontSize:'.72rem',textAlign:'right'}}>+{Number(row.amount).toLocaleString()} {cur}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.75rem',fontWeight:600,color:'#b45309',paddingTop:'.4rem'}}>
+                        <span>Исполнителю за период</span>
+                        <span>+{rewardTotal.toLocaleString()} {cur}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* Премии из табеля */}
               <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden'}}>
                 <div style={{padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -746,7 +805,7 @@ export default function Salary() {
               {/* Итого */}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(storeBonus>0)parts.push('С выручки +'+storeBonus.toLocaleString()+' ₽');if(itemsBonusTotal>0)parts.push('С продаж +'+itemsBonusTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
+                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(storeBonus>0)parts.push('С выручки +'+storeBonus.toLocaleString()+' ₽');if(itemsBonusTotal>0)parts.push('С продаж +'+itemsBonusTotal.toLocaleString()+' ₽');if(rewardTotal>0)parts.push('Исполнителю +'+rewardTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
                 </div>
                 <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} {cur}</div>
               </div>
