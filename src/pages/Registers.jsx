@@ -100,6 +100,7 @@ export default function Registers({ fullscreen }) {
   const [registerReceipts, setRegisterReceipts] = useState([]);
   const [receiptComment, setReceiptComment] = useState('');
   const [heldReceipts, setHeldReceipts] = useState([]);
+  const [heldActiveId, setHeldActiveId] = useState(null); // какой отложенный чек сейчас в корзине («взят в работу»)
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [heldIndex, setHeldIndex] = useState(0);
   const [promos, setPromos] = useState([]);
@@ -625,7 +626,7 @@ export default function Registers({ fullscreen }) {
     }
     
     setRegisterReceipts(prev => [...prev, { amount: total, description: 'Продажа по чеку № ' + receiptNum, created_at: new Date().toISOString(), status: receiptStatus, type:'income' }]);
-    setCart([]); setShowPay(false); setPayMode(null); setLoyaltyPct(0); setLoyaltyPointsSpend(0);
+    setCart([]); setShowPay(false); setPayMode(null); setLoyaltyPct(0); setLoyaltyPointsSpend(0); setHeldActiveId(null);
     minPriceApprovedRef.current = false;
     setProcessingPay(false);
     const msg = receiptStatus === 'paid'
@@ -938,6 +939,7 @@ if (loading) return <CenterSpinner />;
                     <div key={r.id} onClick={function(){
                       setReceiptDropdownOpen(false);
                       setCurrentReceiptNum(r.receipt_number);
+                      setHeldActiveId(null);
                       if (isPaid) {
                         var items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
                         setCart(items);
@@ -965,6 +967,7 @@ if (loading) return <CenterSpinner />;
                   return (
                     <div key={r.id || i} onClick={function(){
                       setReceiptDropdownOpen(false);
+                      setHeldActiveId(r.id || i);
                       setCart((r.items || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; }));
                       setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);
                       
@@ -979,7 +982,7 @@ if (loading) return <CenterSpinner />;
                     </div>
                   );
                 })}
-                <div onClick={function(){setReceiptDropdownOpen(false);setCart([]);setActiveReceiptId(null);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setCurrentReceiptNum((currentReceiptNum||1)+1);setViewingReceipt(null)}}
+                <div onClick={function(){setReceiptDropdownOpen(false);setHeldActiveId(null);setCart([]);setActiveReceiptId(null);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setCurrentReceiptNum((currentReceiptNum||1)+1);setViewingReceipt(null)}}
                   style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 10px',borderRadius:'8px',cursor:'pointer',fontSize:'.80rem',color:'#444',borderTop:'1px solid #eee',marginTop:'4px'}}
                   onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                   onMouseLeave={e => e.currentTarget.style.background='transparent'}>
@@ -1243,7 +1246,7 @@ if (loading) return <CenterSpinner />;
                     <span>Оплачен</span>
                   </div>
                 </div>
-                <button onClick={function(){setViewingReceipt(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0)}} style={{
+                <button onClick={function(){setViewingReceipt(null);setHeldActiveId(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0)}} style={{
                   width:'100%', padding:'13px', borderRadius:'100px', border:'2px solid #eee',
                   background:'#fff', color:'#777', fontSize:'.80rem', fontWeight:600,
                   cursor:'pointer', fontFamily:'inherit',
@@ -1252,7 +1255,7 @@ if (loading) return <CenterSpinner />;
             ) : (
               <div style={{display:'flex',gap:'8px'}}>
                 {cart.length > 0 && (
-                  <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast('Чек отложен')}} style={{
+                  <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});var clientName=clients.find(function(c){return c.id===selectedClient;})?.name||'';var isUpdate=heldActiveId!=null&&heldReceipts.some(function(x){return x.id===heldActiveId;});if(isUpdate){setHeldReceipts(function(p){return p.map(function(x){return x.id===heldActiveId?{...x,items:items,total:finalTotal,client:selectedClient,clientName:clientName,updatedAt:Date.now()}:x;});});}else{setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clientName,createdAt:Date.now(),id:Date.now()}];});}setHeldActiveId(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast(isUpdate?'Чек обновлён':'Чек отложен')}} style={{
                     flex:1, padding:'13px', borderRadius:'8px', border:'1.5px solid var(--border)',
                     background:'#fff', color:'#444', fontSize:'.80rem', fontWeight:600,
                     cursor:'pointer', fontFamily:'inherit',
