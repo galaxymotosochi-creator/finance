@@ -38,6 +38,7 @@ export default function Settings() {
   const [tz, setTz] = useState('Europe/Moscow');
   const [tzSearch, setTzSearch] = useState('Москва');
   const [owner, setOwner] = useState({ lastName: '', firstName: '', patronymic: '' });
+  const [piecework, setPiecework] = useState({ enabled: false, mode: 'auto' }); // сдельная оплата исполнителей
   
   // Load saved settings on mount
   useEffect(() => {
@@ -56,6 +57,8 @@ export default function Settings() {
     if (savedNotifs) setNotifications(JSON.parse(savedNotifs));
     const savedOwner = localStorage.getItem('settings_owner');
     if (savedOwner) setOwner(JSON.parse(savedOwner));
+    const savedPiecework = localStorage.getItem('settings_piecework');
+    if (savedPiecework) setPiecework(JSON.parse(savedPiecework));
     // Загружаем из Supabase
     (async () => {
       try {
@@ -76,6 +79,7 @@ export default function Settings() {
             if (s.currency) setCurrency(s.currency);
             if (s.timezone) setTz(s.timezone);
             if (s.notifications) setNotifications(s.notifications);
+            if (s.piecework) setPiecework(s.piecework);
             // Синхронизируем в localStorage, чтобы валюта/настройки подхватились во всех разделах
             localStorage.setItem('settings_company', JSON.stringify(s.company || {}));
             localStorage.setItem('settings_country', s.country || 'Россия');
@@ -83,6 +87,7 @@ export default function Settings() {
             localStorage.setItem('settings_currency', s.currency || 'RUB');
             localStorage.setItem('settings_tz', s.timezone || 'Europe/Moscow');
             localStorage.setItem('settings_notifications', JSON.stringify(s.notifications || {}));
+            localStorage.setItem('settings_piecework', JSON.stringify(s.piecework || { enabled: false, mode: 'auto' }));
             resetCurrencyCache();
           }
         }
@@ -305,6 +310,42 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* 3.5 Сдельная оплата */}
+      <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 6 }}>Сдельная оплата исполнителей</h2>
+        <p style={{ fontSize: '.8rem', color: 'rgba(0,0,0,.54)', marginBottom: 16, lineHeight: 1.55 }}>
+          Вознаграждение мастеру за выполненную услугу — фиксированная сумма или процент от цены услуги.
+          Указанные в чеках суммы автоматически учитываются при начислении зарплаты.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ width: 46, height: 26, borderRadius: 100, background: piecework.enabled ? '#111' : '#ddd', position: 'relative', border: 'none', cursor: 'pointer', transition: 'background .15s', flexShrink: 0 }}
+            onClick={() => setPiecework({ ...piecework, enabled: !piecework.enabled })}>
+            <span style={{ position: 'absolute', top: 3, left: piecework.enabled ? 23 : 3, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.25)' }}></span>
+          </div>
+          <span style={{ fontSize: '.86rem', fontWeight: 600 }}>{piecework.enabled ? 'Сдельная оплата включена' : 'Сдельная оплата выключена'}</span>
+        </div>
+        {piecework.enabled && (
+          <>
+            <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Способ расчёта</div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              {[['auto', 'Автоматически'], ['manual', 'Вручную']].map(([key, label]) => (
+                <button key={key} onClick={() => setPiecework({ ...piecework, mode: key })}
+                  style={{ padding: '.4rem .9rem', borderRadius: 'var(--radius-pill)', border: `1.5px solid ${piecework.mode === key ? '#000' : 'rgba(0,0,0,.12)'}`, background: piecework.mode === key ? '#000' : 'transparent', color: piecework.mode === key ? '#fff' : '#555', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: '10px 14px', background: '#f8f9fa', borderRadius: 'var(--radius-md)', fontSize: '.78rem', color: 'var(--muted)', lineHeight: 1.6 }}>
+              {piecework.mode === 'auto' ? (
+                <>В карточке каждой <b>услуги</b> появляется поле «Сдельная оплата» — можно задать <b>сумму (₽)</b> или <b>процент (%)</b> от цены услуги. В кассе при выборе мастера сумма подставится сама (её можно изменить).</>
+              ) : (
+                <>Сумма мастеру вводится в кассе вручную при каждом чеке (как сейчас). В карточках услуг поле не показывается.</>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
       {/* 4. Уведомления */}
       <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 16, padding: 24, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 12 }}>Уведомления и связь</h2>
@@ -391,9 +432,10 @@ export default function Settings() {
             localStorage.setItem('settings_tz', tz);
             localStorage.setItem('settings_notifications', JSON.stringify(notifications));
             localStorage.setItem('settings_owner', JSON.stringify(owner));
+            localStorage.setItem('settings_piecework', JSON.stringify(piecework));
             resetCurrencyCache();
             try {
-              var settingsData = { company, country, lang, currency, timezone: tz, notifications };
+              var settingsData = { company, country, lang, currency, timezone: tz, notifications, piecework };
               const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();
               let saveErr = null;
               if (existing) {

@@ -412,7 +412,7 @@ export default function Registers({ fullscreen }) {
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
       const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, sp: [], discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, ...comboData }];
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, sp: [], discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, reward_kind: p.reward_kind || '', reward_value: p.reward_value || 0, ...comboData }];
     });
   };
 
@@ -428,12 +428,21 @@ export default function Registers({ fullscreen }) {
 
   // ===== Исполнители/продавцы с долями (несколько на позицию) =====
   const [pickEmpFor, setPickEmpFor] = useState(null); // item.id — для кого открыт выбор
+  const pwAuto = (function(){ try { const pw = JSON.parse(localStorage.getItem('settings_piecework') || '{}'); return pw.enabled === true && pw.mode === 'auto'; } catch(e) { return false; } })(); // сдельная оплата: авторежим
   const spSum = (item) => (item.sp || []).reduce((s2, x) => s2 + (parseFloat(x.amt) || 0), 0);
   const itemTotalPrice = (item) => ((item.final_price || item.price || 0)) * item.qty;
   const addSplit = (itemId, emp) => {
-    setCart(prev => prev.map(x => x.id === itemId && !(x.sp || []).some(y => y.empId === emp.id)
-      ? { ...x, sp: [...(x.sp || []), { empId: emp.id, name: emp.name, amt: '' }], employee_id: (x.sp || []).length === 0 ? emp.id : x.employee_id }
-      : x));
+    setCart(prev => prev.map(x => {
+      if (x.id !== itemId || (x.sp || []).some(y => y.empId === emp.id)) return x;
+      let amt = '';
+      // Сдельная оплата (авто): первому исполнителю подставляем норматив из карточки услуги
+      if ((x.sp || []).length === 0 && pwAuto) {
+        const base = (x.final_price || x.price || 0);
+        if (x.reward_kind === 'rub' && Number(x.reward_value) > 0) amt = String(Number(x.reward_value));
+        else if (x.reward_kind === 'pct' && Number(x.reward_value) > 0 && base > 0) amt = String(Math.round(base * Number(x.reward_value) / 100));
+      }
+      return { ...x, sp: [...(x.sp || []), { empId: emp.id, name: emp.name, amt }], employee_id: (x.sp || []).length === 0 ? emp.id : x.employee_id };
+    }));
   };
   const setSplitAmt = (itemId, empId, v) => {
     setCart(prev => prev.map(x => x.id === itemId ? { ...x, sp: (x.sp || []).map(y => y.empId === empId ? { ...y, amt: v } : y) } : x));
@@ -1113,6 +1122,13 @@ if (loading) return <CenterSpinner />;
                     <span>{item.type === 'service' ? 'Мастера' : 'Продавец'}</span>
                     <span style={{color: (item.sp || []).length ? '#222' : '#8a8f9c'}}>{(item.sp || []).length ? Math.round(spSum(item)).toLocaleString() + ' ' + cur : '+ добавить'}</span>
                   </div>
+                  {pwAuto && item.reward_kind && Number(item.reward_value) > 0 && (
+                    <div style={{padding:'4px 11px',fontSize:'.68rem',fontWeight:600,color:'#b45309',background:'#fffbeb',borderTop:'1px solid #fde68a',lineHeight:1.4}}>
+                      {item.reward_kind === 'rub'
+                        ? 'Сдельная: ' + Number(item.reward_value).toLocaleString() + ' ' + cur
+                        : 'Сдельная: ' + Number(item.reward_value) + '% (' + Math.round((item.final_price || item.price || 0) * Number(item.reward_value) / 100).toLocaleString() + ' ' + cur + ')'}
+                    </div>
+                  )}
                   {(item.sp || []).length > 0 && (
                     <div style={{padding:'0 10px 9px',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'6px'}}>
                       {(item.sp || []).map(function(spd, si){

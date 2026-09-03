@@ -140,6 +140,8 @@ export default function Products() {
   const [fCat, setFCat] = useState('');
   const [fPrice, setFPrice] = useState('');
   const [fMinPrice, setFMinPrice] = useState('');
+  const [fRewardKind, setFRewardKind] = useState(''); // сдельная оплата (услуги): '' | 'rub' | 'pct'
+  const [fRewardValue, setFRewardValue] = useState('');
   const [fUnit, setFUnit] = useState('');
   const [fSku, setFSku] = useState('');
   const [fBarcode, setFBarcode] = useState('');
@@ -246,6 +248,7 @@ export default function Products() {
   const openAdd = () => {
     setEditId(null); setMode('add'); setFHidden(false); setFPhoto(''); setFreshPhotoUrl('');
     setFName(''); setFCat(''); setFPrice(''); setFMinPrice(''); setFUnit(''); setFSku('');
+    setFRewardKind(''); setFRewardValue('');
     setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
     setFFreePrice(false); // новый товар: свободная цена всегда выключена, включается вручную
@@ -256,6 +259,7 @@ export default function Products() {
   const openEdit = (p) => {
     setEditId(p.id); setMode('edit'); setFHidden(p.hidden || false); setFPhoto(p.photo_url || ''); setFreshPhotoUrl('');
     setFName(p.name); setFCat(p.cat || ''); setFPrice(String(p.price || '')); setFMinPrice(String(p.min_price || ''));
+    setFRewardKind(p.reward_kind || ''); setFRewardValue(p.reward_value ? String(p.reward_value) : '');
     setFUnit(p.unit || ''); setFSku(p.sku || ''); setFBarcode(p.barcode || '');
     setFType(p.type || 'product'); setFWeight(String(p.weight || '0'));
     setFWeightUnit(p.weight_unit || 'кг'); setFMinQty(String(p.min_qty || '')); setFDesc(p.desc || '');
@@ -316,6 +320,8 @@ export default function Products() {
         name: fName.trim(), cat: fCat, price: price, unit: fUnit || 'шт',
         sku: fSku.trim(), barcode: fBarcode.trim(), type: fType,
         min_price: parseFloat(fMinPrice) || 0,
+        reward_kind: fType === 'service' ? (fRewardKind || '') : '',
+        reward_value: fType === 'service' ? (parseFloat(fRewardValue) || 0) : 0,
         weight: fType === 'combo' ? 0 : (parseFloat(fWeight) || 0), weight_unit: fType === 'combo' ? '' : fWeightUnit,
         min_qty: parseInt(fMinQty) || 0, user_id: user.id, description: fDesc,
         hidden: editId ? fHidden : false,
@@ -934,6 +940,21 @@ export default function Products() {
                 </span>
                 Продавать по свободной цене
               </label>}
+              {fType === 'service' && (() => { try { const pw = JSON.parse(localStorage.getItem('settings_piecework') || '{}'); return pw.enabled === true && pw.mode === 'auto'; } catch(e){ return false; } })() && (
+                <div className="form-group">
+                  <label>Сдельная оплата мастеру</label>
+                  <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+                    <select value={fRewardKind} onChange={e => { setFRewardKind(e.target.value); if (!e.target.value) setFRewardValue(''); }} style={{ width: 'auto', minWidth: '140px' }}>
+                      <option value="">— не задана —</option>
+                      <option value="rub">Сумма (₽)</option>
+                      <option value="pct">Процент (%)</option>
+                    </select>
+                    {fRewardKind && <input type="number" min="0" step="0.01" value={fRewardValue} onChange={e => setFRewardValue(e.target.value)} placeholder={fRewardKind === 'pct' ? '30' : '500'} style={{ width: '110px' }} autoFocus={false} />}
+                    {fRewardKind === 'pct' && <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>от цены услуги</span>}
+                  </div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem' }}>Сумма автоматически подставится мастеру в чеке (её можно изменить)</div>
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label>Артикул</label>
