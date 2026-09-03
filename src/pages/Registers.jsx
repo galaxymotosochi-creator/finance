@@ -1430,7 +1430,7 @@ if (loading) return <CenterSpinner />;
                         <span>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                         {a.type === 'cash_register' && <span style={{fontSize:'.68rem',fontWeight:400,color:'var(--muted)'}}>{Math.round(accBal(a)).toLocaleString()} {cur}</span>}
                       </span>
-                      <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'2px solid ' + (payMode === a.id ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payMode === a.id ? '#555' : 'transparent',background: payMode === a.id ? '#e8e8e8' : 'transparent'}}>{payMode === a.id ? '\u2713' : ''}</span>
+                      <span style={{width:'16px',height:'16px',minWidth:'16px',minHeight:'16px',flexShrink:0,lineHeight:1,borderRadius:'50%',border:'2px solid ' + (payMode === a.id ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payMode === a.id ? '#555' : 'transparent',background: payMode === a.id ? '#e8e8e8' : 'transparent'}}>{payMode === a.id ? '\u2713' : ''}</span>
                     </button>
                   ))}
                 </div>
@@ -1438,12 +1438,12 @@ if (loading) return <CenterSpinner />;
                   <button onClick={() => setPaySplit(!paySplit)}
                     style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (paySplit ? '#ddd' : '#eee'),borderRadius:'12px',background: paySplit ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: paySplit ? '#222' : '#444',textAlign:'left'}}>
                     Разделить на счета
-                    <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'2px solid ' + (paySplit ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: paySplit ? '#555' : 'transparent',background: paySplit ? '#e8e8e8' : 'transparent'}}>{paySplit ? '\u2713' : ''}</span>
+                    <span style={{width:'16px',height:'16px',minWidth:'16px',minHeight:'16px',flexShrink:0,lineHeight:1,borderRadius:'50%',border:'2px solid ' + (paySplit ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: paySplit ? '#555' : 'transparent',background: paySplit ? '#e8e8e8' : 'transparent'}}>{paySplit ? '\u2713' : ''}</span>
                   </button>
                   <button onClick={() => {setPayUnpaid(!payUnpaid); if (!payUnpaid) {setPaySplit(false); setSplitAmts({}); setPayMode(null);} else {setPayMode(null)}}}
                     style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (payUnpaid ? '#ddd' : '#eee'),borderRadius:'12px',background: payUnpaid ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: payUnpaid ? '#222' : '#444',textAlign:'left'}}>
                     В долг
-                    <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'2px solid ' + (payUnpaid ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payUnpaid ? '#555' : 'transparent',background: payUnpaid ? '#e8e8e8' : 'transparent'}}>{payUnpaid ? '\u2713' : ''}</span>
+                    <span style={{width:'16px',height:'16px',minWidth:'16px',minHeight:'16px',flexShrink:0,lineHeight:1,borderRadius:'50%',border:'2px solid ' + (payUnpaid ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payUnpaid ? '#555' : 'transparent',background: payUnpaid ? '#e8e8e8' : 'transparent'}}>{payUnpaid ? '\u2713' : ''}</span>
                   </button>
                 </div>
               </div>
