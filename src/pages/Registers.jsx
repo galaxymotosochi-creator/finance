@@ -1006,7 +1006,7 @@ if (loading) return <CenterSpinner />;
       {/* Панель товаров — плашка */}
       <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
         {/* Категории */}
-        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
+        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px',flexShrink:0}}>
           <button onClick={() => setCatFilter('all')} style={{
             padding:'7px 16px', borderRadius:'100px', border:'none', fontSize:'.78rem',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
@@ -1024,7 +1024,8 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gridAutoRows:'auto',gap:'10px',alignContent:'start',minHeight:0,width:'100%'}}>
+        <div style={{flex:1,minHeight:0,overflowY:'auto',width:'100%',paddingRight:'2px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:'10px',alignContent:'start'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
           ) : filtered.map(p => {
@@ -1050,6 +1051,7 @@ if (loading) return <CenterSpinner />;
             </div>
             );
           })}
+          </div>
         </div>
       </div>
 
