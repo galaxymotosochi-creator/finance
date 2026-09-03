@@ -1253,13 +1253,13 @@ if (loading) return <CenterSpinner />;
               <div style={{display:'flex',gap:'8px'}}>
                 {cart.length > 0 && (
                   <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clients.find(function(c){return c.id===selectedClient;})?.name||'',createdAt:Date.now(),id:Date.now()}]});setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast('Чек отложен')}} style={{
-                    flex:1, padding:'13px', borderRadius:'100px', border:'1.5px solid var(--border)',
+                    flex:1, padding:'13px', borderRadius:'8px', border:'1.5px solid var(--border)',
                     background:'#fff', color:'#444', fontSize:'.80rem', fontWeight:600,
                     cursor:'pointer', fontFamily:'inherit',
                   }}>Отложить</button>
                 )}
                 <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
-                  flex:1, padding:'13px', borderRadius:'100px', border:'none',
+                  flex:1, padding:'13px', borderRadius:'8px', border:'none',
                   background: cart.length ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#ddd',
                   color: cart.length ? '#111' : '#fff', fontSize:'.80rem', fontWeight:700,
                   cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
