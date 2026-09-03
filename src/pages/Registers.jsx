@@ -1435,7 +1435,7 @@ if (loading) return <CenterSpinner />;
                   ))}
                 </div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
-                  <button onClick={() => setPaySplit(!paySplit)}
+                  <button onClick={() => { if (!paySplit) { setPayMode(null); setPayUnpaid(false); } setPaySplit(!paySplit); }}
                     style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (paySplit ? '#ddd' : '#eee'),borderRadius:'12px',background: paySplit ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: paySplit ? '#222' : '#444',textAlign:'left'}}>
                     Разделить на счета
                     <span style={{width:'16px',height:'16px',minWidth:'16px',minHeight:'16px',flexShrink:0,lineHeight:1,borderRadius:'50%',border:'2px solid ' + (paySplit ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: paySplit ? '#555' : 'transparent',background: paySplit ? '#e8e8e8' : 'transparent'}}>{paySplit ? '\u2713' : ''}</span>
