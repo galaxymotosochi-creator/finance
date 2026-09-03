@@ -810,7 +810,7 @@ if (loading) return <CenterSpinner />;
           </div>
         </div>
       )}
-      <div style={{display:'flex',flexDirection:'column',flex:1,flexShrink:0,width:'100%'}}>
+      <div style={{display:'flex',flexDirection:'column',flex:1,minHeight:0,width:'100%'}}>
       {/* Подтверждение скидки ниже минимальной цены (пин руководителя) */}
       {minPriceConfirm && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setMinPriceConfirm(false)}>
