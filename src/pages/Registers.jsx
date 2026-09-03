@@ -306,7 +306,7 @@ export default function Registers({ fullscreen }) {
 
   // Закрытие дропдаунов по клику вне
   useEffect(function(){
-    var handler = function(e){ if (!e.target.closest('.receipt-dropdown-wrap')) setReceiptDropdownOpen(false); if (!e.target.closest('.discount-dropdown-wrap')) setDiscountDropdownOpen(false); };
+    var handler = function(e){ if (!e.target.closest('.receipt-dropdown-wrap')) setReceiptDropdownOpen(false); if (!e.target.closest('.kassa-disc')) setDiscountDropdownOpen(false); };
     document.addEventListener('click', handler);
     return function(){ document.removeEventListener('click', handler); };
   }, []);
