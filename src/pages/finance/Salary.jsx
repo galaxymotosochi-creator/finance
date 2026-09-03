@@ -112,11 +112,13 @@ export default function Salary() {
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
+  const [dupSalary, setDupSalary] = useState(null); // уже есть начисление за этот период (защита от дублей)
   // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
   const [accTxs, setAccTxs] = useState([]);
   // Продажи сотрудника (бонусы с продаж)
   const [salesRows, setSalesRows] = useState([]);
   const [rewardRows, setRewardRows] = useState([]); // вознаграждение исполнителю из чеков (employee_splits)
+  const [rewardEdit, setRewardEdit] = useState({}); // ручные правки сумм вознаграждения
   const [salesBonus, setSalesBonus] = useState({});
   const [salesLoaded, setSalesLoaded] = useState(false);
   const [prodRef, setProdRef] = useState([]);
@@ -200,7 +202,7 @@ export default function Salary() {
 
   // Продажи и услуги сотрудника за период (для авто-бонусов)
   useEffect(() => {
-    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setStoreInfo(null); setRewardRows([]); setSalesLoaded(false); return; }
+    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setSalesRows([]); setSalesBonus({}); setStoreInfo(null); setRewardRows([]); setRewardEdit({}); setSalesLoaded(false); return; }
     (async () => {
       setSalesLoaded(false);
       try {
@@ -213,7 +215,7 @@ export default function Salary() {
         }
         const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', fPeriodFrom).lte('date', fPeriodTo).order('created_at', { ascending: false });
         const rlist = recs || [];
-        if (rlist.length === 0) { setSalesRows([]); setSalesBonus({}); setRewardRows([]); setSalesLoaded(true); return; }
+        if (rlist.length === 0) { setSalesRows([]); setSalesBonus({}); setRewardRows([]); setRewardEdit({}); setSalesLoaded(true); return; }
         const { data: items } = await supabase.from('receipt_items').select('*').in('receipt_id', rlist.map(r => r.id));
         const rows = [];
         (items || []).forEach(it => {
@@ -249,6 +251,7 @@ export default function Salary() {
         });
         setSalesRows(rows);
         setRewardRows(rewRows);
+        setRewardEdit({});
         const emp = employees.find(e => e.id === fEmpId);
         const rules = (emp && emp.bonus_rules) || [];
         const bonus = {};
@@ -296,13 +299,30 @@ export default function Salary() {
     setExistingDebt(debt);
   }, [fEmpId, list]);
 
+  // Защита от дублей: если за выбранный период сотруднику уже начислено — предупреждаем и не даём сохранить
+  useEffect(() => {
+    if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setDupSalary(null); return; }
+    const d = (list || []).find(s =>
+      s.employee_id === fEmpId &&
+      String(s.period_from || '').slice(0, 10) === fPeriodFrom &&
+      String(s.period_to || '').slice(0, 10) === fPeriodTo &&
+      s.status !== 'cancelled' &&
+      s.id !== editId
+    ) || null;
+    setDupSalary(d);
+  }, [fEmpId, fPeriodFrom, fPeriodTo, list, editId]);
+
   const tsBonuses = tsEntries.filter(e => (e.bonus_amount||0) > 0);
   const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
   const checkedBonusTotal = tsBonuses.filter(e => bonusChecks[e.id]).reduce((s,e) => s + Number(e.bonus_amount||0), 0);
   const checkedDeductTotal = tsDeducts.filter(e => deductChecks[e.id]).reduce((s,e) => s + Number(e.deduct_amount||0), 0);
   const checkedDebtTotal = empDebts.filter(d => debtChecks[d.id]).reduce((s,d) => s + Number(d.amount||0), 0);
   const salesBonusTotal = Object.values(salesBonus).reduce((s2, b) => s2 + (Number(b.rub) || 0), 0);
-  const rewardTotal = rewardRows.reduce((s2, x) => s2 + (Number(x.amount) || 0), 0);
+  const rewardTotal = rewardRows.reduce((s2, x) => {
+    const edited = rewardEdit[x.itemId];
+    const v = edited !== undefined && edited !== '' ? (parseFloat(edited) || 0) : (Number(x.amount) || 0);
+    return s2 + v;
+  }, 0);
   // Если включён «% от всей выручки» без суммирования — позиционные бонусы не учитываются
   const itemsBonusTotal = (storeInfo && storeInfo.stack === false) ? 0 : salesBonusTotal;
   // Бонус от выручки пропорционален отработанным дням (по табелю): если табель за период заполнен —
@@ -329,7 +349,7 @@ export default function Salary() {
   const openEdit = (s) => {
     if (s.status === 'paid') return alert('Выплаченное начисление нельзя редактировать. Создайте новое начисление или отмените выплату.');
     setEditId(s.id); setFEmpId(s.employee_id||'');
-    setFPeriodFrom(s.period_from||''); setFPeriodTo(s.period_to||'');
+    setFPeriodFrom(String(s.period_from || '').slice(0, 10) || ''); setFPeriodTo(String(s.period_to || '').slice(0, 10) || '');
     setFBaseSalary(s.base_salary||0); setFSalaryType('fixed');
     setFSalaryTotal(s.base_salary||0); setFDays(s.days_worked||0);
     setFPayType(s.pay_type||'salary'); setFStatus(s.status||'pending');
@@ -346,6 +366,7 @@ export default function Salary() {
     e.preventDefault();
     if (!fEmpId) return alert('Выберите сотрудника');
     if (!fPeriodFrom || !fPeriodTo) return alert('Выберите период');
+    if (dupSalary) return alert('За период ' + fPeriodFrom + ' – ' + fPeriodTo + ' начисление уже есть (' + Number(dupSalary.amount || 0).toLocaleString() + ' ' + cur + '). Откройте его кнопкой «Редактировать», чтобы изменить.');
     if (!user) return alert('Ошибка: пользователь не авторизован');
     const emp = employees.find(e => e.id === fEmpId);
     try {
@@ -363,7 +384,7 @@ export default function Salary() {
         amount: grandTotal, status: 'pending', pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
         sales_bonus: salesBonusTotal, sales_items: salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: Number(salesBonus[row.itemId]?.rub) || 0 })),
-        reward_amount: rewardTotal, reward_items: rewardRows.map(row => ({ date: row.date, name: row.name, amount: row.amount })),
+        reward_amount: rewardTotal, reward_items: rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }),
         deduct_amount: checkedDeductTotal + checkedDebtTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })).concat(debtItems),
         paid_at: null,
       };
@@ -540,6 +561,16 @@ export default function Salary() {
                   style={{flex:1,minWidth:'115px',padding:'.3rem .4rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
               </div>
 
+              {dupSalary && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '.5rem .65rem', fontSize: '.76rem', color: '#b91c1c', flexWrap: 'wrap' }}>
+                  <span style={{ flex: 1, minWidth: '200px' }}>⚠️ За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже есть начисление: <b>{Number(dupSalary.amount || 0).toLocaleString()} {cur}</b> ({dupSalary.status === 'paid' ? 'выплачено' : 'начислено'})</span>
+                  {dupSalary.status !== 'paid' && (
+                    <button type="button" onClick={() => openEdit(dupSalary)}
+                      style={{ padding: '.3rem .8rem', borderRadius: 100, border: 'none', background: '#b91c1c', color: '#fff', fontSize: '.72rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Открыть его</button>
+                  )}
+                </div>
+              )}
+
               {/* Расчет */}
               <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'.75rem'}}>
                 <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'.5rem'}}>Расчет</div>
@@ -652,14 +683,18 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
                   ) : (
                     <>
-                      <div style={{fontSize:'.7rem',color:'#b45309',marginBottom:'.3rem'}}>Суммы, указанные исполнителю в чеках кассы (раздел «Мастера»)</div>
+                      <div style={{fontSize:'.7rem',color:'#b45309',marginBottom:'.3rem'}}>Суммы из чеков кассы (раздел «Мастера») — можно поправить вручную</div>
                       <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.74rem',tableLayout:'fixed'}}>
                         <tbody>
                           {rewardRows.map(row => (
                             <tr key={row.itemId}>
                               <td style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--muted)',fontSize:'.7rem',textAlign:'left'}}>{fmtDate(row.date)}</td>
                               <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--body-color)',fontSize:'.72rem',textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.name}</td>
-                              <td style={{width:'80px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'#b45309',fontWeight:600,fontSize:'.72rem',textAlign:'right'}}>+{Number(row.amount).toLocaleString()} {cur}</td>
+                              <td style={{width:'100px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',textAlign:'right'}}>
+                                <input type="number" min="0" value={rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount}
+                                  onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))}
+                                  style={{width:'72px',padding:'.2rem .25rem',fontSize:'.72rem',textAlign:'center',fontFamily:'inherit',border:'1px solid #fde68a',borderRadius:'5px',outline:'none',color:'#b45309',fontWeight:600}} />
+                              </td>
                             </tr>
                           ))}
                         </tbody>
