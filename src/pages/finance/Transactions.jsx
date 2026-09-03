@@ -187,9 +187,11 @@ export default function Transactions() {
     setShowIncome(true);
   };
 
+  const catNameById = (id) => { const c = (cats || []).find(x => x.id === id); return c ? c.name : ''; };
+
   const submitIncome = (e) => {
     e.preventDefault();
-    if (!incName || !incAmount) { alert('Заполните название и сумму'); return; }
+    if (!incAmount) { alert('Введите сумму'); return; }
     setPendingTx({
       id: editingId,
       type: 'income', user_id: user.id,
@@ -204,7 +206,7 @@ export default function Transactions() {
 
   const submitExpense = (e) => {
     e.preventDefault();
-    if (!expName || !expAmount) { alert('Заполните название и сумму'); return; }
+    if (!expAmount) { alert('Введите сумму'); return; }
     setPendingTx({
       id: editingId,
       type: 'expense', user_id: user.id,
@@ -603,27 +605,30 @@ export default function Transactions() {
 
             <form onSubmit={function(e){
               e.preventDefault();
-              if(!incName || !incAmount){alert("Заполните название и сумму");return}
+              if(!incAmount){alert("Введите сумму");return}
               if(editingId){
                 var amtChanged = parseFloat(incAmount) !== parseFloat(origAmount);
                 if(amtChanged){
-                  update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  update(editingId,{description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
-                  setPendingTx({id:editingId,type:'income',user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  setPendingTx({id:editingId,type:'income',user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
                 } else {
-                  update(editingId,{description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                  update(editingId,{description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
                   setToast('Сумма успешно изменена!');
                 }
               }else{
-                setPendingTx({type:"income",user_id:user.id,description:incName,amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
+                setPendingTx({type:"income",user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                 setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
               <div className="form-group">
-                <label>Название</label>
-                <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} required />
+                <label>Категория</label>
+                <select value={incCategory} onChange={function(e){setIncCategory(e.target.value)}}>
+                  <option value="">— выберите —</option>
+                  {(cats||[]).filter(function(c){return c&&c.type==="income"}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
+                </select>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -636,11 +641,8 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Категория</label>
-                <select value={incCategory} onChange={function(e){setIncCategory(e.target.value)}}>
-                  <option value="">— выберите —</option>
-                  {(cats||[]).filter(function(c){return c&&c.type==="income"}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
-                </select>
+                <label>Комментарий (необязательно)</label>
+                <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-dark">{editingId ? "Сохранить" : "Добавить"}</button>
@@ -651,27 +653,30 @@ export default function Transactions() {
       <Modal open={showExpense} onClose={function(){setShowExpense(false);setEditingId(null)}} title={editingId ? "Редактировать расход" : "Добавить расход"} subtitle="Списание средств" width="medium">
             <form onSubmit={function(e){
               e.preventDefault();
-              if(!expName || !expAmount){alert("Заполните название и сумму");return}
+              if(!expAmount){alert("Введите сумму");return}
               if(editingId){
                 var amtChanged = parseFloat(expAmount) !== parseFloat(origAmount);
                 if(amtChanged){
-                  update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  update(editingId,{description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
-                  setPendingTx({id:editingId,type:'expense',user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  setPendingTx({id:editingId,type:'expense',user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
                 } else {
-                  update(editingId,{description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                  update(editingId,{description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
                   setToast('Сумма успешно изменена!');
                 }
               }else{
-                setPendingTx({type:"expense",user_id:user.id,description:expName,amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
+                setPendingTx({type:"expense",user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                 setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
               <div className="form-group">
-                <label>Название</label>
-                <input type="text" placeholder="Например: аренда, коммунальные, налоги" value={expName} onChange={function(e){setExpName(e.target.value)}} required />
+                <label>Категория</label>
+                <select value={expCategory} onChange={function(e){setExpCategory(e.target.value)}}>
+                  <option value="">— выберите —</option>
+                  {(cats||[]).filter(function(c){return c&&(c.type==="expense"||c.type==="supply_expense")}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
+                </select>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -684,11 +689,8 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Категория</label>
-                <select value={expCategory} onChange={function(e){setExpCategory(e.target.value)}}>
-                  <option value="">— выберите —</option>
-                  {(cats||[]).filter(function(c){return c&&(c.type==="expense"||c.type==="supply_expense")}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
-                </select>
+                <label>Комментарий (необязательно)</label>
+                <input type="text" placeholder="Например: аренда за сентябрь, запчасти на скутер" value={expName} onChange={function(e){setExpName(e.target.value)}} />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-dark">{editingId ? "Сохранить" : "Добавить"}</button>
