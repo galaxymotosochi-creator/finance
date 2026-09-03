@@ -387,22 +387,19 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', margin: '.75rem 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ height: '3px', background: '#4caf50' }}></div>
             <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Поступления</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{incomeTotal.toLocaleString()} {cur}</div>
-              <div style={{ borderTop: '1px solid #f0f0f0', marginTop: '8px', paddingTop: '6px', fontSize: '.72rem', color: 'rgba(0,0,0,.55)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '6px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>Выручка от продаж</span>
-                  <b style={{ color: '#16a34a', whiteSpace: 'nowrap' }}>+{salesIncome.toLocaleString()} {cur}</b>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '6px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>Прочие доходы</span>
-                  <b style={{ whiteSpace: 'nowrap', color: otherIncomeTx > 0 ? '#16a34a' : 'rgba(0,0,0,.4)' }}>+{otherIncomeTx.toLocaleString()} {cur}</b>
-                </div>
-              </div>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Выручка от продаж</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#16a34a', textAlign:'center' }}>+{salesIncome.toLocaleString()} {cur}</div>
+            </div>
+          </div>
+          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+            <div style={{ height: '3px', background: '#26a69a' }}></div>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Прочие доходы</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{otherIncomeTx > 0 ? '+' : ''}{otherIncomeTx.toLocaleString()} {cur}</div>
             </div>
           </div>
           <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
