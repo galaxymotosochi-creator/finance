@@ -1273,6 +1273,12 @@ if (loading) return <CenterSpinner />;
                     <span style={{color:'#777'}}>Сумма чека:</span>
                     <span style={{fontWeight:700,color:'#111'}}>{Number(viewingReceipt.total_amount || 0).toLocaleString()} {cur}</span>
                   </div>
+                  {Number(viewingReceipt.discount_sum || 0) > 0 && (
+                    <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                      <span style={{color:'#777'}}>Скидка:</span>
+                      <span style={{fontWeight:600,color:'#16a34a'}}>−{Number(viewingReceipt.discount_sum).toLocaleString()} {cur}</span>
+                    </div>
+                  )}
                   <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
                     <span style={{color:'#777'}}>Оплачено:</span>
                     <span style={{fontWeight:600,color:'#16a34a'}}>{Number(viewingReceipt.paid_amount != null ? viewingReceipt.paid_amount : viewingReceipt.total_amount || 0).toLocaleString()} {cur}</span>
