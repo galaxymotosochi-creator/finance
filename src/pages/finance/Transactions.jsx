@@ -314,7 +314,7 @@ export default function Transactions() {
       <div className="page-header">
         <div>
           <h1>Доходы и расходы</h1>
-          <div className="sub">Доходы, расходы и перемещения</div>
+          <div className="sub">Поступления, списания и переводы между счетами</div>
         </div>
         <div className="page-actions">
           <button className="btn btn-dark" onClick={function(){setShowActionSelect(true)}} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Операция</button>
