@@ -950,9 +950,25 @@ if (loading) return <CenterSpinner />;
                       setCurrentReceiptNum(r.receipt_number);
                       setHeldActiveId(null);
                       if (isPaid) {
-                        var items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
-                        setCart(items);
-                        setViewingReceipt(r);
+                        // Полный просмотр оплаченного чека: позиции с ценами из receipt_items
+                        (async function(){
+                          var items = [];
+                          try {
+                            var { data: ri } = await supabase.from('receipt_items').select('*').eq('receipt_id', r.id);
+                            items = (ri || []).map(function(it){
+                              var qty = Number(it.quantity) || 1;
+                              var unit = qty > 0 ? (Number(it.total) || 0) / qty : 0;
+                              var sp = (it.employee_splits || []).map(function(s){ return { empId: s.employee_id, name: s.name, amt: String(s.amount != null ? s.amount : '') }; });
+                              return { id: it.id || Math.random(), name: it.product_name, price: Number(it.price) || 0, qty: qty, final_price: unit, type: 'product', sp: sp };
+                            });
+                          } catch(e) {}
+                          if (!items.length) {
+                            items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
+                          }
+                          setCart(items);
+                          setReceiptDiscountPercent(0); setReceiptDiscountFixed(0);
+                          setViewingReceipt(r);
+                        })();
                       } else {
                         var items = (r.items_json || []).map(function(it){ return {id: it.id || Math.random(), name: it.name, price: it.price || 0, qty: it.qty || 1, final_price: it.price || 0, type: 'product'}; });
                         setCart(items);
@@ -1248,18 +1264,36 @@ if (loading) return <CenterSpinner />;
             {viewingReceipt ? (
               <>
                 {/* Режим просмотра оплаченного чека */}
-                <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px',fontSize:'.80rem',color:'#777',lineHeight:1.7}}>
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span>Клиент:</span>
-                    <span>{viewingReceipt.client_name || '—'}</span>
+                <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'10px 12px',fontSize:'.80rem',color:'#444',lineHeight:1.8}}>
+                  <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                    <span style={{color:'#777'}}>Клиент:</span>
+                    <span style={{fontWeight:600,textAlign:'right'}}>{viewingReceipt.client_name || '—'}</span>
                   </div>
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span>Дата:</span>
+                  <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                    <span style={{color:'#777'}}>Сумма чека:</span>
+                    <span style={{fontWeight:700,color:'#111'}}>{Number(viewingReceipt.total_amount || 0).toLocaleString()} {cur}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                    <span style={{color:'#777'}}>Оплачено:</span>
+                    <span style={{fontWeight:600,color:'#16a34a'}}>{Number(viewingReceipt.paid_amount != null ? viewingReceipt.paid_amount : viewingReceipt.total_amount || 0).toLocaleString()} {cur}</span>
+                  </div>
+                  {(viewingReceipt.payments && viewingReceipt.payments.length > 0) && (
+                    <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                      <span style={{color:'#777'}}>Способ:</span>
+                      <span style={{fontWeight:600,textAlign:'right'}}>{viewingReceipt.payments.map(function(p){
+                        var acc = accounts.find(function(a){ return a.id === p.account_id; });
+                        var nm = acc ? (acc.type === 'cash_register' ? 'Наличные' : acc.name) : '—';
+                        return nm + ' — ' + Number(p.amount || 0).toLocaleString() + ' ' + cur;
+                      }).join(' · ')}</span>
+                    </div>
+                  )}
+                  <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                    <span style={{color:'#777'}}>Дата:</span>
                     <span>{((viewingReceipt.date || '').split('T')[0] || viewingReceipt.date || '').split('-').reverse().join('.')}</span>
                   </div>
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span>Статус:</span>
-                    <span>Оплачен</span>
+                  <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                    <span style={{color:'#777'}}>Статус:</span>
+                    <span style={{color:'#16a34a',fontWeight:600}}>Оплачен</span>
                   </div>
                 </div>
                 <button onClick={function(){setViewingReceipt(null);setHeldActiveId(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0)}} style={{
