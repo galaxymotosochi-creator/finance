@@ -439,7 +439,7 @@ export default function Settings() {
               const { data: existing } = await supabase.from('user_profiles').select('id').eq('user_id', user.id).maybeSingle();
               let saveErr = null;
               if (existing) {
-                const r = await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData }).eq('user_id', user.id);
+                const r = await supabase.from('user_profiles').update({ last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData }).eq('id', existing.id);
                 saveErr = r.error;
               } else {
                 const r = await supabase.from('user_profiles').insert({ user_id: user.id, last_name: owner.lastName, first_name: owner.firstName, patronymic: owner.patronymic, settings: settingsData });
