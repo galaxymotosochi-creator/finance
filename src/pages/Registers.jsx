@@ -1428,7 +1428,7 @@ if (loading) return <CenterSpinner />;
                       style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (payMode === a.id ? '#ddd' : '#eee'),borderRadius:'12px',background: payMode === a.id ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: payMode === a.id ? '#222' : '#444',textAlign:'left'}}>
                       <span style={{display:'flex',flexDirection:'column',gap:'2px'}}>
                         <span>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
-                        {a.type === 'cash_register' && <span style={{fontSize:'.68rem',fontWeight:400,color:'var(--muted)'}}>В ящике: {Math.round(accBal(a)).toLocaleString()} {cur}</span>}
+                        {a.type === 'cash_register' && <span style={{fontSize:'.68rem',fontWeight:400,color:'var(--muted)'}}>{Math.round(accBal(a)).toLocaleString()} {cur}</span>}
                       </span>
                       <span style={{width:'16px',height:'16px',borderRadius:'50%',border:'2px solid ' + (payMode === a.id ? '#ccc' : '#ddd'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.45rem',color: payMode === a.id ? '#555' : 'transparent',background: payMode === a.id ? '#e8e8e8' : 'transparent'}}>{payMode === a.id ? '\u2713' : ''}</span>
                     </button>
@@ -1575,10 +1575,6 @@ if (loading) return <CenterSpinner />;
               <div className="form-group">
                 <label>Телефон</label>
                 <input type="text" value={newClientPhone} onChange={e => setNewClientPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" value={newClientEmail} onChange={e => setNewClientEmail(e.target.value)} placeholder="ivan@mail.ru" />
               </div>
               <div className="form-group">
                 <label>Дата рождения</label>
