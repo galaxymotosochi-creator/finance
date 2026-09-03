@@ -999,7 +999,7 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
-        <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
+        <div style={{display:'flex',flex:1,minHeight:0,overflow:'hidden',gap:'14px',alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
       <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
