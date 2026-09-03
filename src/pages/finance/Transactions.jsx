@@ -593,7 +593,7 @@ export default function Transactions() {
                 <input type="number" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} placeholder="0" autoFocus />
               </div>
               <div className="form-group">
-                <label>Комментарий (необязательно)</label>
+                <label>Комментарий</label>
                 <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
               </div>
               <div className="modal-actions">
@@ -641,7 +641,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Комментарий (необязательно)</label>
+                <label>Комментарий</label>
                 <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} />
               </div>
               <div className="modal-actions">
@@ -689,7 +689,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Комментарий (необязательно)</label>
+                <label>Комментарий</label>
                 <input type="text" placeholder="Например: аренда за сентябрь, запчасти на скутер" value={expName} onChange={function(e){setExpName(e.target.value)}} />
               </div>
               <div className="modal-actions">

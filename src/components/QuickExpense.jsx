@@ -63,7 +63,7 @@ export default function QuickExpense({ onClose }) {
             </div>
           </div>
           <div className="form-group">
-            <label>Комментарий (необязательно)</label>
+            <label>Комментарий</label>
             <input type="text" value={desc} onChange={e => setDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
           </div>
         </div>

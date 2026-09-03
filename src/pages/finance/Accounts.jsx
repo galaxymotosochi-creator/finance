@@ -470,7 +470,7 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} required autoFocus />
               </div>
               <div className="form-group">
-                <label>Комментарий (необязательно)</label>
+                <label>Комментарий</label>
                 <input type="text" placeholder="Например: аренда за сентябрь" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
@@ -512,7 +512,7 @@ export default function Accounts() {
                         <input type="number" placeholder="Остаток" min="0" step="0.01" value={na.amt} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],amt:e.target.value};setNewAccs(r);}} style={{width:'100px'}} />
                         <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
                       </div>
-                      <input placeholder="Комментарий (необязательно)" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
+                      <input placeholder="Комментарий" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
                       <select value={na.type} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}}>
                         {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                       </select>
