@@ -1542,7 +1542,7 @@ if (loading) return <CenterSpinner />;
               </div>
               
               <button type="button" onClick={processPay} disabled={!selectedClient}
-                style={{padding:"14px 28px",border:"none",borderRadius:"100px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background:"#ffdd2d",color:"#222",alignSelf:"flex-end",marginTop:"auto",opacity: selectedClient ? 1 : 0.4}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
+                style={{padding:"13px 28px",border:"none",borderRadius:"8px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background: selectedClient ? "linear-gradient(135deg,#ffdd2d,#fff9db)" : "#ddd",color: selectedClient ? "#111" : "#fff",alignSelf:"flex-end",marginTop:"auto",boxShadow: selectedClient ? "0 2px 10px rgba(255,205,0,.35)" : "none",opacity:1}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
