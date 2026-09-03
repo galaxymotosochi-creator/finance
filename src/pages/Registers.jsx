@@ -1009,7 +1009,8 @@ if (loading) return <CenterSpinner />;
         </div>
 
         {/* Сетка товаров */}
-        <div style={{flex:1,overflowY:'auto',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gridAutoRows:'auto',gap:'10px',alignContent:'start',minHeight:0,width:'100%',border:'3px solid orange'}}>
+        <div style={{flex:1,overflowY:'auto',minHeight:0,width:'100%',display:'flex',flexDirection:'column',border:'3px solid orange'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:'10px',alignContent:'start'}}>
           {filtered.length === 0 ? (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'3rem 0',color:'var(--muted)',fontSize:'.80rem'}}>Нет товаров</div>
           ) : filtered.map(p => {
@@ -1035,6 +1036,7 @@ if (loading) return <CenterSpinner />;
             </div>
             );
           })}
+          </div>
         </div>
       </div>
 
