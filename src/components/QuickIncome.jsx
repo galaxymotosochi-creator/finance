@@ -5,24 +5,27 @@ import { useAuth } from '../hooks/useAuth';
 export default function QuickIncome({ onClose }) {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState([]);
+  const [cats, setCats] = useState([]);
+  const [catId, setCatId] = useState('');
   const [desc, setDesc] = useState('');
   const [amount, setAmount] = useState('');
   const [payMode, setPayMode] = useState(null);
-  const [client, setClient] = useState('');
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
     supabase.from('accounts').select('*').eq('user_id', user.id).order('name').then(({ data }) => { if (data) setAccounts(data); });
+    supabase.from('categories').select('*').eq('user_id', user.id).eq('type', 'income').order('name').then(({ data }) => { if (data) setCats(data); });
   }, [user]);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); } }, [toast]);
 
   const process = async () => {
     if (!amount || !payMode) return setToast('⚠️ Укажите сумму и выберите счёт');
     const date = new Date().toISOString().split('T')[0];
+    const catName = (cats.find(c => c.id === catId) || {}).name || '';
     const { error } = await supabase.from('transactions').insert({
       user_id: user.id, type: 'income', amount: parseFloat(amount),
-      description: desc.trim() || 'Доход',
-      date, account_id: payMode, status: 'paid',
+      description: desc.trim() || catName || 'Доход',
+      date, account_id: payMode, status: 'paid', category_id: catId || null,
     });
     if (error) return setToast('' + error.message);
     onClose();
@@ -38,8 +41,11 @@ export default function QuickIncome({ onClose }) {
         </div>
         <div style={{padding:'14px 24px 0'}}>
           <div className="form-group">
-            <label>Описание</label>
-            <input type="text" value={desc} onChange={e => setDesc(e.target.value)} placeholder="Назначение платежа..." />
+            <label>Категория</label>
+            <select value={catId} onChange={e => setCatId(e.target.value)}>
+              <option value="">— выберите —</option>
+              {cats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
           </div>
           <div className="form-group">
             <label>Сумма</label>
@@ -55,6 +61,10 @@ export default function QuickIncome({ onClose }) {
                 }}>{a.name}</button>
               ))}
             </div>
+          </div>
+          <div className="form-group">
+            <label>Комментарий (необязательно)</label>
+            <input type="text" value={desc} onChange={e => setDesc(e.target.value)} placeholder="Например: оплата от клиента" />
           </div>
         </div>
         <div style={{padding:'16px 24px',borderTop:'1px solid #eee',display:'flex',gap:'8px',marginTop:'14px'}}>
