@@ -387,35 +387,22 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ height: '3px', background: '#4caf50' }}></div>
-            <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Выручка от продаж</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#16a34a', textAlign:'center' }}>+{salesIncome.toLocaleString()} {cur}</div>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
+          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Выручка от продаж</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>+{salesIncome.toLocaleString()} {cur}</div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ height: '3px', background: '#26a69a' }}></div>
-            <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Прочие доходы</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{otherIncomeTx > 0 ? '+' : ''}{otherIncomeTx.toLocaleString()} {cur}</div>
-            </div>
+          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Прочие доходы</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{otherIncomeTx > 0 ? '+' : ''}{otherIncomeTx.toLocaleString()} {cur}</div>
           </div>
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ height: '3px', background: '#e53935' }}></div>
-            <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Расходы</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111', textAlign:'center' }}>{expenseTotal.toLocaleString()} {cur}</div>
-            </div>
+          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap' }}>Расходы</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{expenseTotal.toLocaleString()} {cur}</div>
           </div>
-
-          <div style={{ background: '#fff', borderRadius: '14px', overflow: 'hidden', border:"1px solid var(--border)",boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ height: '3px', background: '#1e88e5' }}></div>
-            <div style={{ padding: '12px 14px' }}>
-              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'rgba(0,0,0,.5)', marginBottom: '4px', textAlign:'center' }}>Баланс счетов</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: balanceTotal < 0 ? '#dc2626' : '#111', textAlign:'center' }}>{balanceTotal.toLocaleString()} {cur}</div>
-            </div>
+          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap' }}>Баланс счетов</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: balanceTotal < 0 ? '#c62828' : '#111', whiteSpace: 'nowrap' }}>{balanceTotal.toLocaleString()} {cur}</div>
           </div>
         </div>
       )}
