@@ -989,9 +989,9 @@ if (loading) return <CenterSpinner />;
         <div style={{display:'flex',flex:1,gap:'14px',minHeight:0,alignItems:'stretch',background:'#f5f5f7',padding:'0 18px 18px'}}>
 
       {/* Панель товаров — плашка */}
-      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
+      <div style={{flex:'1 1 0',display:'flex',flexDirection:'column',minWidth:0,height:'100%'}}>
         {/* Категории */}
-        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px'}}>
+        <div style={{display:'flex',gap:'4px',marginBottom:'12px',overflowX:'auto',paddingBottom:'4px',flexShrink:0}}>
           <button onClick={() => setCatFilter('all')} style={{
             padding:'7px 16px', borderRadius:'100px', border:'none', fontSize:'.78rem',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
