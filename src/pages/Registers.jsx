@@ -1372,9 +1372,9 @@ if (loading) return <CenterSpinner />;
               {/* Шапка таблицы */}
               <div style={{display:'flex',fontSize:'.76rem',fontWeight:600,color:'#999',textTransform:'uppercase',paddingBottom:'6px',borderBottom:'1px solid #f0f0f0',marginBottom:'6px',gap:'6px'}}>
                 <span style={{flex:1,textAlign:'left'}}>Наименование</span>
-                <span style={{width:'65px',textAlign:'center'}}>Кол-во</span>
-                <span style={{width:'65px',textAlign:'center'}}>Цена</span>
-                <span style={{width:'65px',textAlign:'center'}}>Итого</span>
+                <span style={{width:'60px',textAlign:'center'}}>Кол-во</span>
+                <span style={{width:'72px',textAlign:'center'}}>Цена</span>
+                <span style={{width:'72px',textAlign:'center'}}>Итого</span>
               </div>
               
               {/* Строки товаров */}
@@ -1390,9 +1390,9 @@ if (loading) return <CenterSpinner />;
                         <div style={{fontSize:'.76rem',color:'#999',marginTop:'1px'}}>Cocтaв: {item.combo_items.map((ci, j) => <span key={ci.id}>{ci.name} x{ci.qty}{j < item.combo_items.length - 1 ? ', ' : ''}</span>)}</div>
                       )}
                     </div>
-                    <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:600,color:'#444'}}>{item.qty}</div>
-                    <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:500,color:'#555'}}>{(item.price||0).toLocaleString()}</div>
-                    <div style={{width:'65px',textAlign:'center',fontSize:'.80rem',fontWeight:700,color:'#222'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()}</div>
+                    <div style={{width:'60px',textAlign:'center',fontSize:'.80rem',fontWeight:600,color:'#444'}}>{item.qty}</div>
+                    <div style={{width:'72px',textAlign:'center',fontSize:'.80rem',fontWeight:500,color:'#555'}}>{(item.price||0).toLocaleString()} {cur}</div>
+                    <div style={{width:'72px',textAlign:'center',fontSize:'.80rem',fontWeight:700,color:'#222'}}>{((item.final_price || item.price || 0) * item.qty).toLocaleString()} {cur}</div>
                   </div>
                 ))}
                 </div>
@@ -1424,7 +1424,7 @@ if (loading) return <CenterSpinner />;
                 <div style={{fontSize:'.76rem',fontWeight:600,color:'#999',textTransform:'uppercase',letterSpacing:'.3px',marginBottom:'10px'}}>Способ оплаты</div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginBottom:'8px'}}>
                   {accounts.filter(a => a.type !== 'cash').map(a => (
-                    <button key={a.id} onClick={() => {setPayMode(a.id); if (payMode !== a.id) setPayUnpaid(false)}}
+                    <button key={a.id} onClick={() => {setPayMode(a.id); setPaySplit(false); setSplitAmts({}); if (payMode !== a.id) setPayUnpaid(false)}}
                       style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:'1.5px solid ' + (payMode === a.id ? '#ddd' : '#eee'),borderRadius:'12px',background: payMode === a.id ? '#f5f5f5' : '#fff',cursor:'pointer',fontFamily:'inherit',fontSize:'.76rem',fontWeight:500,color: payMode === a.id ? '#222' : '#444',textAlign:'left'}}>
                       <span style={{display:'flex',flexDirection:'column',gap:'2px'}}>
                         <span>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
@@ -1450,11 +1450,11 @@ if (loading) return <CenterSpinner />;
               
               {/* Разделение */}
               {paySplit && (
-                <div style={{background:'#fafafa',border:'1px solid #f0f0f0',borderRadius:'10px',padding:'12px 14px',marginBottom:'14px',width:'calc(50% - 4px)'}}>
+                <div style={{background:'#fafafa',border:'1px solid #f0f0f0',borderRadius:'10px',padding:'12px 14px',marginBottom:'14px'}}>
                   {accounts.filter(a => a.type !== 'cash').map(a => {
                     const remain = total - Object.entries(splitAmts).filter(e => e[0] !== a.id).reduce((s, e) => s + (parseFloat(e[1]) || 0), 0);
                     return (
-                      <div key={a.id} style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:'10px',marginBottom:'6px',fontSize:'.76rem',color:'#444'}}>
+                      <div key={a.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px',marginBottom:'6px',fontSize:'.76rem',color:'#444'}}>
                         <span style={{fontWeight:500,color:'#444'}}>{a.type === 'cash_register' ? 'Наличные' : a.name}</span>
                         <input type="number" min="0" step="0.01" placeholder={Math.round(remain).toString()} 
                           value={splitAmts[a.id] || ''} 
@@ -1463,7 +1463,7 @@ if (loading) return <CenterSpinner />;
                       </div>
                     );
                   })}
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:'10px',fontSize:'.76rem',color:'#444'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px',fontSize:'.76rem',color:'#444',borderTop:'1px solid #eee',marginTop:'4px',paddingTop:'6px'}}>
                     <span style={{fontWeight:500,color:'#444'}}>Остаток</span>
                     <span style={{fontWeight:500,color:'#444',width:'72px',textAlign:'right'}}>{(total - Object.values(splitAmts).reduce((s, v) => s + (parseFloat(v) || 0), 0)).toLocaleString()} {cur}</span>
                   </div>
@@ -1516,7 +1516,7 @@ if (loading) return <CenterSpinner />;
                     )}
                   </div>
                   <button type="button" onClick={() => { setShowAddClient(true); setNewClientName(''); setNewClientPhone(''); setNewClientEmail(''); setNewClientBirthday(''); setNewClientNote1(''); setNewClientNote2(''); setClientSearch(''); }} 
-                    style={{padding:'9px 12px',border:'1.5px solid #eee',borderRadius:'12px',background:'#f5f5f5',color:'#444',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>+</button>
+                    style={{width:'45px',flexShrink:0,padding:'0',border:'1.5px solid #eee',borderRadius:'12px',background:'#f5f5f5',color:'#444',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>+</button>
                 </div>
                 {/* Баллы выбранного клиента — видно сразу */}
                 {selectedClient && (() => {
