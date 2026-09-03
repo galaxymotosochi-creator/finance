@@ -1278,7 +1278,7 @@ if (loading) return <CenterSpinner />;
           <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={() => setShowAdd(false)}>&times;</button>
             <h2>Добавить позицию</h2>
-            <div className="sub">Новый товар появится в каталоге и разделе «Товары и услуги»</div>
+            <div className="modal-sub">Новый товар появится в каталоге и разделе «Товары и услуги»</div>
             <form onSubmit={saveProduct}>
               <div className="form-group">
                 <label>Название</label>
@@ -1549,7 +1549,7 @@ if (loading) return <CenterSpinner />;
           <div className="modal-box" style={{maxWidth:'380px'}}>
             <button className="modal-close" onClick={() => setShowAddClient(false)}>&times;</button>
             <h2>Новый клиент</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Добавьте клиента для привязки к чеку</div>
+            <div className="modal-sub" style={{marginBottom:'12px'}}>Добавьте клиента для привязки к чеку</div>
             <form onSubmit={async (e) => {
               e.preventDefault();
               if (!newClientName.trim()) return setToast('⚠️ Введите имя');
@@ -1620,7 +1620,7 @@ if (loading) return <CenterSpinner />;
             <div className="modal-box" style={{maxWidth:'380px'}}>
               <button className="modal-close" onClick={() => setShowOpenShift(false)}>&times;</button>
               <h2>Открытие смены</h2>
-              <div className="sub">Для работы кассы необходимо открыть смену</div>
+              <div className="modal-sub">Для работы кассы необходимо открыть смену</div>
               <form onSubmit={e => { e.preventDefault(); openShift(); }}>
                 <div className="form-group"><label>Кассир</label><input type="text" value={openShiftCashier} onChange={e => setOpenShiftCashier(e.target.value)} /></div>
                 <div className="form-group"><label>Остаток денег на начало дня</label>
@@ -1709,7 +1709,7 @@ if (loading) return <CenterSpinner />;
           <div className="modal-box" style={{maxWidth:'520px'}}>
             <button className="modal-close" onClick={() => setShowReceiptsModal(false)}>&times;</button>
             <h2>Чеки за смену</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Чеки, пробитые через кассу</div>
+            <div className="modal-sub" style={{marginBottom:'12px'}}>Чеки, пробитые через кассу</div>
             <div className="product-table" style={{overflowY:'auto',maxHeight:'50vh'}}>
               <table>
                 <thead>
@@ -1755,7 +1755,7 @@ if (loading) return <CenterSpinner />;
           <div className="modal-box" style={{maxWidth:'420px'}}>
             <button className="modal-close" onClick={() => setShowCloseShift(false)}>&times;</button>
             <h2>Закрытие смены</h2>
-            <div className="sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
+            <div className="modal-sub" style={{marginBottom:'12px'}}>Проверьте баланс перед закрытием</div>
             
             <div style={{background:'#f9f9f9',borderRadius:'10px',padding:'12px',fontSize:'.80rem',lineHeight:1.8,marginBottom:'12px'}}>
               <div style={{display:'flex'}}>
