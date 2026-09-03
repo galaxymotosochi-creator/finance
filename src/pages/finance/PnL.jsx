@@ -50,7 +50,7 @@ export default function PnL() {
           { data: invRes },
         ] = await Promise.all([
           // Чеки за период
-          supabase.from('receipts').select('id,total_amount')
+          supabase.from('receipts').select('id,total_amount,discount_sum')
             .eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
           // Все чеки (для расчёта остатков склада)
           supabase.from('receipts').select('id')
@@ -71,8 +71,9 @@ export default function PnL() {
           supabase.from('inventory').select('result').eq('user_id', user.id).eq('status', 'completed').gte('date', dr.from).lte('date', dr.to),
         ]);
 
-        // Продажи за период
+        // Продажи за период (total_amount уже с учётом скидок) + сумма скидок (аналитика)
         const salesRev = (recs || []).reduce((s, r) => s + (r.total_amount || 0), 0);
+        const discounts = (recs || []).reduce((s, r) => s + (Number(r.discount_sum) || 0), 0);
 
         // Позиции чеков ЗА ПЕРИОД (для себестоимости) — только чеки периода
         const periodRecIds = (recs || []).map(r => r.id);
@@ -179,6 +180,7 @@ export default function PnL() {
 
         setData({
           salesRev,
+          discounts,
           totalCogs,
           grossProfit,
           opList,
@@ -240,7 +242,8 @@ export default function PnL() {
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#16a34a' }}></span>
           Доходы
         </div>
-        <Row label="Продажи" value={`+${d.salesRev.toLocaleString()} ${cur}`} />
+        <Row label="Продажи" value={`+${(d.salesRev + d.discounts).toLocaleString()} ${cur}`} />
+        {d.discounts > 0 && <Row label="Скидки с продаж" value={`−${d.discounts.toLocaleString()} ${cur}`} color="#d97706" />}
         <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ${cur}`} color="#dc2626" />
         {d.surpluses > 0 && <Row label="Излишки по инвентаризации" value={`+${Math.round(d.surpluses).toLocaleString()} ${cur}`} color="#16a34a" />}
         <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
