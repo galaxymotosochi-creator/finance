@@ -1193,40 +1193,31 @@ if (loading) return <CenterSpinner />;
               <span style={{fontSize:'.80rem',color:'var(--muted)'}}>К оплате:</span>
               <span style={{fontSize:'.95rem',fontWeight:700,color:receiptDiscountAmount>0?'var(--muted)':'#111',textDecoration:receiptDiscountAmount>0?'line-through':'none'}}>{total.toLocaleString()} {cur}</span>
             </div>
-            {/* Строка скидки — всегда видна */}
+            {/* Плашка «Скидка на чек» — как в прототипе v3-white */}
             {cart.length > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:'.80rem',color:'var(--muted)'}}>Скидка:</span>
-                <div className="discount-dropdown-wrap" style={{display:'flex',alignItems:'center',gap:'6px',position:'relative'}}>
-                  <span onClick={()=>{setDiscountDropdownOpen(!discountDropdownOpen)}}
-                    style={{fontSize:'.95rem',fontWeight:700,cursor:'pointer',color:'#444',padding:'2px 8px',borderRadius:'6px',background:'transparent',userSelect:'none'}}>
-                    {receiptDiscountPercent > 0 ? receiptDiscountPercent + '%' : receiptDiscountFixed > 0 ? receiptDiscountFixed + ' ₽' : '0%'} <span style={{fontSize:'.68rem',color:'#999'}}>▼</span>
-                  </span>
-                  {receiptDiscountAmount > 0 && <span style={{fontSize:'.95rem',color:'#444',fontWeight:700}}>−{receiptDiscountAmount.toLocaleString()} {cur}</span>}
-                  {discountDropdownOpen && (
-                    <div style={{position:'absolute',bottom:'100%',right:0,marginBottom:'4px',background:'#fff',borderRadius:'12px',boxShadow:'0 8px 30px rgba(0,0,0,.12)',padding:'10px',minWidth:'280px',zIndex:100,border:'1px solid #f0f0f0'}}>
-                      <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'8px'}}>
-                        {[0,5,10,15,20].map(function(pct){
-                          return (
-                            <span key={pct} onClick={function(){setReceiptDiscountPercent(pct);setReceiptDiscountFixed(0);setDiscountDropdownOpen(false)}}
-                              style={{padding:'4px 10px',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',background:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#111':'#f5f5f5',color:receiptDiscountPercent===pct&&receiptDiscountFixed===0?'#fff':'#444',userSelect:'none'}}>{pct === 0 ? '0%' : pct + '%'}</span>
-                          );
-                        })}
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:'6px',borderTop:'1px solid #eee',paddingTop:'8px'}}>
-                        <span style={{fontSize:'.80rem',color:'#444',whiteSpace:'nowrap'}}>Своя:</span>
-                        <input type="number" min="0" value={receiptDiscountPercent||''} placeholder="%"
-                          onChange={function(e){var v=parseInt(e.target.value)||0;setReceiptDiscountPercent(Math.min(99,v));setReceiptDiscountFixed(0)}}
-                          style={{width:'46px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
-                        <span style={{fontSize:'.80rem',color:'#444'}}>или</span>
-                        <input type="number" min="0" placeholder="₽"
-                          onChange={function(e){var v=parseFloat(e.target.value);if(isNaN(v)||v<0)v=0;setReceiptDiscountFixed(Math.min(total,Math.round(v)));setReceiptDiscountPercent(0)}}
-                          style={{width:'60px',padding:'4px 6px',border:'1px solid var(--border)',borderRadius:'6px',fontSize:'.76rem',fontWeight:600,fontFamily:'inherit',textAlign:'center',outline:'none'}} />
-                      </div>
-                    </div>
-                  )}
+              <>
+                <div className="kassa-disc">
+                  <span className="dl">Скидка на чек</span>
+                  <div className="db">
+                    {[0,5,10,15,20].map(function(pct){
+                      const active = receiptDiscountPercent === pct && receiptDiscountFixed === 0;
+                      return (
+                        <button key={pct} type="button" className={'dc' + (active ? ' on' : '')} onClick={function(){setReceiptDiscountPercent(pct);setReceiptDiscountFixed(0);setDiscountDropdownOpen(false)}}>{pct === 0 ? '0%' : '−' + pct + '%'}</button>
+                      );
+                    })}
+                    <button type="button" className={'dc own' + ((discountDropdownOpen || receiptDiscountFixed > 0 || (receiptDiscountPercent > 0 && [0,5,10,15,20].indexOf(receiptDiscountPercent) === -1)) ? ' on' : '')} onClick={function(){setDiscountDropdownOpen(!discountDropdownOpen)}}>своя</button>
+                    {discountDropdownOpen && (
+                      <span className="down">
+                        <input type="number" min="0" max="99" value={receiptDiscountPercent || ''} placeholder="%" autoFocus
+                          onChange={function(e){var v=parseInt(e.target.value)||0;setReceiptDiscountPercent(Math.min(99,v));setReceiptDiscountFixed(0)}} />
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
+                {receiptDiscountAmount > 0 && (
+                  <div className="kassa-dl2"><span>Скидка:</span><span>−{receiptDiscountAmount.toLocaleString()} {cur}</span></div>
+                )}
+              </>
             )}
             {/* Итого со скидкой */}
             {receiptDiscountAmount > 0 && (
@@ -1413,8 +1404,8 @@ if (loading) return <CenterSpinner />;
                   </div>
                 )}
                 <div style={{display:'flex',justifyContent:'space-between',fontSize:'.80rem',marginBottom:'4px'}}>
-                  <span style={{color:'#999'}}>Скидка:</span>
-                  <span style={{cursor:'pointer',color:'#444'}}>{receiptDiscountPercent > 0 ? receiptDiscountPercent + '%' : receiptDiscountFixed > 0 ? receiptDiscountFixed + ' ₽' : '0%'} ▼</span>
+                  <span style={{color:'#999'}}>Скидка на чек:</span>
+                  <span style={{color: receiptDiscountAmount > 0 ? '#16a34a' : '#999',fontWeight: receiptDiscountAmount > 0 ? 700 : 400}}>{receiptDiscountAmount > 0 ? '−' + receiptDiscountAmount.toLocaleString() + ' ' + cur + (receiptDiscountPercent > 0 ? ' (' + receiptDiscountPercent + '%)' : '') : '0%'}</span>
                 </div>
                 <div style={{display:'flex',justifyContent:'space-between',fontSize:'1.1rem',fontWeight:800,color:'#222',paddingTop:'4px',borderTop:'1px solid #f0f0f0',marginTop:'4px'}}>
                   <span>Итого:</span>
