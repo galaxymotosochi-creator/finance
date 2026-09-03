@@ -955,7 +955,7 @@ if (loading) return <CenterSpinner />;
                       onMouseEnter={e => e.currentTarget.style.background='#f5f5f5'}
                       onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                       <span style={{minWidth:'46px'}}>№ {r.receipt_number}</span>
-                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.items_str}</span>
+                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(() => { var sit = (r.items_json && r.items_json.length) ? r.items_json : (r.items || []); if (!sit.length) return r.items_str || '—'; var sStr = sit.map(function(it){ return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name; }).slice(0, 3).join(', '); return sStr + (sit.length > 3 ? ' …' : ''); })()}</span>
                       <span style={{whiteSpace:'nowrap'}}>{Number(r.total_amount||0).toLocaleString()} {cur}</span>
                     </div>
                   );
@@ -963,7 +963,8 @@ if (loading) return <CenterSpinner />;
                 {/* Отложенные чеки */}
                 {heldReceipts.length > 0 && <div style={{height:'1px',background:'#eee',margin:'4px 0'}} />}
                 {heldReceipts.map(function(r, i){
-                  var itemsStr = (r.items || []).map(function(it){ return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name; }).slice(0, 3).join(', ');
+                  var heldItems = r.items || [];
+                  var itemsStr = heldItems.map(function(it){ return it.qty > 1 ? it.name + ' (' + it.qty + ')' : it.name; }).slice(0, 3).join(', ') + (heldItems.length > 3 ? ' …' : '');
                   return (
                     <div key={r.id || i} onClick={function(){
                       setReceiptDropdownOpen(false);
