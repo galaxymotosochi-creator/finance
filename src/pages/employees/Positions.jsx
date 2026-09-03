@@ -9,7 +9,7 @@ const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления' },
   { id: 'registers', label: 'Касса' },
   { id: 'finance', label: 'Финансы', children: [
-    { id: 'finance.transactions', label: 'Транзакции' },
+    { id: 'finance.transactions', label: 'Доходы и расходы' },
     { id: 'finance.accounts', label: 'Счета' },
     { id: 'finance.receipts', label: 'Чеки' },
     { id: 'finance.salary', label: 'Зарплата' },

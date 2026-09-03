@@ -20,7 +20,7 @@ const menu = [
   { label: 'Касса', path: '/kassa', icon: 'registers' },
   {
     label: 'Финансы', icon: 'finance', children: [
-      { label: 'Транзакции', path: '/finance/transactions' },
+      { label: 'Доходы и расходы', path: '/finance/transactions' },
       { label: 'Счета', path: '/finance/accounts' },
       { label: 'Смены', path: '/finance/shifts' },
       { label: 'Чеки', path: '/finance/receipts' },
