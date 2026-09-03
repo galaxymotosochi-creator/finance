@@ -133,9 +133,12 @@ export default function PnL() {
         const opByCat = {};
         let opTotal = 0;
         (expenses || []).forEach(t => {
-          // Взнос/вывод своих денег владельца — не операционный расход
-          if (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw') return;
+          // Взнос/вывод своих денег владельца, переводы и инкассации — не операционные расходы
+          if (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw' || t.kind === 'transfer' || t.kind === 'collection') return;
+          const tdesc = String(t.description || '');
+          if (tdesc.indexOf('Перевод') === 0 || tdesc.indexOf('Инкассация') === 0) return;
           const cat = catMap[t.category_id];
+          if (cat && (cat.name === 'Перевод между счетами' || cat.name === 'Инкассация')) return;
           // Если категория указана, но не найдена или не операционная — пропускаем
           if (t.category_id) {
             if (!cat || cat.type !== 'expense') return;
