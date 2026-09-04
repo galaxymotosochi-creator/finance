@@ -482,7 +482,7 @@ body {
 .cols-dropdown { min-width: 210px; padding: .35rem; }
 
 .cat-dd-actions { display: flex; gap: 8px; border-top: 1px solid #f0f0f3; margin-top: 6px; padding: 8px 2px 2px; }
-.cat-dd-action { font-size: 12px; font-weight: 600; color: #fff; background: #111; border-radius: 100px; padding: 5px 14px; cursor: pointer; }
+.cat-dd-action { font-size: 12px; font-weight: 600; color: #fff; background: #111; border-radius: 100px; padding: 5px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .cat-dd-action:hover { background: #000; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
 .cat-dd-action.ghost { background: transparent; color: #999; border: 1.5px solid #e2e2e6; }
 .cat-dd-action.ghost:hover { background: #f5f5f7; color: #444; box-shadow: none; }
