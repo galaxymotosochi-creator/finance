@@ -3,6 +3,7 @@ import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
@@ -54,6 +55,7 @@ const setInitialStock = (data) => {
 };
 
 export default function Stock() {
+  const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
@@ -150,6 +152,22 @@ export default function Stock() {
     return s + costPrice * st.qty;
   }, 0);
   const totalRetail = items.reduce((s, p) => s + ((stockMap[p.id]?.qty || 0) * (p.price || 0)), 0);
+
+  // Плашки «под поиском» — по ВСЕМ товарам (без услуг), не зависят от поиска и фильтра категорий
+  const goodsAll = products.filter(p => p && !p.hidden && p.type !== 'service');
+  const goodsCount = goodsAll.length;
+  const goodsRetail = goodsAll.reduce((s, p) => s + ((stockMap[p.id]?.qty || 0) * (p.price || 0)), 0);
+  const goodsCost = goodsAll.reduce((s, p) => {
+    const st = stockMap[p.id];
+    if (!st) return s;
+    const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+    return s + costPrice * st.qty;
+  }, 0);
+  const stockTiles = [
+    { label: 'Количество товаров', value: String(goodsCount) },
+    { label: 'Сумма товаров', value: `${goodsRetail.toLocaleString()} ${cur}` },
+    { label: 'Себестоимость товаров', value: `${goodsCost.toLocaleString()} ${cur}` },
+  ];
 
   const editPrice = async (id) => {
     const val = prompt('Новая цена продажи:');
@@ -308,6 +326,20 @@ export default function Stock() {
           )}
         </div>
       </div>
+
+      {/* Плашки-итоги по складу (эталон: Transactions.jsx «Доходы и расходы»)
+          Количество товаров — всех позиций-товаров без услуг;
+          Сумма товаров — остатки по цене продажи; Себестоимость — по средней цене закупа */}
+      {!loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
+          {stockTiles.map(t => (
+            <div key={t.label} style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.label}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{t.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table" style={{minWidth:'680px'}}>
