@@ -397,7 +397,8 @@ body {
 }
 .modal-box .modal-sub {
   font-size: .8rem;
-  color: var(--muted);
+  color: #555;
+  font-weight: 500;
   margin-bottom: 1.2rem;
 }
 .modal-box .modal-body {
@@ -409,14 +410,14 @@ body {
 
 /* ======== FORMS ======== */
 .form-group { margin-bottom: .65rem; }
-.form-group label { display: block; font-size: .8rem; font-weight: 500; color: var(--muted); margin-bottom: .25rem; }
+.form-group label { display: block; font-size: .8rem; font-weight: 600; color: #444; margin-bottom: .25rem; }
 .form-group input, .form-group select, .form-group textarea {
   font-family: var(--font);
   font-size: .82rem;
   color: #555;
   width: 100%;
   padding: .5rem .65rem;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(0, 0, 0, .26);
   border-radius: var(--radius-md);
   outline: none;
   background: var(--body-bg);
