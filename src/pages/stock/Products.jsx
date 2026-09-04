@@ -121,6 +121,7 @@ export default function Products() {
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
   const [activeCols, setActiveColsState] = useState(getCols);
   const [selectedCats, setSelectedCats] = useState(new Set());
   const [showModal, setShowModal] = useState(false);
@@ -167,6 +168,16 @@ export default function Products() {
   const [catFilter, setCatFilter] = useState('');
   const fileInputRef = useRef(null);
   const [importing, setImporting] = useState(false);
+
+  // Пилюля-кнопка фильтра (стиль «Остатков»): обычная, активная/открытая — жёлтый градиент
+  const pillStyle = (on) => ({
+    border: 'none', background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
+    color: on ? '#111' : '#666', padding: '8px 14px', borderRadius: '100px',
+    fontSize: '.8rem', fontWeight: on ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
+    whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px',
+    transition: 'all .12s', flexShrink: 0,
+  });
+  const pillHover = (e, on, enter) => { if (!on) e.currentTarget.style.color = enter ? '#333' : '#666'; };
 
   const migrateLocalData = useCallback(async () => {
     const local = JSON.parse(localStorage.getItem('products88') || '[]');
@@ -696,16 +707,20 @@ export default function Products() {
 
 
 
-      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".3rem",width:"30%",minWidth:"180px",maxWidth:"400px",border:"1px solid var(--border)",borderRadius:"6px",padding:"7px .5rem",background:"var(--body-bg)"}}>
-          <span style={{fontSize:".75rem",color:"var(--muted)",lineHeight:1}}>🔍</span>
+      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'wrap',gap:'.4rem'}}>
+        <div className="stock-search" style={{display:"flex",alignItems:"center",gap:".4rem",width:"15%",minWidth:"110px",maxWidth:"200px",border:"1px solid "+(searchFocus?'#111':'#e2e2e6'),borderRadius:"100px",padding:"8px 16px",background:"#fff",boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e=>setSearch(e.target.value)}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
           <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип</span>
+            <button style={pillStyle(typeOpen || typeFilterSet.size > 0)}
+              onMouseEnter={e=>pillHover(e, typeOpen || typeFilterSet.size > 0, true)} onMouseLeave={e=>pillHover(e, typeOpen || typeFilterSet.size > 0, false)}
+              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {typeOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
                 <div className="cat-dd-list">
@@ -726,8 +741,9 @@ export default function Products() {
               </div>
             )}</div>
           <div className="cat-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория</span>
+            <button style={pillStyle(catOpen || selectedCats.size > 0)}
+              onMouseEnter={e=>pillHover(e, catOpen || selectedCats.size > 0, true)} onMouseLeave={e=>pillHover(e, catOpen || selectedCats.size > 0, false)}
+              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {catOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
                 <div className="cat-dd-search">
@@ -764,8 +780,9 @@ export default function Products() {
             )}
           </div>
           <div className="cols-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы</span>
+            <button style={pillStyle(colsOpen)}
+              onMouseEnter={e=>pillHover(e, colsOpen, true)} onMouseLeave={e=>pillHover(e, colsOpen, false)}
+              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {colsOpen && (
               <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
                 <div className="cols-title">Основные столбцы</div>
@@ -781,10 +798,14 @@ export default function Products() {
                 })}
               </div></div>
             )}</div>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</span>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
-            onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}}>Скачать</span>
+          <button style={pillStyle(showTrash)}
+            onMouseEnter={e=>pillHover(e, showTrash, true)} onMouseLeave={e=>pillHover(e, showTrash, false)}
+            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
+          <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} title="Скачать в Excel"
+            style={{width:'34px',height:'34px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 5px rgba(255,205,0,.35)',marginLeft:'.1rem'}}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow='0 3px 10px rgba(255,205,0,.5)'}} onMouseLeave={e=>{e.currentTarget.style.boxShadow='0 1px 5px rgba(255,205,0,.35)'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          </button>
           </div>
         </div>
 
