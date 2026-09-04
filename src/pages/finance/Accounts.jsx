@@ -250,8 +250,8 @@ export default function Accounts() {
               title="Раздел «Счета»"
               intro="Счета — где лежат деньги бизнеса: наличные, кассовый ящик, карты, банковские счета. Здесь виден общий баланс, остаток по каждому счёту и история движений."
               blocks={[
-                { title: 'Плашка «Общий баланс счетов»', items: [
-                  <>Общая сумма денег бизнеса на всех счетах (начальные остатки + все операции).</>,
+                { title: 'Плашки балансов', items: [
+                  <>Белые плашки — баланс каждого счёта (начальный остаток + все операции). Жёлтая плашка в конце — <b>общий баланс</b> по всем счетам.</>,
                 ]},
                 { title: '«Свои деньги владельца»', items: [
                   <>Личные средства владельца, вложенные в бизнес. Не считаются доходом и не влияют на прибыль.</>,
@@ -293,11 +293,20 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          {/* Общий баланс счетов — отдельная плашка (жёлтый градиент) */}
-          <div style={{display:'inline-flex',alignItems:'center',gap:'.75rem',marginBottom:'.5rem',padding:'.8rem 1.1rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px'}}>
-            <div style={{display:'flex',flexDirection:'column'}}>
-              <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Общий баланс счетов</span>
-              <span style={{fontSize:'1.2rem',fontWeight:800,color:'#111'}}>{(total||0).toLocaleString()} {cur}</span>
+          {/* Балансы по каждому счёту + общий баланс последней плашкой */}
+          <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem',marginBottom:'.5rem',alignItems:'stretch'}}>
+            {sorted.map(a => {
+              const bal = (parseFloat(a.balance)||0) + (balById[a.id]||0);
+              return (
+                <div key={a.id} style={{display:'flex',flexDirection:'column',justifyContent:'center',padding:'.7rem 1.05rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)'}}>
+                  <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600,whiteSpace:'nowrap'}}>{a.name}</span>
+                  <span style={{fontSize:'1.05rem',fontWeight:800,color:'#111',whiteSpace:'nowrap'}}>{bal.toLocaleString()} {cur}</span>
+                </div>
+              );
+            })}
+            <div style={{display:'flex',flexDirection:'column',justifyContent:'center',padding:'.7rem 1.05rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px'}}>
+              <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600,whiteSpace:'nowrap'}}>Общий баланс счетов</span>
+              <span style={{fontSize:'1.2rem',fontWeight:800,color:'#111',whiteSpace:'nowrap'}}>{(total||0).toLocaleString()} {cur}</span>
             </div>
           </div>
           {/* Свои деньги владельца — отдельная плашка */}
