@@ -59,6 +59,7 @@ export default function Stock() {
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
   const [stockMap, setStockMap] = useState({});
   const [showInitModal, setShowInitModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -304,8 +305,11 @@ export default function Stock() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
       <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.3rem',width:'30%',minWidth:'180px',maxWidth:'400px',border:'1px solid var(--border)',borderRadius:'6px',padding:'7px .5rem',background:'var(--body-bg)'}}>
-          <span style={{fontSize:'.75rem',color:'var(--muted)',lineHeight:1}}>🔍</span>
+        <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.4rem',width:'30%',minWidth:'180px',maxWidth:'400px',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'8px 16px',background:'#fff',boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
