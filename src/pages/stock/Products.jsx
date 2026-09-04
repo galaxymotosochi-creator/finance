@@ -172,7 +172,7 @@ export default function Products() {
   // Пилюля-кнопка фильтра (стиль «Остатков»): обычная, активная/открытая — жёлтый градиент
   const pillStyle = (on) => ({
     border: 'none', background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
-    color: on ? '#111' : '#666', padding: '8px 14px', borderRadius: '100px',
+    color: on ? '#111' : '#666', padding: '9px 16px', borderRadius: '100px',
     fontSize: '.8rem', fontWeight: on ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
     whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px',
     transition: 'all .12s', flexShrink: 0,
@@ -181,7 +181,7 @@ export default function Products() {
   // Кнопки-дропдауны (Тип/Категория/Столбцы) — всегда жёлтые, как «Категории» в Остатках
   const yellowPill = {
     border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
-    padding: '8px 14px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit',
+    padding: '9px 16px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit',
     whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0,
     boxShadow: '0 1px 4px rgba(255,205,0,.25)',
   };
@@ -724,7 +724,7 @@ export default function Products() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e=>setSearch(e.target.value)}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
-        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
+        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".25rem",marginLeft:"auto"}}>
           <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
@@ -810,7 +810,7 @@ export default function Products() {
             onMouseEnter={e=>pillHover(e, showTrash, true)} onMouseLeave={e=>pillHover(e, showTrash, false)}
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
           <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} title="Скачать в Excel"
-            style={{width:'34px',height:'34px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 5px rgba(255,205,0,.35)',marginLeft:'.1rem'}}
+            style={{width:'34px',height:'34px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 5px rgba(255,205,0,.35)',marginLeft:'.15rem'}}
             onMouseEnter={e=>{e.currentTarget.style.boxShadow='0 3px 10px rgba(255,205,0,.5)'}} onMouseLeave={e=>{e.currentTarget.style.boxShadow='0 1px 5px rgba(255,205,0,.35)'}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
