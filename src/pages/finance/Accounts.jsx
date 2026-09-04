@@ -239,11 +239,6 @@ export default function Accounts() {
   });
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
   const balOfId = (id) => { const a = accounts.find(x => String(x.id) === String(id)); return a ? Math.round(getBal(a)) : 0; };
-  // Собственные средства предпринимателя: внесено / выведено (по операциям владельца)
-  let oIn = 0, oOut = 0;
-  (transactions || []).forEach(t => { if (t.kind === 'owner_deposit') oIn += Number(t.amount || 0); else if (t.kind === 'owner_withdraw') oOut += Number(t.amount || 0); });
-  if (oIn === 0 && oOut === 0) { (transactions || []).forEach(t => { const dd = t.description || ''; if (dd.startsWith('Взнос своих денег')) oIn += Number(t.amount || 0); else if (dd.startsWith('Вывод своих денег')) oOut += Number(t.amount || 0); }); }
-  const ownerInBusiness = oIn - oOut;
    if (loading || !initDone) return <CenterSpinner />;
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
@@ -324,15 +319,34 @@ export default function Accounts() {
               <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{(total||0).toLocaleString()} {cur}</div>
             </div>
           </div>
+          {/* Свои деньги владельца — отдельная плашка */}
+          {(()=>{
+            var oIn=0,oOut=0;
+            (transactions||[]).forEach(function(t){if(t.kind==='owner_deposit')oIn+=Number(t.amount||0);else if(t.kind==='owner_withdraw')oOut+=Number(t.amount||0);});
+            if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
+            return (
+              <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)',flexWrap:'wrap',alignSelf:'flex-start'}}>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
+                <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'auto'}}>
+                  <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
+                  <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>− Забрать</button>
+                </div>
+              </div>
+            );
+          })()}
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
-            <table className="data-table" style={{width:'max-content',minWidth:'760px'}}>
+            <table className="data-table">
               <thead id="colHeaders">
                 <tr>
-                  <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Счёт</th>
-                  <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Начальный остаток</th>
-                  <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Поступления</th>
-                  <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Расходы</th>
-                  <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Баланс</th>
+                  <th style={{textAlign:'left'}}>Счёт</th>
+                  <th style={{textAlign:'left'}}>Начальный остаток</th>
+                  <th style={{textAlign:'left'}}>Поступления</th>
+                  <th style={{textAlign:'left'}}>Расходы</th>
+                  <th style={{textAlign:'left'}}>Баланс</th>
                   <th className="actions" style={{textAlign:'left'}}></th>
                 </tr>
               </thead>
@@ -352,10 +366,10 @@ export default function Accounts() {
                           </div>
                         </div>
                       </td>
-                      <td style={{textAlign:'left',whiteSpace:'nowrap'}}>{in0.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555',whiteSpace:'nowrap'}}>+{mv.i.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555',whiteSpace:'nowrap'}}>−{mv.e.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555',whiteSpace:'nowrap'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>+{mv.i.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>−{mv.e.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -374,38 +388,14 @@ export default function Accounts() {
                   const incTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.i; }, 0);
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   return (
-                    <>
-                    <tr className="total-row">
-                      <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
-                      <td style={{textAlign:'left',fontWeight:700,whiteSpace:'nowrap'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',fontWeight:700,color:'#16a34a',whiteSpace:'nowrap'}}>+{incTot.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',fontWeight:700,color:'#dc2626',whiteSpace:'nowrap'}}>−{expTot.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626',whiteSpace:'nowrap'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
-                      <td></td>
-                    </tr>
-                    {/* Собственные средства предпринимателя — строкой в таблице (как виртуальный счёт) */}
-                    <tr style={{background:'#fffdf5'}}>
-                      <td style={{textAlign:'left'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'.5rem',justifyContent:'space-between'}}>
-                          <div>
-                            <div className="prod-name"><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(135deg,#ffdd2d,#ffb300)',marginRight:'.45rem',verticalAlign:'middle'}} />Собственные средства в бизнесе</div>
-                            <div className="prod-sku">внесено +{oIn.toLocaleString()} {cur} · выведено −{oOut.toLocaleString()} {cur}</div>
-                          </div>
-                          <div style={{display:'flex',alignItems:'center',gap:'.35rem',flexShrink:0}}>
-                            <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                              style={{padding:'.28rem .7rem',borderRadius:'8px',border:'none',background:'#111',color:'#fff',fontSize:'.68rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
-                            <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                              style={{padding:'.28rem .7rem',borderRadius:'8px',border:'none',background:'#fff',color:'#555',fontSize:'.68rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap',border:'1.5px solid #ddd'}}>− Забрать</button>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{textAlign:'left'}}></td>
-                      <td style={{textAlign:'left'}}></td>
-                      <td style={{textAlign:'left'}}></td>
-                      <td style={{textAlign:'left',whiteSpace:'nowrap',fontWeight:700}}>{ownerInBusiness.toLocaleString()} {cur}</td>
-                      <td></td>
-                    </tr>
-                    </>
+                  <tr className="total-row">
+                    <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
+                    <td style={{textAlign:'left',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
+                    <td></td>
+                  </tr>
                   );
                 })()}
               </tbody>
