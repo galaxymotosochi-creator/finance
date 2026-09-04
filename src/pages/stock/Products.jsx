@@ -801,7 +801,6 @@ export default function Products() {
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {colsOpen && (
               <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'210px',padding:'8px',zIndex:100}}>
-                <div className="cols-title">Основные столбцы</div>
                 <div className="cols-list">
                 {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
                   const active = activeCols.has(col.id);
