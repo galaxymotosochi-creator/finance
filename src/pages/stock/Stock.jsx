@@ -339,8 +339,8 @@ export default function Stock() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px', margin: '.75rem 0' }}>
           {stockTiles.map(t => (
             <div key={t.label} style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '14px', padding: '10px 12px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '4px', lineHeight: 1.25 }}>{t.label}</div>
-              <div style={{ fontSize: '17px', fontWeight: 800, color: t.color || '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.value}</div>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '4px', lineHeight: 1.25 }}>{t.label}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: t.color || '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.value}</div>
             </div>
           ))}
         </div>
