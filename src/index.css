@@ -482,8 +482,8 @@ body {
 .cols-dropdown { min-width: 210px; padding: .35rem; }
 
 .cat-dd-actions { display: flex; gap: .35rem; margin-bottom: .25rem; border-bottom: 1px solid var(--border); padding-bottom: .35rem; }
-.cat-dd-action { font-size: .7rem; color: var(--secondary); cursor: pointer; padding: .2rem .35rem; border-radius: var(--radius-sm); }
-.cat-dd-action:hover { background: var(--secondary-light); }
+.cat-dd-action { font-size: .78rem; color: var(--secondary); cursor: pointer; padding: .3rem .5rem; border-radius: 4px; }
+.cat-dd-action:hover { background: #f5f5f5; }
 .cat-dd-search { margin-bottom: .25rem; }
 .cat-dd-search input { width: 100%; padding: .3rem .4rem; font-size: .75rem; font-family: var(--font); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 /* ======== DROPDOWNS (конец) ======== */
@@ -503,8 +503,8 @@ body {
 .cols-item .cb { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: .6rem; color: transparent; flex-shrink: 0; transition: all var(--transition); }
 .cols-item .cb.checked { background: var(--secondary); border-color: var(--secondary); color: #fff; }
 .cols-footer { border-top: 1px solid var(--border); padding: .35rem .35rem .15rem; margin-top: .25rem; }
-.cols-reset { font-size: .68rem; color: var(--secondary); cursor: pointer; padding: .15rem .25rem; border-radius: var(--radius-sm); }
-.cols-reset:hover { background: var(--secondary-light); }
+.cols-reset { font-size: .78rem; color: var(--secondary); cursor: pointer; padding: .3rem .5rem; border-radius: 4px; }
+.cols-reset:hover { background: #f5f5f5; }
 
 .export-dd-title { font-size: .7rem; color: var(--muted); text-align: center; margin-bottom: .35rem; }
 .export-dd-actions { display: flex; gap: .35rem; justify-content: center; }
