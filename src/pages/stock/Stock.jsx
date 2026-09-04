@@ -155,7 +155,7 @@ export default function Stock() {
 
   // Плашки «под поиском» — по ВСЕМ товарам (без услуг), не зависят от поиска и фильтра категорий
   const goodsAll = products.filter(p => p && !p.hidden && p.type !== 'service');
-  const goodsCount = goodsAll.length;
+  const goodsQty = goodsAll.reduce((s, p) => s + (stockMap[p.id]?.qty || 0), 0);
   const goodsRetail = goodsAll.reduce((s, p) => s + ((stockMap[p.id]?.qty || 0) * (p.price || 0)), 0);
   const goodsCost = goodsAll.reduce((s, p) => {
     const st = stockMap[p.id];
@@ -163,10 +163,12 @@ export default function Stock() {
     const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
     return s + costPrice * st.qty;
   }, 0);
+  const goodsProfit = goodsRetail - goodsCost;
   const stockTiles = [
-    { label: 'Количество товаров', value: String(goodsCount) },
+    { label: 'Товаров в наличии', value: `${goodsQty.toLocaleString()} шт` },
     { label: 'Сумма товаров', value: `${goodsRetail.toLocaleString()} ${cur}` },
     { label: 'Себестоимость товаров', value: `${goodsCost.toLocaleString()} ${cur}` },
+    { label: 'Потенциальная прибыль', value: `${goodsProfit.toLocaleString()} ${cur}`, color: goodsProfit < 0 ? '#c62828' : '#111' },
   ];
 
   const editPrice = async (id) => {
@@ -328,14 +330,15 @@ export default function Stock() {
       </div>
 
       {/* Плашки-итоги по складу (эталон: Transactions.jsx «Доходы и расходы»)
-          Количество товаров — всех позиций-товаров без услуг;
-          Сумма товаров — остатки по цене продажи; Себестоимость — по средней цене закупа */}
+          Товаров в наличии — суммарно штук по всем товарам (без услуг);
+          Сумма товаров — остатки по цене продажи; Себестоимость — по средней цене закупа;
+          Потенциальная прибыль — разница (сколько заработаете, продав весь склад по рознице) */}
       {!loading && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
           {stockTiles.map(t => (
             <div key={t.label} style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
               <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.label}</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{t.value}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: t.color || '#111', whiteSpace: 'nowrap' }}>{t.value}</div>
             </div>
           ))}
         </div>
