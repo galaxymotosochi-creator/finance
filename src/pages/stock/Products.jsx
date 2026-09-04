@@ -685,7 +685,7 @@ export default function Products() {
                 { title: 'Поиск и фильтры', items: [
                   <>🔍 <b>Быстрый поиск</b> — ищет по названию, артикулу и штрихкоду.</>,
                   <>«<b>Тип</b>» — показать только товары / услуги / комбо (галочки, «Выбрать все» / «Очистить»).</>,
-                  <>«<b>Категория</b>» — показать позиции выбранных категорий.</>,
+                  <>«<b>Категории</b>» — показать позиции выбранных категорий.</>,
                   <>«<b>Столбцы</b>» — включать и выключать столбцы таблицы.</>,
                   <>«<b>Корзина</b>» — удалённые позиции. Их можно восстановить.</>,
                   <>«<b>Скачать</b>» — выгрузка каталога в Excel.</>,
@@ -758,7 +758,7 @@ export default function Products() {
           <div className="cat-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
+              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категории<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
             {catOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
                 <div className="cat-dd-search">
