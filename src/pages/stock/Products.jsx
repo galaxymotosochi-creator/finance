@@ -179,12 +179,12 @@ export default function Products() {
   // Пилюля-кнопка фильтра (стиль «Остатков»): обычная, активная/открытая — жёлтый градиент
   const pillStyle = (on) => ({
     border: 'none', background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
-    color: on ? '#111' : '#666', padding: '9px 16px', borderRadius: '100px',
+    color: on ? '#111' : '#777', padding: '9px 16px', borderRadius: '100px',
     fontSize: '.8rem', fontWeight: on ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
     whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px',
     transition: 'all .12s', flexShrink: 0,
   });
-  const pillHover = (e, on, enter) => { if (!on) e.currentTarget.style.color = enter ? '#333' : '#666'; };
+  const pillHover = (e, on, enter) => { if (!on) e.currentTarget.style.color = enter ? '#333' : '#777'; };
   // Кнопки-дропдауны (Тип/Категория/Столбцы) — всегда жёлтые, как «Категории» в Остатках
   const yellowPill = {
     border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
@@ -735,7 +735,7 @@ export default function Products() {
           <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
+              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
             {typeOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'180px',padding:'8px',zIndex:100}}>
                 <div className="cat-dd-list">
@@ -758,7 +758,7 @@ export default function Products() {
           <div className="cat-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
+              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
             {catOpen && (
               <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
                 <div className="cat-dd-search">
@@ -798,7 +798,7 @@ export default function Products() {
           <div className="cols-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
+              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
             {colsOpen && (
               <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'210px',padding:'8px',zIndex:100}}>
                 <div className="cols-list">
