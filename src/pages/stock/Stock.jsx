@@ -60,6 +60,7 @@ export default function Stock() {
   const [products, setProductsState] = useState([]);
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
+  const [stStatus, setStStatus] = useState('all'); // all | in (в наличии) | low (заканчиваются) | out (закончились)
   const [stockMap, setStockMap] = useState({});
   const [showInitModal, setShowInitModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -126,9 +127,14 @@ export default function Stock() {
   }, []);
 
   let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort();
+  // Статус наличия товара: out — закончился, low — заканчивается (≤ мин. остатка), in — в наличии
+  const stOf = (p) => { const stq = stockMap[p.id]?.qty || 0; const mn = p.min_qty || 0; return stq === 0 ? 'out' : (mn > 0 && stq <= mn ? 'low' : 'in'); };
   let items = products.filter(p => p && !p.hidden);
   if (selectedCats && selectedCats.size > 0) {
     items = items.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || 'Без категории'));
+  }
+  if (stStatus !== 'all') {
+    items = items.filter(p => stOf(p) === stStatus);
   }
   const q = search.toLowerCase().trim();
   if (q) items = items.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
@@ -173,6 +179,34 @@ export default function Stock() {
     { label: 'Потенциальная прибыль', value: `${goodsProfit.toLocaleString()} ${cur}`, color: goodsProfit < 0 ? '#c62828' : '#111' },
     { label: 'Средняя наценка', value: goodsMargin === null ? '—' : `${goodsMargin}%`, color: goodsMargin !== null && goodsMargin < 0 ? '#c62828' : '#111' },
   ];
+
+  // Выгрузка текущего списка (с учётом фильтров) в CSV — открывается в Excel
+  const exportStock = () => {
+    const esc = (s) => { const v = String(s == null ? '' : s); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const head = ['Товар', 'Артикул', 'Штрихкод', 'Категория', 'Остаток', 'Мин. остаток', 'Закуп', 'Продажа', 'Наценка', 'Сумма'];
+    const lines = [head.join(';')];
+    items.forEach(p => {
+      const st = stockMap[p.id] || { qty: 0, cost: 0 };
+      const qty = st.qty || 0;
+      const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
+      const markup = (p.price || 0) - costPrice;
+      const markupPct = costPrice > 0 ? Math.round((markup / costPrice) * 100) : 0;
+      lines.push([
+        p.name, p.sku || '', p.barcode || '', CAT_LABELS[p.cat] || p.cat || '',
+        qty, p.min_qty > 0 ? p.min_qty : '',
+        costPrice * qty, p.price || 0,
+        (markup >= 0 ? '+' : '') + markup + (markupPct ? ' (' + markupPct + '%)' : ''),
+        (p.price || 0) * qty,
+      ].map(esc).join(';'));
+    });
+    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'остатки.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    setToast('Файл «остатки.csv» выгружен');
+  };
 
   const editPrice = async (id) => {
     const val = prompt('Новая цена продажи:');
@@ -304,7 +338,7 @@ export default function Stock() {
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap',gap:'.4rem'}}>
         <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.4rem',width:'15%',minWidth:'110px',maxWidth:'200px',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'8px 16px',background:'#fff',boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
           onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
           <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
@@ -313,11 +347,33 @@ export default function Stock() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',position:'relative'}}>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:selectedCats&&selectedCats.size>0?600:400,color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1}}
-            onClick={e=>{e.stopPropagation();setCatOpen(!catOpen)}}>Категории</span>
+        <div style={{display:'flex',alignItems:'center',gap:'.25rem',marginLeft:'auto',position:'relative',flexWrap:'wrap',justifyContent:'flex-end'}}>
+          {/* Фильтр по наличию — пилюли (вариант 3: активная — жёлтый градиент) */}
+          {[['all', 'Все'], ['in', 'В наличии'], ['low', 'Заканчиваются'], ['out', 'Закончились']].map(([v, l]) => (
+            <button key={v} onClick={() => setStStatus(v)}
+              style={{
+                border: 'none', background: stStatus === v ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
+                color: stStatus === v ? '#111' : '#777', padding: '6px 13px', borderRadius: '100px',
+                fontSize: '.75rem', fontWeight: stStatus === v ? 700 : 600, cursor: 'pointer', fontFamily: 'inherit',
+                whiteSpace: 'nowrap', lineHeight: 1, transition: 'all .12s',
+              }}
+              onMouseEnter={e => { if (stStatus !== v) e.currentTarget.style.color = '#333'; }}
+              onMouseLeave={e => { if (stStatus !== v) e.currentTarget.style.color = '#777'; }}>{l}</button>
+          ))}
+
+          {/* Категории — жёлтая пилюля */}
+          <button
+            onClick={e => { e.stopPropagation(); setCatOpen(!catOpen); }}
+            style={{
+              border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
+              padding: '6px 13px', borderRadius: '100px', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'inherit', whiteSpace: 'nowrap', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '4px',
+              marginLeft: '.25rem', boxShadow: '0 1px 4px rgba(255,205,0,.25)',
+            }}
+          >Категории<span style={{ fontSize: '.6rem', opacity: .7 }}>▾</span></button>
+
           {catOpen && (
-            <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+            <div onClick={e => e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
               {allCats.map(cat => {
                 const checked = selectedCats && selectedCats.has(cat);
                 return (
@@ -332,6 +388,20 @@ export default function Stock() {
               })}
             </div>
           )}
+
+          {/* Выгрузка в Excel — жёлтая круглая кнопка */}
+          <button onClick={exportStock} title="Выгрузить в Excel"
+            style={{
+              width: '30px', height: '30px', flexShrink: 0, border: 'none', borderRadius: '100px',
+              background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit',
+              boxShadow: '0 1px 5px rgba(255,205,0,.35)', marginLeft: '.15rem',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 3px 10px rgba(255,205,0,.5)'; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 5px rgba(255,205,0,.35)'; }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          </button>
         </div>
       </div>
 
