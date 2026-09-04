@@ -480,7 +480,7 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Счет</label>
                 <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{m?m.icon+' ':''}{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
+                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
                 </select>
               </div>
               <div className="form-group">
