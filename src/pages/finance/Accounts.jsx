@@ -481,7 +481,7 @@ export default function Accounts() {
                 <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} />
               </div>
               <div className="form-group">
-                <label>Сумма ({cur})</label>
+                <label>Сумма</label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} required autoFocus />
               </div>
               <div className="form-group">
