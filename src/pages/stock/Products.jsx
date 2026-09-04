@@ -115,6 +115,13 @@ const setCols = (set) => localStorage.setItem('productsCols', JSON.stringify([..
 const COL_ORDER = ['name','type','category','cost','price','min_price','markup','unit','sku','barcode','weight','min_qty','free_price','description'];
 const COL_LABELS = { name:'Название', type:'Тип', category:'Категория', cost:'Себестоимость', price:'Цена', min_price:'Мин. цена', markup:'Наценка', unit:'Ед. измерения', sku:'Артикул', barcode:'Штрихкод', weight:'Вес', min_qty:'Мин. остаток', free_price:'Свободная цена', description:'Описание' };
 
+// Чекбокс-квадрат в выпадающих списках (дизайн dropdown v5)
+const DdCheck = () => (
+  <span className="dd-cb">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  </span>
+);
+
 export default function Products() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
@@ -730,21 +737,21 @@ export default function Products() {
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
               onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {typeOpen && (
-              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'180px',padding:'8px',zIndex:100}}>
                 <div className="cat-dd-list">
                   {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
                     const checked = typeFilterSet.has(t.v);
                     return (
-                      <div key={t.v} className="cat-dd-item" onClick={() => toggleType(t.v)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
+                      <div key={t.v} className={'cat-dd-item'+(checked?' sel':'')} onClick={() => toggleType(t.v)}>
+                        <DdCheck />
                         <span>{t.l}</span>
                       </div>
                     );
                   })}
                 </div>
-                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
+                <div className="cat-dd-actions">
                   <span className="cat-dd-action" onClick={selectAllTypes}>Выбрать все</span>
-                  <span className="cat-dd-action" onClick={clearAllTypes}>Очистить</span>
+                  <span className="cat-dd-action ghost" onClick={clearAllTypes}>Очистить</span>
                 </div>
               </div>
             )}</div>
@@ -753,8 +760,9 @@ export default function Products() {
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
               onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категория<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {catOpen && (
-              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
+              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
                 <div className="cat-dd-search">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                   <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
                 </div>
                 <div className="cat-dd-list">
@@ -772,17 +780,17 @@ export default function Products() {
                   }).map(c => {
                     const checked = selectedCats.has(c.name);
                     return (
-                      <div key={c.name} className="cat-dd-item" onClick={() => toggleCat(c.name)}>
-                        <input type="checkbox" checked={checked} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
+                      <div key={c.name} className={'cat-dd-item'+(checked?' sel':'')} onClick={() => toggleCat(c.name)}>
+                        <DdCheck />
                         <span>{c.name}</span>
                       </div>
                     );
                   })}
                   {cats.length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
                 </div>
-                <div className="cat-dd-actions" style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
+                <div className="cat-dd-actions">
                   <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
-                  <span className="cat-dd-action" onClick={clearAllCats}>Очистить</span>
+                  <span className="cat-dd-action ghost" onClick={clearAllCats}>Очистить</span>
                 </div>
               </div>
             )}
@@ -792,14 +800,14 @@ export default function Products() {
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
               onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.55rem',opacity:.7}}>▾</span></button>
             {colsOpen && (
-              <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
+              <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'210px',padding:'8px',zIndex:100}}>
                 <div className="cols-title">Основные столбцы</div>
                 <div className="cols-list">
                 {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
                   const active = activeCols.has(col.id);
                   return (
-                    <div key={col.id} className="cols-item" onClick={() => toggleCol(col.id)}>
-                      <input type="checkbox" checked={active} onChange={()=>{}} />
+                    <div key={col.id} className={'cols-item'+(active?' sel':'')} onClick={() => toggleCol(col.id)}>
+                      <DdCheck />
                       <span>{col.label}</span>
                     </div>
                   );

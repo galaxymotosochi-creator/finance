@@ -375,15 +375,13 @@ export default function Stock() {
           >Категории<span style={{ fontSize: '.6rem', opacity: .7 }}>▾</span></button>
 
           {catOpen && (
-            <div onClick={e => e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'180px',padding:'.35rem',zIndex:100}}>
+            <div onClick={e => e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'180px',padding:'8px',zIndex:100}}>
               {allCats.map(cat => {
                 const checked = selectedCats && selectedCats.has(cat);
                 return (
                   <div key={cat} onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}
-                    style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.78rem',color:'#555',background:'transparent'}}
-                    onMouseEnter={e=>e.currentTarget.style.background='#f5f5f5'}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <input type="checkbox" checked={!!checked} onChange={()=>{}} style={{accentColor:'var(--secondary)',cursor:'pointer',margin:0}} />
+                    className={'cat-dd-item'+(checked?' sel':'')}>
+                    <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
                     {cat}
                   </div>
                 );
