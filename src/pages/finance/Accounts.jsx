@@ -275,7 +275,7 @@ export default function Accounts() {
           </div>
           <div className="sub">Управление счетами и учет остатков</div>
         </div>
-        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Добавить</button></div>
+        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>+ Добавить</button></div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
@@ -331,9 +331,9 @@ export default function Accounts() {
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'auto'}}>
                   <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                    style={{padding:'.3rem .8rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
+                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
                   <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                    style={{padding:'.3rem .8rem',borderRadius:'100px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>− Забрать</button>
+                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>− Забрать</button>
                 </div>
               </div>
             );
@@ -489,7 +489,7 @@ export default function Accounts() {
                 <input type="text" placeholder="Например: аренда за сентябрь" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'100px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.background='#000'}} onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
+                <button type="submit" style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.background='#000'}} onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>
