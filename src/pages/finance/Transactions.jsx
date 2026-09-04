@@ -545,7 +545,7 @@ export default function Transactions() {
             </form>
       </Modal>
       {/* Модалка «Свои деньги владельца»: взнос/вывод — не влияет на прибыль */}
-      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Свои деньги владельца" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
+      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
             <form onSubmit={async function(e){
               e.preventDefault();
               const amt = parseFloat(ownerAmt);
@@ -576,18 +576,29 @@ export default function Transactions() {
               <div className="form-group">
                 <label>Операция</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
-                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='deposit'?'var(--secondary)':'var(--border)'),background:ownerMode==='deposit'?'var(--secondary-light)':'transparent',color:ownerMode==='deposit'?'var(--secondary)':'#555'}}>Взнос (доложить)</button>
-                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'8px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:'1.5px solid '+(ownerMode==='withdraw'?'var(--secondary)':'var(--border)'),background:ownerMode==='withdraw'?'var(--secondary-light)':'transparent',color:ownerMode==='withdraw'?'var(--secondary)':'#555'}}>Вывод (забрать)</button>
+                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='deposit'?'#111':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
+                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='withdraw'?'#111':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
                 </div>
               </div>
               <div className="form-group">
                 <label>Счёт</label>
-                <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
-                </select>
+                <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+                  {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+                  {accs.map(function(a){
+                    const sel = String(a.id) === String(ownerAcct);
+                    return (
+                      <div key={a.id} onClick={()=>setOwnerAcct(a.id)}
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1px solid '+(sel?'#ffdd2d':'#e8e8ec')}}>
+                        <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                        <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="form-group">
-                <label>Сумма ({cur})</label>
+                <label>Сумма</label>
                 <input type="number" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} placeholder="0" autoFocus />
               </div>
               <div className="form-group">
@@ -595,7 +606,7 @@ export default function Transactions() {
                 <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
+                <button type="submit" style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.background='#000'}} onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>
