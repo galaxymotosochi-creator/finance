@@ -126,7 +126,9 @@ export default function Stock() {
     return () => document.removeEventListener('click', handler);
   }, []);
 
-  let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort();
+  // Категории: «Без категории» всегда первой, остальные — по алфавиту (по-русски)
+  const sortCats = (a, b) => { if (a === 'Без категории') return -1; if (b === 'Без категории') return 1; return a.localeCompare(b, 'ru'); };
+  let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort(sortCats);
   // Статус наличия товара: out — закончился, low — заканчивается (≤ мин. остатка), in — в наличии
   const stOf = (p) => { const stq = stockMap[p.id]?.qty || 0; const mn = p.min_qty || 0; return stq === 0 ? 'out' : (mn > 0 && stq <= mn ? 'low' : 'in'); };
   let items = products.filter(p => p && !p.hidden);
