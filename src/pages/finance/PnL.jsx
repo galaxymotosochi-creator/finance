@@ -239,8 +239,35 @@ export default function PnL() {
   if (errMsg) return <div className="empty-products"><div className="big-icon">⚠️</div><p>Ошибка загрузки: {errMsg}</p></div>;
   if (!d) return <div className="empty-products"><div className="big-icon">📊</div><p>Нет данных</p></div>;
 
+  // Период для шапки отчёта (01.09.2026 — 04.09.2026)
+  const dr = getDateRange();
+  const fmtIso = (s) => { if (!s) return ''; const [y, m, dd] = s.split('-'); return `${dd}.${m}.${y}`; };
+  const periodLabel = `${fmtIso(dr.from)} — ${fmtIso(dr.to)}`;
+  const fmt = (n) => (Math.round((Number(n) || 0) * 100) / 100).toLocaleString();
+
+  // Донат: шкала рентабельности — полный круг = 40% (в макете 27,5% → дуга ~2/3)
+  const ARC = 540;
+  const MAX_RENT = 40;
+  const donutFrac = Math.max(0, Math.min(1, (d.profitability || 0) / MAX_RENT));
+  const donutOffset = ARC * (1 - donutFrac);
+
+  // Строки отчёта: группа «Доходы» (итог зелёным) → группа «Расходы» (итог красным)
+  const incomeTotal = (d.salesRev + d.discounts) + d.otherIncome + d.surpluses;
+  const expenseTotal = d.discounts + d.totalCogs + d.opTotal + d.shortages;
+  const rowData = [
+    { key: 'h-inc', name: 'Доходы', value: `${fmt(incomeTotal)} ${cur}`, nameColor: '#16a34a', valueColor: '#16a34a', valueWeight: 400 },
+    { key: 'sales', name: 'Доход от продаж', value: fmt(d.salesRev + d.discounts) },
+    ...(d.otherIncome > 0 ? [{ key: 'oi', name: 'Прочие доходы', value: fmt(d.otherIncome) }] : []),
+    ...(d.surpluses > 0 ? [{ key: 'sur', name: 'Излишки по инвентаризации', value: fmt(d.surpluses) }] : []),
+    { key: 'h-exp', name: 'Расходы', value: `${fmt(expenseTotal)} ${cur}`, nameColor: '#dc2626', valueColor: '#dc2626', valueWeight: 400 },
+    ...(d.discounts > 0 ? [{ key: 'disc', name: 'Скидки с продаж', value: fmt(d.discounts) }] : []),
+    { key: 'cogs', name: 'Закупка товара', value: fmt(d.totalCogs) },
+    ...d.opList.map(([name, amt], i) => ({ key: 'op' + i, name, value: fmt(amt) })),
+    ...(d.shortages > 0 ? [{ key: 'short', name: 'Недостачи по инвентаризации', value: fmt(d.shortages) }] : []),
+  ];
+
   return (
-    <div style={{ maxWidth: '520px', margin: '0 auto', fontFamily: "'Golos Text',system-ui,sans-serif" }}>
+    <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: "'Golos Text',system-ui,sans-serif" }}>
       {/* Шапка */}
       <div className="page-header" style={{ marginBottom: '14px' }}>
         <div><h1>Чистая прибыль</h1><div className="sub">{d.month}</div></div>
@@ -251,88 +278,75 @@ export default function PnL() {
         </div>
       </div>
 
-      {/* Карточка: Доходы */}
+      {/* Окно (эталон pnl-donut-v5) */}
       <div style={{
-        background: '#fff', borderRadius: '16px', padding: '18px', marginBottom: '8px',
-        boxShadow: '0 1px 4px rgba(0,0,0,.04)', border: '1px solid #f0f0f0',
+        background: 'linear-gradient(150deg,#fff,#fff8e6)',
+        borderRadius: '22px', padding: '26px',
+        boxShadow: '0 14px 40px rgba(0,0,0,.08)', border: '1px solid #f2ecdc',
+        display: 'flex', gap: '30px', alignItems: 'center', flexWrap: 'wrap',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', color: '#bbb', fontWeight: 600 }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#16a34a' }}></span>
-          Доходы
+        {/* Донат-круг */}
+        <div style={{ position: 'relative', width: '210px', height: '210px', flexShrink: 0, margin: '0 auto' }}>
+          <svg width="210" height="210" viewBox="0 0 210 210">
+            <defs>
+              <linearGradient id="pnlDonutGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#ffdd2d" />
+                <stop offset="1" stopColor="#ffb300" />
+              </linearGradient>
+            </defs>
+            <circle cx="105" cy="105" r="86" fill="none" stroke="#f1ece0" strokeWidth="18" />
+            <circle cx="105" cy="105" r="86" fill="none" stroke="url(#pnlDonutGrad)" strokeWidth="18" strokeLinecap="round" strokeDasharray="540" strokeDashoffset={donutOffset} transform="rotate(-90 105 105)" />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontSize: '11px', color: '#999', fontWeight: 500 }}>Чистая прибыль</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#111', letterSpacing: '-.02em' }}>{fmt(d.netProfit)} {cur}</div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: d.profitability >= 0 ? '#16a34a' : '#dc2626' }}>{d.profitability}%</div>
+            <div style={{ fontSize: '10.5px', color: '#bbb', fontWeight: 500 }}>рентабельность</div>
+          </div>
         </div>
-        <Row label="Выручка от продаж" value={`+${(d.salesRev + d.discounts).toLocaleString()} ${cur}`} />
-        {d.discounts > 0 && <Row label="Скидки с продаж" value={`−${d.discounts.toLocaleString()} ${cur}`} color="#d97706" />}
-        <Row label="Себестоимость" value={`−${d.totalCogs.toLocaleString()} ${cur}`} color="#dc2626" />
-        {d.surpluses > 0 && <Row label="Излишки по инвентаризации" value={`+${Math.round(d.surpluses).toLocaleString()} ${cur}`} color="#16a34a" />}
-        <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }} />
-        <Row label="Валовая прибыль" value={`${d.grossProfit >= 0 ? '+' : ''}${d.grossProfit.toLocaleString()} ${cur}`} color={d.grossProfit >= 0 ? '#16a34a' : '#dc2626'} bold />
-        {d.otherIncome > 0 && <Row label="Прочие доходы" value={`+${Math.round(d.otherIncome).toLocaleString()} ${cur}`} color="#16a34a" />}
-      </div>
 
-      {/* Карточка: Расходы */}
-      <div style={{
-        background: '#fff', borderRadius: '16px', padding: '18px', marginBottom: '8px',
-        boxShadow: '0 1px 4px rgba(0,0,0,.04)', border: '1px solid #f0f0f0',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', color: '#bbb', fontWeight: 600 }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block', background: '#dc2626' }}></span>
-          Расходы
+        {/* Отчёт о прибыли */}
+        <div style={{ flex: 1, minWidth: '290px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid #111', paddingBottom: '6px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>Отчёт о прибыли</span>
+            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>{periodLabel}</span>
+          </div>
+
+          {rowData.map((r, i) => (
+            <Line key={r.key} name={r.name} value={r.value} nameColor={r.nameColor} valueColor={r.valueColor} valueWeight={r.valueWeight} last={i === rowData.length - 1} />
+          ))}
+
+          {/* Итог — жёлтый градиент */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '10px', padding: '12px 14px', marginTop: '10px', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111' }}>
+            <span style={{ fontSize: '15px', fontWeight: 700 }}>Чистая прибыль</span>
+            <b style={{ fontSize: '20px', fontWeight: 800 }}>{fmt(d.netProfit)} {cur}</b>
+          </div>
+
+          {/* Показатели: запас и деньги на счетах */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+            <MiniStat label="Товарный запас" value={`${fmt(d.stockValue)} ${cur}`} />
+            <MiniStat label="Деньги на счетах" value={`${fmt(d.totalCash)} ${cur}`} />
+          </div>
         </div>
-        {d.opList.map(([name, amt], i) => (
-          <Row key={i} label={name} value={`−${amt.toLocaleString()} ${cur}`} color="#dc2626" />
-        ))}
-        {d.shortages > 0 && <Row label="Недостачи по инвентаризации" value={`−${Math.round(d.shortages).toLocaleString()} ${cur}`} color="#dc2626" />}
-
-      </div>
-
-      {/* Итог */}
-      <div style={{
-        background: '#1a1a1a', borderRadius: '14px', padding: '16px 18px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0',
-      }}>
-        <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,.5)' }}>
-          Чистая прибыль
-        </span>
-        <span style={{ fontSize: '22px', fontWeight: 800, color: '#fff' }}>
-          {d.netProfit >= 0 ? '+' : ''}{d.netProfit.toLocaleString()} {cur}
-        </span>
-      </div>
-
-      {/* Дополнительные показатели */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
-        <StatBlock label="Товарный запас" value={d.stockValue.toLocaleString()} />
-        <StatBlock label="Деньги на счетах" value={d.totalCash.toLocaleString()} />
-        <StatBlock label="Рентабельность" value={`${d.profitability}%`} color={d.profitability >= 0 ? '#16a34a' : '#dc2626'} />
       </div>
     </div>
   );
 }
 
-function Row({ label, value, color, bold }) {
+function Line({ name, value, nameColor = '#333', valueColor = '#111', valueWeight = 600, last }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0' }}>
-      <span style={{ fontSize: '13px', color: bold ? '#333' : '#666', fontWeight: bold ? 600 : 400 }}>
-        {label}
-      </span>
-      <span style={{ fontSize: '14px', fontWeight: 600, color: color || '#111' }}>
-        {value}
-      </span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '10px', padding: '6px 0', borderBottom: last ? 'none' : '1px solid #f2f2f2', fontSize: '14px' }}>
+      <span style={{ color: nameColor }}>{name}</span>
+      <span style={{ fontWeight: valueWeight, color: valueColor }}>{value}</span>
     </div>
   );
 }
 
-function StatBlock({ label, value, color }) {
+function MiniStat({ label, value }) {
   return (
-    <div style={{
-      background: '#fff', borderRadius: '12px', padding: '13px', textAlign: 'center',
-      border: '1px solid #f0f0f0', boxShadow: '0 1px 4px rgba(0,0,0,.04)',
-    }}>
-      <div style={{ fontSize: '8px', textTransform: 'uppercase', letterSpacing: '.3px', color: '#bbb', marginBottom: '3px', fontWeight: 600 }}>
-        {label}
-      </div>
-      <div style={{ fontSize: '14px', fontWeight: 700, color: color || '#111' }}>
-        {value}
-      </div>
+    <div style={{ flex: 1, background: '#fff', border: '1px solid #f0f0f0', borderRadius: '12px', padding: '9px 12px' }}>
+      <div style={{ fontSize: '10.5px', color: '#999', marginBottom: '2px' }}>{label}</div>
+      <div style={{ fontSize: '15px', fontWeight: 700, color: '#111' }}>{value}</div>
     </div>
   );
 }
