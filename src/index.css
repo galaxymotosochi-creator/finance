@@ -212,7 +212,7 @@ body {
   color: var(--body-color);
 }
 .login-card input:focus {
-  border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(66, 139, 249, .15);
+  border-color: #111; box-shadow: 0 0 0 3px rgba(17,17,17,.08);
 }
 .login-card button {
   width: 100%; padding: .7rem; font-size: .9rem; font-weight: 600;
@@ -299,7 +299,7 @@ body {
 /* ======== SEARCH ======== */
 .search-row { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .search-input-wrap { display: flex; align-items: center; gap: .3rem; width: 30%; min-width: 180px; max-width: 400px; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .5rem .6rem; background: var(--body-bg); transition: border-color var(--transition); }
-.search-input-wrap:focus-within { border-color: var(--secondary); }
+.search-input-wrap:focus-within { border-color: #111; }
 .search-icon { font-size: .75rem; color: var(--muted); line-height: 1; flex-shrink: 0; }
 .search-field { border: none; outline: none; flex: 1; font-size: .8rem; font-family: var(--font); background: none; padding: 0; }
 .actions-group { display: flex; align-items: center; gap: .25rem; margin-left: auto; }
@@ -425,7 +425,7 @@ body {
   min-height: 38px;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(66,139,249,.12);
+  border-color: #111; box-shadow: 0 0 0 3px rgba(17,17,17,.07);
 }
 .form-group select { cursor: pointer; }
 .form-row { display: flex; gap: .65rem; }
@@ -490,7 +490,7 @@ body {
 .cat-dd-search:focus-within { border-color: #d0d0d6; }
 .cat-dd-search input { border: none; outline: none; background: none; font-size: 12.5px; font-family: var(--font); flex: 1; color: #333; }
 /* ======== DROPDOWNS (конец) ======== */
-.cat-dd-search input:focus { border-color: var(--secondary); }
+.cat-dd-search input:focus { border-color: #111; }
 .cat-dd-search input::placeholder { color: #b0b0b6; }
 .cat-dd-list { max-height: 200px; overflow-y: auto; }
 .cat-dd-item { display: flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: 9px; cursor: pointer; font-size: 13px; color: #3a3a3f; }
@@ -524,11 +524,11 @@ body {
 
 /* ======== EMPLOYEES ======== */
 .emp-rule-pct { width: 50px; padding: .2rem .3rem; font-size: .78rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); outline: none; text-align: center; font-family: var(--font); }
-.emp-rule-pct:focus { border-color: var(--secondary); }
+.emp-rule-pct:focus { border-color: #111; }
 .emp-row { display: flex; align-items: center; gap: .5rem; margin-bottom: .4rem; }
 .emp-row-label { min-width: 100px; font-size: .8rem; color: var(--body-color); }
 .emp-row-input { width: 65px; padding: .3rem .4rem; font-size: .8rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); outline: none; text-align: center; font-family: var(--font); }
-.emp-row-input:focus { border-color: var(--secondary); }
+.emp-row-input:focus { border-color: #111; }
 .emp-row-curr { font-size: .8rem; font-weight: 600; color: var(--body-color); min-width: 30px; }
 .emp-row-sel { font-size: .78rem; padding: .3rem .4rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); outline: none; background: var(--body-bg); font-family: var(--font); }
 .emp-row-rm { background: none; border: none; color: var(--danger); cursor: pointer; font-size: .8rem; padding: .2rem; line-height: 1; }
@@ -639,8 +639,8 @@ body {
 
 /* Глобальный фокус на полях ввода */
 input:focus, select:focus, textarea:focus {
-  border-color: var(--secondary) !important;
-  box-shadow: 0 0 0 3px rgba(66, 139, 249, .15) !important;
+  border-color: #111 !important;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, .08) !important;
   outline: none;
 }
 
