@@ -409,6 +409,10 @@ body {
 .modal-actions .btn { border-radius: var(--radius-pill); }
 
 /* ======== FORMS ======== */
+/* Скрываем браузерные стрелки у числовых полей (суммы, количества) */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .form-group { margin-bottom: .65rem; }
 .form-group label { display: block; font-size: .8125rem; font-weight: 600; color: #333; margin-bottom: .25rem; }
 .form-group input, .form-group select, .form-group textarea {
