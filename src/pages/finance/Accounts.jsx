@@ -278,16 +278,25 @@ export default function Accounts() {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
-      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto'}}>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-            onClick={()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}}>Начальные остатки</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-            onClick={()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}}>Корректировка</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#dc2626',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,fontWeight:600}}
-            onClick={()=>{setColAmt('');setColTo('');setShowCollection(true)}}>Инкассация</span>
-          <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.72rem',color:'#555',cursor:'pointer',lineHeight:1}}
-            onClick={()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}>Перевод между счетами</span>
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap'}}>
+        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.5rem',marginLeft:'auto',flexWrap:'wrap',justifyContent:'flex-end'}}>
+          {/* Кнопки действий (дизайн: белые с жёлтой иконкой-квадратом) */}
+          {[
+            { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, label:'Начальные остатки', icon: (<><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></>) },
+            { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка', icon: (<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>) },
+            { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация', icon: (<><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></>) },
+            { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами', icon: (<><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></>) },
+          ].map(a => (
+            <button key={a.label} type="button" onClick={a.onClick}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}
+              style={{display:'inline-flex',alignItems:'center',gap:'.4rem',padding:'4px 14px 4px 4px',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',lineHeight:1.2,boxShadow:'0 1px 2px rgba(0,0,0,.03)'}}>
+              <span style={{width:'28px',height:'28px',flexShrink:0,borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{a.icon}</svg>
+              </span>
+              {a.label}
+            </button>
+          ))}
         </div>
       </div>
 
