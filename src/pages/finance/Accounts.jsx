@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 
@@ -683,45 +683,23 @@ export default function Accounts() {
   );
 }
 
-// Кастомный выбор счёта — вместо нативного select (без синей системной подсветки),
-// в стиле выпадающих списков приложения (dropdown v5)
+// Выбор счёта — раскрытый список карточек, как в модалке «С какого счета списать?» (Доходы и расходы)
 function AcctPick({ accounts, value, onChange, cur, balOf, placeholder }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('click', h);
-    return () => document.removeEventListener('click', h);
-  }, [open]);
-  const sel = (accounts || []).find(a => String(a.id) === String(value));
+  const list = accounts || [];
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <button type="button" onClick={() => setOpen(!open)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '.55rem .7rem', border: '1px solid var(--border)', borderRadius: '.5rem', background: '#fff', fontFamily: 'inherit', fontSize: '.8rem', color: sel ? '#333' : '#999', cursor: 'pointer' }}>
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sel ? sel.name + ' (' + Math.round(balOf ? balOf(sel.id) : 0).toLocaleString() + ' ' + cur + ')' : (placeholder || '— выберите —')}</span>
-        <span style={{ fontSize: '.55rem', opacity: .65, marginLeft: '.4rem', flexShrink: 0 }}>▾</span>
-      </button>
-      {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: '#fff', borderRadius: '14px', boxShadow: '0 12px 36px rgba(0,0,0,.14)', padding: '6px', zIndex: 120, maxHeight: '230px', overflowY: 'auto' }}>
-          {(!accounts || accounts.length === 0) && <div style={{ padding: '8px 10px', fontSize: '12.5px', color: '#aaa' }}>Нет счетов</div>}
-          {(accounts || []).map(a => {
-            const on = String(a.id) === String(value);
-            return (
-              <div key={a.id} onClick={() => { onChange(a.id); setOpen(false); }}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 9px', borderRadius: '9px', cursor: 'pointer', fontSize: '13px', color: '#3a3a3f', background: on ? '#fff9db' : 'transparent' }}
-                onMouseEnter={e => { if (!on) e.currentTarget.style.background = '#f6f6f8'; }}
-                onMouseLeave={e => { if (!on) e.currentTarget.style.background = 'transparent'; }}>
-                <span style={{ width: '16px', height: '16px', flexShrink: 0, borderRadius: '50%', border: '1.6px solid ' + (on ? '#111' : '#c9c9d1'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {on && <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#111' }} />}
-                </span>
-                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
-                <span style={{ fontSize: '11.5px', color: '#999', whiteSpace: 'nowrap' }}>{Math.round(balOf ? balOf(a.id) : 0).toLocaleString()} {cur}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem', margin: '.25rem 0 .5rem' }}>
+      {list.length === 0 && <div style={{ padding: '.4rem .25rem', fontSize: '.8rem', color: 'var(--muted)' }}>{placeholder || 'Нет счетов'}</div>}
+      {list.map(a => {
+        const sel = String(a.id) === String(value);
+        return (
+          <div key={a.id} onClick={() => onChange(a.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: '.5rem', padding: '.6rem .75rem', cursor: 'pointer', borderRadius: '.6rem', background: sel ? 'var(--secondary-light)' : '#fff', border: '1.5px solid ' + (sel ? 'var(--secondary)' : 'var(--border)') }}>
+            <span style={{ width: '18px', height: '18px', flexShrink: 0, border: '2px solid ' + (sel ? 'var(--secondary)' : 'var(--border)'), borderRadius: '50%', borderWidth: sel ? '6px' : '2px', boxSizing: 'border-box', display: 'inline-block' }} />
+            <span style={{ flex: 1, fontSize: '.85rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
+            <span style={{ fontSize: '.82rem', fontWeight: 600, color: '#111', whiteSpace: 'nowrap' }}>{Math.round(balOf ? balOf(a.id) : 0).toLocaleString()} {cur}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
