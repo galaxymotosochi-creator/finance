@@ -293,20 +293,20 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          {/* Балансы по каждому счёту + общий баланс последней плашкой */}
-          <div style={{display:'flex',flexWrap:'wrap',gap:'.5rem',marginBottom:'.5rem',alignItems:'stretch'}}>
+          {/* Балансы по каждому счёту + общий баланс последней плашкой (дизайн как в Остатках) */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'8px',marginBottom:'.5rem'}}>
             {sorted.map(a => {
               const bal = (parseFloat(a.balance)||0) + (balById[a.id]||0);
               return (
-                <div key={a.id} style={{display:'flex',flexDirection:'column',justifyContent:'center',padding:'.7rem 1.05rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)'}}>
-                  <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600,whiteSpace:'nowrap'}}>{a.name}</span>
-                  <span style={{fontSize:'1.05rem',fontWeight:800,color:'#111',whiteSpace:'nowrap'}}>{bal.toLocaleString()} {cur}</span>
+                <div key={a.id} style={{background:'linear-gradient(135deg,#ffdd2d,#fff9db)',borderRadius:'14px',padding:'10px 12px',boxShadow:'0 2px 10px rgba(255,205,0,.3)'}}>
+                  <div style={{fontSize:'11px',fontWeight:700,color:'rgba(0,0,0,.55)',marginBottom:'4px',lineHeight:1.25}}>{a.name}</div>
+                  <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{bal.toLocaleString()} {cur}</div>
                 </div>
               );
             })}
-            <div style={{display:'flex',flexDirection:'column',justifyContent:'center',padding:'.7rem 1.05rem',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',border:'1px solid #fcd34d',borderRadius:'12px'}}>
-              <span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600,whiteSpace:'nowrap'}}>Общий баланс счетов</span>
-              <span style={{fontSize:'1.2rem',fontWeight:800,color:'#111',whiteSpace:'nowrap'}}>{(total||0).toLocaleString()} {cur}</span>
+            <div style={{background:'linear-gradient(135deg,#ffdd2d,#fff9db)',borderRadius:'14px',padding:'10px 12px',boxShadow:'0 2px 10px rgba(255,205,0,.3)'}}>
+              <div style={{fontSize:'11px',fontWeight:700,color:'rgba(0,0,0,.55)',marginBottom:'4px',lineHeight:1.25}}>Общий баланс счетов</div>
+              <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{(total||0).toLocaleString()} {cur}</div>
             </div>
           </div>
           {/* Свои деньги владельца — отдельная плашка */}
