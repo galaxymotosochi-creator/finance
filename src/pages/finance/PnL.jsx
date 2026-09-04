@@ -13,6 +13,8 @@ export default function PnL() {
   const [data, setData] = useState(null);
   const [errMsg, setErrMsg] = useState(null);
 
+  // Локальная дата без UTC-сдвига (toISOString уводит границу на день назад в Москве)
+  const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const getDateRange = () => {
     const now = new Date();
     let from;
@@ -24,8 +26,7 @@ export default function PnL() {
     } else if (period === 'year') {
       from = new Date(now.getFullYear(), 0, 1);
     }
-    const to = now.toISOString().split('T')[0];
-    return { from: from.toISOString().split('T')[0], to };
+    return { from: toDateStr(from), to: toDateStr(now) };
   };
 
   useEffect(() => {
