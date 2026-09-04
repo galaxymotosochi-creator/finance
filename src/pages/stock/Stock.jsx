@@ -356,7 +356,7 @@ export default function Stock() {
               style={{
                 border: 'none', background: stStatus === v ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
                 color: stStatus === v ? '#111' : '#777', padding: '9px 16px', borderRadius: '100px',
-                fontSize: '.8rem', fontWeight: stStatus === v ? 700 : 600, cursor: 'pointer', fontFamily: 'inherit',
+                fontSize: '.8rem', fontWeight: stStatus === v ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
                 whiteSpace: 'nowrap', lineHeight: 1, transition: 'all .12s',
               }}
               onMouseEnter={e => { if (stStatus !== v) e.currentTarget.style.color = '#333'; }}
@@ -368,7 +368,7 @@ export default function Stock() {
             onClick={e => { e.stopPropagation(); setCatOpen(!catOpen); }}
             style={{
               border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
-              padding: '9px 16px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 700, cursor: 'pointer',
+              padding: '9px 16px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 400, cursor: 'pointer',
               fontFamily: 'inherit', whiteSpace: 'nowrap', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '4px',
               marginLeft: '.25rem', boxShadow: '0 1px 4px rgba(255,205,0,.25)',
             }}
