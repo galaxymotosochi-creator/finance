@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 
@@ -238,6 +238,7 @@ export default function Accounts() {
     balById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
   });
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
+  const balOfId = (id) => { const a = accounts.find(x => String(x.id) === String(id)); return a ? Math.round(getBal(a)) : 0; };
    if (loading || !initDone) return <CenterSpinner />;
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
@@ -439,9 +440,7 @@ export default function Accounts() {
               await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Счет</label>
-                <select value={corAcct} onChange={e=>setCorAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{''} {a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
-                </select>
+                <AcctPick accounts={accounts} value={corAcct} onChange={setCorAcct} cur={cur} balOf={balOfId} />
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -479,9 +478,7 @@ export default function Accounts() {
               </div>
               <div className="form-group">
                 <label>Счет</label>
-                <select value={ownerAcct} onChange={e=>setOwnerAcct(e.target.value)}>
-                  {accounts.map(a=>{var m=ACC_TYPES.find(t=>t.type===a.type);return <option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
-                </select>
+                <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} />
               </div>
               <div className="form-group">
                 <label>Сумма ({cur})</label>
@@ -596,17 +593,11 @@ export default function Accounts() {
             <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;var fromBal=getBal(fromAc);if(amt>fromBal)return alert('Недостаточно средств на счете «'+fromAc.name+'». Баланс: '+fromBal.toLocaleString()+' ₽');var tid=Date.now();await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Откуда</label>
-                <select value={trFrom} onChange={e=>setTrFrom(e.target.value)} required>
-                  <option value="">— выберите —</option>
-                  {accounts.filter(a=>a.id!==trTo).map(a=><option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>)}
-                </select>
+                <AcctPick accounts={accounts.filter(a=>String(a.id)!==String(trTo))} value={trFrom} onChange={setTrFrom} cur={cur} balOf={balOfId} placeholder="— выберите —" />
               </div>
               <div className="form-group">
                 <label>Куда</label>
-                <select value={trTo} onChange={e=>setTrTo(e.target.value)} required>
-                  <option value="">— выберите —</option>
-                  {accounts.filter(a=>a.id!==trFrom).map(a=><option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>)}
-                </select>
+                <AcctPick accounts={accounts.filter(a=>String(a.id)!==String(trFrom))} value={trTo} onChange={setTrTo} cur={cur} balOf={balOfId} placeholder="— выберите —" />
               </div>
               <div className="form-group">
                 <label>Сумма (₽)</label>
@@ -677,10 +668,7 @@ export default function Accounts() {
                 </div>
                 <div className="form-group">
                   <label>Куда зачислить</label>
-                  <select value={colTo} onChange={function(e){setColTo(e.target.value)}} required>
-                    <option value="">— выберите счёт —</option>
-                    {otherAccs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({Math.round(getBal(a)).toLocaleString()} {cur})</option>})}
-                  </select>
+                  <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счёт —" />
                 </div>
                 <div className="modal-actions">
                   <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
@@ -691,6 +679,49 @@ export default function Accounts() {
         );
       })()}
       </Modal>
+    </div>
+  );
+}
+
+// Кастомный выбор счёта — вместо нативного select (без синей системной подсветки),
+// в стиле выпадающих списков приложения (dropdown v5)
+function AcctPick({ accounts, value, onChange, cur, balOf, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('click', h);
+    return () => document.removeEventListener('click', h);
+  }, [open]);
+  const sel = (accounts || []).find(a => String(a.id) === String(value));
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen(!open)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '.55rem .7rem', border: '1px solid var(--border)', borderRadius: '.5rem', background: '#fff', fontFamily: 'inherit', fontSize: '.8rem', color: sel ? '#333' : '#999', cursor: 'pointer' }}>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sel ? sel.name + ' (' + Math.round(balOf ? balOf(sel.id) : 0).toLocaleString() + ' ' + cur + ')' : (placeholder || '— выберите —')}</span>
+        <span style={{ fontSize: '.55rem', opacity: .65, marginLeft: '.4rem', flexShrink: 0 }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: '#fff', borderRadius: '14px', boxShadow: '0 12px 36px rgba(0,0,0,.14)', padding: '6px', zIndex: 120, maxHeight: '230px', overflowY: 'auto' }}>
+          {(!accounts || accounts.length === 0) && <div style={{ padding: '8px 10px', fontSize: '12.5px', color: '#aaa' }}>Нет счетов</div>}
+          {(accounts || []).map(a => {
+            const on = String(a.id) === String(value);
+            return (
+              <div key={a.id} onClick={() => { onChange(a.id); setOpen(false); }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 9px', borderRadius: '9px', cursor: 'pointer', fontSize: '13px', color: '#3a3a3f', background: on ? '#fff9db' : 'transparent' }}
+                onMouseEnter={e => { if (!on) e.currentTarget.style.background = '#f6f6f8'; }}
+                onMouseLeave={e => { if (!on) e.currentTarget.style.background = 'transparent'; }}>
+                <span style={{ width: '16px', height: '16px', flexShrink: 0, borderRadius: '50%', border: '1.6px solid ' + (on ? '#111' : '#c9c9d1'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {on && <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#111' }} />}
+                </span>
+                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
+                <span style={{ fontSize: '11.5px', color: '#999', whiteSpace: 'nowrap' }}>{Math.round(balOf ? balOf(a.id) : 0).toLocaleString()} {cur}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
