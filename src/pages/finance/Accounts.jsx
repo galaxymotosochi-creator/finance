@@ -472,8 +472,8 @@ export default function Accounts() {
               <div className="form-group">
                 <label>Операция</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
-                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='deposit'?'#111':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
-                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='withdraw'?'#111':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
+                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='deposit'?'#111':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
+                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='withdraw'?'#111':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
                 </div>
               </div>
               <div className="form-group">
@@ -695,8 +695,8 @@ function AcctPick({ accounts, value, onChange, cur, balOf, placeholder }) {
           <div key={a.id} onClick={() => onChange(a.id)}
             style={{ display: 'flex', alignItems: 'center', gap: '.5rem', padding: '.6rem .75rem', cursor: 'pointer', borderRadius: '.6rem', background: sel ? '#fff9db' : '#fff', border: '1px solid ' + (sel ? '#ffdd2d' : '#e8e8ec') }}>
             <span style={{ width: '18px', height: '18px', flexShrink: 0, border: '2px solid ' + (sel ? '#111' : '#cfcfd6'), borderRadius: '50%', borderWidth: sel ? '6px' : '2px', boxSizing: 'border-box', display: 'inline-block' }} />
-            <span style={{ flex: 1, fontSize: '.85rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
-            <span style={{ fontSize: '.82rem', fontWeight: 600, color: '#111', whiteSpace: 'nowrap' }}>{Math.round(balOf ? balOf(a.id) : 0).toLocaleString()} {cur}</span>
+            <span style={{ flex: 1, fontSize: '.875rem', fontWeight: 500, color: '#222', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
+            <span style={{ fontSize: '.875rem', fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>{Math.round(balOf ? balOf(a.id) : 0).toLocaleString()} {cur}</span>
           </div>
         );
       })}
