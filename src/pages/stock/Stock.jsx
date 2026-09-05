@@ -530,9 +530,9 @@ export default function Stock() {
             </div>
 
             <div style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.25rem .5rem .35rem',borderBottom:'1px solid var(--border)'}}>
-              <span style={{flex:1,fontSize:'.68rem',color:'var(--muted)'}}>Товар</span>
-              <span style={{width:'65px',textAlign:'center',fontSize:'.68rem',color:'var(--muted)'}}>Кол-во</span>
-              <span style={{width:'80px',textAlign:'center',fontSize:'.68rem',color:'var(--muted)'}}>Цена закупа</span>
+              <span style={{flex:1,fontSize:'.8125rem',fontWeight:600,color:'#333'}}>Товар</span>
+              <span style={{width:'65px',textAlign:'center',fontSize:'.8125rem',fontWeight:600,color:'#333'}}>Кол-во</span>
+              <span style={{width:'80px',textAlign:'center',fontSize:'.8125rem',fontWeight:600,color:'#333'}}>Цена закупа</span>
             </div>
 
             <div style={{overflowY:'auto',flex:1}}>
