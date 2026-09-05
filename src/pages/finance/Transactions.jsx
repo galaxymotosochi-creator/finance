@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useTransactions, useAccounts, useCategories } from '../../hooks/useTransactions';
 import { getCurrencySymbol } from '../../lib/currency';
+import { getSettingsTz } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 
 
@@ -126,6 +127,16 @@ export default function Transactions() {
     return true;
   };
   const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || (tx.type===typeFilter && !isOwner(tx))) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
+
+  // Время операции: реальный момент создания (created_at) в часовом поясе настроек программы
+  const fmtTime = function(tx) {
+    try {
+      var src = tx.created_at || ((tx.date || '').indexOf('T') >= 0 ? tx.date : null);
+      var dt = src ? new Date(src) : new Date();
+      if (isNaN(dt.getTime())) return '—';
+      return dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: getSettingsTz() });
+    } catch (e) { return '—'; }
+  };
 
   var exportCsv = function(list) {
     // CSV разделяется запятыми — числа без разделителей тысяч (точка для дробной части), валюта по настройкам
@@ -434,7 +445,7 @@ export default function Transactions() {
                   onMouseEnter={e=>e.currentTarget.style.background='rgba(0,0,0,.02)'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                   <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[1]||'').slice(0,5) : '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{fmtTime(tx)}</td>
                   <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{isOwner(tx) ? <span style={{fontWeight:600}}>{tx.description || '—'}</span> : (tx.description || '—')}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                   <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
                     {isOwner(tx) ? <span style={{color:'#111'}}>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span> : <span>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span>}
