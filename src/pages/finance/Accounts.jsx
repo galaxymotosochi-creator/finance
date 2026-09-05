@@ -336,10 +336,10 @@ export default function Accounts() {
                           </div>
                         </div>
                       </td>
-                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555'}}>+{mv.i.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555'}}>−{mv.e.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#555'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#222'}}>{in0.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#222'}}>+{mv.i.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#222'}}>−{mv.e.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',color:'#222'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -359,11 +359,11 @@ export default function Accounts() {
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   return (
                   <tr className="total-row">
-                    <td style={{fontWeight:600,textAlign:'left'}}>Итого</td>
-                    <td style={{textAlign:'left',fontWeight:700}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:'#16a34a'}}>+{incTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:'#dc2626'}}>−{expTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:700,color:total>=0?'#16a34a':'#dc2626'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
+                    <td style={{fontWeight:400,textAlign:'left',color:'#222'}}>Итого</td>
+                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>+{incTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>−{expTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
                     <td></td>
                   </tr>
                   );
