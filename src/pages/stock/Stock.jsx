@@ -544,11 +544,11 @@ export default function Stock() {
                   {p.sku && <span style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku}</span>}
                   <input type="number" min="0" value={initQty[p.id] || ''}
                     onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder=""
+                    placeholder="0"
                     style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                   <input type="number" min="0" value={initCost[p.id] || ''}
                     onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder=""
+                    placeholder="0"
                     style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                 </div>
               ))}
