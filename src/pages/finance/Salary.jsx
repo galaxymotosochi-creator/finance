@@ -525,7 +525,7 @@ export default function Salary() {
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{Number(s.amount).toLocaleString()} {cur}</td>
                 <td style={{textAlign:'left',color:'#222'}}>{(s.status==='pending'||s.status==='accrued')
-                  ? <span onClick={()=>{setPendingPayId(s.id);setPayAcctId('');setShowAcc(true)}}
+                  ? <span onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setShowAcc(true)}}
                       style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплатить</span>
                   : s.status==='paid'
                     ? <span style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплачено</span>
