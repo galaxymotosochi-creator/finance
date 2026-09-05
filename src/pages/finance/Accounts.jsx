@@ -18,10 +18,10 @@ const ACC_TYPES = [
   { type: 'electronic', icon: '🌐', label: 'Электронные деньги' },
   { type: 'reserve', icon: '🔒', label: 'Резерв' },
   { type: 'deposit', icon: '📜', label: 'Депозит' },
-  { type: 'custom', icon: '🏦', label: 'Счёт' },
+  { type: 'custom', icon: '🏦', label: 'Счет' },
 ];
 const SYSTEM_KEY = 'systemAccountIds';
-// Отметка «начальный остаток введён» (даже если это 0) — чтобы счёт с нулём не просил ввод снова
+// Отметка «начальный остаток введён» (даже если это 0) — чтобы счет с нулём не просил ввод снова
 const INIT_DONE_KEY = 'atlaspos_init_done';
 const getInitDone = () => { try { return JSON.parse(localStorage.getItem(INIT_DONE_KEY) || '[]'); } catch(e) { return []; } };
 const setInitDoneId = (id) => { const l = getInitDone(); if (id != null && !l.includes(String(id))) { l.push(String(id)); localStorage.setItem(INIT_DONE_KEY, JSON.stringify(l)); } };
@@ -192,7 +192,7 @@ export default function Accounts() {
     setPendingDeleteAc(null);
   };
 
-  // Счёт, которому ещё не ввели начальный остаток (баланс 0 и нет отметки о вводе)
+  // Счет, которому ещё не ввели начальный остаток (баланс 0 и нет отметки о вводе)
   var notInit = (a) => parseFloat(a.balance) === 0 && !isInitDone(a.id);
 
   var saveInit = async (e) => {
@@ -200,7 +200,7 @@ export default function Accounts() {
     try {
       var anyQueued = false;
       // Считаем введённым только то, что реально заполнено: «0» — это введённый ноль,
-      // пустое поле — предприниматель ничего не вводил (счёт остаётся невведённым)
+      // пустое поле — предприниматель ничего не вводил (счет остаётся невведённым)
       for (var ac of accounts) {
         if (parseFloat(ac.balance) !== 0 || isInitDone(ac.id)) continue;
         var raw = initAmts[ac.id];
@@ -211,7 +211,7 @@ export default function Accounts() {
         if (r.queued) anyQueued = true;
         setInitDoneId(ac.id);
       }
-      // Новые счета из модалки — каждый добавляется строкой «+ Добавить счёт»
+      // Новые счета из модалки — каждый добавляется строкой «+ Добавить счет»
       for (var na of newAccs) {
         if (na.name && na.name.trim()) {
           var ir = await supabase.from('accounts').insert({user_id:user.id, name:na.name.trim(), type:na.type||'custom', balance:parseFloat(na.amt)||0, description:(na.desc||'').trim() || null}).select();
@@ -243,20 +243,20 @@ export default function Accounts() {
             <h1>Счета</h1>
             <SectionHelp
               title="Раздел «Счета»"
-              intro="Счета — где лежат деньги бизнеса: наличные, кассовый ящик, карты, банковские счета. Здесь виден общий баланс, остаток по каждому счёту и история движений."
+              intro="Счета — где лежат деньги бизнеса: наличные, кассовый ящик, карты, банковские счета. Здесь виден общий баланс, остаток по каждому счету и история движений."
               blocks={[
                 { title: 'Плашки балансов', items: [
-                  <>Белые плашки — баланс каждого счёта (начальный остаток + все операции). Жёлтая плашка в конце — <b>общий баланс</b> по всем счетам.</>,
+                  <>Белые плашки — баланс каждого счета (начальный остаток + все операции). Жёлтая плашка в конце — <b>общий баланс</b> по всем счетам.</>,
                 ]},
                 { title: 'Действия над счетами', items: [
                   <><b>Начальные остатки</b> — деньги, которые уже были у бизнеса до начала учёта (например, прибыль прошлых месяцев). В прибыль не попадают.</>,
-                  <><b>Корректировка</b> — исправить остаток на счёте. Баланс не может уйти в минус.</>,
-                  <><b>Инкассация</b> — изъять наличные из кассового ящика и зачислить на другой счёт.</>,
-                  <><b>Перевод между счетами</b> — переместить средства со счёта на счёт.</>,
+                  <><b>Корректировка</b> — исправить остаток на счете. Баланс не может уйти в минус.</>,
+                  <><b>Инкассация</b> — изъять наличные из кассового ящика и зачислить на другой счет.</>,
+                  <><b>Перевод между счетами</b> — переместить средства со счета на счет.</>,
                 ]},
                 { title: 'Таблица счетов', items: [
-                  <><b>Начальный остаток</b> — баланс счёта на старте учёта.</>,
-                  <><b>Поступления / Расходы</b> — движения по счёту (кроме переводов между своими счетами и инкассации, чтобы не считать одни и те же деньги дважды). Взносы своих денег владельца здесь видны как поступления, но в прибыль не попадают.</>,
+                  <><b>Начальный остаток</b> — баланс счета на старте учёта.</>,
+                  <><b>Поступления / Расходы</b> — движения по счету (кроме переводов между своими счетами и инкассации, чтобы не считать одни и те же деньги дважды). Взносы своих денег владельца здесь видны как поступления, но в прибыль не попадают.</>,
                   <><b>Баланс</b> — текущий остаток (начальный + поступления − расходы). Клик по строке — история операций.</>,
                 ]},
               ]}
@@ -292,7 +292,7 @@ export default function Accounts() {
 
       {!loading && initDone && (
         <>
-          {/* Балансы по каждому счёту + общий баланс последней плашкой (дизайн как в Остатках) */}
+          {/* Балансы по каждому счету + общий баланс последней плашкой (дизайн как в Остатках) */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'8px',marginBottom:'.5rem'}}>
             {sorted.map(a => {
               const bal = (parseFloat(a.balance)||0) + (balById[a.id]||0);
@@ -312,7 +312,7 @@ export default function Accounts() {
             <table className="data-table">
               <thead id="colHeaders">
                 <tr>
-                  <th style={{textAlign:'left'}}>Счёт</th>
+                  <th style={{textAlign:'left'}}>Счет</th>
                   <th style={{textAlign:'left'}}>Начальный остаток</th>
                   <th style={{textAlign:'left'}}>Поступления</th>
                   <th style={{textAlign:'left'}}>Расходы</th>
@@ -386,7 +386,7 @@ export default function Accounts() {
               </div>
               {!editingId && (
                 <div className="form-group">
-                  <label>Тип счёта</label>
+                  <label>Тип счета</label>
                   <select value={modalType} onChange={e=>setModalType(e.target.value)}>
                     {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                   </select>
@@ -406,7 +406,7 @@ export default function Accounts() {
 
       <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
             <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: баланс не может уйти в минус
-              if(corType==='expense'){var cb=getBal(ac);if(amt>cb)return alert('На счёте «'+ac.name+'» недостаточно средств (доступно '+Math.round(cb).toLocaleString()+' '+cur+'). Баланс не может уйти в минус — выберите другой счёт или сначала пополните этот.');}
+              if(corType==='expense'){var cb=getBal(ac);if(amt>cb)return alert('На счете «'+ac.name+'» недостаточно средств (доступно '+Math.round(cb).toLocaleString()+' '+cur+'). Баланс не может уйти в минус — выберите другой счет или сначала пополните этот.');}
               await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
               <div className="form-group">
                 <label>Счет</label>
@@ -435,7 +435,7 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(notInit).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(notInit).length ? "Введите балансы счетов. Если на счету ноль — оставьте 0 и нажмите «Сохранить»: это тоже нормально" : "Все начальные остатки уже внесены. Изменить баланс счёта можно через «Корректировку»"} width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(notInit).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(notInit).length ? "Введите балансы счетов. Если на счету ноль — оставьте 0 и нажмите «Сохранить»: это тоже нормально" : "Все начальные остатки уже внесены. Изменить баланс счета можно через «Корректировку»"} width="medium">
             <form onSubmit={saveInit}>
               {sorted.filter(notInit).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
@@ -457,14 +457,14 @@ export default function Accounts() {
                   <label style={{margin:0}}>Новые счета</label>
                   <button type="button" onClick={()=>setNewAccs([...newAccs, {name:'',amt:'',desc:'',type:'custom'}])}
                     style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,fontFamily:'inherit',fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',lineHeight:1,fontWeight:400}}>
-                    + Добавить счёт
+                    + Добавить счет
                   </button>
                 </div>
                 {newAccs.map(function(na, idx){
                   return (
                     <div key={idx} style={{padding:'.5rem 0',borderTop:'1px solid var(--border)'}}>
                       <div style={{display:'flex',gap:'.5rem'}}>
-                        <input placeholder="Название счёта" value={na.name} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],name:e.target.value};setNewAccs(r);}} style={{flex:1}} />
+                        <input placeholder="Название счета" value={na.name} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],name:e.target.value};setNewAccs(r);}} style={{flex:1}} />
                         <input type="number" placeholder="Остаток" min="0" step="0.01" value={na.amt} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],amt:e.target.value};setNewAccs(r);}} style={{width:'100px'}} />
                         <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
                       </div>
@@ -476,7 +476,7 @@ export default function Accounts() {
                   );
                 })}
                 {newAccs.length === 0 && (
-                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Нажмите «+ Добавить счёт», чтобы завести ещё один. Все счета сохранятся кнопкой «Сохранить».</div>
+                  <div style={{fontSize:'.78rem',color:'var(--muted)'}}>Нажмите «+ Добавить счет», чтобы завести ещё один. Все счета сохранятся кнопкой «Сохранить».</div>
                 )}
               </div>
               )}
@@ -568,7 +568,7 @@ export default function Accounts() {
         }
         var otherAccs = accounts.filter(function(a){return a.id !== cashRegAc?.id;});
         if (!cashRegAc) return (<>
-              <div style={{padding:'1rem 0',fontSize:'.85rem',color:'var(--muted)'}}>Счёт «Кассовый ящик» не найден. Обновите страницу — он создастся автоматически.</div>
+              <div style={{padding:'1rem 0',fontSize:'.85rem',color:'var(--muted)'}}>Счет «Кассовый ящик» не найден. Обновите страницу — он создастся автоматически.</div>
               <div className="modal-actions"><button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Закрыть</button></div>
         </>);
         return (<>
@@ -581,9 +581,9 @@ export default function Accounts() {
                 var amt = parseFloat(colAmt);
                 if (!amt || amt <= 0) return alert('Введите сумму');
                 if (amt > cashRegBal) return alert('Недостаточно средств в кассе. Баланс: ' + cashRegBal.toLocaleString() + ' ₽');
-                if (!colTo) return alert('Выберите счёт получателя');
+                if (!colTo) return alert('Выберите счет получателя');
                 var toAc = accounts.find(a => a.id === colTo);
-                if (!toAc) return alert('Счёт не найден');
+                if (!toAc) return alert('Счет не найден');
                 try {
                   // Категория «Инкассация»
                   var colCatId = null;
@@ -593,7 +593,7 @@ export default function Accounts() {
                     var { data: newCat } = await supabase.from('categories').insert({user_id:user.id,name:'Инкассация',type:'expense'}).select('id').maybeSingle();
                     if (newCat) colCatId = newCat.id;
                   }
-                  // Расход с Кассы + доход на выбранный счёт
+                  // Расход с Кассы + доход на выбранный счет
                   var tid = Date.now();
                   await supabase.from('transactions').insert([
                     {user_id:user.id,account_id:cashRegAc.id,type:'expense',amount:amt,description:'Инкассация из кассового ящика',date:new Date().toISOString().split('T')[0],category_id:colCatId,kind:'collection',transfer_id:tid},
@@ -609,7 +609,7 @@ export default function Accounts() {
                 </div>
                 <div className="form-group">
                   <label>Куда зачислить</label>
-                  <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счёт —" />
+                  <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
                 </div>
                 <div className="modal-actions">
                   <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
@@ -624,7 +624,7 @@ export default function Accounts() {
   );
 }
 
-// Выбор счёта — раскрытый список карточек, как в модалке «С какого счета списать?» (Доходы и расходы)
+// Выбор счета — раскрытый список карточек, как в модалке «С какого счета списать?» (Доходы и расходы)
 function AcctPick({ accounts, value, onChange, cur, balOf, placeholder }) {
   const list = accounts || [];
   return (
