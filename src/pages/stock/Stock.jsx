@@ -529,6 +529,12 @@ export default function Stock() {
                 style={{border:'none',outline:'none',width:'110px',fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
             </div>
 
+            <div style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.25rem .5rem .35rem',borderBottom:'1px solid var(--border)'}}>
+              <span style={{flex:1,fontSize:'.68rem',color:'var(--muted)'}}>Товар</span>
+              <span style={{width:'65px',textAlign:'center',fontSize:'.68rem',color:'var(--muted)'}}>Кол-во</span>
+              <span style={{width:'80px',textAlign:'center',fontSize:'.68rem',color:'var(--muted)'}}>Цена закупа</span>
+            </div>
+
             <div style={{overflowY:'auto',flex:1}}>
               {filteredProducts.length === 0 ? (
                 <p style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.82rem'}}>Товары не найдены</p>
@@ -538,11 +544,11 @@ export default function Stock() {
                   {p.sku && <span style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku}</span>}
                   <input type="number" min="0" value={initQty[p.id] || ''}
                     onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder="0"
+                    placeholder=""
                     style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                   <input type="number" min="0" value={initCost[p.id] || ''}
                     onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder="Закупка"
+                    placeholder=""
                     style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                 </div>
               ))}
