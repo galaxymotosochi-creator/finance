@@ -167,8 +167,8 @@ export default function Positions() {
 
   const getSectionMeta = (id) => ALL_SECTIONS.find(s => s.id === id);
 
-  const formatPermissions = (p) => {
-    if (!p.permissions || p.permissions.length === 0) return 'Нет доступов';
+  const permLabels = (p) => {
+    if (!p.permissions || p.permissions.length === 0) return [];
     return p.permissions.map(permId => {
       const sec = getSectionMeta(permId);
       if (sec) return sec.label;
@@ -179,8 +179,16 @@ export default function Positions() {
         return (parent.label + ' → ' + (child ? child.label : permId.split('.')[1]));
       }
       return permId;
-    }).join(', ');
+    });
   };
+
+  const formatPermissions = (p) => {
+    const ls = permLabels(p);
+    if (ls.length === 0) return 'Нет доступов';
+    return ls.length > 5 ? ls.slice(0, 5).join(', ') + ', …' : ls.join(', ');
+  };
+
+  const fullPermissions = (p) => permLabels(p).join(', ');
 
   const renderSectionToggle = (section) => {
     const isParentOn = fPermissions.includes(section.id);
@@ -251,10 +259,12 @@ export default function Positions() {
             <tbody>
               {positions.map(p => (
                 <tr key={p.id}>
-                  <td style={{textAlign:'left',paddingLeft:0,color:'#555'}}>
+                  <td style={{textAlign:'left',paddingLeft:0,color:'#222'}}>
                     <span className="prod-name">{p.name}{p.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span>
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{formatPermissions(p)}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>
+                    {permLabels(p).length === 0 ? 'Нет доступов' : <span title={fullPermissions(p)} style={{cursor:'help'}}>{formatPermissions(p)}</span>}
+                  </td>
                   <td style={{whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {

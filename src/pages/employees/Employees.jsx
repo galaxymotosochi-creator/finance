@@ -442,7 +442,7 @@ export default function Employees() {
         <table className="data-table">
           <thead id="colHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
-            <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Принят</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Оклад</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>С продаж</th><th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
+            <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>С продаж</th><th style={{textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
@@ -452,8 +452,8 @@ export default function Employees() {
               const pos = getPosition(emp.position_id);
               return (
                 <tr key={emp.id}>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>
-                    <div className="prod-name" style={{color:'#555'}}>{emp.name}{emp.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
+                    <div className="prod-name" style={{color:'#222'}}>{emp.name}{emp.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div>
                     {debts.filter(d => d.employee_id === emp.id).length > 0 && (
                       <div style={{fontSize:'.72rem',color:'#dc2626',fontWeight:600,marginTop:'.15rem'}}>
                         Долг: {debts.filter(d => d.employee_id === emp.id).reduce((s, d) => s + (parseFloat(d.amount)||0), 0).toLocaleString()} ₽
@@ -461,12 +461,12 @@ export default function Employees() {
                     )}
                     {emp.status === 'inactive' && <span>Уволен</span>}
                   </td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{pos ? pos.name : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{emp.phone || '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{emp.email || '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{fmtDate(emp.hire_date)}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{getRulesSummary(emp)}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{emp.phone || '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{emp.email || '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{fmtDate(emp.hire_date)}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{emp.base_salary ? Number(emp.base_salary).toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{getRulesSummary(emp)}</td>
                   <td style={{textAlign:'left',color:'#555',fontWeight:600,letterSpacing:1}}>{emp.pin || '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">

@@ -148,9 +148,9 @@ export default function Categories() {
         <table className="data-table" style={{minWidth:'500px'}}>
           <thead id="catColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Тип</th>
-              <th style={{width:'130px',textAlign:'left'}}></th>
+              <th>Название</th>
+              <th>Тип</th>
+              <th style={{width:'130px'}}></th>
             </tr>
           </thead>
           <tbody id="catTableBody">

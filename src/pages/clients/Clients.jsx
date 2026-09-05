@@ -205,18 +205,18 @@ export default function Clients() {
                     </div>
                     <div className="prod-sku">{c.email || ''}</div>
                   </td>
-                  <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
-                  <td style={{color:'#555',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{c.phone || '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>
+                  <td style={{color:'#222',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n1||'—'}catch(e){return '—'}})()}</td>
+                  <td style={{color:'#222',textAlign:'left',fontSize:'.75rem'}}>{(()=>{try{const j=JSON.parse(c.comment||'{}');return j.n2||'—'}catch(e){return '—'}})()}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{c.phone || '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>
                     {c.birthday ? (
                       <span>{fmtDate(c.birthday)}{isBday && ' 🎉'}</span>
                     ) : '—'}
                   </td>
-                  <td style={{textAlign:'left',color:'#555'}}>{st.checks > 0 ? st.checks : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{st.checks > 0 ? st.checks : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{avg > 0 ? avg.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{st.total > 0 ? st.total.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{c.debt && c.debt < 0 ? c.debt.toLocaleString()+' ₽' : '—'}</td>
                   <td style={{textAlign:'left'}}>{(() => {
                     const mode = c.loyalty_mode || 'auto';
                     const points = Number(c.points) || 0;

@@ -447,11 +447,11 @@ export default function Inventory() {
             <div className="product-table" style={{overflowX:'auto'}}>
               <table className="data-table">
                 <thead id="colHeaders"><tr>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Товар</th>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Остаток</th>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Факт</th>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Разница</th>
-                  <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
+                  <th style={{textAlign:'left'}}>Товар</th>
+                  <th style={{textAlign:'left'}}>Остаток</th>
+                  <th style={{textAlign:'left'}}>Факт</th>
+                  <th style={{textAlign:'left'}}>Разница</th>
+                  <th style={{textAlign:'left'}}>Сумма</th>
                 </tr></thead>
                 <tbody>
                   {doc.items.map((it,i)=>{
@@ -475,10 +475,10 @@ export default function Inventory() {
         <table className="data-table">
           <thead id="invColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>№</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Дата</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Расхождений</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Результат</th>
+              <th style={{textAlign:'left'}}>№</th>
+              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left'}}>Расхождений</th>
+              <th style={{textAlign:'left'}}>Результат</th>
               <th style={{width:'130px'}}></th>
             </tr>
           </thead>

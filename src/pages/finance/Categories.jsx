@@ -131,9 +131,9 @@ export default function Categories() {
         <table className="data-table">
           <thead id="dirColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',width:'100%'}}>Название</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left',whiteSpace:'nowrap'}}>Тип категории</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'center',width:'30px'}}></th>
+              <th>Название</th>
+              <th>Тип категории</th>
+              <th style={{width:'30px'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">

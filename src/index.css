@@ -331,10 +331,10 @@ body {
 #colHeaders th, #dirColHeaders th, #catColHeaders th, #clientColHeaders th,
 #invColHeaders th, #woColHeaders th, #salaryColHeaders th, #supColHeaders th,
 #supplyColHeaders th, #stockColHeaders th {
-  font-size: .68rem; font-weight: 500; color: var(--muted);
-  text-transform: uppercase; padding: .5rem .4rem;
-  white-space: nowrap; border-bottom: 1.5px solid var(--border);
-  background: transparent; text-align: center;
+  font-size: .72rem; font-weight: 600; color: #888;
+  text-transform: none; padding: .5rem .5rem;
+  white-space: nowrap; border-bottom: 1.5px solid rgba(0,0,0,.12);
+  background: transparent; text-align: left;
 }
 #colHeaders th:first-child, #dirColHeaders th:first-child, #catColHeaders th:first-child,
 #clientColHeaders th:first-child, #invColHeaders th:first-child, #woColHeaders th:first-child,

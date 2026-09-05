@@ -111,12 +111,12 @@ export default function Suppliers() {
         <table className="data-table">
           <thead id="supColHeaders">
             <tr>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Название</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Контакт</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Телефон</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Способ связи</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Поставок</th>
-              <th style={{color:'#222',fontWeight:400,fontSize:'.78rem',textAlign:'left'}}>Сумма</th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Контакт</th>
+              <th style={{textAlign:'left'}}>Телефон</th>
+              <th style={{textAlign:'left'}}>Способ связи</th>
+              <th style={{textAlign:'left'}}>Поставок</th>
+              <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
@@ -132,11 +132,11 @@ export default function Suppliers() {
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.contact||'—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{s.phone||'—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}><span className="prod-cat">{label}</span></td>
-                  <td style={{textAlign:'left',color:'#555'}}>{supplyCount}</td>
-                  <td style={{textAlign:'left',color:'#555'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.contact||'—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{s.phone||'—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}><span className="prod-cat">{label}</span></td>
+                  <td style={{textAlign:'left',color:'#222'}}>{supplyCount}</td>
+                  <td style={{textAlign:'left',color:'#222'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="act-btn prod-more-btn" onClick={(e) => {
