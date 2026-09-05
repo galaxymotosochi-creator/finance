@@ -248,11 +248,6 @@ export default function Accounts() {
                 { title: 'Плашки балансов', items: [
                   <>Белые плашки — баланс каждого счёта (начальный остаток + все операции). Жёлтая плашка в конце — <b>общий баланс</b> по всем счетам.</>,
                 ]},
-                { title: '«Свои деньги владельца»', items: [
-                  <>Личные средства владельца, вложенные в бизнес. Не считаются доходом и не влияют на прибыль.</>,
-                  <><b>Взнос / вывод</b> оформляется через транзакцию — в разделе «Транзакции» пункт «Взнос / вывод своих денег».</>,
-                  <><b>Сейчас в бизнесе</b> — сколько из вложенного ещё в деле (внесено − выведено).</>,
-                ]},
                 { title: 'Действия над счетами', items: [
                   <><b>Начальные остатки</b> — деньги, которые уже были у бизнеса до начала учёта (например, прибыль прошлых месяцев). В прибыль не попадают.</>,
                   <><b>Корректировка</b> — исправить остаток на счёте. Баланс не может уйти в минус.</>,
@@ -313,19 +308,6 @@ export default function Accounts() {
               <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{(total||0).toLocaleString()} {cur}</div>
             </div>
           </div>
-          {/* Свои деньги владельца — отдельная плашка */}
-          {(()=>{
-            var oIn=0,oOut=0;
-            (transactions||[]).forEach(function(t){if(t.kind==='owner_deposit')oIn+=Number(t.amount||0);else if(t.kind==='owner_withdraw')oOut+=Number(t.amount||0);});
-            if(oIn===0&&oOut===0){(transactions||[]).forEach(function(t){var dd=t.description||'';if(dd.startsWith('Взнос своих денег'))oIn+=Number(t.amount||0);else if(dd.startsWith('Вывод своих денег'))oOut+=Number(t.amount||0);});}
-            return (
-              <div style={{display:'inline-flex',alignItems:'center',gap:'1.1rem',marginBottom:'1rem',padding:'.7rem 1rem',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'12px',boxShadow:'0 1px 3px rgba(0,0,0,.05)',flexWrap:'wrap',alignSelf:'flex-start'}}>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
-              </div>
-            );
-          })()}
           <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table className="data-table">
               <thead id="colHeaders">
