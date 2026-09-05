@@ -60,6 +60,7 @@ export default function Transactions() {
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
   const [showTransfer, setShowTransfer] = useState(false);
+  const [ddOpen, setDdOpen] = useState(false);
   const [showOwner, setShowOwner] = useState(false);
   const [ownerMode, setOwnerMode] = useState('deposit');
   const [ownerAcct, setOwnerAcct] = useState('');
@@ -337,18 +338,41 @@ export default function Transactions() {
           <h1>Доходы и расходы</h1>
           <div className="sub">Поступления, списания и переводы между счетами</div>
         </div>
-        <div className="page-actions" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
-          <button className="btn btn-dark" onClick={function(){setEditingId(null);setIncName('');setIncAmount('');setIncDate(new Date().toISOString().split('T')[0]);setIncCategory('');setExpName('');setExpAmount('');setExpDate(new Date().toISOString().split('T')[0]);setExpCategory('');setShowIncome(true)}} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Операция</button>
-          <button type="button" onClick={function(){setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}
-            style={{display:'inline-flex',alignItems:'center',gap:'.45rem',padding:'.28rem .8rem .28rem .28rem',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap',transition:'all .12s'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}>
-            <span style={{width:'26px',height:'26px',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'13px',flexShrink:0}}>⇄</span>Перевод
-          </button>
-          <button type="button" onClick={function(){setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-            style={{display:'inline-flex',alignItems:'center',gap:'.45rem',padding:'.28rem .8rem .28rem .28rem',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap',transition:'all .12s'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}>
-            <span style={{width:'26px',height:'26px',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'13px',flexShrink:0}}>💼</span>Свои средства
-          </button>
+        <div className="page-actions">
+          <div style={{position:'relative',display:'inline-block'}}>
+            <button className="btn btn-dark" onClick={function(){setDdOpen(!ddOpen)}} style={{padding:'.5rem .9rem',fontWeight:600,display:'inline-flex',alignItems:'center',gap:'.35rem'}}>+ Операция <span style={{fontSize:'9px',lineHeight:1}}>▾</span></button>
+            {ddOpen && (
+              <div>
+                <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:75}} onClick={function(){setDdOpen(false)}} />
+                <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,background:'#fff',borderRadius:'16px',boxShadow:'0 14px 40px rgba(0,0,0,.16)',padding:'7px',minWidth:'280px',zIndex:76}}>
+                  <button type="button" onClick={function(){setDdOpen(false);setEditingId(null);resetForms();setShowExpense(true)}}
+                    style={{display:'flex',alignItems:'center',gap:'.65rem',padding:'.55rem .65rem',borderRadius:'11px',cursor:'pointer',width:'100%',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
+                    <span style={{width:'34px',height:'34px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:'#fef2f2',flexShrink:0}}>➖</span>
+                    <span><span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Добавить расход</span><span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Списание средств</span></span>
+                  </button>
+                  <button type="button" onClick={function(){setDdOpen(false);setEditingId(null);resetForms();setShowIncome(true)}}
+                    style={{display:'flex',alignItems:'center',gap:'.65rem',padding:'.55rem .65rem',borderRadius:'11px',cursor:'pointer',width:'100%',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
+                    <span style={{width:'34px',height:'34px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',flexShrink:0}}>➕</span>
+                    <span><span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Добавить доход</span><span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Поступление средств</span></span>
+                  </button>
+                  <button type="button" onClick={function(){setDdOpen(false);setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}
+                    style={{display:'flex',alignItems:'center',gap:'.65rem',padding:'.55rem .65rem',borderRadius:'11px',cursor:'pointer',width:'100%',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
+                    <span style={{width:'34px',height:'34px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',flexShrink:0}}>⇄</span>
+                    <span><span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Перевод между счетами</span><span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Перемещение средств</span></span>
+                  </button>
+                  <button type="button" onClick={function(){setDdOpen(false);setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+                    style={{display:'flex',alignItems:'center',gap:'.65rem',padding:'.55rem .65rem',borderRadius:'11px',cursor:'pointer',width:'100%',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
+                    <span style={{width:'34px',height:'34px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',flexShrink:0}}>💼</span>
+                    <span><span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Взнос / вывод своих денег</span><span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Личные деньги владельца</span></span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
