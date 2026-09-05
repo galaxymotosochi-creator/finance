@@ -188,53 +188,9 @@ app.post('/api/auth/reset-password', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Вход через Яндекс
-const YANDEX_CLIENT_ID = 'a61e2a767f724e368cbcab159c66a941';
-const YANDEX_SECRET = '6f5dc8d0cc4b4db6ac51cf9efaad24c9';
-
+// Вход через Яндекс — ОТКЛЮЧЁН (указание Дениса 05.09.2026)
 app.post('/api/auth/yandex/login', async (req, res) => {
-  try {
-    const { code } = req.body;
-    if (!code) return res.status(400).json({ error: 'No code' });
-
-    // Обмениваем code на токен
-    const tokenRes = await fetch('https://oauth.yandex.ru/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: YANDEX_CLIENT_ID,
-        client_secret: YANDEX_SECRET,
-        code,
-        grant_type: 'authorization_code',
-      }),
-    });
-    const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) return res.status(400).json({ error: 'Token exchange failed' });
-
-    // Получаем email пользователя
-    const userRes = await fetch('https://login.yandex.ru/info?format=json', {
-      headers: { 'Authorization': 'Bearer ' + tokenData.access_token },
-    });
-    const userData = await userRes.json();
-    const email = userData.default_email;
-    if (!email) return res.status(400).json({ error: 'Email not provided' });
-
-    // Ищем или создаём пользователя
-    let { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    let user;
-    const name = userData.real_name || userData.display_name || email.split('@')[0];
-    if (!rows.length) {
-      const id = uuidv4();
-      await pool.query('INSERT INTO users (id, email, password_hash, name, created_at) VALUES ($1, $2, \'\', $3, NOW())',
-        [id, email, name]);
-      user = { id, email, name };
-    } else {
-      user = { id: rows[0].id, email: rows[0].email, name: rows[0].name };
-    }
-
-    const token = jwt.sign({ user_id: user.id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  return res.status(410).json({ error: 'Вход через Яндекс отключён' });
 });
 
 // Приглашение сотрудника (создание учётной записи)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -13,39 +13,6 @@ export default function Login() {
   const [resetLoading, setResetLoading] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
-  const [mailruLoading, setMailruLoading] = useState(false);
-
-  // Обработка code от Mail.ru
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    if (code) {
-      setMailruLoading(true);
-      setError('');
-      window.history.replaceState({}, '', '/login');
-
-      fetch('/api/auth/yandex/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      })
-        .then(r => r.json())
-        .then(data => {
-          if (data.token) {
-            const session = {
-              access_token: data.token, token_type: 'bearer',
-              user: { id: data.user.id, email: data.user.email, user_metadata: {} },
-            };
-            localStorage.setItem('atlaspos_session', JSON.stringify(session));
-            window.location.href = '/';
-          } else {
-            setError('Ошибка входа через Mail.ru');
-            setMailruLoading(false);
-          }
-        })
-        .catch(() => { setError('Ошибка соединения'); setMailruLoading(false); });
-    }
-  }, []);
 
   if (user) {
     return null;
@@ -176,21 +143,6 @@ export default function Login() {
                 Забыли пароль?
               </button>
             </div>
-
-            <div style={{textAlign:'center',marginTop:'.5rem',color:'var(--muted)',fontSize:'.75rem',lineHeight:1}}>или</div>
-
-            <button
-              type="button"
-              onClick={() => { window.location.href = 'https://oauth.yandex.ru/authorize?response_type=code&client_id=a61e2a767f724e368cbcab159c66a941&redirect_uri=https://atlaspos.ru/receiver.html'; }}
-              style={{
-                width:'100%',padding:'.7rem',borderRadius:'8px',border:'1px solid #000',
-                background:'#000',cursor:'pointer',fontSize:'.85rem',fontWeight:500,
-                color:'#fff',fontFamily:'inherit',display:'flex',alignItems:'center',
-                justifyContent:'center',gap:'6px',marginTop:'.5rem'
-              }}
-            >
-              <span style={{display:'inline-flex',width:'22px',height:'22px',borderRadius:'50%',background:'#fc3f1d',color:'#fff',alignItems:'center',justifyContent:'center',fontSize:'.9rem',fontWeight:700}}>Я</span> Войти с Яндекс ID
-            </button>
           </form>
         )}
       </div>
