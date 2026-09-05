@@ -44,7 +44,7 @@ function calcDays(from,to){
   return Math.round((new Date(to)-new Date(from))/(1000*60*60*24))+1;
 }
 
-const fmtDate = (ds) => { if(!ds) return ''; var p=ds.split('-'); return p.length===3?p[2]+'.'+p[1]:ds; };
+const fmtDate = (ds) => { if(!ds) return ''; var d=String(ds).split('T')[0]; var p=d.split('-'); return p.length===3?p[2]+'.'+p[1]:d; };
 
 // Бонус за позицию по правилам сотрудника (приоритет: позиция → категория → тип)
 function calcSalesBonus(rules, row, prods, cats) {
@@ -89,6 +89,7 @@ export default function Salary() {
   const [editId, setEditId] = useState(null);
   const [showAcc, setShowAcc] = useState(false);
   const [pendingPayId, setPendingPayId] = useState(null);
+  const [payAcctId, setPayAcctId] = useState(''); // выбранный счет в модалке выплаты
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
@@ -476,7 +477,7 @@ export default function Salary() {
       }
       const { error: updErr, queued: payQueued } = await supabase.from('salary').update({ status: 'paid', paid_at: payDate }).eq('id', pendingPayId);
       if (updErr) throw updErr;
-      if (!payQueued) await load(); setShowAcc(false); setPendingPayId(null); setSalarySplitMode(false); setSalarySplitAmounts({});
+      if (!payQueued) await load(); setShowAcc(false); setPendingPayId(null); setPayAcctId(''); setSalarySplitMode(false); setSalarySplitAmounts({});
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
 
@@ -492,7 +493,7 @@ export default function Salary() {
     return surname + ' ' + initials;
   };
 
-  const fmtD = (d) => { if(!d) return '—'; var p=d.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0].slice(2):d; };
+  const fmtD = (d) => { if(!d) return '—'; var d0=String(d).split('T')[0]; var p=d0.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:d0; };
 
   return (
     <>
@@ -524,7 +525,7 @@ export default function Salary() {
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
                 <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{Number(s.amount).toLocaleString()} {cur}</td>
                 <td style={{textAlign:'left',color:'#222'}}>{(s.status==='pending'||s.status==='accrued')
-                  ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
+                  ? <span onClick={()=>{setPendingPayId(s.id);setPayAcctId('');setShowAcc(true)}}
                       style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплатить</span>
                   : s.status==='paid'
                     ? <span style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплачено</span>
@@ -860,39 +861,48 @@ export default function Salary() {
       </Modal>
 
       {/* МОДАЛКА ВЫБОРА СЧЕТА */}
-      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null)}} title="Выплата зарплаты" subtitle="Выберите счет для выплаты" width="medium">
+      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}} title="Выплата зарплаты" subtitle="Выберите счет для выплаты" width="medium">
         {(()=>{
         const accsList = accs.filter(a => a.type !== 'credit');
+        const ps = list.find(x => String(x.id) === String(pendingPayId));
+        const payTotal = ps ? Number(ps.amount || 0) : 0;
         return (<>
-              <div style={{display:'flex',flexDirection:'column',gap:'.35rem',marginTop:'.25rem'}}>
-                {accsList.length === 0 && <div style={{padding:'.5rem',fontSize:'.82rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
-                {!salarySplitMode ? accsList.map(a => (
-                  <div key={a.id} onClick={()=>confirmPay(a.id)}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.65rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:'var(--body-bg)',border:'1.5px solid var(--border)',fontSize:'.82rem',transition:'background .12s,border-color .12s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='var(--secondary-light)';e.currentTarget.style.borderColor='var(--secondary)'}}
-                    onMouseLeave={e=>{e.currentTarget.style.background='var(--body-bg)';e.currentTarget.style.borderColor='var(--border)'}}>
-                    <span style={{fontWeight:500}}>{a.name}</span>
-                    <span style={{marginLeft:'auto',color:'#111'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
+              <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+                {accsList.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
+                {!salarySplitMode ? accsList.map(a => {
+                  const sel = String(a.id) === String(payAcctId);
+                  return (
+                  <div key={a.id} onClick={()=>setPayAcctId(a.id)}
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1px solid '+(sel?'#ffdd2d':'#e8e8ec')}}>
+                    <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                    <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                   </div>
-                )) : accsList.map(a => (
+                  );
+                }) : accsList.map(a => (
                   <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
-                    <span style={{flex:1,fontSize:'.8rem',fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:'.72rem',color:'var(--muted)'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
+                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222'}}>{a.name}</span>
+                    <span style={{fontSize:'.75rem',color:'#888'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                     <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
-                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid #e8e8ec',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
                   </div>
                 ))}
                 {accsList.length > 1 && (
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed var(--secondary)',fontSize:'.78rem',color:'var(--secondary)',fontWeight:600,transition:'background .12s',marginTop:'.15rem'}}
-                    onClick={()=>{if(!salarySplitMode){var amt=Math.round((grandTotal||0)/accsList.length);var total=grandTotal||0;var sa={};accsList.forEach(function(a,i){sa[a.id]=i<accsList.length-1?amt:total-amt*(accsList.length-1)});setSalarySplitAmounts(sa)};setSalarySplitMode(!salarySplitMode)}}
-                    onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    {salarySplitMode ? '+Разделить' : '+Разделить'}
-                  </div>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed #cfcfd6',fontSize:'.78rem',color:'#888',fontWeight:600,transition:'background .12s',marginTop:'.15rem'}}
+                    onClick={()=>{if(!salarySplitMode){var amt=Math.round((payTotal||0)/accsList.length);var total=payTotal||0;var sa={};accsList.forEach(function(a,i){sa[a.id]=i<accsList.length-1?amt:total-amt*(accsList.length-1)});setSalarySplitAmounts(sa)};setSalarySplitMode(!salarySplitMode);setPayAcctId('')}}>{salarySplitMode ? '− Не разделять' : '+ Разделить на несколько счетов'}</div>
                 )}
-                {salarySplitMode && (
+              </div>
+              <div className="modal-actions">
+                {salarySplitMode ? (
                   <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                    style={{padding:'.45rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--primary)',color:'var(--primary-text)',fontFamily:'var(--font)',display:'block',margin:'.15rem auto 0'}}>Подтвердить разделение</button>
+                    style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#000'}}
+                    onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>Подтвердить разделение</button>
+                ) : (
+                  <button onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}
+                    style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background='#000'}}
+                    onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>Выплатить {payTotal ? payTotal.toLocaleString() + ' ' + cur : ''}</button>
                 )}
               </div>
         </>
