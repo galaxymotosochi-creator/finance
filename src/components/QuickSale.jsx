@@ -192,14 +192,15 @@ export default function QuickSale({ onClose }) {
     const { count } = await supabase.from('receipts').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
     let receiptNum = (count || 0) + 1;
 
-    // Определяем статус чека
-    var receiptStatus = 'paid';
-    if (payUnpaid) receiptStatus = 'unpaid';
-    else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total) receiptStatus = 'partially_paid';
-
-    // Лояльность: скидка по программе клиента
+    // Лояльность: скидка по программе клиента (считаем ДО статуса — итог к оплате со скидкой)
     const loyaltyDiscountAmount = loyaltyPct > 0 ? Math.round(total * loyaltyPct / 100) : 0;
     const finalTotal = Math.max(0, total - loyaltyDiscountAmount);
+
+    // Определяем статус чека (сравниваем с итогом ПОСЛЕ скидки — иначе полная оплата
+    // со скидкой считалась бы частичной → «Долг 0 ₽» вместо «Оплачено»)
+    var receiptStatus = 'paid';
+    if (payUnpaid) receiptStatus = 'unpaid';
+    else if (payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < finalTotal) receiptStatus = 'partially_paid';
 
     // Начисление баллов (1 {cur} = 1 балл) — считаем до создания чека, чтобы записать в чек
     const bonusProgQS = (loyaltyPrograms || []).find(p => p.type === 'bonus');
@@ -245,7 +246,7 @@ export default function QuickSale({ onClose }) {
 
     if (payUnpaid) {
       const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: total,
+        user_id: user.id, type: 'income', amount: finalTotal,
         description: 'Продажа по чеку №' + receiptNum,
         date, status: 'unpaid', category_id: saleCatId,
       });
@@ -262,25 +263,25 @@ export default function QuickSale({ onClose }) {
     if (selectedAc && selectedAc.type === 'cash') {
       targetAc = accounts.find(a => a.type === 'cash_register') || selectedAc;
     }
-    const paidAmt = payAmount ? parseFloat(payAmount) : total;
+    const paidAmt = payAmount ? parseFloat(payAmount) : finalTotal;
 
     if (paidAmt > 0) {
       await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: Math.min(paidAmt, total),
-        description: (paidAmt >= total ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
+        user_id: user.id, type: 'income', amount: Math.min(paidAmt, finalTotal),
+        description: (paidAmt >= finalTotal ? 'Продажа по чеку №' : 'Частичная оплата по чеку №') + receiptNum,
         date, account_id: targetAc?.id || null, status: 'paid', category_id: saleCatId,
       });
     }
 
-    if (paidAmt > 0 && paidAmt < total) {
+    if (paidAmt > 0 && paidAmt < finalTotal) {
       await supabase.from('transactions').insert({
-        user_id: user.id, type: 'income', amount: total - paidAmt,
+        user_id: user.id, type: 'income', amount: finalTotal - paidAmt,
         description: 'Долг по чеку №' + receiptNum,
         date, status: 'debt', category_id: saleCatId,
       });
       const client = clients.find(c => c.id === selectedClient);
       const curDebt = parseFloat(client?.debt) || 0;
-      await supabase.from('clients').update({ debt: curDebt - (total - paidAmt) }).eq('id', selectedClient);
+      await supabase.from('clients').update({ debt: curDebt - (finalTotal - paidAmt) }).eq('id', selectedClient);
     }
 
     // Лояльность: начисление баллов за оплату (1 {cur} = 1 балл, бонусная программа)

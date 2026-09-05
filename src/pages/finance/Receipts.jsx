@@ -508,16 +508,14 @@ export default function Receipts() {
               <tr><td colSpan="10"><div className="empty-products" style={{ padding: '1rem' }}><div className="big-icon">🔍</div><p>Ничего не найдено</p></div></td></tr>
             ) : filtered.map(r => (
               <tr key={r.id} onClick={() => openReceipt(r)}
-                style={{ cursor: 'pointer', transition: 'background .1s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
-                onMouseLeave={e => e.currentTarget.style.background = ''}>
-                <td style={{ textAlign: 'left', paddingLeft: 0, fontSize: '.82rem' }}>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
-                <td style={{ textAlign: 'left' }}>{fmtDate(r.date)}</td>
-                <td style={{ textAlign: 'left', fontSize: '.82rem' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'left', fontSize: '.78rem', color: Number(r.refund_amount) > 0 ? '#ea580c' : '#bbb' }}>
+                style={{ cursor: 'pointer' }}>
+                <td style={{ textAlign: 'left', paddingLeft: 0, color:'#222' }}>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>{fmtDate(r.date)}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>
                   {Number(r.refund_amount) > 0 ? '−' + Number(r.refund_amount).toLocaleString() + ' ' + cur : '—'}
                 </td>
-                <td style={{ textAlign: 'left', fontSize: '.78rem', color: '#16a34a' }}>
+                <td style={{ textAlign: 'left', color:'#222' }}>
                   {parseInt(r.discount_sum) > 0
                     ? '-' + parseInt(r.discount_sum).toLocaleString() + ' ' + cur
                     : '—'}
@@ -525,20 +523,21 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left' }}>
                   {(() => {
                     const remain = receiptRemain(r);
-                    const paySt = r.status === 'paid' ? 'Оплачено' : 'Долг ' + remain.toLocaleString() + ' ₽';
-                    const payColor = r.status === 'paid' ? '#16a34a' : (r.status === 'partially_paid' ? '#d97706' : '#dc2626');
+                    const settled = r.status === 'paid' || remain <= 0;
+                    const paySt = settled ? 'Оплачено' : 'Долг ' + remain.toLocaleString() + ' ₽';
+                    const payColor = settled ? '#16a34a' : (r.status === 'partially_paid' ? '#d97706' : '#dc2626');
                     return (
                       <>
-                      <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid') { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
-                        style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 600, color: payColor, background: payColor + '18', cursor: r.status !== 'paid' ? 'pointer' : 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{paySt}</span>
+                      <span onClick={(e) => { e.stopPropagation(); if (r.status !== 'paid' && remain > 0) { setPayReceipt(r); setPayAmt(String(remain)); setPayAc(''); } }}
+                        style={{ display: 'inline-block', padding: '.25rem .65rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 400, color: '#222', background: payColor + '18', cursor: (r.status !== 'paid' && remain > 0) ? 'pointer' : 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{paySt}</span>
                       </>
                     );
                   })()}
                 </td>
-                <td style={{ textAlign: 'left' }}>{r.client_name || '—'}</td>
-                <td style={{ textAlign: 'left',fontSize:'.75rem',color:'#888',maxWidth:'120px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
-                <td style={{ textAlign: 'left' }}>{r.cashier_name || '—'}</td>
-                <td style={{ textAlign: 'left' }}>
+                <td style={{ textAlign: 'left', color:'#222' }}>{r.client_name || '—'}</td>
+                <td style={{ textAlign: 'left', color:'#222', maxWidth:'120px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>{r.cashier_name || '—'}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
                 </td>
               </tr>
