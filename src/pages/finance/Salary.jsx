@@ -508,8 +508,8 @@ export default function Salary() {
       <div className="product-table" style={{overflowX:'auto'}}>
         <table className="data-table">
           <thead id="salaryColHeaders"><tr>
-            <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
-            <th>Вычеты</th><th>Итого</th><th>Статус</th><th style={{width:'90px'}}></th>
+            <th style={{textAlign:'left'}}>Сотрудник</th><th style={{textAlign:'left'}}>Период</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>Премия</th>
+            <th style={{textAlign:'left'}}>Вычеты</th><th style={{textAlign:'left'}}>Итого</th><th style={{textAlign:'left'}}>Статус</th><th style={{width:'90px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody id="salaryTableBody">
             {list.length === 0 ? (
@@ -518,15 +518,17 @@ export default function Salary() {
             ) : list.map(s => (
               <tr key={s.id}>
                 <td style={{textAlign:'left'}}><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#555'}}>{Number(s.amount).toLocaleString()} {cur}</td>
-                <td style={{textAlign:'left',color:'#555'}}>{(s.status==='pending'||s.status==='accrued')
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{Number(s.amount).toLocaleString()} {cur}</td>
+                <td style={{textAlign:'left',color:'#222'}}>{(s.status==='pending'||s.status==='accrued')
                   ? <span onClick={()=>{setPendingPayId(s.id);setShowAcc(true)}}
-                      style={{padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'6px',border:'none',cursor:'pointer',background:'#16a34a',color:'#fff',fontFamily:'var(--font)',whiteSpace:'nowrap',display:'inline-block'}}>Выплатить</span>
-                  : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
+                      style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплатить</span>
+                  : s.status==='paid'
+                    ? <span style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплачено</span>
+                    : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
