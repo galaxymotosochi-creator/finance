@@ -778,40 +778,43 @@ export default function Transactions() {
               </div>
             </form>
       </Modal>
-      <Modal open={showAccSelect} onClose={function(){setShowAccSelect(false);setPendingTx(null)}} title={pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"} subtitle={pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") + ": " + Number(pendingTx.amount).toLocaleString() + " ₽" : ""} width="medium">
-            <div style={{display:"flex",flexDirection:"column",gap:".5rem",margin:".75rem 0"}}>
+      <Modal open={showAccSelect} onClose={function(){setShowAccSelect(false);setPendingTx(null)}} title={pendingTx && pendingTx.type === "expense" ? "С какого счета списать?" : "На какой счет зачислить?"} subtitle={pendingTx ? (pendingTx.type === "expense" ? "Сумма расхода" : "Сумма дохода") + ": " + Number(pendingTx.amount).toLocaleString() + " " + cur : ""} width="medium">
+            <div style={{display:"flex",flexDirection:"column",gap:".35rem",margin:".25rem 0 .5rem"}}>
               {accs.map(function(a){
                 var sel = selectedAcc === a.id;
-                var ic = accIcons[a.type] || '🏦';
                 return (
-                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".65rem .75rem",cursor:"pointer",borderRadius:".6rem",background:sel?"var(--secondary-light)":"var(--body-bg)",border:"1.5px solid "+(sel?"var(--secondary)":"var(--border)")}}>
-                    <div style={{width:"18px",height:"18px",border:"2px solid "+(sel?"var(--secondary)":"var(--border)"),borderRadius:"50%",flexShrink:0,borderWidth:sel?"6px":"2px"}} />
-                    
-                    <span style={{flex:1,fontSize:".85rem",fontWeight:500}}>{a.name}</span>
-                    <span style={{fontSize:".82rem",fontWeight:600,color:"#111"}}>{(accBalance[a.id] || 0).toLocaleString()} {cur}</span>
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}}
+                    style={{display:"flex",alignItems:"center",gap:".5rem",padding:".6rem .75rem",cursor:"pointer",borderRadius:".6rem",background:sel?"#fff9db":"#fff",border:"1px solid "+(sel?"#ffdd2d":"#e8e8ec")}}>
+                    <span style={{width:"18px",height:"18px",flexShrink:0,border:"2px solid "+(sel?"#111":"#cfcfd6"),borderRadius:"50%",borderWidth:sel?"6px":"2px",boxSizing:"border-box",display:"inline-block"}} />
+                    <span style={{flex:1,fontSize:".875rem",fontWeight:500,color:"#222",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.name}</span>
+                    <span style={{fontSize:".875rem",fontWeight:700,color:"#111",whiteSpace:"nowrap"}}>{(accBalance[a.id] || 0).toLocaleString()} {cur}</span>
                   </div>
                 );
               })}
-              {accs.length === 0 && <div style={{textAlign:"center",padding:"1rem",color:"var(--muted)",fontSize:".85rem"}}>Нет счетов. Добавьте в разделе Счета</div>}
+              {accs.length === 0 && <div style={{padding:".4rem .25rem",fontSize:".8rem",color:"var(--muted)"}}>Нет счетов. Добавьте в разделе Счета</div>}
             </div>
-            <div className="sub" style={{marginBottom:".75rem",cursor:"pointer",fontSize:".82rem",color:"var(--secondary)"}} onClick={function(){
-              setSplitAmounts({});
-              setSplitMode(!splitMode)
-            }}>{splitMode ? "+ Разделить" : "+ Разделить"}</div>
-            {splitMode && <div style={{padding:".5rem 0",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:".35rem"}}>
+            {accs.length > 1 && (
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:".35rem",padding:".5rem .75rem",cursor:"pointer",borderRadius:".6rem",border:"1.5px dashed #cfcfd6",fontSize:".78rem",color:"#888",fontWeight:600,transition:"background .12s",marginBottom:".75rem"}}
+                onClick={function(){setSplitAmounts({});setSplitMode(!splitMode)}}>{splitMode ? "− Не разделять" : "+ Разделить на несколько счетов"}</div>
+            )}
+            {splitMode && <div style={{padding:".5rem 0",display:"flex",flexDirection:"column",gap:".35rem",marginBottom:".5rem"}}>
               {accs.map(function(a){
                 return (
-                  <div key={a.id} style={{display:"flex",alignItems:"center",gap:".5rem"}}>
-                    <span style={{flex:1,fontSize:".8rem",fontWeight:500}}>{a.name}</span>
+                  <div key={a.id} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".1rem .2rem"}}>
+                    <span style={{flex:1,fontSize:".875rem",fontWeight:500,color:"#222"}}>{a.name}</span>
+                    <span style={{fontSize:".75rem",color:"#888"}}>{(accBalance[a.id] || 0).toLocaleString()} {cur}</span>
                     <input type="number" value={splitAmounts[a.id]||""} onChange={function(e){var v=parseFloat(e.target.value)||0;setSplitAmounts(function(p){var r=Object.assign({},p);r[a.id]=v;return r})}}
-                      style={{width:"100px",padding:".35rem .5rem",fontSize:".78rem",border:"1.5px solid var(--border)",borderRadius:"8px",outline:"none",textAlign:"right",fontFamily:"var(--font)"}} />
+                      style={{width:"100px",padding:".35rem .5rem",fontSize:".78rem",border:"1.5px solid #e8e8ec",borderRadius:"8px",outline:"none",textAlign:"right",fontFamily:"var(--font)"}} />
                   </div>
                 );
               })}
             </div>}
-            <div style={{padding:"1rem 1.25rem",borderTop:"1px solid var(--border)",display:"flex",justifyContent:"flex-end",width:'100%'}}>
-              <button type="button" className="btn btn-dark" onClick={function(){confirmTx()}} style={{fontSize:".8rem",fontWeight:700}}>
-                {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " ₽"}
+            <div className="modal-actions">
+              <button type="button" onClick={function(){confirmTx()}}
+                style={{display:"block",margin:"0 auto",padding:"12px 34px",border:"none",borderRadius:"10px",background:"#111",color:"#fff",fontFamily:"inherit",fontSize:"14px",fontWeight:700,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.15)",transition:"all .12s"}}
+                onMouseEnter={function(e){e.currentTarget.style.background="#000"}}
+                onMouseLeave={function(e){e.currentTarget.style.background="#111"}}>
+                {(pendingTx ? (pendingTx.type === "expense" ? "Списать" : "Зачислить") : "") + " " + (pendingTx ? Number(pendingTx.amount).toLocaleString() : "0") + " " + cur}
               </button>
             </div>
       </Modal>
