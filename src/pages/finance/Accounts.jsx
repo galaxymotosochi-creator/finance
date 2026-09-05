@@ -67,12 +67,6 @@ export default function Accounts() {
   const [corType, setCorType] = useState('income');
   const [corAmt, setCorAmt] = useState('');
   const [corDesc, setCorDesc] = useState('');
-  // Свои деньги владельца (взнос/вывод) — не влияют на прибыль
-  const [showOwner, setShowOwner] = useState(false);
-  const [ownerMode, setOwnerMode] = useState('deposit');
-  const [ownerAcct, setOwnerAcct] = useState('');
-  const [ownerAmt, setOwnerAmt] = useState('');
-  const [ownerDesc, setOwnerDesc] = useState('');
 
   const fetchAccounts = async () => {
     try {
@@ -256,7 +250,7 @@ export default function Accounts() {
                 ]},
                 { title: '«Свои деньги владельца»', items: [
                   <>Личные средства владельца, вложенные в бизнес. Не считаются доходом и не влияют на прибыль.</>,
-                  <><b>+ Внести</b> — доложить свои деньги в бизнес; <b>− Забрать</b> — вернуть себе.</>,
+                  <><b>Взнос / вывод</b> оформляется через транзакцию — в разделе «Транзакции» пункт «Взнос / вывод своих денег».</>,
                   <><b>Сейчас в бизнесе</b> — сколько из вложенного ещё в деле (внесено − выведено).</>,
                 ]},
                 { title: 'Действия над счетами', items: [
@@ -329,12 +323,6 @@ export default function Accounts() {
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Внесено своих средств</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>+{oIn.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Выведено</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>-{oOut.toLocaleString()} {cur}</span></div>
                 <div style={{display:'flex',flexDirection:'column'}}><span style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',fontWeight:600}}>Сейчас в бизнесе</span><span style={{fontSize:'1rem',fontWeight:800,color:'#111'}}>{(oIn-oOut).toLocaleString()} {cur}</span></div>
-                <div style={{display:'flex',flexDirection:'column',gap:'.3rem',marginLeft:'auto'}}>
-                  <button type="button" onClick={()=>{setOwnerMode('deposit');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>+ Внести</button>
-                  <button type="button" onClick={()=>{setOwnerMode('withdraw');setOwnerAcct(accounts[0]?.id||'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                    style={{padding:'.3rem .8rem',borderRadius:'10px',border:'none',background:'#111',color:'#fff',fontSize:'.72rem',fontWeight:700,cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>− Забрать</button>
-                </div>
               </div>
             );
           })()}
@@ -461,35 +449,6 @@ export default function Accounts() {
               </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-dark">Применить</button>
-              </div>
-            </form>
-      </Modal>
-
-      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
-            <form onSubmit={async (e)=>{e.preventDefault();var amt=parseFloat(ownerAmt);if(!amt||amt<=0)return alert('Введите сумму');try{var ac=accounts.find(a=>a.id===ownerAcct);if(!ac)return alert('Выберите счёт');// Нельзя вывести больше, чем есть на счёте
-              if(ownerMode==='withdraw'){var bal=getBal(ac);if(amt>bal)return alert('Недостаточно средств на счёте «'+ac.name+'». Доступно: '+Math.round(bal).toLocaleString()+' '+cur);}
-              var isDeposit=ownerMode==='deposit';var res=await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:isDeposit?'income':'expense',amount:amt,description:(isDeposit?'Взнос своих денег':'Вывод своих денег')+(ownerDesc.trim()?' — '+ownerDesc.trim():''),date:new Date().toISOString().split('T')[0],kind:isDeposit?'owner_deposit':'owner_withdraw',category_id:null});if(res.error)throw res.error;setShowOwner(false);setOwnerAmt('');setOwnerDesc('');if(!res.queued)await fetchTx();setToast((isDeposit?'Взнос':'Вывод')+' своих денег: '+amt.toLocaleString()+' '+cur);}catch(err){alert(err.message);}}}>
-              <div className="form-group">
-                <label>Операция</label>
-                <div style={{display:'flex',gap:'.5rem'}}>
-                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='deposit'?'#111':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
-                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='withdraw'?'#111':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Счет</label>
-                <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} />
-              </div>
-              <div className="form-group">
-                <label>Сумма</label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} required autoFocus />
-              </div>
-              <div className="form-group">
-                <label>Комментарий</label>
-                <input type="text" placeholder="Например: аренда за сентябрь" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.background='#000'}} onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
               </div>
             </form>
       </Modal>
