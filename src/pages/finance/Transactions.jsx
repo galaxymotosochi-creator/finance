@@ -465,7 +465,7 @@ export default function Transactions() {
 
       {txs.length > 0 ? (
         <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
-          <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
+          <table className="data-table" style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
             <thead id="colHeaders">
               <tr>
                 <th style={{width:'9%',paddingLeft:0,textAlign:'left'}}>Дата</th>
@@ -480,18 +480,16 @@ export default function Transactions() {
             </thead>
             <tbody>
               {filtered.map(tx => (
-                <tr key={tx.id} style={{ fontSize: '.82rem', borderBottom: '1px solid rgba(0,0,0,.06)',transition:'background .1s' }}
-                  onMouseEnter={e=>e.currentTarget.style.background='rgba(0,0,0,.02)'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#555', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{fmtTime(tx)}</td>
-                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{isOwner(tx) ? <span style={{fontWeight:600}}>{tx.description || '—'}</span> : (tx.description || '—')}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
-                  <td style={{ padding: '.5rem', color: tx.type === 'income' ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
-                    {isOwner(tx) ? <span style={{color:'#111'}}>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span> : <span>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span>}
+                <tr key={tx.id}>
+                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{fmtTime(tx)}</td>
+                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                  <td style={{ padding: '.5rem', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
+                    <span>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span>
                   </td>
-                  <td style={{ padding: '.5rem', color: '#555', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
-                  <td style={{ padding: '.5rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
-                  <td style={{ padding: '.5rem', color: '#555', fontSize:'.75rem', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{userMap[tx.user_id] || '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
+                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
+                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{userMap[tx.user_id] || '—'}</td>
                   <td style={{ textAlign: 'left', whiteSpace: 'nowrap',borderRight:'none' }}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){
