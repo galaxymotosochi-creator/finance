@@ -59,7 +59,6 @@ export default function Transactions() {
   const [expAmount, setExpAmount] = useState('');
   const [expDate, setExpDate] = useState(new Date().toISOString().split('T')[0]);
   const [expCategory, setExpCategory] = useState('');
-  const [showActionSelect, setShowActionSelect] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showOwner, setShowOwner] = useState(false);
   const [ownerMode, setOwnerMode] = useState('deposit');
@@ -203,6 +202,12 @@ export default function Transactions() {
     setShowIncome(true);
   };
 
+  // Сброс всех полей форм операции (доход/расход)
+  const resetForms = function() {
+    setIncName(''); setIncAmount(''); setIncDate(new Date().toISOString().split('T')[0]); setIncCategory('');
+    setExpName(''); setExpAmount(''); setExpDate(new Date().toISOString().split('T')[0]); setExpCategory('');
+  };
+
   const catNameById = (id) => { const c = (cats || []).find(x => x.id === id); return c ? c.name : ''; };
 
   const submitIncome = (e) => {
@@ -332,8 +337,18 @@ export default function Transactions() {
           <h1>Доходы и расходы</h1>
           <div className="sub">Поступления, списания и переводы между счетами</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={function(){setShowActionSelect(true)}} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Операция</button>
+        <div className="page-actions" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+          <button className="btn btn-dark" onClick={function(){setEditingId(null);setIncName('');setIncAmount('');setIncDate(new Date().toISOString().split('T')[0]);setIncCategory('');setExpName('');setExpAmount('');setExpDate(new Date().toISOString().split('T')[0]);setExpCategory('');setShowIncome(true)}} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Операция</button>
+          <button type="button" onClick={function(){setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}
+            style={{display:'inline-flex',alignItems:'center',gap:'.45rem',padding:'.28rem .8rem .28rem .28rem',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap',transition:'all .12s'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}>
+            <span style={{width:'26px',height:'26px',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'13px',flexShrink:0}}>⇄</span>Перевод
+          </button>
+          <button type="button" onClick={function(){setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
+            style={{display:'inline-flex',alignItems:'center',gap:'.45rem',padding:'.28rem .8rem .28rem .28rem',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap',transition:'all .12s'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}>
+            <span style={{width:'26px',height:'26px',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'13px',flexShrink:0}}>💼</span>Свои средства
+          </button>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
@@ -480,34 +495,6 @@ export default function Transactions() {
           <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первую финансовую операцию, чтобы начать учет</p>
         </div>
       )}
-      <Modal open={showActionSelect} onClose={()=>setShowActionSelect(false)} title="Что вы хотите сделать?" subtitle="Выберите тип операции" width="medium">
-            <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-              <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowExpense(true)}}
-                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                <div><div style={{fontWeight:600}}>Добавить расход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Списание средств</div></div>
-              </button>
-              <button onClick={function(){setShowActionSelect(false);setEditingId(null);setShowIncome(true)}}
-                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                <div><div style={{fontWeight:600}}>Добавить доход</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Поступление средств</div></div>
-              </button>
-              <button onClick={function(){setShowActionSelect(false);setShowTransfer(true);setTrFrom('');setTrTo('');setTrAmt('')}}
-                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                <div><div style={{fontWeight:600}}>Перевод между счетами</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Перемещение средств между счетами</div></div>
-              </button>
-              <button onClick={function(){setShowActionSelect(false);setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem .8rem',borderRadius:'8px',border:'1px solid var(--border)',background:'transparent',cursor:'pointer',fontSize:'.82rem',fontFamily:'var(--font)',fontWeight:500,color:'var(--body-color)',textAlign:'left',width:'100%',transition:'all .1s'}}
-                onMouseEnter={e=>e.currentTarget.style.background='var(--secondary-light)'}
-                onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                <div><div style={{fontWeight:600}}>Взнос / вывод своих денег</div><div style={{fontSize:'.72rem',color:'var(--muted)',fontWeight:400}}>Личные деньги владельца — не влияют на прибыль</div></div>
-              </button>
-            </div>
-      </Modal>
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств со счета на счет" width="medium">
             <form onSubmit={async function(e){
               e.preventDefault();
@@ -538,17 +525,37 @@ export default function Transactions() {
             }}>
               <div className="form-group">
                 <label>С какого счета</label>
-                <select value={trFrom} onChange={function(e){setTrFrom(e.target.value)}} required>
-                  <option value="">— выберите —</option>
-                  {accs.map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
-                </select>
+                <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+                  {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+                  {accs.map(function(a){
+                    const sel=String(a.id)===String(trFrom);
+                    return (
+                      <div key={a.id} onClick={function(){setTrFrom(a.id);if(String(a.id)===String(trTo))setTrTo('')}}
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1px solid '+(sel?'#ffdd2d':'#e8e8ec')}}>
+                        <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                        <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="form-group">
                 <label>На какой счет</label>
-                <select value={trTo} onChange={function(e){setTrTo(e.target.value)}} required>
-                  <option value="">— выберите —</option>
-                  {accs.filter(function(a){return a.id!==trFrom}).map(function(a){return <option key={a.id} value={a.id}>{a.name} ({(accBalance[a.id]||0).toLocaleString()} {cur})</option>})}
-                </select>
+                <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+                  {accs.filter(function(a){return String(a.id)!==String(trFrom)}).length===0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+                  {accs.filter(function(a){return String(a.id)!==String(trFrom)}).map(function(a){
+                    const sel=String(a.id)===String(trTo);
+                    return (
+                      <div key={a.id} onClick={function(){setTrTo(a.id)}}
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1px solid '+(sel?'#ffdd2d':'#e8e8ec')}}>
+                        <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                        <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="form-group">
                 <label>Сумма (₽)</label>
@@ -647,12 +654,26 @@ export default function Transactions() {
                 setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
+              {!editingId && (
+              <div className="form-group">
+                <label>Тип операции</label>
+                <div style={{display:'flex',gap:'.4rem'}}>
+                  <button type="button" onClick={function(){setIncCategory('')}}
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',transition:'all .12s'}}>+ Доход</button>
+                  <button type="button" onClick={function(){setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setShowExpense(true)}}
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>− Расход</button>
+                </div>
+              </div>
+              )}
               <div className="form-group">
                 <label>Категория</label>
-                <select value={incCategory} onChange={function(e){setIncCategory(e.target.value)}}>
-                  <option value="">— выберите —</option>
-                  {(cats||[]).filter(function(c){return c&&c.type==="income"}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
-                </select>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'.35rem'}}>
+                  {incomeCats.length === 0 && <div style={{padding:'.2rem 0',fontSize:'.8rem',color:'var(--muted)'}}>Нет категорий — добавьте в разделе «Категории»</div>}
+                  {incomeCats.map(function(c){const on=String(incCategory)===String(c.id);return (
+                    <button key={c.id} type="button" onClick={function(){setIncCategory(on?'':c.id)}}
+                      style={{padding:'.42rem .85rem',borderRadius:'100px',border:'1.5px solid '+(on?'#111':'#e4e4e8'),background:on?'#111':'#fff',fontSize:'.78rem',fontWeight:500,color:on?'#fff':'#666',cursor:'pointer',fontFamily:'var(--font)',transition:'all .12s'}}>{c.name}</button>
+                  );})}
+                </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -695,12 +716,26 @@ export default function Transactions() {
                 setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
               }
             }}>
+              {!editingId && (
+              <div className="form-group">
+                <label>Тип операции</label>
+                <div style={{display:'flex',gap:'.4rem'}}>
+                  <button type="button" onClick={function(){setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setShowIncome(true)}}
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>+ Доход</button>
+                  <button type="button" onClick={function(){setExpCategory('')}}
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',transition:'all .12s'}}>− Расход</button>
+                </div>
+              </div>
+              )}
               <div className="form-group">
                 <label>Категория</label>
-                <select value={expCategory} onChange={function(e){setExpCategory(e.target.value)}}>
-                  <option value="">— выберите —</option>
-                  {(cats||[]).filter(function(c){return c&&(c.type==="expense"||c.type==="supply_expense")}).map(function(c){return <option key={c.id} value={c.id}>{c.name}</option>})}
-                </select>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'.35rem'}}>
+                  {expenseCats.length === 0 && <div style={{padding:'.2rem 0',fontSize:'.8rem',color:'var(--muted)'}}>Нет категорий — добавьте в разделе «Категории»</div>}
+                  {expenseCats.map(function(c){const on=String(expCategory)===String(c.id);return (
+                    <button key={c.id} type="button" onClick={function(){setExpCategory(on?'':c.id)}}
+                      style={{padding:'.42rem .85rem',borderRadius:'100px',border:'1.5px solid '+(on?'#111':'#e4e4e8'),background:on?'#111':'#fff',fontSize:'.78rem',fontWeight:500,color:on?'#fff':'#666',cursor:'pointer',fontFamily:'var(--font)',transition:'all .12s'}}>{c.name}</button>
+                  );})}
+                </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
