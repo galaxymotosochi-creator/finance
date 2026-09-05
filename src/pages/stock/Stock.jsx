@@ -244,7 +244,7 @@ export default function Stock() {
     const existing = initialCache || getInitialStock();
     const qtyMap = {};
     const costMap = {};
-    (productsFromDB.length ? productsFromDB : products).forEach(p => {
+    (productsFromDB.length ? productsFromDB : products).filter(p => p && p.type !== 'service').forEach(p => {
       qtyMap[p.id] = existing && existing.items ? (existing.items[p.id] || 0) : 0;
       costMap[p.id] = existing && existing.costs ? (existing.costs[p.id] || 0) : 0;
     });
@@ -294,11 +294,10 @@ export default function Stock() {
     else alert(error.message);
   };
 
-  const initProducts = productsFromDB.length ? productsFromDB : products;
-  const filteredProducts = (initSearch.trim()
+  const initProducts = (productsFromDB.length ? productsFromDB : products).filter(p => p && p.type !== 'service');
+  const filteredProducts = initSearch.trim()
     ? initProducts.filter(p => p.name.toLowerCase().includes(initSearch.trim().toLowerCase()))
-    : initProducts.slice())
-    .sort((a, b) => (a.type === 'service' ? 1 : 0) - (b.type === 'service' ? 1 : 0));
+    : initProducts.slice();
 
   return (
     <>
@@ -533,25 +532,20 @@ export default function Stock() {
             <div style={{overflowY:'auto',flex:1}}>
               {filteredProducts.length === 0 ? (
                 <p style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.82rem'}}>Товары не найдены</p>
-              ) : filteredProducts.map(p => {
-                const isService = p.type === 'service';
-                return (
+              ) : filteredProducts.map(p => (
                 <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.45rem .5rem',borderBottom:'1px solid var(--border)'}}>
-                  <span style={{flex:1,fontSize:'.82rem',fontWeight:400,color:isService?'var(--muted)':'inherit'}}>{p.name}{isService && <span style={{fontSize:'.68rem',marginLeft:'.35rem',opacity:.8}}>— услуга</span>}</span>
+                  <span style={{flex:1,fontSize:'.82rem',fontWeight:400}}>{p.name}</span>
                   {p.sku && <span style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku}</span>}
-                  {!isService && <>
-                    <input type="number" min="0" value={initQty[p.id] || ''}
-                      onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                      placeholder="0"
-                      style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
-                    <input type="number" min="0" value={initCost[p.id] || ''}
-                      onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                      placeholder="Цена"
-                      style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
-                  </>}
+                  <input type="number" min="0" value={initQty[p.id] || ''}
+                    onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
+                    placeholder="0"
+                    style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                  <input type="number" min="0" value={initCost[p.id] || ''}
+                    onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
+                    placeholder="Закупка"
+                    style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
                 </div>
-                );
-              })}
+              ))}
             </div>
 
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
