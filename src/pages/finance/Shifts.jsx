@@ -103,15 +103,15 @@ export default function Shifts() {
               const cashier = s.current_cashier_name || s.cashier_name;
               return (
                 <tr key={s.id}>
-                  <td style={{textAlign:'left',color:'#555',paddingLeft:0}}>{dateStr}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{timeOpen}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{s.shift_number ? '#'+s.shift_number : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{cashier || '—'}</td>
-                  <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',fontWeight:600}}>{income > 0 ? '+'+income.toLocaleString()+' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{timeClose}</td>
-                  <td style={{textAlign:'left',color:'#555'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
+                  <td style={{textAlign:'left',color:'#222',paddingLeft:0}}>{dateStr}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{timeOpen}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{s.shift_number ? '#'+s.shift_number : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{cashier || '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{income > 0 ? '+'+income.toLocaleString()+' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString() + ' ₽' : '—'}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{timeClose}</td>
+                  <td style={{textAlign:'left',color:'#222'}}>{isOpen ? 'Открыта' : 'Закрыта'}</td>
                 </tr>
               );
             })}
