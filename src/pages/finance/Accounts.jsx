@@ -359,11 +359,11 @@ export default function Accounts() {
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   return (
                   <tr className="total-row">
-                    <td style={{fontWeight:400,textAlign:'left',color:'#222'}}>Итого</td>
-                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>+{incTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>−{expTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:400,color:'#222'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
+                    <td style={{fontWeight:600,textAlign:'left',color:'#222'}}>Итого:</td>
+                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>+{incTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>−{expTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
                     <td></td>
                   </tr>
                   );
