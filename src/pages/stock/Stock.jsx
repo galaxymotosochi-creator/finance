@@ -294,9 +294,11 @@ export default function Stock() {
     else alert(error.message);
   };
 
-  const filteredProducts = initSearch.trim()
-    ? (productsFromDB.length ? productsFromDB : products).filter(p => p.name.toLowerCase().includes(initSearch.toLowerCase().trim()))
-    : (productsFromDB.length ? productsFromDB : products);
+  const initProducts = productsFromDB.length ? productsFromDB : products;
+  const filteredProducts = (initSearch.trim()
+    ? initProducts.filter(p => p.name.toLowerCase().includes(initSearch.trim().toLowerCase()))
+    : initProducts.slice())
+    .sort((a, b) => (a.type === 'service' ? 1 : 0) - (b.type === 'service' ? 1 : 0));
 
   return (
     <>
@@ -519,32 +521,37 @@ export default function Stock() {
 
       <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
 
-            <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.4rem',width:'15%',minWidth:'110px',maxWidth:'200px',marginBottom:'.6rem',border:'1px solid '+(initSearchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'8px 16px',background:'#fff',boxShadow:initSearchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+            <div className="stock-search" style={{display:'inline-flex',alignItems:'center',gap:'.4rem',marginBottom:'.6rem',border:'1px solid '+(initSearchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'8px 16px',background:'#fff',boxShadow:initSearchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
               onFocus={()=>setInitSearchFocus(true)} onBlur={()=>setInitSearchFocus(false)}>
               <span style={{display:'flex',color:initSearchFocus?'#111':'#999',transition:'color .15s'}}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
               </span>
               <input type="text" placeholder="Поиск товара" value={initSearch} onChange={e=>setInitSearch(e.target.value)}
-                style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+                style={{border:'none',outline:'none',width:'110px',fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
             </div>
 
-            <div style={{overflowY:'auto',flex:1,border:'1px solid var(--border)',borderRadius:'var(--radius)',padding:'.35rem'}}>
+            <div style={{overflowY:'auto',flex:1}}>
               {filteredProducts.length === 0 ? (
                 <p style={{textAlign:'center',padding:'1rem',color:'var(--muted)',fontSize:'.82rem'}}>Товары не найдены</p>
-              ) : filteredProducts.map(p => (
+              ) : filteredProducts.map(p => {
+                const isService = p.type === 'service';
+                return (
                 <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.45rem .5rem',borderBottom:'1px solid var(--border)'}}>
-                  <span style={{flex:1,fontSize:'.82rem',fontWeight:400}}>{p.name}</span>
+                  <span style={{flex:1,fontSize:'.82rem',fontWeight:400,color:isService?'var(--muted)':'inherit'}}>{p.name}{isService && <span style={{fontSize:'.68rem',marginLeft:'.35rem',opacity:.8}}>— услуга</span>}</span>
                   {p.sku && <span style={{fontSize:'.72rem',color:'var(--muted)',fontFamily:'monospace'}}>{p.sku}</span>}
-                  <input type="number" min="0" value={initQty[p.id] || ''}
-                    onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder="0"
-                    style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
-                  <input type="number" min="0" value={initCost[p.id] || ''}
-                    onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
-                    placeholder="Цена"
-                    style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                  {!isService && <>
+                    <input type="number" min="0" value={initQty[p.id] || ''}
+                      onChange={function(e){var v=e.target.value;setInitQty(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
+                      placeholder="0"
+                      style={{width:'65px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                    <input type="number" min="0" value={initCost[p.id] || ''}
+                      onChange={function(e){var v=e.target.value;setInitCost(function(prev){var r=Object.assign({},prev);r[p.id]=v===''?0:Math.max(0,parseInt(v)||0);return r})}}
+                      placeholder="Цена"
+                      style={{width:'80px',padding:'.35rem .4rem',fontSize:'.8rem',border:'1px solid var(--border)',borderRadius:'5px',outline:'none',textAlign:'center',fontFamily:'var(--font)'}} />
+                  </>}
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
