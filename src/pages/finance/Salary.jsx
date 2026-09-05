@@ -873,7 +873,7 @@ export default function Salary() {
                   const sel = String(a.id) === String(payAcctId);
                   return (
                   <div key={a.id} onClick={()=>setPayAcctId(a.id)}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1px solid '+(sel?'#ffdd2d':'#e8e8ec')}}>
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1.5px solid '+(sel?'#ffdd2d':'rgba(0,0,0,.26)')}}>
                     <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
                     <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                     <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
@@ -884,7 +884,7 @@ export default function Salary() {
                     <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222'}}>{a.name}</span>
                     <span style={{fontSize:'.75rem',color:'#888'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                     <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
-                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid #e8e8ec',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
                   </div>
                 ))}
                 {accsList.length > 1 && (
