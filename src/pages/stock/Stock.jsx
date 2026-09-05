@@ -67,6 +67,7 @@ export default function Stock() {
   const [initQty, setInitQty] = useState({});
   const [initCost, setInitCost] = useState({});
   const [initSearch, setInitSearch] = useState('');
+  const [initSearchFocus, setInitSearchFocus] = useState(false);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [suppliesCache, setSuppliesCache] = useState([]);
@@ -518,8 +519,11 @@ export default function Stock() {
 
       <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
 
-            <div className="stock-search" style={{marginBottom:'.6rem'}}>
-              <span style={{fontSize:'.75rem',color:'var(--muted)'}}>🔍</span>
+            <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.4rem',width:'15%',minWidth:'110px',maxWidth:'200px',marginBottom:'.6rem',border:'1px solid '+(initSearchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'8px 16px',background:'#fff',boxShadow:initSearchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+              onFocus={()=>setInitSearchFocus(true)} onBlur={()=>setInitSearchFocus(false)}>
+              <span style={{display:'flex',color:initSearchFocus?'#111':'#999',transition:'color .15s'}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              </span>
               <input type="text" placeholder="Поиск товара" value={initSearch} onChange={e=>setInitSearch(e.target.value)}
                 style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
             </div>
