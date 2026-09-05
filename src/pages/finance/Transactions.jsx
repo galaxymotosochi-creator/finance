@@ -340,7 +340,7 @@ export default function Transactions() {
         </div>
         <div className="page-actions">
           <div style={{position:'relative',display:'inline-block'}}>
-            <button className="btn btn-dark" onClick={function(){setDdOpen(!ddOpen)}} style={{padding:'.5rem .9rem',fontWeight:600,display:'inline-flex',alignItems:'center',gap:'.35rem'}}>+ Операция <span style={{fontSize:'9px',lineHeight:1}}>▾</span></button>
+            <button className="btn btn-dark" onClick={function(){setDdOpen(!ddOpen)}} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px',display:'inline-flex',alignItems:'center',gap:'.35rem'}}>Добавить операцию <span style={{fontSize:'9px',lineHeight:1}}>▾</span></button>
             {ddOpen && (
               <div>
                 <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:75}} onClick={function(){setDdOpen(false)}} />
