@@ -104,16 +104,27 @@ export default function SalesReport() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       {/* Период */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', marginBottom: '.6rem', flexWrap: 'wrap' }}>
-        {[{ k: 0, l: 'Сегодня' }, { k: 1, l: 'Вчера' }, { k: 7, l: '7 дней' }, { k: 30, l: '30 дней' }].map(b => (
-          <span key={b.k} onClick={() => { setTo(tzToday()); setFrom(tzOffsetDate(b.k)); }}
-            style={{ padding: '.25rem .6rem', borderRadius: '100px', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', background: (from === tzOffsetDate(b.k) && to === tzToday()) ? '#111' : '#eee', color: (from === tzOffsetDate(b.k) && to === tzToday()) ? '#fff' : '#555', fontFamily: 'inherit', border: 'none' }}>{b.l}</span>
-        ))}
-        <span onClick={() => { const t = tzToday(); setFrom(t.slice(0, 8) + '01'); setTo(t); }}
-          style={{ padding: '.25rem .6rem', borderRadius: '100px', fontSize: '.75rem', fontWeight: 600, cursor: 'pointer', background: '#eee', color: '#555', fontFamily: 'inherit', border: 'none' }}>Этот месяц</span>
-        <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.6rem', flexWrap: 'wrap' }}>
+        <span onClick={() => { setFrom('2000-01-01'); setTo('2999-12-31'); }}
+          style={{ padding: '.28rem .85rem', borderRadius: '100px', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', background: from === '2000-01-01' ? '#111' : '#eee', color: from === '2000-01-01' ? '#fff' : '#555', fontFamily: 'inherit', border: 'none', whiteSpace: 'nowrap' }}>Все время</span>
+        <select
+          value={from === '2000-01-01' ? '' : (to === tzToday() ? (from === tzToday() ? '0' : from === tzOffsetDate(1) ? '1' : from === tzOffsetDate(7) ? '7' : from === tzOffsetDate(30) ? '30' : (from === (tzToday().slice(0, 8) + '01')) ? 'month' : 'custom') : 'custom')}
+          onChange={e => {
+            const k = e.target.value;
+            if (k === 'month') { const t = tzToday(); setTo(t); setFrom(t.slice(0, 8) + '01'); }
+            else if (k === '0' || k === '1' || k === '7' || k === '30') { setTo(tzToday()); setFrom(tzOffsetDate(Number(k))); }
+          }}
+          style={{ border: '1.5px solid var(--border)', borderRadius: '8px', padding: '.28rem .5rem', fontSize: '.8rem', fontFamily: 'inherit', outline: 'none', cursor: 'pointer', color: from === '2000-01-01' ? '#9aa0ab' : '#222' }}>
+          <option value="">Выберите период</option>
+          <option value="0">Сегодня</option>
+          <option value="1">Вчера</option>
+          <option value="7">7 дней</option>
+          <option value="30">30 дней</option>
+          <option value="month">Этот месяц</option>
+        </select>
         <span style={{ color: '#999', fontSize: '.8rem' }}>—</span>
-        <input type="date" value={to} onChange={e => setTo(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
+        <input type="date" value={from === '2000-01-01' ? '' : from} onChange={e => setFrom(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
+        <input type="date" value={to === '2999-12-31' ? '' : to} onChange={e => setTo(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
       </div>
 
       {loading ? (
