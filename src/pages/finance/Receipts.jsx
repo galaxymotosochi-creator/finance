@@ -450,8 +450,8 @@ export default function Receipts() {
           <span style={{display:'flex',color:receiptSearchFocus?'#111':'#999',transition:'color .15s'}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
-          <input type="text" placeholder="Поиск" value={search} onChange={e => setSearch(e.target.value)}
-            style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
+          <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)}
+            style={{ border: 'none', outline: 'none', width: '150px', minWidth: 0, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
         <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>

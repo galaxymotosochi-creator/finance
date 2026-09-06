@@ -383,9 +383,9 @@ export default function Transactions() {
           <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
-          <input type="text" placeholder="Поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
+          <input type="text" placeholder="Поиск…" value={search} onChange={function(e){setSearch(e.target.value)}}
             autoComplete="off"
-            style={{border:"none",outline:"none",fieldSizing:'content',width:'auto',minWidth:0,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
+            style={{border:"none",outline:"none",width:'150px',minWidth:0,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
         <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto",flexWrap:'wrap',justifyContent:'flex-end'}}>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
