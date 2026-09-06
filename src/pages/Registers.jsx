@@ -2094,7 +2094,7 @@ if (loading) return <CenterSpinner />;
 // ===== Вспомогательные компоненты строки выбора сотрудника (продавец/мастер) =====
 // Нативный выпадающий список сотрудников (ФИО, без иконок)
 function SplitPicker({ label, amount, enabled, avail, onPick }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const none = amount ? '' : '+ добавить';
   // выпадающий список "Купе" без иконок-инициалов
   return (
