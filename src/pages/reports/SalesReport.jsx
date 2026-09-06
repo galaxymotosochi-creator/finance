@@ -73,13 +73,14 @@ export default function SalesReport() {
           else { E.prodQty += qty; E.prodSum += total; }
           E.sum += total;
           E.bonus += bonus;
-          E.items.push({ date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
+          E.items.push({ id: String(it.id), date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
         });
       }
       const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
       // Вознаграждение за выбор продавцом/исполнителем (employee_splits из кассы: «Кто продал?»/«Кто выполняет?»)
       const rewByEmp = {};
-      const addRew = (key, n, v) => { if (!rewByEmp[key]) rewByEmp[key] = { empId: key, name: n, total: 0 }; rewByEmp[key].total += v; };
+      const rewByItem = {}; // itemId -> сумма вознаграждения за выбор конкретному сотруднику
+      const addRew = (key, n, v) => { if (!rewByEmp[key]) rewByEmp[key] = { empId: key, name: n, total: 0, items: {} }; rewByEmp[key].total += v; };
       (itList).forEach(it => {
         const r = rlist.find(x => x.id === it.receipt_id);
         if (!r) return;
@@ -95,6 +96,8 @@ export default function SalesReport() {
           if (amt <= 0) return;
           const emp = (empRes.data || []).find(x => String(x.id) === String(sp.employee_id));
           addRew(String(sp.employee_id), emp ? emp.name : (sp.name || 'Сотрудник'), amt);
+          if (!rewByItem[String(it.id)]) rewByItem[String(it.id)] = {};
+          rewByItem[String(it.id)][String(sp.employee_id)] = (rewByItem[String(it.id)][String(sp.employee_id)] || 0) + amt;
         });
       });
       const list = Object.values(byEmp).map(e => {
@@ -109,7 +112,13 @@ export default function SalesReport() {
         const rew = rewByEmp[String(e.empId)] ? rewByEmp[String(e.empId)].total : 0;
         // Вознаграждение = бонус по правилам ИЛИ/ПЛЮС сумма за выбор продавцом/исполнителем
         const itemsRew = (st && st.stack === false) ? rew : itemsBonus + rew;
-        return { ...e, items: e.items.sort((a, b) => (a.date < b.date ? 1 : -1)), itemsBonus, storeBonus, storePct, reward: rew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
+        // к каждой позиции добавляем вознаграждение = бонус позиции + сумма за выбор (employee_splits) этого сотрудника
+        const enrichedItems = e.items.map(x => {
+          const itemRew = rewByItem[x.id] && rewByItem[x.id][String(e.empId)] ? rewByItem[x.id][String(e.empId)] : 0;
+          const rw = (st && st.stack === false) ? itemRew : x.bonus + itemRew;
+          return { ...x, reward: rw };
+        }).sort((a, b) => (a.date < b.date ? 1 : -1));
+        return { ...e, items: enrichedItems, itemsBonus, storeBonus, storePct, reward: rew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
       });
       list.sort((a, b) => b.sum - a.sum);
       setEmpSales(list);
@@ -281,7 +290,7 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
                       <td style={{ textAlign: 'left' }}>{it.name}{it.qty > 1 ? ' x' + it.qty : ''}</td>
                       <td style={{ textAlign: 'left' }}>{it.type === 'service' ? 'услуга' : it.type === 'combo' ? 'комбо' : 'товар'}</td>
                       <td style={{ textAlign: 'left' }}>{it.total.toLocaleString()} {cur}</td>
-                      <td style={{ textAlign: 'left' }}>{it.bonus ? '+' + it.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+                      <td style={{ textAlign: 'left' }}>{it.reward ? '+' + it.reward.toLocaleString() + ' ' + cur : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
