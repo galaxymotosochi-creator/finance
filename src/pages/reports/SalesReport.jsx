@@ -13,8 +13,8 @@ export default function SalesReport() {
   const { user } = useAuth();
   const [from, setFrom] = useState(() => { const t = tzToday(); return t.slice(0, 8) + '01'; });
   const [to, setTo] = useState(() => tzToday());
-  const [period, setPeriod] = useState('all');
-  const [periodLabel, setPeriodLabel] = useState('Все время');
+  const [period, setPeriod] = useState('month');
+  const [periodLabel, setPeriodLabel] = useState('Этот месяц');
   const [showPeriod, setShowPeriod] = useState(false);
   const periodWrapRef = useRef(null);
   const [loading, setLoading] = useState(true);
