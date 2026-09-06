@@ -57,7 +57,8 @@ const menu = [
     ],
   },
   {
-    label: 'Отчёты', icon: 'reports', children: [
+    label: 'Отчёты', icon: 'reports', path: '/reports', children: [
+      { label: 'Работа сотрудников', path: '/reports/employees' },
       { label: 'Продажи по сотрудникам', path: '/reports/sales' },
     ],
   },
@@ -150,7 +151,7 @@ export default function Sidebar() {
                 return (
                   <div className="nav-group" key={item.label}>
                     <a className={`nav-parent${open ? ' open' : ''}${anyChildActive || open ? ' active' : ''}`}
-                      onClick={() => toggleGroup(item.label)}>
+                      onClick={() => { if (item.path) { setExpanded(item.label); navigate(item.path); } else { toggleGroup(item.label); } }}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                       {!collapsed && item.label}
                       {!collapsed && <span className="arrow">&#9656;</span>}

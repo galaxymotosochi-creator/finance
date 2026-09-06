@@ -46,6 +46,8 @@ const Employees = lazy(() => import('./pages/employees/Employees'));
 const Timesheet = lazy(() => import('./pages/employees/Timesheet'));
 const RegistersPage = lazy(() => import('./pages/Registers'));
 const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
+const ReportsHome = lazy(() => import('./pages/reports/ReportsHome'));
+const EmployeeReport = lazy(() => import('./pages/reports/EmployeeReport'));
 
 function FullKassa() {
   return (
@@ -107,7 +109,11 @@ function AppRoutes() {
       <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/trash" element={<ProtectedRoute><AppLayout><TrashPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsHome /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports/employees" element={<ProtectedRoute><AppLayout><EmployeeReport /></AppLayout></ProtectedRoute>} />
       <Route path="/reports/sales" element={<ProtectedRoute><AppLayout><SalesReport /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports/employees" element={<ProtectedRoute><AppLayout><EmployeeReport /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsHome /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
