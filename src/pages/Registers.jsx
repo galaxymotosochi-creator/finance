@@ -1239,11 +1239,6 @@ if (loading) return <CenterSpinner />;
                             {(item.sp || []).map(function(spd, si){ return <SplitRow key={spd.empId} spd={spd} cur={cur} onAmt={function(v){setSplitAmt(item.id, spd.empId, v);}} onDel={function(){delSplit(item.id, spd.empId);}} />; })}
                           </div>
                         )}
-                        {spSum(item) > 0 && (
-                          <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a',padding:'6px 11px'}}>
-                            {spOver(item) ? 'Больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : 'Распределено: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
-                          </div>
-                        )}
                       </>
                     );
                   })()}
