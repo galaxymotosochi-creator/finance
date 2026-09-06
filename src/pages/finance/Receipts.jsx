@@ -453,9 +453,11 @@ export default function Receipts() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
-        <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
+        <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,whiteSpace:'nowrap',background:'#fff',fontFamily:'inherit'}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
               onClick={e=>{e.stopPropagation();setPeriodOpen(!periodOpen)}}>{periodLabel}</span>
             {periodOpen && (
               <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
@@ -483,10 +485,18 @@ export default function Receipts() {
               </div>
             )}
           </div>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='paid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Оплачен</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='partially_paid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Частично</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='unpaid'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}>Долги</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')} style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:statusFilter==='refunded'?600:400,color:'#ea580c',cursor:'pointer',borderRight:'none',lineHeight:1}}>Возвраты</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='paid'?600:400,color:statusFilter==='paid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='paid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='paid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='paid'?'#111':'#555'}}>Оплачен</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='partially_paid'?600:400,color:statusFilter==='partially_paid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='partially_paid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='partially_paid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='partially_paid'?'#111':'#555'}}>Частично</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='unpaid'?600:400,color:statusFilter==='unpaid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='unpaid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='unpaid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='unpaid'?'#111':'#555'}}>Долги</span>
+          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='refunded'?600:400,color:statusFilter==='refunded'?'#ea580c':'#ea580c',cursor:'pointer',border:'1px solid '+(statusFilter==='refunded'?'#ea580c':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#ea580c';e.currentTarget.style.color='#ea580c'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='refunded'?'#ea580c':'#e0e0e4';e.currentTarget.style.color='#ea580c'}}>Возвраты</span>
         </div>
       </div>
 
