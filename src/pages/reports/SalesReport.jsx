@@ -126,7 +126,7 @@ export default function SalesReport() {
       ) : (
         <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <table className="data-table">
-            <thead>
+            <thead id="colHeaders">
               <tr>
                 <th style={{ textAlign: 'left', paddingLeft: 0 }}>Сотрудник</th>
                 <th style={{ textAlign: 'left' }}>Позиций</th>
@@ -188,7 +188,7 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
           <td colSpan="10" style={{ padding: 0, background: '#fafbfc' }}>
             <div className="product-table" style={{ padding: '.5rem' }}>
               <table className="data-table">
-                <thead>
+                <thead id="colHeaders">
                   <tr>
                     <th style={{ textAlign: 'left', paddingLeft: 0 }}>Дата</th>
                     <th style={{ textAlign: 'left' }}>Позиция</th>
