@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import useOptimisticSync from '../hooks/useOptimisticSync';
@@ -489,6 +490,8 @@ export default function Registers({ fullscreen }) {
       return { ...x, sp, employee_id: sp.length ? sp[0].empId : null };
     }));
   };
+  // дубликат защита: не добавлять повторно
+  const addSplitDedupSafe = addSplit;
   const spOver = (item) => spSum(item) > itemTotalPrice(item) + 0.01;
   const empShort = (name) => { if (!name) return ''; const parts = name.trim().split(/\s+/); return parts.length > 1 ? parts[0] + ' ' + parts.slice(1).map(pp => pp[0] + '.').join(' ') : name; };
 
@@ -1232,13 +1235,10 @@ if (loading) return <CenterSpinner />;
                           </div>
                         )}
                         {(item.sp || []).length > 0 && (
-                          <div style={{padding:'0',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'6px'}}>
-                            {CombosSplits({ item: item, keyname: 'sp', cur: cur, label: null, onSet: function(empId,v){setSplitAmt(item.id, empId, v);}, onDel: function(){ /* handled inline */ } }) }
+                          <div style={{padding:'6px 11px',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px'}}>
+                            {(item.sp || []).map(function(spd, si){ return <SplitRow key={spd.empId} spd={spd} cur={cur} onAmt={function(v){setSplitAmt(item.id, spd.empId, v);}} onDel={function(){delSplit(item.id, spd.empId);}} />; })}
                           </div>
                         )}
-                        <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
-                          {(item.sp || []).map(function(spd, si){ return <SplitRow key={si} spd={spd} cur={cur} onAmt={function(v){setSplitAmt(item.id, spd.empId, v);}} onDel={function(){delSplit(item.id, spd.empId);}} />; })}
-                        </div>
                         {spSum(item) > 0 && (
                           <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a',padding:'6px 11px'}}>
                             {spOver(item) ? 'Больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : 'Распределено: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
@@ -2095,65 +2095,69 @@ if (loading) return <CenterSpinner />;
 // Нативный выпадающий список сотрудников (ФИО, без иконок)
 function SplitPicker({ label, amount, enabled, avail, onPick }) {
   const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const none = amount ? '' : '+ добавить';
-  // выпадающий список "Купе" без иконок-инициалов (panel поверх экрана, не режется overflow)
+  // окошко выбора открывается ПРЯМО ПОД кнопкой (не на весь экран) через портал
+  function toggleOpen() {
+    if (!avail.length) return;
+    if (open) { setOpen(false); return; }
+    const el = wrapRef.current;
+    const r = el ? el.getBoundingClientRect() : null;
+    if (r) setPos({ top: r.bottom + 4, left: r.left, width: r.width });
+    setOpen(true);
+  }
   return (
-    <div style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2' }}>
+    <div ref={wrapRef} style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2' }}>
       <div style={{ fontSize: '.74rem', color: '#777', fontWeight: 600, marginBottom: '6px', display: 'flex', justifyContent: 'space-between' }}>
         <span>{label}</span>
         <span style={{ color: amount ? '#222' : '#8a8f9c', fontWeight: 700 }}>{amount || none}</span>
       </div>
       {enabled && (
         <div
-          onClick={function () { if (avail.length) setOpen(true); }}
+          onClick={toggleOpen}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            border: '1px solid #e0e0e0', borderRadius: '9px', padding: '8px 11px',
+            border: (open ? '1px solid #111' : '1px solid #e0e0e0'), borderRadius: '9px', padding: '8px 11px',
             cursor: avail.length ? 'pointer' : 'not-allowed',
             fontSize: '.84rem', fontWeight: 600,
-            color: avail.length ? '#222' : '#9aa0ab', background: '#fff', userSelect: 'none',
+            color: avail.length ? '#222' : '#9aa0ab', background: '#fff', userSelect: 'none', position: 'relative', zIndex: open ? 300 : 'auto',
           }}
         >
           <span>{avail.length === 0 ? 'Все добавлены' : (label === 'Кто продал? (товары)' ? 'выберите продавца…' : label === 'Кто продал?' ? 'выберите продавца…' : 'выберите сотрудника…')}</span>
-          <span style={{ color: '#b6b6c0', display: 'inline-flex' }}>▼</span>
+          <span style={{ color: '#b6b6c0', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .18s', display: 'inline-flex' }}>▼</span>
         </div>
       )}
-      {open && (
-        <div
-          onClick={function () { setOpen(false); }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}
-        >
+      {open && createPortal(
+        <>
           <div
-            onClick={function (e) { e.stopPropagation(); }}
-            style={{ width: '100%', maxWidth: '420px', background: '#fff', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.25)', animation: 'empup .18s ease' }}
+            onClick={function () { setOpen(false); }}
+            style={{ position: 'fixed', inset: 0, zIndex: 299 }}
+          />
+          <div
+            style={{ position: 'fixed', top: pos.top, left: pos.left, width: pos.width || undefined, zIndex: 300, background: '#fff', borderRadius: '11px', boxShadow: '0 12px 34px rgba(0,0,0,.16)', border: '1px solid #e8e8ee', overflow: 'hidden', animation: 'empup .14s ease' }}
           >
-            <style>{'@keyframes empup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}'}</style>
-            <div style={{ padding: '16px 18px 10px', borderBottom: '1px solid #f2f2f2' }}>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#222' }}>{label}</div>
-            </div>
-            <div style={{ maxHeight: '46vh', overflowY: 'auto' }}>
+            <style>{'@keyframes empup{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}'}</style>
+            <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
               {avail.length === 0 ? (
-                <div style={{ padding: '18px', textAlign: 'center', color: '#999', fontSize: '.84rem' }}>Все сотрудники добавлены</div>
+                <div style={{ padding: '14px 18px', textAlign: 'center', color: '#999', fontSize: '.82rem' }}>Все сотрудники добавлены</div>
               ) : avail.map(function (e) {
                 return (
                   <div key={e.id}
                     onClick={function () { onPick && onPick(String(e.id)); setOpen(false); }}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, color: '#2b2b31', borderBottom: '1px solid #f7f7f9' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', cursor: 'pointer', fontSize: '.85rem', fontWeight: 600, color: '#2b2b31', borderBottom: '1px solid #f7f7f9' }}
                     onMouseEnter={function (ev) { ev.currentTarget.style.background = '#f4f4f8'; }}
                     onMouseLeave={function (ev) { ev.currentTarget.style.background = 'transparent'; }}
                   >
                     <span style={{ flex: 1 }}>{e.name}</span>
-                    <span style={{ color: '#c9c9d3', fontWeight: 700, fontSize: '1.1rem' }}>＋</span>
+                    <span style={{ color: '#c9c9d3', fontWeight: 700 }}>＋</span>
                   </div>
                 );
               })}
             </div>
-            <div style={{ padding: '10px 18px 14px' }}>
-              <button type="button" onClick={function () { setOpen(false); }}
-                style={{ width: '100%', padding: '10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.84rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Готово</button>
-            </div>
           </div>
-        </div>
+        </>,
+        document.body
       )}
     </div>
   );
