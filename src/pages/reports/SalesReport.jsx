@@ -129,40 +129,37 @@ export default function SalesReport() {
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', paddingLeft: 0 }}>Сотрудник</th>
-                <th style={{ textAlign: 'center' }}>Позиций</th>
-                <th style={{ textAlign: 'center' }}>Товары</th>
-                <th style={{ textAlign: 'right' }}>Сумма товаров</th>
-                <th style={{ textAlign: 'center' }}>Услуги</th>
-                <th style={{ textAlign: 'right' }}>Сумма услуг</th>
-                <th style={{ textAlign: 'center' }}>Комбо</th>
-                <th style={{ textAlign: 'right' }}>Сумма комбо</th>
-                <th style={{ textAlign: 'right' }}>Сумма продаж</th>
-                <th style={{ textAlign: 'right' }}>Вознаграждение</th>
+                <th style={{ textAlign: 'left' }}>Позиций</th>
+                <th style={{ textAlign: 'left' }}>Товары</th>
+                <th style={{ textAlign: 'left' }}>Сумма товаров</th>
+                <th style={{ textAlign: 'left' }}>Услуги</th>
+                <th style={{ textAlign: 'left' }}>Сумма услуг</th>
+                <th style={{ textAlign: 'left' }}>Комбо</th>
+                <th style={{ textAlign: 'left' }}>Сумма комбо</th>
+                <th style={{ textAlign: 'left' }}>Сумма продаж</th>
+                <th style={{ textAlign: 'left' }}>Вознаграждение</th>
               </tr>
             </thead>
             <tbody>
               {empSales.map(e => (
                 <FragmentRow key={e.empId} e={e} cur={cur} fmtD={fmtD} expanded={expanded === e.empId} onToggle={() => setExpanded(expanded === e.empId ? null : e.empId)} />
               ))}
-              <tr className="total-row">
-                <td style={{ fontWeight: 600, textAlign: 'left', paddingLeft: 0 }}>Итого</td>
-                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.qty}</td>
-                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.prodQty}</td>
-                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.prodSum.toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.svcQty}</td>
-                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.svcSum.toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.comboQty}</td>
-                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.comboSum.toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.sum.toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'right', fontWeight: 700, color: '#2563eb' }}>+{totals.bonus.toLocaleString()} {cur}</td>
-              </tr>
+              {empSales.length > 0 && (
+                <tr className="total-row">
+                  <td style={{ fontWeight: 600, textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
+                  <td style={{ textAlign: 'left' }}>{totals.qty}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.prodQty}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.prodSum.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.svcQty}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.svcSum.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.comboQty}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left' }}>{'+' + totals.bonus.toLocaleString() + ' ' + cur}</td>
+                </tr>
+              )}
             </tbody>
           </table>
-          {revenue > 0 && (
-            <div style={{ textAlign: 'right', padding: '.5rem .3rem 0', fontSize: '.78rem', color: '#777' }}>
-              Выручка за период (чеки − возвраты): <b>{revenue.toLocaleString()} {cur}</b>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -189,25 +186,25 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
       {expanded && (
         <tr>
           <td colSpan="10" style={{ padding: 0, background: '#fafbfc' }}>
-            <div style={{ padding: '.3rem .6rem .6rem', fontSize: '.75rem' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="product-table" style={{ padding: '.5rem' }}>
+              <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'left', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Дата</th>
-                    <th style={{ textAlign: 'left', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Позиция</th>
-                    <th style={{ textAlign: 'left', width: '70px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Тип</th>
-                    <th style={{ textAlign: 'right', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Сумма</th>
-                    <th style={{ textAlign: 'right', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Вознаграждение</th>
+                    <th style={{ textAlign: 'left', paddingLeft: 0 }}>Дата</th>
+                    <th style={{ textAlign: 'left' }}>Позиция</th>
+                    <th style={{ textAlign: 'left' }}>Тип</th>
+                    <th style={{ textAlign: 'left' }}>Сумма</th>
+                    <th style={{ textAlign: 'left' }}>Вознаграждение</th>
                   </tr>
                 </thead>
                 <tbody>
                   {e.items.map((it, i) => (
                     <tr key={i}>
-                      <td style={{ textAlign: 'left', padding: '.25rem .4rem', color: '#777', fontSize: '.72rem' }}>{fmtD(it.date)}</td>
-                      <td style={{ textAlign: 'left', padding: '.25rem .4rem', fontSize: '.74rem' }}>{it.name}{it.qty > 1 ? ' x' + it.qty : ''}</td>
-                      <td style={{ textAlign: 'left', padding: '.25rem .4rem', color: it.type === 'service' ? '#7c3aed' : '#777', fontSize: '.72rem' }}>{it.type === 'service' ? 'услуга' : 'товар'}</td>
-                      <td style={{ textAlign: 'right', padding: '.25rem .4rem', fontSize: '.72rem' }}>{it.total.toLocaleString()} {cur}</td>
-                      <td style={{ textAlign: 'right', padding: '.25rem .4rem', fontSize: '.72rem', color: it.bonus ? '#2563eb' : '#bbb' }}>{it.bonus ? '+' + it.bonus.toLocaleString() : '—'}</td>
+                      <td style={{ textAlign: 'left', paddingLeft: 0 }}>{fmtD(it.date)}</td>
+                      <td style={{ textAlign: 'left' }}>{it.name}{it.qty > 1 ? ' x' + it.qty : ''}</td>
+                      <td style={{ textAlign: 'left' }}>{it.type === 'service' ? 'услуга' : it.type === 'combo' ? 'комбо' : 'товар'}</td>
+                      <td style={{ textAlign: 'left' }}>{it.total.toLocaleString()} {cur}</td>
+                      <td style={{ textAlign: 'left' }}>{it.bonus ? '+' + it.bonus.toLocaleString() + ' ' + cur : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
