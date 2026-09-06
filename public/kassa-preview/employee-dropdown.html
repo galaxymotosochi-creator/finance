@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Выбор сотрудника — варианты</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#f5f5f7;padding:24px 14px 80px;color:#111}
+h1{font-size:1.2rem;font-weight:800;text-align:center;letter-spacing:-.02em}
+.sub{font-size:.8rem;color:#888;text-align:center;margin:4px 0 6px}
+.tabswrap{max-width:440px;margin:14px auto 18px;display:flex;gap:6px}
+.tab{flex:1;padding:9px 6px;border-radius:100px;border:1.5px solid #ddd;background:#fff;font-size:.76rem;font-weight:600;cursor:pointer;color:#555;text-align:center;font-family:inherit;transition:.15s}
+.tab.on{border-color:#111;background:#111;color:#fff}
+.stage{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.pos{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.05)}
+.pos-head{display:flex;justify-content:space-between;align-items:flex-start}
+.pos-name{font-size:.94rem;font-weight:700}
+.pos-meta{font-size:.72rem;color:#8a8f9c;margin-top:1px}
+.price{font-weight:800;font-size:.92rem}
+.split-box{margin-top:11px;border:1px solid #eee;border-radius:12px;background:#fafbfc}
+.split-t{border-radius:12px 12px 0 0;overflow:visible}
+.stop-label{padding:8px 12px 2px}
+.stop-head{font-size:.76rem;font-weight:600;color:#444;display:flex;justify-content:space-between}
+.stop-head .amt{color:#222;font-weight:700}
+/* ===== PICKER (A и B стили) ===== */
+.picker{position:relative;margin:2px 0 8px}
+.pt{display:flex;align-items:center;justify-content:space-between;margin:4px 12px;border:1px solid #e2e2e8;background:#fff;border-radius:9px;padding:8px 11px;cursor:pointer;font-size:.82rem;font-weight:600;color:#222}
+.pt.ph{color:#9aa0ab;font-weight:500}
+.pt .ch{color:#b6b6c0;transition:.18s;display:inline-flex}
+.pop-area{}
+.pop{position:absolute;top:100%;left:12px;right:12px;background:#fff;border:1px solid #e8e8ee;border-radius:11px;box-shadow:0 12px 34px rgba(0,0,0,.13);z-index:30;display:none;overflow:hidden}
+.picker.open .pop{display:block;animation:down .16s ease}
+.picker.open .pt{border-color:#111}
+.picker.open .pt .ch{transform:rotate(180deg)}
+@keyframes down{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.plist{max-height:208px;overflow-y:auto}
+.eme{display:flex;align-items:center;gap:10px;padding:8px 11px;cursor:pointer}
+.eme:hover{background:#f4f4f8}
+.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.68rem;color:#fff}
+.eme .nm{flex:1;font-size:.82rem;font-weight:600;color:#2b2b31;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plus{color:#c9c9d3;font-weight:700}
+.pe{text-align:center;color:#999;font-size:.78rem;padding:12px}
+/* chips row */
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 12px 9px}
+.picked-list{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+/* A: dark chips */
+.chipa{display:inline-flex;align-items:center;gap:6px;background:#111;color:#fff;border-radius:100px;padding:3px 6px 3px 4px;font-size:.72rem;font-weight:600;font-family:inherit}
+.chipa .i{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;font-size:.55rem}
+.chipa .del{color:#aaa;cursor:pointer;padding:0 3px;font-size:.9rem;line-height:1}
+/* B: light chip w/ border */
+.chipb{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#222;border:1px solid #d8d8e0;border-radius:8px;padding:4px 7px;font-size:.78rem;font-weight:600;font-family:inherit}
+.chipb .i{width:18px;height:18px;border-radius:6px;background:#111;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700}
+.chipb .del{color:#c0c0ca;cursor:pointer;padding:0 2px}
+/* C: sidebar count */
+.root{position:relative}
+.field{display:flex;align-items:center;justify-content:space-between;border:1.5px solid #e2e2e8;background:#fff;border-radius:11px;padding:10px 13px;cursor:pointer;font-size:.84rem;font-weight:600}
+.field.phc{color:#9aa0ab;font-weight:500}
+.count-pill{min-width:22px;height:22px;border-radius:8px;background:#111;color:#fff;font-size:.7rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.panel{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #eee;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.14);display:none;overflow:auto;z-index:40;max-height:290px}
+.demo.active .panel{display:block;animation:down .16s ease}
+.phead{padding:10px 14px;font-size:.95rem;font-weight:700;border-bottom:1px solid #f2f2f2}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px}
+.gc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border:1px solid #eee;border-radius:12px;cursor:pointer;transition:.13s}
+.gc:hover{border-color:#111;background:#fafafa}
+.gc .av2{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;box-shadow:inset 0 -2px 6px rgba(0,0,0,.15)}
+.gc .nn{font-size:.78rem;font-weight:600;color:#2b2b31;text-align:center;line-height:1.2}
+.gc.done{opacity:.5;pointer-events:none;background:#fafafa;border-color:#eee}
+.gc.done .mark{position:absolute;color:#16a34a;font-size:1rem;font-weight:800}
+.gc-w{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.emoji-list{display:flex;flex-wrap:wrap;gap:8px;padding:4px 14px 12px}
+.emo{display:inline-flex;align-items:center;gap:7px;background:#f4f4f7;border-radius:100px;padding:5px 7px 5px 5px;font-size:.74rem;font-weight:600;color:#333;cursor:pointer}
+.emo .del{color:#c5c5cf}
+.foot{display:flex;justify-content:flex-end;padding:0 12px 10px;gap:8px}
+.go{padding:7px 18px;border-radius:100px;border:none;background:#111;color:#fff;font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit}
+.note{max-width:440px;margin:14px auto 0;font-size:.74rem;color:#999;text-align:center;line-height:1.5}
+.flag{font-size:.68rem;font-weight:700;letter-spacing:.06em;color:#999;text-transform:uppercase;margin:0 0 10px}
+.dot3{max-width:440px;margin:20px auto 0;text-align:center;color:#ddd;letter-spacing:6px;font-size:.9rem}
+</style>
+</head>
+<body>
+<h1>Выбор продавца под позицией</h1>
+<p class="sub">Кликните поле «Кто продал?» — выпадает список. Выберите одного — добавится. Нажмите снова — список уже без него.</p>
+
+<div class="tabswrap">
+<div class="tab on" data-v="A">A · Купе</div>
+<div class="tab" data-v="B">B · Чипы</div>
+<div class="tab" data-v="C">C · Аватарки</div>
+</div>
+
+<div id="stageA" class="stage" style="display:block">
+<div class="pos">
+<div class="pos-head"><div><div class="pos-name">Кроссовки Air Max</div><div class="pos-meta">Арт. AM270 · товар</div></div><div class="price">8 900 ₽</div></div>
+<div class="split-box split-t">
+<div class="stop-label"><div class="stop-head"><span>Кто продал?</span></div></div>
+<!-- row appended here -->
+<div id="a-rows"></div>
+</div>
+</div>
+</div>
+
+<div id="stageB" class="stage" style="display:none">
+<div class="pos">
+<div class="pos-head"><div><div class="pos-name">Стрижка + укладка</div><div class="pos-meta">Комбо · услуга</div></div><div class="price">3 500 ₽</div></div>
+<div class="split-box split-t">
+<div class="stop-label"><div class="stop-head"><span>Кто выполняет?</span></div></div>
+<div id="b-rows"></div>
+</div>
+</div>
+</div>
+
+<div id="stageC" class="stage" style="display:none">
+<div class="pos">
+<div class="pos-head"><div><div class="pos-name">Маникюр + покрытие</div><div class="pos-meta">Услуга · салон</div></div><div class="price">2 400 ₽</div></div>
+<div class="field phc" id="c-field">
+<span>Кто продал?</span><span class="count-pill" id="c-count">0</span>
+</div>
+<div class="panel" id="c-panel">
+<div class="phead">Выберите сотрудника</div>
+<div class="emoji-list" id="c-list"></div>
+<div class="foot"><button class="go" id="c-done">Готово</button></div>
+</div>
+</div>
+</div>
+
+<div class="dot3">• • •</div>
+<p class="note">A — добавленные становятся чёрными чипами под списком.<br>B — то же, но светлые чипы с рамкой.<br>C — поле-счётчик, панель выпадает ниже целой карточкой с аватарками.</p>
+
+<script>
+const ROOT = window.location.pathname.split('/').pop().replace('.html','');
+// general employees
+var EMP = [
+ {id:1,name:'Анна Смирнова',c:'#f59e0b'}, {id:2,name:'Иван Петров',c:'#10b981'},
+ {id:3,name:'Мария Козлова',c:'#6366f1'}, {id:4,name:'Пётр Соколов',c:'#ef4444'},
+ {id:5,name:'Ольга Новикова',c:'#8b5cf6'}, {id:6,name:'Дмитрий Лебедев',c:'#0ea5e9'},
+ {id:7,name:'Елена Морозова',c:'#ec4899'}
+];
+function ini(n){return (n||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+
+// ---------- A ----------
+function buildA(root){
+  var pick = document.createElement('div'); pick.className='picker';
+  var sel=[]; var open=false;
+  pick.innerHTML =
+   '<div class="pt ph">выберите продавца… <span class="ch">▼</span></div>'+
+   '<div class="pop"><div class="plist"></div><div class="pe" style="display:none">Все сотрудники добавлены</div></div>';
+  pick.querySelector('.pt').onclick=function(){open?!close():openIt();};
+  var chipsBox=document.createElement('div'); chipsBox.className='chips';
+  root.appendChild(pick); root.appendChild(chipsBox);
+  function avail(){return EMP.filter(e=>!sel.some(x=>x.id==e.id));}
+  function renderList(){var L=pick.querySelector('.plist');L.innerHTML='';
+    var a=avail();
+    pick.querySelector('.pe').style.display = a.length?'none':'block';
+    a.forEach(function(e){var d=document.createElement('div');d.className='eme';
+      d.innerHTML='<span class="av" style="background:'+e.c+'">'+ini(e.name)+'</span><span class="nm">'+e.name+'</span><span class="plus">＋</span>';
+      d.onclick=function(){sel.push(e);render();close();openIt();};
+      L.appendChild(d);});}
+  function render(){
+    var tri=pick.querySelector('.pt');
+    if(sel.length){tri.classList.remove('ph');tri.innerHTML=/* '' */'';tri.append(document.createTextNode(sel.length+' выбран :: '+sel.map(s=>s.name).join(', ')));}
+    // keep simple: rebuild label text
+    chipsBox.innerHTML='';
+    sel.forEach(function(s){var c=document.createElement('span');c.className='chipa';
+      c.innerHTML='<span class="i">'+ini(s.name)+'</span>'+s.name+'<span class="del">✕</span>';
+      c.querySelector('.del').onclick=function(){sel=sel.filter(y=>y.id!=s.id);render();};
+      chipsBox.appendChild(c);});
+    if(sel.length){tri.classList.remove('ph');}
+  }
+  function openIt(){open=true;pick.classList.add('open');renderList();}
+  function close(){open=false;pick.classList.remove('open');}
+}
+buildA(document.getElementById('a-rows'));
+
+// ---------- B ----------
+function buildB(root){
+  var pick=document.createElement('div');pick.className='picker';
+  var sel=[];var open=false;
+  pick.innerHTML='<div class="pt ph">выберите мастера… <span class="ch">▼</span></div><div class="pop"><div class="plist"></div></div>';
+  pick.querySelector('.pt').onclick=function(){open?pick.classList.remove('open'):pick.classList.add('open');open=!open;renderList();};
+  var list=document.createElement('div');list.className='chips';pick.appendChild(list);
+  // note board showing added permanently
+  root.appendChild(pick);
+  var plate=document.createElement('div');plate.style.cssText='padding:0 12px 10px;display:flex;flex-direction:column;gap:5px';root.appendChild(plate);
+  function avail(){return EMP.filter(e=>!sel.some(x=>x.id==e.id));}
+  function renderList(){var L=pick.querySelector('.plist');L.innerHTML='';var a=avail();
+    if(!a.length){L.innerHTML='<div class="pe">Все добавлены</div>';}
+    a.forEach(function(e){var d=document.createElement('div');d.className='eme';
+      d.innerHTML='<span class="av" style="background:'+e.c+'">'+ini(e.name)+'</span><span class="nm">'+e.name+'</span><span class="plus">＋</span>';
+      d.onclick=function(){sel.push(e);plate.innerHTML='';renderChips(plate);
+        pick.querySelector('.pt').innerHTML=e.name+' <span class="ch">▼</span>';
+        pick.querySelector('.pt').classList.remove('ph');
+        pick.classList.remove('open');renderList();renderChips(plate);
+        // reopen instantly so user can add more
+        pick.classList.add('open');
+      };
+      L.appendChild(d);});}
+  function renderChips(box){box.innerHTML='';sel.forEach(function(s){var c=document.createElement('span');c.className='chipb';
+    c.innerHTML='<span class="i">'+ini(s.name)+'</span>'+s.name+'<span class="del">✕</span>';
+    c.querySelector('.del').onclick=function(){sel=sel.filter(y=>y.id!=s.id);pH();renderChips(box);};
+    box.appendChild(c);});}
+  function pH(){if(sel.length){pick.querySelector('.pt').classList.remove('ph');pick.querySelector('.pt').innerHTML=(sel.length>1? sel.length+' мастера':'')+'';} else pick.querySelector('.pt').classList.add('ph');pick.querySelector('.pt').firstChild && (pick.querySelector('.pt').innerHTML='выберите мастера…' ) ;pick.querySelector('.pt').classList.remove('ph');}
+}
+buildB(document.getElementById('b-rows'));
+
+// ---------- C ----------
+(function C(){
+  var field=$('c-field'),panel=$('c-panel'),list=$('c-list'),count=$('c-count');
+  var sel=[];
+  field.onclick=function(e){ if(e.target.closest('#c-panel'))return; panel.classList.toggle('active'); if(panel.classList.contains('active'))renderC(); };
+  $('c-done').onclick=function(){panel.classList.remove('active');};
+  panel.onclick=function(e){e.stopPropagation();};
+  function selIds(){return sel.map(s=>s.id);}
+  function renderC(){list.innerHTML='';count.textContent=sel.length;
+    EMP.forEach(function(e){
+      var d=document.createElement('div');d.className='eme';
+      var chosen=sel.some(s=>s.id==e.id);
+      d.style.opacity=chosen?'.5':'';d.style.pointerEvents=chosen?'none':'';
+      d.innerHTML='<span class="av" style="background:'+e.c+'">'+ini(e.name)+'</span><span class="nm">'+e.name+'</span>'+(chosen?'<span class="plus" style="color:#16a34a">✓</span>':'<span class="plus">＋</span>');
+      d.onclick=function(){sel.push(e);renderC();};
+      list.appendChild(d);});
+  }
+  function $(id){return document.getElementById(id);}
+})();
+
+// tabs
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+  ['A','B','C'].forEach(function(v){document.getElementById('stage'+v).style.display = (t.dataset.v==v)?'block':'none';});
+};});
+</script>
+</body>
+</html>
