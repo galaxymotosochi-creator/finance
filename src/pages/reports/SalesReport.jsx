@@ -159,8 +159,8 @@ export default function SalesReport() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Отчёты — продажи по сотрудникам</h1>
-          <div className="sub">Кто сколько продал (товары) и выполнил (услуги) за период, и бонус по правилам</div>
+          <h1>Продажи по сотрудникам</h1>
+          <div className="sub">Все продажи и вознаграждения сотрудников за период</div>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
