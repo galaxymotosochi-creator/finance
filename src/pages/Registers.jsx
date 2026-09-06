@@ -2094,22 +2094,52 @@ if (loading) return <CenterSpinner />;
 // ===== Вспомогательные компоненты строки выбора сотрудника (продавец/мастер) =====
 // Нативный выпадающий список сотрудников (ФИО, без иконок)
 function SplitPicker({ label, amount, enabled, avail, onPick }) {
+  const [open, setOpen] = React.useState(false);
   const none = amount ? '' : '+ добавить';
+  // выпадающий список "Купе" без иконок-инициалов
   return (
-    <div style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2' }}>
-      <div style={{ fontSize: '.74rem', color: '#777', fontWeight: 600, marginBottom: '2px' }}>
+    <div style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2', position: 'relative' }}>
+      <div style={{ fontSize: '.74rem', color: '#777', fontWeight: 600, marginBottom: '6px', display: 'flex', justifyContent: 'space-between' }}>
         <span>{label}</span>
-        <span style={{ color: amount ? '#222' : '#8a8f9c', paddingLeft: '6px', fontWeight: 700 }}>{amount || none}</span>
+        <span style={{ color: amount ? '#222' : '#8a8f9c', fontWeight: 700 }}>{amount || none}</span>
       </div>
       {enabled && (
-        <select
-          onChange={function(e){ const v = e.target.value; e.target.value=''; onPick && onPick(v); }}
-          style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '6px 8px', fontSize: '.82rem', fontFamily: 'inherit', background: '#fff', color: '#222', cursor: 'pointer', outline: 'none' }}
-        >
-          <option value="">{label === 'Кто продал? (товары)' ? 'выберите продавца…' : label === 'Кто продал?' ? 'выберите продавца…' : 'выберите сотрудника…'}</option>
-          {avail.map(function(e){ return <option key={e.id} value={e.id}>{e.name}</option>; })}
-          {avail.length === 0 && <option disabled>Все добавлены</option>}
-        </select>
+        <>
+          <div
+            onClick={function () { if (avail.length) setOpen(!open); }}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              border: (open ? '1px solid #111' : '1px solid #e0e0e0'),
+              borderRadius: '9px', padding: '8px 11px', cursor: avail.length ? 'pointer' : 'not-allowed',
+              fontSize: '.84rem', fontWeight: 600,
+              color: avail.length ? '#222' : '#9aa0ab', background: '#fff', userSelect: 'none',
+            }}
+          >
+            <span>{avail.length === 0 ? 'Все добавлены' : (label === 'Кто продал? (товары)' ? 'выберите продавца…' : label === 'Кто продал?' ? 'выберите продавца…' : 'выберите сотрудника…')}</span>
+            <span style={{ color: '#b6b6c0', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .18s', display: 'inline-flex' }}>▼</span>
+          </div>
+          {open && (
+            <div style={{ position: 'absolute', top: '100%', left: 11, right: 11, zIndex: 40, background: '#fff', border: '1px solid #e8e8ee', borderRadius: '11px', boxShadow: '0 12px 34px rgba(0,0,0,.13)', overflow: 'hidden' }}>
+              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                {avail.length === 0 ? (
+                  <div style={{ padding: '14px', textAlign: 'center', color: '#999', fontSize: '.8rem' }}>Все сотрудники добавлены</div>
+                ) : avail.map(function (e) {
+                  return (
+                    <div key={e.id}
+                      onClick={function () { onPick && onPick(String(e.id)); setOpen(false); }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 13px', cursor: 'pointer', fontSize: '.84rem', fontWeight: 600, color: '#2b2b31' }}
+                      onMouseEnter={function (ev) { ev.currentTarget.style.background = '#f4f4f8'; }}
+                      onMouseLeave={function (ev) { ev.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <span style={{ flex: 1 }}>{e.name}</span>
+                      <span style={{ color: '#c9c9d3', fontWeight: 700 }}>＋</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -2126,7 +2156,6 @@ function SplitLine({ label, sub, has, active, open }) {
 function SplitRow({ spd, cur, onAmt, onDel }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '.76rem' }}>
-      <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#e3e6f0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '.64rem', fontWeight: 700, color: '#555', flexShrink: 0 }}>{spd.name.charAt(0)}</span>
       <span style={{ flex: 1, fontWeight: 600, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{spd.name}</span>
       <input type="number" min="0" placeholder="0" value={spd.amt}
         onChange={function (e) { onAmt(e.target.value); }}
