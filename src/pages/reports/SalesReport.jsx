@@ -13,6 +13,9 @@ export default function SalesReport() {
   const { user } = useAuth();
   const [from, setFrom] = useState(() => { const t = tzToday(); return t.slice(0, 8) + '01'; });
   const [to, setTo] = useState(() => tzToday());
+  const [period, setPeriod] = useState('all');
+  const [periodLabel, setPeriodLabel] = useState('Все время');
+  const [showPeriod, setShowPeriod] = useState(false);
   const [loading, setLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
   const [prods, setProds] = useState([]);
@@ -91,6 +94,17 @@ export default function SalesReport() {
 
   useEffect(() => { load(); }, [from, to]);
 
+  // период как в «Доходы и расходы»
+  const applyPeriod = (k) => {
+    setPeriod(k);
+    if (k === 'all') { setFrom('2000-01-01'); setTo('2999-12-31'); setPeriodLabel('Все время'); return; }
+    if (k === 'today') { setTo(tzToday()); setFrom(tzToday()); setPeriodLabel('Сегодня'); return; }
+    if (k === 'yesterday') { setTo(tzToday()); setFrom(tzOffsetDate(1)); setPeriodLabel('Вчера'); return; }
+    if (k === 'week') { setTo(tzToday()); setFrom(tzOffsetDate(7)); setPeriodLabel('7 дней'); return; }
+    if (k === 'month30') { setTo(tzToday()); setFrom(tzOffsetDate(30)); setPeriodLabel('30 дней'); return; }
+    if (k === 'month') { const t = tzToday(); setTo(t); setFrom(t.slice(0, 8) + '01'); setPeriodLabel('Этот месяц'); return; }
+  };
+
   const totals = empSales.reduce((s, e) => ({ qty: s.qty + e.totalQty, totalQty: s.totalQty + e.totalQty, prodQty: s.prodQty + e.prodQty, prodSum: s.prodSum + e.prodSum, svcQty: s.svcQty + e.svcQty, svcSum: s.svcSum + e.svcSum, comboQty: s.comboQty + e.comboQty, comboSum: s.comboSum + e.comboSum, sum: s.sum + e.sum, bonus: s.bonus + e.bonus }), { qty: 0, totalQty: 0, prodQty: 0, prodSum: 0, svcQty: 0, svcSum: 0, comboQty: 0, comboSum: 0, sum: 0, bonus: 0 });
 
   return (
@@ -103,28 +117,39 @@ export default function SalesReport() {
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
-      {/* Период */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.6rem', flexWrap: 'wrap' }}>
-        <span onClick={() => { setFrom('2000-01-01'); setTo('2999-12-31'); }}
-          style={{ padding: '.28rem .85rem', borderRadius: '100px', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', background: from === '2000-01-01' ? '#111' : '#eee', color: from === '2000-01-01' ? '#fff' : '#555', fontFamily: 'inherit', border: 'none', whiteSpace: 'nowrap' }}>Все время</span>
-        <select
-          value={from === '2000-01-01' ? '' : (to === tzToday() ? (from === tzToday() ? '0' : from === tzOffsetDate(1) ? '1' : from === tzOffsetDate(7) ? '7' : from === tzOffsetDate(30) ? '30' : (from === (tzToday().slice(0, 8) + '01')) ? 'month' : 'custom') : 'custom')}
-          onChange={e => {
-            const k = e.target.value;
-            if (k === 'month') { const t = tzToday(); setTo(t); setFrom(t.slice(0, 8) + '01'); }
-            else if (k === '0' || k === '1' || k === '7' || k === '30') { setTo(tzToday()); setFrom(tzOffsetDate(Number(k))); }
-          }}
-          style={{ border: '1.5px solid var(--border)', borderRadius: '8px', padding: '.28rem .5rem', fontSize: '.8rem', fontFamily: 'inherit', outline: 'none', cursor: 'pointer', color: from === '2000-01-01' ? '#9aa0ab' : '#222' }}>
-          <option value="">Выберите период</option>
-          <option value="0">Сегодня</option>
-          <option value="1">Вчера</option>
-          <option value="7">7 дней</option>
-          <option value="30">30 дней</option>
-          <option value="month">Этот месяц</option>
-        </select>
-        <span style={{ color: '#999', fontSize: '.8rem' }}>—</span>
-        <input type="date" value={from === '2000-01-01' ? '' : from} onChange={e => setFrom(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
-        <input type="date" value={to === '2999-12-31' ? '' : to} onChange={e => setTo(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '6px', padding: '4px 6px', fontSize: '.78rem', fontFamily: 'inherit', outline: 'none' }} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '.3rem', marginBottom: '.6rem', flexWrap: 'wrap', position: 'relative' }}>
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+          <span className="stock-filter-link"
+            style={{ display: 'inline-flex', alignItems: 'center', padding: '.28rem .6rem', fontSize: '.72rem', color: '#555', cursor: 'pointer', border: '1px solid #e0e0e4', borderRadius: '100px', lineHeight: 1, whiteSpace: 'nowrap', background: '#fff' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; }}
+            onClick={e => { e.stopPropagation(); setShowPeriod(!showPeriod); }}>{periodLabel}</span>
+          {showPeriod && (
+            <div onClick={e => e.stopPropagation()} style={{ display: 'block', position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'var(--body-bg)', border: '1px solid var(--border)', borderRadius: '.6rem', boxShadow: '0 .3rem .8rem rgba(0,0,0,.1)', minWidth: '210px', padding: '.35rem', zIndex: 100 }}>
+              {[{ key: 'all', label: 'Все время' }, { key: 'today', label: 'Сегодня' }, { key: 'yesterday', label: 'Вчера' }, { key: 'week', label: '7 дней' }, { key: 'month30', label: '30 дней' }, { key: 'month', label: 'Этот месяц' }].map(p => {
+                const isActive = period === p.key;
+                return (
+                  <div key={p.key} onClick={() => { applyPeriod(p.key); setShowPeriod(false); }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '.35rem', padding: '.3rem .5rem', borderRadius: 4, cursor: 'pointer', fontSize: '.78rem', color: '#555', background: 'transparent' }}>
+                    <input type="checkbox" checked={isActive} onChange={() => {}} style={{ cursor: 'pointer', margin: 0 }} />
+                    {p.label}
+                  </div>
+                );
+              })}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '.35rem', marginTop: '.15rem' }}>
+                <div style={{ fontSize: '.72rem', color: 'var(--muted)', padding: '.2rem .5rem', marginBottom: '.25rem' }}>Свой период</div>
+                <div style={{ display: 'flex', gap: '.25rem', padding: '.25rem .5rem' }}>
+                  <input type="date" value={from === '2000-01-01' ? '' : from} onChange={e => setFrom(e.target.value)} style={{ flex: 1, fontSize: '.72rem', padding: '.2rem', border: '1px solid var(--border)', borderRadius: 4, fontFamily: 'var(--font)', outline: 'none' }} />
+                  <input type="date" value={to === '2999-12-31' ? '' : to} onChange={e => setTo(e.target.value)} style={{ flex: 1, fontSize: '.72rem', padding: '.2rem', border: '1px solid var(--border)', borderRadius: 4, fontFamily: 'var(--font)', outline: 'none' }} />
+                </div>
+                <div style={{ padding: '.25rem .5rem' }}>
+                  <button onClick={() => { if (!from || !to) return alert('Выберите обе даты'); setPeriod('custom'); setPeriodLabel(from.split('-').reverse().join('.') + ' — ' + to.split('-').reverse().join('.')); setShowPeriod(false); }}
+                    style={{ width: '100%', padding: '.35rem .5rem', fontSize: '.75rem', fontFamily: 'var(--font)', background: 'var(--secondary)', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 }}>Применить</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {loading ? (
