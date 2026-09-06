@@ -214,11 +214,8 @@ export default function SalesReport() {
               <tr>
                 <th style={{ textAlign: 'left', paddingLeft: 0 }}>Сотрудник</th>
                 <th style={{ textAlign: 'left' }}>Позиций</th>
-                <th style={{ textAlign: 'left' }}>Товары</th>
                 <th style={{ textAlign: 'left' }}>Сумма товаров</th>
-                <th style={{ textAlign: 'left' }}>Услуги</th>
                 <th style={{ textAlign: 'left' }}>Сумма услуг</th>
-                <th style={{ textAlign: 'left' }}>Комбо</th>
                 <th style={{ textAlign: 'left' }}>Сумма комбо</th>
                 <th style={{ textAlign: 'left' }}>Сумма продаж</th>
                 <th style={{ textAlign: 'left' }}>Вознаграждение</th>
@@ -232,11 +229,8 @@ export default function SalesReport() {
                 <tr className="total-row">
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.qty}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.prodQty}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.prodSum.toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.svcQty}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.svcSum.toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboQty}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.bonus ? '+' + totals.bonus.toLocaleString() + ' ' + cur : '—'}</td>
@@ -260,18 +254,15 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
           <span className="prod-name">{expanded ? '▾ ' : '▸ '}{e.name}</span>
         </td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.totalQty}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.prodQty || '—'}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.prodSum ? e.prodSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.svcQty || '—'}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.svcSum ? e.svcSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.comboQty || '—'}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.sum.toLocaleString()} {cur}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
       </tr>
       {expanded && (
         <tr>
-          <td colSpan="10" style={{ padding: 0, background: '#fafbfc' }}>
+          <td colSpan="7" style={{ padding: 0, background: '#fafbfc' }}>
             <div className="product-table" style={{ padding: '.5rem' }}>
               <table className="data-table">
                 <thead id="colHeaders">
