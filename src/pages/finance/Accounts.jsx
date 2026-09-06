@@ -269,20 +269,19 @@ export default function Accounts() {
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap'}}>
-        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.4rem',marginLeft:'auto',flexWrap:'wrap',justifyContent:'flex-end'}}>
-          {/* Кнопки действий (компактные, без иконок) */}
+        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',flexWrap:'wrap',justifyContent:'flex-end'}}>
+          {/* Кнопки действий (вид 1-в-1 с фильтрами в Доходах и расходах: Все время/Расходы/Доходы/Скачать) */}
           {[
             { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, label:'Начальные остатки' },
             { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
             { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
             { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
           ].map(a => (
-            <button key={a.label} type="button" onClick={a.onClick}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111';e.currentTarget.style.background='#f7f7f9'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#444';e.currentTarget.style.background='#fff'}}
-              style={{display:'inline-flex',alignItems:'center',padding:'6px 13px',background:'#fff',border:'1px solid #e0e0e4',borderRadius:'100px',fontSize:'.75rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',lineHeight:1,boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}>
-              {a.label}
-            </button>
+            <span key={a.label} className="stock-filter-link"
+              style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,background:'#fff',whiteSpace:'nowrap',fontFamily:'inherit',transition:'all .12s'}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
+              onClick={a.onClick}>{a.label}</span>
           ))}
         </div>
       </div>
