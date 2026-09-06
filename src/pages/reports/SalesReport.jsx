@@ -57,12 +57,14 @@ export default function SalesReport() {
           let E = byEmp[eid];
           if (!E) {
             const emp = (empRes.data || []).find(x => x.id === eid);
-            E = { empId: eid, name: emp ? emp.name : 'Сотрудник', rules: emp ? (emp.bonus_rules || []) : [], qty: 0, prodQty: 0, svcQty: 0, sum: 0, bonus: 0, items: [] };
+            E = { empId: eid, name: emp ? emp.name : 'Сотрудник', rules: emp ? (emp.bonus_rules || []) : [], qty: 0, prodQty: 0, svcQty: 0, comboQty: 0, totalQty: 0, prodSum: 0, svcSum: 0, comboSum: 0, sum: 0, bonus: 0, items: [] };
             byEmp[eid] = E;
           }
           const bonus = calcSalesBonus(E.rules, { product_id: it.product_id, total, qty }, prData, crData).rub;
-          E.qty += qty;
-          if (type === 'service') E.svcQty += qty; else E.prodQty += qty;
+          E.totalQty += qty;
+          if (type === 'service') { E.svcQty += qty; E.svcSum += total; }
+          else if (type === 'combo') { E.comboQty += qty; E.comboSum += total; }
+          else { E.prodQty += qty; E.prodSum += total; }
           E.sum += total;
           E.bonus += bonus;
           E.items.push({ date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
@@ -89,7 +91,7 @@ export default function SalesReport() {
 
   useEffect(() => { load(); }, [from, to]);
 
-  const totals = empSales.reduce((s, e) => ({ qty: s.qty + e.qty, sum: s.sum + e.sum, bonus: s.bonus + e.bonus }), { qty: 0, sum: 0, bonus: 0 });
+  const totals = empSales.reduce((s, e) => ({ qty: s.qty + e.totalQty, totalQty: s.totalQty + e.totalQty, prodQty: s.prodQty + e.prodQty, prodSum: s.prodSum + e.prodSum, svcQty: s.svcQty + e.svcQty, svcSum: s.svcSum + e.svcSum, comboQty: s.comboQty + e.comboQty, comboSum: s.comboSum + e.comboSum, sum: s.sum + e.sum, bonus: s.bonus + e.bonus }), { qty: 0, totalQty: 0, prodQty: 0, prodSum: 0, svcQty: 0, svcSum: 0, comboQty: 0, comboSum: 0, sum: 0, bonus: 0 });
 
   return (
     <div>
@@ -127,11 +129,15 @@ export default function SalesReport() {
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', paddingLeft: 0 }}>Сотрудник</th>
-                <th style={{ textAlign: 'left' }}>Позиций</th>
-                <th style={{ textAlign: 'left' }}>Товары</th>
-                <th style={{ textAlign: 'left' }}>Услуги</th>
-                <th style={{ textAlign: 'left' }}>Сумма продаж</th>
-                <th style={{ textAlign: 'left' }}>Бонус (по правилам)</th>
+                <th style={{ textAlign: 'center' }}>Позиций</th>
+                <th style={{ textAlign: 'center' }}>Товары</th>
+                <th style={{ textAlign: 'right' }}>Сумма товаров</th>
+                <th style={{ textAlign: 'center' }}>Услуги</th>
+                <th style={{ textAlign: 'right' }}>Сумма услуг</th>
+                <th style={{ textAlign: 'center' }}>Комбо</th>
+                <th style={{ textAlign: 'right' }}>Сумма комбо</th>
+                <th style={{ textAlign: 'right' }}>Сумма продаж</th>
+                <th style={{ textAlign: 'right' }}>Вознаграждение</th>
               </tr>
             </thead>
             <tbody>
@@ -140,11 +146,15 @@ export default function SalesReport() {
               ))}
               <tr className="total-row">
                 <td style={{ fontWeight: 600, textAlign: 'left', paddingLeft: 0 }}>Итого</td>
-                <td style={{ textAlign: 'left', fontWeight: 700 }}>{totals.qty}</td>
-                <td style={{ textAlign: 'left' }}></td>
-                <td style={{ textAlign: 'left' }}></td>
-                <td style={{ textAlign: 'left', fontWeight: 700 }}>{totals.sum.toLocaleString()} {cur}</td>
-                <td style={{ textAlign: 'left', fontWeight: 700, color: '#2563eb' }}>+{totals.bonus.toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.qty}</td>
+                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.prodQty}</td>
+                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.prodSum.toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.svcQty}</td>
+                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.svcSum.toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'center', fontWeight: 700 }}>{totals.comboQty}</td>
+                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.comboSum.toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'right', fontWeight: 700 }}>{totals.sum.toLocaleString()} {cur}</td>
+                <td style={{ textAlign: 'right', fontWeight: 700, color: '#2563eb' }}>+{totals.bonus.toLocaleString()} {cur}</td>
               </tr>
             </tbody>
           </table>
@@ -166,15 +176,19 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
         onMouseEnter={ev => { ev.currentTarget.style.background = '#f5f5f5'; }}
         onMouseLeave={ev => { ev.currentTarget.style.background = ''; }}>
         <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 600 }}>{expanded ? '▾ ' : '▸ '}{e.name}</td>
-        <td style={{ textAlign: 'left' }}>{e.qty}</td>
-        <td style={{ textAlign: 'left', color: e.prodQty ? '#555' : '#bbb' }}>{e.prodQty || '—'}</td>
-        <td style={{ textAlign: 'left', color: e.svcQty ? '#555' : '#bbb' }}>{e.svcQty || '—'}</td>
-        <td style={{ textAlign: 'left' }}>{e.sum.toLocaleString()} {cur}</td>
-        <td style={{ textAlign: 'left', color: e.bonus ? '#2563eb' : '#bbb', fontWeight: e.bonus ? 600 : 400 }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'center' }}>{e.totalQty}</td>
+        <td style={{ textAlign: 'center', color: e.prodQty ? '#555' : '#bbb' }}>{e.prodQty || '—'}</td>
+        <td style={{ textAlign: 'right', color: e.prodSum ? '#555' : '#bbb' }}>{e.prodSum ? e.prodSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'center', color: e.svcQty ? '#555' : '#bbb' }}>{e.svcQty || '—'}</td>
+        <td style={{ textAlign: 'right', color: e.svcSum ? '#555' : '#bbb' }}>{e.svcSum ? e.svcSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'center', color: e.comboQty ? '#555' : '#bbb' }}>{e.comboQty || '—'}</td>
+        <td style={{ textAlign: 'right', color: e.comboSum ? '#555' : '#bbb' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'right', fontWeight: 600 }}>{e.sum.toLocaleString()} {cur}</td>
+        <td style={{ textAlign: 'right', color: e.bonus ? '#2563eb' : '#bbb', fontWeight: e.bonus ? 600 : 400 }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
       </tr>
       {expanded && (
         <tr>
-          <td colSpan="6" style={{ padding: 0, background: '#fafbfc' }}>
+          <td colSpan="10" style={{ padding: 0, background: '#fafbfc' }}>
             <div style={{ padding: '.3rem .6rem .6rem', fontSize: '.75rem' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
@@ -183,7 +197,7 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
                     <th style={{ textAlign: 'left', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Позиция</th>
                     <th style={{ textAlign: 'left', width: '70px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Тип</th>
                     <th style={{ textAlign: 'right', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Сумма</th>
-                    <th style={{ textAlign: 'right', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Бонус</th>
+                    <th style={{ textAlign: 'right', width: '90px', padding: '.3rem .4rem', color: '#888', fontWeight: 500, fontSize: '.7rem' }}>Вознаграждение</th>
                   </tr>
                 </thead>
                 <tbody>
