@@ -429,7 +429,7 @@ export default function Transactions() {
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
             <button type="button" title="Скачать" aria-label="Скачать"
-              style={{width:'28px',height:'28px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}
+              style={{width:'22px',height:'22px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
               onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
