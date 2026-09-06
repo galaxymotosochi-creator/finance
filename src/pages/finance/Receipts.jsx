@@ -444,9 +444,9 @@ export default function Receipts() {
 
       {/* Поиск + фильтры */}
       <div className="search-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '.5rem', width: '100%', flexWrap: 'nowrap' }}>
-        <div className="stock-search" style={{ display: 'inline-flex', alignItems: 'center', gap: '.3rem', width: 'auto', border: '1.5px solid var(--border)', borderRadius: '100px', padding: '7px 16px', background: 'var(--body-bg)' }}>>
+        <div className="stock-search" style={{ display: 'inline-flex', alignItems: 'center', gap: '.3rem', width: 'auto', border: '1.5px solid var(--border)', borderRadius: '100px', padding: '5px 12px', background: 'var(--body-bg)' }}>>
           <span style={{ fontSize: '.75rem', color: 'var(--muted)', lineHeight: 1 }}>🔍</span>
-          <input type="text" placeholder="Номер чека, клиент, кассир..." value={search} onChange={e => setSearch(e.target.value)}
+          <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
         <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
