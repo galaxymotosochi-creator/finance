@@ -386,7 +386,7 @@ export default function Transactions() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
-        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".3rem",marginLeft:"auto",flexWrap:'wrap',justifyContent:'flex-end'}}>
+        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto",flexWrap:'wrap',justifyContent:'flex-end'}}>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
             <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,whiteSpace:'nowrap',background:'#fff'}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
