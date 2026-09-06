@@ -817,10 +817,10 @@ export default function Products() {
             onMouseEnter={e=>pillHover(e, showTrash, true)} onMouseLeave={e=>pillHover(e, showTrash, false)}
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
           <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} type="button" title="Скачать" aria-label="Скачать"
-            style={{width:'24px',height:'24px',flexShrink:0,border:'1px solid #d8d8dc',borderRadius:'100px',background:'#fff',color:'#666',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.05)',transition:'all .12s',marginLeft:'.15rem'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#b0b0b5';e.currentTarget.style.color='#333'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor='#d8d8dc';e.currentTarget.style.color='#666'}}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            style={{width:'22px',height:'22px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s',marginLeft:'.15rem'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
           </div>
         </div>
