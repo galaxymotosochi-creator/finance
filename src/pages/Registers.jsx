@@ -2092,7 +2092,6 @@ function SplitPicker({ label, amount, enabled, avail, onPick }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
-  const none = amount ? '' : '+ добавить';
   // окошко выбора открывается ПРЯМО ПОД кнопкой (не на весь экран) через портал
   function toggleOpen() {
     if (!avail.length) return;
@@ -2106,7 +2105,7 @@ function SplitPicker({ label, amount, enabled, avail, onPick }) {
     <div ref={wrapRef} style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2' }}>
       <div style={{ fontSize: '.74rem', color: '#777', fontWeight: 600, marginBottom: '6px', display: 'flex', justifyContent: 'space-between' }}>
         <span>{label}</span>
-        <span style={{ color: amount ? '#222' : '#8a8f9c', fontWeight: 700 }}>{amount || none}</span>
+        <span style={{ color: amount ? '#222' : '#8a8f9c', fontWeight: 700 }}>{amount}</span>
       </div>
       {enabled && (
         <div
