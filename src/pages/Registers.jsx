@@ -2096,50 +2096,64 @@ if (loading) return <CenterSpinner />;
 function SplitPicker({ label, amount, enabled, avail, onPick }) {
   const [open, setOpen] = useState(false);
   const none = amount ? '' : '+ добавить';
-  // выпадающий список "Купе" без иконок-инициалов
+  // выпадающий список "Купе" без иконок-инициалов (panel поверх экрана, не режется overflow)
   return (
-    <div style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2', position: 'relative' }}>
+    <div style={{ padding: '7px 11px', borderBottom: '1px solid #f2f2f2' }}>
       <div style={{ fontSize: '.74rem', color: '#777', fontWeight: 600, marginBottom: '6px', display: 'flex', justifyContent: 'space-between' }}>
         <span>{label}</span>
         <span style={{ color: amount ? '#222' : '#8a8f9c', fontWeight: 700 }}>{amount || none}</span>
       </div>
       {enabled && (
-        <>
+        <div
+          onClick={function () { if (avail.length) setOpen(true); }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            border: '1px solid #e0e0e0', borderRadius: '9px', padding: '8px 11px',
+            cursor: avail.length ? 'pointer' : 'not-allowed',
+            fontSize: '.84rem', fontWeight: 600,
+            color: avail.length ? '#222' : '#9aa0ab', background: '#fff', userSelect: 'none',
+          }}
+        >
+          <span>{avail.length === 0 ? 'Все добавлены' : (label === 'Кто продал? (товары)' ? 'выберите продавца…' : label === 'Кто продал?' ? 'выберите продавца…' : 'выберите сотрудника…')}</span>
+          <span style={{ color: '#b6b6c0', display: 'inline-flex' }}>▼</span>
+        </div>
+      )}
+      {open && (
+        <div
+          onClick={function () { setOpen(false); }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '16px', boxSizing: 'border-box' }}
+        >
           <div
-            onClick={function () { if (avail.length) setOpen(!open); }}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              border: (open ? '1px solid #111' : '1px solid #e0e0e0'),
-              borderRadius: '9px', padding: '8px 11px', cursor: avail.length ? 'pointer' : 'not-allowed',
-              fontSize: '.84rem', fontWeight: 600,
-              color: avail.length ? '#222' : '#9aa0ab', background: '#fff', userSelect: 'none',
-            }}
+            onClick={function (e) { e.stopPropagation(); }}
+            style={{ width: '100%', maxWidth: '420px', background: '#fff', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.25)', animation: 'empup .18s ease' }}
           >
-            <span>{avail.length === 0 ? 'Все добавлены' : (label === 'Кто продал? (товары)' ? 'выберите продавца…' : label === 'Кто продал?' ? 'выберите продавца…' : 'выберите сотрудника…')}</span>
-            <span style={{ color: '#b6b6c0', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .18s', display: 'inline-flex' }}>▼</span>
-          </div>
-          {open && (
-            <div style={{ position: 'absolute', top: '100%', left: 11, right: 11, zIndex: 40, background: '#fff', border: '1px solid #e8e8ee', borderRadius: '11px', boxShadow: '0 12px 34px rgba(0,0,0,.13)', overflow: 'hidden' }}>
-              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                {avail.length === 0 ? (
-                  <div style={{ padding: '14px', textAlign: 'center', color: '#999', fontSize: '.8rem' }}>Все сотрудники добавлены</div>
-                ) : avail.map(function (e) {
-                  return (
-                    <div key={e.id}
-                      onClick={function () { onPick && onPick(String(e.id)); setOpen(false); }}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 13px', cursor: 'pointer', fontSize: '.84rem', fontWeight: 600, color: '#2b2b31' }}
-                      onMouseEnter={function (ev) { ev.currentTarget.style.background = '#f4f4f8'; }}
-                      onMouseLeave={function (ev) { ev.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <span style={{ flex: 1 }}>{e.name}</span>
-                      <span style={{ color: '#c9c9d3', fontWeight: 700 }}>＋</span>
-                    </div>
-                  );
-                })}
-              </div>
+            <style>{'@keyframes empup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}'}</style>
+            <div style={{ padding: '16px 18px 10px', borderBottom: '1px solid #f2f2f2' }}>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#222' }}>{label}</div>
             </div>
-          )}
-        </>
+            <div style={{ maxHeight: '46vh', overflowY: 'auto' }}>
+              {avail.length === 0 ? (
+                <div style={{ padding: '18px', textAlign: 'center', color: '#999', fontSize: '.84rem' }}>Все сотрудники добавлены</div>
+              ) : avail.map(function (e) {
+                return (
+                  <div key={e.id}
+                    onClick={function () { onPick && onPick(String(e.id)); setOpen(false); }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 18px', cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, color: '#2b2b31', borderBottom: '1px solid #f7f7f9' }}
+                    onMouseEnter={function (ev) { ev.currentTarget.style.background = '#f4f4f8'; }}
+                    onMouseLeave={function (ev) { ev.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <span style={{ flex: 1 }}>{e.name}</span>
+                    <span style={{ color: '#c9c9d3', fontWeight: 700, fontSize: '1.1rem' }}>＋</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ padding: '10px 18px 14px' }}>
+              <button type="button" onClick={function () { setOpen(false); }}
+                style={{ width: '100%', padding: '10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.84rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Готово</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
