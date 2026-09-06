@@ -172,16 +172,18 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
       <tr onClick={onToggle} style={{ cursor: 'pointer' }}
         onMouseEnter={ev => { ev.currentTarget.style.background = '#f5f5f5'; }}
         onMouseLeave={ev => { ev.currentTarget.style.background = ''; }}>
-        <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 600 }}>{expanded ? '▾ ' : '▸ '}{e.name}</td>
-        <td style={{ textAlign: 'left' }}>{e.totalQty}</td>
-        <td style={{ textAlign: 'left', color: e.prodQty ? '#555' : '#bbb' }}>{e.prodQty || '—'}</td>
-        <td style={{ textAlign: 'left', color: e.prodSum ? '#555' : '#bbb' }}>{e.prodSum ? e.prodSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: e.svcQty ? '#555' : '#bbb' }}>{e.svcQty || '—'}</td>
-        <td style={{ textAlign: 'left', color: e.svcSum ? '#555' : '#bbb' }}>{e.svcSum ? e.svcSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: e.comboQty ? '#555' : '#bbb' }}>{e.comboQty || '—'}</td>
-        <td style={{ textAlign: 'left', color: e.comboSum ? '#555' : '#bbb' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left' }}>{e.sum.toLocaleString()} {cur}</td>
-        <td style={{ textAlign: 'left', color: e.bonus ? '#222' : '#bbb' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', paddingLeft: 0 }}>
+          <span className="prod-name">{expanded ? '▾ ' : '▸ '}{e.name}</span>
+        </td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.totalQty}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.prodQty || '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.prodSum ? e.prodSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.svcQty || '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.svcSum ? e.svcSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.comboQty || '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.sum.toLocaleString()} {cur}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
       </tr>
       {expanded && (
         <tr>
