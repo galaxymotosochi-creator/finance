@@ -29,14 +29,16 @@ export default function SalesReport() {
     if (!user) return;
     setLoading(true);
     try {
-      const [empRes, prRes, crRes] = await Promise.all([
+      const [empRes, prRes, crRes, salRes] = await Promise.all([
         supabase.from('employees').select('*').eq('user_id', user.id).order('name'),
         supabase.from('products').select('id,name,type,cat').eq('user_id', user.id),
         supabase.from('stock_categories').select('id,name,type').eq('user_id', user.id),
+        supabase.from('salary').select('*').eq('user_id', user.id),
       ]);
       setEmployees(empRes.data || []);
       setProds(prRes.data || []);
       setCats(crRes.data || []);
+      const salaries = (salRes && (salRes.data || [])) || [];
 
       const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', from).lte('date', to).order('created_at', { ascending: false });
       const rlist = recs || [];
@@ -116,9 +118,20 @@ export default function SalesReport() {
         const enrichedItems = e.items.map(x => {
           const itemRew = rewByItem[x.id] && rewByItem[x.id][String(e.empId)] ? rewByItem[x.id][String(e.empId)] : 0;
           const rw = (st && st.stack === false) ? itemRew : x.bonus + itemRew;
-          return { ...x, reward: rw };
+          // выплачено/не выплачено по позиции: начисление, где эта позиция числится с paid-статусом
+          const sell = (salaries || []).find(s => String(s.employee_id || '') === String(e.empId) && s.sales_items && (s.sales_items).some(i => String(i.itemId || '') === String(x.id)));
+          const rewI = (salaries || []).find(s => String(s.employee_id || '') === String(e.empId) && s.reward_items && (s.reward_items).some(i => String(i.itemId || '') === String(x.id)));
+          const rec = sell || rewI;
+          const paidWhen = rec && rec.status === 'paid';
+          return { ...x, reward: rw, recPaid: paidWhen ? ({ status: 'paid', recId: rec.id }) : null, recNotPaid: rec && !paidWhen ? ({ status: 'accrued' }) : null };
         }).sort((a, b) => (a.date < b.date ? 1 : -1));
-        return { ...e, items: enrichedItems, itemsBonus, storeBonus, storePct, reward: rew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
+        // Выплачено/не выплачено по сотруднику: начисления вознаграждения за период [from,to]
+        const salEmp = (salaries || []).filter(s => String(s.employee_id || '') === String(e.empId));
+        const inPer = salEmp.filter(s => { const pf = String(s.period_from || '').slice(0, 10), pt = String(s.period_to || '').slice(0, 10); return (!pf || pf <= to) && (!pt || pt >= from); });
+        const rewSum = (s) => (Number(s.sales_bonus) || 0) + (Number(s.reward_amount) || 0);
+        const paidRew = inPer.filter(s => s.status === 'paid').reduce((a, s) => a + rewSum(s), 0);
+        const owedRew = inPer.filter(s => s.status !== 'paid').reduce((a, s) => a + rewSum(s), 0);
+        return { ...e, items: enrichedItems, itemsBonus, storeBonus, storePct, reward: rew, paidRew, owedRew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
       });
       list.sort((a, b) => b.sum - a.sum);
       setEmpSales(list);
@@ -153,7 +166,7 @@ export default function SalesReport() {
     return () => document.removeEventListener('click', handler);
   }, [showPeriod]);
 
-  const totals = empSales.reduce((s, e) => ({ qty: s.qty + e.totalQty, totalQty: s.totalQty + e.totalQty, prodQty: s.prodQty + e.prodQty, prodSum: s.prodSum + e.prodSum, svcQty: s.svcQty + e.svcQty, svcSum: s.svcSum + e.svcSum, comboQty: s.comboQty + e.comboQty, comboSum: s.comboSum + e.comboSum, sum: s.sum + e.sum, bonus: s.bonus + e.bonus }), { qty: 0, totalQty: 0, prodQty: 0, prodSum: 0, svcQty: 0, svcSum: 0, comboQty: 0, comboSum: 0, sum: 0, bonus: 0 });
+  const totals = empSales.reduce((s, e) => ({ qty: s.qty + e.totalQty, totalQty: s.totalQty + e.totalQty, prodQty: s.prodQty + e.prodQty, prodSum: s.prodSum + e.prodSum, svcQty: s.svcQty + e.svcQty, svcSum: s.svcSum + e.svcSum, comboQty: s.comboQty + e.comboQty, comboSum: s.comboSum + e.comboSum, sum: s.sum + e.sum, bonus: s.bonus + e.bonus, paidRew: s.paidRew + e.paidRew, owedRew: s.owedRew + e.owedRew }), { qty: 0, totalQty: 0, prodQty: 0, prodSum: 0, svcQty: 0, svcSum: 0, comboQty: 0, comboSum: 0, sum: 0, bonus: 0, paidRew: 0, owedRew: 0 });
 
   return (
     <div>
@@ -219,6 +232,8 @@ export default function SalesReport() {
                 <th style={{ textAlign: 'left' }}>Сумма комбо</th>
                 <th style={{ textAlign: 'left' }}>Сумма продаж</th>
                 <th style={{ textAlign: 'left' }}>Вознаграждение</th>
+                <th style={{ textAlign: 'left' }}>Выплачено</th>
+                <th style={{ textAlign: 'left' }}>Не выплачено</th>
               </tr>
             </thead>
             <tbody>
@@ -234,6 +249,8 @@ export default function SalesReport() {
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.bonus ? '+' + totals.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.paidRew ? totals.paidRew.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.owedRew ? totals.owedRew.toLocaleString() + ' ' + cur : '—'}</td>
                 </tr>
               )}
             </tbody>
@@ -259,10 +276,12 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
         <td style={{ textAlign: 'left', color: '#555' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.sum.toLocaleString()} {cur}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#228b22' }}>{e.paidRew ? e.paidRew.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#c0392b' }}>{e.owedRew ? e.owedRew.toLocaleString() + ' ' + cur : '—'}</td>
       </tr>
       {expanded && (
         <tr>
-          <td colSpan="7" style={{ padding: 0, background: '#fafbfc' }}>
+          <td colSpan="9" style={{ padding: 0, background: '#fafbfc' }}>
             <div className="product-table" style={{ padding: '.5rem' }}>
               <table className="data-table">
                 <thead id="colHeaders">
@@ -272,6 +291,8 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
                     <th style={{ textAlign: 'left' }}>Тип</th>
                     <th style={{ textAlign: 'left' }}>Сумма</th>
                     <th style={{ textAlign: 'left' }}>Вознаграждение</th>
+                    <th style={{ textAlign: 'left' }}>Выплачено</th>
+                    <th style={{ textAlign: 'left' }}>Не выплачено</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,6 +303,8 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
                       <td style={{ textAlign: 'left' }}>{it.type === 'service' ? 'услуга' : it.type === 'combo' ? 'комбо' : 'товар'}</td>
                       <td style={{ textAlign: 'left' }}>{it.total.toLocaleString()} {cur}</td>
                       <td style={{ textAlign: 'left' }}>{it.reward ? '+' + it.reward.toLocaleString() + ' ' + cur : '—'}</td>
+                      <td style={{ textAlign: 'left', color: '#228b22' }}>{it.recPaid ? '+' + it.reward.toLocaleString() + ' ' + cur : '—'}</td>
+                      <td style={{ textAlign: 'left', color: '#c0392b' }}>{it.recNotPaid ? '+' + it.reward.toLocaleString() + ' ' + cur : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
