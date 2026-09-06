@@ -146,16 +146,16 @@ export default function SalesReport() {
               ))}
               {empSales.length > 0 && (
                 <tr className="total-row">
-                  <td style={{ fontWeight: 600, textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
-                  <td style={{ textAlign: 'left' }}>{totals.qty}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.prodQty}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.prodSum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.svcQty}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.svcSum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.comboQty}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left' }}>{'+' + totals.bonus.toLocaleString() + ' ' + cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.qty}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.prodQty}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.prodSum.toLocaleString()} {cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.svcQty}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.svcSum.toLocaleString()} {cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboQty}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.bonus ? '+' + totals.bonus.toLocaleString() + ' ' + cur : '—'}</td>
                 </tr>
               )}
             </tbody>
