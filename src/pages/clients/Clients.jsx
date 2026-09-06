@@ -145,7 +145,7 @@ export default function Clients() {
       {/* Быстрый поиск */}
       <div className="search-row">
         <div className="search-input-wrap">
-          <span className="search-icon">🔍</span>
+          <span style={{display:'flex',alignItems:'center',color:'#999'}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
           <input type="text" className="search-field" placeholder="Быстрый поиск"
             value={search} onChange={e => setSearch(e.target.value)} />
         </div>

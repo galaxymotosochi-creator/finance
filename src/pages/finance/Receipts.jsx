@@ -30,6 +30,7 @@ export default function Receipts() {
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [receiptSearchFocus, setReceiptSearchFocus] = useState(false);
   const [statusFilter, setStatusFilter] = useState(null);
   const [periodOpen, setPeriodOpen] = useState(false);
   const [period, setPeriod] = useState('all');
@@ -444,8 +445,11 @@ export default function Receipts() {
 
       {/* Поиск + фильтры */}
       <div className="search-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '.5rem', width: '100%', flexWrap: 'nowrap' }}>
-        <div className="stock-search" style={{ display: 'inline-flex', alignItems: 'center', gap: '.3rem', width: 'auto', border: '1.5px solid var(--border)', borderRadius: '100px', padding: '5px 12px', background: 'var(--body-bg)' }}>>
-          <span style={{ fontSize: '.75rem', color: 'var(--muted)', lineHeight: 1 }}>🔍</span>
+        <div className="stock-search" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', width: 'auto', border: '1px solid ' + (receiptSearchFocus ? '#111' : '#e2e2e6'), borderRadius: '100px', padding: '5px 12px', background: '#fff', boxShadow: receiptSearchFocus ? '0 2px 8px rgba(0,0,0,.12)' : '0 1px 3px rgba(0,0,0,.05)', transition: 'border-color .15s, box-shadow .15s' }}
+          onFocus={()=>setReceiptSearchFocus(true)} onBlur={()=>setReceiptSearchFocus(false)}>
+          <span style={{display:'flex',color:receiptSearchFocus?'#111':'#999',transition:'color .15s'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={e => setSearch(e.target.value)}
             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
         </div>
