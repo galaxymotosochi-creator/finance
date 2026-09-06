@@ -75,6 +75,26 @@ export default function SalesReport() {
         });
       }
       const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
+      // Вознаграждение за выбор продавцом/исполнителем (employee_splits из кассы: «Кто продал?»/«Кто выполняет?»)
+      const rewByEmp = {};
+      const addRew = (key, n, v) => { if (!rewByEmp[key]) rewByEmp[key] = { empId: key, name: n, total: 0 }; rewByEmp[key].total += v; };
+      (items || []).forEach(it => {
+        const r = rlist.find(x => x.id === it.receipt_id);
+        if (!r) return;
+        const qtyAll = Number(it.quantity) || 1;
+        let retQty = 0;
+        ((r.refund_items) || []).forEach(rf => { if (String(rf.item_id) === String(it.id)) retQty += Number(rf.qty) || 0; });
+        const availQty = Math.max(0, qtyAll - retQty);
+        if (availQty <= 0) return;
+        const factor = qtyAll > 0 ? availQty / qtyAll : 1;
+        const sps = it.employee_splits || [];
+        (sps).forEach(sp => {
+          const amt = (parseFloat(sp.amount) || 0) * factor;
+          if (amt <= 0) return;
+          const emp = (empRes.data || []).find(x => String(x.id) === String(sp.employee_id));
+          addRew(String(sp.employee_id), emp ? emp.name : (sp.name || 'Сотрудник'), amt);
+        });
+      });
       const list = Object.values(byEmp).map(e => {
         const st = (e.rules || []).find(r => r.scope === 'store_sales');
         let storeBonus = 0, storePct = null;
@@ -84,7 +104,10 @@ export default function SalesReport() {
           storePct = st.vt === 'fixed' ? null : v;
         }
         const itemsBonus = (st && st.stack === false) ? 0 : e.bonus;
-        return { ...e, items: e.items.sort((a, b) => (a.date < b.date ? 1 : -1)), itemsBonus, storeBonus, storePct, bonus: itemsBonus + storeBonus };
+        const rew = rewByEmp[String(e.empId)] ? rewByEmp[String(e.empId)].total : 0;
+        // Вознаграждение = бонус по правилам ИЛИ/ПЛЮС сумма за выбор продавцом/исполнителем
+        const itemsRew = (st && st.stack === false) ? rew : itemsBonus + rew;
+        return { ...e, items: e.items.sort((a, b) => (a.date < b.date ? 1 : -1)), itemsBonus, storeBonus, storePct, reward: rew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
       });
       list.sort((a, b) => b.sum - a.sum);
       setEmpSales(list);
