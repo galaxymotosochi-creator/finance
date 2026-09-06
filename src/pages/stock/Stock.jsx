@@ -352,28 +352,30 @@ export default function Stock() {
             style={{border:'none',outline:'none',width:'150px',minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'.25rem',marginLeft:'auto',position:'relative',flexWrap:'wrap',justifyContent:'flex-end'}}>
-          {/* Фильтр по наличию — пилюли (вариант 3: активная — жёлтый градиент) */}
+          {/* Фильтр по наличию — нитральные капсулы как «Все время/Расходы/Доходы», активная — темнее */}
           {[['all', 'Все'], ['in', 'В наличии'], ['low', 'Заканчиваются'], ['out', 'Закончились']].map(([v, l]) => (
             <button key={v} onClick={() => setStStatus(v)}
               style={{
-                border: 'none', background: stStatus === v ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
-                color: stStatus === v ? '#111' : '#777', padding: '9px 16px', borderRadius: '100px',
-                fontSize: '.8rem', fontWeight: stStatus === v ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
+                border: stStatus === v ? '1px solid #bbb' : '1px solid #e0e0e4',
+                background: '#fff', color: stStatus === v ? '#111' : '#555', padding: '.3rem .6rem', borderRadius: '100px',
+                fontSize: '.72rem', fontWeight: stStatus === v ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit',
                 whiteSpace: 'nowrap', lineHeight: 1, transition: 'all .12s',
               }}
-              onMouseEnter={e => { if (stStatus !== v) e.currentTarget.style.color = '#333'; }}
-              onMouseLeave={e => { if (stStatus !== v) e.currentTarget.style.color = '#777'; }}>{l}</button>
+              onMouseEnter={e => { if (stStatus !== v) { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; } }}
+              onMouseLeave={e => { if (stStatus !== v) { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; } }}>{l}</button>
           ))}
 
-          {/* Категории — жёлтая пилюля */}
+          {/* Категории — нитральная капсула */}
           <button
             onClick={e => { e.stopPropagation(); setCatOpen(!catOpen); }}
             style={{
-              border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
-              padding: '9px 16px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 400, cursor: 'pointer',
+              border: catOpen ? '1px solid #bbb' : '1px solid #e0e0e4', background: '#fff', color: catOpen ? '#111' : '#555',
+              padding: '.28rem .6rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 400, cursor: 'pointer',
               fontFamily: 'inherit', whiteSpace: 'nowrap', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '4px',
-              marginLeft: '.25rem', boxShadow: '0 1px 4px rgba(255,205,0,.25)',
+              marginLeft: '.25rem', transition: 'all .12s',
             }}
+            onMouseEnter={e => { if (!catOpen) { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; } }}
+            onMouseLeave={e => { if (!catOpen) { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; } }}
           >Категории<span style={{ fontSize: '.6rem', opacity: .7 }}>▾</span></button>
 
           {catOpen && (
@@ -391,18 +393,18 @@ export default function Stock() {
             </div>
           )}
 
-          {/* Выгрузка в Excel — жёлтая круглая кнопка */}
-          <button onClick={exportStock} title="Выгрузить в Excel"
+          {/* Выгрузка в Excel — нейтральная круглая кнопка */}
+          <button onClick={exportStock} type="button" title="Скачать" aria-label="Скачать"
             style={{
-              width: '34px', height: '34px', flexShrink: 0, border: 'none', borderRadius: '100px',
-              background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111', cursor: 'pointer',
+              width: '22px', height: '22px', flexShrink: 0, border: '1px solid #e0e0e4', borderRadius: '100px',
+              background: '#fff', color: '#555', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit',
-              boxShadow: '0 1px 5px rgba(255,205,0,.35)', marginLeft: '.15rem',
+              boxShadow: '0 1px 2px rgba(0,0,0,.03)', transition: 'all .12s', marginLeft: '.15rem',
             }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 3px 10px rgba(255,205,0,.5)'; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 5px rgba(255,205,0,.35)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
         </div>
       </div>
