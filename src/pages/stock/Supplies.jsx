@@ -33,6 +33,8 @@ export default function Supplies() {
   const [splitAmts, setSplitAmts] = useState({});
   const loc = useLocation();
   const [supplies, setSuppliesState] = useState([]);
+  const [supplySearch, setSupplySearch] = useState('');
+  const [supplySearchFocus, setSupplySearchFocus] = useState(false);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -352,6 +354,17 @@ const load = async () => {
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap',gap:'.4rem'}}>
+        <div className="stock-search" style={{display:'inline-flex',alignItems:'center',gap:'.4rem',width:'auto',border:'1px solid '+(supplySearchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'5px 12px',background:'#fff',boxShadow:supplySearchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+          onFocus={()=>setSupplySearchFocus(true)} onBlur={()=>setSupplySearchFocus(false)}>
+          <span style={{display:'flex',color:supplySearchFocus?'#111':'#999',transition:'color .15s'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
+          <input type="text" placeholder="Быстрый поиск" value={supplySearch} onChange={e => setSupplySearch(e.target.value)}
+            style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        </div>
+      </div>
+
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
           <thead id="supplyColHeaders">
@@ -371,7 +384,19 @@ const load = async () => {
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
               <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
-            ) : supplies.map((s, i) => {
+            ) : supplies.filter(s => {
+              if (!supplySearch) return true;
+              const q = supplySearch.toLowerCase();
+              const hay = [
+                s.supplier_name || '',
+                (s.invoice || '') + '',
+                String(s.date || ''),
+                (s.items||[]).map(it => it && it.name ? it.name : '').join(' '),
+                SUPPLY_LABELS[s.status||'ordered'] || '',
+                PAY_LABELS[getPayStatus(s)] || ''
+              ].join(' ').toLowerCase();
+              return hay.indexOf(q) !== -1;
+            }).map((s, i) => {
               const total = s.total || (s.items||[]).reduce((sum,it) => sum + it.qty*it.cost, 0) || (s.qty||0)*(s.cost||0);
               const payStatus = getPayStatus(s);
               const supSt = SUPPLY_LABELS[s.status||'ordered']||'Заказано';
