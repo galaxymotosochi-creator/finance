@@ -411,8 +411,8 @@ export default function Registers({ fullscreen }) {
       const origPrice = p.price || 0;
       const discountPct = promo ? (promo.discount || 0) : 0;
       const finalPrice = discountPct > 0 ? Math.round(origPrice * (100 - discountPct) / 100) : origPrice;
-      const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items } : {};
-      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, sp: [], discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, reward_kind: p.reward_kind || '', reward_value: p.reward_value || 0, ...comboData }];
+      const comboData = p.type === 'combo' && p.combo_items ? { combo_items: p.combo_items.map(function(c){ return { id: c.id, name: c.name, qty: c.qty, price: c.price, t: (products.find(function(x){return String(x.id)===String(c.id);})||{}).type || (c.t||'product') }; }) } : {};
+      return [...prev, { id: p.id, name: p.name, price: origPrice, qty: 1, cat: p.cat || '', free_price: p.free_price || false, final_price: finalPrice, promo_id: promo?.id || null, employee_id: null, sp: [], spT: [], spS: [], discount_percent: discountPct, type: p.type, min_price: p.min_price || 0, reward_kind: p.reward_kind || '', reward_value: p.reward_value || 0, ...comboData }];
     });
   };
 
@@ -430,6 +430,41 @@ export default function Registers({ fullscreen }) {
   const [pickEmpFor, setPickEmpFor] = useState(null); // item.id — для кого открыт выбор
   const pwAuto = (function(){ try { const pw = JSON.parse(localStorage.getItem('settings_piecework') || '{}'); return pw.enabled === true && pw.mode === 'auto'; } catch(e) { return false; } })(); // сдельная оплата: авторежим
   const spSum = (item) => (item.sp || []).reduce((s2, x) => s2 + (parseFloat(x.amt) || 0), 0);
+  // Для комбо: сумма долей по раздельным массивам (товары / услуги)
+  const spPartSum = (item, key) => (item[key] || []).reduce((s2, x) => s2 + (parseFloat(x.amt) || 0), 0);
+  // Стоимость товарной части комбо (по ценам компонентов) и услугой части
+  const comboProductAmount = (item) => {
+    var s = 0;
+    (item.combo_items || []).forEach(function(c){ if (c.t === 'service') return; s += (Number(c.price)||0) * (Number(c.qty)||1); });
+    return s;
+  };
+  const comboServAmount = (item) => {
+    var s = 0;
+    (item.combo_items || []).forEach(function(c){ if (c.t !== 'service') return; s += (Number(c.price)||0) * (Number(c.qty)||1); });
+    return s;
+  };
+  // Доли сотрудника для комбо: продавец присваивается к товарной части, мастер — к услугой части
+  const addComboSplit = (itemId, emp, isService) => {
+    setCart(prev => prev.map(x => {
+      if (String(x.id) !== String(itemId)) return x;
+      const key = isService ? 'spS' : 'spT';
+      if ((x[key] || []).some(function(y){ return String(y.empId) === String(emp.id); })) return x;
+      const base = isService ? comboServAmount(x) : comboProductAmount(x);
+      let amt = '';
+      // Сдельная оплата (авто): первому мастеру подставляем норматив из карточки услуги
+      if (isService && !(x.spS || []).length && pwAuto) {
+        if (x.reward_kind === 'rub' && Number(x.reward_value) > 0) amt = String(Number(x.reward_value));
+        else if (x.reward_kind === 'pct' && Number(x.reward_value) > 0 && base > 0) amt = String(Math.round(base * Number(x.reward_value) / 100));
+      }
+      return { ...x, [key]: [...(x[key] || []), { empId: emp.id, name: emp.name, amt }] };
+    }));
+  };
+  const setComboSplitAmt = (itemId, empId, key, v) => {
+    setCart(prev => prev.map(x => String(x.id) === String(itemId) ? { ...x, [key]: (x[key] || []).map(function(y){ return String(y.empId) === String(empId) ? { ...y, amt: v } : y; }) } : x));
+  };
+  const delComboSplit = (itemId, empId, key) => {
+    setCart(prev => prev.map(x => String(x.id) === String(itemId) ? { ...x, [key]: (x[key] || []).filter(function(y){ return String(y.empId) !== String(empId); }) } : x));
+  };
   const itemTotalPrice = (item) => ((item.final_price || item.price || 0)) * item.qty;
   const addSplit = (itemId, emp) => {
     setCart(prev => prev.map(x => {
@@ -604,7 +639,16 @@ export default function Registers({ fullscreen }) {
           discount_percent: item.discount_percent || 0,
           discount_amount: (((item.price || 0) - (item.final_price || item.price || 0)) * item.qty),
           promo_id: item.promo_id || null, employee_id: item.employee_id || null,
-          employee_splits: (item.sp || []).map(function(spd){ return { employee_id: spd.empId, name: spd.name, amount: parseFloat(spd.amt) || 0 }; }),
+          employee_splits: (function(){
+            // Обычная позиция — как было; для комбо объединяем доли продавцов (spT) и мастеров (spS)
+            if (item.type === 'combo') {
+              var all = [];
+              (item.spT || []).forEach(function(x){ all.push({ employee_id: x.empId, name: x.name, amount: parseFloat(x.amt) || 0 }); });
+              (item.spS || []).forEach(function(x){ all.push({ employee_id: x.empId, name: x.name, amount: parseFloat(x.amt) || 0 }); });
+              return all;
+            }
+            return (item.sp || []).map(function(spd){ return { employee_id: spd.empId, name: spd.name, amount: parseFloat(spd.amt) || 0 }; });
+          })(),
         };
         if (item.combo_items && item.combo_items.length > 0) {
           entry.combo_items = item.combo_items.map(function(ci) { return { name: ci.name, qty: ci.qty * item.qty, price: ci.price }; });
@@ -872,22 +916,32 @@ if (loading) return <CenterSpinner />;
 
       {/* Выбор исполнителя/продавца для позиции */}
       {pickEmpFor !== null && (function(){
-        const it = cart.find(function(x){return x.id === pickEmpFor;});
+        const targetId = typeof pickEmpFor === 'object' ? pickEmpFor.id : pickEmpFor;
+        const part = typeof pickEmpFor === 'object' ? pickEmpFor.part : null;
+        const it = cart.find(function(x){return String(x.id) === String(targetId);});
         if (!it) return null;
-        const avail = employees.filter(function(e){return !(it.sp || []).some(function(y){return y.empId === e.id;});});
-        const total = itemTotalPrice(it);
+        const isServicePart = part === 'S';
+        const isCombo = !!part;
+        const activeList = isCombo ? (it[(isServicePart ? 'spS' : 'spT')] || []) : (it.sp || []);
+        const avail = employees.filter(function(e){return !activeList.some(function(y){return String(y.empId) === String(e.id);});});
+        const maxAmt = isCombo ? (isServicePart ? comboServAmount(it) : comboProductAmount(it)) : itemTotalPrice(it);
+        const title = (part === 'S') ? 'Кто выполняет?' : (part === 'T') ? 'Кто продал?' : (it.type === 'service' ? 'Кто выполняет?' : 'Кто продал?');
         return (
           <div className="modal-overlay active" onClick={function(e){if(e.target.className==='modal-overlay active')setPickEmpFor(null);}}>
             <div className="modal-box" style={{maxWidth:'400px',maxHeight:'80vh',display:'flex',flexDirection:'column'}}>
               <button className="modal-close" onClick={function(){setPickEmpFor(null);}}>&times;</button>
-              <h2 style={{fontSize:'1rem',fontWeight:700,marginBottom:'2px'}}>{it.type === 'service' ? 'Добавить исполнителя' : 'Добавить продавца'}</h2>
-              <div style={{fontSize:'.78rem',color:'var(--muted)',marginBottom:'10px'}}>{it.name} · {Math.round(total).toLocaleString()} {cur}</div>
+              <h2 style={{fontSize:'1rem',fontWeight:700,marginBottom:'2px'}}>{title}</h2>
+              <div style={{fontSize:'.78rem',color:'var(--muted)',marginBottom:'10px'}}>{it.name} · до {Math.round(maxAmt).toLocaleString()} {cur}</div>
               <div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:'2px',paddingBottom:'8px'}}>
                 {avail.length === 0 ? (
                   <div style={{fontSize:'.8rem',color:'#999',textAlign:'center',padding:'1rem 0'}}>Все сотрудники уже добавлены</div>
                 ) : avail.map(function(e){
                   return (
-                    <div key={e.id} onClick={function(){addSplit(pickEmpFor, {id: e.id, name: e.name});}}
+                    <div key={e.id} onClick={function(){
+                      if (isCombo) addComboSplit(targetId, {id: e.id, name: e.name}, isServicePart);
+                      else addSplit(targetId, {id: e.id, name: e.name});
+                      setPickEmpFor(null);
+                    }}
                       style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 10px',borderRadius:'10px',cursor:'pointer',fontSize:'.84rem'}}
                       onMouseEnter={function(ev){ev.currentTarget.style.background='#f5f5f8';}}
                       onMouseLeave={function(ev){ev.currentTarget.style.background='transparent';}}>
@@ -1133,40 +1187,53 @@ if (loading) return <CenterSpinner />;
               {/* Мастера/продавец — как в прототипе */}
               {employees.length > 0 && (
                 <div style={{marginTop:'9px',border:'1px solid #eee',borderRadius:'12px',background:'#fafbfc',overflow:'hidden'}}>
-                  <div onClick={function(){setPickEmpFor(item.id);}}
-                    style={{padding:'7px 11px',fontSize:'.74rem',color:'#777',display:'flex',justifyContent:'space-between',cursor:'pointer',fontWeight:600,userSelect:'none'}}>
-                    <span>{item.type === 'service' ? 'Мастера' : 'Продавец'}</span>
-                    <span style={{color: (item.sp || []).length ? '#222' : '#8a8f9c'}}>{(item.sp || []).length ? Math.round(spSum(item)).toLocaleString() + ' ' + cur : '+ добавить'}</span>
-                  </div>
-                  {pwAuto && item.reward_kind && Number(item.reward_value) > 0 && (
-                    <div style={{padding:'4px 11px',fontSize:'.68rem',fontWeight:600,color:'#b45309',background:'#fffbeb',borderTop:'1px solid #fde68a',lineHeight:1.4}}>
-                      {item.reward_kind === 'rub'
-                        ? 'Сдельная: ' + Number(item.reward_value).toLocaleString() + ' ' + cur
-                        : 'Сдельная: ' + Number(item.reward_value) + '% (' + Math.round((item.final_price || item.price || 0) * Number(item.reward_value) / 100).toLocaleString() + ' ' + cur + ')'}
-                    </div>
-                  )}
-                  {(item.sp || []).length > 0 && (
-                    <div style={{padding:'0 10px 9px',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'6px'}}>
-                      {(item.sp || []).map(function(spd, si){
-                        return (
-                          <div key={si} style={{display:'flex',alignItems:'center',gap:'7px',fontSize:'.76rem'}}>
-                            <span style={{width:'20px',height:'20px',borderRadius:'50%',background:'#e3e6f0',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.64rem',fontWeight:700,color:'#555',flexShrink:0}}>{spd.name.charAt(0)}</span>
-                            <span style={{flex:1,fontWeight:600,color:'#333',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{spd.name}</span>
-                            <input type="number" min="0" placeholder="0" value={spd.amt}
-                              onChange={function(e){setSplitAmt(item.id, spd.empId, e.target.value);}}
-                              style={{width:'64px',border:'1px solid #e0e0e0',borderRadius:'7px',padding:'3px 5px',fontSize:'.76rem',textAlign:'center',fontFamily:'inherit',outline:'none'}} />
-                            <span style={{fontSize:'.68rem',color:'#999'}}>{cur}</span>
-                            <span onClick={function(){delSplit(item.id, spd.empId);}} style={{cursor:'pointer',color:'#ccc',fontSize:'.82rem',lineHeight:1}}>✕</span>
+                  {(() => {
+                    // Комбо: две раздельные подписи (продавцы по товарной части, мастера по услугой части)
+                    if (item.type === 'combo') {
+                      const pAmt = comboProductAmount(item), sAmt = comboServAmount(item);
+                      return (
+                        <div style={{display:'flex',flexDirection:'column'}}>
+                          <SplitLine label="Кто продал? (товары)" sub={pAmt>0 ? Math.round(pAmt).toLocaleString()+' '+cur : 'нет товаров'}
+                            has={!item.spT || item.spT.length} active={item.combo_items && item.combo_items.some(function(c){return c.t!=='service';})}
+                            open={function(){ if(item.combo_items && item.combo_items.some(function(c){return c.t!=='service';})) setPickEmpFor({id:item.id,part:'T'}); else setToast('В этом комбо нет товаров'); }} />
+                          <SplitLine label="Кто выполняет? (услуги)" sub={sAmt>0 ? Math.round(sAmt).toLocaleString()+' '+cur : 'нет услуг'}
+                            has={!item.spS || item.spS.length} active={item.combo_items && item.combo_items.some(function(c){return c.t==='service';})}
+                            open={function(){ if(item.combo_items && item.combo_items.some(function(c){return c.t==='service';})) setPickEmpFor({id:item.id,part:'S'}); else setToast('В этом комбо нет услуг'); }} />
+                          <div style={{padding:'0 10px 9px',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'4px'}}>
+                            <CombosSplits item={item} keyname="spT" cur={cur} onSet={function(empId,v){setComboSplitAmt(item.id,empId,'spT',v);}} onDel={function(empId){delComboSplit(item.id,empId,'spT');}} />
+                            <CombosSplits item={item} keyname="spS" cur={cur} onSet={function(empId,v){setComboSplitAmt(item.id,empId,'spS',v);}} onDel={function(empId){delComboSplit(item.id,empId,'spS');}} />
                           </div>
-                        );
-                      })}
-                      {spSum(item) > 0 && (
-                        <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a'}}>
-                          {spOver(item) ? '⚠️ Больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : '✓ Распределено: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
                         </div>
-                      )}
-                    </div>
-                  )}
+                      );
+                    }
+                    // Обычная позиция (товар или услуга)
+                    return (
+                      <React.Fragment>
+                        <div onClick={function(){setPickEmpFor(item.id);}}
+                          style={{padding:'7px 11px',fontSize:'.74rem',color:'#777',display:'flex',justifyContent:'space-between',cursor:'pointer',fontWeight:600,userSelect:'none'}}>
+                          <span>{item.type === 'service' ? 'Кто выполняет?' : 'Кто продал?'}</span>
+                          <span style={{color: (item.sp || []).length ? '#222' : '#8a8f9c'}}>{(item.sp || []).length ? Math.round(spSum(item)).toLocaleString() + ' ' + cur : '+ добавить'}</span>
+                        </div>
+                        {pwAuto && item.reward_kind && Number(item.reward_value) > 0 && (
+                          <div style={{padding:'4px 11px',fontSize:'.68rem',fontWeight:600,color:'#b45309',background:'#fffbeb',borderTop:'1px solid #fde68a',lineHeight:1.4}}>
+                            {item.reward_kind === 'rub'
+                              ? 'Сдельная: ' + Number(item.reward_value).toLocaleString() + ' ' + cur
+                              : 'Сдельная: ' + Number(item.reward_value) + '% (' + Math.round((item.final_price || item.price || 0) * Number(item.reward_value) / 100).toLocaleString() + ' ' + cur + ')'}
+                          </div>
+                        )}
+                        {(item.sp || []).length > 0 && (
+                          <div style={{padding:'0 10px 9px',borderTop:'1px solid #f2f2f2',display:'flex',flexDirection:'column',gap:'5px',paddingTop:'6px'}}>
+                            {(item.sp || []).map(function(spd, si){ return <SplitRow key={si} spd={spd} cur={cur} onAmt={function(v){setSplitAmt(item.id, spd.empId, v);}} onDel={function(){delSplit(item.id, spd.empId);}} />; })}
+                            {spSum(item) > 0 && (
+                              <div style={{fontSize:'.7rem',fontWeight:700,color: spOver(item) ? '#dc2626' : '#16a34a'}}>
+                                {spOver(item) ? 'Больше стоимости ' + Math.round(itemTotalPrice(item)).toLocaleString() + ' ' + cur : 'Распределено: ' + Math.round(spSum(item)).toLocaleString() + ' ' + cur}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -1177,7 +1244,7 @@ if (loading) return <CenterSpinner />;
         <div style={{padding:'14px',borderTop:'1px solid #eee',display:'flex',flexDirection:'column',gap:'10px'}}>
             {cart.reduce(function(s2, x){return s2 + spSum(x);}, 0) > 0 && (
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'.78rem',color:'#777'}}>
-                <span>Исполнителям:</span>
+                <span>Сотрудникам:</span>
                 <span style={{fontWeight:700}}>{Math.round(cart.reduce(function(s2, x){return s2 + spSum(x);}, 0)).toLocaleString()} {cur}</span>
               </div>
             )}
@@ -2009,5 +2076,39 @@ if (loading) return <CenterSpinner />;
     </div>
     </div>
     </>
+  );
+}
+// ===== Вспомогательные компоненты строки выбора сотрудника (продавец/мастер) =====
+function SplitLine({ label, sub, has, active, open }) {
+  return (
+    <div onClick={open}
+      style={{ padding: '7px 11px', fontSize: '.74rem', color: active ? '#777' : '#bbb', display: 'flex', justifyContent: 'space-between', cursor: active ? 'pointer' : 'default', fontWeight: 600, userSelect: 'none', borderBottom: '1px solid #f2f2f2' }}>
+      <span>{label}</span>
+      <span style={{ color: has ? '#222' : '#8a8f9c' }}>{sub}</span>
+    </div>
+  );
+}
+function SplitRow({ spd, cur, onAmt, onDel }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '.76rem' }}>
+      <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#e3e6f0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '.64rem', fontWeight: 700, color: '#555', flexShrink: 0 }}>{spd.name.charAt(0)}</span>
+      <span style={{ flex: 1, fontWeight: 600, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{spd.name}</span>
+      <input type="number" min="0" placeholder="0" value={spd.amt}
+        onChange={function (e) { onAmt(e.target.value); }}
+        style={{ width: '64px', border: '1px solid #e0e0e0', borderRadius: '7px', padding: '3px 5px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+      <span style={{ fontSize: '.68rem', color: '#999' }}>{cur}</span>
+      <span onClick={onDel} style={{ cursor: 'pointer', color: '#ccc', fontSize: '.82rem', lineHeight: 1 }}>✕</span>
+    </div>
+  );
+}
+function CombosSplits({ item, keyname, cur, onSet, onDel }) {
+  const list = item[keyname] || [];
+  if (!list.length) return null;
+  return (
+    <div style={{ padding: '5px 0', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      {list.map(function (spd, si) {
+        return <SplitRow key={si} spd={spd} cur={cur} onAmt={function (v) { onSet(spd.empId, v); }} onDel={function () { onDel(spd.empId); }} />;
+      })}
+    </div>
   );
 }
