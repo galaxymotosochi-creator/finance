@@ -461,7 +461,7 @@ export default function Salary() {
           const { error } = await supabase.from('transactions').insert({
             user_id: user.id, account_id: aid,
             type: 'expense', amount: amt,
-            description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
+            description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + fmtD(s.period_from) + ' / ' + fmtD(s.period_to),
             date: payDate, category_id: salaryCatId,
           });
           if (error) throw error;
@@ -470,7 +470,7 @@ export default function Salary() {
         const { error } = await supabase.from('transactions').insert({
           user_id: user.id, account_id: accId,
           type: 'expense', amount: s.amount,
-          description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + (s.period_from || '') + ' / ' + (s.period_to || ''),
+          description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + fmtD(s.period_from) + ' / ' + fmtD(s.period_to),
           date: payDate, category_id: salaryCatId,
         });
         if (error) throw error;
