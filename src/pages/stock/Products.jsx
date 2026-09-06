@@ -816,10 +816,11 @@ export default function Products() {
           <button style={pillStyle(showTrash)}
             onMouseEnter={e=>pillHover(e, showTrash, true)} onMouseLeave={e=>pillHover(e, showTrash, false)}
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
-          <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} title="Скачать в Excel"
-            style={{width:'34px',height:'34px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 5px rgba(255,205,0,.35)',marginLeft:'.15rem'}}
-            onMouseEnter={e=>{e.currentTarget.style.boxShadow='0 3px 10px rgba(255,205,0,.5)'}} onMouseLeave={e=>{e.currentTarget.style.boxShadow='0 1px 5px rgba(255,205,0,.35)'}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} type="button" title="Скачать" aria-label="Скачать"
+            style={{width:'24px',height:'24px',flexShrink:0,border:'1px solid #d8d8dc',borderRadius:'100px',background:'#fff',color:'#666',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.05)',transition:'all .12s',marginLeft:'.15rem'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#b0b0b5';e.currentTarget.style.color='#333'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor='#d8d8dc';e.currentTarget.style.color='#666'}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
           </div>
         </div>
