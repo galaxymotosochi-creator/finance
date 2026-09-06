@@ -41,10 +41,12 @@ export default function SalesReport() {
       const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', from).lte('date', to).order('created_at', { ascending: false });
       const rlist = recs || [];
       const byEmp = {};
+      let itList = [];
       if (rlist.length > 0) {
         const { data: items } = await supabase.from('receipt_items').select('*').in('receipt_id', rlist.map(r => r.id));
+        itList = items || [];
         const prData = prRes.data || [], crData = crRes.data || [];
-        (items || []).forEach(it => {
+        (itList).forEach(it => {
           const eid = it.employee_id;
           if (eid == null) return;
           const r = rlist.find(x => x.id === it.receipt_id);
@@ -78,7 +80,7 @@ export default function SalesReport() {
       // Вознаграждение за выбор продавцом/исполнителем (employee_splits из кассы: «Кто продал?»/«Кто выполняет?»)
       const rewByEmp = {};
       const addRew = (key, n, v) => { if (!rewByEmp[key]) rewByEmp[key] = { empId: key, name: n, total: 0 }; rewByEmp[key].total += v; };
-      (items || []).forEach(it => {
+      (itList).forEach(it => {
         const r = rlist.find(x => x.id === it.receipt_id);
         if (!r) return;
         const qtyAll = Number(it.quantity) || 1;
