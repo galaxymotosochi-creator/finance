@@ -360,7 +360,7 @@ const load = async () => {
           <span style={{display:'flex',color:supplySearchFocus?'#111':'#999',transition:'color .15s'}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
-          <input type="text" placeholder="Быстрый поиск" value={supplySearch} onChange={e => setSupplySearch(e.target.value)}
+          <input type="text" placeholder="Поиск" value={supplySearch} onChange={e => setSupplySearch(e.target.value)}
             style={{border:'none',outline:'none',flex:1,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
       </div>
