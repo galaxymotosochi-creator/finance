@@ -45,9 +45,10 @@ h1{font-size:1.2rem;font-weight:800;text-align:center;letter-spacing:-.02em}
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 12px 9px}
 .picked-list{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 /* A: dark chips */
-.chipa{display:inline-flex;align-items:center;gap:6px;background:#111;color:#fff;border-radius:100px;padding:3px 6px 3px 4px;font-size:.72rem;font-weight:600;font-family:inherit}
-.chipa .i{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;font-size:.55rem}
-.chipa .del{color:#aaa;cursor:pointer;padding:0 3px;font-size:.9rem;line-height:1}
+.chipa{display:inline-flex;align-items:center;gap:6px;background:#111;color:#fff;border-radius:100px;padding:3px 6px 3px 7px;font-size:.72rem;font-weight:600;font-family:inherit}
+.chipa-nopad .del{margin-left:6px}
+.chipa .del,.chipa-nopad .del{color:#aaa;cursor:pointer;padding:0 3px;font-size:.9rem;line-height:1}
+.eme-nopad{padding:9px 13px}
 /* B: light chip w/ border */
 .chipb{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#222;border:1px solid #d8d8e0;border-radius:8px;padding:4px 7px;font-size:.78rem;font-weight:600;font-family:inherit}
 .chipb .i{width:18px;height:18px;border-radius:6px;background:#111;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700}
@@ -151,8 +152,8 @@ function buildA(root){
   function renderList(){var L=pick.querySelector('.plist');L.innerHTML='';
     var a=avail();
     pick.querySelector('.pe').style.display = a.length?'none':'block';
-    a.forEach(function(e){var d=document.createElement('div');d.className='eme';
-      d.innerHTML='<span class="av" style="background:'+e.c+'">'+ini(e.name)+'</span><span class="nm">'+e.name+'</span><span class="plus">＋</span>';
+    a.forEach(function(e){var d=document.createElement('div');d.className='eme eme-nopad';
+      d.innerHTML='<span class="nm">'+e.name+'</span><span class="plus">＋</span>';
       d.onclick=function(){sel.push(e);render();close();openIt();};
       L.appendChild(d);});}
   function render(){
@@ -160,8 +161,8 @@ function buildA(root){
     if(sel.length){tri.classList.remove('ph');tri.innerHTML=/* '' */'';tri.append(document.createTextNode(sel.length+' выбран :: '+sel.map(s=>s.name).join(', ')));}
     // keep simple: rebuild label text
     chipsBox.innerHTML='';
-    sel.forEach(function(s){var c=document.createElement('span');c.className='chipa';
-      c.innerHTML='<span class="i">'+ini(s.name)+'</span>'+s.name+'<span class="del">✕</span>';
+    sel.forEach(function(s){var c=document.createElement('span');c.className='chipa chipa-nopad';
+      c.innerHTML=s.name+'<span class="del">✕</span>';
       c.querySelector('.del').onclick=function(){sel=sel.filter(y=>y.id!=s.id);render();};
       chipsBox.appendChild(c);});
     if(sel.length){tri.classList.remove('ph');}
