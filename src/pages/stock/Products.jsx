@@ -176,23 +176,23 @@ export default function Products() {
   const fileInputRef = useRef(null);
   const [importing, setImporting] = useState(false);
 
-  // Пилюля-кнопка фильтра (стиль «Остатков»): обычная, активная/открытая — жёлтый градиент
+  // Пилюля-кнопка фильтра — нейтральная капсула как «Все время/Расходы/Доходы» (тонкая серая рамка, без жёлтого)
   const pillStyle = (on) => ({
-    border: 'none', background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : 'transparent',
-    color: on ? '#111' : '#777', padding: '9px 16px', borderRadius: '100px',
-    fontSize: '.8rem', fontWeight: on ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
+    background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#fff',
+    border: on ? '1px solid #e6c92a' : '1px solid #e0e0e4',
+    color: on ? '#111' : '#555', padding: '.3rem .6rem', borderRadius: '100px',
+    fontSize: '.72rem', fontWeight: on ? 500 : 400, cursor: 'pointer', fontFamily: 'inherit',
     whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px',
     transition: 'all .12s', flexShrink: 0,
   });
-  const pillHover = (e, on, enter) => { if (!on) e.currentTarget.style.color = enter ? '#333' : '#777'; };
-  // Кнопки-дропдауны (Тип/Категория/Столбцы) — всегда жёлтые, как «Категории» в Остатках
+  const pillHover = (e, on, enter) => { if (!on) { e.currentTarget.style.borderColor = enter ? '#999' : '#e0e0e4'; e.currentTarget.style.color = enter ? '#111' : '#555'; } };
+  // Кнопки-дропдауны (Тип/Категория/Столбцы) — нейтральные капсулы (без жёлтого)
   const yellowPill = {
-    border: 'none', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111',
-    padding: '9px 16px', borderRadius: '100px', fontSize: '.8rem', fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit',
+    background: '#fff', border: '1px solid #e0e0e4', color: '#555',
+    padding: '.3rem .6rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit',
     whiteSpace: 'nowrap', lineHeight: 1, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0,
-    boxShadow: '0 1px 4px rgba(255,205,0,.25)',
   };
-  const yellowHover = (e, enter) => { e.currentTarget.style.boxShadow = enter ? '0 3px 10px rgba(255,205,0,.5)' : '0 1px 4px rgba(255,205,0,.25)'; };
+  const yellowHover = (e, enter) => { e.currentTarget.style.borderColor = enter ? '#999' : '#e0e0e4'; e.currentTarget.style.color = enter ? '#111' : '#555'; };
 
   const migrateLocalData = useCallback(async () => {
     const local = JSON.parse(localStorage.getItem('products88') || '[]');
