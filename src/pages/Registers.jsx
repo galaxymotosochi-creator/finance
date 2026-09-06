@@ -1208,7 +1208,7 @@ if (loading) return <CenterSpinner />;
                     }
                     // Обычная позиция (товар или услуга)
                     return (
-                      <React.Fragment>
+                      <>
                         <div onClick={function(){setPickEmpFor(item.id);}}
                           style={{padding:'7px 11px',fontSize:'.74rem',color:'#777',display:'flex',justifyContent:'space-between',cursor:'pointer',fontWeight:600,userSelect:'none'}}>
                           <span>{item.type === 'service' ? 'Кто выполняет?' : 'Кто продал?'}</span>
@@ -1231,7 +1231,7 @@ if (loading) return <CenterSpinner />;
                             )}
                           </div>
                         )}
-                      </React.Fragment>
+                      </>
                     );
                   })()}
                 </div>
