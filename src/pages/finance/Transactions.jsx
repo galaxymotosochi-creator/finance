@@ -428,10 +428,13 @@ export default function Transactions() {
             onMouseLeave={e=>{e.currentTarget.style.borderColor=typeFilter==='income'?'#bbb':'#e0e0e4';e.currentTarget.style.color=typeFilter==='income'?'#111':'#555'}}
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
           <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
-            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",color:"#555",cursor:"pointer",border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,background:'#fff'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            <button type="button" title="Скачать" aria-label="Скачать"
+              style={{width:'34px',height:'34px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
-              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
+              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            </button>
             {showDownload && (
               <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.35rem',zIndex:100}}>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',marginBottom:'.5rem',padding:'0 .25rem'}}>
