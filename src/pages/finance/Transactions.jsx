@@ -386,9 +386,11 @@ export default function Transactions() {
           <input type="text" placeholder="Быстрый поиск" value={search} onChange={function(e){setSearch(e.target.value)}}
             style={{border:"none",outline:"none",flex:1,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
         </div>
-        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto"}}>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1,whiteSpace:'nowrap'}}
+        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".3rem",marginLeft:"auto",flexWrap:'wrap',justifyContent:'flex-end'}}>
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,whiteSpace:'nowrap',background:'#fff'}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
               onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
             {showPeriod && (
               <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
@@ -416,12 +418,18 @@ export default function Transactions() {
               </div>
             )}
           </div>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='expense'?600:400,color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+          <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",fontWeight:typeFilter==='expense'?600:400,color:typeFilter==='expense'?'#111':'#555',cursor:"pointer",border:'1px solid '+(typeFilter==='expense'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=typeFilter==='expense'?'#bbb':'#e0e0e4';e.currentTarget.style.color=typeFilter==='expense'?'#111':'#555'}}
             onClick={()=>setTypeFilter(typeFilter==='expense'?null:'expense')}>Расходы</span>
-          <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",fontWeight:typeFilter==='income'?600:400,color:"#555",cursor:"pointer",borderRight:"1px solid var(--border)",lineHeight:1}}
+          <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",fontWeight:typeFilter==='income'?600:400,color:typeFilter==='income'?'#111':'#555',cursor:"pointer",border:'1px solid '+(typeFilter==='income'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=typeFilter==='income'?'#bbb':'#e0e0e4';e.currentTarget.style.color=typeFilter==='income'?'#111':'#555'}}
             onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1}}>
-            <span className="stock-filter-link" style={{padding:".15rem .4rem",fontSize:".75rem",color:"#555",cursor:"pointer",borderRight:"none",lineHeight:1}}
+          <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
+            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",color:"#555",cursor:"pointer",border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,background:'#fff'}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
               onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>Скачать</span>
             {showDownload && (
               <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.35rem',zIndex:100}}>

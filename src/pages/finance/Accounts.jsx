@@ -278,9 +278,9 @@ export default function Accounts() {
             { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
           ].map(a => (
             <button key={a.label} type="button" onClick={a.onClick}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e6e6ea';e.currentTarget.style.color='#444'}}
-              style={{display:'inline-flex',alignItems:'center',padding:'7px 14px',background:'#fff',border:'1px solid #e6e6ea',borderRadius:'10px',fontSize:'.78rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',lineHeight:1,boxShadow:'0 1px 2px rgba(0,0,0,.03)'}}>
+              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111';e.currentTarget.style.background='#f7f7f9'}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#444';e.currentTarget.style.background='#fff'}}
+              style={{display:'inline-flex',alignItems:'center',padding:'6px 13px',background:'#fff',border:'1px solid #e0e0e4',borderRadius:'100px',fontSize:'.75rem',fontWeight:500,color:'#444',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',lineHeight:1,boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}>
               {a.label}
             </button>
           ))}
