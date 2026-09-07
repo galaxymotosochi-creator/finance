@@ -695,7 +695,7 @@ input:focus, select:focus, textarea:focus {
 }
 .annual-table thead th { text-align: center; font-weight: 600; color: #000; font-size: .72rem; white-space: nowrap; }
 .annual-table thead th:first-child { text-align: left; }
-.annual-table tbody td { text-align: right; color: #000; }
+.annual-table thead th:first-child, .annual-table tbody td.cat { width: 220px; }
 .annual-table tbody td.cat { font-weight: 600; }
 .annual-table tbody tr.r-head td { border: none; font-weight: 700; color: #000; padding: .9rem .5rem .4rem; font-size: .82rem; text-align: left; }
 .annual-table tbody tr.subtotal td, .annual-table tbody tr.profit td, .annual-table tbody tr.cash td { font-weight: 700; }
