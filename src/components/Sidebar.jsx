@@ -26,7 +26,6 @@ const menu = [
       { label: 'Чеки', path: '/finance/receipts' },
       { label: 'Зарплата', path: '/finance/salary' },
       { label: 'Чистая прибыль', path: '/finance/pnl' },
-      { label: 'Годовой отчёт', path: '/finance/annual' },
       { label: 'Категории', path: '/finance/categories' },
       { label: 'Планирование', path: '/finance/plans' },
     ],

@@ -13,7 +13,6 @@ const PATH_TO_PERM = {
   '/finance/salary': 'finance.salary',
   '/finance/shifts': 'finance.shifts',
   '/finance/pnl': 'finance.pnl',
-  '/finance/annual': 'finance.annual',
   '/finance/categories': 'finance.categories',
   '/finance/plans': 'finance.plans',
   '/stock/products': 'stock.products',

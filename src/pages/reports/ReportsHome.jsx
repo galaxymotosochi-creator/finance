@@ -57,6 +57,13 @@ const reports = [
     path: '/reports/monthly',
     gradient: 'linear-gradient(135deg,#0d9488,#2dd4bf)',
   },
+  {
+    key: 'annual',
+    title: 'Годовой отчёт',
+    sub: 'Доходы и расходы по категориям за 12 месяцев года',
+    path: '/reports/annual',
+    gradient: 'linear-gradient(135deg,#f59e0b,#fbbf24)',
+  },
 ];
 
 export default function ReportsHome() {
