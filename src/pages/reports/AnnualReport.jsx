@@ -33,6 +33,11 @@ export default function AnnualReport() {
         const from = `${year}-01-01`;
         const to = `${year}-12-31`;
 
+        // Последний месяц в году, который уже прошёл/идёт (для будущих — данные ещё не известны):
+        const nowY = new Date().getFullYear();
+        const nowM = new Date().getMonth(); // 0..11
+        const lastMonth = year < nowY ? 11 : (year === nowY ? nowM : -1); // -1 => год ещё не существует
+
         // ---- Данные по году ----
         const [
           { data: recs },        // чеки года
@@ -183,9 +188,11 @@ export default function AnnualReport() {
         // Для правильного остатка считаем приход/расход по каждому счёту с учётом направленности (transfer идёт
         // со счёта и на счёт — суммируем net по каждому счёту).
 
-        // «Деньги на конец месяца» — накопительный остаток по всем счетам (как в разделе «Счета»).
-        // Остаток счёта = balance (стартовый) + все движения. На конец месяца X = Σ(balance + движения до конца X).
-        // Дельта за каждый месяц по каждому счёту:
+        // «Деньги на конец месяца» — накопительный остаток по счетам (как в разделе «Счета»).
+        // Остаток счёта = balance (стартовый) + все движения на дату. На конец месяца X = Σ на конец X.
+        // Деньги на конец месяца X = остаток на счетах на дату (последний день X).
+        // Остаток счёта = balance (стартовый при создании) + все движения по нему до этой даты
+        // (приход +, расход −) — как в разделе «Считаем: balance + движения».
         const txByMonthByAcc = Array.from({ length: 12 }, () => ({})); // [mi][accId] = net
         (allTx || []).forEach(t => {
           if (!t || !t.account_id) return;
@@ -195,10 +202,13 @@ export default function AnnualReport() {
           const net = (t.type === 'income' ? 1 : -1) * N(t.amount);
           txByMonthByAcc[mi][t.account_id] = (txByMonthByAcc[mi][t.account_id] || 0) + net;
         });
+        // Стартовый остаток счёта = balance. Пройдём месяцы, накапливая движения.
         const runningAcc = {};
         (accts || []).forEach(a => { runningAcc[a.id] = parseFloat(a.balance) || 0; });
-        M.forEach(m => {
-          Object.entries(txByMonthByAcc[m.idx]).forEach(([accId, delta]) => {
+        M.forEach((m) => {
+          // Будущие месяцы (ещё не наступили) — данных нет, показываем 0.
+          if (m.idx > lastMonth) { m.cash = 0; return; }
+          Object.entries(txByMonthByAcc[m.idx] || {}).forEach(([accId, delta]) => {
             runningAcc[accId] = (runningAcc[accId] || 0) + delta;
           });
           m.cash = Object.values(runningAcc).reduce((s, v) => s + v, 0);
