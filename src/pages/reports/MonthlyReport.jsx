@@ -265,13 +265,13 @@ export default function MonthlyReport() {
                   <td style={{ textAlign: 'left', paddingLeft: 0 }}>
                     <span className="prod-name">{p.label}</span>
                   </td>
-                  <td style={{ textAlign: 'left', color: p.salesSum ? '#111' : '#999' }}>{p.salesSum ? p.salesSum.toLocaleString() + ' ' + cur : '—'}</td>
-                  <td style={{ textAlign: 'left', color: p.retSum ? '#c0392b' : '#999' }}>{p.retSum ? '−' + p.retSum.toLocaleString() + ' ' + cur : '—'}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.salesCost ? p.salesCost.toLocaleString() + ' ' + cur : '—'}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.retCost ? p.retCost.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ textAlign: 'left', color: p.salesSum ? '#111' : '#999' }}>{p.salesSum.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left', color: p.retSum ? '#c0392b' : '#999' }}>{p.retSum ? '−' + p.retSum.toLocaleString() + ' ' + cur : '0 ' + cur}</td>
+                  <td style={{ textAlign: 'left', color: '#555' }}>{p.salesCost.toLocaleString()} {cur}</td>
+                  <td style={{ textAlign: 'left', color: '#555' }}>{p.retCost.toLocaleString()} {cur}</td>
                   <td style={{ textAlign: 'left', color: p.profit >= 0 ? '#228b22' : '#c0392b', fontWeight: 600 }}>{p.profit >= 0 ? p.profit.toLocaleString() : '−' + Math.abs(p.profit).toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.salesQty ? p.salesQty.toLocaleString() : '—'}</td>
-                  <td style={{ textAlign: 'left', color: p.retQty ? '#c0392b' : '#999' }}>{p.retQty ? p.retQty.toLocaleString() : '—'}</td>
+                  <td style={{ textAlign: 'left', color: '#555' }}>{p.salesQty ? p.salesQty.toLocaleString() : '0'}</td>
+                  <td style={{ textAlign: 'left', color: p.retQty ? '#c0392b' : '#999' }}>{p.retQty ? p.retQty.toLocaleString() : '0'}</td>
                   <td style={{ textAlign: 'left', color: '#555' }}>{p.rent}</td>
                   <td style={{ textAlign: 'left', color: '#555' }}>{p.margin}</td>
                 </tr>
@@ -280,7 +280,7 @@ export default function MonthlyReport() {
                 <tr className="total-row">
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{T.salesSum.toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{T.retSum ? '−' + T.retSum.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{T.retSum ? '−' + T.retSum.toLocaleString() + ' ' + cur : '0 ' + cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{T.salesCost.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{T.retCost.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: T.profit >= 0 ? '#222' : '#c0392b', textAlign: 'left' }}>{T.profit >= 0 ? T.profit.toLocaleString() : '−' + Math.abs(T.profit).toLocaleString()} {cur}</td>

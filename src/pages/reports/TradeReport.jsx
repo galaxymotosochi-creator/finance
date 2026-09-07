@@ -251,7 +251,7 @@ export default function TradeReport() {
                     {kind !== 'combo' && <td style={{ textAlign: 'left', color: '#555', whiteSpace: 'nowrap' }}>{p.sku || '—'}</td>}
                     {kind === 'combo' && <td style={{ textAlign: 'left', color: '#888', fontSize: '.72rem', maxWidth: 220 }}>{comboStr}</td>}
                     <td style={{ textAlign: 'left', color: '#555' }}>{p.sum.toLocaleString()} {cur}</td>
-                    <td style={{ textAlign: 'left', color: '#555' }}>{p.cost ? p.cost.toLocaleString() + ' ' + cur : '—'}</td>
+                    <td style={{ textAlign: 'left', color: '#555' }}>{p.cost.toLocaleString()} {cur}</td>
                     <td style={{ textAlign: 'left', color: p.profit >= 0 ? '#228b22' : '#c0392b', fontWeight: 600 }}>{p.profit >= 0 ? p.profit.toLocaleString() : '−' + Math.abs(p.profit).toLocaleString()} {cur}</td>
                     <td style={{ textAlign: 'left', color: '#555' }}>{p.qty.toLocaleString()}</td>
                     <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.cost)}</td>

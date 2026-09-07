@@ -249,7 +249,7 @@ export default function SalesReport() {
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.svcSum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.comboSum.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.bonus ? '+' + totals.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.bonus ? '+' + totals.bonus.toLocaleString() + ' ' + cur : '0 ' + cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.paidRew.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.owedRew.toLocaleString()} {cur}</td>
                 </tr>
@@ -272,11 +272,11 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
           <span className="prod-name">{expanded ? '▾ ' : '▸ '}{e.name}</span>
         </td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.totalQty}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.prodSum ? e.prodSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.svcSum ? e.svcSum.toLocaleString() + ' ' + cur : '—'}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.comboSum ? e.comboSum.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.prodSum.toLocaleString()} {cur}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.svcSum.toLocaleString()} {cur}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.comboSum.toLocaleString()} {cur}</td>
         <td style={{ textAlign: 'left', color: '#555' }}>{e.sum.toLocaleString()} {cur}</td>
-        <td style={{ textAlign: 'left', color: '#555' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '—'}</td>
+        <td style={{ textAlign: 'left', color: '#555' }}>{e.bonus ? '+' + e.bonus.toLocaleString() + ' ' + cur : '0 ' + cur}</td>
         <td style={{ textAlign: 'left', color: '#228b22' }}>{e.paidRew.toLocaleString()} {cur}</td>
         <td style={{ textAlign: 'left', color: '#c0392b' }}>{e.owedRew.toLocaleString()} {cur}</td>
       </tr>
@@ -303,7 +303,7 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
                       <td style={{ textAlign: 'left' }}>{it.name}{it.qty > 1 ? ' x' + it.qty : ''}</td>
                       <td style={{ textAlign: 'left' }}>{it.type === 'service' ? 'услуга' : it.type === 'combo' ? 'комбо' : 'товар'}</td>
                       <td style={{ textAlign: 'left' }}>{it.total.toLocaleString()} {cur}</td>
-                      <td style={{ textAlign: 'left' }}>{it.reward ? '+' + it.reward.toLocaleString() + ' ' + cur : '—'}</td>
+                      <td style={{ textAlign: 'left' }}>{it.reward ? '+' + it.reward.toLocaleString() + ' ' + cur : '0 ' + cur}</td>
                       <td style={{ textAlign: 'left', color: '#228b22' }}>{it.recPaid ? (it.reward || 0).toLocaleString() : '0'} {cur}</td>
                       <td style={{ textAlign: 'left', color: '#c0392b' }}>{it.recNotPaid ? (it.reward || 0).toLocaleString() : '0'} {cur}</td>
                     </tr>

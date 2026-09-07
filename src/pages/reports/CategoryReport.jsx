@@ -219,7 +219,7 @@ export default function CategoryReport() {
                     <span className="prod-name">{p.c}</span>
                   </td>
                   <td style={{ textAlign: 'left', color: '#555' }}>{p.sum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.cost ? p.cost.toLocaleString() + ' ' + cur : '—'}</td>
+                  <td style={{ textAlign: 'left', color: '#555' }}>{p.cost.toLocaleString()} {cur}</td>
                   <td style={{ textAlign: 'left', color: p.profit >= 0 ? '#228b22' : '#c0392b', fontWeight: 600 }}>{p.profit >= 0 ? p.profit.toLocaleString() : '−' + Math.abs(p.profit).toLocaleString()} {cur}</td>
                   <td style={{ textAlign: 'left', color: '#555' }}>{p.qty.toLocaleString()}</td>
                   <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.cost)}</td>
