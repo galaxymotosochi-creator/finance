@@ -36,6 +36,13 @@ const reports = [
     path: '/reports/category',
     gradient: 'linear-gradient(135deg,#7c3aed,#a78bfa)',
   },
+  {
+    key: 'daily',
+    title: 'Продажи по дням',
+    sub: 'Продажи, возвраты и прибыль по каждому дню',
+    path: '/reports/daily',
+    gradient: 'linear-gradient(135deg,#0891b2,#22d3ee)',
+  },
 ];
 
 export default function ReportsHome() {
