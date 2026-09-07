@@ -37,6 +37,7 @@ const ALL_SECTIONS = [
   ]},
   { id: 'team', label: 'Команда', children: [
     { id: 'team.employees', label: 'Сотрудники' },
+    // permissions: набор ИД-привилегий, список ниже (label показ.)
     { id: 'team.positions', label: 'Должности' },
     { id: 'team.timesheet', label: 'Табель' },
   ]},
@@ -90,7 +91,6 @@ export default function Employees() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
-  const [positions, setPositions] = useState([]);
   const [allCats, setAllCats] = useState([]);
   const [allProds, setAllProds] = useState([]);
   const [toast, setToast] = useState(null);
@@ -103,7 +103,7 @@ export default function Employees() {
   const [fName, setFName] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fEmail, setFEmail] = useState('');
-  const [fPositionId, setFPositionId] = useState('');
+  const [fPositionName, setFPositionName] = useState('');
   const [fHireDate, setFHireDate] = useState(new Date().toISOString().split('T')[0]);
   const [fBaseSalary, setFBaseSalary] = useState('');
   const [fBonusType, setFBonusType] = useState('none');
@@ -129,14 +129,12 @@ export default function Employees() {
     setLoading(true);
     if (!user) { setLoading(false); return; }
     try {
-      const [empRes, posRes, debtRes] = await Promise.all([
+      const [empRes, debtRes] = await Promise.all([
         supabase.from('employees').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('position_templates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('employee_debts').select('*').eq('user_id', user.id).eq('status', 'pending'),
       ]);
       if (empRes.error) { alert('Ошибка загрузки: ' + empRes.error.message); return; }
       if (empRes.data) setEmployees(empRes.data);
-      if (posRes.data) setPositions(posRes.data);
       if (debtRes.data) setDebts(debtRes.data);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
     // Категории/товары для выбора в правилах бонусов: из кеша, при пустоте — из БД
@@ -172,20 +170,7 @@ export default function Employees() {
     return () => document.removeEventListener('click', handler);
   }, []);
 
-  // position_id хранится строкой, id должности — числом — сравниваем строково
-  const getPosition = (id) => positions.find(p => String(p.id) === String(id));
-
-  const onPositionChange = (posId) => {
-    setFPositionId(posId);
-    const pos = positions.find(p => String(p.id) === String(posId));
-    if (pos) {
-      setFBaseSalary(String(pos.salary || ''));
-      setFBonusType(pos.bonus_type || 'none');
-      setFBonusValue(String(pos.bonus_value || ''));
-      if (pos.permissions && pos.permissions.length > 0) setFPermissions(pos.permissions);
-    }
-  };
-
+  // getPosition/onPositionChange — справочник должностей удалён; должность вводится текстом (position_name)
   // Хелперы авто-бонусов
   const scopeLabel = (v) => { const f = BONUS_SCOPES.find(x => x.v === v); return f ? f.l : v; };
   const refName = (rule) => {
@@ -254,7 +239,7 @@ export default function Employees() {
 
   const openEdit = (e) => {
     setEditId(e.id); setFName(e.name); setFPhone(e.phone||'');
-    setFEmail(e.email||''); setFPositionId(e.position_id||'');
+    setFEmail(e.email||''); setFPositionName(e.position_name||e.position_id||'');
     // hire_date в БД — timestamptz (с временем) — берём только дату, иначе поле в форме пустое
     setFHireDate((e.hire_date||'').slice(0,10) || new Date().toISOString().split('T')[0]);
     setFBaseSalary(String(e.base_salary||''));
@@ -270,7 +255,7 @@ export default function Employees() {
     try {
       const obj = {
         user_id: user.id, name: fName.trim(), phone: fPhone.trim(),
-        email: fEmail.trim(), position_id: fPositionId || null,
+        email: fEmail.trim(), position_name: fPositionName.trim(),
         hire_date: fHireDate, base_salary: parseFloat(fBaseSalary)||0,
         bonus_type: fBonusType, bonus_value: parseFloat(fBonusValue)||0,
         bonus_rules: fBonusRules, permissions: fPermissions,
@@ -449,7 +434,7 @@ export default function Employees() {
               <tr><td colSpan="9"><div className="empty-products"><div className="big-icon">👤</div><p>Список сотрудников пуст</p>
                     <p style={{color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
             ) : filtered.map(emp => {
-              const pos = getPosition(emp.position_id);
+              const pos = emp.position_name;
               return (
                 <tr key={emp.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
@@ -461,7 +446,7 @@ export default function Employees() {
                     )}
                     {emp.status === 'inactive' && <span>Уволен</span>}
                   </td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{pos ? pos.name : '—'}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{pos || '—'}</td>
                   <td style={{textAlign:'left',color:'#222'}}>{emp.phone || '—'}</td>
                   <td style={{textAlign:'left',color:'#222'}}>{emp.email || '—'}</td>
                   <td style={{textAlign:'left',color:'#222'}}>{fmtDate(emp.hire_date)}</td>
@@ -520,10 +505,7 @@ export default function Employees() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Должность</label>
-                  <select value={fPositionId} onChange={e => onPositionChange(e.target.value)}>
-                    <option value="">— Без должности —</option>
-                    {positions.map(p => <option key={p.id} value={String(p.id)}>{p.name}</option>)}
-                  </select>
+                  <input type="text" value={fPositionName} onChange={e=>setFPositionName(e.target.value)} placeholder="Например: Администратор" />
                 </div>
                 <div className="form-group">
                   <label>Дата приема</label>

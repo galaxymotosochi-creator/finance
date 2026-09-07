@@ -41,7 +41,6 @@ const SettingsPage = lazy(() => import('./pages/Settings'));
 const TrashPage = lazy(() => import('./pages/Trash'));
 const Clients = lazy(() => import('./pages/clients/Clients'));
 const Loyalty = lazy(() => import('./pages/clients/Loyalty'));
-const Positions = lazy(() => import('./pages/employees/Positions'));
 const Employees = lazy(() => import('./pages/employees/Employees'));
 const Timesheet = lazy(() => import('./pages/employees/Timesheet'));
 const RegistersPage = lazy(() => import('./pages/Registers'));
@@ -101,7 +100,6 @@ function AppRoutes() {
       <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
       <Route path="/clients" element={<ProtectedRoute><AppLayout><Clients /></AppLayout></ProtectedRoute>} />
       <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
-      <Route path="/employees/positions" element={<ProtectedRoute><AppLayout><Positions /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/timesheet" element={<ProtectedRoute><AppLayout><Timesheet /></AppLayout></ProtectedRoute>} />
       <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
