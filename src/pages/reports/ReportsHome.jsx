@@ -12,10 +12,26 @@ const reports = [
   {
     key: 'products',
     title: 'Продажи по товарам',
-    sub: 'Продажи, себестоимость и маржинальность по товарам',
+    sub: 'Только товары — продажи и себестоимость за период',
     path: '/reports/products',
     icon: '📦',
     gradient: 'linear-gradient(135deg,#0ea5e9,#38bdf8)',
+  },
+  {
+    key: 'services',
+    title: 'Продажи по услугам',
+    sub: 'Только услуги — оказание и выручка за период',
+    path: '/reports/services',
+    icon: '💅',
+    gradient: 'linear-gradient(135deg,#a855f7,#c084fc)',
+  },
+  {
+    key: 'combo',
+    title: 'Продажи по комбо',
+    sub: 'Комплекты — выручка и прибыль по составу',
+    path: '/reports/combo',
+    icon: '🧩',
+    gradient: 'linear-gradient(135deg,#ea580c,#fb923c)',
   },
 ];
 

@@ -12,9 +12,16 @@ const pct = (part, whole) => {
   return (v > 0 ? '' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + '%';
 };
 
-export default function ProductReport() {
+const META = {
+  product: { title: 'Продажи по товарам', sub: 'Только товары — продажи, себестоимость и маржинальность за период', cols: 9 },
+  service: { title: 'Продажи по услугам', sub: 'Только услуги — оказание и выручка за период', cols: 9 },
+  combo:   { title: 'Продажи по комбо',   sub: 'Комплекты целиком — выручка, себестоимость состава и прибыль', cols: 9 },
+};
+
+export default function TradeReport() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
+  const kind = new URLSearchParams(window.location.search).get('kind') || 'product';
   const [from, setFrom] = useState(() => { const t = tzToday(); return t.slice(0, 8) + '01'; });
   const [to, setTo] = useState(() => tzToday());
   const [period, setPeriod] = useState('month');
@@ -22,19 +29,15 @@ export default function ProductReport() {
   const [showPeriod, setShowPeriod] = useState(false);
   const periodWrapRef = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [prods, setProds] = useState([]); // итоговые строки по товарам
-  const [revenue, setRevenue] = useState(0);
-  const [cost, setCost] = useState(0);
-  const [qty, setQty] = useState(0);
+  const [rows, setRows] = useState([]);
+  const [totals, setTotals] = useState({ qty: 0, sum: 0, cost: 0 });
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      // Все товары (включая скрытые — по ним есть продажи) для маппинга id → product
-      const prRes = await supabase.from('products').select('id,name,sku,barcode,type').eq('user_id', user.id);
+      const prRes = await supabase.from('products').select('id,name,sku,barcode,type,combo_items').eq('user_id', user.id);
       const prList = prRes.data || [];
-      // Поставки — для расчёта средней себестоимости (как в PnL)
       const supRes = await supabase.from('supplies').select('items').eq('user_id', user.id);
 
       const { data: recs } = await supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', from).lte('date', to).order('created_at', { ascending: false });
@@ -45,7 +48,7 @@ export default function ProductReport() {
         itList = items || [];
       }
 
-      // Средняя себестоимость за шт: prodId -> avg (сумма закупок / количество), из поставок
+      // Средняя себестоимость за шт из поставок
       const costTotals = {};
       (supRes.data || []).forEach(sp => (sp.items || []).forEach(it => {
         const pid = String(it.prodId);
@@ -56,36 +59,40 @@ export default function ProductReport() {
       }));
       const avgCost = {};
       Object.entries(costTotals).forEach(([id, v]) => { if (v.qty > 0) avgCost[id] = v.cost / v.qty; });
+      // Себестоимость комбо = сумма себестоимости элементов состава (combo_items: {id,name,price,qty})
+      const comboCost = {};
+      (prList || []).forEach(p => {
+        if (p.type !== 'combo' || !p.combo_items || !p.combo_items.length) return;
+        let c = 0;
+        (p.combo_items || []).forEach(ci => { c += (avgCost[String(ci.id)] || 0) * (Number(ci.qty) || 1); });
+        comboCost[String(p.id)] = c;
+      });
 
-      // Маппинг по product_id (и по product_name как запасной)
       const byId = {};
       prList.forEach(p => { byId[String(p.id)] = p; });
 
-      const byProd = {}; // product_key -> агрегат
-      const getKey = (pid, pname) => {
-        if (pid != null && pid !== '' && byId[String(pid)]) return 'id:' + pid;
-        if (pname) return 'name:' + pname;
-        return 'id:';
+      // Агрегируем по продукту. cls: 1="товар", 2="услуга", 3="комбо" (по типу товара из карточки)
+      const agg = {};
+      const ensure = (pid) => {
+        const pidKey = pid != null ? String(pid) : '';
+        if (!agg[pidKey]) agg[pidKey] = { pidKey, qty: 0, sum: 0, cost: 0 };
+        return agg[pidKey];
       };
-      const ensure = (key) => {
-        if (!byProd[key]) byProd[key] = { key, qty: 0, sum: 0, cost: 0 };
-        return byProd[key];
-      };
+      const cls = (p) => p ? (p.type === 'combo' ? 3 : p.type === 'service' ? 2 : 1) : 1;
 
-      // Карта чеков (для возвратов refund_items по позициям)
       const recById = {};
       rlist.forEach(r => { recById[r.id] = r; });
 
       itList.forEach(it => {
         const r = recById[it.receipt_id];
         const pid = it.product_id != null ? String(it.product_id) : null;
-        const pr = pid && byId[pid] ? byId[pid] : null;
-        const key = getKey(pid, it.product_name);
-        const row = ensure(key);
-        const av = (pr ? avgCost[String(pr.id)] : null) || avgCost[pid] || 0;
+        const pr = pid != null && pid !== '' && byId[pid] ? byId[pid] : null;
+        if (!pr) return; // позиции без товара в карточке игнорируем
+        if (cls(pr) !== (kind === 'product' ? 1 : kind === 'service' ? 2 : 3)) return;
+
         const qtySales = Number(it.quantity) || 0;
-        const totalSales = Number(it.total) || 0; // итог позиции (с учётом скидки на позицию)
-        // Возвраты по этой позиции (частичные/полные) — вычитаем из кол-ва и выручки
+        const totalSales = Number(it.total) || 0;
+        // Возвраты по позиции
         let retQty = 0, retSum = 0;
         if (r && (r.refund_items || []).length) {
           const unit = qtySales > 0 ? totalSales / qtySales : 0;
@@ -94,48 +101,45 @@ export default function ProductReport() {
             const rq = Number(rf.qty) || 0;
             if (rq <= 0) return;
             retQty += rq;
-            retSum += unit * rq; // возврат по средней цене единицы позиции
+            retSum += unit * rq;
           });
         }
         const qtyNet = Math.max(0, qtySales - retQty);
         if (qtyNet <= 0) return;
         const totalNet = Math.max(0, totalSales - retSum);
+        const row = ensure(pid);
         row.qty += qtyNet;
         row.sum += totalNet;
-        row.cost += av * qtyNet; // себестоимость только по фактически проданному (без возвратов)
-        row._pr = pr || row._pr;
+        // Себестоимость проданного
+        const unitCost = cls(pr) === 3 ? comboCost[String(pr.id)] || 0 : avgCost[String(pr.id)] || 0;
+        row.cost += unitCost * qtyNet;
+        row._pr = pr;
       });
 
-      const rows = Object.values(byProd).map(r => {
-        const pr = r._pr;
+      // Выручка товара/услуги/комбо как есть; но если вид не товар — колонки штрихкода мы не обязаны, оставлю по желанию
+      const list = Object.values(agg).filter(x => x.qty > 0).map(row => {
+        const p = row._pr;
         return {
-          name: pr ? pr.name : (r.key.indexOf('name:') === 0 ? r.key.slice(5) : 'Товар'),
-          barcode: pr ? (pr.barcode || '') : '',
-          sku: pr ? (pr.sku || '') : '',
-          type: pr ? pr.type : 'product',
-          qty: r.qty,
-          sum: rq(r.sum),
-          cost: rq(r.cost),
-          profit: rq(r.sum - r.cost),
+          pidKey: row.pidKey,
+          name: p ? p.name : '—',
+          sku: p ? (p.sku || '') : '',
+          barcode: p ? (p.barcode || '') : '',
+          qty: r2(row.qty),
+          sum: r2(row.sum),
+          cost: r2(row.cost),
+          profit: r2(row.sum - row.cost),
         };
-      });
-      rows.sort((a, b) => b.sum - a.sum);
+      }).sort((a, b) => b.sum - a.sum);
 
-      const totQty = rows.reduce((s, x) => s + x.qty, 0);
-      const totSum = rows.reduce((s, x) => s + x.sum, 0);
-      const totCost = rows.reduce((s, x) => s + x.cost, 0);
-
-      setProds(rows);
-      setQty(totQty);
-      setRevenue(totSum);
-      setCost(totCost);
+      const T = list.reduce((s, x) => ({ qty: s.qty + x.qty, sum: s.sum + x.sum, cost: s.cost + x.cost }), { qty: 0, sum: 0, cost: 0 });
+      setRows(list);
+      setTotals(T);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [from, to]);
+  useEffect(() => { load(); }, [from, to, kind]);
 
-  // период как в «Продажи по сотрудникам»
   const applyPeriod = (k) => {
     setPeriod(k);
     if (k === 'all') { setFrom('2000-01-01'); setTo('2999-12-31'); setPeriodLabel('Все время'); return; }
@@ -146,7 +150,6 @@ export default function ProductReport() {
     if (k === 'month') { const t = tzToday(); setTo(t); setFrom(t.slice(0, 8) + '01'); setPeriodLabel('Этот месяц'); return; }
   };
 
-  // закрытие выпадающего меню периода при клике вне (как в «Продажи по сотрудникам»)
   useEffect(() => {
     if (!showPeriod) return;
     const handler = (e) => {
@@ -158,14 +161,15 @@ export default function ProductReport() {
     return () => document.removeEventListener('click', handler);
   }, [showPeriod]);
 
-  const tProfit = revenue - cost;
+  const meta = META[kind] || META.product;
+  const tProfit = totals.sum - totals.cost;
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1>Продажи по товарам</h1>
-          <div className="sub">Продажи, себестоимость и маржинальность по товарам за период</div>
+          <h1>{meta.title}</h1>
+          <div className="sub">{meta.sub}</div>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
@@ -207,10 +211,10 @@ export default function ProductReport() {
 
       {loading ? (
         <CenterSpinner />
-      ) : prods.length === 0 ? (
+      ) : rows.length === 0 ? (
         <div className="empty-products" style={{ marginTop: '1.5rem' }}>
           <div className="big-icon">📊</div>
-          <p>За этот период нет продаж товаров</p>
+          <p>За этот период нет продаж {kind === 'combo' ? 'комбо' : kind === 'service' ? 'услуг' : 'товаров'}</p>
         </div>
       ) : (
         <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -218,8 +222,9 @@ export default function ProductReport() {
             <thead id="colHeaders">
               <tr>
                 <th style={{ textAlign: 'left', paddingLeft: 0 }}>Наименование</th>
-                <th style={{ textAlign: 'left' }}>Штрихкод</th>
-                <th style={{ textAlign: 'left' }}>Артикул</th>
+                {kind !== 'combo' && <th style={{ textAlign: 'left' }}>Штрихкод</th>}
+                {kind !== 'combo' && <th style={{ textAlign: 'left' }}>Артикул</th>}
+                {kind === 'combo' && <th style={{ textAlign: 'left' }}>Состав</th>}
                 <th style={{ textAlign: 'left' }}>Выручка</th>
                 <th style={{ textAlign: 'left' }}>Себестоимость продаж</th>
                 <th style={{ textAlign: 'left' }}>Прибыль</th>
@@ -229,32 +234,38 @@ export default function ProductReport() {
               </tr>
             </thead>
             <tbody>
-              {prods.map((p, i) => (
-                <tr key={p.key ? p.key : i}>
-                  <td style={{ textAlign: 'left', paddingLeft: 0 }}>
-                    <span className="prod-name">{p.name}</span>
-                  </td>
-                  <td style={{ textAlign: 'left', color: '#555', whiteSpace: 'nowrap' }}>{p.barcode || '—'}</td>
-                  <td style={{ textAlign: 'left', color: '#555', whiteSpace: 'nowrap' }}>{p.sku || '—'}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.sum.toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.cost ? p.cost.toLocaleString() + ' ' + cur : '—'}</td>
-                  <td style={{ textAlign: 'left', color: p.profit >= 0 ? '#228b22' : '#c0392b', fontWeight: 600 }}>{p.profit >= 0 ? p.profit.toLocaleString() : '−' + Math.abs(p.profit).toLocaleString()} {cur}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{p.qty.toLocaleString()}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.cost)}</td>
-                  <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.sum)}</td>
-                </tr>
-              ))}
-              {prods.length > 0 && (
+              {rows.map((p, i) => {
+                const pr = p._pr;
+                const comboStr = (pr && pr.combo_items && pr.combo_items.length) ? pr.combo_items.map(c => (c.name || '') + ' x' + (Number(c.qty) || 1)).join(', ') : '—';
+                return (
+                  <tr key={p.pidKey ? p.pidKey : i}>
+                    <td style={{ textAlign: 'left', paddingLeft: 0 }}>
+                      <span className="prod-name">{p.name}</span>
+                    </td>
+                    {kind !== 'combo' && <td style={{ textAlign: 'left', color: '#555', whiteSpace: 'nowrap' }}>{p.barcode || '—'}</td>}
+                    {kind !== 'combo' && <td style={{ textAlign: 'left', color: '#555', whiteSpace: 'nowrap' }}>{p.sku || '—'}</td>}
+                    {kind === 'combo' && <td style={{ textAlign: 'left', color: '#888', fontSize: '.72rem', maxWidth: 220 }}>{comboStr}</td>}
+                    <td style={{ textAlign: 'left', color: '#555' }}>{p.sum.toLocaleString()} {cur}</td>
+                    <td style={{ textAlign: 'left', color: '#555' }}>{p.cost ? p.cost.toLocaleString() + ' ' + cur : '—'}</td>
+                    <td style={{ textAlign: 'left', color: p.profit >= 0 ? '#228b22' : '#c0392b', fontWeight: 600 }}>{p.profit >= 0 ? p.profit.toLocaleString() : '−' + Math.abs(p.profit).toLocaleString()} {cur}</td>
+                    <td style={{ textAlign: 'left', color: '#555' }}>{p.qty.toLocaleString()}</td>
+                    <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.cost)}</td>
+                    <td style={{ textAlign: 'left', color: '#555' }}>{pct(p.profit, p.sum)}</td>
+                  </tr>
+                );
+              })}
+              {rows.length > 0 && (
                 <tr className="total-row">
                   <td style={{ fontWeight: 600, color: '#222', textAlign: 'left', paddingLeft: 0 }}>Итого:</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>—</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>—</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{revenue.toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{cost.toLocaleString()} {cur}</td>
+                  {kind !== 'combo' && <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>—</td>}
+                  {kind !== 'combo' && <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>—</td>}
+                  {kind === 'combo' && <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>—</td>}
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.sum.toLocaleString()} {cur}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.cost.toLocaleString()} {cur}</td>
                   <td style={{ fontWeight: 600, color: tProfit >= 0 ? '#222' : '#c0392b', textAlign: 'left' }}>{tProfit >= 0 ? tProfit.toLocaleString() : '−' + Math.abs(tProfit).toLocaleString()} {cur}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{qty.toLocaleString()}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{pct(tProfit, cost)}</td>
-                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{pct(tProfit, revenue)}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{totals.qty.toLocaleString()}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{pct(tProfit, totals.cost)}</td>
+                  <td style={{ fontWeight: 600, color: '#222', textAlign: 'left' }}>{pct(tProfit, totals.sum)}</td>
                 </tr>
               )}
             </tbody>
@@ -264,6 +275,3 @@ export default function ProductReport() {
     </div>
   );
 }
-
-// округление до копеек
-function rq(n) { return Math.round((Number(n) || 0) * 100) / 100; }
