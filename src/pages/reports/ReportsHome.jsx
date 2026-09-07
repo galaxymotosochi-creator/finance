@@ -4,7 +4,7 @@ const reports = [
   {
     key: 'sales',
     title: 'Продажи по сотрудникам',
-    sub: 'Кто сколько продал и выполнил за период, бонус по правилам',
+    sub: 'Все продажи и вознаграждения сотрудников за период',
     path: '/reports/sales',
     icon: '📈',
     gradient: 'linear-gradient(135deg,#16a34a,#22c55e)',
