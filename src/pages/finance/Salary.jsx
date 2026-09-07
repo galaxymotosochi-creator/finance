@@ -229,8 +229,10 @@ export default function Salary() {
           const availQty = Math.max(0, qty - retQty);
           if (availQty <= 0) return;
           const unit = qty > 0 ? (Number(it.total) || 0) / qty : 0;
-          rows.push({ itemId: it.id, date: String(r.date || '').split('T')[0], name: it.product_name, product_id: it.product_id, qty: availQty, total: Math.round(unit * availQty) });
+          rows.push({ itemId: it.id, created: it.created_at || r.created_at || r.date || '', date: String(r.date || '').split('T')[0], name: it.product_name, product_id: it.product_id, qty: availQty, total: Math.round(unit * availQty) });
         });
+        // Новые продажи — первыми (по времени создания позиции/чека)
+        rows.sort((a, b) => String(b.created).localeCompare(String(a.created)));
         // Вознаграждение исполнителю: суммы из employee_splits чеков (сколько указано мастеру в кассе)
         const rewRows = [];
         (items || []).forEach(it => {

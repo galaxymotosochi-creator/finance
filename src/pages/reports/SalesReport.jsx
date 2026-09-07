@@ -75,7 +75,7 @@ export default function SalesReport() {
           else { E.prodQty += qty; E.prodSum += total; }
           E.sum += total;
           E.bonus += bonus;
-          E.items.push({ id: String(it.id), date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
+          E.items.push({ id: String(it.id), created: it.created_at || r.created_at || r.date || '', date: String(r.date || '').split('T')[0], name: it.product_name, type, qty, total, bonus });
         });
       }
       const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
@@ -128,7 +128,7 @@ export default function SalesReport() {
           // если начислений за период вовсе нет — позиция ещё не выплачена
           const recPaid = inPer.length ? isPaid : false;
           return { ...x, reward: rw, recPaid, recNotPaid: !recPaid };
-        }).sort((a, b) => (a.date < b.date ? 1 : -1));
+        }).sort((a, b) => (String(b.created || '')).localeCompare(String(a.created || '')) || b.total - a.total);
         // Выплачено/Не выплачено = сумма по позициям (основная строка = сумма раскрытия)
         const paidRew = enrichedItems.reduce((a, x) => a + (x.recPaid ? (Number(x.reward) || 0) : 0), 0);
         const owedRew = enrichedItems.reduce((a, x) => a + (x.recNotPaid ? (Number(x.reward) || 0) : 0), 0);
