@@ -231,7 +231,7 @@ export default function Employees() {
 
   const openAdd = () => {
     setEditId(null); setFName(''); setFPhone(''); setFEmail('');
-    setFPositionId(''); setFHireDate(new Date().toISOString().split('T')[0]);
+    setFPositionName(''); setFHireDate(new Date().toISOString().split('T')[0]);
     setFBaseSalary(''); setFBonusType('none'); setFBonusValue('');
     setFBonusRules([]); setFPermissions([]);
     setFPin(''); setFStatus('active'); setExpanded({}); setShow(true);
