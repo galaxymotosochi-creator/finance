@@ -689,7 +689,7 @@ input:focus, select:focus, textarea:focus {
 
 .annual-table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
 .annual-table th, .annual-table td {
-  border: 1px solid #000;
+  border: 1px solid #cfcfcf;
   padding: .44rem .5rem;
   font-size: .78rem;
 }
