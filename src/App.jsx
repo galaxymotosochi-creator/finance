@@ -45,6 +45,7 @@ const Employees = lazy(() => import('./pages/employees/Employees'));
 const Timesheet = lazy(() => import('./pages/employees/Timesheet'));
 const RegistersPage = lazy(() => import('./pages/Registers'));
 const SalesReport = lazy(() => import('./pages/reports/SalesReport'));
+const ProductReport = lazy(() => import('./pages/reports/ProductReport'));
 const ReportsHome = lazy(() => import('./pages/reports/ReportsHome'));
 
 function FullKassa() {
@@ -108,6 +109,7 @@ function AppRoutes() {
       <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsHome /></AppLayout></ProtectedRoute>} />
       <Route path="/reports/sales" element={<ProtectedRoute><AppLayout><SalesReport /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports/products" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

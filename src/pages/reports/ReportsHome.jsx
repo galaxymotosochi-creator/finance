@@ -9,6 +9,14 @@ const reports = [
     icon: '📈',
     gradient: 'linear-gradient(135deg,#16a34a,#22c55e)',
   },
+  {
+    key: 'products',
+    title: 'Продажи по товарам',
+    sub: 'Продажи, себестоимость и маржинальность по товарам',
+    path: '/reports/products',
+    icon: '📦',
+    gradient: 'linear-gradient(135deg,#0ea5e9,#38bdf8)',
+  },
 ];
 
 export default function ReportsHome() {
