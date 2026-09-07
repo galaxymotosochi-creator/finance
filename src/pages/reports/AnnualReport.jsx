@@ -183,8 +183,10 @@ export default function AnnualReport() {
         // Для правильного остатка считаем приход/расход по каждому счёту с учётом направленности (transfer идёт
         // со счёта и на счёт — суммируем net по каждому счёту).
 
-        // Построим net-delta на счёт от каждой транзакции
-        const txByMonthByAcc = Array.from({ length: 12 }, () => ({})); // [mi][accId] = net delta за месяц
+        // «Деньги на конец месяца» — накопительный остаток по всем счетам (как в разделе «Счета»).
+        // Остаток счёта = balance (стартовый) + все движения. На конец месяца X = Σ(balance + движения до конца X).
+        // Дельта за каждый месяц по каждому счёту:
+        const txByMonthByAcc = Array.from({ length: 12 }, () => ({})); // [mi][accId] = net
         (allTx || []).forEach(t => {
           if (!t || !t.account_id) return;
           const mi = monthOfDate(t.date || t.created_at);
@@ -193,20 +195,8 @@ export default function AnnualReport() {
           const net = (t.type === 'income' ? 1 : -1) * N(t.amount);
           txByMonthByAcc[mi][t.account_id] = (txByMonthByAcc[mi][t.account_id] || 0) + net;
         });
-        // Текущий баланс счёта минус все движения = стартовый остаток (до учёта транзакций)
-        const totalDelta = {};
-        (allTx || []).forEach(t => {
-          if (!t || !t.account_id) return;
-          if (t.status && t.status !== 'paid') return;
-          totalDelta[t.account_id] = (totalDelta[t.account_id] || 0) + (t.type === 'income' ? 1 : -1) * N(t.amount);
-        });
-        const startBal = {};
-        (accts || []).forEach(a => {
-          startBal[a.id] = (parseFloat(a.balance) || 0) - (totalDelta[a.id] || 0);
-        });
-        // Накопим деньги на конец каждого месяца
-        const runningAcc = {}; // accId -> накопл
-        (accts || []).forEach(a => { runningAcc[a.id] = startBal[a.id] || 0; });
+        const runningAcc = {};
+        (accts || []).forEach(a => { runningAcc[a.id] = parseFloat(a.balance) || 0; });
         M.forEach(m => {
           Object.entries(txByMonthByAcc[m.idx]).forEach(([accId, delta]) => {
             runningAcc[accId] = (runningAcc[accId] || 0) + delta;
