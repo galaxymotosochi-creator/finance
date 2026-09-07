@@ -307,31 +307,30 @@ export default function AnnualReport() {
               {MONSHORT.map((mn, i) => (
                 <th key={mn} title={MONLONG[i]}>{mn}</th>
               ))}
-              <th className="br">Год</th>
+              <th>Год</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => {
               if (r.kind === 'head') {
                 return (
-                  <tr key={r.key} className="head">
-                    <td colSpan={14} style={{ color: r.color }}>{r.label}</td>
+                  <tr key={r.key} className="r-head">
+                    <td colSpan={14}>{r.label}</td>
                   </tr>
                 );
               }
               if (r.kind === 'item') {
                 const vals = MONSHORT.map((_, mi) => cellVals[r.key + ':' + mi] || 0);
                 const yearSum = vals.reduce((a, b) => a + b, 0);
-                const isIncome = r.income;
-                const col = isIncome ? '#1e7d32' : '#c0392b';
-                const cls = r.section === 'cogs' ? ' section-before' : '';
+                const income = r.income;
+                const col = income ? '#1e7d32' : '#c0392b';
                 return (
-                  <tr key={r.key} className={"item" + cls}>
+                  <tr key={r.key}>
                     <td className="cat">{r.label}</td>
                     {vals.map((v, mi) => (
-                      <td key={mi} style={{ color: col, opacity: v ? 1 : .4 }}>{v ? fmt(v) : '0'}</td>
+                      <td key={mi} style={{ color: col }}>{v !== 0 ? fmt(v) : <span className="num0">0</span>}</td>
                     ))}
-                    <td className="br" style={{ color: col, fontWeight: 700 }}>{fmt(yearSum)}</td>
+                    <td style={{ color: col, fontWeight: 600 }}>{fmt(yearSum)}</td>
                   </tr>
                 );
               }
@@ -340,20 +339,20 @@ export default function AnnualReport() {
                   <tr key={r.key} className="subtotal">
                     <td className="cat">Итог за месяц</td>
                     {MONSHORT.map((_, mi) => (
-                      <td key={mi} style={{ color: (monthVals[mi].income - monthVals[mi].expense) >= 0 ? '#222' : '#c0392b' }}>{fmt(monthVals[mi].income - monthVals[mi].expense)}</td>
+                      <td key={mi}>{fmt(monthVals[mi].income - monthVals[mi].expense)}</td>
                     ))}
-                    <td className="br" style={{ color: '#222' }}>{fmt(monthVals.reduce((s, m) => s + (m.income - m.expense), 0))}</td>
+                    <td>{fmt(monthVals.reduce((s, m) => s + (m.income - m.expense), 0))}</td>
                   </tr>
                 );
               }
               if (r.kind === 'profit') {
                 return (
                   <tr key={r.key} className="profit">
-                    <td className="cat" style={{ color: '#1e7d32' }}>Чистая прибыль</td>
+                    <td className="cat">Чистая прибыль</td>
                     {MONSHORT.map((_, mi) => (
                       <td key={mi}>{fmt(monthVals[mi].profit)}</td>
                     ))}
-                    <td className="br">{fmt(monthVals.reduce((s, m) => s + m.profit, 0))}</td>
+                    <td>{fmt(monthVals.reduce((s, m) => s + m.profit, 0))}</td>
                   </tr>
                 );
               }
@@ -363,7 +362,7 @@ export default function AnnualReport() {
                   {MONSHORT.map((_, mi) => (
                     <td key={mi}>{fmt(monthVals[mi].cash)}</td>
                   ))}
-                  <td className="br">{fmt(monthVals[11].cash)}</td>
+                  <td>{fmt(monthVals[11].cash)}</td>
                 </tr>
               );
             })}

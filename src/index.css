@@ -688,34 +688,21 @@ input:focus, select:focus, textarea:focus {
 .at-table thead th:first-child { padding-left: 0; }
 
 .annual-table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
-.annual-table thead th {
-  padding: .55rem .5rem; font-size: .72rem; font-weight: 700; color: #666;
-  text-align: right; border-bottom: 2px solid #c9c9c9;
-  border-left: 1px solid #ececec; white-space: nowrap;
+.annual-table th, .annual-table td {
+  border: 1px solid #000;
+  padding: .44rem .5rem;
+  font-size: .78rem;
 }
-.annual-table thead th:first-child {
-  width: 20%; text-align: left; padding-left: .5rem; border-left: none;
-}
-.annual-table thead th:last-child { border-left: 2px solid #c9c9c9; border-right: 1px solid #ececec; }
-.annual-table tbody td {
-  padding: .42rem .5rem; font-size: .78rem; text-align: right;
-  border-bottom: 1px solid #ececec; border-left: 1px solid #ececec;
-  color: #333; border-top: 0;
-}
-.annual-table tbody td.cat { width: 20%; border-left: 0; }
-.annual-table tbody td.br { font-weight: 700; }
-.annual-table tbody tr.head td {
-  border-bottom: none; border-left: none; font-size: .8rem; font-weight: 800;
-  padding: .9rem .5rem .2rem; text-align: left; letter-spacing: .02em;
-}
-.annual-table tbody tr.subtotal { background: #fafafa; }
-.annual-table tbody tr.subtotal td { border-top: 1.5px solid #bbb; font-weight: 700; }
-.annual-table tbody tr.profit td, .annual-table tbody tr.cash td {
-  border-top: 2px solid #bbb; font-weight: 800;
-}
-.annual-table tbody tr.profit { background: #f4faf2; color: #1e7d32; }
-.annual-table tbody tr.cash { background: #eef6ff; color: #0b5394; }
-.annual-table .num0 { opacity: .38; }
+.annual-table thead th { text-align: right; font-weight: 600; color: #000; font-size: .72rem; white-space: nowrap; }
+.annual-table thead th:first-child, .annual-table tbody td.cat, .annual-table tbody td.head-only { text-align: left; width: 16%; }
+.annual-table tbody td { text-align: right; color: #000; }
+.annual-table tbody td.cat { font-weight: 600; }
+.annual-table tbody tr.r-head td { border: none; font-weight: 700; color: #000; padding: .9rem .5rem .4rem; font-size: .82rem; text-align: left; }
+.annual-table tbody tr.subtotal td, .annual-table tbody tr.profit td, .annual-table tbody tr.cash td { font-weight: 700; }
+.annual-table tbody tr.profit td { background: #f4faf2; color: #1e7d32; }
+.annual-table tbody tr.cash td { background: #eef6ff; color: #0b5394; }
+.annual-table tbody tr.subtotal td { background: #fafafa; }
+.annual-table .num0 { color: #9a9a9a; }
 @keyframes loadbar {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(200%); }
