@@ -300,27 +300,22 @@ export default function AnnualReport() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginTop: '.5rem' }}>
-        <table className="data-table" style={{ borderCollapse: 'separate', borderSpacing: 0, tableLayout: 'fixed', width: '100%' }}>
-          <colgroup>
-            <col style={{ width: '26%' }} />
-            {MONSHORT.map(mn => <col key={mn} />)}
-            <col />
-          </colgroup>
-          <thead id="colHeaders">
+        <table className="annual-table">
+          <thead>
             <tr>
-              <th style={{ textAlign: 'left', paddingLeft: 0, position:'sticky', left: 0, background:'#fff', zIndex: 2 }}>Показатель</th>
+              <th>Показатель</th>
               {MONSHORT.map((mn, i) => (
-                <th key={mn} style={{ textAlign: 'right', whiteSpace: 'nowrap', fontSize: '.72rem', color: '#555', width: 'auto' }} title={MONLONG[i]}>{mn}</th>
+                <th key={mn} title={MONLONG[i]}>{mn}</th>
               ))}
-              <th style={{ textAlign: 'right', whiteSpace: 'nowrap', color: '#222', width: 'auto' }}>Год</th>
+              <th className="br">Год</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => {
               if (r.kind === 'head') {
                 return (
-                  <tr key={r.key} style={{ background: 'transparent' }}>
-                    <td colSpan={14} style={{ color: r.color, fontWeight: 700, fontSize: '.8rem', paddingTop: '14px', paddingBottom: '4px', letterSpacing: '.02em' }}>{r.label}</td>
+                  <tr key={r.key} className="head">
+                    <td colSpan={14} style={{ color: r.color }}>{r.label}</td>
                   </tr>
                 );
               }
@@ -328,48 +323,47 @@ export default function AnnualReport() {
                 const vals = MONSHORT.map((_, mi) => cellVals[r.key + ':' + mi] || 0);
                 const yearSum = vals.reduce((a, b) => a + b, 0);
                 const isIncome = r.income;
+                const col = isIncome ? '#1e7d32' : '#c0392b';
+                const cls = r.section === 'cogs' ? ' section-before' : '';
                 return (
-                  <tr key={r.key}>
-                    <td style={{ textAlign: 'left', paddingLeft: 0, position: 'sticky', left: 0, background: '#fff' }}>
-                      <span className="prod-name" style={{ fontWeight: 500 }}>{r.label}</span>
-                    </td>
+                  <tr key={r.key} className={"item" + cls}>
+                    <td className="cat">{r.label}</td>
                     {vals.map((v, mi) => (
-                      <td key={mi} style={{ textAlign: 'right', color: v ? (isIncome ? '#16a34a' : '#c0392b') : (isIncome ? '#16a34a' : '#c0392b'), opacity: v ? 1 : .3 }}>{v ? fmt(v) : '0'}</td>
+                      <td key={mi} style={{ color: col, opacity: v ? 1 : .4 }}>{v ? fmt(v) : '0'}</td>
                     ))}
-                    <td style={{ textAlign: 'right', fontWeight: 700, color: isIncome ? '#16a34a' : '#c0392b', borderTop: '1px dashed #ddd' }}>{fmt(yearSum)}</td>
+                    <td className="br" style={{ color: col, fontWeight: 700 }}>{fmt(yearSum)}</td>
                   </tr>
                 );
               }
               if (r.kind === 'subtotal') {
                 return (
-                  <tr key={r.key}>
-                    <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 700, color: '#222', position: 'sticky', left: 0, background: '#fff' }}>Итог за месяц</td>
+                  <tr key={r.key} className="subtotal">
+                    <td className="cat">Итог за месяц</td>
                     {MONSHORT.map((_, mi) => (
-                      <td key={mi} style={{ textAlign: 'right', fontWeight: 700, color: (monthVals[mi].income - monthVals[mi].expense) >= 0 ? '#16a34a' : '#c0392b', borderTop: '1px solid #ccc' }}>{fmt(monthVals[mi].income - monthVals[mi].expense)}</td>
+                      <td key={mi} style={{ color: (monthVals[mi].income - monthVals[mi].expense) >= 0 ? '#222' : '#c0392b' }}>{fmt(monthVals[mi].income - monthVals[mi].expense)}</td>
                     ))}
-                    <td style={{ textAlign: 'right', fontWeight: 800, color: '#222', borderTop: '1px solid #ccc' }}>{fmt(monthVals.reduce((s, m) => s + (m.income - m.expense), 0))}</td>
+                    <td className="br" style={{ color: '#222' }}>{fmt(monthVals.reduce((s, m) => s + (m.income - m.expense), 0))}</td>
                   </tr>
                 );
               }
               if (r.kind === 'profit') {
                 return (
-                  <tr key={r.key} style={{ background: '#f2f7ee' }}>
-                    <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 800, color: '#111', position: 'sticky', left: 0, background: '#f2f7ee' }}>Чистая прибыль</td>
+                  <tr key={r.key} className="profit">
+                    <td className="cat" style={{ color: '#1e7d32' }}>Чистая прибыль</td>
                     {MONSHORT.map((_, mi) => (
-                      <td key={mi} style={{ textAlign: 'right', fontWeight: 800, color: monthVals[mi].profit >= 0 ? '#16a34a' : '#c0392b' }}>{fmt(monthVals[mi].profit)}</td>
+                      <td key={mi}>{fmt(monthVals[mi].profit)}</td>
                     ))}
-                    <td style={{ textAlign: 'right', fontWeight: 800, color: monthVals.reduce((s, m) => s + m.profit, 0) >= 0 ? '#16a34a' : '#c0392b', borderTop: '3px double #16a34a' }}>{fmt(monthVals.reduce((s, m) => s + m.profit, 0))}</td>
+                    <td className="br">{fmt(monthVals.reduce((s, m) => s + m.profit, 0))}</td>
                   </tr>
                 );
               }
-              // cash
               return (
-                <tr key={r.key} style={{ background: '#eef6ff' }}>
-                  <td style={{ textAlign: 'left', paddingLeft: 0, fontWeight: 800, color: '#0b5394', position: 'sticky', left: 0, background: '#eef6ff' }}>Деньги на конец месяца</td>
+                <tr key={r.key} className="cash">
+                  <td className="cat">Деньги на конец месяца</td>
                   {MONSHORT.map((_, mi) => (
-                    <td key={mi} style={{ textAlign: 'right', fontWeight: 700, color: '#0b5394' }}>{fmt(monthVals[mi].cash)}</td>
+                    <td key={mi}>{fmt(monthVals[mi].cash)}</td>
                   ))}
-                  <td style={{ textAlign: 'right', fontWeight: 800, color: '#0b5394' }}>{fmt(monthVals[11].cash)}</td>
+                  <td className="br">{fmt(monthVals[11].cash)}</td>
                 </tr>
               );
             })}
