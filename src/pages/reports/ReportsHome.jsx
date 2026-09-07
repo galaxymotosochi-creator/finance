@@ -29,6 +29,13 @@ const reports = [
     path: '/reports/combo',
     gradient: 'linear-gradient(135deg,#ea580c,#fb923c)',
   },
+  {
+    key: 'category',
+    title: 'Продажи по категориям',
+    sub: 'Продажи товаров, услуг и комбо по всем категориям',
+    path: '/reports/category',
+    gradient: 'linear-gradient(135deg,#7c3aed,#a78bfa)',
+  },
 ];
 
 export default function ReportsHome() {
