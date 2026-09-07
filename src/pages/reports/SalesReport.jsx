@@ -114,23 +114,23 @@ export default function SalesReport() {
         const rew = rewByEmp[String(e.empId)] ? rewByEmp[String(e.empId)].total : 0;
         // Вознаграждение = бонус по правилам ИЛИ/ПЛЮС сумма за выбор продавцом/исполнителем
         const itemsRew = (st && st.stack === false) ? rew : itemsBonus + rew;
-        // к каждой позиции добавляем вознаграждение = бонус позиции + сумма за выбор (employee_splits) этого сотрудника
+        // выплачено/не выплачено Позиций: если за период есть выплаченный (paid) начисления вознаграждения — позиция с ним "выплачена", иначе остаётся невыплаченной
+        const salEmpRows = (salaries || []).filter(s => String(s.employee_id || '') === String(e.empId));
+        const inPer = salEmpRows.filter(s => { const pf = String(s.period_from || '').slice(0, 10), pt = String(s.period_to || '').slice(0, 10); return (!pf || pf <= to) && (!pt || pt >= from); });
+        const rewSum = (s) => (Number(s.sales_bonus) || 0) + (Number(s.reward_amount) || 0);
+        const paidRows = inPer.filter(s => s.status === 'paid');
+        const owedRows = inPer.filter(s => s.status !== 'paid' && s.status !== 'cancelled');
+        const paidRew = paidRows.reduce((a, s) => a + rewSum(s), 0);
+        // Если за период нет начислений вознаграждения совсем (ни одной строки) — всё вознаграждение из отчёта ещё не выплачено
+        const owedRew = inPer.length ? owedRows.reduce((a, s) => a + rewSum(s), 0) : e.bonus + rew;
+        // к каждой позиции добавляем вознаграждение
         const enrichedItems = e.items.map(x => {
           const itemRew = rewByItem[x.id] && rewByItem[x.id][String(e.empId)] ? rewByItem[x.id][String(e.empId)] : 0;
           const rw = (st && st.stack === false) ? itemRew : x.bonus + itemRew;
-          // выплачено/не выплачено по позиции: начисление, где эта позиция числится с paid-статусом
-          const sell = (salaries || []).find(s => String(s.employee_id || '') === String(e.empId) && s.sales_items && (s.sales_items).some(i => String(i.itemId || '') === String(x.id)));
-          const rewI = (salaries || []).find(s => String(s.employee_id || '') === String(e.empId) && s.reward_items && (s.reward_items).some(i => String(i.itemId || '') === String(x.id)));
-          const rec = sell || rewI;
-          const paidWhen = rec && rec.status === 'paid';
-          return { ...x, reward: rw, recPaid: paidWhen ? ({ status: 'paid', recId: rec.id }) : null, recNotPaid: rec && !paidWhen ? ({ status: 'accrued' }) : null };
+          const found = paidRows.find(s => (s.sales_items || []).some(i => String(i.itemId || '') === String(x.id)) || (s.reward_items || []).some(i => String(i.itemId || '') === String(x.id)));
+          const recPaid = !!found;
+          return { ...x, reward: rw, recPaid, recNotPaid: !recPaid };
         }).sort((a, b) => (a.date < b.date ? 1 : -1));
-        // Выплачено/не выплачено по сотруднику: начисления вознаграждения за период [from,to]
-        const salEmp = (salaries || []).filter(s => String(s.employee_id || '') === String(e.empId));
-        const inPer = salEmp.filter(s => { const pf = String(s.period_from || '').slice(0, 10), pt = String(s.period_to || '').slice(0, 10); return (!pf || pf <= to) && (!pt || pt >= from); });
-        const rewSum = (s) => (Number(s.sales_bonus) || 0) + (Number(s.reward_amount) || 0);
-        const paidRew = inPer.filter(s => s.status === 'paid').reduce((a, s) => a + rewSum(s), 0);
-        const owedRew = inPer.filter(s => s.status !== 'paid').reduce((a, s) => a + rewSum(s), 0);
         return { ...e, items: enrichedItems, itemsBonus, storeBonus, storePct, reward: rew, paidRew, owedRew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
       });
       list.sort((a, b) => b.sum - a.sum);
