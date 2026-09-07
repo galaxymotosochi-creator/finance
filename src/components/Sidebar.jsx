@@ -57,9 +57,7 @@ const menu = [
     ],
   },
   {
-    label: 'Отчёты', icon: 'reports', path: '/reports', children: [
-      { label: 'Продажи по сотрудникам', path: '/reports/sales' },
-    ],
+    label: 'Отчёты', icon: 'reports', path: '/reports',
   },
   {
     label: 'Настройки', icon: 'settings', children: [
