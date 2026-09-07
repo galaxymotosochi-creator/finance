@@ -2,14 +2,6 @@ import { useNavigate } from 'react-router-dom';
 
 const reports = [
   {
-    key: 'employees',
-    title: 'Работа сотрудников',
-    sub: 'Продажи, смены, исполнители, премии и штрафы по дням',
-    path: '/reports/employees',
-    icon: '👥',
-    gradient: 'linear-gradient(135deg,#2563eb,#3b82f6)',
-  },
-  {
     key: 'sales',
     title: 'Продажи по сотрудникам',
     sub: 'Кто сколько продал и выполнил за период, бонус по правилам',

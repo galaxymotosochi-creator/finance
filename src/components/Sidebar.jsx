@@ -58,7 +58,6 @@ const menu = [
   },
   {
     label: 'Отчёты', icon: 'reports', path: '/reports', children: [
-      { label: 'Работа сотрудников', path: '/reports/employees' },
       { label: 'Продажи по сотрудникам', path: '/reports/sales' },
     ],
   },
