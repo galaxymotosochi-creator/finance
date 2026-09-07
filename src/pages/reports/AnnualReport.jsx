@@ -300,14 +300,19 @@ export default function AnnualReport() {
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginTop: '.5rem' }}>
-        <table className="data-table" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+        <table className="data-table" style={{ borderCollapse: 'separate', borderSpacing: 0, tableLayout: 'fixed', width: '100%' }}>
+          <colgroup>
+            <col style={{ width: '26%' }} />
+            {MONSHORT.map(mn => <col key={mn} />)}
+            <col />
+          </colgroup>
           <thead id="colHeaders">
             <tr>
               <th style={{ textAlign: 'left', paddingLeft: 0, position:'sticky', left: 0, background:'#fff', zIndex: 2 }}>Показатель</th>
               {MONSHORT.map((mn, i) => (
-                <th key={mn} style={{ textAlign: 'right', whiteSpace: 'nowrap', fontSize: '.72rem', color: '#555' }} title={MONLONG[i]}>{mn}</th>
+                <th key={mn} style={{ textAlign: 'right', whiteSpace: 'nowrap', fontSize: '.72rem', color: '#555', width: 'auto' }} title={MONLONG[i]}>{mn}</th>
               ))}
-              <th style={{ textAlign: 'right', whiteSpace: 'nowrap', color: '#222' }}>Год</th>
+              <th style={{ textAlign: 'right', whiteSpace: 'nowrap', color: '#222', width: 'auto' }}>Год</th>
             </tr>
           </thead>
           <tbody>
