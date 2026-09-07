@@ -120,17 +120,18 @@ export default function SalesReport() {
         const rewSum = (s) => (Number(s.sales_bonus) || 0) + (Number(s.reward_amount) || 0);
         const paidRows = inPer.filter(s => s.status === 'paid');
         const owedRows = inPer.filter(s => s.status !== 'paid' && s.status !== 'cancelled');
-        const paidRew = paidRows.reduce((a, s) => a + rewSum(s), 0);
-        // Если за период нет начислений вознаграждения совсем (ни одной строки) — всё вознаграждение из отчёта ещё не выплачено
-        const owedRew = inPer.length ? owedRows.reduce((a, s) => a + rewSum(s), 0) : e.bonus + rew;
-        // к каждой позиции добавляем вознаграждение
+        // к каждой позиции добавляем вознаграждение и признак выплаты
         const enrichedItems = e.items.map(x => {
           const itemRew = rewByItem[x.id] && rewByItem[x.id][String(e.empId)] ? rewByItem[x.id][String(e.empId)] : 0;
           const rw = (st && st.stack === false) ? itemRew : x.bonus + itemRew;
-          const found = paidRows.find(s => (s.sales_items || []).some(i => String(i.itemId || '') === String(x.id)) || (s.reward_items || []).some(i => String(i.itemId || '') === String(x.id)));
-          const recPaid = !!found;
+          const isPaid = (paidRows || []).some(s => (s.sales_items || []).some(i => String(i.itemId || '') === String(x.id)) || (s.reward_items || []).some(i => String(i.itemId || '') === String(x.id)));
+          // если начислений за период вовсе нет — позиция ещё не выплачена
+          const recPaid = inPer.length ? isPaid : false;
           return { ...x, reward: rw, recPaid, recNotPaid: !recPaid };
         }).sort((a, b) => (a.date < b.date ? 1 : -1));
+        // Выплачено/Не выплачено = сумма по позициям (основная строка = сумма раскрытия)
+        const paidRew = enrichedItems.reduce((a, x) => a + (x.recPaid ? (Number(x.reward) || 0) : 0), 0);
+        const owedRew = enrichedItems.reduce((a, x) => a + (x.recNotPaid ? (Number(x.reward) || 0) : 0), 0);
         return { ...e, items: enrichedItems, itemsBonus, storeBonus, storePct, reward: rew, paidRew, owedRew, bonus: (st && st.stack === false) ? storeBonus + rew : itemsBonus + storeBonus + rew };
       });
       list.sort((a, b) => b.sum - a.sum);
