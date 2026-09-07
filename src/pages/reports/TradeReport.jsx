@@ -23,7 +23,10 @@ export default function TradeReport() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const params = useParams();
-  const kind = params.kind || 'product';
+  // Нормализация множественного числа в пути → ключ вида ('services'→'service','products'→'product')
+  const rawKind = params.kind || 'product';
+  const kind = rawKind === 'services' || rawKind === 'service' ? 'service' :
+               rawKind === 'combo' || rawKind === 'combos' ? 'combo' : 'product';
   const [from, setFrom] = useState(() => { const t = tzToday(); return t.slice(0, 8) + '01'; });
   const [to, setTo] = useState(() => tzToday());
   const [period, setPeriod] = useState('month');
