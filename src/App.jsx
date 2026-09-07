@@ -109,9 +109,7 @@ function AppRoutes() {
       <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsHome /></AppLayout></ProtectedRoute>} />
       <Route path="/reports/sales" element={<ProtectedRoute><AppLayout><SalesReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/products" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/services" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/combo" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
+      <Route path="/reports/:kind" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

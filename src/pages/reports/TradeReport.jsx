@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -21,7 +22,8 @@ const META = {
 export default function TradeReport() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
-  const kind = new URLSearchParams(window.location.search).get('kind') || 'product';
+  const params = useParams();
+  const kind = params.kind || 'product';
   const [from, setFrom] = useState(() => { const t = tzToday(); return t.slice(0, 8) + '01'; });
   const [to, setTo] = useState(() => tzToday());
   const [period, setPeriod] = useState('month');

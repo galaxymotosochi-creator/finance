@@ -6,7 +6,6 @@ const reports = [
     title: 'Продажи по сотрудникам',
     sub: 'Все продажи и вознаграждения сотрудников за период',
     path: '/reports/sales',
-    icon: '📈',
     gradient: 'linear-gradient(135deg,#16a34a,#22c55e)',
   },
   {
@@ -14,7 +13,6 @@ const reports = [
     title: 'Продажи по товарам',
     sub: 'Только товары — продажи и себестоимость за период',
     path: '/reports/products',
-    icon: '📦',
     gradient: 'linear-gradient(135deg,#0ea5e9,#38bdf8)',
   },
   {
@@ -22,7 +20,6 @@ const reports = [
     title: 'Продажи по услугам',
     sub: 'Только услуги — оказание и выручка за период',
     path: '/reports/services',
-    icon: '💅',
     gradient: 'linear-gradient(135deg,#a855f7,#c084fc)',
   },
   {
@@ -30,7 +27,6 @@ const reports = [
     title: 'Продажи по комбо',
     sub: 'Комплекты — выручка и прибыль по составу',
     path: '/reports/combo',
-    icon: '🧩',
     gradient: 'linear-gradient(135deg,#ea580c,#fb923c)',
   },
 ];
@@ -57,12 +53,8 @@ export default function ReportsHome() {
               borderRadius: '18px', padding: '18px', cursor: 'pointer', color: '#fff',
               background: r.gradient, boxShadow: '0 2px 10px rgba(0,0,0,.06)',
               transition: 'transform .15s, box-shadow .15s', minHeight: '130px',
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '1.7rem', lineHeight: 1 }}>{r.icon}</span>
-              <span style={{ fontSize: '1.1rem', opacity: .9 }}>→</span>
-            </div>
             <div>
               <div style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '3px' }}>{r.title}</div>
               <div style={{ fontSize: '.78rem', opacity: .92, lineHeight: 1.4 }}>{r.sub}</div>
