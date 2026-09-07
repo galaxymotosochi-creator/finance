@@ -50,6 +50,13 @@ const reports = [
     path: '/reports/weekly',
     gradient: 'linear-gradient(135deg,#4f46e5,#818cf8)',
   },
+  {
+    key: 'monthly',
+    title: 'Продажи по месяцам',
+    sub: 'Продажи, возвраты и прибыль по каждому месяцу',
+    path: '/reports/monthly',
+    gradient: 'linear-gradient(135deg,#0d9488,#2dd4bf)',
+  },
 ];
 
 export default function ReportsHome() {
