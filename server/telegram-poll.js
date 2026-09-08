@@ -5,9 +5,10 @@ const TG_HOST = '149.154.167.220';
 const API_URL = 'https://' + TG_HOST + '/bot' + BOT_TOKEN;
 var lastOffset = 0;
 
+if (!process.env.PG_PASSWORD) { console.error('FATAL: PG_PASSWORD не задан в env telegram-poll'); process.exit(1); }
 const pool = new Pool({
-  host: 'localhost', port: 5432, database: 'atlaspos',
-  user: 'atlaspos', password: 'atlaspos_2026_secret', max: 5,
+  host: process.env.PG_HOST || 'localhost', port: 5432, database: process.env.PG_DATABASE || 'atlaspos',
+  user: process.env.PG_USER || 'atlaspos', password: process.env.PG_PASSWORD || '', max: 5,
 });
 
 function tgApi(method, body) {

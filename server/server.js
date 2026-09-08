@@ -13,7 +13,8 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'atlaspos-jwt-secret-2026';
+const JWT_SECRET = process.env.JWT_SECRET || '';
+if (!JWT_SECRET) { console.error('FATAL: JWT_SECRET не задан в окружении'); process.exit(1); }
 
 // Parse int8/bigint as numbers (otherwise pg returns strings)
 types.setTypeParser(20, parseInt);
@@ -24,18 +25,19 @@ const mailer = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: 'atlaspos@mail.ru',
-    pass: 'TlZHlj2zX8kOAzcn15oa',
+    user: process.env.SMTP_USER || 'atlaspos@mail.ru',
+    pass: process.env.SMTP_PASS || '',
   },
 });
 
 const pool = new Pool({
-  user: 'atlaspos',
-  password: 'atlaspos_2026_secret',
-  host: 'localhost',
+  user: process.env.PG_USER || 'atlaspos',
+  password: process.env.PG_PASSWORD || '',
+  host: process.env.PG_HOST || 'localhost',
   port: 5432,
-  database: 'atlaspos',
+  database: process.env.PG_DATABASE || 'atlaspos',
 });
+if (!process.env.PG_PASSWORD) { console.error('FATAL: PG_PASSWORD не задан в окружении'); process.exit(1); }
 
 const rlsStorage = new AsyncLocalStorage();
 
@@ -403,7 +405,8 @@ app.get('/api/:table', auth, async (req, res) => {
             else if (op === 'like' || op === 'ilike') { sql += ' AND ' + cleanCol + ' ' + op + ' $' + paramIdx; params.push(v); paramIdx++; }
             else if (op === 'in') {
               // col=in.(v1,v2,v3) — список через запятую (раньше оператор игнорировался и возвращались ВСЕ строки)
-              const list = v.split(',').map(x => x.trim()).filter(x => x !== '');
+              const inner = v.startsWith('(') ? v.slice(1, -1) : v;
+              const list = inner.split(',').map(x => x.trim().replace(/^"|"$/g, '')).filter(x => x !== '');
               if (list.length > 0) {
                 sql += ' AND ' + cleanCol + ' IN (' + list.map((_, i) => '$' + (paramIdx + i) + cast).join(',') + ')';
                 params.push(...list);
