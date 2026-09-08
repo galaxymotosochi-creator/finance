@@ -156,7 +156,29 @@ const auth = async (req, res, next) => {
 
 // ===== AUTH =====
 
-app.post('/api/auth/login', async (req, res) => {
+// Простой rate-limit по IP: защита от перебора паролей / спама.
+const authAttempts = new Map();
+function rateLimitAuth(options) {
+  const { max = 8, windowMs = 5 * 60 * 1000, label = 'auth' } = options;
+  return (req, res, next) => {
+    const ipRaw = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'x';
+    const ip = String(ipRaw).split(',')[0].trim();
+    const key = label + ':' + ip;
+    const now = Date.now();
+    const rec = authAttempts.get(key) || { count: 0, resetAt: now + windowMs };
+    if (now > rec.resetAt) { rec.count = 0; rec.resetAt = now + windowMs; }
+    rec.count += 1;
+    authAttempts.set(key, rec);
+    if (rec.count > max) {
+      const waitSec = Math.ceil((rec.resetAt - now) / 1000);
+      return res.status(429).json({ error: 'Слишком много попыток. Повторите через ' + waitSec + ' сек.' });
+    }
+    next();
+  };
+}
+setInterval(() => { const now = Date.now(); for (const [k, v] of authAttempts) if (now > v.resetAt) authAttempts.delete(k); }, 60 * 1000).unref();
+
+app.post('/api/auth/login', rateLimitAuth({ max: 8, windowMs: 5 * 60 * 1000, label: 'login' }), async (req, res) => {
   try {
     const { email, password } = req.body;
     const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -168,7 +190,7 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', rateLimitAuth({ max: 5, windowMs: 15 * 60 * 1000, label: 'register' }), async (req, res) => {
   try {
     const { email, password, name } = req.body;
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -207,7 +229,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Восстановление пароля — отправка письма
-app.post('/api/auth/reset-password', async (req, res) => {
+app.post('/api/auth/reset-password', rateLimitAuth({ max: 3, windowMs: 10 * 60 * 1000, label: 'reset' }), async (req, res) => {
   try {
     const { email } = req.body;
     const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
