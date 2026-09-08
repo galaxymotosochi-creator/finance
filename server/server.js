@@ -115,6 +115,26 @@ const auth = async (req, res, next) => {
     const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [decoded.user_id]);
     if (!rows.length) return res.status(401).json({ error: 'User not found' });
     req.user = rows[0];
+    // Резолв: если это сотрудник (has employee_id) — работаем под владельцем бизнеса
+    if (req.user.employee_id) {
+      const emp = await pool.query(
+        'SELECT id, user_id, permissions, position_id, name, status FROM employees WHERE id = $1',
+        [String(req.user.employee_id)]
+      );
+      const eRow = emp.rows[0];
+      if (!eRow) return res.status(401).json({ error: 'Employee record not found' });
+      req.empRow = eRow;
+      req.isEmployee = true;
+      // Владолец бизнеса — данные привязаны к нему
+      req.dataUserId = eRow.user_id;
+      let perms = eRow.permissions;
+      if (perms && typeof perms === 'string') { try { perms = JSON.parse(perms); } catch(e2) { perms = []; } }
+      req.permissions = Array.isArray(perms) ? perms : [];
+    } else {
+      req.isEmployee = false;
+      req.dataUserId = req.user.id;
+      req.permissions = null; // владелец — полный доступ
+    }
     next();
   } catch (e) { res.status(401).json({ error: 'Invalid token' }); }
 };
@@ -375,7 +395,7 @@ app.get('/api/:table', auth, async (req, res) => {
     if (!ALLOWED_TABLES.includes(table)) return res.status(400).json({ error: 'Invalid table' });
     // Корзина: записи старше 30 дней удаляем навсегда (автоочистка)
     if (table === 'trash') {
-      await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.user.id]);
+      await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.dataUserId]);
     }
     let sql = 'SELECT * FROM ' + table + ' WHERE 1=1';
     const params = [];
@@ -431,11 +451,11 @@ app.get('/api/:table', auth, async (req, res) => {
         }
       }
     }
-    // Фильтр по user_id из токена — только если колонка есть (иначе 500 для receipt_items/users)
+    // Фильтр по владельцу данных (для сотрудника — владелец бизнеса)
     const cols = await getTableColumns(table);
     if (cols.has('user_id')) {
       sql += ' AND user_id = $' + paramIdx;
-      params.push(req.user.id);
+      params.push(req.dataUserId);
       paramIdx++;
     }
     const { order, limit } = req.query;
@@ -483,7 +503,7 @@ app.post('/api/:table', auth, async (req, res) => {
     if (table === 'accounts') {
       for (const b of items) {
         if (b.type === 'cash' || b.type === 'cash_register') {
-          const { rows: ex } = await pool.query('SELECT id FROM accounts WHERE user_id = $1 AND type = $2', [req.user.id, b.type]);
+          const { rows: ex } = await pool.query('SELECT id FROM accounts WHERE user_id = $1 AND type = $2', [req.dataUserId, b.type]);
           if (ex.length > 0) {
             return res.status(400).json({ error: 'Счёт «' + (b.type === 'cash' ? 'Наличные' : 'Кассовый ящик') + '» уже существует — на одно заведение можно завести только один' });
           }
@@ -493,7 +513,7 @@ app.post('/api/:table', auth, async (req, res) => {
     // Начальные остатки: только одна запись на пользователя — повторное сохранение заменяет старую
     // (иначе копятся дубли и загружается неизвестно какая из них)
     if (table === 'initial_stocks') {
-      await pool.query('DELETE FROM initial_stocks WHERE user_id = $1', [req.user.id]);
+      await pool.query('DELETE FROM initial_stocks WHERE user_id = $1', [req.dataUserId]);
     }
     const results = [];
     for (const body of items) {
@@ -501,8 +521,8 @@ app.post('/api/:table', auth, async (req, res) => {
       // (чинит дубли: раньше QuickSale считал count+1, касса max+1, плюс гонки)
       if (table === 'receipts') {
         const keys = Object.keys(body).filter(k => body[k] !== undefined && k !== 'receipt_number');
-        // user_id всегда берём из токена — не доверяем переданному в payload
-        if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.user.id; }
+        // user_id — владелец бизнеса (для сотрудника резолвится; не доверяем переданному в payload)
+        if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.dataUserId; }
         if (!keys.includes('id')) { keys.unshift('id'); body.id = Date.now() + results.length; }
         // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
         if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
@@ -518,8 +538,8 @@ app.post('/api/:table', auth, async (req, res) => {
       }
 
       const keys = Object.keys(body).filter(k => body[k] !== undefined);
-      // user_id всегда берём из токена — не доверяем переданному в payload
-      if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.user.id; }
+      // user_id — владелец бизнеса (для сотрудника резолвится)
+      if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.dataUserId; }
       // timesheet_entries: id — serial (integer), Date.now() не влезает — не подставляем, пусть БД сама
       if (!keys.includes('id') && table !== 'timesheet_entries') { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
@@ -563,7 +583,7 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     let sql;
     let vals;
     if (cols.has('user_id')) {
-      vals = [...keys.map(k => toVal(data[k])), id, req.user.id];
+      vals = [...keys.map(k => toVal(data[k])), id, req.dataUserId];
       sql = 'UPDATE ' + table + ' SET ' + sc + ' WHERE id = $' + (keys.length + 1) + ' AND user_id = $' + (keys.length + 2);
     } else {
       vals = [...keys.map(k => toVal(data[k])), id];
@@ -572,11 +592,11 @@ app.patch('/api/:table/:id', auth, async (req, res) => {
     const { rows } = await q(sql, vals);
     // Переименование складской категории → обновляем товары/услуги этой категории
     if (oldCatName) {
-      await pool.query('UPDATE products SET cat = $1 WHERE cat = $2 AND user_id = $3', [data.name, oldCatName, req.user.id]);
+      await pool.query('UPDATE products SET cat = $1 WHERE cat = $2 AND user_id = $3', [data.name, oldCatName, req.dataUserId]);
     }
     // Переименование поставщика → обновляем закупки (иначе статистика и защита теряют связь)
     if (oldSupplierName) {
-      await pool.query('UPDATE supplies SET supplier_name = $1 WHERE supplier_name = $2 AND user_id = $3', [data.name, oldSupplierName, req.user.id]);
+      await pool.query('UPDATE supplies SET supplier_name = $1 WHERE supplier_name = $2 AND user_id = $3', [data.name, oldSupplierName, req.dataUserId]);
     }
     res.json(rows[0] || {});
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -589,11 +609,11 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     const cols = await getTableColumns(table);
     // Защита счетов: системные (наличные/касса) и счета с операциями удалять нельзя
     if (table === 'accounts') {
-      const { rows: ac } = await pool.query('SELECT type FROM accounts WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+      const { rows: ac } = await pool.query('SELECT type FROM accounts WHERE id = $1 AND user_id = $2', [id, req.dataUserId]);
       if (ac.length && (ac[0].type === 'cash' || ac[0].type === 'cash_register')) {
         return res.status(400).json({ error: 'Системный счёт («Наличные»/«Кассовый ящик») удалить нельзя' });
       }
-      const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE account_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      const { rows: tx } = await pool.query('SELECT id FROM transactions WHERE account_id = $1 AND user_id = $2 LIMIT 1', [id, req.dataUserId]);
       if (tx.length > 0) return res.status(400).json({ error: 'Нельзя удалить счёт — на нём есть операции' });
     }
     // Защита категорий: используемые в операциях удалять нельзя
@@ -605,18 +625,18 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     if (table === 'stock_categories') {
       const { rows: sc } = await pool.query('SELECT name FROM stock_categories WHERE id = $1', [id]);
       if (sc.length) {
-        const { rows: prod } = await pool.query('SELECT id FROM products WHERE cat = $1 AND user_id = $2 LIMIT 1', [sc[0].name, req.user.id]);
+        const { rows: prod } = await pool.query('SELECT id FROM products WHERE cat = $1 AND user_id = $2 LIMIT 1', [sc[0].name, req.dataUserId]);
         if (prod.length > 0) return res.status(400).json({ error: 'Нельзя удалить категорию — в ней есть товары или услуги. Сначала переназначьте их' });
       }
     }
     // Защита должностей: привязанных к сотрудникам удалять нельзя
     if (table === 'position_templates') {
-      const { rows: emp } = await pool.query('SELECT id FROM employees WHERE position_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      const { rows: emp } = await pool.query('SELECT id FROM employees WHERE position_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.dataUserId]);
       if (emp.length > 0) return res.status(400).json({ error: 'Нельзя удалить должность — она назначена сотрудникам. Сначала переназначьте их' });
     }
     // Защита связанных данных: клиент с чеками, товар в чеках/закупках, сотрудник в зарплате и т.д.
     if (table === 'clients') {
-      const { rows } = await pool.query('SELECT id FROM receipts WHERE client_id = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      const { rows } = await pool.query('SELECT id FROM receipts WHERE client_id = $1 AND user_id = $2 LIMIT 1', [id, req.dataUserId]);
       if (rows.length > 0) return res.status(400).json({ error: 'Нельзя удалить клиента — у него есть чеки. Сначала удалите или переназначьте чеки' });
     }
     if (table === 'products') {
@@ -624,11 +644,11 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       if (ri.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — он есть в чеке. Можно скрыть его в каталоге' });
       const { rows: wo } = await pool.query('SELECT id FROM writeoffs WHERE product_id::text = $1 LIMIT 1', [id]);
       if (wo.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — по нему есть списания со склада' });
-      const { rows: sp } = await pool.query('SELECT id FROM supplies, jsonb_array_elements(items) it WHERE user_id = $2 AND it->>\'prodId\' = $1 LIMIT 1', [id, req.user.id]);
+      const { rows: sp } = await pool.query('SELECT id FROM supplies, jsonb_array_elements(items) it WHERE user_id = $2 AND it->>\'prodId\' = $1 LIMIT 1', [id, req.dataUserId]);
       if (sp.length > 0) return res.status(400).json({ error: 'Нельзя удалить товар — он есть в закупках' });
     }
     if (table === 'employees') {
-      const { rows: s } = await pool.query('SELECT id FROM salary WHERE employee_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.user.id]);
+      const { rows: s } = await pool.query('SELECT id FROM salary WHERE employee_id::text = $1 AND user_id = $2 LIMIT 1', [id, req.dataUserId]);
       if (s.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — по нему есть зарплатные начисления' });
       const { rows: t } = await pool.query('SELECT id FROM timesheet_entries WHERE employee_id::text = $1 LIMIT 1', [id]);
       if (t.length > 0) return res.status(400).json({ error: 'Нельзя удалить сотрудника — по нему есть записи в табеле' });
@@ -639,7 +659,7 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
       // Проверяем и по supplier_id, и по supplier_name (старые поставки пишут только имя)
       const { rows: sup } = await pool.query('SELECT name FROM suppliers WHERE id = $1', [id]);
       const supName = sup.length ? sup[0].name : null;
-      const { rows: sp } = await pool.query('SELECT id FROM supplies WHERE user_id = $2 AND (supplier_id = $1 OR (supplier_name IS NOT NULL AND supplier_name = $3)) LIMIT 1', [id, req.user.id, supName]);
+      const { rows: sp } = await pool.query('SELECT id FROM supplies WHERE user_id = $2 AND (supplier_id = $1 OR (supplier_name IS NOT NULL AND supplier_name = $3)) LIMIT 1', [id, req.dataUserId, supName]);
       if (sp.length > 0) return res.status(400).json({ error: 'Нельзя удалить поставщика — есть закупки от него' });
     }
     if (table === 'promos') {
@@ -650,16 +670,16 @@ app.delete('/api/:table/:id', auth, async (req, res) => {
     // (кроме самой корзины и системных таблиц) — восстановление в течение 30 дней
     if (table !== 'trash' && table !== 'users' && table !== 'user_profiles' && table !== 'telegram_connections' && table !== 'telegram_codes') {
       try {
-        const { rows: rec } = await q('SELECT * FROM ' + table + ' WHERE id = $1' + (cols.has('user_id') ? ' AND user_id = $2' : ''), cols.has('user_id') ? [id, req.user.id] : [id]);
+        const { rows: rec } = await q('SELECT * FROM ' + table + ' WHERE id = $1' + (cols.has('user_id') ? ' AND user_id = $2' : ''), cols.has('user_id') ? [id, req.dataUserId] : [id]);
         if (rec.length) {
           await q('INSERT INTO trash (id, user_id, table_name, record_id, data, deleted_by) VALUES ($1, $2, $3, $4, $5, $6)', [
-            Date.now(), req.user.id, table, String(id), JSON.stringify(rec[0]), (req.user.name || req.user.email || String(req.user.id))
+            Date.now(), req.dataUserId, table, String(id), JSON.stringify(rec[0]), (req.user.name || req.user.email || String(req.dataUserId))
           ]);
         }
       } catch (e) { /* если не удалось скопировать — удаляем как раньше */ }
     }
     if (cols.has('user_id')) {
-      await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+      await q('DELETE FROM ' + table + ' WHERE id = $1 AND user_id = $2', [id, req.dataUserId]);
     } else {
       await q('DELETE FROM ' + table + ' WHERE id = $1', [id]);
     }
@@ -672,8 +692,8 @@ app.post('/api/trash/:id/restore', auth, async (req, res) => {
   try {
     const id = req.params.id;
     // Автоочистка: записи старше 30 дней удаляем навсегда
-    await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.user.id]);
-    const { rows } = await pool.query('SELECT * FROM trash WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    await pool.query('DELETE FROM trash WHERE user_id = $1 AND deleted_at < NOW() - INTERVAL \'30 days\'', [req.dataUserId]);
+    const { rows } = await pool.query('SELECT * FROM trash WHERE id = $1 AND user_id = $2', [id, req.dataUserId]);
     if (!rows.length) return res.status(404).json({ error: 'Запись не найдена в корзине' });
     const t = rows[0];
     const target = t.table_name;
