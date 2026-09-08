@@ -47,8 +47,12 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
+app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); next(); });
 app.use(express.json({ limit: '50mb' }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { fallthrough: true, setHeaders: (res, path) => {
+  // Предотвращаем исполнение HTML/SVG в контексте домена даже для старых файлов
+  if (/\\.(html?|svg|xml)$/i.test(path)) res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+} }));
 
 // ===== МИНИАТЮРЫ: лёгкие картинки для списков (иначе тяжёлые фото тормозят скролл) =====
 const sharp = require('sharp');
@@ -75,11 +79,22 @@ app.get('/api/thumb', async (req, res) => {
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
+const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp']);
+const EXT_BY_MIME = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif', 'image/bmp': '.bmp' };
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.random().toString(36).slice(2, 8) + (EXT_BY_MIME[file.mimetype] || '.img')),
 });
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    // Только растровые изображения. SVG/HTML/сторонние расширения отклоняются (защита от XSS через загрузку).
+    if (ALLOWED_MIME.has(file.mimetype)) return cb(null, true);
+    cb(new Error('Недопустимый тип файла: ожидается изображение (jpg/png/webp/gif/bmp)'));
+  },
+});
 
 app.get('/api/health', (req, res) => { res.json({ status: 'ok', time: new Date().toISOString() }); });
 
@@ -475,11 +490,20 @@ app.get('/api/:table', auth, async (req, res) => {
 });
 
 // ===== PHOTO UPLOAD (ДОЛЖЕН быть ДО generic /api/:table — иначе перехватывается им) =====
-app.post('/api/upload', auth, upload.single('photo'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file' });
-  const url = '/uploads/' + req.file.filename;
-  res.json({ url });
-});
+function uploadPhoto(req, res) {
+  upload.single('photo')(req, res, (err) => {
+    if (err) {
+      const msg = (err && err.message && err.message.includes('Недопустимый тип'))
+        ? err.message
+        : (err && err.code === 'LIMIT_FILE_SIZE' ? 'Файл слишком большой (макс. 10 МБ)' : (err ? err.message : 'Upload error'));
+      return res.status(400).json({ error: msg });
+    }
+    if (!req.file) return res.status(400).json({ error: 'No file' });
+    const url = '/uploads/' + req.file.filename;
+    return res.json({ url });
+  });
+}
+app.post('/api/upload', auth, uploadPhoto);
 
 // Удаление загруженного фото (используется, когда форму закрыли без сохранения)
 app.delete('/api/upload/:file', auth, async (req, res) => {
