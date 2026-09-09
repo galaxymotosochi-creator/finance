@@ -136,7 +136,7 @@ export default function Writeoffs() {
           <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
         </div>
         <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600}}>+ Добавить</button>
+          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Списать товар</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
