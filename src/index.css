@@ -587,9 +587,10 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .stock-filterbar { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: .5rem; flex-wrap: wrap; }
 .total-row { background: transparent; }
 .total-row td { font-weight: 700; border-top: 1px solid var(--border); padding: .6rem .4rem; }
-.empty-products { text-align: center; padding: 3rem 1rem; color: var(--muted); }
-.empty-products .big-icon { font-size: 3rem; opacity: .15; margin-bottom: .5rem; }
-.empty-products p { font-size: .85rem; }
+.empty-products { max-width: 460px; margin: 0 auto; text-align: center; padding: 2.2rem 1.4rem; border: 1.5px dashed #d9d9de; border-radius: var(--radius-lg); color: var(--muted); }
+.empty-products .big-icon { font-size: 2rem; opacity: .35; margin-bottom: .6rem; line-height: 1; }
+.empty-products p { font-size: .85rem; color: var(--body-color); font-weight: 600; margin: 0 0 .35rem; }
+.empty-products p + p { font-size: .78rem; color: var(--muted); font-weight: 400; }
 
 /* ======== MOBILE HAMBURGER ======== */
 .mobile-hamburger { display: none; }
