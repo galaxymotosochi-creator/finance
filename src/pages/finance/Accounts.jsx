@@ -289,23 +289,23 @@ export default function Accounts() {
       {!loading && initDone && (
         <>
           {/* Балансы по каждому счету + общий баланс последней плашкой (дизайн как в Остатках) */}
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'8px',marginBottom:'.5rem'}}>
+          <div className="sk-tiles">
             {sorted.map(a => {
               const bal = (parseFloat(a.balance)||0) + (balById[a.id]||0);
               return (
-                <div key={a.id} style={{background:'linear-gradient(135deg,#ffdd2d,#fff9db)',borderRadius:'14px',padding:'10px 12px',boxShadow:'0 2px 10px rgba(255,205,0,.3)'}}>
-                  <div style={{fontSize:'11px',fontWeight:700,color:'rgba(0,0,0,.55)',marginBottom:'4px',lineHeight:1.25}}>{a.name}</div>
-                  <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{bal.toLocaleString()} {cur}</div>
+                <div key={a.id} className="sk-tile">
+                  <div className="sk-t">{a.name}</div>
+                  <div className="sk-v">{bal.toLocaleString()} {cur}</div>
                 </div>
               );
             })}
-            <div style={{background:'linear-gradient(135deg,#ffdd2d,#fff9db)',borderRadius:'14px',padding:'10px 12px',boxShadow:'0 2px 10px rgba(255,205,0,.3)'}}>
-              <div style={{fontSize:'11px',fontWeight:700,color:'rgba(0,0,0,.55)',marginBottom:'4px',lineHeight:1.25}}>Общий баланс счетов</div>
-              <div style={{fontSize:'20px',fontWeight:800,color:'#111',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{(total||0).toLocaleString()} {cur}</div>
+            <div className="sk-tile sk-primary">
+              <div className="sk-t">💰 Общий баланс счетов</div>
+              <div className="sk-v">{(total||0).toLocaleString()} {cur}</div>
             </div>
           </div>
-          <div className="product-table" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
-            <table className="data-table">
+          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
+            <table className="sk-table">
               <thead id="colHeaders">
                 <tr>
                   <th style={{textAlign:'left'}}>Счет</th>
@@ -327,19 +327,19 @@ export default function Accounts() {
                       <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
-                            <div className="prod-name">{a.name}</div>
-                            <div className="prod-sku">{a.description || lb}</div>
+                            <div className="sk-name">{a.name}</div>
+                            <div className="sk-sub">{a.description || lb}</div>
                           </div>
                         </div>
                       </td>
-                      <td style={{textAlign:'left',color:'#222'}}>{in0.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#222'}}>+{mv.i.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#222'}}>−{mv.e.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',color:'#222'}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>+{mv.i.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>−{mv.e.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',fontWeight:700}}>{bl>=0?'+':''}{bl.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                            <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
+                            <button className="sk-more" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
                             <div className="prod-dropdown">
                               <button onClick={()=>openEdit(a)}>Редактировать</button>
                               <button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button>
@@ -354,12 +354,12 @@ export default function Accounts() {
                   const incTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.i; }, 0);
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   return (
-                  <tr className="total-row">
-                    <td style={{fontWeight:600,textAlign:'left',color:'#222'}}>Итого:</td>
-                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>+{incTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>−{expTot.toLocaleString()} {cur}</td>
-                    <td style={{textAlign:'left',fontWeight:600,color:'#222'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
+                  <tr className="sk-total">
+                    <td style={{textAlign:'left'}}>Итого:</td>
+                    <td style={{textAlign:'left'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left'}}>+{incTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left'}}>−{expTot.toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
                     <td></td>
                   </tr>
                   );

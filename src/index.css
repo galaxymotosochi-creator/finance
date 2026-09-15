@@ -724,3 +724,63 @@ input:focus, select:focus, textarea:focus {
 .kassa-disc .down{display:flex;align-items:center;gap:5px;flex-shrink:0}
 .kassa-disc .down input{width:46px;border:1.5px solid #d0d0d8;border-radius:8px;padding:4px 5px;font-size:12px;text-align:center;outline:none;font-family:inherit;color:#222}
 .kassa-dl2{display:flex;justify-content:space-between;color:#16a34a;font-size:12.5px;font-weight:600;margin-bottom:2px}
+
+/* =========================================================
+   СТИЛЬ «SCANURIK» для страницы Счета (эксперимент)
+   Откат: git revert  /  вернуть Accounts.jsx из c0c71cb
+   ========================================================= */
+:root{
+  --sk-blue:#1d78fc; --sk-blue-dark:#1567d8; --sk-blue-deep:#0d4ea8;
+  --sk-soft:#E6F0FF; --sk-ink:#0b1220; --sk-muted:#5b6472;
+  --sk-radius:20px; --sk-radius-sm:14px;
+}
+/* Плитки балансов */
+.sk-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.sk-tile{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:var(--sk-radius);padding:16px 18px;transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s}
+.sk-tile:hover{transform:translateY(-3px);box-shadow:0 20px 60px -16px rgba(29,120,252,.35),0 12px 40px -12px rgba(0,0,0,.12)}
+.sk-tile .sk-t{font-size:12px;color:var(--sk-muted);display:flex;align-items:center;gap:6px;line-height:1.3}
+.sk-tile .sk-v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:8px;color:var(--sk-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-tile.sk-primary{background:var(--sk-blue);border:none;color:#fff;box-shadow:0 16px 44px -18px rgba(29,120,252,.6)}
+.sk-tile.sk-primary .sk-t{color:rgba(255,255,255,.82)}
+.sk-tile.sk-primary .sk-v{color:#fff}
+.sk-tile.sk-gold{background:linear-gradient(135deg,#ffdd2d,#fff9db);border:none}
+.sk-tile.sk-gold .sk-t{color:rgba(0,0,0,.55)}
+.sk-tile.sk-gold .sk-v{color:#111}
+
+/* Карточка-обёртка таблицы */
+.sk-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:var(--sk-radius);overflow:hidden}
+
+/* Таблица */
+.sk-table{width:100%;border-collapse:collapse;min-width:700px}
+.sk-table thead th{
+  padding:13px 18px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--sk-muted);text-align:left;border-bottom:1px solid rgba(29,120,252,.14);white-space:nowrap;
+}
+.sk-table tbody td{padding:15px 18px;font-size:.82rem;color:var(--sk-ink);border-bottom:1px solid rgba(29,120,252,.08)}
+.sk-table tbody tr{transition:background .18s}
+.sk-table tbody tr:hover{background:#f5f9ff}
+.sk-table tbody tr:last-child td{border-bottom:none}
+.sk-table .sk-name{font-weight:600;color:var(--sk-ink);font-size:.84rem}
+.sk-table .sk-sub{font-size:.72rem;color:var(--sk-muted);margin-top:2px}
+.sk-table .sk-total td{background:var(--sk-soft);font-weight:700;color:var(--sk-ink);border-bottom:none}
+
+/* Теги типов */
+.sk-tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 11px;font-size:11.5px;font-weight:600;background:var(--sk-soft);color:var(--sk-blue-deep)}
+
+/* Кнопка «⋯» */
+.sk-more{width:34px;height:34px;border-radius:50%;border:1px solid rgba(29,120,252,.18);background:#fff;color:var(--sk-blue-deep);font-weight:800;line-height:1;cursor:pointer;transition:background .2s,box-shadow .25s,transform .1s}
+.sk-more:hover{background:var(--sk-soft);box-shadow:0 8px 24px rgba(29,120,252,.25)}
+.sk-more:active{transform:scale(.98)}
+
+/* Кнопки в стиле scanurik */
+.sk-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:9999px;padding:11px 20px;font-size:13px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer;position:relative;isolation:isolate;white-space:nowrap;transition:background .2s,box-shadow .25s,transform .1s}
+.sk-btn:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(135deg,#ffffff73,#ffffff14 35%,#ffffff0a 65%,#ffffff59);-webkit-mask-image:linear-gradient(#fff 0 0),linear-gradient(#fff 0 0);mask-image:linear-gradient(#fff 0 0),linear-gradient(#fff 0 0);-webkit-mask-clip:content-box,border-box;mask-clip:content-box,border-box;-webkit-mask-composite:xor;mask-composite:exclude}
+.sk-btn-primary{background:var(--sk-blue);color:#fff}
+.sk-btn-primary:hover{background:var(--sk-blue-dark);box-shadow:0 8px 32px rgba(29,120,252,.4),0 0 60px rgba(29,120,252,.15)}
+.sk-btn:active{transform:scale(.98)}
+
+/* Чипсы-фильтры */
+.sk-chip{border:none;border-radius:999px;padding:8px 15px;font-size:12.5px;font-weight:600;font-family:inherit;background:var(--sk-soft);color:var(--sk-blue-deep);cursor:pointer;transition:background .2s,box-shadow .25s,transform .1s}
+.sk-chip:hover{background:#d8e7ff}
+.sk-chip.active{background:var(--sk-blue);color:#fff;box-shadow:0 8px 24px -8px rgba(29,120,252,.6)}
+.sk-chip:active{transform:scale(.98)}
