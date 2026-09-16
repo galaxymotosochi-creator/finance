@@ -797,3 +797,20 @@ input:focus, select:focus, textarea:focus {
 .sk-btn-soft:hover{background:#f2f7ff;box-shadow:inset 0 0 0 1px rgba(29,120,252,.4)}
 .sk-btn-soft:active{transform:scale(.98)}
 @media(max-width:1100px){.sk-bar-acts{flex-wrap:wrap}}
+
+/* Круг «Структура денег» на странице Счета */
+.sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+.sk-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative}
+.sk-ring:after{content:"";position:absolute;inset:15px;background:#fff;border-radius:50%}
+.sk-ring .in{position:relative;text-align:center;z-index:1}
+.sk-ring .in .t{font-size:10.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.sk-ring .in .v{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.sk-legend{flex:1;min-width:250px;display:flex;flex-direction:column;gap:7px}
+.sk-leg{display:flex;align-items:center;gap:10px}
+.sk-leg .dot{width:11px;height:11px;border-radius:3px;flex:none}
+.sk-leg .nm{flex:1;font-size:12.5px;color:var(--sk-muted);font-weight:600}
+.sk-leg .pct{font-size:12px;font-weight:700;color:var(--sk-blue-deep,#0d4ea8);min-width:38px;text-align:right}
+.sk-leg .amt{font-size:13.5px;font-weight:800;min-width:100px;text-align:right}
+.sk-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
+.sk-leg-bar i{display:block;height:100%}
+@media(max-width:640px){.sk-ring{width:120px;height:120px}}

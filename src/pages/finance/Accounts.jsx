@@ -280,21 +280,42 @@ export default function Accounts() {
       {!loading && initDone && (
         <>
           {/* Балансы по каждому счету + общий баланс последней плашкой (дизайн как в Остатках) */}
-          <div className="sk-tiles">
-            {sorted.map(a => {
-              const bal = (parseFloat(a.balance)||0) + (balById[a.id]||0);
-              return (
-                <div key={a.id} className="sk-tile">
-                  <div className="sk-t">{a.name}</div>
-                  <div className="sk-v">{bal.toLocaleString()} {cur}</div>
+          {/* Круг: структура денег по счетам (% от общего баланса) */}
+          {(() => {
+            const COLORS=['#1F75FF','#4a92ff','#74aefe','#a9c8ff','#cfe2ff','#0d4ea8'];
+            const vals = sorted.map(a => Math.max(0, (parseFloat(a.balance)||0) + (balById[a.id]||0)));
+            const sum = vals.reduce((x,y)=>x+y,0) || 1;
+            let acc = 0;
+            const stops = vals.map((v,i) => {
+              const from = acc/sum*100, to=(acc+v)/sum*100; acc+=v;
+              return COLORS[i%COLORS.length]+' '+from.toFixed(2)+'% '+to.toFixed(2)+'%';
+            }).join(', ');
+            return (
+              <div className="sk-ring-block">
+                <div className="sk-ring" style={{background:'conic-gradient('+stops+')'}}>
+                  <div className="in"><div className="t">Общий баланс</div><div className="v">{(total||0).toLocaleString()} {cur}</div></div>
                 </div>
-              );
-            })}
-            <div className="sk-tile sk-primary">
-              <div className="sk-t">Общий баланс счетов</div>
-              <div className="sk-v">{(total||0).toLocaleString()} {cur}</div>
-            </div>
-          </div>
+                <div className="sk-legend">
+                  {sorted.map((a,i) => {
+                    const v = vals[i];
+                    const pct = Math.round(v/sum*100);
+                    const col = COLORS[i%COLORS.length];
+                    return (
+                      <div key={a.id}>
+                        <div className="sk-leg">
+                          <span className="dot" style={{background:col}}></span>
+                          <span className="nm">{a.name}</span>
+                          <span className="pct">{pct}%</span>
+                          <span className="amt">{v.toLocaleString()} {cur}</span>
+                        </div>
+                        <div className="sk-leg-bar"><i style={{width:pct+'%',background:col}}></i></div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
           <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
             <table className="sk-table">
               <thead id="colHeaders">
