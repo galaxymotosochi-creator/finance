@@ -606,33 +606,33 @@ export default function Salary() {
       {loading ? (
         <CenterSpinner />
       ) : (
-      <div className="product-table" style={{overflowX:'auto'}}>
-        <table className="data-table">
+      <div className="sal-tbl">
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+          <div className="sk-fade sk-fade-r"></div>
+        <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
-            <th style={{textAlign:'left'}}>Сотрудник</th><th style={{textAlign:'left'}}>Период</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>Премия</th>
-            <th style={{textAlign:'left'}}>Вычеты</th><th style={{textAlign:'left'}}>Итого</th><th style={{textAlign:'left'}}>Статус</th><th style={{width:'90px',textAlign:'left'}}></th>
+            <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
+            <th>Вычеты</th><th>Итого</th><th>Статус</th><th></th>
           </tr></thead>
           <tbody id="salaryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">💼</div><p>История начислений пуста</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Начислите зарплату с привязкой к табелю</p></div></td></tr>
+              <tr><td colSpan="8" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Начислений не найдено</td></tr>
             ) : list.map(s => (
               <tr key={s.id}>
-                <td style={{textAlign:'left'}}><div className="prod-name" style={{whiteSpace:'nowrap'}} onClick={()=>{}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{Number(s.amount).toLocaleString()} {cur}</td>
-                <td style={{textAlign:'left',color:'#222'}}>{(s.status==='pending'||s.status==='accrued')
-                  ? <span onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setShowAcc(true)}}
-                      style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',cursor:'pointer',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплатить</span>
+                <td><div className="sk-name" style={{whiteSpace:'nowrap'}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
+                <td>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
+                <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
+                <td>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
+                <td>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
+                <td><b>{Number(s.amount).toLocaleString()} {cur}</b></td>
+                <td>{(s.status==='pending'||s.status==='accrued')
+                  ? <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setShowAcc(true)}}>Выплатить</span>
                   : s.status==='paid'
-                    ? <span style={{display:'inline-block',padding:'.25rem .65rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:400,color:'#222',background:'#16a34a18',fontFamily:'var(--font)',whiteSpace:'nowrap'}}>Выплачено</span>
-                    : <span className="prod-cat">{STATUS_LABELS[s.status]||s.status}</span>}</td>
+                    ? <span className="sk-tag sk-tag-ok">Выплачено</span>
+                    : <span className="sk-tag">{STATUS_LABELS[s.status]||s.status}</span>}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                    <button className="act-btn prod-more-btn" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
+                    <button className="sk-more" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
                     <div className="prod-dropdown">
                       <button onClick={()=>openEdit(s)}>Редактировать</button>
                       <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
@@ -643,6 +643,7 @@ export default function Salary() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       )}
 
