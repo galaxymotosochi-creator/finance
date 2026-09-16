@@ -864,4 +864,5 @@ input:focus, select:focus, textarea:focus {
 .sk-fade-r{right:0;width:34px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.75))}
 .sk-fade-r:after{content:"›";position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:22px;font-weight:700;color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
 @keyframes sknudge{0%,100%{transform:translateY(-50%) translateX(0);opacity:.3}50%{transform:translateY(-50%) translateX(4px);opacity:.7}}
-@media(min-width:769px){.sk-fade{display:none}}
+/* шторки показываем на мобильных и планшетах (до 1024px), на десктопе таблица помещается целиком */
+@media(min-width:1025px){.sk-fade{display:none}}
