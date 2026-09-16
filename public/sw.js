@@ -3,7 +3,7 @@
 // 2) Мутации (POST/PATCH/DELETE) без сети уходят в очередь (IndexedDB)
 // 3) При появлении сети очередь синхронизируется автоматически
 
-const CACHE = 'atlaspos-v5';
+const CACHE = 'atlaspos-v6';
 const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 // ===== IndexedDB: очередь офлайн-запросов =====
