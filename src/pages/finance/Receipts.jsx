@@ -445,12 +445,21 @@ export default function Receipts() {
             <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'150px'}} />
           </div>
           <span style={{flex:1}}></span>
-          <div className="sk-seg">
-            <button className={statusFilter===null?'on':''} onClick={()=>setStatusFilter(null)}>Все</button>
-            <button className={statusFilter==='paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')}>Оплачен</button>
-            <button className={statusFilter==='partially_paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')}>Частично</button>
-            <button className={statusFilter==='unpaid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')}>Долги</button>
-            <button className={'red'+(statusFilter==='refunded'?' on':'')} onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')}>Возвраты</button>
+          <div className="sk-dd-wrap">
+            <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car">▾</span></button>
+            <div className="sk-dd-menu">
+              {[
+                { v:null, label:'Все' },
+                { v:'paid', label:'Оплаченные' },
+                { v:'partially_paid', label:'Частично оплаченные' },
+                { v:'unpaid', label:'Не оплаченные' },
+                { v:'refunded', label:'Возвраты' },
+              ].map(o => (
+                <button key={String(o.v)} type="button"
+                  style={statusFilter===o.v?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+                  onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setStatusFilter(o.v)}}>{o.label}</button>
+              ))}
+            </div>
           </div>
         </div>
         <div className="empty-products" style={{ marginTop: '2rem' }}>
@@ -522,12 +531,21 @@ export default function Receipts() {
           <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'150px'}} />
         </div>
         <span style={{flex:1}}></span>
-        <div className="sk-seg">
-          <button className={statusFilter===null?'on':''} onClick={()=>setStatusFilter(null)}>Все</button>
-          <button className={statusFilter==='paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')}>Оплачен</button>
-          <button className={statusFilter==='partially_paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')}>Частично</button>
-          <button className={statusFilter==='unpaid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')}>Долги</button>
-          <button className={'red'+(statusFilter==='refunded'?' on':'')} onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')}>Возвраты</button>
+        <div className="sk-dd-wrap">
+          <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car">▾</span></button>
+          <div className="sk-dd-menu">
+            {[
+              { v:null, label:'Все' },
+              { v:'paid', label:'Оплаченные' },
+              { v:'partially_paid', label:'Частично оплаченные' },
+              { v:'unpaid', label:'Не оплаченные' },
+              { v:'refunded', label:'Возвраты' },
+            ].map(o => (
+              <button key={String(o.v)} type="button"
+                style={statusFilter===o.v?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+                onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setStatusFilter(o.v)}}>{o.label}</button>
+            ))}
+          </div>
         </div>
         <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
           <button className="sk-period" onClick={e=>{e.stopPropagation();setPeriodOpen(!periodOpen)}}>
