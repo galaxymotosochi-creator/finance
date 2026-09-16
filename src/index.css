@@ -814,3 +814,16 @@ input:focus, select:focus, textarea:focus {
 .sk-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
 .sk-leg-bar i{display:block;height:100%}
 @media(max-width:640px){.sk-ring{width:120px;height:120px}}
+
+/* Раскрывающаяся кнопка «Действия» на странице Счета */
+.sk-dd-wrap{position:relative}
+.sk-dd-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:10px 18px;font-size:12.5px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer;background:#E6F0FF;color:#0d4ea8;transition:background .18s,transform .1s}
+.sk-dd-btn:hover{background:#d6e7ff}
+.sk-dd-btn .car{font-size:9px;transition:transform .2s}
+.sk-dd-wrap.open .sk-dd-btn .car{transform:rotate(180deg)}
+.sk-dd-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:235px;background:#fff;border:1px solid rgba(29,120,252,.16);border-radius:14px;box-shadow:0 24px 50px -20px rgba(29,120,252,.55);padding:6px;display:none;z-index:60}
+.sk-dd-wrap.open .sk-dd-menu{display:block;animation:skpop .16s ease}
+@keyframes skpop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.sk-dd-menu button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#040506;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .16s,color .16s}
+.sk-dd-menu button:hover{background:#f2f7ff;color:#0d4ea8}
+.sk-dd-menu button .i{font-size:14px;width:18px;text-align:center;flex:none}

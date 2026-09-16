@@ -265,15 +265,20 @@ export default function Accounts() {
           <div className="sub">Управление счетами и учет остатков</div>
         </div>
         <div className="sk-bar-acts">
-          {[
-            { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, label:'Начальные остатки' },
-            { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
-            { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
-            { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
-            { onClick: openAdd, label:'Добавить счет' },
-          ].map(a => (
-            <button key={a.label} type="button" className="sk-btn-soft" onClick={a.onClick}>{a.label}</button>
-          ))}
+          <div className="sk-dd-wrap">
+            <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия <span className="car">▾</span></button>
+            <div className="sk-dd-menu">
+              {[
+                { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, icon:'🏦', label:'Начальные остатки' },
+                { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, icon:'✏️', label:'Корректировка' },
+                { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, icon:'📥', label:'Инкассация' },
+                { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, icon:'🔁', label:'Перевод между счетами' },
+              ].map(a => (
+                <button key={a.label} type="button" onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');a.onClick()}}><span className="i">{a.icon}</span>{a.label}</button>
+              ))}
+            </div>
+          </div>
+          <button type="button" className="sk-btn-soft sk-btn-add" onClick={openAdd}>＋ Добавить счет</button>
         </div>
       </div>
 
