@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * Кнопка «?» рядом с заголовком раздела + справка ВЫДВИЖНОЙ ПАНЕЛЬЮ СПРАВА.
@@ -28,9 +29,10 @@ export default function SectionHelp({ title = 'Справка', intro, blocks = 
         className="sec-help-q"
       >?</button>
 
-      {open && <div className="sec-help-ov" onClick={() => setOpen(false)} />}
-
-      <aside className={'sec-help-panel' + (open ? ' open' : '')}>
+      {createPortal(
+        <>
+          {open && <div className="sec-help-ov" onClick={() => setOpen(false)} />}
+          <aside className={'sec-help-panel' + (open ? ' open' : '')}>
         <div className="sec-help-head">
           <div>
             <h2>{title}</h2>
@@ -66,7 +68,10 @@ export default function SectionHelp({ title = 'Справка', intro, blocks = 
             </div>
           ))}
         </div>
-      </aside>
+          </aside>
+        </>,
+        document.body
+      )}
     </>
   );
 }
