@@ -608,7 +608,7 @@ export default function Salary() {
       ) : (
       <div className="sal-tbl">
         <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
-          <div className="sk-fade sk-fade-r"></div>
+          <div className="sk-fade sk-fade-r" style={{position:'sticky',top:0,left:'100%',height:0,zIndex:6}}></div>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
             <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
@@ -624,7 +624,7 @@ export default function Salary() {
                 <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
                 <td>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
                 <td>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
-                <td><b>{Number(s.amount).toLocaleString()} {cur}</b></td>
+                <td>{Number(s.amount).toLocaleString()} {cur}</td>
                 <td>{(s.status==='pending'||s.status==='accrued')
                   ? <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setShowAcc(true)}}>Выплатить</span>
                   : s.status==='paid'
