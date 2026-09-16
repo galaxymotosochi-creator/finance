@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 const STATUS_LABELS = {pending:'Начислено',accrued:'Начислено',paid:'Выплачено',cancelled:'Отменено'};
@@ -499,11 +500,20 @@ export default function Salary() {
 
   return (
     <>
-      <div className="page-header">
-        <div><h1>Зарплата</h1><div className="sub">Расчет начислений с привязкой к табелю</div></div>
-        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Начислить зарплату</button></div>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Зарплата</h1>
+            <SectionHelp
+              title="Раздел «Зарплата»"
+              intro="Начисления и выплаты сотрудникам. Видно, сколько начислено, сколько выплачено и сколько осталось."
+              faq={[]}
+            />
+          </div>
+          <div className="sub">Расчёт начислений с привязкой к табелю</div>
+        </div>
+        <button className="btn btn-dark" onClick={openAdd}>Начислить зарплату</button>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
         <CenterSpinner />
