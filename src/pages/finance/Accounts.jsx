@@ -233,6 +233,12 @@ export default function Accounts() {
   });
   var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
   const balOfId = (id) => { const a = accounts.find(x => String(x.id) === String(id)); return a ? Math.round(getBal(a)) : 0; };
+
+  useEffect(() => {
+    const close = () => document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
    if (loading || !initDone) return <CenterSpinner />;
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
