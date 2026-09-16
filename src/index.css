@@ -758,7 +758,7 @@ input:focus, select:focus, textarea:focus {
 }
 .sk-table tbody td{padding:16px 16px;font-size:.82rem;color:var(--sk-ink);border-bottom:1px solid rgba(29,120,252,.08);text-align:left;white-space:nowrap}
 .sk-table thead th,.sk-table tbody td{padding-left:16px;padding-right:16px;text-align:left;border-right:1px solid rgba(29,120,252,.09)}
-.sk-table thead th:first-child,.sk-table tbody td:first-child{padding-left:22px}
+.sk-table thead th:first-child,.sk-table tbody td:first-child{padding-left:24px !important}
 .sk-table thead th{vertical-align:bottom}
 .sk-table thead th:last-child,.sk-table tbody td:last-child{border-right:none}
 .sk-table tbody td{vertical-align:middle}
