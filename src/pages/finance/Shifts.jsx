@@ -23,20 +23,18 @@ export default function Shifts() {
     const max = el.scrollWidth - el.clientWidth;
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
-  // Замер подсказки: несколько раз после отрисовки (шрифты/таблица меняют ширину), без раннего сброса
+  // Замер подсказки скролла — ровно как в разделе «Счета»
   useEffect(() => {
     const el = tblRef.current;
     if (!el) return;
     const upd = () => {
       const max = el.scrollWidth - el.clientWidth;
-      setTblPos({ left: el.scrollLeft > 4, right: max > 4 && el.scrollLeft < max - 4 });
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
     };
-    const t1 = setTimeout(upd, 100);
-    const t2 = setTimeout(upd, 400);
-    const t3 = setTimeout(upd, 900);
+    upd();
     window.addEventListener('resize', upd);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); window.removeEventListener('resize', upd); };
-  }, [shifts, loading]);
+    return () => window.removeEventListener('resize', upd);
+  }, [shifts]);
 
   const showToast = (msg, isError = false) => {
     setToastError(isError);
