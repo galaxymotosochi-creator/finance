@@ -933,7 +933,7 @@ input:focus, select:focus, textarea:focus {
 .sk-seg button.on{background:#fff;color:#1F75FF;box-shadow:0 4px 12px -4px rgba(29,120,252,.5)}
 .sk-seg button.red{color:#dc2626}
 .sk-seg button.red.on{color:#dc2626}
-.sk-period{border:1px solid rgba(29,120,252,.22);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#0d4ea8;background:#fff;cursor:pointer;white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.sk-period{border:1px solid rgba(29,120,252,.22);border-radius:9999px;padding:11px 18px;font-size:12.5px;font-weight:700;line-height:1;color:#0d4ea8;background:#fff;cursor:pointer;white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
 .sk-search{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(29,120,252,.22);border-radius:999px;padding:7px 14px;background:#fff;transition:border-color .15s,box-shadow .15s}
 .sk-search:focus-within{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(29,120,252,.12)}
 .sk-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;background:none;padding:0}
