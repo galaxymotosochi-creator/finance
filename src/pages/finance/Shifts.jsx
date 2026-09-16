@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -16,29 +16,14 @@ export default function Shifts() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [toastError, setToastError] = useState(false);
-  const tblRef = useRef(null);
-  const [tblPos, setTblPos] = useState({left:false, right:true});
+  // Подсказка скролла (вариант 2а): без замеров ширины. Тени видны всегда,
+  // гасятся только по факту прокрутки — как в разделе «Счета».
+  const [tblPos, setTblPos] = useState({left:true, right:true});
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
-  // Замер подсказки скролла: как в «Счетах», но с учётом того, что таблица тут видна и при пустом списке.
-  // Срабатывает после загрузки (loading -> false) и при появлении данных.
-  useEffect(() => {
-    if (loading) return;
-    const el = tblRef.current;
-    if (!el) return;
-    const upd = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
-    };
-    upd();
-    const raf = requestAnimationFrame(upd);
-    window.addEventListener('resize', upd);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', upd); };
-  }, [shifts, loading]);
-
   const showToast = (msg, isError = false) => {
     setToastError(isError);
     setToast(msg);
@@ -67,18 +52,6 @@ export default function Shifts() {
       }
     })();
   }, [user]);
-
-  useEffect(() => {
-    const el = tblRef.current;
-    if (!el) return;
-    const upd = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
-    };
-    upd();
-    window.addEventListener('resize', upd);
-    return () => window.removeEventListener('resize', upd);
-  }, [shifts]);
 
   // Выручка смены = сумма оплаченного по чекам смены (только кассовые чеки, быстрые продажи не входят)
   const getShiftIncome = (s) => {
@@ -143,7 +116,7 @@ export default function Shifts() {
       </div>
 
       {!loading && (
-      <div className="sk-tablewrap" ref={tblRef}>
+      <div className="sk-tablewrap">
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
         <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
