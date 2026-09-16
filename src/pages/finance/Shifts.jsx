@@ -147,14 +147,14 @@ export default function Shifts() {
                 const cashier = s.current_cashier_name || s.cashier_name;
                 return (
                   <tr key={s.id}>
-                    <td><span className="sk-name">{dateStr}</span></td>
-                    <td>{cashier || '—'}</td>
-                    <td>{s.shift_number ? '#'+s.shift_number : '—'}</td>
-                    <td>{(parseFloat(s.opening_balance)||0).toLocaleString()} {cur}</td>
-                    <td>{income > 0 ? income.toLocaleString()+' ₽' : '—'}</td>
-                    <td>{sCloseBal > 0 ? sCloseBal.toLocaleString()+' ₽' : '—'}</td>
-                    <td>{timeOpen}{s.closed_at ? ' — '+timeClose : ''}</td>
-                    <td><span className={isOpen ? 'sk-tag sk-tag-open' : 'sk-tag'}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
+                    <td>{dateStr}</td>
+                    <td style={{textAlign:'left'}}>{cashier || '—'}</td>
+                    <td style={{textAlign:'left'}}>{s.shift_number ? '#'+s.shift_number : '—'}</td>
+                    <td style={{textAlign:'left'}}>{(parseFloat(s.opening_balance)||0).toLocaleString()} {cur}</td>
+                    <td style={{textAlign:'left'}}>{income > 0 ? income.toLocaleString()+' ₽' : '—'}</td>
+                    <td style={{textAlign:'left'}}>{sCloseBal > 0 ? sCloseBal.toLocaleString()+' ₽' : '—'}</td>
+                    <td style={{textAlign:'left'}}>{timeOpen}{s.closed_at ? ' — '+timeClose : ''}</td>
+                    <td style={{textAlign:'left'}}><span className={isOpen ? 'sk-tag sk-tag-open' : 'sk-tag'}>{isOpen ? 'Открыта' : 'Закрыта'}</span></td>
                   </tr>
                 );
               })}

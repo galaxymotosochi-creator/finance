@@ -957,3 +957,6 @@ input:focus, select:focus, textarea:focus {
 }
 /* Чеки: тень-подсказка прилипает к правому краю области прокрутки */
 .sk-card > .sk-fade-r{position:sticky;top:0;height:100%;pointer-events:none;z-index:6}
+/* Смены: все заголовки и значения — по левому краю, значения обычным текстом */
+.sk-table.sk-shifts thead th{text-align:left}
+.sk-table.sk-shifts tbody td{text-align:left;font-weight:400}
