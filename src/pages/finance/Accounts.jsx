@@ -76,7 +76,7 @@ export default function Accounts() {
       var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
       if (user) {
         var cr = [];
-        if (need.cash) cr.push({user_id:user.id,name:'Наличные',type:'cash',balance:0,description:'Деньги вне кассы (сейф) — сюда инкассируется'});
+        if (need.cash) cr.push({user_id:user.id,name:'Наличные в сейфе',type:'cash',balance:0,description:'Сюда поступают изъятые из кассы деньги'});
         if (need.cash_register) cr.push({user_id:user.id,name:'Кассовый ящик',type:'cash_register',balance:0,description:'Наличные от продаж — лежат в ящике кассы'});
         if (cr.length > 0) {
           var r = await supabase.from('accounts').insert(cr).select();
