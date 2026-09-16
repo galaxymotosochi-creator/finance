@@ -869,9 +869,12 @@ input:focus, select:focus, textarea:focus {
 
 /* Шторки-подсказки горизонтального скролла таблицы (4 вариант) */
 .sk-tablewrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+/* Вариант 2а: тени видны ПО УМОЛЧАНИЮ (без JS-замеров), гасятся только по факту прокрутки */
 .sk-fade{position:absolute;top:0;bottom:0;pointer-events:none;z-index:5;transition:opacity .25s ease}
 .sk-fade-l{left:0;width:22px;background:linear-gradient(-90deg,rgba(255,255,255,0),rgba(255,255,255,.7))}
 .sk-fade-r{right:0;width:34px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.75))}
+.sk-fade.at-start{opacity:0}
+.sk-fade.at-end{opacity:0}
 .sk-fade-r:after{content:"›";position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:22px;font-weight:700;color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
 @keyframes sknudge{0%,100%{transform:translateY(-50%) translateX(0);opacity:.3}50%{transform:translateY(-50%) translateX(4px);opacity:.7}}
 /* шторки показываем на мобильных и планшетах (до 1024px), на десктопе таблица помещается целиком */

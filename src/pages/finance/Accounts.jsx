@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 
@@ -56,25 +56,14 @@ export default function Accounts() {
   const [colTo, setColTo] = useState('');
   const [viewAcTx, setViewAcTx] = useState(null);
   const [toast, setToast] = useState(null);
-  const tblRef = useRef(null);
-  const [tblPos, setTblPos] = useState({left:false, right:true});
+  // Подсказка скролла (вариант 2а): без замеров ширины. Тени видны всегда,
+  // гасятся только по факту прокрутки — состояние обновляется на самом событии scroll.
+  const [tblPos, setTblPos] = useState({left:true, right:true});
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
-  useEffect(() => {
-    const el = tblRef.current;
-    if (!el) return;
-    const upd = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
-    };
-    upd();
-    window.addEventListener('resize', upd);
-    return () => window.removeEventListener('resize', upd);
-  }, [accounts]);
-
   useEffect(() => {
     if (toast) {
       const t = setTimeout(() => setToast(null), 3000);
@@ -364,7 +353,7 @@ export default function Accounts() {
               </div>
             );
           })()}
-          <div className="sk-tablewrap" ref={tblRef}>
+          <div className="sk-tablewrap">
             <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
             <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
           <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
