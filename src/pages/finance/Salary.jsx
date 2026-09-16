@@ -97,6 +97,8 @@ export default function Salary() {
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
   const [salPeriod, setSalPeriod] = useState('all');
   const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
+  const [salPeriodFrom, setSalPeriodFrom] = useState('');
+  const [salPeriodTo, setSalPeriodTo] = useState('');
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
