@@ -422,7 +422,7 @@ export default function Receipts() {
         <div className="sk-bar">
           <div className="grow">
             <div style={{display:'flex',alignItems:'center'}}>
-              <h1>Чеки ТЕСТ</h1>
+              <h1>Чеки</h1>
               <SectionHelp
                 title="Раздел «Чеки»"
                 intro="Здесь все чеки: пробитые через кассу и быстрые продажи."
@@ -449,7 +449,7 @@ export default function Receipts() {
       <div className="sk-bar">
         <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Чеки ТЕСТ</h1>
+            <h1>Чеки</h1>
             <SectionHelp
               title="Раздел «Чеки»"
               intro="Здесь все чеки: пробитые через кассу и быстрые продажи. Видно сумму, оплату, долг клиента, скидку и возвраты."
