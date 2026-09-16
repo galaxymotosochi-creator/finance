@@ -134,10 +134,14 @@ export default function Receipts() {
   // Оптимистичная синхронизация: офлайн-чеки появляются сразу (с красной точкой)
   useOptimisticSync({ table: 'receipts', setList: setReceipts, onSynced: load });
 
-  // Close period dropdown on outside click
+  // Закрытие выпадающих списков (Тип и «Все время») по клику в любом месте.
+  // Открытие одного автоматически закрывает другой — как в разделе «Счета».
   useEffect(() => {
     const handler = (e) => {
-      if (!e.target.closest('.stock-filter-links > div')) setPeriodOpen(false);
+      if (!e.target.closest('.sk-period-wrap')) setPeriodOpen(false);
+      if (!e.target.closest('.sk-dd-wrap')) {
+        document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+      }
     };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
@@ -478,7 +482,7 @@ export default function Receipts() {
         </div>
         <span style={{flex:1}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car">▾</span></button>
+          <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();setPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
@@ -493,8 +497,8 @@ export default function Receipts() {
             ))}
           </div>
         </div>
-        <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button className="sk-period" onClick={e=>{e.stopPropagation();setPeriodOpen(!periodOpen)}}>
+        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button className="sk-period" onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setPeriodOpen(!periodOpen)}}>
             {periodLabel}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
