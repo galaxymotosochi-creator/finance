@@ -713,7 +713,7 @@ export default function Salary() {
               <tr><td colSpan="8" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Начислений не найдено</td></tr>
             ) : salFiltered.map(s => (
               <tr key={s.id}>
-                <td><div className="sk-name" style={{whiteSpace:'nowrap'}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
+                <td><span style={{whiteSpace:'nowrap'}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                 <td>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
                 <td>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
