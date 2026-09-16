@@ -91,6 +91,12 @@ export default function Salary() {
   const [showAcc, setShowAcc] = useState(false);
   const [pendingPayId, setPendingPayId] = useState(null);
   const [payAcctId, setPayAcctId] = useState(''); // выбранный счет в модалке выплаты
+  // Фильтры (как в разделе «Чеки»)
+  const [salStatus, setSalStatus] = useState(null);
+  const [salSearch, setSalSearch] = useState('');
+  const [salPeriodOpen, setSalPeriodOpen] = useState(false);
+  const [salPeriod, setSalPeriod] = useState('all');
+  const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
@@ -503,6 +509,41 @@ export default function Salary() {
   const salPaid = (list || []).filter(s => s.status === 'paid').reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
   const salDue = salTotal - salPaid;
 
+  // Закрытие выпадающих списков зарплаты по клику в любом месте
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.sal-period-wrap')) setSalPeriodOpen(false);
+      if (!e.target.closest('.sk-dd-wrap')) {
+        document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
+  // Фильтры списка: статус, поиск, период (как в «Чеках»)
+  const salFiltered = (list || []).filter(s => {
+    if (salStatus && s.status !== salStatus) return false;
+    if (salSearch) {
+      const q = salSearch.toLowerCase();
+      const nm = (s.employee_name || '').toLowerCase();
+      const note = (s.note || '').toLowerCase();
+      if (!nm.includes(q) && !note.includes(q)) return false;
+    }
+    if (salPeriod !== 'all') {
+      const d = s.paid_at || s.period_from || s.created_at;
+      if (!d) return false;
+      const dt = new Date(d);
+      const now = new Date();
+      const day = 86400000;
+      if (salPeriod === 'today' && dt.toDateString() !== now.toDateString()) return false;
+      if (salPeriod === 'yesterday' && dt.toDateString() !== new Date(now.getTime() - day).toDateString()) return false;
+      if (salPeriod === 'week' && (now - dt) > 7 * day) return false;
+      if (salPeriod === 'month' && (dt.getMonth() !== now.getMonth() || dt.getFullYear() !== now.getFullYear())) return false;
+    }
+    return true;
+  });
+
   // Сводка по сотрудникам для колец: начислено / выплачено / процент
   const salByEmp = Object.values((list || []).reduce((acc, s) => {
     const key = s.employee_name || 'Сотрудник';
@@ -581,6 +622,51 @@ export default function Salary() {
         <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить зарплату</button>
       </div>
 
+      {/* Фильтры: поиск, «Статус ▾», «Все время ▾» — как в разделе «Чеки» */}
+      <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'wrap',marginBottom:'12px'}}>
+        <div className="sk-search">
+          <span style={{display:'flex',color:'#9aa3b2'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
+          <input type="text" placeholder="Поиск…" value={salSearch} onChange={e => setSalSearch(e.target.value)} style={{width:'150px'}} />
+        </div>
+        <span style={{flex:1}}></span>
+        <div className="sk-dd-wrap">
+          <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();setSalPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Статус <span className="car">▾</span></button>
+          <div className="sk-dd-menu">
+            {[
+              { v:null, label:'Все' },
+              { v:'accrued', label:'Начислено' },
+              { v:'paid', label:'Выплачено' },
+            ].map(o => (
+              <button key={String(o.v)} type="button"
+                style={salStatus===o.v?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+                onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setSalStatus(o.v)}}>{o.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className="sal-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button className="sk-period" onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setSalPeriodOpen(!salPeriodOpen)}}>
+            {salPeriodLabel}
+            <span style={{fontSize:'10px'}}>▾</span>
+          </button>
+          {salPeriodOpen && (
+            <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'},{key:'month',label:'Этот месяц'}].map(p2=>{
+                const isActive = salPeriod === p2.key;
+                return (
+                  <div key={p2.key} onClick={()=>{setSalPeriod(p2.key);setSalPeriodLabel(p2.label);setSalPeriodOpen(false)}}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {p2.label}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Итоги: общая сумма зарплат / выплачено / не выплачено */}
       <div className="sk-tiles">
         <div className="sk-tile sk-primary"><div className="sk-t">Общая сумма зарплат</div><div className="sk-v">{salTotal.toLocaleString()} {cur}</div></div>
@@ -615,9 +701,9 @@ export default function Salary() {
             <th>Вычеты</th><th>Итого</th><th>Статус</th><th></th>
           </tr></thead>
           <tbody id="salaryTableBody">
-            {list.length === 0 ? (
+            {salFiltered.length === 0 ? (
               <tr><td colSpan="8" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Начислений не найдено</td></tr>
-            ) : list.map(s => (
+            ) : salFiltered.map(s => (
               <tr key={s.id}>
                 <td><div className="sk-name" style={{whiteSpace:'nowrap'}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                 <td>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
