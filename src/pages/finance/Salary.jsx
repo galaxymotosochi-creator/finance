@@ -727,10 +727,10 @@ export default function Salary() {
       {loading ? (
         <CenterSpinner />
       ) : (
-      <div className="sal-tbl">
-        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
+      <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
             <th style={{ textAlign: 'left' }}>Сотрудник</th><th style={{ textAlign: 'left' }}>Период</th><th style={{ textAlign: 'left' }}>Оклад</th><th style={{ textAlign: 'left' }}>Премия</th>
