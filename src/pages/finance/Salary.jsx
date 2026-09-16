@@ -498,6 +498,11 @@ export default function Salary() {
 
   const fmtD = (d) => { if(!d) return '—'; var d0=String(d).split('T')[0]; var p=d0.split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:d0; };
 
+  // Итоги по зарплате: общая сумма начислений, выплачено, не выплачено
+  const salTotal = (list || []).reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+  const salPaid = (list || []).filter(s => s.status === 'paid').reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+  const salDue = salTotal - salPaid;
+
   return (
     <>
       <div className="sk-bar">
@@ -513,6 +518,13 @@ export default function Salary() {
           <div className="sub">Расчёт начислений с привязкой к табелю</div>
         </div>
         <button className="btn btn-dark" onClick={openAdd}>Начислить зарплату</button>
+      </div>
+
+      {/* Итоги: общая сумма зарплат / выплачено / не выплачено */}
+      <div className="sk-tiles">
+        <div className="sk-tile sk-primary"><div className="sk-t">Общая сумма зарплат</div><div className="sk-v">{salTotal.toLocaleString()} {cur}</div></div>
+        <div className="sk-tile"><div className="sk-t">Выплачено</div><div className="sk-v">{salPaid.toLocaleString()} {cur}</div></div>
+        <div className="sk-tile sk-gold"><div className="sk-t">Не выплачено</div><div className="sk-v">{salDue.toLocaleString()} {cur}</div></div>
       </div>
 
       {loading ? (
