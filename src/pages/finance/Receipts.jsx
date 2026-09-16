@@ -551,7 +551,7 @@ export default function Receipts() {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="10"><div className="empty-products" style={{ padding: '1rem' }}><div className="big-icon">🔍</div><p>Ничего не найдено</p></div></td></tr>
+              <tr><td colSpan="10" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Чеков не найдено</td></tr>
             ) : filtered.map(r => (
               <tr key={r.id} onClick={() => openReceipt(r)}
                 style={{ cursor: 'pointer' }}>
