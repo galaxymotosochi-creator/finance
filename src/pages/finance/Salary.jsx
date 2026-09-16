@@ -503,6 +503,17 @@ export default function Salary() {
   const salPaid = (list || []).filter(s => s.status === 'paid').reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
   const salDue = salTotal - salPaid;
 
+  // Сводка по сотрудникам для колец: начислено / выплачено / процент
+  const salByEmp = Object.values((list || []).reduce((acc, s) => {
+    const key = s.employee_name || 'Сотрудник';
+    if (!acc[key]) acc[key] = { name: key, total: 0, paid: 0 };
+    const amt = Number(s.amount) || 0;
+    acc[key].total += amt;
+    if (s.status === 'paid') acc[key].paid += amt;
+    return acc;
+  }, {})).map(e => ({ ...e, pct: e.total > 0 ? Math.round(e.paid / e.total * 100) : 0 }))
+     .sort((a, b) => b.total - a.total);
+
   return (
     <>
       <div className="sk-bar">
@@ -526,6 +537,24 @@ export default function Salary() {
         <div className="sk-tile"><div className="sk-t">Выплачено</div><div className="sk-v">{salPaid.toLocaleString()} {cur}</div></div>
         <div className="sk-tile sk-gold"><div className="sk-t">Не выплачено</div><div className="sk-v">{salDue.toLocaleString()} {cur}</div></div>
       </div>
+
+      {/* Кольца сотрудников: прогресс выплат по каждому */}
+      {salByEmp.length > 0 && (
+        <div className="sal-rings">
+          {salByEmp.map(e => (
+            <div className="sal-ring-card" key={e.name}>
+              <div className="sal-ring" style={{background:'conic-gradient(#1F75FF 0 '+e.pct+'%, #eef4ff '+e.pct+'% 100%)'}}>
+                <span className="rv">{e.pct}%</span>
+              </div>
+              <div className="rn">{abbreviateName(e.name)}</div>
+              <div className="rs">{e.paid.toLocaleString()} из {e.total.toLocaleString()} {cur}</div>
+              <div className="rb" style={{color: e.total - e.paid > 0 ? '#dc2626' : '#0f7b43'}}>
+                {e.total - e.paid > 0 ? 'остаток ' + (e.total - e.paid).toLocaleString() + ' ' + cur : 'выплачено'}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <CenterSpinner />
