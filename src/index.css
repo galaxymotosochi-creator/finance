@@ -912,9 +912,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → absolute; панель ниже кнопки меню */
 @media(max-width:1024px){
-  .sec-help-panel{position:absolute;top:16px;right:14px;bottom:16px;height:auto;max-height:none;border-radius:20px}
+  .sec-help-panel{position:absolute;top:22px;right:14px;bottom:22px;height:auto;max-height:none;border-radius:20px}
   .sec-help-ov{position:absolute}
 }
 @media(max-width:480px){
-  .sec-help-panel{top:16px;bottom:16px;height:auto;max-height:none;right:10px;width:calc(100vw - 20px)}
+  .sec-help-panel{top:22px;bottom:22px;height:auto;max-height:none;right:10px;width:calc(100vw - 20px)}
 }
