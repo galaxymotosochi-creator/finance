@@ -883,10 +883,10 @@ input:focus, select:focus, textarea:focus {
 .sec-help-ov{position:fixed;inset:0;background:rgba(11,18,32,.35);z-index:70}
 /* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → используем absolute по высоте экрана */
 @media(max-width:1024px){
-  .sec-help-panel{position:absolute;top:10vh;right:14px;bottom:auto;height:80vh;max-height:80vh;border-radius:20px}
+  .sec-help-panel{position:absolute;top:14px;right:14px;bottom:auto;height:80vh;max-height:80vh;border-radius:20px}
   .sec-help-ov{position:absolute}
 }
-.sec-help-panel{position:fixed;top:10vh;right:14px;height:80vh;max-height:80vh;width:min(430px,94vw);background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;box-shadow:-30px 0 70px -30px rgba(11,18,32,.45);z-index:71;display:flex;flex-direction:column;overflow:hidden;transform:translateX(120%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sec-help-panel{position:fixed;top:14px;right:14px;height:80vh;max-height:80vh;width:min(430px,94vw);background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;box-shadow:-30px 0 70px -30px rgba(11,18,32,.45);z-index:71;display:flex;flex-direction:column;overflow:hidden;transform:translateX(120%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
 .sec-help-panel.open{transform:translateX(0)}
 .sec-help-head{flex:none;padding:18px 20px;border-bottom:1px solid rgba(29,120,252,.12);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(120deg,#f4f9ff,#eaf2ff);border-radius:20px 20px 0 0}
 .sec-help-head h2{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0}
