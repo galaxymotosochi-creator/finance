@@ -502,10 +502,10 @@ export default function Accounts() {
               <div className="modal-actions">
                 {sorted.filter(notInit).length > 0 && (<>
                   <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
-                  <button type="submit" className="btn btn-dark">Сохранить</button>
+                  <button type="submit" className="sk-dd-btn">Сохранить</button>
                 </>)}
                 {sorted.filter(notInit).length === 0 && (
-                  <button type="button" className="btn btn-outline sk-pulse-plain" onClick={()=>setShowInit(false)}>Закрыть</button>
+                  <button type="button" className="sk-dd-btn sk-pulse-plain" onClick={()=>setShowInit(false)}>Закрыть</button>
                 )}
               </div>
             </form>
@@ -564,7 +564,7 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">Перевести</button>
+                <button type="submit" className="sk-dd-btn">Перевести</button>
               </div>
             </form>
       </Modal>
@@ -631,8 +631,8 @@ export default function Accounts() {
                   <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
                 </div>
                 <div className="modal-actions">
-                  <button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Отмена</button>
-                  <button type="submit" className="btn btn-danger" style={{fontWeight:600}}>Инкассировать</button>
+                  <button type="button" className="sk-dd-btn-out" onClick={()=>setShowCollection(false)}>Отмена</button>
+                  <button type="submit" className="sk-dd-btn">Инкассировать</button>
                 </div>
               </form>
         </>

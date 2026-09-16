@@ -834,3 +834,8 @@ input:focus, select:focus, textarea:focus {
 .sk-pulse-plain{animation:skpulseplain 2s ease-in-out infinite}
 .sk-pulse-plain:hover{animation-play-state:paused}
 @keyframes skpulseplain{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* Единый размер кнопок модалок: эталон — «Применить» (sk-dd-btn) */
+.sk-dd-btn-out{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:11px 18px;font-size:12.5px;font-weight:700;line-height:1;font-family:inherit;cursor:pointer;background:#f0f0f0;color:var(--body-color,#333);transition:background .18s,transform .15s}
+.sk-dd-btn-out:hover{background:#e4e4e4}
+.sk-dd-btn-out:active{transform:scale(.98)}
