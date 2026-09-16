@@ -532,8 +532,8 @@ export default function Receipts() {
 
       {/* Таблица чеков */}
       <div className="***">
-        <div className="sk-fade sk-fade-r"></div>
-        <div className="sk-card" style={{overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+          <div className="sk-fade sk-fade-r"></div>
         <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>

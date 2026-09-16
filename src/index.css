@@ -944,3 +944,5 @@ input:focus, select:focus, textarea:focus {
 .sk-more-btn{border:none;border-radius:999px;padding:11px 24px;font-family:inherit;font-size:12.5px;font-weight:700;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;cursor:pointer;box-shadow:0 12px 26px -12px rgba(29,120,252,.8);transition:transform .15s}
 .sk-more-btn:hover{transform:translateY(-1px)}
 .sk-more-btn:disabled{opacity:.6;cursor:default;transform:none}
+/* Чеки: подсказка скролла ровно по границам табличной карточки (без «уезжания» вниз) */
+.sk-card > .sk-fade{top:0;bottom:0}
