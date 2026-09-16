@@ -950,3 +950,5 @@ input:focus, select:focus, textarea:focus {
 .sk-period{animation:skperiodpulse 2.4s ease-in-out infinite}
 .sk-period:hover{animation-play-state:paused}
 @keyframes skperiodpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+/* Чеки: тень-подсказка прилипает к правому краю области прокрутки */
+.sk-card > .sk-fade-r{position:sticky;top:0;height:100%;pointer-events:none;z-index:6}
