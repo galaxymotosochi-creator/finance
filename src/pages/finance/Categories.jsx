@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 const dirTypeLabels = {
   income: 'Доходы (Внекассовые)',
@@ -116,16 +117,42 @@ export default function Categories() {
   return (
     <>
       {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
-      <div className="page-header">
-        <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>Финансовые категории</h1>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Финансовые категории</h1>
+            <SectionHelp
+              title="Раздел «Финансовые категории»"
+              intro="Справочник статей доходов и расходов бизнеса. Категории выбираются при вводе расходов, доходов и поставок."
+              faq={[
+                { q: 'Что это за раздел и зачем он нужен?', a: (
+                  <div>Это <b>справочник статей</b>, по которым вы учитываете деньги. Один раз заводите категории — потом выбираете их при вводе расходов, доходов и в поставках. Благодаря этому видно, <i>куда</i> уходят деньги и <i>откуда</i> приходят.</div>
+                ) },
+                { q: 'Чем отличаются три типа категорий?', a: (
+                  <ul>
+                    <li style={{marginBottom:'.4rem'}}><b>Доходы (внекассовые)</b> — деньги не от продаж: проценты банка, доп. услуги, прочие поступления.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Расходы бизнеса (операционные)</b> — жизнь компании: аренда, зарплата, реклама, интернет. В себестоимость товара не входят.</li>
+                    <li><b>Расходы поставки (себестоимость)</b> — довески к товару: доставка ТК, сборка, упаковка, пошлина. Увеличивают себестоимость товара.</li>
+                  </ul>
+                ) },
+                { q: 'Как добавить категорию?', a: (
+                  <div>Нажмите <b>«Добавить категорию»</b> справа вверху. Укажите название и выберите тип. Готово — категория сразу появится в выпадающих списках при вводе расходов и доходов.</div>
+                ) },
+                { q: 'Почему категорию нельзя удалить?', a: (
+                  <div>Если категория уже использована в операциях, система предупредит — сначала нужно разобраться с этими операциями. Так сумма не потеряется из учёта.</div>
+                ) },
+                { q: 'Можно ли переименовать категорию?', a: (
+                  <div>Да. Нажмите <b>⋯</b> в строке категории → <b>«Редактировать»</b>. Название изменится везде, где категория использовалась.</div>
+                ) },
+              ]}
+            />
+          </div>
           <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={function () { openModal(null); }} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить категорию</button>
+        <div className="sk-bar-acts">
+          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={function () { openModal(null); }}>Добавить категорию</button>
         </div>
       </div>
-      <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }}></div>
 
       <div className="product-table" style={{ overflowX: 'auto' }}>
         <table className="data-table">
