@@ -300,7 +300,7 @@ export default function Accounts() {
               );
             })}
             <div className="sk-tile sk-primary">
-              <div className="sk-t">💰 Общий баланс счетов</div>
+              <div className="sk-t">Общий баланс счетов</div>
               <div className="sk-v">{(total||0).toLocaleString()} {cur}</div>
             </div>
           </div>
