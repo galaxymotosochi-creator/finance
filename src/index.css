@@ -946,3 +946,7 @@ input:focus, select:focus, textarea:focus {
 .sk-more-btn:disabled{opacity:.6;cursor:default;transform:none}
 /* Чеки: подсказка скролла ровно по границам табличной карточки (без «уезжания» вниз) */
 .sk-card > .sk-fade{top:0;bottom:0}
+/* «Все время ▾» — лёгкая пульсация (дизайн не меняется) */
+.sk-period{animation:skperiodpulse 2.4s ease-in-out infinite}
+.sk-period:hover{animation-play-state:paused}
+@keyframes skperiodpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
