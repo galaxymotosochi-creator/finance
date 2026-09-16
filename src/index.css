@@ -912,7 +912,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → absolute; панель ниже кнопки меню */
 @media(max-width:1024px){
-  .sec-help-panel{position:absolute;top:76px;right:14px;bottom:auto;height:66vh;max-height:66vh;border-radius:20px}
+  .sec-help-panel{position:absolute;top:16px;right:14px;bottom:auto;height:74vh;max-height:74vh;border-radius:20px}
   .sec-help-ov{position:absolute}
 }
 @media(max-width:480px){
