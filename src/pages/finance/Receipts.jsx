@@ -6,6 +6,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import { tzToday, tzOffsetDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 const STATUS_LABELS = {
@@ -435,77 +436,113 @@ export default function Receipts() {
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1>Чеки</h1>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Чеки</h1>
+            <SectionHelp
+              title="Раздел «Чеки»"
+              intro="Здесь все чеки: пробитые через кассу и быстрые продажи. Видно сумму, оплату, долг клиента, скидку и возвраты."
+              faq={[
+                { q: 'С чего начать работу?', a: (
+                  <ol style={{paddingLeft:'1.15rem',margin:0}}>
+                    <li style={{marginBottom:'.5rem'}}>Чеки создаются сами — при продаже через <b>«Кассу»</b> или быстрой продаже. Вручную их добавлять не нужно.</li>
+                    <li style={{marginBottom:'.5rem'}}>Нажмите на любую строку — откроется <b>состав чека</b>: товары, количество, цены.</li>
+                    <li>Если клиент должен — в колонке <b>«Оплата»</b> будет долг. Нажмите на него, чтобы <b>принять оплату</b>.</li>
+                  </ol>
+                ) },
+                { q: 'Что означает каждая колонка?', a: (
+                  <ul>
+                    <li><b>№ чека</b> — номер чека. Красная точка — ждёт синхронизации.</li>
+                    <li><b>Дата</b> — когда пробили чек.</li>
+                    <li><b>Сумма</b> — итог чека.</li>
+                    <li><b>Возврат</b> — сколько вернули по этому чеку.</li>
+                    <li><b>Скидка</b> — размер скидки.</li>
+                    <li><b>Оплата</b> — «Оплачено» или «Долг N ₽». Нажмите, чтобы принять оплату.</li>
+                    <li><b>Клиент</b>, <b>Комментарий</b>, <b>Кассир</b> — кто продал и кому.</li>
+                    <li><b>Откуда</b> — «Касса» или «Быстрая» продажа.</li>
+                  </ul>
+                ) },
+                { q: 'Чем отличаются фильтры?', a: (
+                  <ul>
+                    <li><b>Все</b> — показывает все чеки.</li>
+                    <li><b>Оплачен</b> — полностью оплаченные.</li>
+                    <li><b>Частично</b> — оплачены частично.</li>
+                    <li><b>Долги</b> — есть долг (включая частично оплаченные).</li>
+                    <li><b>Возвраты</b> — чеки, по которым были возвраты.</li>
+                    <li><b>Период</b> — Все время, Сегодня, Вчера, Эта неделя или свой диапазон дат.</li>
+                  </ul>
+                ) },
+                { q: 'Как принять оплату долга?', a: (
+                  <p>Найдите чек с долгом (фильтр <b>«Долги»</b>), нажмите на плашку с суммой долга в колонке <b>«Оплата»</b> — откроется окно, где выберите счёт и введите сумму.</p>
+                ) },
+                { q: 'Как оформить возврат?', a: (
+                  <p>Откройте чек и нажмите <b>«Оформить возврат»</b>, укажите товары и сумму. Возврат уменьшит долг клиента, а деньги вернутся с выбранного счёта.</p>
+                ) },
+              ]}
+            />
+          </div>
           <div className="sub">Все чеки, пробитые через кассу и быстрые продажи</div>
         </div>
       </div>
-      <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
-      {/* Поиск + фильтры */}
-      <div className="search-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '.5rem', width: '100%', flexWrap: 'nowrap' }}>
-        <div className="stock-search" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', width: 'auto', border: '1px solid ' + (receiptSearchFocus ? '#111' : '#e2e2e6'), borderRadius: '100px', padding: '5px 12px', background: '#fff', boxShadow: receiptSearchFocus ? '0 2px 8px rgba(0,0,0,.12)' : '0 1px 3px rgba(0,0,0,.05)', transition: 'border-color .15s, box-shadow .15s' }}
-          onFocus={()=>setReceiptSearchFocus(true)} onBlur={()=>setReceiptSearchFocus(false)}>
-          <span style={{display:'flex',color:receiptSearchFocus?'#111':'#999',transition:'color .15s'}}>
+      {/* Фильтры (вариант 4: сегмент-переключатель) */}
+      <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'wrap',marginBottom:'12px',marginTop:'2px'}}>
+        <div className="sk-search">
+          <span style={{display:'flex',color:'#9aa3b2'}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
-          <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)}
-            style={{ border: 'none', outline: 'none', width: '150px', minWidth: 0, fontSize: '.8rem', fontFamily: 'var(--font)', background: 'none', padding: 0 }} />
+          <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'150px'}} />
         </div>
-        <div className="stock-filter-links" style={{ display: 'flex', alignItems: 'center', gap: '.15rem', marginLeft: 'auto' }}>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,whiteSpace:'nowrap',background:'#fff',fontFamily:'inherit'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
-              onClick={e=>{e.stopPropagation();setPeriodOpen(!periodOpen)}}>{periodLabel}</span>
-            {periodOpen && (
-              <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
-                {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>{
-                  const isActive = period === p.key;
-                  return (
-                    <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setPeriodOpen(false)}}
-                      style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.78rem',color:'#555',background:'transparent'}}>
-                      <input type="checkbox" checked={isActive} onChange={()=>{}} style={{cursor:'pointer',margin:0}} />
-                      {p.label}
-                    </div>
-                  );
-                })}
-                <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
-                  <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem',marginBottom:'.25rem'}}>Свой период</div>
-                  <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
-                    <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
-                    <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
+        <span style={{flex:1}}></span>
+        <div className="sk-seg">
+          <button className={statusFilter===null?'on':''} onClick={()=>setStatusFilter(null)}>Все</button>
+          <button className={statusFilter==='paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')}>Оплачен</button>
+          <button className={statusFilter==='partially_paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')}>Частично</button>
+          <button className={statusFilter==='unpaid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')}>Долги</button>
+          <button className={'red'+(statusFilter==='refunded'?' on':'')} onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')}>Возвраты</button>
+        </div>
+        <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button className="sk-period" onClick={e=>{e.stopPropagation();setPeriodOpen(!periodOpen)}}>
+            {periodLabel}
+            <span style={{fontSize:'10px'}}>▾</span>
+          </button>
+          {periodOpen && (
+            <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>{
+                const isActive = period === p.key;
+                return (
+                  <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setPeriodOpen(false)}}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {p.label}
                   </div>
-                  <div style={{padding:'.25rem .5rem'}}>
-                    <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setPeriodOpen(false)}}
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--secondary)',color:'#fff',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
-                  </div>
+                );
+              })}
+              <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+                <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                  <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                  <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                </div>
+                <div style={{padding:'.3rem .55rem 0'}}>
+                  <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setPeriodOpen(false)}}
+                    className="sk-dd-btn" style={{width:'100%',padding:'.5rem'}}>Применить</button>
                 </div>
               </div>
-            )}
-          </div>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='paid'?600:400,color:statusFilter==='paid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='paid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='paid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='paid'?'#111':'#555'}}>Оплачен</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='partially_paid'?600:400,color:statusFilter==='partially_paid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='partially_paid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='partially_paid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='partially_paid'?'#111':'#555'}}>Частично</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='unpaid'?600:400,color:statusFilter==='unpaid'?'#111':'#555',cursor:'pointer',border:'1px solid '+(statusFilter==='unpaid'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='unpaid'?'#bbb':'#e0e0e4';e.currentTarget.style.color=statusFilter==='unpaid'?'#111':'#555'}}>Долги</span>
-          <span className="stock-filter-link" onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')} style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',fontWeight:statusFilter==='refunded'?600:400,color:'#dc2626',cursor:'pointer',border:'1px solid '+(statusFilter==='refunded'?'#dc2626':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff',fontFamily:'inherit'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#dc2626';e.currentTarget.style.color='#dc2626'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=statusFilter==='refunded'?'#dc2626':'#e0e0e4';e.currentTarget.style.color='#dc2626'}}>Возвраты</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Таблица чеков */}
-      <div className="product-table" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', overflowY: 'visible' }}>
-        <table className="data-table">
+      <div className="***">
+        <div className="sk-fade sk-fade-r"></div>
+        <div className="sk-card" style={{overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+        <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>
-              <th style={{ textAlign: 'left', paddingLeft: 0 }}>№ чека</th>
+              <th>№ чека</th>
               <th style={{ textAlign: 'left' }}>Дата</th>
               <th style={{ textAlign: 'left' }}>Сумма</th>
               <th style={{ textAlign: 'left' }}>Возврат</th>
@@ -523,7 +560,7 @@ export default function Receipts() {
             ) : filtered.map(r => (
               <tr key={r.id} onClick={() => openReceipt(r)}
                 style={{ cursor: 'pointer' }}>
-                <td style={{ textAlign: 'left', paddingLeft: 0, color:'#222' }}>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                <td>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>
@@ -558,15 +595,16 @@ export default function Receipts() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Показать ещё (если чеков больше, чем загружено) */}
       {hasMore && (
         <div style={{ textAlign: 'center', padding: '1rem 0 .5rem' }}>
-          <button onClick={loadMore} disabled={loadingMore} style={{ padding: '.5rem 1.4rem', borderRadius: '100px', border: '1.5px solid var(--border)', background: '#fff', color: '#444', fontSize: '.8rem', fontWeight: 600, cursor: loadingMore ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={loadMore} disabled={loadingMore} className="sk-more-btn">
             {loadingMore ? 'Загрузка...' : 'Показать ещё'}
           </button>
-          <div style={{ fontSize: '.72rem', color: '#999', marginTop: '.35rem' }}>Показано чеков: {receipts.length}</div>
+          <div style={{ fontSize: '.72rem', color: '#5b6472', marginTop: '.45rem' }}>Показано чеков: {receipts.length}</div>
         </div>
       )}
 

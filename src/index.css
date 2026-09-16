@@ -925,3 +925,22 @@ input:focus, select:focus, textarea:focus {
 .sk-table.sk-shifts th:nth-child(8),.sk-table.sk-shifts td:nth-child(8){min-width:110px}
 /* статус-пилюля */
 .sk-tag-open{background:#e7f8ee;color:#0f7b43}
+
+/* ===== Чеки: фильтры-сегмент (вариант 4) ===== */
+.sk-seg{display:inline-flex;background:var(--sk-soft);border-radius:999px;padding:3px;gap:2px}
+.sk-seg button{border:none;border-radius:999px;padding:7px 14px;font-family:inherit;font-size:12.5px;font-weight:600;background:none;color:#0d4ea8;cursor:pointer;white-space:nowrap;transition:background .2s,box-shadow .25s,color .2s}
+.sk-seg button:hover{background:rgba(255,255,255,.7)}
+.sk-seg button.on{background:#fff;color:#1F75FF;box-shadow:0 4px 12px -4px rgba(29,120,252,.5)}
+.sk-seg button.red{color:#dc2626}
+.sk-seg button.red.on{color:#dc2626}
+.sk-period{border:1px solid rgba(29,120,252,.22);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#0d4ea8;background:#fff;cursor:pointer;white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.sk-search{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(29,120,252,.22);border-radius:999px;padding:7px 14px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.sk-search:focus-within{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(29,120,252,.12)}
+.sk-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;background:none;padding:0}
+/* таблица чеков */
+.sk-table.sk-receipts{min-width:1150px}
+.sk-table.sk-receipts tbody tr{cursor:pointer}
+.sk-tag-red{background:#fee2e2;color:#dc2626}
+.sk-more-btn{border:none;border-radius:999px;padding:11px 24px;font-family:inherit;font-size:12.5px;font-weight:700;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;cursor:pointer;box-shadow:0 12px 26px -12px rgba(29,120,252,.8);transition:transform .15s}
+.sk-more-btn:hover{transform:translateY(-1px)}
+.sk-more-btn:disabled{opacity:.6;cursor:default;transform:none}
