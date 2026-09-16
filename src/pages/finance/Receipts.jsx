@@ -419,13 +419,23 @@ export default function Receipts() {
   if (!loading && receipts.length === 0 && statusFilter === null && search === '') {
     return (
       <div>
-        <div className="page-header">
-          <div>
-            <h1>Чеки</h1>
+        <div className="sk-bar">
+          <div className="grow">
+            <div style={{display:'flex',alignItems:'center'}}>
+              <h1>Чеки ТЕСТ</h1>
+              <SectionHelp
+                title="Раздел «Чеки»"
+                intro="Здесь все чеки: пробитые через кассу и быстрые продажи."
+                faq={[
+                  { q: 'С чего начать работу?', a: (
+                    <p>Чеки создаются сами — при продаже через <b>«Кассу»</b> или быстрой продаже. Вручную их добавлять не нужно.</p>
+                  ) },
+                ]}
+              />
+            </div>
             <div className="sub">Все чеки, пробитые через кассу и быстрые продажи</div>
           </div>
         </div>
-        <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
         <div className="empty-products" style={{ marginTop: '2rem' }}>
           <div className="big-icon">🧾</div>
           <p>Чеки появятся после первой продажи через кассу</p>
@@ -439,7 +449,7 @@ export default function Receipts() {
       <div className="sk-bar">
         <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Чеки</h1>
+            <h1>Чеки ТЕСТ</h1>
             <SectionHelp
               title="Раздел «Чеки»"
               intro="Здесь все чеки: пробитые через кассу и быстрые продажи. Видно сумму, оплату, долг клиента, скидку и возвраты."
