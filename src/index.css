@@ -797,6 +797,12 @@ input:focus, select:focus, textarea:focus {
 .sk-btn-soft:hover{background:#f2f7ff;box-shadow:inset 0 0 0 1px rgba(29,120,252,.4)}
 .sk-btn-soft:active{transform:scale(.98)}
 @media(max-width:1100px){.sk-bar-acts{flex-wrap:wrap}}
+@media(max-width:768px){
+  /* гамбургер фиксирован сверху слева — сдвигаем плашку, чтобы не налезала */
+  .sk-bar{padding-left:54px}
+  .sk-bar h1{font-size:19px}
+  .sk-bar .sub{font-size:12px}
+}
 
 /* Круг «Структура денег» на странице Счета */
 .sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
