@@ -237,8 +237,8 @@ export default function Accounts() {
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
-      <div className="page-header">
-        <div>
+      <div className="sk-bar">
+        <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
             <h1>Счета</h1>
             <SectionHelp
@@ -246,7 +246,7 @@ export default function Accounts() {
               intro="Счета — где лежат деньги бизнеса: наличные, кассовый ящик, карты, банковские счета. Здесь виден общий баланс, остаток по каждому счету и история движений."
               blocks={[
                 { title: 'Плашки балансов', items: [
-                  <>Белые плашки — баланс каждого счета (начальный остаток + все операции). Жёлтая плашка в конце — <b>общий баланс</b> по всем счетам.</>,
+                  <>Белые плашки — баланс каждого счета (начальный остаток + все операции). Синяя плашка в конце — <b>общий баланс</b> по всем счетам.</>,
                 ]},
                 { title: 'Действия над счетами', items: [
                   <><b>Начальные остатки</b> — деньги, которые уже были у бизнеса до начала учёта (например, прибыль прошлых месяцев). В прибыль не попадают.</>,
@@ -264,24 +264,15 @@ export default function Accounts() {
           </div>
           <div className="sub">Управление счетами и учет остатков</div>
         </div>
-        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить счет</button></div>
-      </div>
-      <div className="nav-sep" style={{margin:'0 0 1.5rem',width:'100%'}} />
-
-      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'1.25rem',width:'100%',flexWrap:'wrap',marginTop:'0.25rem'}}>
-        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',flexWrap:'wrap',justifyContent:'flex-end'}}>
-          {/* Кнопки действий (вид 1-в-1 с фильтрами в Доходах и расходах: Все время/Расходы/Доходы/Скачать) */}
+        <div className="sk-bar-acts">
           {[
             { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, label:'Начальные остатки' },
             { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
             { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
             { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
+            { onClick: openAdd, label:'Добавить счет' },
           ].map(a => (
-            <span key={a.label} className="stock-filter-link"
-              style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,background:'#fff',whiteSpace:'nowrap',fontFamily:'inherit',transition:'all .12s'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
-              onClick={a.onClick}>{a.label}</span>
+            <button key={a.label} type="button" className="sk-btn-soft" onClick={a.onClick}>{a.label}</button>
           ))}
         </div>
       </div>
