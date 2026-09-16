@@ -799,7 +799,7 @@ input:focus, select:focus, textarea:focus {
 @media(max-width:1100px){.sk-bar-acts{flex-wrap:wrap}}
 @media(max-width:768px){
   /* кнопка меню (☰) фиксирована сверху слева — опускаем голубую плашку ниже */
-  .sk-bar{margin-top:46px}
+  .sk-bar{margin-top:34px}
 }
 
 /* Круг «Структура денег» на странице Счета */
