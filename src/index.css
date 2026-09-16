@@ -813,7 +813,19 @@ input:focus, select:focus, textarea:focus {
 .sk-leg .amt{font-size:13.5px;font-weight:800;min-width:100px;text-align:right}
 .sk-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
 .sk-leg-bar i{display:block;height:100%}
-@media(max-width:640px){.sk-ring{width:120px;height:120px}}
+@media(max-width:640px){
+  .sk-ring-block{flex-direction:column;align-items:flex-start;gap:14px}
+  .sk-ring{width:128px;height:128px;align-self:center}
+  .sk-ring .in .t{font-size:9.5px}
+  .sk-ring .in .v{font-size:16px}
+  .sk-legend{width:100%;min-width:0}
+  .sk-leg .nm{font-size:12px}
+  .sk-leg .amt{min-width:86px;font-size:12.5px}
+}
+@media(max-width:400px){
+  .sk-ring{width:112px;height:112px}
+  .sk-ring .in .v{font-size:14px}
+}
 
 /* Раскрывающаяся кнопка «Действия» на странице Счета */
 .sk-dd-wrap{position:relative}
