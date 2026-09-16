@@ -882,11 +882,6 @@ input:focus, select:focus, textarea:focus {
 @keyframes secqpulse{0%,100%{transform:scale(1);box-shadow:0 6px 14px -6px rgba(29,120,252,.7),0 0 0 0 rgba(29,120,252,.28)}50%{transform:scale(1.08);box-shadow:0 8px 18px -6px rgba(29,120,252,.85),0 0 0 5px rgba(29,120,252,0)}}
 .sec-help-q:hover{transform:scale(1.12)}
 .sec-help-ov{position:fixed;inset:0;background:rgba(11,18,32,.35);z-index:70}
-/* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → используем absolute по высоте экрана */
-@media(max-width:1024px){
-  .sec-help-panel{position:absolute;top:76px;right:14px;bottom:auto;height:66vh;max-height:66vh;border-radius:20px}
-  .sec-help-ov{position:absolute}
-}
 .sec-help-panel{position:fixed;top:14px;right:14px;height:80vh;max-height:80vh;width:min(430px,94vw);background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;box-shadow:-30px 0 70px -30px rgba(11,18,32,.45);z-index:71;display:flex;flex-direction:column;overflow:hidden;transform:translateX(120%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
 .sec-help-panel.open{transform:translateX(0)}
 .sec-help-head{flex:none;padding:18px 20px;border-bottom:1px solid rgba(29,120,252,.12);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(120deg,#f4f9ff,#eaf2ff);border-radius:20px 20px 0 0}
@@ -914,3 +909,12 @@ input:focus, select:focus, textarea:focus {
 .sec-help-block li{margin-bottom:5px}
 .sec-help-block p{margin:0;font-size:12.5px;color:#3d4655;line-height:1.65}
 .sec-help-a .k{display:inline-flex;align-items:center;gap:5px;font-weight:700;color:#0d4ea8;background:#E6F0FF;border-radius:6px;padding:1px 6px;font-size:11.5px}
+
+/* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → absolute; панель ниже кнопки меню */
+@media(max-width:1024px){
+  .sec-help-panel{position:absolute;top:76px;right:14px;bottom:auto;height:66vh;max-height:66vh;border-radius:20px}
+  .sec-help-ov{position:absolute}
+}
+@media(max-width:480px){
+  .sec-help-panel{top:84px;height:62vh;max-height:62vh;right:10px;width:calc(100vw - 20px)}
+}
