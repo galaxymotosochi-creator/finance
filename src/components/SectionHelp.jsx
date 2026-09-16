@@ -14,7 +14,8 @@ import { useState } from 'react';
  */
 export default function SectionHelp({ title = 'Справка', intro, blocks = [], faq = [] }) {
   const [open, setOpen] = useState(false);
-  const [opened, setOpened] = useState(0);
+  const [opened, setOpened] = useState([0]);
+  const toggle = (i) => setOpened(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
 
   const hasFaq = Array.isArray(faq) && faq.length > 0;
 
@@ -43,12 +44,12 @@ export default function SectionHelp({ title = 'Справка', intro, blocks = 
           {hasFaq && (
             <div className="sec-help-faq">
               {faq.map((f, i) => (
-                <div key={i} className={'sec-help-item' + (opened === i ? ' open' : '')}>
-                  <button type="button" className="sec-help-q-row" onClick={() => setOpened(opened === i ? -1 : i)}>
+                <div key={i} className={'sec-help-item' + (opened.includes(i) ? ' open' : '')}>
+                  <button type="button" className="sec-help-q-row" onClick={() => toggle(i)}>
                     <span>{f.q}</span>
                     <span className="car">▾</span>
                   </button>
-                  {opened === i && <div className="sec-help-a">{f.a}</div>}
+                  {opened.includes(i) && <div className="sec-help-a">{f.a}</div>}
                 </div>
               ))}
             </div>
