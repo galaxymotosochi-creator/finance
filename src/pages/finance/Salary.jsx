@@ -697,8 +697,8 @@ export default function Salary() {
           <div className="sk-fade sk-fade-r" style={{position:'sticky',top:0,left:'100%',height:0,zIndex:6}}></div>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
-            <th>Сотрудник</th><th>Период</th><th>Оклад</th><th>Премия</th>
-            <th>Вычеты</th><th>Итого</th><th>Статус</th><th></th>
+            <th style={{ textAlign: 'left' }}>Сотрудник</th><th style={{ textAlign: 'left' }}>Период</th><th style={{ textAlign: 'left' }}>Оклад</th><th style={{ textAlign: 'left' }}>Премия</th>
+            <th style={{ textAlign: 'left' }}>Вычеты</th><th style={{ textAlign: 'left' }}>Итого</th><th style={{ textAlign: 'left' }}>Статус</th><th></th>
           </tr></thead>
           <tbody id="salaryTableBody">
             {salFiltered.length === 0 ? (
