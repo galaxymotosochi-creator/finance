@@ -878,7 +878,8 @@ input:focus, select:focus, textarea:focus {
 @media(min-width:1025px){.sk-fade{display:none}}
 
 /* ===== Справка раздела: синий «?» + выдвижная панель справа ===== */
-.sec-help-q{width:22px;height:22px;border-radius:50%;border:none;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:.76rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -6px rgba(29,120,252,.9);transition:transform .15s;margin-left:.45rem;vertical-align:middle;flex-shrink:0;line-height:1;padding:0}
+.sec-help-q{width:22px;height:22px;border-radius:50%;border:none;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:.76rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -6px rgba(29,120,252,.9);transition:transform .15s;margin-left:.45rem;vertical-align:middle;flex-shrink:0;line-height:1;padding:0;animation:secqpulse 2s ease-in-out infinite}
+@keyframes secqpulse{0%,100%{transform:scale(1);box-shadow:0 6px 14px -6px rgba(29,120,252,.7),0 0 0 0 rgba(29,120,252,.28)}50%{transform:scale(1.08);box-shadow:0 8px 18px -6px rgba(29,120,252,.85),0 0 0 5px rgba(29,120,252,0)}}
 .sec-help-q:hover{transform:scale(1.12)}
 .sec-help-ov{position:fixed;inset:0;background:rgba(11,18,32,.35);z-index:70}
 /* Планшеты/мобильные: position:fixed ломается внутри overflow:hidden-родителя → используем absolute по высоте экрана */
@@ -899,9 +900,10 @@ input:focus, select:focus, textarea:focus {
 .sec-help-item{border-bottom:1px solid rgba(29,120,252,.12)}
 .sec-help-item:last-child{border-bottom:none}
 .sec-help-q-row{width:100%;list-style:none;cursor:pointer;padding:13px 15px;font-family:inherit;font-size:12.5px;font-weight:700;color:#0b1220;display:flex;justify-content:space-between;gap:10px;align-items:center;background:none;border:none;text-align:left;transition:background .18s}
-.sec-help-q-row .car{color:#1F75FF;font-size:11px;flex:none;transition:transform .2s}
+.sec-help-q-row .car{color:#1F75FF;font-size:16px;font-weight:800;flex:none;transition:transform .2s;animation:secarcar 1.8s ease-in-out infinite}
 .sec-help-item.open .sec-help-q-row{color:#0d4ea8;background:#f7fbff}
-.sec-help-item.open .sec-help-q-row .car{transform:rotate(180deg)}
+.sec-help-item.open .sec-help-q-row .car{transform:rotate(180deg);animation:none}
+@keyframes secarcar{0%,100%{opacity:.55;transform:translateY(-1px)}50%{opacity:1;transform:translateY(1px)}}
 .sec-help-a{padding:0 15px 14px;font-size:12.5px;color:#3d4655;line-height:1.65}
 .sec-help-a ul{padding-left:18px;margin:6px 0 0}
 .sec-help-a li{margin-bottom:5px}
