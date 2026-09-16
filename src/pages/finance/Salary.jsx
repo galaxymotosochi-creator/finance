@@ -523,7 +523,8 @@ export default function Salary() {
 
   // Фильтры списка: статус, поиск, период (как в «Чеках»)
   const salFiltered = (list || []).filter(s => {
-    if (salStatus && s.status !== salStatus) return false;
+    if (salStatus === 'pending' && s.status !== 'pending' && s.status !== 'accrued') return false;
+    if (salStatus && salStatus !== 'pending' && s.status !== salStatus) return false;
     if (salSearch) {
       const q = salSearch.toLowerCase();
       const nm = (s.employee_name || '').toLowerCase();
@@ -540,6 +541,12 @@ export default function Salary() {
       if (salPeriod === 'yesterday' && dt.toDateString() !== new Date(now.getTime() - day).toDateString()) return false;
       if (salPeriod === 'week' && (now - dt) > 7 * day) return false;
       if (salPeriod === 'month' && (dt.getMonth() !== now.getMonth() || dt.getFullYear() !== now.getFullYear())) return false;
+      if (salPeriod === 'custom') {
+        const d0 = salPeriodFrom ? new Date(salPeriodFrom) : null;
+        const d1 = salPeriodTo ? new Date(salPeriodTo + 'T23:59:59') : null;
+        if (d0 && dt < d0) return false;
+        if (d1 && dt > d1) return false;
+      }
     }
     return true;
   });
@@ -644,7 +651,7 @@ export default function Salary() {
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
-              { v:'accrued', label:'Начислено' },
+              { v:'pending', label:'Начислено' },
               { v:'paid', label:'Выплачено' },
             ].map(o => (
               <button key={String(o.v)} type="button"
@@ -670,6 +677,17 @@ export default function Salary() {
                   </div>
                 );
               })}
+              <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+                <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                  <input type="date" value={salPeriodFrom} onChange={e=>setSalPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                  <input type="date" value={salPeriodTo} onChange={e=>setSalPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                </div>
+                <div style={{padding:'.3rem .55rem 0'}}>
+                  <button type="button" onClick={()=>{if(!salPeriodFrom||!salPeriodTo)return alert('Выберите обе даты');setSalPeriod('custom');setSalPeriodLabel(salPeriodFrom.split('-').reverse().join('.')+' — '+salPeriodTo.split('-').reverse().join('.'));setSalPeriodOpen(false)}}
+                    className="sk-dd-btn" style={{width:'100%',padding:'.5rem'}}>Применить</button>
+                </div>
+              </div>
             </div>
           )}
         </div>
