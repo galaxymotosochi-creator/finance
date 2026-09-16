@@ -99,6 +99,13 @@ export default function Salary() {
   const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
   const [salPeriodFrom, setSalPeriodFrom] = useState('');
   const [salPeriodTo, setSalPeriodTo] = useState('');
+  // Подсказка скролла таблицы (как в «Сменах» и «Счетах»)
+  const [tblPos, setTblPos] = useState({left:true, right:true});
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
@@ -685,9 +692,9 @@ export default function Salary() {
                   <input type="date" value={salPeriodFrom} onChange={e=>setSalPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                   <input type="date" value={salPeriodTo} onChange={e=>setSalPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                 </div>
-                <div style={{padding:'.3rem .55rem 0'}}>
+                <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
                   <button type="button" onClick={()=>{if(!salPeriodFrom||!salPeriodTo)return alert('Выберите обе даты');setSalPeriod('custom');setSalPeriodLabel(salPeriodFrom.split('-').reverse().join('.')+' — '+salPeriodTo.split('-').reverse().join('.'));setSalPeriodOpen(false)}}
-                    className="sk-dd-btn" style={{width:'100%',padding:'.5rem'}}>Применить</button>
+                    className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}>Применить</button>
                 </div>
               </div>
             </div>
@@ -721,8 +728,9 @@ export default function Salary() {
         <CenterSpinner />
       ) : (
       <div className="sal-tbl">
-        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
-          <div className="sk-fade sk-fade-r" style={{position:'sticky',top:0,left:'100%',height:0,zIndex:6}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
+          <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
             <th style={{ textAlign: 'left' }}>Сотрудник</th><th style={{ textAlign: 'left' }}>Период</th><th style={{ textAlign: 'left' }}>Оклад</th><th style={{ textAlign: 'left' }}>Премия</th>

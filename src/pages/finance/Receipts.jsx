@@ -29,6 +29,13 @@ export default function Receipts() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [receipts, setReceipts] = useState([]);
+  // Подсказка скролла таблицы (как в «Сменах» и «Счетах»)
+  const [tblPos, setTblPos] = useState({left:true, right:true});
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [receiptSearchFocus, setReceiptSearchFocus] = useState(false);
@@ -520,9 +527,9 @@ export default function Receipts() {
                   <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                   <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                 </div>
-                <div style={{padding:'.3rem .55rem 0'}}>
+                <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
                   <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setPeriodOpen(false)}}
-                    className="sk-dd-btn" style={{width:'100%',padding:'.5rem'}}>Применить</button>
+                    className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}>Применить</button>
                 </div>
               </div>
             </div>
@@ -532,8 +539,9 @@ export default function Receipts() {
 
       {/* Таблица чеков */}
       <div className="***">
-        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
-          <div className="sk-fade sk-fade-r" style={{position:'sticky',top:0,left:'100%',height:0,zIndex:6}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
+          <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>
