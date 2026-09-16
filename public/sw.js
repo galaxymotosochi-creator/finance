@@ -3,7 +3,7 @@
 // 2) Мутации (POST/PATCH/DELETE) без сети уходят в очередь (IndexedDB)
 // 3) При появлении сети очередь синхронизируется автоматически
 
-const CACHE = 'atlaspos-v6';
+const CACHE = 'atlaspos-v7';
 const STATIC = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 // ===== IndexedDB: очередь офлайн-запросов =====
@@ -115,18 +115,22 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // ===== Статика: кеш → сеть =====
+  // ===== Статика: ВСЕГДА сеть → кэш =====
+  // Было «кэш → сеть»: из-за этого после обновления сайта браузер отдавал старые файлы
+  // с тем же именем. Теперь свежий файл всегда берётся с сервера, кэш — только запасной.
   if (
     url.pathname.startsWith('/assets/') ||
     url.pathname.startsWith('/icons/') ||
     url.pathname === '/manifest.json'
   ) {
     e.respondWith(
-      caches.match(e.request).then((r) => r || fetch(e.request).then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, clone));
+      fetch(e.request).then((res) => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, clone));
+        }
         return res;
-      }))
+      }).catch(() => caches.match(e.request).then((r) => r || new Response('offline', { status: 503 })))
     );
     return;
   }
@@ -143,7 +147,16 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // ===== Страница и всё остальное: сеть → кеш =====
+  // ===== Страница (index.html): ВСЕГДА свежая из сети =====
+  // Кэш не подставляем — иначе после деплоя открывается старая версия приложения.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request).then((r) => r || caches.match('/')))
+    );
+    return;
+  }
+
+  // ===== Всё остальное: сеть → кэш =====
   e.respondWith(networkFirst(e.request));
 });
 
