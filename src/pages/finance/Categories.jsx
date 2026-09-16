@@ -22,6 +22,13 @@ export default function Categories() {
   const [dirType, setDirType] = useState('income');
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  // Подсказка скролла таблицы (как в «Счетах» и «Чекax»)
+  const [tblPos, setTblPos] = useState({left:true, right:true});
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
