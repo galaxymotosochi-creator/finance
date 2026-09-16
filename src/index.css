@@ -328,7 +328,7 @@ body {
 .product-table .stock-low { color: var(--danger); font-weight: 500; }
 
 /* Все таблицы — единый стиль */
-#dirColHeaders th, #catColHeaders th, #clientColHeaders th,
+#catColHeaders th, #clientColHeaders th,
 #invColHeaders th, #woColHeaders th, #supColHeaders th,
 #supplyColHeaders th, #stockColHeaders th {
   font-size: .68rem; font-weight: 500; color: var(--muted);
@@ -336,7 +336,7 @@ body {
   white-space: nowrap; border-bottom: 1.5px solid var(--border);
   background: transparent; text-align: left;
 }
-#dirColHeaders th:first-child, #catColHeaders th:first-child,
+#catColHeaders th:first-child,
 #clientColHeaders th:first-child, #invColHeaders th:first-child, #woColHeaders th:first-child,
 #supColHeaders th:first-child, #supplyColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
@@ -1014,3 +1014,18 @@ input:focus, select:focus, textarea:focus {
 .sk-table.cat-table thead th:first-child,.sk-table.cat-table tbody td:first-child{min-width:280px}
 .sk-table.cat-table thead th:nth-child(2),.sk-table.cat-table tbody td:nth-child(2){min-width:200px}
 .sk-table.cat-table thead th:nth-child(3),.sk-table.cat-table tbody td:nth-child(3){width:60px;text-align:center}
+
+/* Финансовые категории: заголовки и линия — один в один как в «Чекax» */
+.main .content .sk-table.cat-table thead th{
+  font-size:11.5px !important; font-weight:700 !important; letter-spacing:.04em !important;
+  text-transform:uppercase !important; color:var(--sk-muted) !important;
+  text-align:left !important; padding:14px 16px !important;
+  border-bottom:1px solid rgba(29,120,252,.14) !important;
+  border-right:1px solid rgba(29,120,252,.09) !important;
+  white-space:nowrap !important; vertical-align:bottom !important;
+}
+.main .content .sk-table.cat-table thead th:first-child{padding-left:24px !important}
+.main .content .sk-table.cat-table tbody td{padding-left:16px !important;padding-right:16px !important;text-align:left !important;border-right:1px solid rgba(29,120,252,.09) !important}
+.main .content .sk-table.cat-table tbody td:first-child{padding-left:24px !important}
+.main .content .sk-table.cat-table thead th:last-child,
+.main .content .sk-table.cat-table tbody td:last-child{border-right:none !important;text-align:center !important}
