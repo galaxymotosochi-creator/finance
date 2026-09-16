@@ -817,8 +817,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Раскрывающаяся кнопка «Действия» на странице Счета */
 .sk-dd-wrap{position:relative}
-.sk-dd-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:10px 18px;font-size:12.5px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer;background:#E6F0FF;color:#0d4ea8;transition:background .18s,transform .1s}
-.sk-dd-btn:hover{background:#d6e7ff}
+.sk-dd-btn{display:inline-flex;align-items:center;gap:8px;border:2px solid #1F75FF;border-radius:9999px;padding:9px 18px;font-size:13px;font-weight:800;line-height:1;font-family:inherit;cursor:pointer;background:#fff;color:#0d4ea8;box-shadow:0 10px 24px -12px rgba(29,120,252,.9);transition:background .18s,box-shadow .18s,transform .1s}
+.sk-dd-btn:hover{background:#eaf2ff;box-shadow:0 14px 30px -12px rgba(29,120,252,.95)}
+.sk-dd-btn:active{transform:scale(.98)}
 .sk-dd-btn .car{font-size:9px;transition:transform .2s}
 .sk-dd-wrap.open .sk-dd-btn .car{transform:rotate(180deg)}
 .sk-dd-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:235px;background:#fff;border:1px solid rgba(29,120,252,.16);border-radius:14px;box-shadow:0 24px 50px -20px rgba(29,120,252,.55);padding:6px;display:none;z-index:60}
