@@ -416,60 +416,6 @@ export default function Receipts() {
     return <CenterSpinner />;
   }
 
-  if (!loading && receipts.length === 0 && statusFilter === null && search === '') {
-    return (
-      <div>
-        <div className="sk-bar">
-          <div className="grow">
-            <div style={{display:'flex',alignItems:'center'}}>
-              <h1>Чеки</h1>
-              <SectionHelp
-                title="Раздел «Чеки»"
-                intro="Здесь все чеки: пробитые через кассу и быстрые продажи."
-                faq={[
-                  { q: 'С чего начать работу?', a: (
-                    <p>Чеки создаются сами — при продаже через <b>«Кассу»</b> или быстрой продаже. Вручную их добавлять не нужно.</p>
-                  ) },
-                ]}
-              />
-            </div>
-            <div className="sub">Все чеки, пробитые через кассу и быстрые продажи</div>
-          </div>
-        </div>
-        {/* Фильтры — показываем и при пустом списке, как в обычном состоянии */}
-        <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'wrap',marginBottom:'12px',marginTop:'2px'}}>
-          <div className="sk-search">
-            <span style={{display:'flex',color:'#9aa3b2'}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            </span>
-            <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'150px'}} />
-          </div>
-          <span style={{flex:1}}></span>
-          <div className="sk-dd-wrap">
-            <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car">▾</span></button>
-            <div className="sk-dd-menu">
-              {[
-                { v:null, label:'Все' },
-                { v:'paid', label:'Оплаченные' },
-                { v:'partially_paid', label:'Частично оплаченные' },
-                { v:'unpaid', label:'Не оплаченные' },
-                { v:'refunded', label:'Возвраты' },
-              ].map(o => (
-                <button key={String(o.v)} type="button"
-                  style={statusFilter===o.v?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
-                  onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setStatusFilter(o.v)}}>{o.label}</button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="empty-products" style={{ marginTop: '2rem' }}>
-          <div className="big-icon">🧾</div>
-          <p>Чеки появятся после первой продажи через кассу</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="sk-bar">
