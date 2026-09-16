@@ -154,13 +154,17 @@ export default function Categories() {
         </div>
       </div>
 
-      <div className="product-table" style={{ overflowX: 'auto' }}>
-        <table className="data-table">
+      <div className="***">
+        <div className="***">
+          <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+        <table className="sk-table cat-table">
           <thead id="dirColHeaders">
             <tr>
-              <th>Название</th>
-              <th>Тип категории</th>
-              <th style={{width:'30px'}}></th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Тип категории</th>
+              <th style={{textAlign:'center',width:'60px'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">
@@ -178,8 +182,8 @@ export default function Categories() {
             {list.map(function (c) {
               return (
                 <tr key={c.id}>
-                  <td style={{textAlign:'left'}}><div className="prod-name" >{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
-                  <td style={{textAlign:'left'}}><span className="prod-cat">{dirTypeLabels[c.type] || c.type}</span></td>
+                  <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
+                  <td style={{textAlign:'left'}}>{dirTypeLabels[c.type] || c.type}</td>
                   <td style={{textAlign:'center',width:'30px'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;if(el){el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');var h=function(){el.classList.remove('open');document.removeEventListener('click',h)};setTimeout(function(){document.addEventListener('click',h)},10)}}}>⋯</button>
@@ -194,6 +198,8 @@ export default function Categories() {
             })}
           </tbody>
         </table>
+        </div>
+        </div>
       </div>
 
       {/* МОДАЛКА */}

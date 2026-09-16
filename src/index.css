@@ -1008,3 +1008,9 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.sal-table tbody td:first-child{padding-left:24px !important}
 /* Подсказки скролла: показывать и на широких экранах (таблицы широкие) */
 @media(min-width:1025px){.sk-table.*** ~ .sk-fade,.sk-table.sal-table ~ .sk-fade{display:block}}
+
+/* Финансовые категории: таблица в фирменном стиле scanurik */
+.sk-table.cat-table{min-width:520px}
+.sk-table.cat-table thead th:first-child,.sk-table.cat-table tbody td:first-child{min-width:280px}
+.sk-table.cat-table thead th:nth-child(2),.sk-table.cat-table tbody td:nth-child(2){min-width:200px}
+.sk-table.cat-table thead th:nth-child(3),.sk-table.cat-table tbody td:nth-child(3){width:60px;text-align:center}
