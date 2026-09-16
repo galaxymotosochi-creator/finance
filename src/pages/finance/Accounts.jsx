@@ -266,9 +266,9 @@ export default function Accounts() {
         </div>
         <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить счет</button></div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
+      <div className="nav-sep" style={{margin:'0 0 1.5rem',width:'100%'}} />
 
-      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap'}}>
+      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'1.25rem',width:'100%',flexWrap:'wrap',marginTop:'0.25rem'}}>
         <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',flexWrap:'wrap',justifyContent:'flex-end'}}>
           {/* Кнопки действий (вид 1-в-1 с фильтрами в Доходах и расходах: Все время/Расходы/Доходы/Скачать) */}
           {[
