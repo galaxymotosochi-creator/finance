@@ -436,6 +436,23 @@ export default function Receipts() {
             <div className="sub">Все чеки, пробитые через кассу и быстрые продажи</div>
           </div>
         </div>
+        {/* Фильтры — показываем и при пустом списке, как в обычном состоянии */}
+        <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'wrap',marginBottom:'12px',marginTop:'2px'}}>
+          <div className="sk-search">
+            <span style={{display:'flex',color:'#9aa3b2'}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            </span>
+            <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'150px'}} />
+          </div>
+          <span style={{flex:1}}></span>
+          <div className="sk-seg">
+            <button className={statusFilter===null?'on':''} onClick={()=>setStatusFilter(null)}>Все</button>
+            <button className={statusFilter==='paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='paid'?null:'paid')}>Оплачен</button>
+            <button className={statusFilter==='partially_paid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='partially_paid'?null:'partially_paid')}>Частично</button>
+            <button className={statusFilter==='unpaid'?'on':''} onClick={()=>setStatusFilter(statusFilter==='unpaid'?null:'unpaid')}>Долги</button>
+            <button className={'red'+(statusFilter==='refunded'?' on':'')} onClick={()=>setStatusFilter(statusFilter==='refunded'?null:'refunded')}>Возвраты</button>
+          </div>
+        </div>
         <div className="empty-products" style={{ marginTop: '2rem' }}>
           <div className="big-icon">🧾</div>
           <p>Чеки появятся после первой продажи через кассу</p>
