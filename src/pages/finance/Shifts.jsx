@@ -146,7 +146,7 @@ export default function Shifts() {
             </thead>
             <tbody>
               {shifts.length === 0 ? (
-                <tr><td colSpan="8"><div className="empty-products"><div className="big-icon">📊</div><p>Нет кассовых смен</p></div></td></tr>
+                <tr><td colSpan="8" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Смен пока нет</td></tr>
               ) : shifts.map((s) => {
                 const income = getShiftIncome(s);
                 const isOpen = s.status === 'open';
