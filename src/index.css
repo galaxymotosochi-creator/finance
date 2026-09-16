@@ -988,6 +988,6 @@ input:focus, select:focus, textarea:focus {
 .sk-tag.sk-tag-pay{background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;cursor:pointer;box-shadow:0 6px 14px -8px rgba(29,120,252,.9)}
 .sk-tag.sk-tag-pay:hover{transform:translateY(-1px)}
 .sk-tag.sk-tag-ok{background:#e7f8ee;color:#0f7b43}
-/* Зарплата: значения — обычным текстом, по левому краю (заголовки берут базовый стиль sk-table, как в «Чекax») */
-.main .content .sk-table.sal-table tbody td{text-align:left !important;font-weight:400}
+/* Зарплата: значения — как в «Чекax» (базовый стиль sk-table: .82rem, цвет --sk-ink), только выравнивание слева */
+.main .content .sk-table.sal-table tbody td{text-align:left !important}
 .main .content .sk-table.sal-table tbody td:last-child{text-align:right !important}
