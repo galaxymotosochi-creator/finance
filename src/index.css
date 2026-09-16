@@ -751,22 +751,25 @@ input:focus, select:focus, textarea:focus {
 .sk-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:var(--sk-radius);overflow:hidden}
 
 /* Таблица */
-.sk-table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px;table-layout:fixed}
+.sk-table{width:100%;border-collapse:separate;border-spacing:0;min-width:860px}
 .sk-table thead th{
   padding:14px 16px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
   color:var(--sk-muted);text-align:left;border-bottom:1px solid rgba(29,120,252,.14);white-space:nowrap;vertical-align:bottom;
 }
 .sk-table tbody td{padding:16px 16px;font-size:.82rem;color:var(--sk-ink);border-bottom:1px solid rgba(29,120,252,.08);text-align:left;white-space:nowrap}
-.sk-table thead th,.sk-table tbody td{padding-left:20px;padding-right:20px;text-align:left;border-right:1px solid rgba(29,120,252,.09)}
+.sk-table thead th,.sk-table tbody td{padding-left:16px;padding-right:16px;text-align:left;border-right:1px solid rgba(29,120,252,.09)}
+.sk-table thead th:first-child,.sk-table tbody td:first-child{padding-left:22px}
 .sk-table thead th{vertical-align:bottom}
 .sk-table thead th:last-child,.sk-table tbody td:last-child{border-right:none}
+.sk-table tbody td{vertical-align:middle}
 /* Фиксированные ширины колонок — заголовки и значения строго совпадают */
-.sk-table thead th:nth-child(1),.sk-table tbody td:nth-child(1){width:34%;min-width:230px}
-.sk-table thead th:nth-child(2),.sk-table tbody td:nth-child(2){width:17%;min-width:130px}
-.sk-table thead th:nth-child(3),.sk-table tbody td:nth-child(3){width:17%;min-width:130px}
-.sk-table thead th:nth-child(4),.sk-table tbody td:nth-child(4){width:15%;min-width:115px}
-.sk-table thead th:nth-child(5),.sk-table tbody td:nth-child(5){width:17%;min-width:126px}
-.sk-table thead th:nth-child(6),.sk-table tbody td:nth-child(6){width:56px;min-width:56px;text-align:center;padding-left:8px;padding-right:8px}
+/* Минимальные ширины колонок — заголовки и значения совпадают */
+.sk-table thead th:nth-child(1),.sk-table tbody td:nth-child(1){min-width:250px}
+.sk-table thead th:nth-child(2),.sk-table tbody td:nth-child(2){min-width:150px}
+.sk-table thead th:nth-child(3),.sk-table tbody td:nth-child(3){min-width:150px}
+.sk-table thead th:nth-child(4),.sk-table tbody td:nth-child(4){min-width:130px}
+.sk-table thead th:nth-child(5),.sk-table tbody td:nth-child(5){min-width:140px}
+.sk-table thead th:nth-child(6),.sk-table tbody td:nth-child(6){width:60px;text-align:center;padding-left:10px;padding-right:10px}
 .sk-table tbody tr{transition:background .18s}
 .sk-table tbody tr:hover{background:#f5f9ff}
 .sk-table tbody tr:last-child td{border-bottom:none}
