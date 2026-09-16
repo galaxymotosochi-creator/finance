@@ -961,8 +961,8 @@ input:focus, select:focus, textarea:focus {
 .sk-table.sk-shifts thead th{text-align:left}
 .sk-table.sk-shifts tbody td{text-align:left;font-weight:400}
 /* Зарплата: кольца сотрудников — прогресс выплат */
-.sal-rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.sal-ring-card{border:1px solid rgba(29,120,252,.14);border-radius:16px;padding:14px 12px;text-align:center;background:#fff;transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s}
+.sal-rings{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.sal-ring-card{width:168px;flex:none;border:1px solid rgba(29,120,252,.14);border-radius:16px;padding:14px 12px;text-align:center;background:#fff;transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s}
 .sal-ring-card:hover{transform:translateY(-2px);box-shadow:0 20px 60px -16px rgba(29,120,252,.35),0 12px 40px -12px rgba(0,0,0,.12)}
 .sal-ring{width:88px;height:88px;margin:0 auto 9px;border-radius:50%;display:grid;place-items:center;position:relative}
 .sal-ring:after{content:"";position:absolute;inset:9px;background:#fff;border-radius:50%}
