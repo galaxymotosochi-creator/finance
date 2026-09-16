@@ -578,7 +578,7 @@ export default function Salary() {
           </div>
           <div className="sub">Расчёт начислений с привязкой к табелю</div>
         </div>
-        <button className="btn btn-dark" onClick={openAdd}>Начислить зарплату</button>
+        <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить зарплату</button>
       </div>
 
       {/* Итоги: общая сумма зарплат / выплачено / не выплачено */}
