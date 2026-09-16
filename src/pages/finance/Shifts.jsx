@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -16,6 +16,13 @@ export default function Shifts() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [toastError, setToastError] = useState(false);
+  const tblRef = useRef(null);
+  const [tblPos, setTblPos] = useState({left:false, right:true});
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
 
   const showToast = (msg, isError = false) => {
     setToastError(isError);
@@ -45,6 +52,18 @@ export default function Shifts() {
       }
     })();
   }, [user]);
+
+  useEffect(() => {
+    const el = tblRef.current;
+    if (!el) return;
+    const upd = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    upd();
+    window.addEventListener('resize', upd);
+    return () => window.removeEventListener('resize', upd);
+  }, [shifts]);
 
   // Выручка смены = сумма оплаченного по чекам смены (только кассовые чеки, быстрые продажи не входят)
   const getShiftIncome = (s) => {
@@ -108,8 +127,10 @@ export default function Shifts() {
         </div>
       </div>
 
-      <div className="***">
-        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}}>
+      <div className="***" ref={tblRef}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
           <table className="sk-table sk-shifts">
             <thead>
               <tr>
