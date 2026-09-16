@@ -757,8 +757,9 @@ input:focus, select:focus, textarea:focus {
   color:var(--sk-muted);text-align:left;border-bottom:1px solid rgba(29,120,252,.14);white-space:nowrap;vertical-align:bottom;
 }
 .sk-table tbody td{padding:16px 16px;font-size:.82rem;color:var(--sk-ink);border-bottom:1px solid rgba(29,120,252,.08);text-align:left;white-space:nowrap}
-.sk-table thead th:first-child,.sk-table tbody td:first-child{padding-left:26px !important}
-.sk-table thead th:last-child,.sk-table tbody td:last-child{padding-right:26px !important;text-align:right}
+.sk-table thead th,.sk-table tbody td{padding-left:20px;padding-right:20px;text-align:left}
+.sk-table thead th:first-child,.sk-table tbody td:first-child{padding-left:20px !important}
+.sk-table thead th:last-child,.sk-table tbody td:last-child{padding-right:20px !important;text-align:right}
 .sk-table tbody tr{transition:background .18s}
 .sk-table tbody tr:hover{background:#f5f9ff}
 .sk-table tbody tr:last-child td{border-bottom:none}
