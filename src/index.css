@@ -329,7 +329,7 @@ body {
 
 /* Все таблицы — единый стиль */
 #dirColHeaders th, #catColHeaders th, #clientColHeaders th,
-#invColHeaders th, #woColHeaders th, #salaryColHeaders th, #supColHeaders th,
+#invColHeaders th, #woColHeaders th, #supColHeaders th,
 #supplyColHeaders th, #stockColHeaders th {
   font-size: .68rem; font-weight: 500; color: var(--muted);
   text-transform: uppercase; padding: .5rem .4rem;
@@ -338,7 +338,7 @@ body {
 }
 #dirColHeaders th:first-child, #catColHeaders th:first-child,
 #clientColHeaders th:first-child, #invColHeaders th:first-child, #woColHeaders th:first-child,
-#salaryColHeaders th:first-child, #supColHeaders th:first-child, #supplyColHeaders th:first-child,
+#supColHeaders th:first-child, #supplyColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
 #productTableBody td:first-child { text-align: left; padding-left: 0; }
@@ -991,3 +991,14 @@ input:focus, select:focus, textarea:focus {
 /* Зарплата: значения — как в «Чекax» (базовый стиль sk-table: .82rem, цвет --sk-ink), только выравнивание слева */
 .main .content .sk-table.sal-table tbody td{text-align:left !important}
 .main .content .sk-table.sal-table tbody td:last-child{text-align:right !important}
+
+/* Зарплата: заголовки и линия — один в один как в «Чекax» (фирменный стиль scanurik) */
+.main .content .sk-table.sal-table thead th{
+  font-size:11.5px !important; font-weight:700 !important; letter-spacing:.04em !important;
+  text-transform:uppercase !important; color:var(--sk-muted) !important;
+  text-align:left !important; padding:14px 16px !important;
+  border-bottom:1px solid rgba(29,120,252,.14) !important;
+  border-right:1px solid rgba(29,120,252,.09) !important;
+  white-space:nowrap !important; vertical-align:bottom !important;
+}
+.main .content .sk-table.sal-table thead th:last-child{border-right:none !important;text-align:right !important}
