@@ -23,6 +23,19 @@ export default function Shifts() {
     const max = el.scrollWidth - el.clientWidth;
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+  // Замер после загрузки данных — иначе подсказка то есть, то нет
+  useEffect(() => {
+    const el = tblRef.current;
+    if (!el) return;
+    const upd = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    upd();
+    const t = setTimeout(upd, 120);
+    window.addEventListener('resize', upd);
+    return () => { clearTimeout(t); window.removeEventListener('resize', upd); };
+  }, [shifts, loading]);
 
   const showToast = (msg, isError = false) => {
     setToastError(isError);
