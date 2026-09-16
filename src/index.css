@@ -946,9 +946,12 @@ input:focus, select:focus, textarea:focus {
 .sk-more-btn:disabled{opacity:.6;cursor:default;transform:none}
 /* Чеки: подсказка скролла ровно по границам табличной карточки (без «уезжания» вниз) */
 .sk-card > .sk-fade{top:0;bottom:0}
-/* «Все время ▾» — лёгкая пульсация (дизайн не меняется) */
-.sk-period{animation:skperiodpulse 2.4s ease-in-out infinite}
+/* «Все время ▾» — та же пульсация, что у кнопки «Тип» (дизайн не меняется) */
+.sk-period{animation:skperiodpulse 2s ease-in-out infinite}
 .sk-period:hover{animation-play-state:paused}
-@keyframes skperiodpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes skperiodpulse{
+  0%,100%{transform:scale(1);box-shadow:inset 0 0 0 1px rgba(29,120,252,.22), 0 0 0 0 rgba(29,120,252,.22)}
+  50%{transform:scale(1.04);box-shadow:inset 0 0 0 1px rgba(29,120,252,.35), 0 0 0 5px rgba(29,120,252,0)}
+}
 /* Чеки: тень-подсказка прилипает к правому краю области прокрутки */
 .sk-card > .sk-fade-r{position:sticky;top:0;height:100%;pointer-events:none;z-index:6}
