@@ -418,7 +418,7 @@ export default function Accounts() {
                 </div>
               )}
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">{editingId?'Сохранить':'Добавить'}</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
@@ -449,7 +449,7 @@ export default function Accounts() {
                 <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Применить</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
@@ -564,7 +564,7 @@ export default function Accounts() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Перевести</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
@@ -631,7 +631,6 @@ export default function Accounts() {
                   <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
                 </div>
                 <div className="modal-actions">
-                  <button type="button" className="sk-dd-btn-out" onClick={()=>setShowCollection(false)}>Отмена</button>
                   <button type="submit" className="sk-dd-btn">Инкассировать</button>
                 </div>
               </form>
