@@ -505,7 +505,7 @@ export default function Accounts() {
                   <button type="submit" className="btn btn-dark">Сохранить</button>
                 </>)}
                 {sorted.filter(notInit).length === 0 && (
-                  <button type="button" className="btn btn-outline" onClick={()=>setShowInit(false)}>Закрыть</button>
+                  <button type="button" className="btn btn-outline sk-pulse-plain" onClick={()=>setShowInit(false)}>Закрыть</button>
                 )}
               </div>
             </form>

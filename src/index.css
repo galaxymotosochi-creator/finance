@@ -829,3 +829,8 @@ input:focus, select:focus, textarea:focus {
 .sk-dd-menu button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#040506;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .16s,color .16s}
 .sk-dd-menu button:hover{background:#f2f7ff;color:#0d4ea8}
 .sk-dd-menu button .i{font-size:14px;width:18px;text-align:center;flex:none}
+
+/* Пульсация без смены цвета/стиля (для кнопок btn-outline) */
+.sk-pulse-plain{animation:skpulseplain 2s ease-in-out infinite}
+.sk-pulse-plain:hover{animation-play-state:paused}
+@keyframes skpulseplain{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
