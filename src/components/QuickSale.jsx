@@ -79,8 +79,13 @@ export default function QuickSale({ onClose }) {
       if (aRes.data) setAccounts(aRes.data);
       if (clRes?.data) setClients(clRes.data);
       if (catRes?.data) setAllCats(catRes.data);
-      const { data: profile } = await supabase.from('user_profiles').select('name').eq('user_id', user.id).maybeSingle();
-      if (profile?.name) setUserName(profile.name);
+      // Профиль: поля last_name/first_name/patronymic (поля 'name' в таблице нет).
+      // Кассир = «Фамилия И. О.» — как в разделе «Касса», почта больше не подставляется.
+      const { data: profile } = await supabase.from('user_profiles').select('last_name,first_name,patronymic').eq('user_id', user.id).maybeSingle();
+      if (profile && (profile.last_name || profile.first_name)) {
+        const parts = [profile.last_name, profile.first_name, profile.patronymic].filter(Boolean);
+        setUserName(parts.length > 1 ? parts[0] + ' ' + parts.slice(1).map(p2 => p2.charAt(0) + '.').join(' ') : parts[0]);
+      }
       setLoading(false);
     })();
   }, [user]);
@@ -219,7 +224,7 @@ export default function QuickSale({ onClose }) {
       points_spent: 0,
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
-      cashier_name: userName || '',
+      cashier_name: userName || 'Кассир',
       source: 'quick_sale',
     }).select('id').single();
     if (newReceipt) {

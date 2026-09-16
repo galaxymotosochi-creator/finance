@@ -582,7 +582,7 @@ export default function Receipts() {
                 </td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{r.client_name || '—'}</td>
                 <td style={{ textAlign: 'left', color:'#222', maxWidth:'120px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.comment || '—'}</td>
-                <td style={{ textAlign: 'left', color:'#222' }}>{r.cashier_name || '—'}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>{r.cashier_name && r.cashier_name.includes('@') ? '—' : abbreviateName(r.cashier_name)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
                 </td>
@@ -607,7 +607,7 @@ export default function Receipts() {
       <Modal open={!!selectedReceipt} onClose={() => { setSelectedReceipt(null); setReceiptItems([]); }} title={selectedReceipt ? 'Чек № ' + selectedReceipt.receipt_number : ''} subtitle={selectedReceipt ? (
           <span style={{ display: 'block', lineHeight: 1.8 }}>
             <span style={{ display: 'block' }}>Дата: {fmtDateTime(selectedReceipt.created_at || selectedReceipt.date)}</span>
-            <span style={{ display: 'block' }}>Кассир: {selectedReceipt.cashier_name || '—'}</span>
+            <span style={{ display: 'block' }}>Кассир: {selectedReceipt.cashier_name && selectedReceipt.cashier_name.includes('@') ? '—' : abbreviateName(selectedReceipt.cashier_name)}</span>
             {selectedReceipt.client_name ? <span style={{ display: 'block' }}>Клиент: {selectedReceipt.client_name}</span> : null}
           </span>
         ) : ''} width={780}>

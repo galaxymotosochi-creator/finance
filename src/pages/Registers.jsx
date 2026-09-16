@@ -191,7 +191,7 @@ export default function Registers({ fullscreen }) {
     })();
   }, [user]);
   const localName = getOwnerName();
-  const userName = abbreviateName(ownerName || localName || user?.user_metadata?.full_name) || user?.email?.split('@')[0] || 'Кассир';
+  const userName = abbreviateName(ownerName || localName || user?.user_metadata?.full_name) || 'Кассир';
   const effectiveName = displayCashierName || userName || activeShift?.cashier_name || 'Кассир';
 
   // Оптимистичная синхронизация: офлайн-чеки фиксируются в реестре — появятся в разделе «Чеки» сразу
@@ -613,7 +613,7 @@ export default function Registers({ fullscreen }) {
       client_id: selectedClient || null,
       client_name: clientObj?.name || '',
       shift_id: activeShift?.id || null,
-      cashier_name: activeShift?.current_cashier_name || activeShift?.cashier_name || userName || '',
+      cashier_name: activeShift?.current_cashier_name || activeShift?.cashier_name || userName || 'Кассир',
       source: 'register',
       items_json: receiptItemsNames,
     }).select('id').single();
@@ -787,7 +787,7 @@ export default function Registers({ fullscreen }) {
   const openShift = async () => {
     const bal = parseFloat(openShiftBal) || 0;
     const { data, error } = await supabase.from('shifts').insert({
-      user_id: user.id, opening_balance: bal, status: 'open', cashier_name: openShiftCashier.trim() || userName,
+      user_id: user.id, opening_balance: bal, status: 'open', cashier_name: openShiftCashier.trim() || userName || 'Кассир',
       // opened_at обязателен — иначе дата открытия не сохраняется (в БД будет NULL, в разделе «Смены» — 01.01.1970)
       opened_at: new Date().toISOString(),
     }).select().single();
