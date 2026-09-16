@@ -548,9 +548,6 @@ export default function Salary() {
               </div>
               <div className="rn">{abbreviateName(e.name)}</div>
               <div className="rs">{e.paid.toLocaleString()} из {e.total.toLocaleString()} {cur}</div>
-              <div className="rb" style={{color: e.total - e.paid > 0 ? '#dc2626' : '#0f7b43'}}>
-                {e.total - e.paid > 0 ? 'остаток ' + (e.total - e.paid).toLocaleString() + ' ' + cur : 'выплачено'}
-              </div>
             </div>
           ))}
         </div>
