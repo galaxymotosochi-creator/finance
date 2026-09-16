@@ -1,54 +1,71 @@
 import { useState } from 'react';
-import Modal from './Modal';
 
 /**
- * Кнопка «?» рядом с заголовком раздела + модалка-справка в стиле пустой подсказки.
+ * Кнопка «?» рядом с заголовком раздела + справка ВЫДВИЖНОЙ ПАНЕЛЬЮ СПРАВА.
+ *
+ * Два режима содержимого:
+ *  1) FAQ (как в разделе «Счета»):  faq={[{q:'Вопрос', a:<>Ответ</>}, ...]}
+ *  2) Классические блоки (как в остальных разделах): blocks={[{title, items|text}, ...]}
  *
  * Пример:
- * <SectionHelp title="Остатки"
- *   intro="Как пользоваться разделом"
- *   blocks={[
- *     { title: 'Как добавить товар', items: [<>Пункт 1</>, <>Пункт 2</>] },
- *     { title: 'Столбцы таблицы', items: [<><b>Товар</b> — название</>] },
- *   ]} />
+ * <SectionHelp title="Счета"
+ *   intro="..."
+ *   faq={[{ q: 'С чего начать?', a: <>...</> }]} />
  */
-export default function SectionHelp({ title = 'Справка', intro, blocks = [] }) {
+export default function SectionHelp({ title = 'Справка', intro, blocks = [], faq = [] }) {
   const [open, setOpen] = useState(false);
+  const [opened, setOpened] = useState(0);
+
+  const hasFaq = Array.isArray(faq) && faq.length > 0;
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
         title="Как пользоваться разделом"
-        style={{
-          width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0,
-          border: '1px solid var(--border)', background: 'var(--body-bg)',
-          color: 'var(--muted)', fontSize: '.72rem', fontWeight: 700,
-          cursor: 'pointer', display: 'inline-flex', alignItems: 'center',
-          justifyContent: 'center', padding: 0, lineHeight: 1, marginLeft: '.45rem',
-        }}
+        aria-label="Справка по разделу"
+        className="sec-help-q"
       >?</button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={title} width="wide">
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2.6rem', opacity: .15, marginBottom: '.5rem' }}>❓</div>
-        </div>
-        {intro && (
-          <p style={{ fontSize: '.82rem', color: '#555', lineHeight: 1.6, marginBottom: '1rem' }}>{intro}</p>
-        )}
-        {blocks.map((b, i) => (
-          <div key={i} style={{ marginBottom: '.9rem' }}>
-            <div style={{ fontWeight: 600, fontSize: '.82rem', color: '#222', marginBottom: '.25rem' }}>{b.title}</div>
-            {b.items ? (
-              <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '.8rem', color: '#555', lineHeight: 1.65 }}>
-                {b.items.map((it, j) => <li key={j}>{it}</li>)}
-              </ul>
-            ) : b.text ? (
-              <p style={{ margin: 0, fontSize: '.8rem', color: '#555', lineHeight: 1.65 }}>{b.text}</p>
-            ) : null}
+      {open && <div className="sec-help-ov" onClick={() => setOpen(false)} />}
+
+      <aside className={'sec-help-panel' + (open ? ' open' : '')}>
+        <div className="sec-help-head">
+          <div>
+            <h2>{title}</h2>
+            <div className="ms">{hasFaq ? 'Частые вопросы' : 'Как пользоваться'}</div>
           </div>
-        ))}
-      </Modal>
+          <button className="sec-help-x" onClick={() => setOpen(false)} aria-label="Закрыть">×</button>
+        </div>
+        <div className="sec-help-body">
+          {intro && <p className="sec-help-intro">{intro}</p>}
+
+          {hasFaq && (
+            <div className="sec-help-faq">
+              {faq.map((f, i) => (
+                <div key={i} className={'sec-help-item' + (opened === i ? ' open' : '')}>
+                  <button type="button" className="sec-help-q-row" onClick={() => setOpened(opened === i ? -1 : i)}>
+                    <span>{f.q}</span>
+                    <span className="car">▾</span>
+                  </button>
+                  {opened === i && <div className="sec-help-a">{f.a}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {blocks.map((b, i) => (
+            <div key={i} className="sec-help-block">
+              <div className="bt">{b.title}</div>
+              {b.items ? (
+                <ul>{b.items.map((it, j) => <li key={j}>{it}</li>)}</ul>
+              ) : b.text ? (
+                <p>{b.text}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </aside>
     </>
   );
 }
