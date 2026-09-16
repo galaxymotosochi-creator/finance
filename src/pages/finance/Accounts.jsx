@@ -269,6 +269,7 @@ export default function Accounts() {
             <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия <span className="car">▾</span></button>
             <div className="sk-dd-menu">
               {[
+                { onClick: openAdd, icon:'＋', label:'Добавить счет' },
                 { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, icon:'🏦', label:'Начальные остатки' },
                 { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, icon:'✏️', label:'Корректировка' },
                 { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, icon:'📥', label:'Инкассация' },
@@ -278,7 +279,6 @@ export default function Accounts() {
               ))}
             </div>
           </div>
-          <button type="button" className="sk-btn-soft sk-btn-add" onClick={openAdd}>＋ Добавить счет</button>
         </div>
       </div>
 
