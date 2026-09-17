@@ -183,7 +183,7 @@ export default function Loyalty() {
       <div className="sk-bar" style={{flexWrap:'nowrap'}}>
         <div className="grow" style={{minWidth:0}}>
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Программы лояльности</h1>
+            <h1>Лояльность</h1>
             <SectionHelp
               title="Раздел «Программы лояльности»"
               intro="Программы лояльности — это скидки и поощрения для клиентов. Чем больше клиент покупает, тем выгоднее ему с вами работать."
