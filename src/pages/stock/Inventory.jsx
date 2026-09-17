@@ -493,14 +493,14 @@ export default function Inventory() {
         );
       })()}
 
-      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+      <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
         <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table inv-table">
           <thead id="invColHeaders">
             <tr>
-              <th style={{textAlign:'left'}}>№</th>
+              <th style={{width:'18px',textAlign:'left',paddingRight:0}}>№</th>
               <th style={{textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Расхождений</th>
               <th style={{textAlign:'left'}}>Результат</th>
