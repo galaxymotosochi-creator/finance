@@ -1178,3 +1178,7 @@ input:focus, select:focus, textarea:focus {
   vertical-align:middle !important;
 }
 .main .content .sk-table.emp-table .prod-name{font-weight:600 !important;color:#111 !important;display:block !important}
+
+/* Серая кнопка мастера — размер и пульсация как у .sk-dd-btn */
+.sk-dd-btn-gray{background:#eef1f6 !important;color:#5b6472 !important;box-shadow:0 8px 18px -14px rgba(11,18,32,.3) !important}
+.sk-dd-btn-gray:hover{background:#e5e9f0 !important;color:#3c4553 !important}

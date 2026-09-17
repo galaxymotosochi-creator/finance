@@ -751,7 +751,7 @@ export default function Employees() {
                   ))}
                 </div>
                 {wStep > 0 && (
-                  <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep-1)}>← Назад</button>
+                  <button type="button" className="sk-dd-btn sk-dd-btn-gray" onClick={()=>setWStep(wStep-1)}>← Назад</button>
                 )}
                 {wStep < 2 ? (
                   <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
