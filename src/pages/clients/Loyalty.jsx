@@ -212,7 +212,7 @@ export default function Loyalty() {
           </div>
           <div className="sub" style={{maxWidth:'210px'}}>Системы скидок и поощрений для клиентов</div>
         </div>
-        <div className="sk-bar-acts">
+        <div className="***">
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
