@@ -1055,5 +1055,5 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-empty p + p{font-size:.78rem;font-weight:500;color:var(--muted);margin:0}
 
 /* Стрелка-треугольник на кнопках фильтров: крупнее, синяя, пульсирует */
-.car-tri{font-size:14px;font-weight:800;line-height:1;color:#1F75FF;display:inline-block;transition:transform .2s;animation:cartripulse 1.6s ease-in-out infinite}
+.car-tri{font-size:19px;font-weight:800;line-height:1;color:#1F75FF;display:inline-block;transition:transform .2s;animation:cartripulse 1.6s ease-in-out infinite}
 @keyframes cartripulse{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(3px);opacity:1}}
