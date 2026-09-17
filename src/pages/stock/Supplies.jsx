@@ -384,7 +384,7 @@ const load = async () => {
 
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button className="sk-period" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
+          <button className="sk-period" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',minHeight:'32px'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
             {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
@@ -415,7 +415,7 @@ const load = async () => {
 
         {/* Фильтр «Оплата» — выпадающий список, как «Тип» в Чеках */}
         <div className="sk-dd-wrap">
-          <button type="button" className="sk-dd-btn" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600,animation:'skpulse 2s ease-in-out infinite'}}
+          <button type="button" className="sk-dd-btn" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',minHeight:'32px',animation:'skpulse 2s ease-in-out infinite'}}
             onClick={e => { e.stopPropagation(); setSupOpen(false); e.currentTarget.parentElement.classList.toggle('open'); }}>
             {payFilter ? PAY_LABELS[payFilter] : 'Оплата'} <span className="car">▾</span>
           </button>
@@ -435,7 +435,7 @@ const load = async () => {
 
         {/* Фильтр «Все время» — как в Чекax */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button className="sk-period" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
+          <button className="sk-period" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',minHeight:'32px'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
             {periodLabel}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
