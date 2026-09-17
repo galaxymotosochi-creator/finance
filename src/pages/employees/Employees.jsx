@@ -100,6 +100,7 @@ export default function Employees() {
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [wStep, setWStep] = useState(0);
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
   const [tblPos, setTblPos] = useState({left:false, right:false});
@@ -252,7 +253,7 @@ export default function Employees() {
     setFPositionName(''); setFHireDate(new Date().toISOString().split('T')[0]);
     setFBaseSalary(''); setFBonusType('none'); setFBonusValue('');
     setFBonusRules([]); setFPermissions([]);
-    setFPin(''); setFStatus('active'); setExpanded({}); setShow(true);
+    setFPin(''); setFStatus('active'); setExpanded({}); setWStep(0); setShow(true);
   };
 
   const openEdit = (e) => {
@@ -265,7 +266,7 @@ export default function Employees() {
     setFBonusValue(String(e.bonus_value||''));
     setFBonusRules(e.bonus_rules || []);
     setFPermissions(e.permissions||[]);
-    setFPin(e.pin||''); setFStatus(e.status||'active'); setExpanded({}); setShow(true);
+    setFPin(e.pin||''); setFStatus(e.status||'active'); setExpanded({}); setWStep(0); setShow(true);
   };
 
   const doSave = async () => {
@@ -534,7 +535,8 @@ export default function Employees() {
       <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="Создание карточки сотрудника" width="wide">
         <form onSubmit={save}>
 
-              {/* БЛОК 1: БАЗА */}
+              {/* ШАГ 1: ДАННЫЕ */}
+              {wStep===0 && (<>
               <div className="form-group">
                 <label>ФИО</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Петров" required />
@@ -569,8 +571,10 @@ export default function Employees() {
                 </div>
               </div>
 
-              {/* ОПЛАТА И АВТО-БОНУСЫ */}
-              <div style={{ borderTop: '1px solid var(--border)', marginTop: '1rem', paddingTop: '1rem' }}>
+              </>)}
+              {/* ШАГ 2: ОПЛАТА И БОНУСЫ */}
+              {wStep===1 && (<>
+              <div>
                 <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', marginBottom: '.6rem' }}>Оплата</div>
                 <div className="form-row">
                   <div className="form-group">
@@ -740,8 +744,10 @@ export default function Employees() {
                 <div className="form-group"></div>
               </div>
 
-              {/* ПРАВА ДОСТУПА */}
-              <div className="form-group" style={{marginTop:'1rem'}}>
+              </>)}
+              {/* ШАГ 3: ДОСТУПЫ */}
+              {wStep===2 && (<>
+              <div>
                 <label>Доступ к разделам</label>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
                   {ALL_SECTIONS.map(renderSectionToggle)}
@@ -751,8 +757,24 @@ export default function Employees() {
                 </div>
               </div>
 
-              <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
+              </>)}
+
+              {/* Шаги мастера */}
+              <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'1rem'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginRight:'auto'}}>
+                  {[0,1,2].map(i => (
+                    <span key={i} onClick={()=>setWStep(i)} style={{cursor:'pointer',height:'6px',width:wStep===i?'22px':'6px',borderRadius:'100px',background:wStep>=i?'#111':'#e2e8f0',transition:'.2s'}}></span>
+                  ))}
+                  <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>Шаг {wStep+1} из 3</span>
+                </div>
+                {wStep > 0 && (
+                  <button type="button" className="btn btn-outline" onClick={()=>setWStep(wStep-1)}>← Назад</button>
+                )}
+                {wStep < 2 ? (
+                  <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
+                ) : (
+                  <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
+                )}
               </div>
             </form>
       </Modal>
