@@ -685,7 +685,6 @@ export default function Employees() {
                             ) : allCats.filter(c => c.name.toLowerCase().includes(catSearch.toLowerCase().trim())).map(c => (
                               <div key={c.id} onClick={() => { setCatRef((c.type === 'service' ? 's:' : 'p:') + c.id); setCatSearch(c.name); setCatDrop(false); }}
                                 style={{ padding: '.45rem .55rem', cursor: 'pointer', fontSize: '.8125rem', borderBottom: '1px solid #f5f5f5', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                <span>{c.type === 'service' ? '🔧' : '📦'}</span>
                                 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
                               </div>
                             ))}
@@ -737,7 +736,6 @@ export default function Employees() {
                             ) : allProds.filter(pp => pp.name.toLowerCase().includes(itemSearch.toLowerCase().trim())).map(pp => (
                               <div key={pp.id} onClick={() => { setItemRef((pp.type === 'service' ? 's:' : 'p:') + pp.id); setItemSearch(pp.name); setItemDrop(false); }}
                                 style={{ padding: '.45rem .55rem', cursor: 'pointer', fontSize: '.8125rem', borderBottom: '1px solid #f5f5f5', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                <span>{pp.type === 'service' ? '🔧' : '📦'}</span>
                                 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pp.name}</span>
                               </div>
                             ))}
