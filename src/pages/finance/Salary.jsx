@@ -657,9 +657,11 @@ export default function Salary() {
               ]}
             />
           </div>
-          <div className="sub">Расчёт начислений с привязкой к табелю</div>
+          <div className="sub" style={{maxWidth:'210px'}}>Расчёт начислений с привязкой к табелю</div>
         </div>
-        <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить зарплату</button>
+        <div className="sk-bar-acts">
+          <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить</button>
+        </div>
       </div>
 
       {/* Фильтры: поиск, «Статус ▾», «Все время ▾» — как в разделе «Чеки» */}
