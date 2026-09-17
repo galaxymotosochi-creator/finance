@@ -169,20 +169,7 @@ export default function Loyalty() {
   });
 
 
-  if (loading) {
-    return (
-      <>
-        <div className="page-header">
-          <div>
-            <h1>Программы лояльности</h1>
-            <div className="sub">Системы скидок и поощрений для клиентов</div>
-          </div>
-        </div>
-        <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-        <CenterSpinner />
-      </>
-    );
-  }
+  if (loading) return <CenterSpinner />;
 
   return (
     <>
