@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -26,6 +27,29 @@ export default function Loyalty() {
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Подсказка скролла таблицы (эталон — Поставки)
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+
+  // Проверка подсказок скролла
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
   const carRef = useRef(null);
 
   const [fIcon, setFIcon] = useState('🎯');
@@ -63,6 +87,20 @@ export default function Loyalty() {
   const selectCard = (i) => {
     setIdx(i);
     const ap = allProgs;
+  // Панель фильтров (эталон — Поставки)
+  const [loySearch, setLoySearch] = useState('');
+  const [loySearchFocus, setLoySearchFocus] = useState(false);
+  const [loyType, setLoyType] = useState(() => new Set());
+  const [loyTypeOpen, setLoyTypeOpen] = useState(false);
+  const loyFiltered = ap.filter(p => {
+    if (loyType.size > 0 && !loyType.has(p.type)) return false;
+    if (loySearch) {
+      const q = loySearch.toLowerCase();
+      const hay = [p.name, p.desc, p.description].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
     if (carRef.current) {
       const cards = carRef.current.querySelectorAll('.loy-card');
       if (cards[i]) cards[i].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
@@ -148,96 +186,143 @@ export default function Loyalty() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
-          <h1>Программы лояльности</h1>
-          <div className="sub">Системы скидок и поощрений для клиентов</div>
-        </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить программу</button>
-        </div>
-      </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-
-      {/* Карусель */}
-      <div className="loy-carousel-wrap">
-        <button className="loy-arrow loy-arrow-left" onClick={() => scrollLoyalty(-1)}>‹</button>
-        <div className="loy-carousel" id="loyCarousel" ref={carRef}>
-          {ap.map((p, i) => {
-            const tl = {accumulative:'📈 Накопительная', bonus:'🎯 Бонусная', birthday:'🎂 ДР-скидка'};
-            const badge = tl[p.type] || 'Постоянная';
-            return (
-              <div key={p.id || i} className={`loy-card${i === idx ? ' active' : ''}`} onClick={() => selectCard(i)}>
-                <div className="loy-card-icon">{p.icon}</div>
-                <div className="loy-card-title">{p.name}</div>
-                <div className="loy-card-desc">{p.desc || p.description}</div>
-                <span className="loy-card-badge" style={{background:p.bg,color:p.color}}>{badge}</span>
-                <div className="loy-card-stat">
-                  <span>💰 {p.discount ? p.discount+'%' : '—'}</span>
-                  {p.condition ? <span>📋 от {p.condition.toLocaleString()} {cur}</span> : null}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <button className="loy-arrow loy-arrow-right" onClick={() => scrollLoyalty(1)}>›</button>
-      </div>
-
-      {/* Точки */}
-      <div className="loy-dots" id="loyDots">
-        {ap.map((p, i) => (
-          <div key={i} className={`loy-dot${i === idx ? ' active' : ''}`} onClick={() => selectCard(i)} />
-        ))}
-      </div>
-
-      {/* Детали */}
-      {current ? (
-        <div className="loy-detail">
-          <div id="loyDetailContent" style={{display:'block'}}>
-            <div style={{display:'flex',alignItems:'flex-start',gap:'.75rem',marginBottom:'1rem'}}>
-              <div style={{fontSize:'2.5rem'}}>{current.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:'1.1rem',fontWeight:600}}>{current.name}</div>
-                <div style={{fontSize:'.8rem',color:'var(--muted)'}}>{TYPE_LABELS[current.type] || 'Постоянная'}</div>
-              </div>
-              <div style={{position:'relative',flexShrink:0}}>
-                <span style={{fontSize:'1.1rem',cursor:'pointer',color:'var(--muted)',padding:'4px',borderRadius:'4px'}}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const dd = e.currentTarget.nextElementSibling;
-                    document.querySelectorAll('.promo-menu-dropdown').forEach(d => { if (d !== dd) d.style.display = 'none'; });
-                    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-                    if (dd.style.display === 'block') {
-                      document.addEventListener('click', function handler(ev) {
-                        if (!ev.target.closest('.promo-menu-dropdown') && ev.target !== e.currentTarget) {
-                          dd.style.display = 'none';
-                          document.removeEventListener('click', handler);
-                        }
-                      });
-                    }
-                  }}>⋮</span>
-                <div className="promo-menu-dropdown" style={{display:'none'}}>
-                  <div className="promo-menu-item" onClick={() => { openEdit(current); }}>Редактировать</div>
-                </div>
-              </div>
-            </div>
-            <div className="loy-detail-grid">
-              <div className="loy-detail-item"><div className="lbl">Скидка</div><div className="val">{current.discount ? current.discount+'%' : '—'}</div></div>
-              <div className="loy-detail-item"><div className="lbl">Условие</div><div className="val">{current.condition ? 'от '+current.condition.toLocaleString()+' ₽' : 'Без условий'}</div></div>
-              <div className="loy-detail-item"><div className="lbl">Клиентов</div><div className="val">0</div></div>
-              <div className="loy-detail-item"><div className="lbl">Выручка</div><div className="val">0₽</div></div>
-            </div>
-            <div style={{fontSize:'.82rem',color:'var(--body-color)',marginBottom:'.5rem'}}>{current.desc || current.description}</div>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Программы лояльности</h1>
+            <SectionHelp
+              title="Раздел «Программы лояльности»"
+              intro="Программы лояльности — это скидки и поощрения для клиентов. Чем больше клиент покупает, тем выгоднее ему с вами работать."
+              faq={[
+                { q: 'Как создать программу?', a: (
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите название, иконку, тип программы, размер скидки и порог суммы.</div>
+                ) },
+                { q: 'Какие типы программ есть?', a: (
+                  <ul>
+                    <li style={{marginBottom:'.4rem'}}><b>Накопительная</b> — скидка растёт от суммы покупок.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Бонусная</b> — за покупки начисляются баллы, ими можно платить.</li>
+                    <li><b>ДР-скидка</b> — автоматическая скидка в день рождения клиента.</li>
+                  </ul>
+                ) },
+                { q: 'Что такое «Порог»?', a: (
+                  <div>Минимальная сумма покупок, с которой начинает действовать скидка. <b>0</b> — без порога, скидка действует всегда.</div>
+                ) },
+                { q: 'Как программа применяется к клиенту?', a: (
+                  <div>В карточке клиента в колонке <b>«Лояльность»</b> видно, какая программа ему назначена. Режим <b>«Авто»</b> подбирает лучшую программу по сумме покупок.</div>
+                ) },
+                { q: 'Как изменить или удалить программу?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+              ]}
+            />
           </div>
+          <div className="sub" style={{maxWidth:'210px'}}>Системы скидок и поощрений для клиентов</div>
         </div>
-      ) : (
-        <div className="loy-detail">
-          <div className="empty-products" style={{display:'block'}}>
-            <div className="big-icon">⭐</div>
-            <p>Выберите программу лояльности</p>
-          </div>
+        <div className="***">
+          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
-      )}
+      </div>
+
+      {/* Панель фильтров — одна планка, эталон «Поставки» */}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(loySearchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:loySearchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
+        <span style={{display:'flex',color:loySearchFocus?'#111':'#999',transition:'color .15s'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </span>
+        <input type="text" placeholder="Поиск…" value={loySearch} onChange={e => setLoySearch(e.target.value)}
+          onFocus={()=>setLoySearchFocus(true)} onBlur={()=>setLoySearchFocus(false)}
+          style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+        <div className="loy-type-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setLoyTypeOpen(function(v){ return !v; }); }}>
+            {loyType.size > 0 ? 'Тип · ' + loyType.size : 'Тип'}
+            <span className="car-tri">▾</span>
+          </button>
+          {loyTypeOpen && (
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'230px',padding:'.4rem',zIndex:100}}>
+              {[{v:'accumulative',label:'Накопительная'},{v:'bonus',label:'Бонусная'},{v:'birthday',label:'ДР-скидка'},{v:'constant',label:'Постоянная'}].map(o => {
+                const isActive = loyType.has(o.v);
+                return (
+                  <div key={o.v} onClick={() => setLoyType(prev => { const n = new Set(prev); if (n.has(o.v)) n.delete(o.v); else n.add(o.v); return n; })}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {o.label}
+                  </div>
+                );
+              })}
+              {loyType.size > 0 && (
+                <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                  <div onClick={() => setLoyType(new Set())}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                    Очистить
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+          <table className="sk-table loy-table">
+            <thead>
+              <tr>
+                <th style={{textAlign:'left'}}>Программа</th>
+                <th style={{textAlign:'left'}}>Тип</th>
+                <th style={{textAlign:'left'}}>Скидка</th>
+                <th style={{textAlign:'left'}}>Условие</th>
+                <th style={{textAlign:'left'}}>Клиентов</th>
+                <th style={{textAlign:'left'}}>Выручка</th>
+                <th style={{width:'70px'}}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {loyFiltered.length === 0 ? (
+                <tr><td colSpan="7"><div className="sk-empty"><p>Программ пока нет</p><p>Создайте первую программу лояльности для клиентов</p></div></td></tr>
+              ) : loyFiltered.map(p => {
+                const badge = TYPE_LABELS[p.type] || 'Постоянная';
+                return (
+                  <tr key={p.id}>
+                    <td style={{textAlign:'left'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'.6rem'}}>
+                        <span style={{fontSize:'1.15rem',flexShrink:0}}>{p.icon}</span>
+                        <div style={{minWidth:0}}>
+                          <div style={{fontWeight:600,color:'#111'}}>{p.name}</div>
+                          <div style={{fontSize:'.72rem',color:'#5b6472',marginTop:'1px'}}>{p.desc || p.description || ''}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{textAlign:'left'}}>
+                      <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:700,background:(p.bg||'#eef2ff'),color:(p.color||'#4f46e5'),whiteSpace:'nowrap'}}>{badge}</span>
+                    </td>
+                    <td style={{textAlign:'left',color:'#222',fontWeight:600}}>{p.discount ? p.discount+'%' : '—'}</td>
+                    <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{p.condition ? 'от '+p.condition.toLocaleString()+' '+cur : 'Без условий'}</td>
+                    <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0</td>
+                    <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0 {cur}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
+                      <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
+                        <button className="act-btn prod-more-btn" onClick={(e) => {
+                          e.stopPropagation();
+                          const dd = e.currentTarget.nextElementSibling;
+                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+                          dd.classList.toggle('open');
+                        }}>⋯</button>
+                        <div className="prod-dropdown">
+                          <button onClick={() => openEdit(p)}>Редактировать</button>
+                          <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Модалка */}
       <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать программу' : 'Добавить программу'} subtitle="Создание и настройка условий лояльности" width="wide">
