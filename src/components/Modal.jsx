@@ -6,7 +6,7 @@ import { useEffect } from 'react';
  * width — 'narrow' (400px) | 'medium' (480px) | 'wide' (560px) | число (своя ширина)
  * Пример: <Modal open={show} onClose={fn} title="Заголовок" subtitle="Описание" width="wide">
  */
-export default function Modal({ open, onClose, title, subtitle, children, actions, width }) {
+export default function Modal({ open, onClose, title, subtitle, children, actions, width, className }) {
   // Закрытие по Escape
   useEffect(() => {
     if (!open) return;
@@ -37,7 +37,7 @@ export default function Modal({ open, onClose, title, subtitle, children, action
 
   return (
     <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') onClose(); }}>
-      <div className={`modal-box ${widthClass}`} style={customWidth ? { maxWidth: customWidth + 'px' } : {}}>
+      <div className={`modal-box ${widthClass}${className ? ' ' + className : ''}`} style={customWidth ? { maxWidth: customWidth + 'px' } : {}}>
         <button className="modal-close" onClick={onClose} type="button">&times;</button>
         {title && <h1 className="modal-title">{title}</h1>}
         {subtitle && <p className="modal-sub">{subtitle}</p>}
