@@ -600,7 +600,6 @@ export default function Employees() {
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>процент от всех продаж за период — для управляющего (не нужно указывать его в чеках)</div>
                   <div style={{ width: '50%', maxWidth: '50%', background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '13px' }}>🏪</span>
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1 }}>Процент от всей выручки</span>
                       {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                     </div>
@@ -634,7 +633,6 @@ export default function Employees() {
                       return (
                         <div key={sc} style={{ flex: 1, minWidth: 0, background: '#fff', border: '1.5px solid ' + (r ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
-                            <span style={{ fontSize: '13px' }}>{ic}</span>
                             <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lb}</span>
                             {r && <span onClick={() => setTypeRule(sc, r.vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                           </div>
