@@ -182,7 +182,7 @@ export default function Writeoffs() {
               intro="Списания — выбытие товаров со склада: брак, порча, потери. Здесь видно, что и сколько списали, по какой причине и на какую сумму."
               faq={[
                 { q: 'Как списать товар?', a: (
-                  <div>Нажмите <b>«Списать товар»</b> справа вверху. Выберите <b>товар</b>, укажите <b>количество</b>, <b>причину</b> и дату.</div>
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Выберите <b>товар</b>, укажите <b>количество</b>, <b>причину</b> и дату.</div>
                 ) },
                 { q: 'Какие причины списания есть?', a: (
                   <ul>
@@ -209,7 +209,7 @@ export default function Writeoffs() {
           <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
         </div>
         <div className="***">
-          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Списать товар</button>
+          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
 
