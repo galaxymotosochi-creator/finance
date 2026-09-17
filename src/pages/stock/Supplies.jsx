@@ -43,14 +43,14 @@ export default function Supplies() {
   const [periodLabel, setPeriodLabel] = useState('Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
-  // Закрытие выпадающих меню по клику в любом месте экрана
+  // Закрытие выпадающих меню по клику в любом месте экрана.
+  // Клик по самой кнопке (или её меню) — не трогаем: кнопка сама управляет открытием.
   useEffect(() => {
     const close = (e) => {
-      if (!e.target.closest('.sk-period-wrap') && !e.target.closest('.sk-dd-wrap')) {
-        document.querySelectorAll('.sk-period-wrap.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
-        setSupOpen(false);
-        setPeriodOpen(false);
-      }
+      if (e.target.closest('.sk-period-wrap') || e.target.closest('.sk-dd-wrap')) return;
+      document.querySelectorAll('.sk-period-wrap.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+      setSupOpen(false);
+      setPeriodOpen(false);
     };
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
