@@ -161,11 +161,10 @@ export default function Categories() {
         </div>
       </div>
 
-      <div className="***">
-        <div className="***">
+      <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
         <table className="sk-table cat-table">
           <thead id="dirColHeaders">
             <tr>
@@ -193,7 +192,7 @@ export default function Categories() {
                   <td style={{textAlign:'left'}}>{dirTypeLabels[c.type] || c.type}</td>
                   <td style={{textAlign:'center',width:'30px'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                      <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;if(el){el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');var h=function(){el.classList.remove('open');document.removeEventListener('click',h)};setTimeout(function(){document.addEventListener('click',h)},10)}}}>⋯</button>
+                      <button className="sk-more" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(function(){document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)})},10)}}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={function(e){e.stopPropagation();openModal(c)}}>Редактировать</button>
                         <button onClick={function(e){e.stopPropagation();remove(c.id)}} style={{color:'#dc3545'}}>Удалить</button>
@@ -205,7 +204,6 @@ export default function Categories() {
             })}
           </tbody>
         </table>
-        </div>
         </div>
       </div>
 
