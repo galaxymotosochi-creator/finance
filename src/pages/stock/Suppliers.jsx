@@ -355,7 +355,7 @@ export default function Suppliers() {
           </div>
           <div className="modal-actions">
             {editId && <button type="button" className="btn btn-outline" onClick={() => { const id = editId; setShowModal(false); remove(id); }}>Удалить</button>}
-            <button type="submit" className="sk-dd-btn" style={{animation:'none'}}>{editId?'Сохранить':'Добавить'}</button>
+            <button type="submit" className="sk-dd-btn">{editId?'Сохранить':'Добавить'}</button>
           </div>
         </form>
       </Modal>
