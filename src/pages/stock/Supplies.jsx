@@ -43,18 +43,19 @@ export default function Supplies() {
   const [periodLabel, setPeriodLabel] = useState('Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
-  // Закрытие выпадающих меню по клику в любом месте экрана.
-  // Клик по самой кнопке (или её меню) — не трогаем: кнопка сама управляет открытием.
+  // Открытие одного автоматически закрывает другой — как в разделе «Чеки».
   useEffect(() => {
-    const close = (e) => {
-      if (e.target.closest('.sk-period-wrap') || e.target.closest('.sk-dd-wrap')) return;
-      document.querySelectorAll('.sk-period-wrap.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
-      setSupOpen(false);
-      setPeriodOpen(false);
+    const handler = (e) => {
+      if (!e.target.closest('.sk-period-wrap')) setPeriodOpen(false);
+      if (!e.target.closest('.sk-dd-wrap')) {
+        document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+      }
+      if (!e.target.closest('.sup-dd-wrap')) setSupOpen(false);
     };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
   }, []);
+
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -382,10 +383,10 @@ const load = async () => {
           <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
 
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
-        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.***.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
+        <div className="sup-dd-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setPeriodOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(function(v){ return !v; }); }}>
             {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
-            <span style={{fontSize:'10px'}}>▾</span>
+            <span className="car-tri">▾</span>
           </button>
           {supOpen && (
             <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
@@ -421,8 +422,8 @@ const load = async () => {
         {/* Фильтр «Оплата» — выпадающий список, как «Тип» в Чеках */}
         <div className="sk-dd-wrap">
           <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
-            onClick={e => { e.stopPropagation(); setSupOpen(false); e.currentTarget.parentElement.classList.toggle('open'); }}>
-            {payFilter ? PAY_LABELS[payFilter] : 'Оплата'} <span className="car">▾</span>
+            onClick={e => { e.stopPropagation(); setSupOpen(false); setPeriodOpen(false); e.currentTarget.parentElement.classList.toggle('open'); }}>
+            {payFilter ? PAY_LABELS[payFilter] : 'Оплата'} <span className="car-tri">▾</span>
           </button>
           <div className="sk-dd-menu">
             {[
@@ -440,9 +441,9 @@ const load = async () => {
 
         {/* Фильтр «Все время» — как в Чекax */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.***.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setSupOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(function(v){ return !v; }); }}>
             {periodLabel}
-            <span style={{fontSize:'10px'}}>▾</span>
+            <span className="car-tri">▾</span>
           </button>
           {periodOpen && (
             <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
