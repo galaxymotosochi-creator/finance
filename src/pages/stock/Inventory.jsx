@@ -502,6 +502,7 @@ export default function Inventory() {
             <tr>
               <th style={{width:'18px',textAlign:'left',paddingRight:0}}>№</th>
               <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left'}}>Проводит</th>
               <th style={{textAlign:'left'}}>Расхождений</th>
               <th style={{textAlign:'left'}}>Результат</th>
               <th style={{width:'130px'}}></th>
@@ -509,7 +510,7 @@ export default function Inventory() {
           </thead>
           <tbody id="inventoryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="5"><div className="sk-empty"><p>Инвентаризации не проводились</p><p>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
+              <tr><td colSpan="6"><div className="sk-empty"><p>Инвентаризации не проводились</p><p>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
             ) : list.map(inv => {
               let totals = {};
               try { totals = JSON.parse(inv.result || '{}'); } catch (e) {}
@@ -525,6 +526,7 @@ export default function Inventory() {
                     </span>
                   </td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{fmtDate(inv.date)}</td>
+                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{inv.responsible || '—'}</td>
                   <td style={{textAlign:'left'}}><span className="prod-cat">{isDraft ? '—' : diffCount + ' шт.'}</span></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{isDraft ? '—' : (result > 0 ? '+' : '') + result.toLocaleString() + ' ' + cur}</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
