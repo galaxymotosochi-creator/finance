@@ -382,6 +382,9 @@ const load = async () => {
             style={{border:'none',outline:'none',width:'150px',minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
 
+        {/* Плашка с фильтрами — по ширине кнопок, справа */}
+        <div style={{display:'flex',alignItems:'center',gap:'.4rem',background:'#f5f9ff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'14px',padding:'6px 8px',marginLeft:'auto',width:'fit-content'}}>
+
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
           <button className="sk-period" style={{padding:'5px 12px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',minHeight:'32px'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
@@ -464,6 +467,7 @@ const load = async () => {
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
 
