@@ -597,7 +597,7 @@ export default function Employees() {
                 {/* От всей выручки */}
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>От всей выручки</div>
-                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>процент от всех продаж за период — для управляющего (не нужно указывать его в чеках)</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Процент от продаж за период. В чеках указывать не нужно.</div>
                   <div style={{ width: '50%', maxWidth: '50%', background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1 }}>Процент от всей выручки</span>
