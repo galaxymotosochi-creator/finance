@@ -1055,3 +1055,8 @@ input:focus, select:focus, textarea:focus {
 /* Стрелка-треугольник на кнопках фильтров: крупнее, синяя, пульсирует */
 .car-tri{font-size:19px;font-weight:800;line-height:1;color:#1F75FF;display:inline-block;transition:transform .2s;animation:cartripulse 1.6s ease-in-out infinite}
 @keyframes cartripulse{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(3px);opacity:1}}
+
+/* Панель фильтров Поставок: на мобильной всё умещается в одну строку */
+@media(max-width:600px){
+  .car-tri{font-size:15px !important}
+}

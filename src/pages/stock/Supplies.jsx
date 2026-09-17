@@ -396,18 +396,18 @@ const load = async () => {
 
       
 
-      <div style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'.5rem',width:'100%',flexWrap:'wrap',border:'1px solid '+(supplySearchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:supplySearchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(supplySearchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:supplySearchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
         onFocus={()=>setSupplySearchFocus(true)} onBlur={()=>setSupplySearchFocus(false)}>
           <span style={{display:'flex',color:supplySearchFocus?'#111':'#999',transition:'color .15s'}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
           <input type="text" placeholder="Поиск…" value={supplySearch} onChange={e => setSupplySearch(e.target.value)}
-            style={{border:'none',outline:'none',flex:1,minWidth:'90px',fontSize:'.82rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+            style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
           <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
 
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
         <div className="sup-dd-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setPeriodOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(function(v){ return !v; }); }}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setPeriodOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(function(v){ return !v; }); }}>
             {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
             <span className="car-tri">▾</span>
           </button>
@@ -444,7 +444,7 @@ const load = async () => {
 
         {/* Фильтр «Оплата» — выпадающий список, как «Тип» в Чеках */}
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
             onClick={e => { e.stopPropagation(); setSupOpen(false); setPeriodOpen(false); e.currentTarget.parentElement.classList.toggle('open'); }}>
             {payFilter ? PAY_LABELS[payFilter] : 'Оплата'} <span className="car-tri">▾</span>
           </button>
@@ -464,7 +464,7 @@ const load = async () => {
 
         {/* Фильтр «Все время» — как в Чекax */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setSupOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(function(v){ return !v; }); }}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setSupOpen(false); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(function(v){ return !v; }); }}>
             {periodLabel}
             <span className="car-tri">▾</span>
           </button>
