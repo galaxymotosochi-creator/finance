@@ -118,6 +118,12 @@ export default function Employees() {
     if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+  // Проверка подсказок скролла — как в «Клиентах»
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
 
   const [fName, setFName] = useState('');
   const [fPhone, setFPhone] = useState('');
@@ -592,16 +598,16 @@ export default function Employees() {
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>От всей выручки</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>процент от всех продаж за период — для управляющего (не нужно указывать его в чеках)</div>
-                  <div style={{ background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
+                  <div style={{ background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px', display: 'block' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>🏪</span>
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1 }}>Процент от всей выручки</span>
                       {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                     </div>
-                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', maxWidth: '210px' }}>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                       <input type="number" min="0" value={storeRule() ? storeRule().val : ''} placeholder="0"
                         onChange={e => setStoreRule('percent', e.target.value)}
-                        style={{ width: '150px', border: '1.5px solid var(--border)', borderRadius: '7px', padding: '5px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
                     </div>
                     {storeRule() && (
