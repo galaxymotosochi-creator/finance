@@ -346,7 +346,7 @@ const load = async () => {
           <div className="sub">Поступления товаров от поставщиков</div>
         </div>
         <div className="***">
-          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={() => navigate('/stock/supplies/new')}>+ Добавить поставку</button>
+          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={() => navigate('/stock/supply/new')}>+ Добавить поставку</button>
         </div>
       </div>
 
