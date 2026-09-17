@@ -500,7 +500,7 @@ export default function Inventory() {
         <table className="sk-table inv-table">
           <thead id="invColHeaders">
             <tr>
-              <th style={{width:'54px',minWidth:'54px',maxWidth:'54px',textAlign:'left',paddingRight:0}}>№</th>
+              <th style={{width:'92px',minWidth:'92px',textAlign:'left',paddingRight:0}}>№</th>
               <th style={{textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Проводит</th>
               <th style={{textAlign:'left'}}>Расхождений</th>
@@ -519,7 +519,7 @@ export default function Inventory() {
               const isDraft = inv.status === 'draft';
               return (
                 <tr key={inv.id}>
-                  <td style={{width:'54px',minWidth:'54px',maxWidth:'54px',textAlign:'left',paddingRight:0}}>
+                  <td style={{width:'92px',minWidth:'92px',textAlign:'left',paddingRight:0}}>
                     <div className="prod-name">{inv.number}{inv.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div>
                     <span style={{display:'inline-block',padding:'.15rem .5rem',borderRadius:'100px',fontSize:'.68rem',fontWeight:600,background:isDraft ? '#fef3c7' : '#dcfce7',color:isDraft ? '#b45309' : '#16a34a',marginTop:'.2rem'}}>
                       {isDraft ? 'Черновик' : 'Проведена'}

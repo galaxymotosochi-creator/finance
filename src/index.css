@@ -1113,8 +1113,8 @@ input:focus, select:focus, textarea:focus {
   white-space:nowrap !important; vertical-align:bottom !important;
   background:transparent !important;
 }
-.main .content .sk-table.inv-table thead th:first-child{width:54px !important;min-width:54px !important;max-width:54px !important;white-space:nowrap !important}
+.main .content .sk-table.inv-table thead th:first-child{width:92px !important;min-width:92px !important;white-space:nowrap !important}
 .main .content .sk-table.inv-table tbody td{padding:6px 16px !important;text-align:left !important;border-right:1px solid rgba(29,120,252,.09) !important}
-.main .content .sk-table.inv-table tbody td:first-child{width:54px !important;min-width:54px !important;max-width:54px !important;white-space:nowrap !important}
+.main .content .sk-table.inv-table tbody td:first-child{width:92px !important;min-width:92px !important;white-space:normal !important}
 .main .content .sk-table.inv-table thead th:last-child,
 .main .content .sk-table.inv-table tbody td:last-child{border-right:none !important;text-align:left !important}
