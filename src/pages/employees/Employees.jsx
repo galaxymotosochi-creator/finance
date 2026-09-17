@@ -626,7 +626,7 @@ export default function Employees() {
                 {/* По типу */}
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По типу</div>
-                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>действует на все услуги или все товары</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для всех услуг и для всех товаров</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {[['all_services', '🔧', 'Все услуги'], ['all_products', '📦', 'Все товары']].map(([sc, ic, lb]) => {
                       const r = typeRule(sc);
