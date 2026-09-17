@@ -43,6 +43,18 @@ export default function Supplies() {
   const [periodLabel, setPeriodLabel] = useState('Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
+  // Закрытие выпадающих меню по клику в любом месте экрана
+  useEffect(() => {
+    const close = (e) => {
+      if (!e.target.closest('.sk-period-wrap') && !e.target.closest('.sk-dd-wrap')) {
+        document.querySelectorAll('.sk-period-wrap.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+        setSupOpen(false);
+        setPeriodOpen(false);
+      }
+    };
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -372,7 +384,7 @@ const load = async () => {
 
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(!supOpen); }}>
+          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
             {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
@@ -423,7 +435,7 @@ const load = async () => {
 
         {/* Фильтр «Все время» — как в Чекax */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(!periodOpen); }}>
+          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
             {periodLabel}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
