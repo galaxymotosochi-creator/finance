@@ -55,6 +55,7 @@ export default function Receipts() {
   const [search, setSearch] = useState('');
   const [receiptSearchFocus, setReceiptSearchFocus] = useState(false);
   const [statusFilter, setStatusFilter] = useState(null);
+  const [searchFocus, setSearchFocus] = useState(false);
   const [periodOpen, setPeriodOpen] = useState(false);
   const [period, setPeriod] = useState('all');
   const [periodLabel, setPeriodLabel] = useState('Все время');
@@ -495,16 +496,15 @@ export default function Receipts() {
       </div>
 
       {/* Фильтры (вариант 4: сегмент-переключатель) */}
-      <div style={{display:'flex',alignItems:'center',gap:'4px',flexWrap:'nowrap',marginBottom:'12px',marginTop:'2px',width:'100%',border:'1px solid rgba(29,120,252,.22)',borderRadius:'999px',padding:'4px 4px 4px 12px',background:'#fff'}}>
-        <div className="sk-search" style={{border:'none',padding:0,background:'none',flex:'1 1 60px',minWidth:0}}>
-          <span style={{display:'flex',color:'#9aa3b2'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+        onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
-          <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{width:'100%',minWidth:0,fontSize:'.78rem'}} />
-        </div>
+          <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#1F75FF',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
@@ -520,7 +520,7 @@ export default function Receipts() {
           </div>
         </div>
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#1F75FF',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setPeriodOpen(!periodOpen)}}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setPeriodOpen(!periodOpen)}}>
             {periodLabel}
             <span className="car-tri">▾</span>
           </button>
