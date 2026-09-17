@@ -517,7 +517,7 @@ const load = async () => {
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
+              <tr><td colSpan="10"><div className="sk-empty"><p>Список поставок пуст</p><p>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.filter(s => {
               if (supFilter.size > 0 && !supFilter.has(s.supplier_name || '')) return false;
               if (period !== 'all') {

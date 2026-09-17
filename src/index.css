@@ -328,17 +328,15 @@ body {
 .product-table .stock-low { color: var(--danger); font-weight: 500; }
 
 /* Все таблицы — единый стиль */
-#catColHeaders th, #clientColHeaders th,
-#invColHeaders th, #woColHeaders th, #supColHeaders th,
-#supplyColHeaders th, #stockColHeaders th {
+#clientColHeaders th,
+#invColHeaders th, #woColHeaders th,
+#stockColHeaders th {
   font-size: .68rem; font-weight: 500; color: var(--muted);
   text-transform: uppercase; padding: .5rem .4rem;
   white-space: nowrap; border-bottom: 1.5px solid var(--border);
   background: transparent; text-align: left;
 }
-#catColHeaders th:first-child,
-#clientColHeaders th:first-child, #invColHeaders th:first-child, #woColHeaders th:first-child,
-#supColHeaders th:first-child, #supplyColHeaders th:first-child,
+#clientColHeaders th:first-child, #invColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
 #productTableBody td:first-child { text-align: left; padding-left: 0; }
