@@ -651,7 +651,7 @@ export default function Employees() {
                 {/* По категориям */}
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По категориям</div>
-                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для позиций из этой категории. Ставка «По типу» для них не применяется.</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для позиций категории. Заменяет «По типу».</div>
                   {fBonusRules.filter(r => r.scope === 'service_category' || r.scope === 'product_category').map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>{rule.scope === 'service_category' ? '🔧' : '📦'}</span>
@@ -687,7 +687,7 @@ export default function Employees() {
                 {/* Конкретные позиции */}
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>Конкретные позиции</div>
-                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для конкретной позиции. Ставка по категориям и «По типу» для неё не применяется.</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для одной позиции. Заменяет категории и «По типу».</div>
                   {fBonusRules.filter(r => r.scope === 'service' || r.scope === 'product').map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>{rule.scope === 'service' ? '🔧' : '📦'}</span>
