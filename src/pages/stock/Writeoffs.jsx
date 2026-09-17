@@ -39,6 +39,8 @@ export default function Writeoffs() {
   const [woPeriodOpen, setWoPeriodOpen] = useState(false);
   const [woPeriod, setWoPeriod] = useState('all');
   const [woPeriodLabel, setWoPeriodLabel] = useState('Все время');
+  const [woPeriodFrom, setWoPeriodFrom] = useState('');
+  const [woPeriodTo, setWoPeriodTo] = useState('');
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
@@ -245,6 +247,17 @@ export default function Writeoffs() {
                   </div>
                 );
               })}
+              <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+                <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                  <input type="date" value={woPeriodFrom} onChange={e => setWoPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                  <input type="date" value={woPeriodTo} onChange={e => setWoPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                </div>
+                <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
+                  <button type="button" onClick={() => { setWoPeriod('custom'); setWoPeriodLabel('Свой период'); setWoPeriodOpen(false); }}
+                    className="sk-dd-btn" style={{padding:'.5rem 1.1rem',animation:'none'}}>Применить</button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -277,6 +290,10 @@ export default function Writeoffs() {
                 if (woPeriod === 'yesterday') { const y = new Date(day); y.setDate(y.getDate()-1); if (d < y || d >= day) return false; }
                 if (woPeriod === 'week') { const wk = new Date(day); wk.setDate(wk.getDate()-((wk.getDay()+6)%7)); if (d < wk) return false; }
                 if (woPeriod === 'month') { const m = new Date(now.getFullYear(), now.getMonth(), 1); if (d < m) return false; }
+                if (woPeriod === 'custom') {
+                  if (woPeriodFrom && d < new Date(woPeriodFrom)) return false;
+                  if (woPeriodTo) { const t = new Date(woPeriodTo); t.setHours(23,59,59,999); if (d > t) return false; }
+                }
               }
               return true;
             }).map(w => (
