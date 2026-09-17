@@ -599,14 +599,10 @@ export default function Employees() {
                       {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                      <select value={storeRule() ? storeRule().vt : 'percent'} onChange={e => setStoreRule(e.target.value, storeRule() ? storeRule().val : 0)}
-                        style={{ border: '1px solid var(--border)', borderRadius: '7px', padding: '4px 4px', fontSize: '.72rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
-                        <option value="percent">%</option>
-                        <option value="fixed">₽/период</option>
-                      </select>
                       <input type="number" min="0" value={storeRule() ? storeRule().val : ''} placeholder="0"
-                        onChange={e => setStoreRule(storeRule() ? storeRule().vt : 'percent', e.target.value)}
-                        style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        onChange={e => setStoreRule('percent', e.target.value)}
+                        style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                      <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
                     </div>
                     {storeRule() && (
                       <div onClick={toggleStoreStack} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '7px', cursor: 'pointer', userSelect: 'none' }}>
