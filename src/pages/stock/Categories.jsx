@@ -157,7 +157,7 @@ export default function Categories() {
 
       
 
-      <div style={{position:'relative'}}>
+      <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
