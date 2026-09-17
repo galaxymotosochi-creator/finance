@@ -1,10 +1,11 @@
 import Modal from '../../components/Modal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 const ALL_SECTIONS = [
@@ -99,6 +100,22 @@ export default function Employees() {
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
 
   const [fName, setFName] = useState('');
   const [fPhone, setFPhone] = useState('');
@@ -403,29 +420,61 @@ export default function Employees() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
-          <h1>Сотрудники</h1>
-          <div className="sub">Управление командой, должностями и правами</div>
+      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+        <div className="grow" style={{minWidth:0}}>
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Сотрудники</h1>
+            <SectionHelp
+              title="Раздел «Сотрудники»"
+              intro="Сотрудники — это ваша команда. Здесь хранятся контакты, должности, оклад, процент с продаж и пин-код для входа в кассу."
+              faq={[
+                { q: 'Как добавить сотрудника?', a: (
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите имя, должность, телефон, оклад и пин-код для кассы.</div>
+                ) },
+                { q: 'Что такое «Пин»?', a: (
+                  <div>Код сотрудника для входа в кассу. По нему система понимает, кто пробил чек и кому начислять зарплату.</div>
+                ) },
+                { q: 'Что такое «С продаж»?', a: (
+                  <div>Процент или фиксированная сумма, которую сотрудник получает с каждой продажи. Настраивается в правилах должности.</div>
+                ) },
+                { q: 'Что показывает «Долг» у сотрудника?', a: (
+                  <div>Красная строка <b>«Долг»</b> — сколько сотрудник взял из кассы и ещё не вернул. Долг закрывается при возврате денег.</div>
+                ) },
+                { q: 'Как найти сотрудника?', a: (
+                  <div>Под шапкой — <b>поиск</b> по имени, телефону и должности.</div>
+                ) },
+                { q: 'Как изменить или удалить сотрудника?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+              ]}
+            />
+          </div>
+          <div className="sub" style={{maxWidth:'210px'}}>Управление командой, должностями и правами</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить сотрудника</button>
+        <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
+          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-      <div className="search-row">
-        <div className="search-input-wrap">
-          <span style={{display:'flex',alignItems:'center',color:'#999'}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
-          <input type="text" className="search-field" placeholder="Поиск…" value={search} onChange={e=>setSearch(e.target.value)} />
-        </div>
+
+      {/* Панель фильтров — одна планка, эталон «Поставки» */}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
+        <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </span>
+        <input type="text" placeholder="Поиск…" value={search} onChange={e=>setSearch(e.target.value)}
+          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}
+          style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
       </div>
 
       {loading ? (
         <CenterSpinner />
       ) : (
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table">
-          <thead id="colHeaders"><tr>
+      <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table emp-table">
+          <thead id="empColHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
             <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>С продаж</th><th style={{textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
@@ -455,10 +504,15 @@ export default function Employees() {
                   <td style={{textAlign:'left',color:'#555',fontWeight:600,letterSpacing:1}}>{emp.pin || '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={e => {
+                      <button className="sk-more" onClick={(e) => {
                         e.stopPropagation();
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => d.classList.remove('open'));
-                        e.currentTarget.nextElementSibling.classList.toggle('open');
+                        var el = e.currentTarget.nextElementSibling;
+                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
+                        var willOpen = !el.classList.contains('open');
+                        el.classList.toggle('open');
+                        var _r = el.getBoundingClientRect();
+                        if (_r.bottom > window.innerHeight) el.classList.add('up'); else el.classList.remove('up');
+                        if (willOpen) setTimeout(function(){ document.addEventListener('click', function h(){ el.classList.remove('open'); document.removeEventListener('click', h); }); }, 10);
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => openEdit(emp)}>Редактировать</button>
@@ -471,6 +525,7 @@ export default function Employees() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
       )}
 
@@ -696,7 +751,7 @@ export default function Employees() {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить сотрудника'}</button>
+                <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
       </Modal>
