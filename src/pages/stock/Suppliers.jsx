@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -96,16 +97,41 @@ export default function Suppliers() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
-          <h1>Поставщики</h1>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h1>Поставщики</h1>
+            <SectionHelp
+              title="Раздел «Поставщики»"
+              intro="Поставщики — база контрагентов, у которых вы закупаете товары. Здесь видно контакт, способ связи, количество поставок и общую сумму закупок."
+              faq={[
+                { q: 'Как добавить поставщика?', a: (
+                  <div>Нажмите <b>«Добавить поставщика»</b> справа вверху. Укажите <b>название</b> — оно обязательно. Контакт, телефон и способ связи можно заполнить позже.</div>
+                ) },
+                { q: 'Что показывает колонка «Поставок»?', a: (
+                  <div>Сколько <b>поставок</b> оформлено у этого поставщика. Считается по совпадению названия в разделе «Поставки».</div>
+                ) },
+                { q: 'Что показывает колонка «Сумма»?', a: (
+                  <div>Общая <b>сумма закупок</b> у этого поставщика по всем поставкам.</div>
+                ) },
+                { q: 'Какие способы связи есть?', a: (
+                  <div>Телефон, WhatsApp, Telegram, e-mail и другие — выбираются при добавлении поставщика.</div>
+                ) },
+                { q: 'Как изменить или удалить поставщика?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+                { q: 'Как искать поставщиков?', a: (
+                  <div>Под шапкой — <b>поиск</b> по названию, контакту и телефону.</div>
+                ) },
+              ]}
+            />
+          </div>
           <div className="sub">База контрагентов и история сотрудничества</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить поставщика</button>
+        <div className="***">
+          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Добавить поставщика</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
