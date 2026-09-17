@@ -598,10 +598,10 @@ export default function Employees() {
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1 }}>Процент от всей выручки</span>
                       {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                     </div>
-                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', maxWidth: '210px' }}>
                       <input type="number" min="0" value={storeRule() ? storeRule().val : ''} placeholder="0"
                         onChange={e => setStoreRule('percent', e.target.value)}
-                        style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        style={{ width: '150px', border: '1.5px solid var(--border)', borderRadius: '7px', padding: '5px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                       <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
                     </div>
                     {storeRule() && (
