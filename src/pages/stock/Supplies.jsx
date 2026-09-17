@@ -388,12 +388,24 @@ const load = async () => {
           )}
         </div>
 
-        {/* Фильтр «Оплата» */}
-        <div className="sk-seg">
-          <button className={!payFilter ? 'on' : ''} onClick={() => setPayFilter(null)}>Все</button>
-          <button className={payFilter === 'unpaid' ? 'on red' : ''} onClick={() => setPayFilter(payFilter === 'unpaid' ? null : 'unpaid')}>Не оплачено</button>
-          <button className={payFilter === 'partially_paid' ? 'on' : ''} onClick={() => setPayFilter(payFilter === 'partially_paid' ? null : 'partially_paid')}>Частично</button>
-          <button className={payFilter === 'paid' ? 'on' : ''} onClick={() => setPayFilter(payFilter === 'paid' ? null : 'paid')}>Оплачено</button>
+        {/* Фильтр «Оплата» — выпадающий список, как «Тип» в Чеках */}
+        <div className="sk-dd-wrap">
+          <button type="button" className="sk-dd-btn"
+            onClick={e => { e.stopPropagation(); setSupOpen(false); e.currentTarget.parentElement.classList.toggle('open'); }}>
+            {payFilter ? PAY_LABELS[payFilter] : 'Оплата'} <span className="car">▾</span>
+          </button>
+          <div className="sk-dd-menu">
+            {[
+              { v:null, label:'Все' },
+              { v:'unpaid', label:'Не оплачено' },
+              { v:'partially_paid', label:'Частично оплачено' },
+              { v:'paid', label:'Оплачено' },
+            ].map(o => (
+              <button key={String(o.v)} type="button"
+                style={payFilter === o.v ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
+                onClick={e => { e.currentTarget.closest('.sk-dd-wrap').classList.remove('open'); setPayFilter(o.v); }}>{o.label}</button>
+            ))}
+          </div>
         </div>
       </div>
 
