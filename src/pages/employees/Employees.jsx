@@ -673,9 +673,9 @@ export default function Employees() {
                         {allCats.map(c => <option key={c.id} value={(c.type === 'service' ? 's:' : 'p:') + c.id}>{c.type === 'service' ? '🔧 ' : '📦 '}{c.name}</option>)}
                       </select>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ width: '54px', flexShrink: 0, border: '1.5px solid var(--border)', borderRadius: '8px', padding: '8px 3px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
-                        <button type="button" onClick={addCatRule} style={{ flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Добавить</button>
+                        <button type="button" onClick={addCatRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0 }}>Добавить</button>
                         <span onClick={() => { setShowCatForm(false); setCatVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
                       </div>
                     </div>
@@ -709,9 +709,9 @@ export default function Employees() {
                         {allProds.map(pp => <option key={pp.id} value={(pp.type === 'service' ? 's:' : 'p:') + pp.id}>{pp.type === 'service' ? '🔧 ' : '📦 '}{pp.name}</option>)}
                       </select>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                        <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ width: '54px', flexShrink: 0, border: '1.5px solid var(--border)', borderRadius: '8px', padding: '8px 3px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
-                        <button type="button" onClick={addItemRule} style={{ flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Добавить</button>
+                        <button type="button" onClick={addItemRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0 }}>Добавить</button>
                         <span onClick={() => { setShowItemForm(false); setItemVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
                       </div>
                     </div>
