@@ -16,6 +16,9 @@ export default function Clients() {
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
   const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [statusSel, setStatusSel] = useState(() => new Set());
+  const [statusOpen, setStatusOpen] = useState(false);
   // Подсказка скролла таблицы (эталон — Поставки)
   const [tblPos, setTblPos] = useState({left:false, right:false});
   const tblElRef = useRef(null);
@@ -32,6 +35,13 @@ export default function Clients() {
     if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+
+  // Открытие одного меню закрывает другое — как в «Чеках»
+  useEffect(() => {
+    const handler = (e) => { if (!e.target.closest('.cli-status-wrap')) setStatusOpen(false); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   // Проверка подсказок скролла
   useEffect(() => {
@@ -153,6 +163,20 @@ export default function Clients() {
     c.name.toLowerCase().includes(q) || (c.phone||'').includes(q) || (c.email||'').toLowerCase().includes(q)
   );
 
+  // Фильтр по статусу оплаты (по долгу клиента)
+  if (statusSel.size > 0) {
+    filtered = filtered.filter(c => {
+      const debt = Math.abs(parseFloat(c.debt) || 0);
+      const st = clientStats[c.id] || { checks: 0, total: 0 };
+      const total = st.total || 0;
+      let status;
+      if (debt <= 0) status = 'paid';
+      else if (total > 0 && debt >= total) status = 'unpaid';
+      else status = 'partial';
+      return statusSel.has(status);
+    });
+  }
+
   return (
     <>
       <div className="sk-bar">
@@ -194,12 +218,48 @@ export default function Clients() {
         </div>
       </div>
 
-      {/* Быстрый поиск */}
-      <div className="search-row">
-        <div className="search-input-wrap">
-          <span style={{display:'flex',alignItems:'center',color:'#999'}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
-          <input type="text" className="search-field" placeholder="Поиск…"
-            value={search} onChange={e => setSearch(e.target.value)} />
+      {/* Панель фильтров — одна планка, эталон «Поставки» */}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
+        <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </span>
+        <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)}
+          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}
+          style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+
+        <div className="cli-status-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setStatusOpen(function(v){ return !v; }); }}>
+            {statusSel.size > 0 ? 'Статус · ' + statusSel.size : 'Статус'}
+            <span className="car-tri">▾</span>
+          </button>
+          {statusOpen && (
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'230px',padding:'.4rem',zIndex:100}}>
+              {[
+                { v:'paid', label:'Оплачено' },
+                { v:'partial', label:'Частично оплачено' },
+                { v:'unpaid', label:'Не оплачено' },
+              ].map(o => {
+                const isActive = statusSel.has(o.v);
+                return (
+                  <div key={o.v} onClick={() => setStatusSel(prev => { const n = new Set(prev); if (n.has(o.v)) n.delete(o.v); else n.add(o.v); return n; })}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {o.label}
+                  </div>
+                );
+              })}
+              {statusSel.size > 0 && (
+                <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                  <div onClick={() => setStatusSel(new Set())}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                    Очистить
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
