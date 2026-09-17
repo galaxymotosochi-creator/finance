@@ -675,7 +675,7 @@ export default function Employees() {
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
-                        <button type="button" onClick={addCatRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0 }}>Добавить</button>
+                        <button type="button" onClick={addCatRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0, animationDelay: '-1s' }}>Добавить</button>
                         <span onClick={() => { setShowCatForm(false); setCatVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
                       </div>
                     </div>
@@ -711,7 +711,7 @@ export default function Employees() {
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
-                        <button type="button" onClick={addItemRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0 }}>Добавить</button>
+                        <button type="button" onClick={addItemRule} className="sk-dd-btn" style={{ padding: '7px 14px', fontSize: '.78rem', flexShrink: 0, animationDelay: '-1s' }}>Добавить</button>
                         <span onClick={() => { setShowItemForm(false); setItemVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
                       </div>
                     </div>
