@@ -27,6 +27,11 @@ export default function Loyalty() {
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Панель фильтров (эталон — Поставки)
+  const [loySearch, setLoySearch] = useState('');
+  const [loySearchFocus, setLoySearchFocus] = useState(false);
+  const [loyType, setLoyType] = useState(() => new Set());
+  const [loyTypeOpen, setLoyTypeOpen] = useState(false);
   // Подсказка скролла таблицы (эталон — Поставки)
   const [tblPos, setTblPos] = useState({left:false, right:false});
   const tblElRef = useRef(null);
@@ -86,21 +91,6 @@ export default function Loyalty() {
 
   const selectCard = (i) => {
     setIdx(i);
-    const ap = allProgs;
-  // Панель фильтров (эталон — Поставки)
-  const [loySearch, setLoySearch] = useState('');
-  const [loySearchFocus, setLoySearchFocus] = useState(false);
-  const [loyType, setLoyType] = useState(() => new Set());
-  const [loyTypeOpen, setLoyTypeOpen] = useState(false);
-  const loyFiltered = ap.filter(p => {
-    if (loyType.size > 0 && !loyType.has(p.type)) return false;
-    if (loySearch) {
-      const q = loySearch.toLowerCase();
-      const hay = [p.name, p.desc, p.description].filter(Boolean).join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  });
     if (carRef.current) {
       const cards = carRef.current.querySelectorAll('.loy-card');
       if (cards[i]) cards[i].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
@@ -168,6 +158,16 @@ export default function Loyalty() {
 
   const current = allProgs[idx];
   const ap = allProgs;
+  const loyFiltered = ap.filter(p => {
+    if (loyType.size > 0 && !loyType.has(p.type)) return false;
+    if (loySearch) {
+      const q = loySearch.toLowerCase();
+      const hay = [p.name, p.desc, p.description].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
 
   if (loading) {
     return (
