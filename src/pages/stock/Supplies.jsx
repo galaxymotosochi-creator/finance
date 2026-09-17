@@ -473,8 +473,11 @@ const load = async () => {
         </div>
       </div>
 
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table">
+      <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table sup-table">
           <thead id="supplyColHeaders">
             <tr>
               <th style={{width:'30px',textAlign:'left'}}>№</th>
@@ -595,6 +598,7 @@ const load = async () => {
             })}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Модалка редактирования поставки (была потеряна при рефакторинге — кнопка «Редактировать» не работала) */}
