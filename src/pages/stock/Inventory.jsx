@@ -1,6 +1,6 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -49,6 +49,29 @@ export default function Inventory() {
   const [products, setProducts] = useState([]);
   const [supplies, setSupplies] = useState([]);
   const [employees, setEmployees] = useState([]);  const [loading, setLoading] = useState(true);
+  // Подсказка скролла таблицы (эталон — Поставки)
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+
+  // Проверка подсказок скролла после отрисовки и изменения размера окна
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
   const [editing, setEditing] = useState(null);
   const [viewing, setViewing] = useState(null);
   const [showResult, setShowResult] = useState(null);
@@ -392,8 +415,8 @@ export default function Inventory() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
+      <div className="sk-bar">
+        <div className="grow">
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>Инвентаризация</h1>
             <SectionHelp
@@ -430,11 +453,10 @@ export default function Inventory() {
           </div>
           <div className="sub">Сверка фактических остатков с учетными</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={startNew} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить инвентаризацию</button>
+        <div className="***">
+          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={startNew}>Добавить инвентаризацию</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {viewing && (() => {
         const doc = viewing;
@@ -471,8 +493,11 @@ export default function Inventory() {
         );
       })()}
 
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table">
+      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table inv-table">
           <thead id="invColHeaders">
             <tr>
               <th style={{textAlign:'left'}}>№</th>
@@ -484,8 +509,7 @@ export default function Inventory() {
           </thead>
           <tbody id="inventoryTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">📋</div><p>Инвентаризации не проводились</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
+              <tr><td colSpan="5"><div className="sk-empty"><p>Инвентаризации не проводились</p><p>Запустите первую сверку фактических остатков с учетными</p></div></td></tr>
             ) : list.map(inv => {
               let totals = {};
               try { totals = JSON.parse(inv.result || '{}'); } catch (e) {}
@@ -522,6 +546,7 @@ export default function Inventory() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
     
 
