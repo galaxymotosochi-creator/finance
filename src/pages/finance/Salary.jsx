@@ -1,5 +1,5 @@
 import Modal from '../../components/Modal';
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -102,22 +102,25 @@ export default function Salary() {
   // Подсказка скролла таблицы (как в «Сменах» и «Счетах»)
   // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
   const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
     if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
-  const tblRef = (el) => {
+  const checkTbl = () => {
+    const el = tblElRef.current;
     if (!el) return;
-    const check = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 4) { setTblPos({ left:false, right:false }); return; }
-      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
-    };
-    check();
-    window.addEventListener('resize', check);
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
 
   // Form
   const [fEmpId, setFEmpId] = useState('');
@@ -742,7 +745,7 @@ export default function Salary() {
       <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblRef} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
             <th style={{ textAlign: 'left' }}>Сотрудник</th><th style={{ textAlign: 'left' }}>Период</th><th style={{ textAlign: 'left' }}>Оклад</th><th style={{ textAlign: 'left' }}>Премия</th>

@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import SectionHelp from '../../components/SectionHelp';
 import Modal from '../../components/Modal';
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 
@@ -60,22 +60,25 @@ export default function Accounts() {
   // гасятся только по факту прокрутки — состояние обновляется на самом событии scroll.
   // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
   const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
     if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
-  const tblRef = (el) => {
+  const checkTbl = () => {
+    const el = tblElRef.current;
     if (!el) return;
-    const check = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 4) { setTblPos({ left:false, right:false }); return; }
-      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
-    };
-    check();
-    window.addEventListener('resize', check);
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
   useEffect(() => {
     if (toast) {
       const t = setTimeout(() => setToast(null), 3000);
@@ -368,7 +371,7 @@ export default function Accounts() {
           <div className="sk-tablewrap">
             <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
             <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblRef} onScroll={onTblScroll}>
+          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
             <table className="sk-table">
               <thead id="colHeaders">
                 <tr>
