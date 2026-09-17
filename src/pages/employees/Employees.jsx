@@ -767,7 +767,7 @@ export default function Employees() {
               </>)}
               {/* ШАГ 3: ДОСТУПЫ */}
               {wStep===2 && (<>
-              <div>
+              <div className="form-group">
                 <label>Доступ к разделам</label>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
                   {ALL_SECTIONS.map(renderSectionToggle)}
