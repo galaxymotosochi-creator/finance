@@ -9,13 +9,12 @@ import CenterSpinner from '../../components/CenterSpinner';
 
 
 const LD = [
-  {id:'loyal',icon:'⭐',name:'Постоянный клиент',discount:5,condition:50000,desc:'Скидка 5% при покупках от 50 000₽',type:'accumulative',color:'#f59e0b',bg:'#fffbeb'},
-  {id:'bonus',icon:'🎯',name:'Бонусная система',discount:0,condition:0,desc:'1₽ = 1 балл. 100 баллов = 100₽ скидки',type:'bonus',color:'#6366f1',bg:'#eef2ff'},
-  {id:'birthday',icon:'🎂',name:'День рождения',discount:15,condition:0,desc:'Скидка 15% за 3 дня до и 3 после ДР',type:'birthday',color:'#ec4899',bg:'#fdf2f8'}
+  {id:'loyal',icon:'',name:'Постоянный клиент',discount:5,condition:50000,desc:'Скидка 5% при покупках от 50 000₽',type:'accumulative',color:'#f59e0b',bg:'#fffbeb'},
+  {id:'bonus',icon:'',name:'Бонусная система',discount:0,condition:0,desc:'1₽ = 1 балл. 100 баллов = 100₽ скидки',type:'bonus',color:'#6366f1',bg:'#eef2ff'},
+  {id:'birthday',icon:'',name:'День рождения',discount:15,condition:0,desc:'Скидка 15% за 3 дня до и 3 после ДР',type:'birthday',color:'#ec4899',bg:'#fdf2f8'}
 ];
 
-const LOY_EMOJIS = ['🎯','🏆','💎','🥇','🚀','🎁','💝','✨','🔥','👑','🛡️','🍀'];
-const TYPE_LABELS = {constant:'Постоянная',accumulative:'📈 Накопительная',bonus:'🎯 Бонусная',birthday:'🎂 ДР-скидка'};
+const TYPE_LABELS = {constant:'Постоянная',accumulative:'Накопительная',bonus:'Бонусная',birthday:'ДР-скидка'};
 
 const LD_IDS = new Set(LD.map(x => x.id));
 
@@ -64,8 +63,7 @@ export default function Loyalty() {
   });
   const carRef = useRef(null);
 
-  const [fIcon, setFIcon] = useState('🎯');
-  const [fName, setFName] = useState('');
+    const [fName, setFName] = useState('');
   const [fType, setFType] = useState('accumulative');
   const [fDiscount, setFDiscount] = useState('');
   const [fCondition, setFCondition] = useState('');
@@ -112,13 +110,13 @@ export default function Loyalty() {
   };
 
   const openAdd = () => {
-    setEditId(null); setFIcon('🎯'); setFName(''); setFType('accumulative');
+    setEditId(null); setFName(''); setFType('accumulative');
     setFDiscount(''); setFCondition(''); setFDesc('');
     setShow(true);
   };
 
   const openEdit = (p) => {
-    setEditId(p.id); setFIcon(p.icon); setFName(p.name);
+    setEditId(p.id); setFName(p.name);
     setFType(p.type||'accumulative'); setFDiscount(String(p.discount||''));
     setFCondition(String(p.condition||'')); setFDesc(p.desc||'');
     setShow(true);
@@ -132,7 +130,6 @@ export default function Loyalty() {
       const obj = {
         user_id: user.id, name: fName.trim(), type: fType,
         discount: parseFloat(fDiscount)||0, condition: parseFloat(fCondition)||0,
-        icon: fIcon,
         description: fDesc.trim() || ('Скидка '+(parseFloat(fDiscount)||'постоянная')+(parseFloat(fCondition)?' от '+ (parseFloat(fCondition)).toLocaleString()+' ₽':'')),
         color:'#1983dd', bg:'#eaf5ff'
       };
@@ -282,7 +279,6 @@ export default function Loyalty() {
                   <tr key={p.id}>
                     <td style={{textAlign:'left'}}>
                       <div style={{display:'flex',alignItems:'center',gap:'.6rem'}}>
-                        <span style={{fontSize:'1.15rem',flexShrink:0}}>{p.icon}</span>
                         <div style={{minWidth:0}}>
                           <div style={{fontWeight:600,color:'#111'}}>{p.name}</div>
                           <div style={{fontSize:'.72rem',color:'#5b6472',marginTop:'1px'}}>{p.desc || p.description || ''}</div>
@@ -330,15 +326,6 @@ export default function Loyalty() {
             <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнерская программа" required />
           </div>
           <div className="form-group">
-            <label>Иконка (эмодзи)</label>
-            <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
-              {LOY_EMOJIS.map(e => (
-                <span key={e} className={`loy-emoji${fIcon === e ? ' selected' : ''}`}
-                  onClick={() => setFIcon(e)}>{e}</span>
-              ))}
-            </div>
-          </div>
-          <div className="form-group">
             <label>Тип программы</label>
             <select value={fType} onChange={e=>setFType(e.target.value)}>
               <option value="accumulative">Накопительная — скидка растет от суммы</option>
@@ -363,7 +350,6 @@ export default function Loyalty() {
           <div className="loy-modal-preview" id="loyPreview">
             <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>
             <div style={{display:'flex',alignItems:'center',gap:'.75rem',background:'#f8f9fa',borderRadius:'.75rem',padding:'.75rem'}}>
-              <div id="loyPreviewIcon" style={{fontSize:'1.8rem'}}>{fIcon}</div>
               <div>
                 <div id="loyPreviewName" style={{fontWeight:600,fontSize:'.85rem'}}>{fName || 'Новая программа'}</div>
                 <div id="loyPreviewDesc" style={{fontSize:'.75rem',color:'var(--muted)'}}>{fDiscount ? 'Скидка '+fDiscount+'%' : 'Без скидки'}</div>
@@ -371,7 +357,7 @@ export default function Loyalty() {
             </div>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'✨ Создать программу'}</button>
+            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'Создать программу'}</button>
           </div>
         </form>
       </Modal>
