@@ -501,7 +501,7 @@ export default function Inventory() {
           <thead id="invColHeaders">
             <tr>
               <th style={{width:'92px',minWidth:'92px',textAlign:'left',paddingRight:0}}>№</th>
-              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{width:'96px',minWidth:'96px',textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Проводит</th>
               <th style={{textAlign:'left'}}>Расхождений</th>
               <th style={{textAlign:'left'}}>Результат</th>
