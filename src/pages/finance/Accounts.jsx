@@ -58,11 +58,23 @@ export default function Accounts() {
   const [toast, setToast] = useState(null);
   // Подсказка скролла (вариант 2а): без замеров ширины. Тени видны всегда,
   // гасятся только по факту прокрутки — состояние обновляется на самом событии scroll.
-  const [tblPos, setTblPos] = useState({left:true, right:true});
+  // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
+  const [tblPos, setTblPos] = useState({left:false, right:false});
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const tblRef = (el) => {
+    if (!el) return;
+    const check = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    check();
+    window.addEventListener('resize', check);
   };
   useEffect(() => {
     if (toast) {
@@ -356,7 +368,7 @@ export default function Accounts() {
           <div className="sk-tablewrap">
             <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
             <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblRef} onScroll={onTblScroll}>
             <table className="sk-table">
               <thead id="colHeaders">
                 <tr>

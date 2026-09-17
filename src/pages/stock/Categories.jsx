@@ -16,11 +16,23 @@ export default function Categories() {
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   // Подсказка скролла таблицы (как в «Счетах» и «Чекax»)
-  const [tblPos, setTblPos] = useState({left:true, right:true});
+  // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
+  const [tblPos, setTblPos] = useState({left:false, right:false});
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const tblRef = (el) => {
+    if (!el) return;
+    const check = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    check();
+    window.addEventListener('resize', check);
   };
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
@@ -160,7 +172,7 @@ export default function Categories() {
       <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblRef} onScroll={onTblScroll}>
         <table className="sk-table stock-cat-table">
           <thead id="catColHeaders">
             <tr>

@@ -30,11 +30,23 @@ export default function Receipts() {
   const { user } = useAuth();
   const [receipts, setReceipts] = useState([]);
   // Подсказка скролла таблицы (как в «Сменах» и «Счетах»)
-  const [tblPos, setTblPos] = useState({left:true, right:true});
+  // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
+  const [tblPos, setTblPos] = useState({left:false, right:false});
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const tblRef = (el) => {
+    if (!el) return;
+    const check = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+      setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    check();
+    window.addEventListener('resize', check);
   };
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -541,7 +553,7 @@ export default function Receipts() {
       <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblRef} onScroll={onTblScroll}>
         <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>
