@@ -1048,3 +1048,8 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.stock-cat-table tbody td:first-child{padding-left:24px !important}
 .main .content .sk-table.stock-cat-table thead th:last-child,
 .main .content .sk-table.stock-cat-table tbody td:last-child{border-right:none !important;text-align:left !important}
+
+/* Фирменное пустое состояние таблиц — без рамки и без иконок */
+.main .content .sk-empty{max-width:460px;margin:0 auto;text-align:center;padding:26px 18px;border:none;background:none}
+.main .content .sk-empty p{font-size:.86rem;font-weight:700;color:var(--sk-ink);margin:0 0 5px}
+.main .content .sk-empty p + p{font-size:.78rem;font-weight:500;color:var(--muted);margin:0}

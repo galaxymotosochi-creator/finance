@@ -188,10 +188,9 @@ export default function Categories() {
             {cats.length === 0 ? (
               <tr>
                 <td colSpan="3">
-                  <div className="empty-products">
-                    <div className="big-icon">🏷️</div>
+                  <div className="sk-empty">
                     <p>Список категорий пуст</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую категорию, чтобы распределить товары и услуги</p>
+                    <p>Создайте первую категорию, чтобы распределить товары и услуги</p>
                   </div>
                 </td>
               </tr>
