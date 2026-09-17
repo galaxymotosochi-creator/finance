@@ -357,7 +357,7 @@ export default function Loyalty() {
             </div>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'Создать программу'}</button>
+            <button type="submit" className="sk-dd-btn">{editId?'Сохранить':'Создать программу'}</button>
           </div>
         </form>
       </Modal>
