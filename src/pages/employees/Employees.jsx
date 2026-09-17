@@ -77,6 +77,7 @@ function Toggle({ checked, onChange, disabled }) {
 
 // Уровни авто-бонусов с продаж (приоритет: конкретная позиция → категория → тип)
 const BONUS_SCOPES = [
+  { v: 'store_sales', l: 'Вся выручка' },
   { v: 'all_services', l: 'Все услуги' },
   { v: 'all_products', l: 'Все товары' },
   { v: 'service_category', l: 'Категория услуг' },
