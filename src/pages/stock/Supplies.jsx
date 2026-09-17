@@ -35,6 +35,9 @@ export default function Supplies() {
   const [supplies, setSuppliesState] = useState([]);
   const [supplySearch, setSupplySearch] = useState('');
   const [supplySearchFocus, setSupplySearchFocus] = useState(false);
+  const [supFilter, setSupFilter] = useState('');       // фильтр по поставщику
+  const [supOpen, setSupOpen] = useState(false);
+  const [payFilter, setPayFilter] = useState(null);      // null | 'paid' | 'unpaid' | 'partially_paid'
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -361,6 +364,37 @@ const load = async () => {
           <input type="text" placeholder="Поиск…" value={supplySearch} onChange={e => setSupplySearch(e.target.value)}
             style={{border:'none',outline:'none',width:'150px',minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
+
+        {/* Фильтр «Поставщик ▾» */}
+        <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
+          <button type="button" className="sk-period" onClick={() => setSupOpen(!supOpen)}>
+            {supFilter || 'Поставщик'}<span style={{fontSize:'9px'}}>▾</span>
+          </button>
+          {supOpen && (
+            <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
+              <div className="cat-dd-list" style={{maxHeight:'220px',overflowY:'auto'}}>
+                <div className={'cat-dd-item' + (!supFilter ? ' sel' : '')} onClick={() => { setSupFilter(''); setSupOpen(false); }}>
+                  <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  Все поставщики
+                </div>
+                {Array.from(new Set(supplies.map(x => x.supplier_name).filter(Boolean))).sort().map(nm => (
+                  <div key={nm} className={'cat-dd-item' + (supFilter === nm ? ' sel' : '')} onClick={() => { setSupFilter(nm); setSupOpen(false); }}>
+                    <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    {nm}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Фильтр «Оплата» */}
+        <div className="sk-seg">
+          <button className={!payFilter ? 'on' : ''} onClick={() => setPayFilter(null)}>Все</button>
+          <button className={payFilter === 'unpaid' ? 'on red' : ''} onClick={() => setPayFilter(payFilter === 'unpaid' ? null : 'unpaid')}>Не оплачено</button>
+          <button className={payFilter === 'partially_paid' ? 'on' : ''} onClick={() => setPayFilter(payFilter === 'partially_paid' ? null : 'partially_paid')}>Частично</button>
+          <button className={payFilter === 'paid' ? 'on' : ''} onClick={() => setPayFilter(payFilter === 'paid' ? null : 'paid')}>Оплачено</button>
+        </div>
       </div>
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
@@ -383,6 +417,8 @@ const load = async () => {
             {supplies.length === 0 ? (
               <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.filter(s => {
+              if (supFilter && (s.supplier_name || '') !== supFilter) return false;
+              if (payFilter && getPayStatus(s) !== payFilter) return false;
               if (!supplySearch) return true;
               const q = supplySearch.toLowerCase();
               const hay = [
