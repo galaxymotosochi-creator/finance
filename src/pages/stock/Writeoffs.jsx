@@ -16,12 +16,29 @@ export default function Writeoffs() {
   const { user } = useAuth();
   const [list, setList] = useState([]);
   const [products, setProducts] = useState([]);
+  // Открытие одного меню закрывает другое — как в «Чеках»
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.wo-dd-wrap')) setWoReasonOpen(false);
+      if (!e.target.closest('.wo-period-wrap')) setWoPeriodOpen(false);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fProd, setFProd] = useState('');
   const [fQty, setFQty] = useState('1');
   const [fReason, setFReason] = useState('Списание');
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0]);
+  // Панель фильтров (эталон — Поставки)
+  const [woSearch, setWoSearch] = useState('');
+  const [woSearchFocus, setWoSearchFocus] = useState(false);
+  const [woReasons, setWoReasons] = useState(() => new Set());
+  const [woReasonOpen, setWoReasonOpen] = useState(false);
+  const [woPeriodOpen, setWoPeriodOpen] = useState(false);
+  const [woPeriod, setWoPeriod] = useState('all');
+  const [woPeriodLabel, setWoPeriodLabel] = useState('Все время');
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
@@ -171,6 +188,68 @@ export default function Writeoffs() {
         </div>
       </div>
 
+      {/* Панель фильтров — одна планка, эталон «Поставки» */}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(woSearchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:woSearchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
+        <span style={{display:'flex',color:woSearchFocus?'#111':'#999',transition:'color .15s'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </span>
+        <input type="text" placeholder="Поиск…" value={woSearch} onChange={e => setWoSearch(e.target.value)}
+          onFocus={()=>setWoSearchFocus(true)} onBlur={()=>setWoSearchFocus(false)}
+          style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+
+        <div className="wo-dd-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setWoPeriodOpen(false); setWoReasonOpen(function(v){ return !v; }); }}>
+            {woReasons.size > 0 ? 'Причина · ' + woReasons.size : 'Причина'}
+            <span className="car-tri">▾</span>
+          </button>
+          {woReasonOpen && (
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',maxHeight:'280px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
+              {REASONS.map(nm => {
+                const isActive = woReasons.has(nm);
+                return (
+                  <div key={nm} onClick={() => setWoReasons(prev => { const n = new Set(prev); if (n.has(nm)) n.delete(nm); else n.add(nm); return n; })}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {nm}
+                  </div>
+                );
+              })}
+              {woReasons.size > 0 && (
+                <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                  <div onClick={() => setWoReasons(new Set())}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                    Очистить
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="wo-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); setWoReasonOpen(false); setWoPeriodOpen(function(v){ return !v; }); }}>
+            {woPeriodLabel}
+            <span className="car-tri">▾</span>
+          </button>
+          {woPeriodOpen && (
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'},{key:'month',label:'Этот месяц'}].map(p2 => {
+                const isActive = woPeriod === p2.key;
+                return (
+                  <div key={p2.key} onClick={() => { setWoPeriod(p2.key); setWoPeriodLabel(p2.label); setWoPeriodOpen(false); }}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {p2.label}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
           <thead id="woColHeaders">
@@ -187,7 +266,20 @@ export default function Writeoffs() {
             {list.length === 0 ? (
               <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Список списаний пуст</p>
                     <p style={{color:'#555',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
-            ) : list.map(w => (
+            ) : list.filter(w => {
+              const nm = String(w.name || products.find(p=>p.id===w.product_id)?.name || '').toLowerCase();
+              if (woSearch && !nm.includes(woSearch.toLowerCase())) return false;
+              if (woReasons.size > 0 && !woReasons.has(w.reason || '')) return false;
+              if (woPeriod !== 'all') {
+                const d = new Date(w.date); const now = new Date();
+                const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                if (woPeriod === 'today' && d < day) return false;
+                if (woPeriod === 'yesterday') { const y = new Date(day); y.setDate(y.getDate()-1); if (d < y || d >= day) return false; }
+                if (woPeriod === 'week') { const wk = new Date(day); wk.setDate(wk.getDate()-((wk.getDay()+6)%7)); if (d < wk) return false; }
+                if (woPeriod === 'month') { const m = new Date(now.getFullYear(), now.getMonth(), 1); if (d < m) return false; }
+              }
+              return true;
+            }).map(w => (
               <tr key={w.id}>
                 <td style={{whiteSpace:'nowrap'}}><div className="prod-name">{w.name || products.find(p=>p.id===w.product_id)?.name || '—'}{w.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                 <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{w.quantity}</td>
