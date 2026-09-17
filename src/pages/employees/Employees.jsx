@@ -570,6 +570,14 @@ export default function Employees() {
                   <input type="date" value={fHireDate} onChange={e=>setFHireDate(e.target.value)} />
                 </div>
               </div>
+              <div className="form-group">
+                <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                  Пин-код кассы
+                  <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={genPin}>Сгенерировать</span>
+                </label>
+                <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
+                <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.35rem',lineHeight:1.5}}>4 цифры — по нему сотрудник входит в кассу</div>
+              </div>
 
               </>)}
               {/* ШАГ 2: ОПЛАТА И БОНУСЫ */}
@@ -734,14 +742,6 @@ export default function Employees() {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                    Пин-код кассы
-                    <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={genPin}>Сгенерировать</span>
-                  </label>
-                  <input type="text" value={fPin} onChange={e=>setFPin(e.target.value)} placeholder="1234" maxLength={4} />
-                </div>
-                <div className="form-group"></div>
               </div>
 
               </>)}
