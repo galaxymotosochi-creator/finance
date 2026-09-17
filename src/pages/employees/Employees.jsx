@@ -435,7 +435,7 @@ export default function Employees() {
                 { q: 'Что такое «Пин»?', a: (
                   <div>Код сотрудника для входа в кассу. По нему система понимает, кто пробил чек и кому начислять зарплату.</div>
                 ) },
-                { q: 'Что такое «С продаж»?', a: (
+                { q: 'Что такое «% с продаж»?', a: (
                   <div>Процент или фиксированная сумма, которую сотрудник получает с каждой продажи. Настраивается в правилах должности.</div>
                 ) },
                 { q: 'Что показывает «Долг» у сотрудника?', a: (
@@ -477,7 +477,7 @@ export default function Employees() {
         <table className="sk-table emp-table">
           <thead id="empColHeaders"><tr>
             <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Должность</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>Телефон</th><th style={{textAlign:'left',whiteSpace:'nowrap'}}>E-mail</th>
-            <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>С продаж</th><th style={{textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
+            <th style={{textAlign:'left'}}>Принят</th><th style={{textAlign:'left'}}>Оклад</th><th style={{textAlign:'left'}}>% с продаж</th><th style={{textAlign:'left'}}>Пин</th><th style={{width:'110px',textAlign:'left'}}></th>
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
