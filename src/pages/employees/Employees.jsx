@@ -532,7 +532,7 @@ export default function Employees() {
       )}
 
       {/* ============ МОДАЛКА ============ */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="Создание карточки сотрудника" width="wide">
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="Создание карточки сотрудника" width="wide" hideHead={wStep>0}>
         <form onSubmit={save}>
 
               {/* ШАГ 1: ДАННЫЕ */}
@@ -752,11 +752,10 @@ export default function Employees() {
 
               {/* Шаги мастера */}
               <div style={{display:'flex',alignItems:'center',gap:'.5rem',marginTop:'1rem'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'.35rem',marginRight:'auto'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'.45rem',marginRight:'auto'}}>
                   {[0,1,2].map(i => (
-                    <span key={i} onClick={()=>setWStep(i)} style={{cursor:'pointer',height:'6px',width:wStep===i?'22px':'6px',borderRadius:'100px',background:wStep>=i?'#111':'#e2e8f0',transition:'.2s'}}></span>
+                    <span key={i} onClick={()=>setWStep(i)} title={'Шаг '+(i+1)} style={{cursor:'pointer',width:'11px',height:'11px',borderRadius:'50%',background:wStep===i?'#1d78fc':'#bcd8fe',boxShadow:wStep===i?'0 0 0 3px rgba(29,120,252,.18)':'none',transition:'all .22s',transform:wStep===i?'scale(1.12)':'scale(1)'}}></span>
                   ))}
-                  <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>Шаг {wStep+1} из 3</span>
                 </div>
                 {wStep > 0 && (
                   <button type="button" className="btn btn-outline" onClick={()=>setWStep(wStep-1)}>← Назад</button>
