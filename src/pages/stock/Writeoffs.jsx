@@ -303,8 +303,7 @@ export default function Writeoffs() {
           </thead>
           <tbody id="writeoffTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">📝</div><p>Список списаний пуст</p>
-                    <p style={{color:'#555',margin:'.5rem 0 0'}}>Зафиксируйте первый факт брака, порчи или потери товаров</p></div></td></tr>
+              <tr><td colSpan="6"><div className="sk-empty"><p>Список списаний пуст</p><p>Зафиксируйте первый факт брака, порчи или потери товара</p></div></td></tr>
             ) : list.filter(w => {
               const nm = String(w.name || products.find(p=>p.id===w.product_id)?.name || '').toLowerCase();
               if (woSearch && !nm.includes(woSearch.toLowerCase())) return false;
@@ -381,7 +380,8 @@ export default function Writeoffs() {
             </select>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-dark">{editId?'Сохранить':'Списать'}</button>
+            {editId && <button type="button" className="btn btn-outline" onClick={() => { const id = editId; setShow(false); remove(id); }}>Удалить</button>}
+            <button type="submit" className="sk-dd-btn" style={{animation:'none'}}>{editId?'Сохранить':'Списать'}</button>
           </div>
         </form>
       </Modal>
