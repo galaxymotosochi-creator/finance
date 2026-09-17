@@ -15,6 +15,13 @@ export default function Categories() {
   const [fType, setFType] = useState('product');
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Подсказка скролла таблицы (как в «Счетах» и «Чекax»)
+  const [tblPos, setTblPos] = useState({left:true, right:true});
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
   const load = async () => {
@@ -150,13 +157,16 @@ export default function Categories() {
 
       
 
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table" style={{minWidth:'500px'}}>
+      <div className="***">
+          <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+        <table className="sk-table stock-cat-table">
           <thead id="catColHeaders">
             <tr>
-              <th>Название</th>
-              <th>Тип</th>
-              <th style={{width:'130px'}}></th>
+              <th style={{textAlign:'left'}}>Название</th>
+              <th style={{textAlign:'left'}}>Тип</th>
+              <th className="actions" style={{textAlign:'left',width:'58px'}}></th>
             </tr>
           </thead>
           <tbody id="catTableBody">
@@ -172,11 +182,11 @@ export default function Categories() {
               </tr>
             ) : cats.map(c => (
               <tr key={c.id}>
-                <td style={{textAlign:'left'}}><div className="prod-name">{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
-                <td style={{textAlign:'left'}}><span className="prod-cat">{c.type === 'service' ? 'Услуга' : 'Товар'}</span></td>
+                <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
+                <td style={{textAlign:'left'}}>{c.type === 'service' ? 'Услуга' : 'Товар'}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                    <button className="act-btn prod-more-btn" onClick={(e) => {
+                    <button className="sk-more" onClick={(e) => {
                       e.stopPropagation();
                       const dd = e.currentTarget.nextElementSibling;
                       document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
@@ -192,6 +202,7 @@ export default function Categories() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Модалка */}
