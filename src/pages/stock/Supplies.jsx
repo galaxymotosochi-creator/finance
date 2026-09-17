@@ -1,6 +1,6 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -43,6 +43,22 @@ export default function Supplies() {
   const [periodLabel, setPeriodLabel] = useState('Все время');
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
+  // Подсказка скролла таблицы: показывается ТОЛЬКО когда реально есть что прокрутить
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   // Открытие одного автоматически закрывает другой — как в разделе «Чеки».
   useEffect(() => {
     const handler = (e) => {
@@ -55,6 +71,13 @@ export default function Supplies() {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, []);
+
+  // Проверка подсказок скролла после отрисовки и при изменении размера окна
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
 
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
