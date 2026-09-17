@@ -329,14 +329,13 @@ body {
 
 /* Все таблицы — единый стиль */
 #clientColHeaders th,
-#invColHeaders th,
 #stockColHeaders th {
   font-size: .68rem; font-weight: 500; color: var(--muted);
   text-transform: uppercase; padding: .5rem .4rem;
   white-space: nowrap; border-bottom: 1.5px solid var(--border);
   background: transparent; text-align: left;
 }
-#clientColHeaders th:first-child, #invColHeaders th:first-child,
+#clientColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
 #productTableBody td:first-child { text-align: left; padding-left: 0; }
@@ -1103,3 +1102,19 @@ input:focus, select:focus, textarea:focus {
   .modal-box.inv-modal .inv-cols > div{max-height:none !important;border-right:none !important;padding:.4rem .2rem !important}
   .modal-overlay{padding:.5rem}
 }
+
+/* Таблица «Инвентаризация» — фирменный стиль (перебивает старые правила по ID) */
+.main .content .sk-table.inv-table thead th{
+  font-size:11.5px !important; font-weight:700 !important; letter-spacing:.04em !important;
+  text-transform:uppercase !important; color:var(--sk-muted) !important;
+  text-align:left !important; padding:7px 16px !important;
+  border-bottom:1px solid rgba(29,120,252,.14) !important;
+  border-right:1px solid rgba(29,120,252,.09) !important;
+  white-space:nowrap !important; vertical-align:bottom !important;
+  background:transparent !important;
+}
+.main .content .sk-table.inv-table thead th:first-child{padding-left:24px !important}
+.main .content .sk-table.inv-table tbody td{padding:6px 16px !important;text-align:left !important;border-right:1px solid rgba(29,120,252,.09) !important}
+.main .content .sk-table.inv-table tbody td:first-child{padding-left:24px !important}
+.main .content .sk-table.inv-table thead th:last-child,
+.main .content .sk-table.inv-table tbody td:last-child{border-right:none !important;text-align:left !important}
