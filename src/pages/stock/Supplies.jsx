@@ -668,7 +668,7 @@ const load = async () => {
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={()=>{setShowModal(false);setEditId(null)}}>Отмена</button>
-            <button type="submit" className="sk-dd-btn" style={{animation:'none'}}>{editId ? 'Сохранить' : 'Создать поставку'}</button>
+            <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Создать поставку'}</button>
           </div>
         </form>
       </Modal>
@@ -696,7 +696,7 @@ const load = async () => {
               <div style={{fontSize:'.76rem',color:'#222',lineHeight:1.6,marginBottom:'16px',padding:'10px 12px',background:'#f9f9f9',borderRadius:'8px'}}>{hints[nextSt]||''}</div>
               <div style={{display:'flex',gap:'.5rem',justifyContent:'center'}}>
                 <button type="button" className="btn btn-outline" onClick={()=>setShowStatusConfirm(null)}>Отмена</button>
-                <button type="button" className="sk-dd-btn" style={{animation:'none'}} onClick={confirmStatusChange}>Подтвердить</button>
+                <button type="button" className="sk-dd-btn" onClick={confirmStatusChange}>Подтвердить</button>
               </div>
         </>);})()}
       </Modal>
@@ -742,7 +742,7 @@ const load = async () => {
                   })}
                 </div>}
                 <div style={{textAlign:'right'}}>
-                  <button type="submit" className="sk-dd-btn" style={{animation:'none'}}>Провести оплату</button>
+                  <button type="submit" className="sk-dd-btn">Провести оплату</button>
                 </div>
               </form>
         </>);
