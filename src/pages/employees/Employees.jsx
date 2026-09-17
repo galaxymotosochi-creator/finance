@@ -140,10 +140,14 @@ export default function Employees() {
   const [expanded, setExpanded] = useState({});
   const [showCatForm, setShowCatForm] = useState(false);
   const [catRef, setCatRef] = useState('');
+  const [catSearch, setCatSearch] = useState('');
+  const [catDrop, setCatDrop] = useState(false);
   const [catVt, setCatVt] = useState('percent');
   const [catVal, setCatVal] = useState('');
   const [showItemForm, setShowItemForm] = useState(false);
   const [itemRef, setItemRef] = useState('');
+  const [itemSearch, setItemSearch] = useState('');
+  const [itemDrop, setItemDrop] = useState(false);
   const [itemVt, setItemVt] = useState('percent');
   const [itemVal, setItemVal] = useState('');
   const [showNoPermsConfirm, setShowNoPermsConfirm] = useState(false);
@@ -230,7 +234,7 @@ export default function Employees() {
     const scope = kind === 's' ? 'service_category' : 'product_category';
     if (fBonusRules.some(r => r.scope === scope && String(r.ref) === id)) return alert('Правило для этой категории уже добавлено');
     setFBonusRules(prev => [...prev, { scope, ref: id, vt: catVt, val: parseFloat(catVal) }]);
-    setShowCatForm(false); setCatRef(''); setCatVal('');
+    setShowCatForm(false); setCatRef(''); setCatSearch(''); setCatVal('');
   };
   const addItemRule = () => {
     if (!itemRef) return alert('Выберите позицию');
@@ -240,7 +244,7 @@ export default function Employees() {
     const scope = kind === 's' ? 'service' : 'product';
     if (fBonusRules.some(r => r.scope === scope && String(r.ref) === id)) return alert('Правило для этой позиции уже добавлено');
     setFBonusRules(prev => [...prev, { scope, ref: id, vt: itemVt, val: parseFloat(itemVal) }]);
-    setShowItemForm(false); setItemRef(''); setItemVal('');
+    setShowItemForm(false); setItemRef(''); setItemSearch(''); setItemVal('');
   };
   // Правило «от всей выручки» (управленческий процент — не привязан к исполнителю в чеке)
   const storeRule = () => fBonusRules.find(r => r.scope === 'store_sales') || null;
@@ -399,7 +403,7 @@ export default function Employees() {
     return (
       <div key={section.id} style={{marginBottom:'.35rem'}}>
         <div style={{display:'flex',alignItems:'center',gap:'.25rem'}}>
-          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
+          <label style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:'pointer',fontSize:'.8125rem',fontWeight:600,color:'#333',fontFamily:'inherit',lineHeight:1.4,flex:1,minWidth:0}}>
             <Toggle checked={isParentOn || allChildOn} onChange={() => togglePerm(section.id, section.children)} />
             <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{section.label}</span>
           </label>
@@ -414,7 +418,7 @@ export default function Employees() {
             {section.children.map(child => {
               const childOn = fPermissions.includes(child.id) || isParentOn;
               return (
-                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.75rem',fontWeight:400,color:isParentOn?'rgba(0,0,0,.34)':'rgba(0,0,0,.54)',fontFamily:'inherit',lineHeight:1.3}}>
+                <label key={child.id} style={{display:'flex',alignItems:'center',gap:'.25rem',cursor:isParentOn?'default':'pointer',fontSize:'.8125rem',fontWeight:400,color:isParentOn?'rgba(0,0,0,.34)':'#5b6472',fontFamily:'inherit',lineHeight:1.3}}>
                   <Toggle checked={childOn} onChange={() => { if (!isParentOn) togglePerm(child.id); }} disabled={isParentOn} />
                   <span>{child.label}</span>
                 </label>
@@ -668,10 +672,26 @@ export default function Employees() {
                   ))}
                   {showCatForm ? (
                     <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
-                      <select value={catRef} onChange={e => setCatRef(e.target.value)} style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff', marginBottom: '7px' }}>
-                        <option value="">— категория —</option>
-                        {allCats.map(c => <option key={c.id} value={(c.type === 'service' ? 's:' : 'p:') + c.id}>{c.type === 'service' ? '🔧 ' : '📦 '}{c.name}</option>)}
-                      </select>
+                      <div style={{ position: 'relative', marginBottom: '7px' }}>
+                        <input type="text" value={catSearch}
+                          onChange={e => { setCatSearch(e.target.value); setCatDrop(true); setCatRef(''); }}
+                          onFocus={() => setCatDrop(true)}
+                          placeholder="Поиск категории…"
+                          style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
+                        {catDrop && catSearch.trim() && (
+                          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 190, overflowY: 'auto', marginTop: 2 }}>
+                            {allCats.filter(c => c.name.toLowerCase().includes(catSearch.toLowerCase().trim())).length === 0 ? (
+                              <div style={{ padding: '.5rem', fontSize: '.8125rem', color: 'var(--muted)', textAlign: 'center' }}>Ничего не найдено</div>
+                            ) : allCats.filter(c => c.name.toLowerCase().includes(catSearch.toLowerCase().trim())).map(c => (
+                              <div key={c.id} onClick={() => { setCatRef((c.type === 'service' ? 's:' : 'p:') + c.id); setCatSearch(c.name); setCatDrop(false); }}
+                                style={{ padding: '.45rem .55rem', cursor: 'pointer', fontSize: '.8125rem', borderBottom: '1px solid #f5f5f5', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <span>{c.type === 'service' ? '🔧' : '📦'}</span>
+                                <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
@@ -680,7 +700,7 @@ export default function Employees() {
                       </div>
                     </div>
                   ) : (
-                    <div onClick={() => setShowCatForm(true)} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить категорию</div>
+                    <div onClick={() => { setShowCatForm(true); setCatSearch(''); setCatRef(''); }} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить категорию</div>
                   )}
                 </div>
 
@@ -704,10 +724,26 @@ export default function Employees() {
                   ))}
                   {showItemForm ? (
                     <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
-                      <select value={itemRef} onChange={e => setItemRef(e.target.value)} style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff', marginBottom: '7px' }}>
-                        <option value="">— позиция —</option>
-                        {allProds.map(pp => <option key={pp.id} value={(pp.type === 'service' ? 's:' : 'p:') + pp.id}>{pp.type === 'service' ? '🔧 ' : '📦 '}{pp.name}</option>)}
-                      </select>
+                      <div style={{ position: 'relative', marginBottom: '7px' }}>
+                        <input type="text" value={itemSearch}
+                          onChange={e => { setItemSearch(e.target.value); setItemDrop(true); setItemRef(''); }}
+                          onFocus={() => setItemDrop(true)}
+                          placeholder="Поиск товара или услуги…"
+                          style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
+                        {itemDrop && itemSearch.trim() && (
+                          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 190, overflowY: 'auto', marginTop: 2 }}>
+                            {allProds.filter(pp => pp.name.toLowerCase().includes(itemSearch.toLowerCase().trim())).length === 0 ? (
+                              <div style={{ padding: '.5rem', fontSize: '.8125rem', color: 'var(--muted)', textAlign: 'center' }}>Ничего не найдено</div>
+                            ) : allProds.filter(pp => pp.name.toLowerCase().includes(itemSearch.toLowerCase().trim())).map(pp => (
+                              <div key={pp.id} onClick={() => { setItemRef((pp.type === 'service' ? 's:' : 'p:') + pp.id); setItemSearch(pp.name); setItemDrop(false); }}
+                                style={{ padding: '.45rem .55rem', cursor: 'pointer', fontSize: '.8125rem', borderBottom: '1px solid #f5f5f5', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <span>{pp.type === 'service' ? '🔧' : '📦'}</span>
+                                <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pp.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                         <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
@@ -716,7 +752,7 @@ export default function Employees() {
                       </div>
                     </div>
                   ) : (
-                    <div onClick={() => setShowItemForm(true)} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить позицию</div>
+                    <div onClick={() => { setShowItemForm(true); setItemSearch(''); setItemRef(''); }} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить позицию</div>
                   )}
                 </div>
 
@@ -736,9 +772,6 @@ export default function Employees() {
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.35rem .75rem',marginTop:'.4rem'}}>
                   {ALL_SECTIONS.map(renderSectionToggle)}
                 </div>
-                <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.45rem',lineHeight:1.5}}>
-                  Права должности подтягиваются автоматически при её выборе. Меняйте галочки, только если для этого сотрудника нужен особый доступ.
-                </div>
               </div>
 
               </>)}
@@ -756,7 +789,7 @@ export default function Employees() {
                 {wStep < 2 ? (
                   <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
                 ) : (
-                  <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
+                  <button type="submit" className="sk-dd-btn">Сохранить</button>
                 )}
               </div>
             </form>
