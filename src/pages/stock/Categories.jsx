@@ -157,10 +157,10 @@ export default function Categories() {
 
       
 
-      <div className="***">
+      <div style={{position:'relative'}}>
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
           <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} onScroll={onTblScroll}>
         <table className="sk-table stock-cat-table">
           <thead id="catColHeaders">
             <tr>
