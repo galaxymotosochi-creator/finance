@@ -212,7 +212,7 @@ export default function Loyalty() {
           </div>
           <div className="sub" style={{maxWidth:'210px'}}>Системы скидок и поощрений для клиентов</div>
         </div>
-        <div className="***">
+        <div className="sk-bar-acts">
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
@@ -300,9 +300,13 @@ export default function Loyalty() {
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                         <button className="sk-more" onClick={(e) => {
                           e.stopPropagation();
-                          const dd = e.currentTarget.nextElementSibling;
-                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                          dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                          var el = e.currentTarget.nextElementSibling;
+                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
+                          var willOpen = !el.classList.contains('open');
+                          el.classList.toggle('open');
+                          var _r = el.getBoundingClientRect();
+                          if (_r.bottom > window.innerHeight) el.classList.add('up'); else el.classList.remove('up');
+                          if (willOpen) setTimeout(function(){ document.addEventListener('click', function h(){ el.classList.remove('open'); document.removeEventListener('click', h); }); }, 10);
                         }}>⋯</button>
                         <div className="prod-dropdown">
                           <button onClick={() => openEdit(p)}>Редактировать</button>
