@@ -583,19 +583,19 @@ export default function Employees() {
               {/* ШАГ 2: ОПЛАТА И БОНУСЫ */}
               {wStep===1 && (<>
               <div>
-                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', margin: '.7rem 0 .15rem' }}>Бонусы с продаж</div>
+                <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', margin: '.7rem 0 .25rem' }}>Бонусы с продаж</div>
                 <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginBottom: '.55rem', lineHeight: 1.5 }}>
                   Начисляются за позиции в чеках, где сотрудник указан Продавцом/Исполнителем. Оставьте поле пустым (0), чтобы не начислять.
                 </div>
 
                 {/* От всей выручки */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
-                  <div style={{ fontSize: '.76rem', fontWeight: 700, color: '#333', marginBottom: '1px' }}>От всей выручки</div>
+                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>От всей выручки</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>процент от всех продаж за период — для управляющего (не нужно указывать его в чеках)</div>
                   <div style={{ background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>🏪</span>
-                      <span style={{ fontSize: '.76rem', fontWeight: 600, flex: 1 }}>Процент от всей выручки</span>
+                      <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1 }}>Процент от всей выручки</span>
                       {storeRule() && <span onClick={() => setStoreRule(storeRule().vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
@@ -618,14 +618,13 @@ export default function Employees() {
                     )}
                   </div>
                   <div style={{ marginTop: '8px', background: '#fefce8', border: '1px solid #fde68a', borderRadius: '9px', padding: '7px 10px', fontSize: '.7rem', color: '#92600a', lineHeight: 1.55 }}>
-                    ℹ️ Бонус от выручки начисляется за отработанные дни: выручка × % × (дни по табелю ÷ дни периода).<br />
-                    Для корректного начисления заполняйте <b>табель</b> за период. Если табель не заполнен — начислится полный процент.
+                    ℹ️ Считается за отработанные дни: <b>выручка × % × (дни по табелю ÷ дни периода)</b>. Нет табеля — начислим полный процент.
                   </div>
                 </div>
 
                 {/* По типу */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
-                  <div style={{ fontSize: '.76rem', fontWeight: 700, color: '#333', marginBottom: '1px' }}>По типу</div>
+                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По типу</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>действует на все услуги или все товары</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {[['all_services', '🔧', 'Все услуги'], ['all_products', '📦', 'Все товары']].map(([sc, ic, lb]) => {
@@ -634,18 +633,14 @@ export default function Employees() {
                         <div key={sc} style={{ flex: 1, minWidth: 0, background: '#fff', border: '1.5px solid ' + (r ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                             <span style={{ fontSize: '13px' }}>{ic}</span>
-                            <span style={{ fontSize: '.76rem', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lb}</span>
+                            <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lb}</span>
                             {r && <span onClick={() => setTypeRule(sc, r.vt, 0)} title="Убрать правило" style={{ cursor: 'pointer', color: '#bbb', fontSize: '.78rem', lineHeight: 1 }}>✕</span>}
                           </div>
                           <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                            <select value={r ? r.vt : 'percent'} onChange={e => setTypeRule(sc, e.target.value, r ? r.val : 0)}
-                              style={{ flexShrink: 0, border: '1px solid var(--border)', borderRadius: '7px', padding: '4px 4px', fontSize: '.72rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
-                              <option value="percent">%</option>
-                              <option value="fixed">₽/шт</option>
-                            </select>
                             <input type="number" min="0" value={r ? r.val : ''} placeholder="0"
-                              onChange={e => setTypeRule(sc, r ? r.vt : 'percent', e.target.value)}
-                              style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                              onChange={e => setTypeRule(sc, 'percent', e.target.value)}
+                              style={{ flex: 1, minWidth: 0, border: '1.5px solid var(--border)', borderRadius: '7px', padding: '4px 6px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                            <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
                           </div>
                         </div>
                       );
@@ -654,8 +649,8 @@ export default function Employees() {
                 </div>
 
                 {/* По категориям */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
-                  <div style={{ fontSize: '.76rem', fontWeight: 700, color: '#333', marginBottom: '1px' }}>По категориям</div>
+                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По категориям</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>бонус за любую позицию из категории (перекрывает «по типу»)</div>
                   {fBonusRules.filter(r => r.scope === 'service_category' || r.scope === 'product_category').map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
@@ -672,18 +667,17 @@ export default function Employees() {
                     </div>
                   ))}
                   {showCatForm ? (
-                    <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '8px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <select value={catRef} onChange={e => setCatRef(e.target.value)} style={{ flex: '1 1 170px', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                    <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
+                      <select value={catRef} onChange={e => setCatRef(e.target.value)} style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff', marginBottom: '7px' }}>
                         <option value="">— категория —</option>
                         {allCats.map(c => <option key={c.id} value={(c.type === 'service' ? 's:' : 'p:') + c.id}>{c.type === 'service' ? '🔧 ' : '📦 '}{c.name}</option>)}
                       </select>
-                      <select value={catVt} onChange={e => setCatVt(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
-                        <option value="percent">%</option>
-                        <option value="fixed">₽/шт</option>
-                      </select>
-                      <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ width: '70px', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
-                      <button type="button" onClick={addCatRule} style={{ padding: '5px 12px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.72rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
-                      <span onClick={() => { setShowCatForm(false); setCatVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.78rem' }}>✕</span>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <input type="number" min="0" placeholder="0" value={catVal} onChange={e => setCatVal(e.target.value)} style={{ width: '54px', flexShrink: 0, border: '1.5px solid var(--border)', borderRadius: '8px', padding: '8px 3px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
+                        <button type="button" onClick={addCatRule} style={{ flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Добавить</button>
+                        <span onClick={() => { setShowCatForm(false); setCatVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
+                      </div>
                     </div>
                   ) : (
                     <div onClick={() => setShowCatForm(true)} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить категорию</div>
@@ -691,8 +685,8 @@ export default function Employees() {
                 </div>
 
                 {/* Конкретные позиции */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '12px' }}>
-                  <div style={{ fontSize: '.76rem', fontWeight: 700, color: '#333', marginBottom: '1px' }}>Конкретные позиции</div>
+                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px' }}>
+                  <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>Конкретные позиции</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>бонус за конкретную услугу или товар (перекрывает категорию и тип)</div>
                   {fBonusRules.filter(r => r.scope === 'service' || r.scope === 'product').map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
@@ -709,18 +703,17 @@ export default function Employees() {
                     </div>
                   ))}
                   {showItemForm ? (
-                    <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '8px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <select value={itemRef} onChange={e => setItemRef(e.target.value)} style={{ flex: '1 1 170px', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                    <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
+                      <select value={itemRef} onChange={e => setItemRef(e.target.value)} style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff', marginBottom: '7px' }}>
                         <option value="">— позиция —</option>
                         {allProds.map(pp => <option key={pp.id} value={(pp.type === 'service' ? 's:' : 'p:') + pp.id}>{pp.type === 'service' ? '🔧 ' : '📦 '}{pp.name}</option>)}
                       </select>
-                      <select value={itemVt} onChange={e => setItemVt(e.target.value)} style={{ border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
-                        <option value="percent">%</option>
-                        <option value="fixed">₽/шт</option>
-                      </select>
-                      <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ width: '70px', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '6px', fontSize: '.76rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
-                      <button type="button" onClick={addItemRule} style={{ padding: '5px 12px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.72rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Добавить</button>
-                      <span onClick={() => { setShowItemForm(false); setItemVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.78rem' }}>✕</span>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <input type="number" min="0" placeholder="0" value={itemVal} onChange={e => setItemVal(e.target.value)} style={{ width: '54px', flexShrink: 0, border: '1.5px solid var(--border)', borderRadius: '8px', padding: '8px 3px', fontSize: '.8125rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                        <span style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', flexShrink: 0 }}>%</span>
+                        <button type="button" onClick={addItemRule} style={{ flex: 1, minWidth: 0, padding: '8px 10px', borderRadius: '100px', border: 'none', background: '#111', color: '#fff', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Добавить</button>
+                        <span onClick={() => { setShowItemForm(false); setItemVal(''); }} style={{ cursor: 'pointer', color: '#999', fontSize: '.95rem', flexShrink: 0, padding: '0 5px', lineHeight: 1 }}>✕</span>
+                      </div>
                     </div>
                   ) : (
                     <div onClick={() => setShowItemForm(true)} style={{ color: '#999', fontSize: '.76rem', border: '1.5px dashed #e5e7eb', borderRadius: '10px', padding: '7px', textAlign: 'center', cursor: 'pointer' }}>+ Добавить позицию</div>
@@ -758,7 +751,7 @@ export default function Employees() {
                   ))}
                 </div>
                 {wStep > 0 && (
-                  <button type="button" className="btn btn-outline" onClick={()=>setWStep(wStep-1)}>← Назад</button>
+                  <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep-1)}>← Назад</button>
                 )}
                 {wStep < 2 ? (
                   <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
