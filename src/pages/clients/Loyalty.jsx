@@ -49,6 +49,13 @@ export default function Loyalty() {
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
 
+  // Закрытие меню «Тип» по клику вне — как в «Клиентах»
+  useEffect(() => {
+    const handler = (e) => { if (!e.target.closest('.loy-type-wrap')) setLoyTypeOpen(false); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+
   // Проверка подсказок скролла
   useEffect(() => {
     const t = setTimeout(checkTbl, 120);
@@ -206,7 +213,9 @@ export default function Loyalty() {
           <div className="sub" style={{maxWidth:'210px'}}>Системы скидок и поощрений для клиентов</div>
         </div>
         <div className="***">
-          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+          <div className="sk-dd-wrap" style={{marginLeft:'auto'}}>
+            <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+          </div>
         </div>
       </div>
 
@@ -250,7 +259,7 @@ export default function Loyalty() {
         </div>
       </div>
 
-      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+      <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
         <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
@@ -285,17 +294,17 @@ export default function Loyalty() {
                     <td style={{textAlign:'left'}}>
                       <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.72rem',fontWeight:700,background:(p.bg||'#eef2ff'),color:(p.color||'#4f46e5'),whiteSpace:'nowrap'}}>{badge}</span>
                     </td>
-                    <td style={{textAlign:'left',color:'#222',fontWeight:600}}>{p.discount ? p.discount+'%' : '—'}</td>
+                    <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{p.discount ? p.discount+'%' : '—'}</td>
                     <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{p.condition ? 'от '+p.condition.toLocaleString()+' '+cur : 'Без условий'}</td>
                     <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0</td>
                     <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0 {cur}</td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                        <button className="act-btn prod-more-btn" onClick={(e) => {
+                        <button className="sk-more" onClick={(e) => {
                           e.stopPropagation();
                           const dd = e.currentTarget.nextElementSibling;
                           document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                          dd.classList.toggle('open');
+                          dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
                         }}>⋯</button>
                         <div className="prod-dropdown">
                           <button onClick={() => openEdit(p)}>Редактировать</button>
