@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -130,16 +131,45 @@ export default function Writeoffs() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
-          <h1>Списания</h1>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h1>Списания</h1>
+            <SectionHelp
+              title="Раздел «Списания»"
+              intro="Списания — выбытие товаров со склада: брак, порча, потери. Здесь видно, что и сколько списали, по какой причине и на какую сумму."
+              faq={[
+                { q: 'Как списать товар?', a: (
+                  <div>Нажмите <b>«Списать товар»</b> справа вверху. Выберите <b>товар</b>, укажите <b>количество</b>, <b>причину</b> и дату.</div>
+                ) },
+                { q: 'Какие причины списания есть?', a: (
+                  <ul>
+                    <li style={{marginBottom:'.4rem'}}><b>Списание</b> — обычное выбытие.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Брак</b> — товар повреждён.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Потеря</b> и <b>Порча</b> — недостача или порча.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Окончание срока</b> — истёк срок годности.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Инвентаризация</b> — расхождение по факту.</li>
+                    <li><b>Прочее</b> — другая причина.</li>
+                  </ul>
+                ) },
+                { q: 'Списывается ли себестоимость?', a: (
+                  <div>Да. При списании <b>себестоимость уменьшается</b> вместе с количеством, поэтому оставшиеся товары не «дорожают».</div>
+                ) },
+                { q: 'Как найти нужное списание?', a: (
+                  <div>Под шапкой — <b>поиск</b> по товару и <b>фильтры</b> по причине и периоду.</div>
+                ) },
+                { q: 'Как изменить или удалить списание?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+              ]}
+            />
+          </div>
           <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Списать товар</button>
+        <div className="***">
+          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Списать товар</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table">
