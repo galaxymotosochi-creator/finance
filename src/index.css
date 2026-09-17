@@ -1123,10 +1123,13 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.inv-table thead th:nth-child(2),
 .main .content .sk-table.inv-table tbody td:nth-child(2){width:96px !important;min-width:96px !important;white-space:nowrap !important}
 
-/* Шапка sk-bar на мобильной: кнопки прижаты к правому краю */
+/* Шапка sk-bar на мобильной: кнопка справа внутри голубой плашки */
 @media(max-width:640px){
-  .sk-bar{flex-wrap:wrap;padding:14px 16px;gap:10px}
-  .sk-bar .grow{flex:1 1 100%;min-width:0}
-  .***{width:100%;display:flex;justify-content:flex-end}
-  .sk-bar-acts{width:100%;display:flex;justify-content:flex-end;flex-wrap:wrap}
+  .sk-bar{padding:14px 16px;gap:8px;flex-wrap:wrap}
+  .sk-bar .grow{flex:1 1 auto;min-width:0}
+  .sk-bar .sk-bar-right{margin-left:auto;display:flex;justify-content:flex-end;flex-shrink:0}
+  .sk-bar h1{font-size:18px}
+  .sk-bar .sub{font-size:12px}
 }
+/* Компьютер: кнопка тоже справа внутри плашки */
+.sk-bar .sk-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px}

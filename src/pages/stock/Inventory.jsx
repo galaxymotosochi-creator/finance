@@ -453,7 +453,7 @@ export default function Inventory() {
           </div>
           <div className="sub">Сверка фактических остатков с учетными</div>
         </div>
-        <div className="***">
+        <div className="sk-bar-right">
           <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={startNew}>Добавить инвентаризацию</button>
         </div>
       </div>
