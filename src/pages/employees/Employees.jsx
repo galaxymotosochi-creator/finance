@@ -275,7 +275,7 @@ export default function Employees() {
       const obj = {
         user_id: user.id, name: fName.trim(), phone: fPhone.trim(),
         email: fEmail.trim(), position_name: fPositionName.trim(),
-        hire_date: fHireDate, base_salary: parseFloat(fBaseSalary)||0,
+        hire_date: fHireDate, base_salary: 0,
         bonus_type: fBonusType, bonus_value: parseFloat(fBonusValue)||0,
         bonus_rules: fBonusRules, permissions: fPermissions,
         pin: fPin, status: fStatus,
@@ -583,15 +583,6 @@ export default function Employees() {
               {/* ШАГ 2: ОПЛАТА И БОНУСЫ */}
               {wStep===1 && (<>
               <div>
-                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', marginBottom: '.6rem' }}>Оплата</div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Оклад (₽/мес)</label>
-                    <input type="number" min="0" value={fBaseSalary} onChange={e => setFBaseSalary(e.target.value)} placeholder="0" />
-                  </div>
-                  <div className="form-group"></div>
-                </div>
-
                 <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222', margin: '.7rem 0 .15rem' }}>Бонусы с продаж</div>
                 <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginBottom: '.55rem', lineHeight: 1.5 }}>
                   Начисляются за позиции в чеках, где сотрудник указан Продавцом/Исполнителем. Оставьте поле пустым (0), чтобы не начислять.
