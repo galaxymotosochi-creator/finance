@@ -35,9 +35,14 @@ export default function Supplies() {
   const [supplies, setSuppliesState] = useState([]);
   const [supplySearch, setSupplySearch] = useState('');
   const [supplySearchFocus, setSupplySearchFocus] = useState(false);
-  const [supFilter, setSupFilter] = useState('');       // фильтр по поставщику
+  const [supFilter, setSupFilter] = useState(() => new Set());  // выбранные поставщики (мультивыбор)
   const [supOpen, setSupOpen] = useState(false);
   const [payFilter, setPayFilter] = useState(null);      // null | 'paid' | 'unpaid' | 'partially_paid'
+  const [periodOpen, setPeriodOpen] = useState(false);
+  const [period, setPeriod] = useState('all');
+  const [periodLabel, setPeriodLabel] = useState('Все время');
+  const [periodFrom, setPeriodFrom] = useState('');
+  const [periodTo, setPeriodTo] = useState('');
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -365,25 +370,33 @@ const load = async () => {
             style={{border:'none',outline:'none',width:'150px',minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         </div>
 
-        {/* Фильтр «Поставщик ▾» */}
-        <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
-          <button type="button" className="sk-period" onClick={() => setSupOpen(!supOpen)}>
-            {supFilter || 'Поставщик'}<span style={{fontSize:'9px'}}>▾</span>
+        {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
+        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(!supOpen); }}>
+            {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
+            <span style={{fontSize:'10px'}}>▾</span>
           </button>
           {supOpen && (
-            <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
-              <div className="cat-dd-list" style={{maxHeight:'220px',overflowY:'auto'}}>
-                <div className={'cat-dd-item' + (!supFilter ? ' sel' : '')} onClick={() => { setSupFilter(''); setSupOpen(false); }}>
-                  <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                  Все поставщики
-                </div>
-                {Array.from(new Set(supplies.map(x => x.supplier_name).filter(Boolean))).sort().map(nm => (
-                  <div key={nm} className={'cat-dd-item' + (supFilter === nm ? ' sel' : '')} onClick={() => { setSupFilter(nm); setSupOpen(false); }}>
-                    <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
+              {Array.from(new Set(supplies.map(x => x.supplier_name).filter(Boolean))).sort().map(nm => {
+                const isActive = supFilter.has(nm);
+                return (
+                  <div key={nm} onClick={() => setSupFilter(prev => { const n = new Set(prev); if (n.has(nm)) n.delete(nm); else n.add(nm); return n; })}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                     {nm}
                   </div>
-                ))}
-              </div>
+                );
+              })}
+              {supFilter.size > 0 && (
+                <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                  <div onClick={() => setSupFilter(new Set())}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                    Очистить
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -407,6 +420,39 @@ const load = async () => {
             ))}
           </div>
         </div>
+
+        {/* Фильтр «Все время» — как в Чекax */}
+        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button className="sk-period" onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(!periodOpen); }}>
+            {periodLabel}
+            <span style={{fontSize:'10px'}}>▾</span>
+          </button>
+          {periodOpen && (
+            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'},{key:'month',label:'Этот месяц'}].map(p => {
+                const isActive = period === p.key;
+                return (
+                  <div key={p.key} onClick={() => { setPeriod(p.key); setPeriodLabel(p.label); setPeriodOpen(false); }}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {p.label}
+                  </div>
+                );
+              })}
+              <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+                <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                  <input type="date" value={periodFrom} onChange={e => setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                  <input type="date" value={periodTo} onChange={e => setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                </div>
+                <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
+                  <button type="button" onClick={() => { setPeriod('custom'); setPeriodLabel('Свой период'); setPeriodOpen(false); }}
+                    className="sk-dd-btn" style={{padding:'.5rem 1.1rem',animation:'none'}}>Применить</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
@@ -429,7 +475,19 @@ const load = async () => {
             {supplies.length === 0 ? (
               <tr><td colSpan="10"><div className="empty-products"><div className="big-icon">📦</div><p>Список поставок пуст</p><p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.filter(s => {
-              if (supFilter && (s.supplier_name || '') !== supFilter) return false;
+              if (supFilter.size > 0 && !supFilter.has(s.supplier_name || '')) return false;
+              if (period !== 'all') {
+                const d = new Date(s.date); const now = new Date();
+                const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                if (period === 'today' && d < day) return false;
+                if (period === 'yesterday') { const y = new Date(day); y.setDate(y.getDate()-1); if (d < y || d >= day) return false; }
+                if (period === 'week') { const w = new Date(day); w.setDate(w.getDate()-((w.getDay()+6)%7)); if (d < w) return false; }
+                if (period === 'month') { const m = new Date(now.getFullYear(), now.getMonth(), 1); if (d < m) return false; }
+                if (period === 'custom') {
+                  if (periodFrom && d < new Date(periodFrom)) return false;
+                  if (periodTo) { const t = new Date(periodTo); t.setHours(23,59,59,999); if (d > t) return false; }
+                }
+              }
               if (payFilter && getPayStatus(s) !== payFilter) return false;
               if (!supplySearch) return true;
               const q = supplySearch.toLowerCase();
