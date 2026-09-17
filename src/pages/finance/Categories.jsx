@@ -158,7 +158,7 @@ export default function Categories() {
                   </ul>
                 ) },
                 { q: 'Как добавить категорию?', a: (
-                  <div>Нажмите <b>«Добавить категорию»</b> справа вверху. Укажите название и выберите тип. Готово — категория сразу появится в выпадающих списках при вводе расходов и доходов.</div>
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите название и выберите тип. Готово — категория сразу появится в выпадающих списках при вводе расходов и доходов.</div>
                 ) },
                 { q: 'Почему категорию нельзя удалить?', a: (
                   <div>Если категория уже использована в операциях, система предупредит — сначала нужно разобраться с этими операциями. Так сумма не потеряется из учёта.</div>
@@ -172,7 +172,7 @@ export default function Categories() {
           <div className="sub">Структура доходов и расходов бизнеса</div>
         </div>
         <div className="sk-bar-acts">
-          <button type="button" className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={function () { openModal(null); }}>Добавить категорию</button>
+          <button type="button" className="sk-dd-btn" onClick={function () { openModal(null); }}>Добавить</button>
         </div>
       </div>
 
