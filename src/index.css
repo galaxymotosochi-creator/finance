@@ -328,7 +328,6 @@ body {
 .product-table .stock-low { color: var(--danger); font-weight: 500; }
 
 /* Все таблицы — единый стиль */
-#clientColHeaders th,
 #stockColHeaders th {
   font-size: .68rem; font-weight: 500; color: var(--muted);
   text-transform: uppercase; padding: .5rem .4rem;
@@ -1133,3 +1132,19 @@ input:focus, select:focus, textarea:focus {
 }
 /* Компьютер: кнопка тоже справа внутри плашки */
 .sk-bar .sk-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* Таблица «База клиентов» — фирменный стиль (перебивает старые правила по ID) */
+.main .content .sk-table.cli-table thead th{
+  font-size:11.5px !important; font-weight:700 !important; letter-spacing:.04em !important;
+  text-transform:uppercase !important; color:var(--sk-muted) !important;
+  text-align:left !important; padding:7px 16px !important;
+  border-bottom:1px solid rgba(29,120,252,.14) !important;
+  border-right:1px solid rgba(29,120,252,.09) !important;
+  white-space:nowrap !important; vertical-align:bottom !important;
+  background:transparent !important;
+}
+.main .content .sk-table.cli-table thead th:first-child{padding-left:24px !important}
+.main .content .sk-table.cli-table tbody td{padding:6px 16px !important;text-align:left !important;border-right:1px solid rgba(29,120,252,.09) !important}
+.main .content .sk-table.cli-table tbody td:first-child{padding-left:24px !important}
+.main .content .sk-table.cli-table thead th:last-child,
+.main .content .sk-table.cli-table tbody td:last-child{border-right:none !important;text-align:left !important}

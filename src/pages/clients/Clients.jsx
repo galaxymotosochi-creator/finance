@@ -1,5 +1,6 @@
 import Modal from '../../components/Modal';
-import { useState, useEffect } from 'react';
+import SectionHelp from '../../components/SectionHelp';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -15,6 +16,29 @@ export default function Clients() {
   const [clients, setClientsState] = useState([]);
   const [sales, setSalesState] = useState([]);
   const [search, setSearch] = useState('');
+  // Подсказка скролла таблицы (эталон — Поставки)
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+
+  // Проверка подсказок скролла
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -131,16 +155,44 @@ export default function Clients() {
 
   return (
     <>
-      <div className="page-header">
-        <div>
-          <h1>База клиентов</h1>
-          <div className="sub">История покупок, лояльность и статистика</div>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>База клиентов</h1>
+            <SectionHelp
+              title="Раздел «База клиентов»"
+              intro="Здесь хранятся все покупатели: контакты, день рождения, история покупок, сумма и долг, а также уровень лояльности."
+              faq={[
+                { q: 'Как добавить клиента?', a: (
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите имя, телефон и, при желании, день рождения — по нему программа поздравляет клиента.</div>
+                ) },
+                { q: 'Что показывает колонка «Покупок»?', a: (
+                  <div>Сколько раз клиент совершал покупки (по чекам).</div>
+                ) },
+                { q: 'Что такое «Ср. чек»?', a: (
+                  <div>Средняя сумма одной покупки: общая сумма делится на количество покупок.</div>
+                ) },
+                { q: 'Что такое «Долг»?', a: (
+                  <div>Сколько клиент остался должен по чекам с частичной оплатой. Долг закрывается при оплате.</div>
+                ) },
+                { q: 'Что такое «Лояльность»?', a: (
+                  <div>Уровень клиента по сумме покупок: <b>Базовый / Серебро / Золото / Платина</b>. Чем выше — тем больше скидка.</div>
+                ) },
+                { q: 'Как найти клиента?', a: (
+                  <div>Под шапкой — <b>поиск</b> по имени, телефону и примечаниям.</div>
+                ) },
+                { q: 'Как изменить или удалить клиента?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+              ]}
+            />
+          </div>
+          <div className="sub" style={{maxWidth:'210px'}}>История покупок, лояльность и статистика</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить клиента</button>
+        <div className="***">
+          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {/* Быстрый поиск */}
       <div className="search-row">
@@ -171,8 +223,11 @@ export default function Clients() {
       {loading ? (
         <CenterSpinner />
       ) : (
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table">
+      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table cli-table">
           <thead id="clientColHeaders">
             <tr>
               <th style={{textAlign:'left'}}>Клиент</th>
@@ -190,7 +245,7 @@ export default function Clients() {
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="12"><div className="empty-products"><div className="big-icon">👤</div><p>База клиентов пуста</p><p style={{fontSize:'.82rem',color:'#555',margin:'.5rem 0 0'}}>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr><td colSpan="12"><div className="sk-empty"><p>База клиентов пуста</p><p>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
@@ -247,6 +302,7 @@ export default function Clients() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
       )}
 
@@ -301,7 +357,7 @@ export default function Clients() {
                 </div>
               )()})}
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить'}</button>
+                <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
       </Modal>
