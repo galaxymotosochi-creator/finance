@@ -180,8 +180,8 @@ export default function Loyalty() {
 
   return (
     <>
-      <div className="sk-bar">
-        <div className="grow">
+      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+        <div className="grow" style={{minWidth:0}}>
           <div style={{display:'flex',alignItems:'center'}}>
             <h1>Программы лояльности</h1>
             <SectionHelp
