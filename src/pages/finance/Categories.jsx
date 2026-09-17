@@ -170,7 +170,7 @@ export default function Categories() {
             <tr>
               <th style={{textAlign:'left'}}>Название</th>
               <th style={{textAlign:'left'}}>Тип категории</th>
-              <th style={{textAlign:'center',width:'60px'}}></th>
+              <th className="actions" style={{textAlign:'left',width:'58px'}}></th>
             </tr>
           </thead>
           <tbody id="dirTableBody">
@@ -190,7 +190,7 @@ export default function Categories() {
                 <tr key={c.id}>
                   <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                   <td style={{textAlign:'left'}}>{dirTypeLabels[c.type] || c.type}</td>
-                  <td style={{textAlign:'center',width:'30px'}}>
+                  <td style={{textAlign:'left',width:'58px'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
                       <button className="sk-more" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(function(){document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)})},10)}}>⋯</button>
                       <div className="prod-dropdown">
