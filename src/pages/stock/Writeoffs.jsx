@@ -206,7 +206,7 @@ export default function Writeoffs() {
               ]}
             />
           </div>
-          <div className="sub">Учет брака, порчи и потерь товаров на складе</div>
+          <div className="sub" style={{maxWidth:'210px'}}>Учет брака, порчи и потерь товаров на складе</div>
         </div>
         <div className="***">
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
