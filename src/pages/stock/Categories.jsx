@@ -236,7 +236,8 @@ export default function Categories() {
             </select>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить'}</button>
+            {editId && <button type="button" className="btn btn-ghost" onClick={() => { const id = editId; setShowModal(false); remove(id); }}>Удалить</button>}
+            <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
           </div>
         </form>
       </Modal>
