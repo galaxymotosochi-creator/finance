@@ -383,13 +383,16 @@ const load = async () => {
 
         {/* Фильтр «Поставщик» — как «Время» в Чекax: точки, мультивыбор */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.***.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setPeriodOpen(false); setSupOpen(function(v){ return !v; }); }}>
             {supFilter.size > 0 ? 'Поставщик · ' + supFilter.size : 'Поставщик'}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
           {supOpen && (
             <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
-              {Array.from(new Set(supplies.map(x => x.supplier_name).filter(Boolean))).sort().map(nm => {
+              {Array.from(new Set([
+                ...suppliers.map(x => x.name).filter(Boolean),
+                ...supplies.map(x => x.supplier_name).filter(Boolean),
+              ])).sort().map(nm => {
                 const isActive = supFilter.has(nm);
                 return (
                   <div key={nm} onClick={() => setSupFilter(prev => { const n = new Set(prev); if (n.has(nm)) n.delete(nm); else n.add(nm); return n; })}
@@ -399,6 +402,9 @@ const load = async () => {
                   </div>
                 );
               })}
+              {Array.from(new Set([...suppliers.map(x => x.name).filter(Boolean), ...supplies.map(x => x.supplier_name).filter(Boolean)])).length === 0 && (
+                <div style={{padding:'.5rem .55rem',fontSize:'.78rem',color:'#5b6472'}}>Поставщиков пока нет — добавьте в разделе «Поставщики»</div>
+              )}
               {supFilter.size > 0 && (
                 <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
                   <div onClick={() => setSupFilter(new Set())}
@@ -434,7 +440,7 @@ const load = async () => {
 
         {/* Фильтр «Все время» — как в Чекax */}
         <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.8rem',fontWeight:600,lineHeight:'20px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e => { e.stopPropagation(); document.querySelectorAll('.***.open, .sk-dd-wrap.open').forEach(w => w.classList.remove('open')); setSupOpen(false); setPeriodOpen(function(v){ return !v; }); }}>
             {periodLabel}
             <span style={{fontSize:'10px'}}>▾</span>
           </button>
