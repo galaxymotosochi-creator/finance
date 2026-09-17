@@ -1,6 +1,6 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -25,6 +25,13 @@ export default function Writeoffs() {
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, []);
+
+  // Проверка подсказок скролла после отрисовки и при изменении размера окна
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fProd, setFProd] = useState('');
@@ -41,6 +48,22 @@ export default function Writeoffs() {
   const [woPeriodLabel, setWoPeriodLabel] = useState('Все время');
   const [woPeriodFrom, setWoPeriodFrom] = useState('');
   const [woPeriodTo, setWoPeriodTo] = useState('');
+  // Подсказка скролла таблицы (эталон — Поставки/Категории)
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
@@ -263,8 +286,11 @@ export default function Writeoffs() {
         </div>
       </div>
 
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table">
+      <div className="***" style={{flex:'none',minHeight:'auto'}}>
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table wo-table">
           <thead id="woColHeaders">
             <tr>
               <th style={{textAlign:'left'}}>Товар</th>
@@ -325,6 +351,7 @@ export default function Writeoffs() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Модалка */}
