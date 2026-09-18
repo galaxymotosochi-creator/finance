@@ -1039,7 +1039,7 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.sal-table thead th:first-child{padding-left:24px !important}
 .main .content .sk-table.sal-table tbody td:first-child{padding-left:24px !important}
 /* Подсказки скролла: показывать и на широких экранах (таблицы широкие) */
-@media(min-width:1025px){.sk-table.*** ~ .sk-fade,.sk-table.sal-table ~ .sk-fade{display:block}}
+@media(min-width:1025px){.*** > .sk-fade{display:block}}
 
 /* Финансовые категории: таблица в фирменном стиле scanurik */
 .sk-table.cat-table{min-width:520px}
