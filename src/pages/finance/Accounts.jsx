@@ -398,11 +398,11 @@ export default function Accounts() {
               <tbody id="dirTableBody">
                 {sorted.length === 0 ? (
                   <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
-                ) : sorted.map(a => {
+                ) : sorted.map((a, idx) => {
                   var m=ACC_TYPES.find(t=>t.type===a.type), lb=m?m.label:a.type;
                   var bl=getBal(a), mv=getMv(a), in0=parseFloat(a.balance)||0;
                   return (
-                    <tr key={a.id}>
+                    <tr key={a.id} style={{position:'relative'}}>
                       <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
@@ -425,6 +425,7 @@ export default function Accounts() {
                             </div>
                           </div>
                         ) : null}
+                        {idx === 0 && tblPos.right && <div className="sk-fade sk-fade-r"></div>}
                       </td>
                     </tr>
                   );
