@@ -287,20 +287,20 @@ export default function Timesheet() {
       ) : (
         <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
           {/* КАЛЕНДАРЬ */}
-          <div className="promo-calendar-wrap">
-            <div className="promo-cal-header">
-              <button className="promo-cal-nav" onClick={prevMonth}>‹</button>
-              <div className="promo-cal-month">{MONTHS[month]} {year}</div>
-              <button className="promo-cal-nav" onClick={nextMonth}>›</button>
+          <div className="promo-calendar-wrap" style={{background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'var(--sk-radius)',padding:'14px 16px',marginBottom:'10px',boxShadow:'none'}}>
+            <div className="promo-cal-header" style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
+              <div className="promo-cal-month" style={{flex:1,fontSize:'.8125rem',fontWeight:600,color:'#333'}}>{MONTHS[month]} {year}</div>
+              <button className="promo-cal-nav" onClick={prevMonth} style={{width:'26px',height:'26px',fontSize:'.9rem',borderRadius:'50%',background:'#f8f9fa',border:'1px solid var(--border)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontFamily:'inherit',color:'#333'}}>‹</button>
+              <button className="promo-cal-nav" onClick={nextMonth} style={{width:'26px',height:'26px',fontSize:'.9rem',borderRadius:'50%',background:'#f8f9fa',border:'1px solid var(--border)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontFamily:'inherit',color:'#333'}}>›</button>
             </div>
-            <div className="promo-cal-grid">
-              {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd">{w}</div>)}
+            <div className="promo-cal-grid" style={{gap:'4px'}}>
+              {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd" style={{fontSize:'.68rem',fontWeight:600,color:'#98a1b0',paddingBottom:'.35rem'}}>{w}</div>)}
               {days.map((d, i) => {
                 if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
                 const stat = getDayStat(d);
                 return (
                   <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}
-                    style={stat.hasEntries ? {background:'#f0fdf4'} : undefined}>
+                    style={{padding:'.45rem .2rem',borderRadius:'10px',fontSize:'.8125rem',...((stat.hasEntries && !isToday(d)) ? {background:'#f0fdf4'} : {})}}>
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
                       {stat.dots.map((c, idx) => <span key={idx} style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:c}} />)}
@@ -309,9 +309,9 @@ export default function Timesheet() {
                 );
               })}
             </div>
-            <div className="promo-cal-legend" style={{marginTop:'.5rem'}}>
-              <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a',verticalAlign:'middle',marginRight:'4px'}} /> Бонус</span>
-              <span><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626',verticalAlign:'middle',marginRight:'4px'}} /> Штраф</span>
+            <div className="promo-cal-legend" style={{display:'flex',gap:'14px',marginTop:'10px',paddingTop:'10px',borderTop:'1px solid #f0f3f8',fontSize:'.75rem',color:'#5b6472'}}>
+              <span style={{display:'flex',alignItems:'center',gap:'5px'}}><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a'}} /> Бонус</span>
+              <span style={{display:'flex',alignItems:'center',gap:'5px'}}><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626'}} /> Штраф</span>
             </div>
           </div>
 
