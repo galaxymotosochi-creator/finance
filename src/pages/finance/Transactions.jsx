@@ -7,6 +7,7 @@ import { useTransactions, useAccounts, useCategories } from '../../hooks/useTran
 import { getCurrencySymbol } from '../../lib/currency';
 import { getSettingsTz } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 export default function Transactions() {
@@ -333,14 +334,45 @@ export default function Transactions() {
    if (loading) return <CenterSpinner />;
    return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1>Доходы и расходы</h1>
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Доходы и расходы</h1>
+            <SectionHelp
+              title="Раздел «Доходы и расходы»"
+              intro="Все поступления, списания и переводы между счетами."
+              faq={[
+                { q: 'С чего начать работу? (по шагам)', a: (
+                  <ol style={{paddingLeft:'1.15rem',margin:0}}>
+                    <li style={{marginBottom:'.5rem'}}>Нажмите кнопку <b>«Добавить ▾»</b> справа вверху — откроется меню.</li>
+                    <li style={{marginBottom:'.5rem'}}>Выберите <b>«Добавить расход»</b> — деньги списываются со счёта, категория уходит в расходы.</li>
+                    <li style={{marginBottom:'.5rem'}}>Или <b>«Добавить доход»</b> — поступление на счёт, категория в доходы.</li>
+                    <li>Нужно перекинуть деньги между своими счетами — <b>«Перевод между счетами»</b>. Это не доход и не расход бизнеса.</li>
+                  </ol>
+                ) },
+                { q: 'Что означает каждая кнопка на странице?', a: (
+                  <ul>
+                    <li><b>Добавить ▾</b> — меню со всеми операциями: доход, расход, перевод, свои деньги.</li>
+                    <li><b>Плашки сверху</b> — доходы, расходы, баланс счетов и прибыль за выбранный период.</li>
+                    <li><b>Строка операции</b> — дата, время, название, сумма, счёт и категория.</li>
+                    <li><b>⋯ в строке</b> — редактировать или удалить операцию.</li>
+                    <li><b>?</b> — эта справка.</li>
+                  </ul>
+                ) },
+                { q: 'Что такое «Взнос / вывод своих денег»?', a: (
+                  <p>Это личные деньги владельца: взнос — когда вкладываете свои средства в бизнес, вывод — когда забираете. Такие операции <b>не считаются</b> доходом или расходом бизнеса и не входят в прибыль.</p>
+                ) },
+                { q: 'Чем перевод отличается от расхода?', a: (
+                  <p><b>Перевод</b> — деньги переходят между вашими счетами, общий баланс не меняется. <b>Расход</b> — деньги уходят из бизнеса, баланс уменьшается. Перевод в прибыли не участвует.</p>
+                ) },
+              ]}
+            />
+          </div>
           <div className="sub">Поступления, списания и переводы между счетами</div>
         </div>
-        <div className="page-actions">
+        <div className="sk-bar-acts">
           <div style={{position:'relative',display:'inline-block'}}>
-            <button className="btn btn-dark" onClick={function(){setDdOpen(!ddOpen)}} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px',display:'inline-flex',alignItems:'center',gap:'.35rem'}}>Добавить <span style={{fontSize:'9px',lineHeight:1}}>▾</span></button>
+            <button className="sk-dd-btn" onClick={function(){setDdOpen(!ddOpen)}}>Добавить <span className="car">▾</span></button>
             {ddOpen && (
               <div>
                 <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:75}} onClick={function(){setDdOpen(false)}} />
