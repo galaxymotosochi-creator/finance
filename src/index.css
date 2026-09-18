@@ -907,9 +907,14 @@ input:focus, select:focus, textarea:focus {
 .sk-fade.at-start{opacity:0}
 .sk-fade.at-end{opacity:0}
 .sk-fade-r:after{content:"›";position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:22px;font-weight:700;color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
+/* Подсказка внутри первой строки таблицы: ровно по высоте строки, стрелка — по её центру */
+td > .sk-fade-r{position:absolute;top:0;bottom:0;height:auto}
+td > .sk-fade-r:after{top:50%}
 @keyframes sknudge{0%,100%{transform:translateX(0);opacity:.3}50%{transform:translateX(4px);opacity:.7}}
 /* шторки показываем на мобильных и планшетах (до 1024px), на десктопе таблица помещается целиком */
 @media(min-width:1025px){.sk-fade{display:none}}
+/* Подсказка в первой строке значений: показываем и на десктопе (иначе в неё нечего втыкать) */
+@media(min-width:1025px){td > .sk-fade-r{display:block}}
 
 /* ===== Справка раздела: синий «?» + выдвижная панель справа ===== */
 .sec-help-q{width:22px;height:22px;border-radius:50%;border:none;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:.76rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -6px rgba(29,120,252,.9);transition:transform .15s;margin-left:.45rem;vertical-align:middle;flex-shrink:0;line-height:1;padding:0;animation:secqpulse 2s ease-in-out infinite}

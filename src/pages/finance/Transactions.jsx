@@ -596,7 +596,6 @@ export default function Transactions() {
       {txs.length > 0 ? (
         <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
           <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
           <table className="sk-table sk-tx-table">
             <thead id="colHeaders">
@@ -612,8 +611,8 @@ export default function Transactions() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(tx => (
-                <tr key={tx.id}>
+              {filtered.map((tx, idx) => (
+                <tr key={tx.id} style={{position:'relative'}}>
                   <td style={{textAlign:'left'}}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
                   <td style={{textAlign:'left'}}>{fmtTime(tx)}</td>
                   <td style={{textAlign:'left'}}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
@@ -635,6 +634,7 @@ export default function Transactions() {
                         <button onClick={async function(){await remove(tx.id);setToast('Транзакция успешно удалена!')}} style={{color:'#dc3545'}}>Удалить</button>
                       </div>
                     </div>
+                    {idx === 0 && tblPos.right && <div className="sk-fade sk-fade-r"></div>}
                   </td>
                 </tr>
               ))}

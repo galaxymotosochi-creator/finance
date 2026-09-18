@@ -383,8 +383,7 @@ export default function Accounts() {
           })()}
           <div className="sk-tablewrap">
             <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-            <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+              <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
             <table className="sk-table">
               <thead id="colHeaders">
                 <tr>

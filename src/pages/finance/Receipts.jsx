@@ -555,8 +555,7 @@ export default function Receipts() {
       {/* Таблица чеков */}
       <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+          <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>
