@@ -679,7 +679,7 @@ export default function Employees() {
                           placeholder="Поиск категории…"
                           style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
                         {catDrop && (
-                          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 190, overflowY: 'auto', marginTop: 2 }}>
+                          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 230, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', marginTop: 2 }}>
                             {allCats.filter(c => c.name.toLowerCase().includes(catSearch.toLowerCase().trim())).length === 0 ? (
                               <div style={{ padding: '.5rem', fontSize: '.8125rem', color: 'var(--muted)', textAlign: 'center' }}>Ничего не найдено</div>
                             ) : allCats.filter(c => c.name.toLowerCase().includes(catSearch.toLowerCase().trim())).map(c => (
@@ -730,7 +730,7 @@ export default function Employees() {
                           placeholder="Поиск товара или услуги…"
                           style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
                         {itemDrop && (
-                          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 190, overflowY: 'auto', marginTop: 2 }}>
+                          <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 230, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', marginTop: 2 }}>
                             {allProds.filter(pp => pp.name.toLowerCase().includes(itemSearch.toLowerCase().trim())).length === 0 ? (
                               <div style={{ padding: '.5rem', fontSize: '.8125rem', color: 'var(--muted)', textAlign: 'center' }}>Ничего не найдено</div>
                             ) : allProds.filter(pp => pp.name.toLowerCase().includes(itemSearch.toLowerCase().trim())).map(pp => (
