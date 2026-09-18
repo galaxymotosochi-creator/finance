@@ -712,7 +712,7 @@ export default function Transactions() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Перевести</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
