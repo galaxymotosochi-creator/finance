@@ -1029,9 +1029,7 @@ function CategorySelect({ cats, value, onChange, placeholder }) {
             return (
               <button key={c.id} type="button" onClick={() => { onChange(on ? '' : c.id); setOpen(false); }}
                 style={{display:'flex',alignItems:'center',gap:'.5rem',width:'100%',padding:'.45rem .55rem',borderRadius:'.5rem',border:'none',background:on?'#E6F0FF':'none',fontFamily:'inherit',fontSize:'.8rem',fontWeight:on?700:400,color:'#3a3a3f',cursor:'pointer',textAlign:'left'}}>
-                <span className="dd-cb" style={{borderColor:on?'#111':'#c9c9d1',background:on?'#111':'#fff'}}>
-                  {on && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                </span>
+                <span style={{width:'8px',height:'8px',borderRadius:'50%',background:on?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                 {c.name}
               </button>
             );
