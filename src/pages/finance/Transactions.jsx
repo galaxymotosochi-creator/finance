@@ -407,8 +407,12 @@ export default function Transactions() {
       setShowIncome(true);
     }
   };
-  const incomeCats = cats.filter(c => c?.type === 'income');
-  const expenseCats = cats.filter(c => c?.type === 'expense' || c?.type === 'supply_expense');
+  // Служебные категории (перевод между счетами, инкассация) не предлагаем в выборе —
+  // это не доход и не расход бизнеса, а перемещение своих денег
+  const SERVICE_CATS = ['Перевод между счетами', 'Инкассация'];
+  const isServiceCat = (c) => c && SERVICE_CATS.indexOf(c.name) !== -1;
+  const incomeCats = cats.filter(c => c?.type === 'income' && !isServiceCat(c));
+  const expenseCats = cats.filter(c => (c?.type === 'expense' || c?.type === 'supply_expense') && !isServiceCat(c));
   if (dataError) return (
     <div className="empty-products" style={{marginTop:'1rem'}}>
       <div style={{fontSize:'2rem',marginBottom:'.5rem'}}>⚠️</div>
