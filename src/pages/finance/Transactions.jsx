@@ -177,6 +177,37 @@ export default function Transactions() {
   const salesIncome = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t) && ((saleCatTxId && String(t.category_id) === String(saleCatTxId)) || (t.description || '').indexOf('Кассовая смена') === 0 || (t.description || '').indexOf('по чеку') >= 0)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const otherIncomeTx = Math.max(0, incomeTotal - salesIncome);
   const expenseTotal = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+
+  // --- Структура доходов/расходов по категориям (для круга и легенды) ---
+  const txIncomeList = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t));
+  const txExpenseList = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t));
+  const buildCatBreakdown = (list, total) => {
+    const map = new Map();
+    list.forEach(t => {
+      const nm = catNameById(t.category_id) || 'Без категории';
+      map.set(nm, (map.get(nm) || 0) + (Number(t.amount) || 0));
+    });
+    return Array.from(map.entries()).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
+  };
+  const incomeCatsList = buildCatBreakdown(txIncomeList, incomeTotal);
+  const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
+  const txProfit = Math.max(0, incomeTotal - expenseTotal);
+  const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
+  const txTurnover = incomeTotal + expenseTotal || 1;
+  const INC_COLORS = ['#1F75FF', '#4a92ff', '#74aefe', '#a9c8ff', '#cfe2ff'];
+  const EXP_COLORS = ['#ffcf2e', '#ffdd2d', '#ffe680', '#fff2b8', '#fff9db'];
+  const txRingSegs = [
+    ...incomeCatsList.map((c, i) => ({ ...c, color: INC_COLORS[i % INC_COLORS.length], side: 'inc' })),
+    ...expenseCatsList.map((c, i) => ({ ...c, color: EXP_COLORS[i % EXP_COLORS.length], side: 'exp' })),
+  ].filter(s => s.amount > 0);
+  let txAccPct = 0;
+  const txRingStops = txRingSegs.map(s => {
+    const from = txAccPct / txTurnover * 100;
+    txAccPct += s.amount;
+    const to = txAccPct / txTurnover * 100;
+    return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
+  }).join(', ');
+  const [txRingOpen, setTxRingOpen] = useState(false);
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
@@ -494,23 +525,55 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', margin: '.75rem 0' }}>
-          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Выручка от продаж</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>+{salesIncome.toLocaleString()} {cur}</div>
+        <div className="tx-card">
+          <div className="tx-ring-block">
+            <div className="tx-ring" style={{background: txRingStops ? 'conic-gradient(' + txRingStops + ')' : '#eef4ff'}}>
+              {txRingSegs.map((s, i) => {
+                const prev = txRingSegs.slice(0, i).reduce((x, y) => x + y.amount, 0);
+                const midPct = (prev + s.amount / 2) / txTurnover;
+                const ang = midPct * 360 - 90;
+                const rad = ang * Math.PI / 180;
+                const x = Math.round(Math.cos(rad) * 56);
+                const y = Math.round(Math.sin(rad) * 56);
+                const pct = Math.round(s.amount / txTurnover * 100);
+                if (pct < 4) return null;
+                return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.side === 'inc' ? '#1F75FF' : '#ffcf2e', color:s.side === 'inc' ? '#fff' : '#111'}}>{pct}%</span>;
+              })}
+              <div className="in">
+                <div className="t">Прибыль</div>
+                <div className="v">{(incomeTotal - expenseTotal) >= 0 ? '+' : ''}{(incomeTotal - expenseTotal).toLocaleString()} {cur}</div>
+              </div>
+            </div>
+            <div className={'tx-legend' + (txRingOpen ? '' : ' tx-collapse')}>
+              <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#1F75FF'}}></span>Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
+              <div className="tx-sub">
+                {incomeCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет доходов за период</div>}
+                {incomeCatsList.map((c, i) => (
+                  <div key={i}>
+                    <div className="tx-leg"><span className="dot" style={{background:INC_COLORS[i % INC_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:INC_COLORS[i % INC_COLORS.length]}}></i></div>
+                  </div>
+                ))}
+              </div>
+              <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#ffcf2e'}}></span>Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
+              <div className="tx-sub">
+                {expenseCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет расходов за период</div>}
+                {expenseCatsList.map((c, i) => (
+                  <div key={i}>
+                    <div className="tx-leg"><span className="dot" style={{background:EXP_COLORS[i % EXP_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:EXP_COLORS[i % EXP_COLORS.length]}}></i></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Прочие доходы</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{otherIncomeTx > 0 ? '+' : ''}{otherIncomeTx.toLocaleString()} {cur}</div>
-          </div>
-          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap' }}>Расходы</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#111', whiteSpace: 'nowrap' }}>{expenseTotal.toLocaleString()} {cur}</div>
-          </div>
-          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '12px 14px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '6px', whiteSpace: 'nowrap' }}>Баланс счетов</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: balanceTotal < 0 ? '#c62828' : '#111', whiteSpace: 'nowrap' }}>{balanceTotal.toLocaleString()} {cur}</div>
-          </div>
+          {(incomeCatsList.length > 2 || expenseCatsList.length > 2) && (
+            <div className="tx-toggle-row">
+              <button type="button" className={'tx-toggle' + (txRingOpen ? ' open' : '')} onClick={() => setTxRingOpen(!txRingOpen)}>
+                <span className="car">▾</span><span>{txRingOpen ? 'Свернуть категории' : 'Раскрыть категории'}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 

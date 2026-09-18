@@ -841,6 +841,34 @@ input:focus, select:focus, textarea:focus {
   .sk-ring .in .v{font-size:14px}
 }
 
+/* ===== Доходы и расходы: карточка «круг + структура» (дизайн tx-panels v3) ===== */
+.tx-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;padding:20px 22px;margin-bottom:14px}
+.tx-ring-block{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
+.tx-ring{width:164px;height:164px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 14px 30px -14px rgba(11,18,32,.28)}
+.tx-ring:after{content:"";position:absolute;inset:30px;background:#fff;border-radius:50%;box-shadow:0 0 0 1px rgba(11,18,32,.05)}
+.tx-ring .in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.tx-ring .in .t{font-size:10.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;line-height:1.2}
+.tx-ring .in .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.15;color:#111}
+.tx-ring-pct{position:absolute;z-index:2;font-size:10px;font-weight:800;letter-spacing:-.01em;background:#fff;border-radius:100px;padding:1px 5px;box-shadow:0 1px 4px rgba(11,18,32,.18);transform:translate(-50%,-50%)}
+.tx-legend{flex:1;min-width:280px;display:flex;flex-direction:column;gap:10px}
+.tx-leg{display:flex;align-items:center;gap:10px}
+.tx-leg .dot{width:11px;height:11px;border-radius:3px;flex:none}
+.tx-leg .nm{flex:1;font-size:12.5px;color:var(--sk-muted);font-weight:600}
+.tx-leg .amt{font-size:13.5px;font-weight:800;min-width:104px;text-align:right;color:#111}
+.tx-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
+.tx-leg-bar i{display:block;height:100%;border-radius:3px}
+.tx-grp-h{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:800;color:var(--sk-ink);margin-top:4px}
+.tx-grp-h .grp-amt{font-size:13.5px;font-weight:800;color:#111;margin-left:6px}
+.tx-sub{padding-left:21px;display:flex;flex-direction:column;gap:8px}
+.tx-collapse .tx-sub > *:nth-child(n+5){display:none}
+@keyframes tx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(29,120,252,.45),0 8px 20px -10px rgba(29,120,252,.55)}50%{box-shadow:0 0 0 8px rgba(29,120,252,0),0 12px 26px -10px rgba(29,120,252,.7)}}
+.tx-toggle{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:100px;padding:9px 16px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;animation:tx-pulse 2.2s ease-in-out infinite;transition:transform .15s}
+.tx-toggle:hover{transform:translateY(-1px)}
+.tx-toggle .car{font-size:9px;transition:transform .2s;display:inline-block}
+.tx-toggle.open .car{transform:rotate(180deg)}
+.tx-toggle-row{display:flex;justify-content:center;margin-top:14px}
+@media(max-width:760px){.tx-ring-block{flex-direction:column;align-items:flex-start;gap:16px}.tx-ring{align-self:center}.tx-legend{width:100%;min-width:0}}
+
 /* Раскрывающаяся кнопка «Действия» на странице Счета */
 .sk-dd-wrap{position:relative}
 .sk-dd-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:11px 18px;font-size:12.5px;font-weight:700;line-height:1;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;box-shadow:0 12px 26px -12px rgba(29,120,252,.8);transition:transform .15s;animation:skpulse 2s ease-in-out infinite}
