@@ -98,13 +98,18 @@ export default function Transactions() {
     }
   }, [transactions, accounts]);
 
-  // Закрытие дропдаунов при клике вне
+  // Закрытие выпадающих списков («Тип» и «Все время») по клику в любом месте.
+  // Открытие одного автоматически закрывает другой — как в разделе «Чеки».
   useEffect(() => {
-    if (!showPeriod && !showDownload) return;
-    const handler = () => { setShowPeriod(false); setShowDownload(false); };
+    const handler = (e) => {
+      if (!e.target.closest('.sk-period-wrap')) setShowPeriod(false);
+      if (!e.target.closest('.sk-dd-wrap')) {
+        document.querySelectorAll('.sk-dd-wrap.open').forEach(w => w.classList.remove('open'));
+      }
+    };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
-  }, [showPeriod, showDownload]);
+  }, []);
   const [typeFilter, setTypeFilterRaw] = useState(null);
   var setTypeFilter = function(t) { setTypeFilterRaw(t); };
 
@@ -444,23 +449,21 @@ export default function Transactions() {
                 const isActive = period === p.key;
                 return (
                   <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.78rem',color:'#3a3a3f',background:isActive?'#E6F0FF':'transparent',fontWeight:isActive?700:400}}>
-                    <span className="dd-cb" style={{borderColor:isActive?'#111':'#c9c9d1',background:isActive?'#111':'#fff'}}>
-                      {isActive && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                    </span>
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                     {p.label}
                   </div>
                 );
               })}
-              <div style={{borderTop:'1px solid rgba(29,120,252,.12)',paddingTop:'.4rem',marginTop:'.25rem'}}>
-                <div style={{fontSize:'.72rem',color:'#9aa3b0',padding:'.2rem .55rem',marginBottom:'.25rem'}}>Свой период</div>
+              <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
                 <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
-                  <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.25rem',border:'1px solid #e2e2e6',borderRadius:'.5rem',fontFamily:'var(--font)',outline:'none'}} />
-                  <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.25rem',border:'1px solid #e2e2e6',borderRadius:'.5rem',fontFamily:'var(--font)',outline:'none'}} />
+                  <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                  <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                 </div>
-                <div style={{padding:'.35rem .55rem .15rem'}}>
+                <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
                   <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setShowPeriod(false)}}
-                    style={{width:'100%',padding:'.4rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'#111',color:'#fff',border:'none',borderRadius:'100px',cursor:'pointer',fontWeight:600}}>Применить</button>
+                    className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}>Применить</button>
                 </div>
               </div>
             </div>
