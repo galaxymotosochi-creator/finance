@@ -28,8 +28,8 @@ export default function Variant3() {
       <section style={{maxWidth:1104,margin:"48px auto",padding:"0 24px",display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(320px, 1fr))",gap:16}}>
         {[
           {emoji:"📊",title:"Финансы",desc:"Управляйте доходами и расходами, смотрите P&L и движение денег. Все счета и кассы в одном месте.",color:"#fff8d6"},
-          {emoji:"📦",title:"Склад и товары",desc:"Полный складской учёт: остатки, поставки, списания, инвентаризация и поставщики.",color:"#e8f0ff"},
-          {emoji:"👷",title:"Зарплата и сотрудники",desc:"Автоматический расчёт зарплаты, табель, бонусы, штрафы. Ведите штатное расписание.",color:"#f0fdf4"},
+          {emoji:"📦",title:"Склад и товары",desc:"Полный складской учет: остатки, поставки, списания, инвентаризация и поставщики.",color:"#e8f0ff"},
+          {emoji:"👷",title:"Зарплата и сотрудники",desc:"Автоматический расчет зарплаты, табель, бонусы, штрафы. Ведите штатное расписание.",color:"#f0fdf4"},
         ].map((c,i)=>(
           <div key={i} style={{
             border:"1px solid rgba(0,0,0,.08)",borderRadius:20,padding:28,

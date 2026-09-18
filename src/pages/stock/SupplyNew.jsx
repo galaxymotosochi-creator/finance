@@ -247,7 +247,7 @@ export default function SupplyNew() {
                     <span onClick={e => { e.stopPropagation(); setPayments(prev => prev.filter((_, j) => j !== i)); }} style={{ marginLeft: 'auto', color: '#dc2626', cursor: 'pointer', fontSize: '.75rem' }}>✕</span>
                   </div>
                 ))}
-                <div style={{ fontSize: '.72rem', color: 'var(--primary)', cursor: 'pointer' }}>+ Добавить ещё</div>
+                <div style={{ fontSize: '.72rem', color: 'var(--primary)', cursor: 'pointer' }}>+ Добавить еще</div>
               </div>
             )}
           </div>
@@ -269,9 +269,9 @@ export default function SupplyNew() {
                 <input type="number" id="payAmount" placeholder="0" style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none' }} />
               </div>
               <div style={{ flex: 2, minWidth: 140 }}>
-                <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Счёт</label>
+                <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Счет</label>
                 <select id="payMethod" style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
-                  <option value="">Выберите счёт</option>
+                  <option value="">Выберите счет</option>
                   {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Number(a.balance||0).toLocaleString()} {cur}</option>)}
                 </select>
               </div>

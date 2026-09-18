@@ -334,7 +334,7 @@ export default function Salary() {
     setExistingDebt(debt);
   }, [fEmpId, list]);
 
-  // Защита от дублей: если за выбранный период сотруднику уже начислено — предупреждаем и не даём сохранить
+  // Защита от дублей: если за выбранный период сотруднику уже начислено — предупреждаем и не даем сохранить
   useEffect(() => {
     if (!fEmpId || !fPeriodFrom || !fPeriodTo) { setDupSalary(null); return; }
     const d = (list || []).find(s =>
@@ -358,7 +358,7 @@ export default function Salary() {
     const v = edited !== undefined && edited !== '' ? (parseFloat(edited) || 0) : (Number(x.amount) || 0);
     return s2 + v;
   }, 0);
-  // Если включён «% от всей выручки» без суммирования — позиционные бонусы не учитываются
+  // Если включен «% от всей выручки» без суммирования — позиционные бонусы не учитываются
   const itemsBonusTotal = (storeInfo && storeInfo.stack === false) ? 0 : salesBonusTotal;
   // Бонус от выручки пропорционален отработанным дням (по табелю): если табель за период заполнен —
   // умножаем на (рабочие дни / дни периода), если нет — полный процент
@@ -414,7 +414,7 @@ export default function Salary() {
         user_id: user.id, employee_id: fEmpId, employee_name: emp ? emp.name : 'Сотрудник',
         period_from: fPeriodFrom, period_to: fPeriodTo, period_start: fPeriodFrom, period_end: fPeriodTo,
         base_salary: fBaseSalary, days_worked: fDays,
-        // Статус всегда «Начислено» — выплата выполняется только через кнопку «Выплатить» с выбором счёта,
+        // Статус всегда «Начислено» — выплата выполняется только через кнопку «Выплатить» с выбором счета,
         // иначе зарплата помечалась выплаченной без создания расходной операции
         amount: grandTotal, status: 'pending', pay_type: fPayType,
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
@@ -440,7 +440,7 @@ export default function Salary() {
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
-  // Реальный баланс счёта: начальный остаток + все движения (доходы минус расходы)
+  // Реальный баланс счета: начальный остаток + все движения (доходы минус расходы)
   const getAccountBalance = (a) => {
     var b = parseFloat(a.balance || a.initial_balance || 0);
     (accTxs || []).forEach(t => { if (t.account_id === a.id) b += Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
@@ -475,7 +475,7 @@ export default function Salary() {
           const acct = accs.find(a => a.id === aid);
           const balance = acct ? getAccountBalance(acct) : 0;
           if (balance < amt) {
-            return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + ', нужно: ' + amt.toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов или выберите другой счёт.');
+            return alert('Недостаточно средств на счету ' + (acct?.name || 'счет') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + ', нужно: ' + amt.toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов или выберите другой счет.');
           }
         }
         if (Math.abs(totalSplit - Number(s.amount)) > 0.01) {
@@ -485,7 +485,7 @@ export default function Salary() {
         const acct = accs.find(a => a.id === accId);
         const balance = acct ? getAccountBalance(acct) : 0;
         if (balance < s.amount) {
-          return alert('Недостаточно средств на счету ' + (acct?.name || 'счёт') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов (кнопка «+ Разделить») или выберите другой счёт.');
+          return alert('Недостаточно средств на счету ' + (acct?.name || 'счет') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов (кнопка «+ Разделить») или выберите другой счет.');
         }
       }
 
@@ -606,8 +606,8 @@ export default function Salary() {
                 ) },
                 { q: 'Что значит «начислить» и «выплатить»?', a: (
                   <ul>
-                    <li style={{marginBottom:'.5rem'}}><b>Начислить</b> — записать, что сотруднику <b>положено</b> за период. Деньги при этом ещё не выданы. Статус: <b>«Начислено»</b>.</li>
-                    <li style={{marginBottom:'.5rem'}}><b>Выплатить</b> — зафиксировать, что деньги <b>фактически выданы</b> и со счёта ушла сумма. Статус: <b>«Выплачено»</b>.</li>
+                    <li style={{marginBottom:'.5rem'}}><b>Начислить</b> — записать, что сотруднику <b>положено</b> за период. Деньги при этом еще не выданы. Статус: <b>«Начислено»</b>.</li>
+                    <li style={{marginBottom:'.5rem'}}><b>Выплатить</b> — зафиксировать, что деньги <b>фактически выданы</b> и со счета ушла сумма. Статус: <b>«Выплачено»</b>.</li>
                     <li>Сначала всегда начисление, потом выплата. Выплатить можно только то, что начислено.</li>
                   </ul>
                 ) },
@@ -624,16 +624,16 @@ export default function Salary() {
                   <ol style={{paddingLeft:'1.15rem',margin:0}}>
                     <li style={{marginBottom:'.5rem'}}>Найдите строку со статусом <b>«Начислено»</b>.</li>
                     <li style={{marginBottom:'.5rem'}}>Нажмите на <b>статус</b> в строке.</li>
-                    <li style={{marginBottom:'.5rem'}}>Выберите <b>счёт</b>, с которого выдаёте деньги, и дату.</li>
-                    <li>Подтвердите. Статус станет <b>«Выплачено»</b>, сумма уйдёт со счёта, кольцо заполнится.</li>
+                    <li style={{marginBottom:'.5rem'}}>Выберите <b>счет</b>, с которого выдаете деньги, и дату.</li>
+                    <li>Подтвердите. Статус станет <b>«Выплачено»</b>, сумма уйдет со счета, кольцо заполнится.</li>
                   </ol>
                 ) },
                 { q: 'Что означают кольца сотрудников?', a: (
                   <ul>
-                    <li style={{marginBottom:'.5rem'}}>Кольцо — это <b>прогресс выплат</b> по сотруднику за всё время.</li>
+                    <li style={{marginBottom:'.5rem'}}>Кольцо — это <b>прогресс выплат</b> по сотруднику за все время.</li>
                     <li style={{marginBottom:'.5rem'}}><b>Процент в центре</b> — сколько выплачено от начисленного. Например 40% — из 100 000 ₽ выдано 40 000 ₽.</li>
                     <li style={{marginBottom:'.5rem'}}>Под кольцом — <b>«выплачено из начислено»</b>, чтобы видеть суммы.</li>
-                    <li>Кольцо полностью закрашено — сотрудник рассчитан. Пустое — начислено, но ещё не платили.</li>
+                    <li>Кольцо полностью закрашено — сотрудник рассчитан. Пустое — начислено, но еще не платили.</li>
                   </ul>
                 ) },
                 { q: 'Как работают фильтры и поиск?', a: (
@@ -657,7 +657,7 @@ export default function Salary() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>Расчёт начислений с привязкой к табелю</div>
+          <div className="sub" style={{maxWidth:'210px'}}>Расчет начислений с привязкой к табелю</div>
         </div>
         <div className="sk-bar-acts">
           <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить</button>
@@ -867,7 +867,7 @@ export default function Salary() {
                     </div>
                   ) : null}
                   {storeInfo && storeInfo.stack === false && salesRows.length > 0 && (
-                    <div style={{fontSize:'.7rem',color:'#d97706',marginBottom:'6px'}}>⚠️ Включён процент от всей выручки без суммирования — бонусы за свои продажи ниже не начисляются</div>
+                    <div style={{fontSize:'.7rem',color:'#d97706',marginBottom:'6px'}}>⚠️ Включен процент от всей выручки без суммирования — бонусы за свои продажи ниже не начисляются</div>
                   )}
                   {salesRows.length === 0 ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
@@ -1091,7 +1091,7 @@ export default function Salary() {
 
               {/* Кнопки */}
               <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
-                <span style={{fontSize:'.72rem',color:'var(--muted)'}}>Статус: Начислено (выплата — через кнопку «Выплатить» со счёта)</span>
+                <span style={{fontSize:'.72rem',color:'var(--muted)'}}>Статус: Начислено (выплата — через кнопку «Выплатить» со счета)</span>
                 <button type="submit"
                   style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
                   {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}

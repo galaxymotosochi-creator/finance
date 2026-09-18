@@ -62,7 +62,7 @@ export default function Promos() {
 
   const promoDays = (d) => {
     const ds = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    // даты в БД — timestamptz (с временем) — берём только дату
+    // даты в БД — timestamptz (с временем) — берем только дату
     return promos.filter(p => ds >= String(p.start_date||'').slice(0,10) && ds <= String(p.end_date||'').slice(0,10));
   };
 
@@ -290,7 +290,7 @@ export default function Promos() {
                     <span style={{color:'var(--muted)'}}>{x.price ? x.price.toLocaleString()+' ₽' : '—'}</span>
                   </div>
                 ))}
-                {matchedProducts.length > 50 && <div style={{padding:'.3rem .5rem',textAlign:'center',color:'var(--muted)',fontSize:'.72rem'}}>... и ещё {matchedProducts.length - 50}</div>}
+                {matchedProducts.length > 50 && <div style={{padding:'.3rem .5rem',textAlign:'center',color:'var(--muted)',fontSize:'.72rem'}}>... и еще {matchedProducts.length - 50}</div>}
               </div>
 
               <div className="prod-more-wrap" style={{position:'absolute',top:'.75rem',right:'3rem'}}>

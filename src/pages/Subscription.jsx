@@ -43,8 +43,8 @@ export default function Subscription() {
   const periodLabels = {"1m":"1 месяц","3m":"3 месяца","6m":"6 месяцев","1y":"1 год"};
 
   const plans = [
-    {name:"Базовый",price:490,desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false},
-    {name:"Старт",price:990,desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false},
+    {name:"Базовый",price:490,desc:"Для самозанятых и микро-бизнеса",features:["Учет доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false},
+    {name:"Старт",price:990,desc:"Для малого бизнеса и сервисов",features:["Полный учет кассы","Складской учет и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false},
     {name:"Бизнес",price:2900,desc:"Для компаний с командой",features:["Тариф «Старт»","Зарплата и табель","До 5 пользователей","Безлимитный AI"],popular:true},
     {name:"Профи",price:6900,desc:"Для сетей и крупных проектов",features:["Тариф «Бизнес»","Мульти-аккаунты","API доступ","∞ пользователей"],popular:false},
   ];
@@ -221,7 +221,7 @@ export default function Subscription() {
           ))}
         </div>
         <div style={{marginTop:16,fontSize:11,color:"rgba(0,0,0,.34)",lineHeight:1.4}}>
-          🔒 Все данные защищены. Оплата проходит через защищённый протокол PCI DSS.
+          🔒 Все данные защищены. Оплата проходит через защищенный протокол PCI DSS.
           Автоматические списания происходят согласно{' '}
           <a href="/terms" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline"}}>Пользовательскому соглашению</a>.
         </div>
@@ -243,7 +243,7 @@ export default function Subscription() {
           <div style={{fontSize:'2rem',marginBottom:12,textAlign:'center'}}>💔</div>
           <h2 style={{fontSize:"1.15rem",fontWeight:700,textAlign:'center',marginBottom:8}}>Отменить автопродление?</h2>
           <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",textAlign:'center',marginBottom:20,lineHeight:1.4}}>
-            После отмены ваш тариф «{currentPlan.name}» будет активен до {currentPlan.until}, после чего подписка перейдёт на бесплатный тариф.
+            После отмены ваш тариф «{currentPlan.name}» будет активен до {currentPlan.until}, после чего подписка перейдет на бесплатный тариф.
           </p>
           <div style={{display:"flex",gap:10}}>
             <button onClick={()=>{setShowCancelModal(false);setShowDiscountOffer(true)}} style={{
@@ -255,7 +255,7 @@ export default function Subscription() {
             <button onClick={()=>{setShowCancelModal(false);setAutoRenew(false)}} style={{
               background:'none',border:'none',fontSize:12,color:'rgba(0,0,0,.34)',
               textDecoration:'underline',cursor:'pointer',fontFamily:'inherit',
-            }}>Всё равно отменить</button>
+            }}>Все равно отменить</button>
           </div>
         </div></div>
       )}
@@ -267,7 +267,7 @@ export default function Subscription() {
             <div style={{fontSize:'2.5rem',marginBottom:12}}>🎁</div>
             <h2 style={{fontSize:"1.15rem",fontWeight:700,marginBottom:8}}>Мы хотим вас удержать!</h2>
             <p style={{fontSize:".85rem",color:"rgba(0,0,0,.54)",marginBottom:16,lineHeight:1.4}}>
-              Дарим вам персональную скидку <strong style={{color:'#16a34a'}}>10%</strong> на текущий тариф на следующие 3 месяца. Остаётесь?
+              Дарим вам персональную скидку <strong style={{color:'#16a34a'}}>10%</strong> на текущий тариф на следующие 3 месяца. Остаетесь?
             </p>
             <button onClick={()=>{setAutoRenew(true);setShowDiscountOffer(false)}} style={{
               width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",color:"#000",

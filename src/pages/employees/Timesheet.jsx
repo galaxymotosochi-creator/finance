@@ -140,7 +140,7 @@ export default function Timesheet() {
     const de = getDayEntries(d);
     const hasBonus = de.some(e => (e.bonus_amount || 0) > 0);
     const hasDeduct = de.some(e => (e.deduct_amount || 0) > 0);
-    // Цветные точки статусов: больничный, отпуск, прогул, удалёнка
+    // Цветные точки статусов: больничный, отпуск, прогул, удаленка
     const dots = [];
     if (de.some(e => e.status === 'sick')) dots.push('#f97316');
     if (de.some(e => e.status === 'vacation')) dots.push('#3b82f6');
@@ -295,19 +295,19 @@ export default function Timesheet() {
             <h1>Табель</h1>
             <SectionHelp
               title="Раздел «Табель»"
-              intro="Табель — учёт рабочего времени. Здесь отмечаются отработанные дни, больничные и отпуска. От табеля считается процент от выручки."
+              intro="Табель — учет рабочего времени. Здесь отмечаются отработанные дни, больничные и отпуска. От табеля считается процент от выручки."
               faq={[
                 { q: 'Как отметить день?', a: (
                   <div>Нажмите на день в <b>календаре</b> — откроется окно со статусами сотрудников за этот день.</div>
                 ) },
                 { q: 'Что за цветные точки в календаре?', a: (
-                  <div><b>Зелёная</b> точка — в этот день был бонус, <b>красная</b> — штраф.</div>
+                  <div><b>Зеленая</b> точка — в этот день был бонус, <b>красная</b> — штраф.</div>
                 ) },
                 { q: 'Зачем нужен табель?', a: (
                   <div>От количества отработанных дней считается <b>процент от выручки</b>. Нет табеля — начислится полный процент.</div>
                 ) },
                 { q: 'Как переключить месяц?', a: (
-                  <div>Стрелками <b>‹ ›</b> над календарём.</div>
+                  <div>Стрелками <b>‹ ›</b> над календарем.</div>
                 ) },
                 { q: 'Кто видит табель?', a: (
                   <div>Все, у кого открыт доступ к разделу <b>«Команда»</b>.</div>
@@ -607,7 +607,7 @@ export default function Timesheet() {
                     if (entry) {
                       const r = await supabase.from('timesheet_entries').update({ status: localStatuses[empId] }).eq('id', entry.id); if (r.queued) anyQueued = true;
                     } else if (localStatuses[empId] && localStatuses[empId] !== 'present') {
-                      // Создаём запись только если отметили нестандартный статус —
+                      // Создаем запись только если отметили нестандартный статус —
                       // иначе каждый «Сохранить» плодит «Работал» всем сотрудникам
                       const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId] }); if (r.queued) anyQueued = true;
                     }

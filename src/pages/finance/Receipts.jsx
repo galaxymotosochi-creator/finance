@@ -84,7 +84,7 @@ export default function Receipts() {
   const [refundAltAc, setRefundAltAc] = useState('');
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
-  // Сколько чеков подгружаем за раз (кнопка «Показать ещё»)
+  // Сколько чеков подгружаем за раз (кнопка «Показать еще»)
   const PAGE_SIZE = 500;
 
   const load = async () => {
@@ -100,7 +100,7 @@ export default function Receipts() {
       setReceipts(data || []);
       setHasMore((data || []).length === PAGE_SIZE);
     } catch (e) {
-      // Таблица может ещё не существовать
+      // Таблица может еще не существовать
       setReceipts([]);
       setHasMore(false);
       console.warn('Таблица receipts недоступна. Выполните SQL миграцию в Supabase.');
@@ -127,7 +127,7 @@ export default function Receipts() {
 
   useEffect(() => { load(); }, [user]);
 
-  // Подгрузка следующих чеков («Показать ещё»): берём старше последнего загруженного
+  // Подгрузка следующих чеков («Показать еще»): берем старше последнего загруженного
   const loadMore = async () => {
     if (loadingMore || !hasMore || !user) return;
     setLoadingMore(true);
@@ -240,7 +240,7 @@ export default function Receipts() {
   };
   // Остаток к возврату по позиции
   const refundableQty = (r, item) => Math.max(0, (Number(item.quantity) || 0) - returnedQtyByItem(r, item.id));
-  // Можно ли ещё оформить возврат по чеку
+  // Можно ли еще оформить возврат по чеку
   const canRefund = (r) => {
     if (!r || r.status === 'unpaid') return false;
     return receiptItems.some(it => refundableQty(r, it) > 0);
@@ -251,7 +251,7 @@ export default function Receipts() {
     return q > 0 ? (Number(item.total) || 0) / q : 0;
   };
 
-  // Текущий остаток счёта: начальный баланс + все движения
+  // Текущий остаток счета: начальный баланс + все движения
   const accBalance = (acId) => {
     const ac = accounts.find(a => a.id === acId);
     let b = parseFloat(ac?.balance) || 0;
@@ -293,7 +293,7 @@ export default function Receipts() {
     const remain = receiptRemain(payReceipt);
     const amt = parseFloat(payAmt) || remain;
     if (!amt || amt <= 0) return alert('Введите сумму');
-    if (!payAc) return alert('Выберите счёт');
+    if (!payAc) return alert('Выберите счет');
     if (amt > remain) return alert('Сумма больше остатка долга (' + remain.toLocaleString() + ' ₽)');
     try {
       // Категория «Доход от продаж»
@@ -342,26 +342,26 @@ export default function Receipts() {
     const sumItems = rows.reduce((s2, x) => s2 + x.total, 0);
     if (sumItems <= 0) return alert('Сумма возврата равна нулю');
     // Возврат денег — с тех же счетов, которыми оплачен чек (пропорционально).
-    // Если на них не хватает — кассир выбирает другой счёт (например, куда инкассировали)
+    // Если на них не хватает — кассир выбирает другой счет (например, куда инкассировали)
     const { splits: autoSplits, money, hasPayList } = calcRefundSplits(r, sumItems);
     const diff = sumItems - money;
     let splits = autoSplits;
     if (money > 0) {
       const shortage = autoSplits.some(sp => accBalance(sp.account_id) < sp.amount - 0.01);
       if (shortage) {
-        if (!refundAltAc) return alert('На счетах оплаты недостаточно средств — выберите счёт, с которого вернуть деньги');
-        if (accBalance(refundAltAc) < money - 0.01) return alert('На выбранном счёте недостаточно средств (доступно ' + Math.max(0, Math.round(accBalance(refundAltAc))).toLocaleString() + ' ' + cur + ')');
+        if (!refundAltAc) return alert('На счетах оплаты недостаточно средств — выберите счет, с которого вернуть деньги');
+        if (accBalance(refundAltAc) < money - 0.01) return alert('На выбранном счете недостаточно средств (доступно ' + Math.max(0, Math.round(accBalance(refundAltAc))).toLocaleString() + ' ' + cur + ')');
         splits = [{ account_id: refundAltAc, amount: money }];
       } else if (!hasPayList) {
-        if (!refundAc) return alert('По чеку нет разбивки оплаты — выберите счёт для возврата');
+        if (!refundAc) return alert('По чеку нет разбивки оплаты — выберите счет для возврата');
         splits = [{ account_id: refundAc, amount: money }];
       }
-      if (splits.length === 0) return alert('Не удалось определить счёт возврата — выберите счёт');
+      if (splits.length === 0) return alert('Не удалось определить счет возврата — выберите счет');
     }
     try {
       setRefunding(true);
-      // 1) Деньги: если смена ещё открыта — правим payments чека (закроется сменой),
-      //    если закрыта/вне смены — создаём транзакцию «Возврат»
+      // 1) Деньги: если смена еще открыта — правим payments чека (закроется сменой),
+      //    если закрыта/вне смены — создаем транзакцию «Возврат»
       const shiftRes = r.shift_id ? await supabase.from('shifts').select('status').eq('id', r.shift_id).maybeSingle() : { data: null };
       const shiftOpen = !!(shiftRes.data && shiftRes.data.status === 'open');
       const newPayments = Array.isArray(r.payments) ? r.payments.slice() : [];
@@ -462,7 +462,7 @@ export default function Receipts() {
                 ) },
                 { q: 'Что означает каждая колонка?', a: (
                   <ul>
-                    <li><b>№ чека</b> — номер чека. Красная точка — ждёт синхронизации.</li>
+                    <li><b>№ чека</b> — номер чека. Красная точка — ждет синхронизации.</li>
                     <li><b>Дата</b> — когда пробили чек.</li>
                     <li><b>Сумма</b> — итог чека.</li>
                     <li><b>Возврат</b> — сколько вернули по этому чеку.</li>
@@ -483,10 +483,10 @@ export default function Receipts() {
                   </ul>
                 ) },
                 { q: 'Как принять оплату долга?', a: (
-                  <p>Найдите чек с долгом (фильтр <b>«Долги»</b>), нажмите на плашку с суммой долга в колонке <b>«Оплата»</b> — откроется окно, где выберите счёт и введите сумму.</p>
+                  <p>Найдите чек с долгом (фильтр <b>«Долги»</b>), нажмите на плашку с суммой долга в колонке <b>«Оплата»</b> — откроется окно, где выберите счет и введите сумму.</p>
                 ) },
                 { q: 'Как оформить возврат?', a: (
-                  <p>Откройте чек и нажмите <b>«Оформить возврат»</b>, укажите товары и сумму. Возврат уменьшит долг клиента, а деньги вернутся с выбранного счёта.</p>
+                  <p>Откройте чек и нажмите <b>«Оформить возврат»</b>, укажите товары и сумму. Возврат уменьшит долг клиента, а деньги вернутся с выбранного счета.</p>
                 ) },
               ]}
             />
@@ -616,11 +616,11 @@ export default function Receipts() {
         </div>
       </div>
 
-      {/* Показать ещё (если чеков больше, чем загружено) */}
+      {/* Показать еще (если чеков больше, чем загружено) */}
       {hasMore && (
         <div style={{ textAlign: 'center', padding: '1rem 0 .5rem' }}>
           <button onClick={loadMore} disabled={loadingMore} className="sk-more-btn">
-            {loadingMore ? 'Загрузка...' : 'Показать ещё'}
+            {loadingMore ? 'Загрузка...' : 'Показать еще'}
           </button>
           <div style={{ fontSize: '.72rem', color: '#5b6472', marginTop: '.45rem' }}>Показано чеков: {receipts.length}</div>
         </div>
@@ -667,7 +667,7 @@ export default function Receipts() {
                   <tbody>
                     {receiptItems.map(function(item) {
                       var combo = item.combo_items;
-                      // Сколько по этой позиции уже возвращено (для зачёркивания)
+                      // Сколько по этой позиции уже возвращено (для зачеркивания)
                       var retQty = returnedQtyByItem(selectedReceipt, item.id);
                       var itemQty = Number(item.quantity) || 1;
                       var isRefunded = retQty > 0;
@@ -811,12 +811,12 @@ export default function Receipts() {
           </div>
           <div className="form-group">
             <label>Причина возврата *</label>
-            <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошёл размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
+            <textarea value={refundReason} onChange={e => setRefundReason(e.target.value)} rows="2" placeholder="Например: не подошел размер, брак, передумал..." style={{ width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '.82rem', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', outline: 'none', resize: 'vertical' }} />
           </div>
           <div className="form-group">
             <label>Возврат денег</label>
             {(() => {
-              const acName = (id) => { const a = accounts.find(x => x.id === id); return a ? a.name : 'Счёт'; };
+              const acName = (id) => { const a = accounts.find(x => x.id === id); return a ? a.name : 'Счет'; };
               const payList = (refundReceipt && Array.isArray(refundReceipt.payments)) ? refundReceipt.payments.filter(p => p && p.account_id && Number(p.amount) > 0) : [];
               // Считаем сумму возврата по выбранным позициям
               let selSum = 0;
@@ -827,26 +827,26 @@ export default function Receipts() {
               const withMoney = accounts.filter(a => accBalance(a.id) > 0);
               if (payList.length === 0) return (
                 <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px' }}>
-                  По чеку нет разбивки оплаты — выберите счёт возврата:
+                  По чеку нет разбивки оплаты — выберите счет возврата:
                   <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
-                    <option value="">— выберите счёт —</option>
+                    <option value="">— выберите счет —</option>
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.max(0, Math.round(accBalance(a.id))).toLocaleString()} {cur}</option>)}
                   </select>
                 </div>
               );
               return (
                 <div style={{ fontSize: '.72rem', marginTop: '5px', lineHeight: 1.7 }}>
-                  <div style={{ color: '#777' }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}. Вернём: <b>{money.toLocaleString()} {cur}</b></div>
+                  <div style={{ color: '#777' }}>Оплачено: {payList.map((p, i) => <span key={i}>{acName(p.account_id)} — {Number(p.amount).toLocaleString()} {cur}{i < payList.length - 1 ? '; ' : ''}</span>)}. Вернем: <b>{money.toLocaleString()} {cur}</b></div>
                   {shortage ? (
                     <>
-                      <div style={{ color: '#dc2626', marginTop: '2px' }}>⚠️ На счетах оплаты недостаточно средств (касса могла быть инкассирована). Выберите счёт, с которого вернуть:</div>
+                      <div style={{ color: '#dc2626', marginTop: '2px' }}>⚠️ На счетах оплаты недостаточно средств (касса могла быть инкассирована). Выберите счет, с которого вернуть:</div>
                       <select value={refundAltAc} onChange={e => setRefundAltAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid #fca5a5', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
-                        <option value="">— выберите счёт —</option>
+                        <option value="">— выберите счет —</option>
                         {withMoney.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.round(accBalance(a.id)).toLocaleString()} {cur}</option>)}
                       </select>
                     </>
                   ) : (
-                    <div style={{ color: '#777' }}>Вернём с этих же счетов пропорционально. Если клиент возьмёт другой товар — пробьёте новый чек</div>
+                    <div style={{ color: '#777' }}>Вернем с этих же счетов пропорционально. Если клиент возьмет другой товар — пробьете новый чек</div>
                   )}
                 </div>
               );
@@ -867,9 +867,9 @@ export default function Receipts() {
             <input type="number" min="0" step="0.01" value={payAmt} onChange={e => setPayAmt(e.target.value)} autoFocus />
           </div>
           <div className="form-group">
-            <label>Счёт зачисления</label>
+            <label>Счет зачисления</label>
             <select value={payAc} onChange={e => setPayAc(e.target.value)}>
-              <option value="">— выберите счёт —</option>
+              <option value="">— выберите счет —</option>
               {accounts.filter(a => a.type !== 'cash').map(a => <option key={a.id} value={a.id}>{a.type === 'cash_register' ? 'Наличные' : a.name}</option>)}
             </select>
           </div>

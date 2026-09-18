@@ -137,7 +137,7 @@ export default function Writeoffs() {
     if (qty <= 0) return alert('Введите количество');
     const prod = products.find(p => p.id === prodId);
 
-    // Проверяем остаток (с учётом текущего списания при редактировании)
+    // Проверяем остаток (с учетом текущего списания при редактировании)
     const data = await getStockData(prodId);
     const curQty = editId ? (Number(list.find(x => x.id === editId)?.quantity) || 0) : 0;
     const stock = data.stock + curQty;
@@ -187,9 +187,9 @@ export default function Writeoffs() {
                 { q: 'Какие причины списания есть?', a: (
                   <ul>
                     <li style={{marginBottom:'.4rem'}}><b>Списание</b> — обычное выбытие.</li>
-                    <li style={{marginBottom:'.4rem'}}><b>Брак</b> — товар повреждён.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Брак</b> — товар поврежден.</li>
                     <li style={{marginBottom:'.4rem'}}><b>Потеря</b> и <b>Порча</b> — недостача или порча.</li>
-                    <li style={{marginBottom:'.4rem'}}><b>Окончание срока</b> — истёк срок годности.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Окончание срока</b> — истек срок годности.</li>
                     <li style={{marginBottom:'.4rem'}}><b>Инвентаризация</b> — расхождение по факту.</li>
                     <li><b>Прочее</b> — другая причина.</li>
                   </ul>

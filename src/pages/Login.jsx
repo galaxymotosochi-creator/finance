@@ -79,7 +79,7 @@ export default function Login() {
         ) : resetMode ? (
           <form onSubmit={handleResetPassword}>
             <p style={{ fontSize: '.82rem', color: 'var(--muted)', marginBottom: '1rem', textAlign: 'center' }}>
-              Введите email — пришлём ссылку для сброса пароля
+              Введите email — пришлем ссылку для сброса пароля
             </p>
             <input
               type="email"

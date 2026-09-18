@@ -17,7 +17,7 @@ export default function Variant1() {
         <div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 30% 50%, #ffdd2d 0%, transparent 50%)",opacity:.08}}/>
         <div style={{position:"relative",zIndex:1,maxWidth:700,margin:"0 auto"}}>
           <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"4px 14px",borderRadius:100,background:"#fff8d6",fontSize:12,fontWeight:600,color:"#92400e",marginBottom:16,border:"1px solid #ffe082"}}>
-            <span>✨</span> Финансовый учёт нового поколения
+            <span>✨</span> Финансовый учет нового поколения
           </div>
           <h1 style={{fontSize:"clamp(34px,6vw,56px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
             Вся финансовая<br/>картина бизнеса
@@ -54,15 +54,15 @@ export default function Variant1() {
       `}</style>
       {/* Возможности */}
       <section style={{maxWidth:1104,margin:"60px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:36,letterSpacing:"-.02em"}}>Всё, что нужно для управления</h2>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:36,letterSpacing:"-.02em"}}>Все, что нужно для управления</h2>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(300px, 1fr))",gap:16}}>
           {[
-            ["📊","Аналитика","Реальные отчёты о прибыли, убытках и оборотах с возможностью детализации"],
-            ["📦","Склад","Учёт товаров, постаки, списания, инвентаризация и наценки"],
+            ["📊","Аналитика","Реальные отчеты о прибыли, убытках и оборотах с возможностью детализации"],
+            ["📦","Склад","Учет товаров, постаки, списания, инвентаризация и наценки"],
             ["👥","Клиенты","База клиентов, программы лояльности и автоматические акции"],
-            ["👷","Сотрудники","Расчёт зарплаты, табель, бонусы и штрафы"],
-            ["💰","Касса","Операции, смены, пробитие чеков — полный кассовый учёт"],
-            ["📱","Всё в одном","Единое окно для всех бизнес-процессов компании"],
+            ["👷","Сотрудники","Расчет зарплаты, табель, бонусы и штрафы"],
+            ["💰","Касса","Операции, смены, пробитие чеков — полный кассовый учет"],
+            ["📱","Все в одном","Единое окно для всех бизнес-процессов компании"],
           ].map((f,i)=>(
             <div key={i} style={{border:"1px solid rgba(0,16,36,.12)",borderRadius:16,padding:24,transition:"all .2s",animation:`slideUp .5s ${i*0.08+.3}s ease both`}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.06)"}}

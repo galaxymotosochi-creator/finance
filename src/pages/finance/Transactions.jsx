@@ -140,7 +140,7 @@ export default function Transactions() {
 
   const txs = transactions || [];
 
-  // Взнос/вывод своих денег собственника — двигает баланс счёта, но НЕ считается доходом/расходом
+  // Взнос/вывод своих денег собственника — двигает баланс счета, но НЕ считается доходом/расходом
   const isOwner = (t) => {
     if (t && (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw')) return true;
     const d = (t && t.description) || '';
@@ -330,15 +330,15 @@ export default function Transactions() {
         }
         var acct = accs.find(a => a?.id === selectedAcc) || accs[0];
         if (!acct) {
-          alert('Нет доступных счетов. Сначала создайте счёт в разделе "Финансовые счета".');
+          alert('Нет доступных счетов. Сначала создайте счет в разделе "Финансовые счета".');
           return;
         }
-        // Защита от ухода в минус: списать можно только в пределах баланса счёта.
-        // Если не хватает — разделите сумму на несколько счетов или выберите другой счёт.
+        // Защита от ухода в минус: списать можно только в пределах баланса счета.
+        // Если не хватает — разделите сумму на несколько счетов или выберите другой счет.
         if (pendingTx.type === 'expense') {
           var curBal = accBalance[acct.id] || 0;
           if (pendingTx.amount > curBal) {
-            alert('На счёте «' + acct.name + '» недостаточно средств (доступно ' + Math.round(curBal).toLocaleString() + ' ' + cur + ').\nРазделите сумму на несколько счетов (кнопка «+ Разделить») или выберите другой счёт.');
+            alert('На счете «' + acct.name + '» недостаточно средств (доступно ' + Math.round(curBal).toLocaleString() + ' ' + cur + ').\nРазделите сумму на несколько счетов (кнопка «+ Разделить») или выберите другой счет.');
             return;
           }
         }
@@ -404,8 +404,8 @@ export default function Transactions() {
                 { q: 'С чего начать работу? (по шагам)', a: (
                   <ol style={{paddingLeft:'1.15rem',margin:0}}>
                     <li style={{marginBottom:'.5rem'}}>Нажмите кнопку <b>«Добавить ▾»</b> справа вверху — откроется меню.</li>
-                    <li style={{marginBottom:'.5rem'}}>Выберите <b>«Добавить расход»</b> — деньги списываются со счёта, категория уходит в расходы.</li>
-                    <li style={{marginBottom:'.5rem'}}>Или <b>«Добавить доход»</b> — поступление на счёт, категория в доходы.</li>
+                    <li style={{marginBottom:'.5rem'}}>Выберите <b>«Добавить расход»</b> — деньги списываются со счета, категория уходит в расходы.</li>
+                    <li style={{marginBottom:'.5rem'}}>Или <b>«Добавить доход»</b> — поступление на счет, категория в доходы.</li>
                     <li>Нужно перекинуть деньги между своими счетами — <b>«Перевод между счетами»</b>. Это не доход и не расход бизнеса.</li>
                   </ol>
                 ) },
@@ -413,7 +413,7 @@ export default function Transactions() {
                   <ul>
                     <li><b>Добавить ▾</b> — меню со всеми операциями: доход, расход, перевод, свои деньги.</li>
                     <li><b>Плашки сверху</b> — доходы, расходы, баланс счетов и прибыль за выбранный период.</li>
-                    <li><b>Строка операции</b> — дата, время, название, сумма, счёт и категория.</li>
+                    <li><b>Строка операции</b> — дата, время, название, сумма, счет и категория.</li>
                     <li><b>⋯ в строке</b> — редактировать или удалить операцию.</li>
                     <li><b>?</b> — эта справка.</li>
                   </ul>
@@ -723,11 +723,11 @@ export default function Transactions() {
               const amt = parseFloat(ownerAmt);
               if (!amt || amt <= 0) return alert('Введите сумму');
               const acct = accs.find(a => a.id === ownerAcct);
-              if (!acct) return alert('Выберите счёт');
-              // Нельзя вывести больше, чем есть на счёте
+              if (!acct) return alert('Выберите счет');
+              // Нельзя вывести больше, чем есть на счете
               if (ownerMode === 'withdraw') {
                 const bal = accBalance[acct.id] || 0;
-                if (amt > bal) return alert('Недостаточно средств на счёте «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
+                if (amt > bal) return alert('Недостаточно средств на счете «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
               }
               try {
                 const isDeposit = ownerMode === 'deposit';
@@ -753,7 +753,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Счёт</label>
+                <label>Счет</label>
                 <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
                   {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
                   {accs.map(function(a){

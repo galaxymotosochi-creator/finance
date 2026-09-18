@@ -144,7 +144,7 @@ const pageLoader = (
 export default function App() {
   const { loading, user } = useAuth();
   // При старте подтягиваем настройки профиля (валюта и др.) в localStorage —
-  // чтобы они работали во всех разделах ещё до открытия настроек
+  // чтобы они работали во всех разделах еще до открытия настроек
   useEffect(() => {
     if (!user) return;
     (async () => {

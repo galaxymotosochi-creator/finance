@@ -12,7 +12,7 @@ const pct = (part, whole) => {
   return (v > 0 ? '' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + '%';
 };
 
-// Словарь имён категорий (как в Products/Ostatki) + подстановка своих названий
+// Словарь имен категорий (как в Products/Ostatki) + подстановка своих названий
 const CAT_LABELS = { material: 'Материалы', tool: 'Инструменты', equipment: 'Оборудование', other: 'Прочее' };
 const catName = (c) => CAT_LABELS[c] || c || 'Без категории';
 

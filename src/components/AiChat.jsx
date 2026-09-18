@@ -48,8 +48,8 @@ const ACTION_MAP = {
     const income = txs.filter(t => t.type === 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw').reduce((s, t) => s + Number(t.amount || 0), 0);
     const expense = txs.filter(t => t.type !== 'income' && t.kind !== 'owner_deposit' && t.kind !== 'owner_withdraw').reduce((s, t) => s + Number(t.amount || 0), 0);
     const profit = income - expense;
-    const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[p.period] || p.period;
-    return `📊 Отчёт за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ${cur}\n- Расходы: −${expense.toLocaleString()} ${cur}\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ${cur}`;
+    const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'все время' }[p.period] || p.period;
+    return `📊 Отчет за ${periodLabel}:\n- Доходы: +${income.toLocaleString()} ${cur}\n- Расходы: −${expense.toLocaleString()} ${cur}\n- Прибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ${cur}`;
   },
   GET_TIMESHEET_STATS: async (p, user) => {
     try {
@@ -448,7 +448,7 @@ const ACTION_MAP = {
         }).filter(Boolean);
         text += parts.join(', ') + '\n';
       });
-      if (data.length > 15) text += `... и ещё ${data.length - 15}\n`;
+      if (data.length > 15) text += `... и еще ${data.length - 15}\n`;
       return text;
     } catch (err) {
       return '❌ Ошибка запроса: ' + err.message;
@@ -461,7 +461,7 @@ export default function AiChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n- Добавить расход / доход\n- Баланс счетов / Деньги на счетах\n- Отчёт за день / неделю / месяц\n- Кто должен клиентов\n\n📦 Склад и товары\n- Создать товар / категорию\n- Остатки на складе\n\n👥 Сотрудники\n- Статистика табеля\n- Бонусы / Штрафы\n- Сколько дней отработал\n\n📊 Продажи\n- Что продаётся лучше всего\n- Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
+    { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n- Добавить расход / доход\n- Баланс счетов / Деньги на счетах\n- Отчет за день / неделю / месяц\n- Кто должен клиентов\n\n📦 Склад и товары\n- Создать товар / категорию\n- Остатки на складе\n\n👥 Сотрудники\n- Статистика табеля\n- Бонусы / Штрафы\n- Сколько дней отработал\n\n📊 Продажи\n- Что продается лучше всего\n- Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

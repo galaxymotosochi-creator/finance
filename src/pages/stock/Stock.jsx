@@ -183,7 +183,7 @@ export default function Stock() {
     { label: 'Средняя наценка', value: goodsMargin === null ? '—' : `${goodsMargin}%`, color: goodsMargin !== null && goodsMargin < 0 ? '#c62828' : '#111' },
   ];
 
-  // Выгрузка текущего списка (с учётом фильтров) в CSV — открывается в Excel
+  // Выгрузка текущего списка (с учетом фильтров) в CSV — открывается в Excel
   const exportStock = () => {
     const esc = (s) => { const v = String(s == null ? '' : s); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const head = ['Товар', 'Артикул', 'Штрихкод', 'Категория', 'Остаток', 'Мин. остаток', 'Закуп', 'Продажа', 'Наценка', 'Сумма'];
@@ -231,7 +231,7 @@ export default function Stock() {
 
   // Initial stock handlers
   const openInitialStock = () => {
-    // Читаем сохранённые остатки из БД (а не только localStorage — иначе после сохранения показываются нули)
+    // Читаем сохраненные остатки из БД (а не только localStorage — иначе после сохранения показываются нули)
     const existing = initialCache || getInitialStock();
     if (existing && existing.done) {
       setShowConfirm(true);
@@ -278,15 +278,15 @@ export default function Stock() {
     }
     const { error, queued } = await supabase.from('initial_stocks').upsert({ user_id: user.id, items: filtered, costs: filteredCosts, done: true }).eq('user_id', user.id);
     if (!error) {
-      // Синхронизируем и в localStorage, чтобы повторное открытие показывало сохранённые значения
+      // Синхронизируем и в localStorage, чтобы повторное открытие показывало сохраненные значения
       setInitialStock({ items: filtered, costs: filteredCosts, done: true });
       setShowInitModal(false);
       if (queued) {
-        // Офлайн: показываем новые остатки сразу (пересчёт по локальным данным)
+        // Офлайн: показываем новые остатки сразу (пересчет по локальным данным)
         const init = { user_id: user.id, items: filtered, costs: filteredCosts, done: true };
         setInitialCache(init);
         setStockMap(buildStockMap(suppliesCache, init, []));
-        setToast('Начальные остатки сохранены (ждёт синхронизации)');
+        setToast('Начальные остатки сохранены (ждет синхронизации)');
       } else {
         await load(); setToast('Начальные остатки сохранены');
       }
@@ -325,9 +325,9 @@ export default function Stock() {
                   <><b>Штрихкод</b> — код со сканера, если используете.</>,
                   <><b>Категория</b> — к какой группе относится товар.</>,
                   <><b>Остаток</b> — сколько сейчас на складе в штуках.</>,
-                  <><b>Мин. остаток</b> — желаемый минимум. Если остаток ниже него — цифра красная, если выше — зелёная.</>,
+                  <><b>Мин. остаток</b> — желаемый минимум. Если остаток ниже него — цифра красная, если выше — зеленая.</>,
                   <><b>Закуп</b> — сумма закупа: остаток × себестоимость.</>,
-                  <><b>Продажа</b> — цена за штуку. <b>Клик по цене</b> — быстро изменить её.</>,
+                  <><b>Продажа</b> — цена за штуку. <b>Клик по цене</b> — быстро изменить ее.</>,
                   <><b>Наценка</b> — разница между ценой продажи и себестоимостью: сумма и процент.</>,
                   <><b>Сумма</b> — остаток × цена продажи (сколько можно выручить за весь товар).</>,
                 ]},

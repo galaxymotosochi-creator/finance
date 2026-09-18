@@ -144,10 +144,10 @@ export default function Landing() {
             Первая программа с AI аналитикой
           </div>
           <h1 style={{fontSize:"clamp(31px,5vw,47px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
-            Учёт бизнеса без рутины
+            Учет бизнеса без рутины
           </h1>
           <p style={{fontSize:15,color:"rgba(0,0,0,.54)",lineHeight:1.55,marginBottom:28}}>
-            Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
+            Умный учет для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
           </p>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
             <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
@@ -193,14 +193,14 @@ export default function Landing() {
 
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учёте с первых минут</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учёт в AtlasPos</p>
+        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учете с первых минут</h2>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учет в AtlasPos</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:20,alignItems:"stretch"}}>
         {[
           {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
-          {num:"02",title:"Надёжность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
-          {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учёт и CRM-систему. Вы получаете всё в одной вкладке и не переплачиваете за разные сервисы."},
-          {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесём ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
+          {num:"02",title:"Надежность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
+          {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учет и CRM-систему. Вы получаете все в одной вкладке и не переплачиваете за разные сервисы."},
+          {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
         ].map((f,i)=>(
           <div key={i} style={{display:"flex",gap:16,padding:20,border:"1px solid rgba(0,0,0,.08)",borderRadius:14,alignItems:"flex-start",transition:"all .15s"}}
             onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
@@ -217,7 +217,7 @@ export default function Landing() {
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
-        <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — всё работает так, как вы видите</p>
+        <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — все работает так, как вы видите</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch"}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
@@ -295,7 +295,7 @@ export default function Landing() {
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:20,alignItems:"start"}}>
           {/* Карточка 1 — ERP */}
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
-            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжёлые программы<br/>(1С и аналоги)</h3>
+            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжелые программы<br/>(1С и аналоги)</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
               <CompareItem type="bad" text="Сложное внедрение: требуются недели обучения персонала и платные услуги программистов для любой настройки." />
               <CompareItem type="bad" text="Перегруженный интерфейс: сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники." />
@@ -306,7 +306,7 @@ export default function Landing() {
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
             <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Таблицы и блокноты<br/>(Excel / Sheets)</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <CompareItem type="bad" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьётся с реальными остатками на складе." />
+              <CompareItem type="bad" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьется с реальными остатками на складе." />
               <CompareItem type="bad" text="Человеческий фактор: сотрудники регулярно забывают вовремя вносить продажи, путают позиции товара или теряют чеки." />
               <CompareItem type="bad" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
             </div>
@@ -317,7 +317,7 @@ export default function Landing() {
             <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа AtlasPos</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
               <CompareItem type="good" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
-              <CompareItem type="good" text="Всё в одной вкладке: живая касса, складской учёт, база клиентов и финансы команды работают в единой связке." />
+              <CompareItem type="good" text="Все в одной вкладке: живая касса, складской учет, база клиентов и финансы команды работают в единой связке." />
               <CompareItem type="good" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
             </div>
             <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",transition:"all .15s"}}
@@ -334,17 +334,17 @@ export default function Landing() {
             {
               svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
               title:"Товарный бизнес и ритейл",
-              desc:"Умный учёт остатков на складе, контроль поставщиков, инвентаризация и автоматический расчёт маржинальности товаров."
+              desc:"Умный учет остатков на складе, контроль поставщиков, инвентаризация и автоматический расчет маржинальности товаров."
             },
             {
               svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
               title:"Услуги, сервис и аренда",
-              desc:"Контроль кассовых смен, ведение клиентской базы (CRM), учёт загрузки мастеров и прозрачный расчёт сдельной зарплаты команды."
+              desc:"Контроль кассовых смен, ведение клиентской базы (CRM), учет загрузки мастеров и прозрачный расчет сдельной зарплаты команды."
             },
             {
               svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
               title:"Смешанный и проектный бизнес",
-              desc:"Идеально, если вы одновременно продаёте товары, оказываете услуги и сдаёте оборудование в прокат. Система объединит все направления в один P&L отчёт."
+              desc:"Идеально, если вы одновременно продаете товары, оказываете услуги и сдаете оборудование в прокат. Система объединит все направления в один P&L отчет."
             },
           ].map((t,i)=>(
             <div key={i} style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,transition:"all .2s",textAlign:"center"}}
@@ -381,7 +381,7 @@ export default function Landing() {
               {icon:"bulb",title:"Рекомендации",desc:
                 "Подсказывает, какие товары пора дозаказать, на что поднять цену, а что уценить."},
               {icon:"help",title:"Ответы на вопросы",desc:
-                "Спросите «Сколько заработали в марте?» или «Какой сотрудник принёс больше всего прибыли?»."},
+                "Спросите «Сколько заработали в марте?» или «Какой сотрудник принес больше всего прибыли?»."},
               {icon:"refresh",title:"Автокатегоризация",desc:
                 "Сама распределяет операции по категориям — не нужно вручную разносить каждую трату."},
             ].map((f,i)=>(
@@ -398,14 +398,14 @@ export default function Landing() {
       {/* ===== FAQ ===== */}
       <section style={{maxWidth:700,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Остались вопросы? Отвечаем</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Всё, что нужно знать о старте, безопасности и возможностях платформы AtlasPos</p>
+        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Все, что нужно знать о старте, безопасности и возможностях платформы AtlasPos</p>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {[ 
             {q:"Сколько стоит AtlasPos?",a:"Мы гибко подходим к ценообразованию в зависимости от масштаба вашей компании. Есть прозрачные тарифы для небольших команд и крупных сетей, а начать можно абсолютно бесплатно."},
             {q:"Можно ли попробовать бесплатно?",a:"Да! Мы предоставляем полноценный тестовый доступ на 14 дней. Вам не нужно привязывать банковскую карту — просто зарегистрируйтесь за 1 минуту и сразу тестируйте все возможности системы."},
             {q:"Нужно ли устанавливать программу?",a:"Нет, ничего скачивать не нужно. AtlasPos — это облачная платформа. Вы можете работать из любого браузера на компьютере, планшете или смартфоне, а данные обновляются в реальном времени."},
             {q:"Мои данные в безопасности?",a:"Абсолютно. Мы используем передовые протоколы шифрования, регулярное резервное копирование и строгую систему разграничения прав доступа. Ваши показатели защищены надежнее, чем в Excel."},
-            {q:"Можно ли добавить сотрудников?",a:"Да, вы можете подключать всю команду и гибко настраивать права доступа для каждого. Например, кладовщик будет видеть только склад, но не получит доступ к отчётам о чистой прибыли."},
+            {q:"Можно ли добавить сотрудников?",a:"Да, вы можете подключать всю команду и гибко настраивать права доступа для каждого. Например, кладовщик будет видеть только склад, но не получит доступ к отчетам о чистой прибыли."},
           ].map((f,i)=>(
             <FaqItem key={i} question={f.q} answer={f.a} />
           ))}
@@ -433,8 +433,8 @@ export default function Landing() {
 
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,alignItems:"stretch"}}>
           {[
-            {name:"Базовый",price:490,desc:"Для самозанятых и микро-бизнеса",features:["Учёт доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Подключить"},
-            {name:"Старт",price:990,desc:"Для малого бизнеса и сервисов",features:["Полный учёт кассы","Складской учёт и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false,btn:"Подключить"},
+            {name:"Базовый",price:490,desc:"Для самозанятых и микро-бизнеса",features:["Учет доходов и расходов","База клиентов (CRM)","1 пользователь"],popular:false,btn:"Подключить"},
+            {name:"Старт",price:990,desc:"Для малого бизнеса и сервисов",features:["Полный учет кассы","Складской учет и остатки","Автокатегоризация AI","До 2 пользователей"],popular:false,btn:"Подключить"},
             {name:"Бизнес",price:2900,desc:"Для компаний с командой",features:["Все функции тарифа «Старт»","Зарплата и табель сотрудников","Управление ролями и доступом","Безлимитный AI-помощник","До 5 пользователей"],popular:true,btn:"Подключить"},
             {name:"Профи",price:6900,desc:"Для сетей и крупных проектов",features:["Все функции тарифа «Бизнес»","Мульти-аккаунты (несколько точек)","Интеграции и доступ к API","ИИ-мониторинг аномалий","Безлимитные пользователи"],popular:false,btn:"Подключить"},
           ].map((t,i)=>{

@@ -3,7 +3,7 @@
 
 // Короткий звуковой сигнал (Web Audio, без файлов)
 // Один общий AudioContext на всю страницу: браузеры ограничивают число контекстов (~6),
-// если создавать новый на каждый пик — звук перестаёт появляться
+// если создавать новый на каждый пик — звук перестает появляться
 let _ac = null;
 export const beep = (freq = 1200, dur = 100, vol = 0.15) => {
   try {
@@ -27,7 +27,7 @@ export const beep = (freq = 1200, dur = 100, vol = 0.15) => {
   } catch (e) { /* звук недоступен — не критично */ }
 };
 
-// Сканирование: открывает камеру, распознаёт штрихкод, пикает и вызывает onResult(code)
+// Сканирование: открывает камеру, распознает штрихкод, пикает и вызывает onResult(code)
 // continuous: true — окно не закрывается после скана (непрерывный режим для инвентаризации),
 // закрывается только крестиком ✕
 export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continuous = false } = {}) => {
@@ -68,8 +68,8 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       }
     }, 200);
     var q = null;
-    // Повторный скан того же кода с камеры разрешён через интервал 1200мс,
-    // но надёжный способ повтора — кнопка «ещё раз» под камерой (не зависит от камеры)
+    // Повторный скан того же кода с камеры разрешен через интервал 1200мс,
+    // но надежный способ повтора — кнопка «еще раз» под камерой (не зависит от камеры)
     var lastFire = {}; // code -> ts последнего срабатывания
     var lastCode = null;
     var emit = function(code) {
@@ -82,7 +82,7 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
         fire(code);
       }
     };
-    // Кнопка «ещё раз» — повторный скан последнего кода без камеры (всегда работает)
+    // Кнопка «еще раз» — повторный скан последнего кода без камеры (всегда работает)
     var repeatBtn = document.createElement('div');
     repeatBtn.style.cssText = 'display:none;margin-top:12px;padding:10px 18px;border-radius:100px;background:#111;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit';
     repeatBtn.onclick = function() {
@@ -91,7 +91,7 @@ export const scanBarcode = (onResult, { lockDelay = 2500, onBeep = null, continu
       if (onResult) onResult(lastCode);
     };
     var showRepeat = function(code) {
-      repeatBtn.textContent = '➕ Ещё раз: ' + code + ' (+1)';
+      repeatBtn.textContent = '➕ Еще раз: ' + code + ' (+1)';
       repeatBtn.style.display = 'block';
     };
     var fire = function(val) {

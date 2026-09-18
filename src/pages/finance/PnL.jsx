@@ -53,7 +53,7 @@ export default function PnL() {
           // Чеки за период
           supabase.from('receipts').select('id,total_amount,discount_sum')
             .eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
-          // Все чеки (для расчёта остатков склада)
+          // Все чеки (для расчета остатков склада)
           supabase.from('receipts').select('id')
             .eq('user_id', user.id),
           supabase.from('supplies').select('items').eq('user_id', user.id),
@@ -72,7 +72,7 @@ export default function PnL() {
           supabase.from('inventory').select('result').eq('user_id', user.id).eq('status', 'completed').gte('date', dr.from).lte('date', dr.to),
         ]);
 
-        // Продажи за период (total_amount уже с учётом скидок) + сумма скидок (аналитика)
+        // Продажи за период (total_amount уже с учетом скидок) + сумма скидок (аналитика)
         const salesRev = (recs || []).reduce((s, r) => s + (r.total_amount || 0), 0);
         const discounts = (recs || []).reduce((s, r) => s + (Number(r.discount_sum) || 0), 0);
         // Прочие доходы = поступления за период, не связанные с продажами (не переводы, не свои деньги владельца)
@@ -96,7 +96,7 @@ export default function PnL() {
           ? await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id', periodRecIds)
           : { data: [] };
 
-        // Все ID чеков (для расчёта остатков склада)
+        // Все ID чеков (для расчета остатков склада)
         const allRecIds = (allRecs || []).map(r => r.id);
         const { data: recItemsAll } = allRecIds.length
           ? await supabase.from('receipt_items').select('product_name,quantity').in('receipt_id', allRecIds)
@@ -240,7 +240,7 @@ export default function PnL() {
   if (errMsg) return <div className="empty-products"><div className="big-icon">⚠️</div><p>Ошибка загрузки: {errMsg}</p></div>;
   if (!d) return <div className="empty-products"><div className="big-icon">📊</div><p>Нет данных</p></div>;
 
-  // Период для шапки отчёта (01.09.2026 — 04.09.2026)
+  // Период для шапки отчета (01.09.2026 — 04.09.2026)
   const dr = getDateRange();
   const fmtIso = (s) => { if (!s) return ''; const [y, m, dd] = s.split('-'); return `${dd}.${m}.${y}`; };
   const periodLabel = `${fmtIso(dr.from)} — ${fmtIso(dr.to)}`;
@@ -252,7 +252,7 @@ export default function PnL() {
   const donutFrac = Math.max(0, Math.min(1, (d.profitability || 0) / MAX_RENT));
   const donutOffset = ARC * (1 - donutFrac);
 
-  // Строки отчёта: группа «Доходы» (итог зелёным) → группа «Расходы» (итог красным)
+  // Строки отчета: группа «Доходы» (итог зеленым) → группа «Расходы» (итог красным)
   const incomeTotal = (d.salesRev + d.discounts) + d.otherIncome + d.surpluses;
   const expenseTotal = d.discounts + d.totalCogs + d.opTotal + d.shortages;
   const rowData = [
@@ -306,10 +306,10 @@ export default function PnL() {
           </div>
         </div>
 
-        {/* Отчёт о прибыли */}
+        {/* Отчет о прибыли */}
         <div style={{ flex: 1, minWidth: '290px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid #111', paddingBottom: '6px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>Отчёт о прибыли</span>
+            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>Отчет о прибыли</span>
             <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>{periodLabel}</span>
           </div>
 
@@ -317,7 +317,7 @@ export default function PnL() {
             <Line key={r.key} name={r.name} value={r.value} nameColor={r.nameColor} valueColor={r.valueColor} valueWeight={r.valueWeight} last={i === rowData.length - 1} />
           ))}
 
-          {/* Итог — жёлтый градиент */}
+          {/* Итог — желтый градиент */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '10px', padding: '12px 14px', marginTop: '10px', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111' }}>
             <span style={{ fontSize: '15px', fontWeight: 700 }}>Чистая прибыль</span>
             <b style={{ fontSize: '20px', fontWeight: 800 }}>{fmt(d.netProfit)} {cur}</b>

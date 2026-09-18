@@ -76,7 +76,7 @@ const ACTION_MAP = {
   GET_FORECAST: async (p, user) => { const r = await getForecast(user); return r.text; },
 };
 
-// Быстрые отчёты (возвращают { text, table, title })
+// Быстрые отчеты (возвращают { text, table, title })
 const REPORT_ACTIONS = {
   weekly: (user) => getWeeklyReport(user),
   revenue: (user) => getReport('week', user, { asTable: true }),
@@ -108,11 +108,11 @@ export default function AiAssistant() {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages]);
 
-  // Быстрый отчёт
+  // Быстрый отчет
   const handleQuickReport = async (id) => {
     const fn = REPORT_ACTIONS[id];
     if (!fn) return;
-    setMessages(p => [...p, { role: 'user', text: QUICK_BUTTONS.find(b => b.id === id)?.label || 'Отчёт', data: null }]);
+    setMessages(p => [...p, { role: 'user', text: QUICK_BUTTONS.find(b => b.id === id)?.label || 'Отчет', data: null }]);
     setLoading(true);
     try {
       const result = await fn(user);
@@ -197,7 +197,7 @@ export default function AiAssistant() {
       <div style={{ marginBottom: '1rem' }}>
         <h1 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>🤖 AI помощник</h1>
         <div className="sub" style={{ fontSize: '.8rem', color: 'var(--muted)', marginTop: '.2rem' }}>
-          Спрашивай, загружай фото, получай отчёты
+          Спрашивай, загружай фото, получай отчеты
         </div>
       </div>
 
@@ -229,7 +229,7 @@ export default function AiAssistant() {
       }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#999', fontSize: '.85rem' }}>
-            Начните диалог или выберите быстрый отчёт 👆
+            Начните диалог или выберите быстрый отчет 👆
           </div>
         )}
         {messages.map((m, i) => (

@@ -137,7 +137,7 @@ export default function Registers({ fullscreen }) {
     return surname + ' ' + initials;
   };
 
-  // Реальный баланс счёта: начальный остаток + все движения (доходы минус расходы)
+  // Реальный баланс счета: начальный остаток + все движения (доходы минус расходы)
   const accBal = (a) => {
     if (!a) return 0;
     var b = parseFloat(a.balance) || 0;
@@ -155,7 +155,7 @@ export default function Registers({ fullscreen }) {
     } catch(e) {}
     return null;
   };
-  // Касса — полноэкранный инструмент: жёстко блокируем прокрутку страницы
+  // Касса — полноэкранный инструмент: жестко блокируем прокрутку страницы
   // (скролл возможен только внутри колонок каталога и чека)
   useEffect(() => {
     const prevB = document.body.style.overflow;
@@ -299,7 +299,7 @@ export default function Registers({ fullscreen }) {
     })();
   }, [user]);
 
-  // Отслеживание ширины экрана для адаптивной вёрстки
+  // Отслеживание ширины экрана для адаптивной верстки
   useEffect(function(){
     var handler = function(){ setIsWide(window.innerWidth > 900); };
     window.addEventListener('resize', handler);
@@ -367,7 +367,7 @@ export default function Registers({ fullscreen }) {
 
   const findPromo = (product) => {
     const today = tzToday();
-    // Активные акции (даты в БД — timestamptz, берём только дату)
+    // Активные акции (даты в БД — timestamptz, берем только дату)
     const active = promos.filter(p => {
       const sd = String(p.start_date || '').slice(0, 10);
       const ed = String(p.end_date || '').slice(0, 10);
@@ -505,7 +505,7 @@ export default function Registers({ fullscreen }) {
   const loyaltyPointsAmount = Math.min(loyaltyPointsSpend, Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount));
   const finalTotal = Math.max(0, total - receiptDiscountAmount - loyaltyDiscountAmount - loyaltyPointsAmount);
 
-  // Пересчёт остатков склада из supplies (items) и writeoffs (product_id/quantity)
+  // Пересчет остатков склада из supplies (items) и writeoffs (product_id/quantity)
   const recalcStockMap = function(){
     Promise.all([
       supabase.from('supplies').select('items').eq('user_id', user.id),
@@ -591,7 +591,7 @@ export default function Registers({ fullscreen }) {
     const { data: maxReceipt } = await supabase.from('receipts').select('receipt_number').eq('user_id', user.id).order('receipt_number', { ascending: false }).limit(1).maybeSingle();
     let receiptNum = (maxReceipt?.receipt_number || 0) + 1;
 
-    // Создаём чек
+    // Создаем чек
     var receiptId = null;
     // Локальный id — при офлайне чек и его позиции уходят в очередь вместе и привяжутся друг к другу
     var localReceiptId = Date.now();
@@ -618,13 +618,13 @@ export default function Registers({ fullscreen }) {
       items_json: receiptItemsNames,
     }).select('id').single();
     if (receiptErr || !newReceipt) {
-      // Таблица receipts может ещё не существовать — продолжаем без чеков
+      // Таблица receipts может еще не существовать — продолжаем без чеков
       showToast('Не удалось создать чек: ' + (receiptErr?.message || ''), 'error');
       setProcessingPay(false);
       return;
     } else {
       if (newReceipt.queued) {
-        // Офлайн: чек ушёл в очередь — используем локальный id и номер (сервер назначит настоящие при синхронизации)
+        // Офлайн: чек ушел в очередь — используем локальный id и номер (сервер назначит настоящие при синхронизации)
         receiptId = localReceiptId;
       } else {
         receiptId = newReceipt.id;
@@ -689,7 +689,7 @@ export default function Registers({ fullscreen }) {
       ? 'Чек № ' + receiptNum + ' — ' + finalTotal.toLocaleString() + ' ₽'
       : (receiptStatus === 'partially_paid'
         ? 'Чек № ' + receiptNum + ' — оплачено ' + (payAmount ? parseFloat(payAmount).toLocaleString() : '0') + ' ₽, долг ' + (finalTotal - (payAmount ? parseFloat(payAmount) : 0)).toLocaleString() + ' ₽'
-        : 'Чек № ' + receiptNum + ' сохранён (не оплачен)');
+        : 'Чек № ' + receiptNum + ' сохранен (не оплачен)');
     setToast(msg);
     
     // Уменьшаем остатки на складе
@@ -725,7 +725,7 @@ export default function Registers({ fullscreen }) {
           await supabase.from('writeoffs').insert(woInserts);
         }
       } catch(e) { console.error('Ошибка списания со склада:', e); }
-      // Обновляем stockMap после списания пересчётом из БД
+      // Обновляем stockMap после списания пересчетом из БД
       recalcStockMap();
     setReceiptComment('');
   };
@@ -759,9 +759,9 @@ export default function Registers({ fullscreen }) {
     if (!client) return;
     const progs = loyaltyPrograms || [];
     const mode = client.loyalty_mode || 'auto';
-    // 1) Клиент исключён из скидок
+    // 1) Клиент исключен из скидок
     if (mode === 'none') return;
-    // 2) Назначенная вручную программа — применяем её скидку сразу
+    // 2) Назначенная вручную программа — применяем ее скидку сразу
     if (mode !== 'auto') {
       const assigned = progs.find(p => String(p.id) === String(mode));
       if (assigned) { setLoyaltyPct(parseFloat(assigned.discount) || 0); return; }
@@ -808,7 +808,7 @@ export default function Registers({ fullscreen }) {
     loadInner.style.cssText='background:#fff;border-radius:16px;padding:28px 40px;text-align:center;box-shadow:0 8px 60px rgba(0,0,0,.15)';
     loadInner.innerHTML='<div style="width:200px;height:4px;background:#eee;border-radius:2px;overflow:hidden;margin:0 auto"><div style="width:0%;height:100%;background:#222;border-radius:2px;animation:scanLoad 2s ease-in-out forwards"></div></div>';;
     w.appendChild(loadInner);
-    // Создаём контейнер для видео (скрыт пока не загрузится)
+    // Создаем контейнер для видео (скрыт пока не загрузится)
     var v=document.createElement('div');v.id='qv';
     v.style.cssText='position:relative;width:100%;max-width:500px;overflow:hidden;border-radius:12px;background:#000;display:none';
     var f=document.createElement('div');
@@ -1146,7 +1146,7 @@ if (loading) return <CenterSpinner />;
       {/* Панель чека — отдельная плашка */}
       <div style={{flex:'0 0 ' + (isWide ? '420px' : '340px'),maxWidth:'46%',minWidth:0,display:'flex',flexDirection:'column',background:'#fff',borderRadius:'20px',boxShadow:'0 4px 24px rgba(0,0,0,.05)',overflow:'hidden'}}>
 
-        {/* Шапка чека: номер + счётчик, тонкая полоса */}
+        {/* Шапка чека: номер + счетчик, тонкая полоса */}
         <div style={{padding:'12px 16px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
           <span style={{fontSize:'14px',fontWeight:800,color:'#222',letterSpacing:'-.01em'}}>Чек № {currentReceiptNum || 1}</span>
           <span style={{fontSize:'11.5px',color:'#999',fontWeight:600}}>{cart.length ? cart.reduce(function(a,x){return a+x.qty;},0) + ' поз.' : ''}</span>
@@ -1386,7 +1386,7 @@ if (loading) return <CenterSpinner />;
             ) : (
               <div style={{display:'flex',gap:'8px'}}>
                 {cart.length > 0 && (
-                  <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});var clientName=clients.find(function(c){return c.id===selectedClient;})?.name||'';var isUpdate=heldActiveId!=null&&heldReceipts.some(function(x){return x.id===heldActiveId;});if(isUpdate){setHeldReceipts(function(p){return p.map(function(x){return x.id===heldActiveId?{...x,items:items,total:finalTotal,client:selectedClient,clientName:clientName,updatedAt:Date.now()}:x;});});}else{setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clientName,createdAt:Date.now(),id:Date.now()}];});}setHeldActiveId(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast(isUpdate?'Чек обновлён':'Чек отложен')}} style={{
+                  <button onClick={function(){var items=cart.map(function(i){return {id:i.id,name:i.name,price:i.price,qty:i.qty}});var clientName=clients.find(function(c){return c.id===selectedClient;})?.name||'';var isUpdate=heldActiveId!=null&&heldReceipts.some(function(x){return x.id===heldActiveId;});if(isUpdate){setHeldReceipts(function(p){return p.map(function(x){return x.id===heldActiveId?{...x,items:items,total:finalTotal,client:selectedClient,clientName:clientName,updatedAt:Date.now()}:x;});});}else{setHeldReceipts(function(p){return [...p,{items:items,total:finalTotal,client:selectedClient,clientName:clientName,createdAt:Date.now(),id:Date.now()}];});}setHeldActiveId(null);setCart([]);setReceiptDiscountPercent(0);setReceiptDiscountFixed(0);setToast(isUpdate?'Чек обновлен':'Чек отложен')}} style={{
                     flex:1, padding:'13px', borderRadius:'8px', border:'1.5px solid var(--border)',
                     background:'#fff', color:'#444', fontSize:'.80rem', fontWeight:600,
                     cursor:'pointer', fontFamily:'inherit',
@@ -1826,7 +1826,7 @@ if (loading) return <CenterSpinner />;
                 setTransferEmpId('');
                 setTransferBalance('');
                 setEditingCashier(false);
-                showToast('Кассир сменён: ' + newCashierName, 'success');
+                showToast('Кассир сменен: ' + newCashierName, 'success');
               }} style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:'#000',color:'#fff',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Передать смену</button>
             </div>
           </div>
@@ -1905,7 +1905,7 @@ if (loading) return <CenterSpinner />;
                 accounts.forEach(a => { acMap[a.id] = a.name; });
                 return Object.entries(byAc).map(([acId, amt]) => (
                   <div key={acId} style={{display:'flex',padding:'2px 0'}}>
-                    <span style={{flex:1}}>{acMap[acId] || 'Без счёта'}</span>
+                    <span style={{flex:1}}>{acMap[acId] || 'Без счета'}</span>
                     <span>+{amt.toLocaleString()} {cur}</span>
                   </div>
                 ));
@@ -1929,12 +1929,12 @@ if (loading) return <CenterSpinner />;
                       <span>−{rf.amount.toLocaleString()} {cur}</span>
                     </div>
                   ))}
-                  <div style={{fontSize:'.70rem',color:'#c97a3d',padding:'2px 0'}}>Деньги отданы из кассы по возвратам (по чекам прошлых дней) — учтены в расчётном остатке</div>
+                  <div style={{fontSize:'.70rem',color:'#c97a3d',padding:'2px 0'}}>Деньги отданы из кассы по возвратам (по чекам прошлых дней) — учтены в расчетном остатке</div>
                 </>
               )}
               <div style={{borderTop:'1px solid #eee',margin:'4px 0'}}></div>
               <div style={{display:'flex',fontWeight:700}}>
-                <span style={{flex:1}}>Расчётный остаток</span>
+                <span style={{flex:1}}>Расчетный остаток</span>
                 <span>{( (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) - refundSum ).toLocaleString()} {cur}</span>
               </div>
             </div>
@@ -1962,7 +1962,7 @@ if (loading) return <CenterSpinner />;
                 const calcBal = (parseFloat(activeShift.opening_balance)||0) + (shiftReceipts||[]).reduce((s, r) => s + (r.payments||[]).reduce((a, p) => a + (parseFloat(p.amount)||0), 0), 0) - refundSum;
                 try {
                   // Номер смены (для описания транзакции): считаем только закрытые + 1.
-                  // Внимание: кастомный клиент не поддерживает count/head — берём длину списка закрытых смен.
+                  // Внимание: кастомный клиент не поддерживает count/head — берем длину списка закрытых смен.
                   const { data: closedShifts } = await supabase.from('shifts').select('*').eq('user_id', user.id).eq('status', 'closed');
                   const shiftNum = (closedShifts?.length || 0) + 1;
                   // Категория «Доход от продаж»
@@ -2052,7 +2052,7 @@ if (loading) return <CenterSpinner />;
                   setHeldReceipts(newList);
                   if (heldIndex >= newList.length) setHeldIndex(Math.max(0, newList.length-1));
                   if (newList.length === 0) setShowHoldModal(false);
-                  setToast('Чек удалён');
+                  setToast('Чек удален');
                 }} style={{flex:1,padding:'10px',borderRadius:'10px',border:'none',background:'#f5f5f5',color:'#777',fontSize:'.80rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✕ Удалить</button>
                 <button type="button" onClick={function(){
                   setCart(cur.items || []);

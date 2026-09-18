@@ -132,7 +132,7 @@ export default function Clients() {
 
   const fmtDate = (d) => {
     if (!d) return null;
-    // birthday в БД — timestamptz (2026-08-30T00:00:00.000Z), берём только дату
+    // birthday в БД — timestamptz (2026-08-30T00:00:00.000Z), берем только дату
     const ds = String(d).slice(0, 10);
     const parts = ds.split('-');
     if (parts.length !== 3) return d;

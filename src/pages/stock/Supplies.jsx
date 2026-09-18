@@ -312,7 +312,7 @@ const load = async () => {
         if (amt <= 0) continue;
         var bal = parseFloat(ac.balance)||0;
         payTxList.forEach(function(t){if(t.account_id===ac.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
-        if (bal < amt) return alert('Недостаточно средств на ' + ac.name + '. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счёт.');
+        if (bal < amt) return alert('Недостаточно средств на ' + ac.name + '. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счет.');
         await supabase.from('transactions').insert({
           user_id: user.id, account_id: ac.id, type: 'expense', amount: amt,
           description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
@@ -329,7 +329,7 @@ const load = async () => {
       var ac = payAccounts.find(function(a){return a.id === acId;});
       var bal = parseFloat(ac?.balance)||0;
       payTxList.forEach(function(t){if(t.account_id===acId)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});
-      if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счёт.');
+      if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счет.');
       const { error: txErr } = await supabase.from('transactions').insert({
         user_id: user.id, account_id: acId, type: 'expense', amount: amount,
         description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
@@ -356,7 +356,7 @@ const load = async () => {
             <h1>Поставки</h1>
             <SectionHelp
               title="Раздел «Поставки»"
-              intro="Поставки — поступления товаров от поставщиков. Здесь видно, что и по какой цене закуплено, на каком этапе поставка и сколько за неё ещё должны."
+              intro="Поставки — поступления товаров от поставщиков. Здесь видно, что и по какой цене закуплено, на каком этапе поставка и сколько за нее еще должны."
               faq={[
                 { q: 'Как добавить поставку?', a: (
                   <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите <b>поставщика</b>, номер накладной, статус и список товаров — с количеством и закупочной ценой.</div>
@@ -365,17 +365,17 @@ const load = async () => {
                   <ul>
                     <li style={{marginBottom:'.4rem'}}><b>Заказано</b> — оформили заказ поставщику.</li>
                     <li style={{marginBottom:'.4rem'}}><b>В пути</b> — товар едет.</li>
-                    <li><b>Оприходовано</b> — товар пришёл и зачислен на склад.</li>
+                    <li><b>Оприходовано</b> — товар пришел и зачислен на склад.</li>
                   </ul>
                 ) },
                 { q: 'Как перевести поставку на следующий этап?', a: (
-                  <div>Нажмите на <b>статус в таблице</b> — поставка перейдёт на следующий шаг: Заказано → В пути → Оприходовано.</div>
+                  <div>Нажмите на <b>статус в таблице</b> — поставка перейдет на следующий шаг: Заказано → В пути → Оприходовано.</div>
                 ) },
                 { q: 'Что показывает колонка «Оплата»?', a: (
                   <ul>
-                    <li style={{marginBottom:'.4rem'}}><b>Не оплачено</b> (красным) — поставщику ещё ничего не платили.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Не оплачено</b> (красным) — поставщику еще ничего не платили.</li>
                     <li style={{marginBottom:'.4rem'}}><b>Частично оплачено</b> (оранжевым) — внесли часть суммы.</li>
-                    <li><b>Оплачено</b> (зелёным) — рассчитались полностью.</li>
+                    <li><b>Оплачено</b> (зеленым) — рассчитались полностью.</li>
                   </ul>
                 ) },
                 { q: 'Как искать и фильтровать поставки?', a: (
@@ -683,7 +683,7 @@ const load = async () => {
         const nextLbl = SUPPLY_LABELS[nextSt]||'';
         const nextColor = SUPPLY_COLORS[nextSt]||'#2563eb';
         const hints = {
-          ordered:'Товар заказан у поставщика, но ещё не отправлен. Можно редактировать состав поставки.',
+          ordered:'Товар заказан у поставщика, но еще не отправлен. Можно редактировать состав поставки.',
           transit:'Поставка в пути. Товар скоро поступит на склад.',
           received:'Товар поступил на склад и готов к продаже. Редактирование недоступно.'
         };

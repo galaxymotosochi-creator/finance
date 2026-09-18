@@ -133,7 +133,7 @@ export default function Dashboard() {
         const yS = new Date().getFullYear() + '-01-01';
         const sumR = (from, to) => recAll.filter(r => r.d >= from && r.d <= to).reduce((s, r) => s + r.amt, 0);
         const cmp = { today: sumR(tStr, tStr), yesterday: sumR(yStr, yStr), week: sumR(wStr, tStr), month: sumR(mStr, tStr), year: sumR(yS, tStr) };
-        // Свои деньги владельца (за всё время): внесено / выведено / остаток в бизнесе
+        // Свои деньги владельца (за все время): внесено / выведено / остаток в бизнесе
         let ownerIn = 0, ownerOut = 0;
         (allTx || []).forEach(t => {
           if (t.kind === 'owner_deposit') ownerIn += Number(t.amount || 0);

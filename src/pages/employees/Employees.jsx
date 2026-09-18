@@ -42,7 +42,7 @@ const ALL_SECTIONS = [
     { id: 'team.positions', label: 'Должности' },
     { id: 'team.timesheet', label: 'Табель' },
   ]},
-  { id: 'reports', label: 'Отчёты', children: [
+  { id: 'reports', label: 'Отчеты', children: [
     { id: 'reports.sales', label: 'Продажи по сотрудникам' },
   ]},
   { id: 'settings', label: 'Настройки', children: [
@@ -206,7 +206,7 @@ export default function Employees() {
     return () => document.removeEventListener('click', handler);
   }, []);
 
-  // getPosition/onPositionChange — справочник должностей удалён; должность вводится текстом (position_name)
+  // getPosition/onPositionChange — справочник должностей удален; должность вводится текстом (position_name)
   // Хелперы авто-бонусов
   const scopeLabel = (v) => { const f = BONUS_SCOPES.find(x => x.v === v); return f ? f.l : v; };
   const refName = (rule) => {
@@ -276,7 +276,7 @@ export default function Employees() {
   const openEdit = (e) => {
     setEditId(e.id); setFName(e.name); setFPhone(e.phone||'');
     setFEmail(e.email||''); setFPositionName(e.position_name||e.position_id||'');
-    // hire_date в БД — timestamptz (с временем) — берём только дату, иначе поле в форме пустое
+    // hire_date в БД — timestamptz (с временем) — берем только дату, иначе поле в форме пустое
     setFHireDate((e.hire_date||'').slice(0,10) || new Date().toISOString().split('T')[0]);
     setFBaseSalary(String(e.base_salary||''));
     setFBonusType(e.bonus_type||'none');
@@ -455,7 +455,7 @@ export default function Employees() {
                   <div>Процент или фиксированная сумма, которую сотрудник получает с каждой продажи. Настраивается в правилах должности.</div>
                 ) },
                 { q: 'Что показывает «Долг» у сотрудника?', a: (
-                  <div>Красная строка <b>«Долг»</b> — сколько сотрудник взял из кассы и ещё не вернул. Долг закрывается при возврате денег.</div>
+                  <div>Красная строка <b>«Долг»</b> — сколько сотрудник взял из кассы и еще не вернул. Долг закрывается при возврате денег.</div>
                 ) },
                 { q: 'Как найти сотрудника?', a: (
                   <div>Под шапкой — <b>поиск</b> по имени, телефону и должности.</div>
@@ -792,7 +792,7 @@ export default function Employees() {
       <Modal open={showNoPermsConfirm} onClose={() => setShowNoPermsConfirm(false)} title="Доступ не настроен" subtitle="" width="narrow"
         actions={<>
           <button type="button" className="btn btn-outline" onClick={() => setShowNoPermsConfirm(false)}>Отмена</button>
-          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff',fontFamily:'inherit'}} onClick={async () => { setShowNoPermsConfirm(false); await doSave(); }}>Всё равно сохранить</button>
+          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff',fontFamily:'inherit'}} onClick={async () => { setShowNoPermsConfirm(false); await doSave(); }}>Все равно сохранить</button>
         </>}>
         <p style={{fontSize:'.85rem',color:'#555',lineHeight:1.5,margin:'.5rem 0'}}>
           Не выбран ни один раздел — сотрудник не будет иметь доступа к разделам.

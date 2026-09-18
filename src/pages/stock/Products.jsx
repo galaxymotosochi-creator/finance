@@ -78,7 +78,7 @@ const refreshCostMap = async (userId) => {
     map[it.prodId].qty += it.qty || 0;
     map[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
   }); });
-  // Начальные остатки тоже идут в учёт себестоимости (как в кассе/остатках/инвентаризации)
+  // Начальные остатки тоже идут в учет себестоимости (как в кассе/остатках/инвентаризации)
   const init = initialRes.data;
   if (init && init.done && init.items) {
     Object.keys(init.items).forEach(id => {
@@ -97,13 +97,13 @@ const refreshCostMap = async (userId) => {
   return result;
 };
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
-// Лёгкая миниатюра для списков (сервер ресайзит до 120px — вместо тяжёлых оригиналов)
+// Легкая миниатюра для списков (сервер ресайзит до 120px — вместо тяжелых оригиналов)
 const thumbUrl = (u) => u ? '/api/thumb?file=' + encodeURIComponent(String(u).split('/').pop()) : u;
 const getCols = () => {
   const def = new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('productsCols');
   if (saved) {
-    // Добавляем новые колонки по умолчанию (например, «Мин. цена») к сохранённым настройкам
+    // Добавляем новые колонки по умолчанию (например, «Мин. цена») к сохраненным настройкам
     const set = new Set(JSON.parse(saved));
     def.forEach(id => set.add(id));
     return set;
@@ -162,7 +162,7 @@ export default function Products() {
   const [fHidden, setFHidden] = useState(false);
   const [fPhoto, setFPhoto] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [freshPhotoUrl, setFreshPhotoUrl] = useState(''); // загружено в этой сессии, ещё не сохранено
+  const [freshPhotoUrl, setFreshPhotoUrl] = useState(''); // загружено в этой сессии, еще не сохранено
   const [fComboItems, setFComboItems] = useState([]);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilterSet, setTypeFilterSet] = useState(new Set());
@@ -176,7 +176,7 @@ export default function Products() {
   const fileInputRef = useRef(null);
   const [importing, setImporting] = useState(false);
 
-  // Пилюля-кнопка фильтра — нейтральная капсула как «Все время/Расходы/Доходы» (тонкая серая рамка, без жёлтого)
+  // Пилюля-кнопка фильтра — нейтральная капсула как «Все время/Расходы/Доходы» (тонкая серая рамка, без желтого)
   const pillStyle = (on) => ({
     background: on ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#fff',
     border: on ? '1px solid #e6c92a' : '1px solid #e0e0e4',
@@ -186,7 +186,7 @@ export default function Products() {
     transition: 'all .12s', flexShrink: 0,
   });
   const pillHover = (e, on, enter) => { if (!on) { e.currentTarget.style.borderColor = enter ? '#999' : '#e0e0e4'; e.currentTarget.style.color = enter ? '#111' : '#555'; } };
-  // Кнопки-дропдауны (Тип/Категория/Столбцы) — нейтральные капсулы (без жёлтого)
+  // Кнопки-дропдауны (Тип/Категория/Столбцы) — нейтральные капсулы (без желтого)
   const yellowPill = {
     background: '#fff', border: '1px solid #e0e0e4', color: '#555',
     padding: '.3rem .6rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit',
@@ -296,7 +296,7 @@ export default function Products() {
   };
 
   // Загрузка фото товара/услуги на сервер
-  // Удаление загруженного, но не сохранённого фото (закрыли форму — файл не должен оставаться на сервере)
+  // Удаление загруженного, но не сохраненного фото (закрыли форму — файл не должен оставаться на сервере)
   const deleteUploadedFile = async (url) => {
     if (!url) return;
     try {
@@ -361,8 +361,8 @@ export default function Products() {
       } else {
         const { data: insData, error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
         if (error) { alert(error.message); return; }
-        // Офлайн: запрос ушёл в очередь Service Worker — товар уже добавил хук
-        // useOptimisticSync (с пометкой «ждёт синхронизации»); не делаем load() — кеш перезатрёт его
+        // Офлайн: запрос ушел в очередь Service Worker — товар уже добавил хук
+        // useOptimisticSync (с пометкой «ждет синхронизации»); не делаем load() — кеш перезатрет его
         if (insData && insData[0] && insData[0].queued) {
           setShowModal(false);
           setFreshPhotoUrl('');
@@ -373,7 +373,7 @@ export default function Products() {
       setShowModal(false);
       load();
       setFreshPhotoUrl(''); // фото сохранено — больше не удаляем
-      showToast(editId ? 'Товар успешно сохранён!' : 'Товар успешно добавлен!');
+      showToast(editId ? 'Товар успешно сохранен!' : 'Товар успешно добавлен!');
     } finally {
       setSaving(false);
     }
@@ -398,7 +398,7 @@ export default function Products() {
     }
     // Убираем товар из списка сразу (без ожидания перезагрузки)
     setProductsState(prev => prev.filter(x => x.id !== id));
-    showToast('Товар успешно удалён!');
+    showToast('Товар успешно удален!');
     setShowRemoveModal(false);
     setRemoveTarget(null);
   };
@@ -673,22 +673,22 @@ export default function Products() {
             <h1>Товары и услуги</h1>
             <SectionHelp
               title="Раздел «Товары и услуги»"
-              intro="Каталог всего, что вы продаёте: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость."
+              intro="Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость."
               blocks={[
                 { title: 'Типы позиций', items: [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
-                  <><b>Услуга</b> — работа или сервис. Остатков нет, просто продаётся в кассе.</>,
-                  <><b>Комбо</b> — набор из нескольких позиций, продаётся как одна.</>,
+                  <><b>Услуга</b> — работа или сервис. Остатков нет, просто продается в кассе.</>,
+                  <><b>Комбо</b> — набор из нескольких позиций, продается как одна.</>,
                 ]},
                 { title: 'Кнопка «Добавить товар, услугу»', items: [
-                  <>Создаёт новую позицию: название, тип, категория, цена, артикул, штрихкод, единица измерения, фото и другие поля.</>,
+                  <>Создает новую позицию: название, тип, категория, цена, артикул, штрихкод, единица измерения, фото и другие поля.</>,
                 ]},
                 { title: 'Поиск и фильтры', items: [
                   <>🔍 <b>Быстрый поиск</b> — ищет по названию, артикулу и штрихкоду.</>,
                   <>«<b>Тип</b>» — показать только товары / услуги / комбо (галочки, «Выбрать все» / «Очистить»).</>,
                   <>«<b>Категории</b>» — показать позиции выбранных категорий.</>,
                   <>«<b>Столбцы</b>» — включать и выключать столбцы таблицы.</>,
-                  <>«<b>Корзина</b>» — удалённые позиции. Их можно восстановить.</>,
+                  <>«<b>Корзина</b>» — удаленные позиции. Их можно восстановить.</>,
                   <>«<b>Скачать</b>» — выгрузка каталога в Excel.</>,
                 ]},
                 { title: 'Столбцы таблицы', items: [
@@ -709,7 +709,7 @@ export default function Products() {
                   <><b>Восстановить</b> — вернуть скрытую позицию.</>,
                   <><b>Удалить</b> — отправить в корзину.</>,
                 ]},
-                { title: 'Откуда берётся себестоимость', text: <>Себестоимость не заполняется вручную — она считается сама: из <b>начальных остатков</b> (страница «Остатки») и <b>поставок</b> (раздел «Поставки»). Пока по позиции нет ни того, ни другого — в графе будет 0. После первой поставки или ввода остатков цифра появится автоматически.</> },
+                { title: 'Откуда берется себестоимость', text: <>Себестоимость не заполняется вручную — она считается сама: из <b>начальных остатков</b> (страница «Остатки») и <b>поставок</b> (раздел «Поставки»). Пока по позиции нет ни того, ни другого — в графе будет 0. После первой поставки или ввода остатков цифра появится автоматически.</> },
               ]}
             />
           </div>
@@ -990,7 +990,7 @@ export default function Products() {
                     {fRewardKind && <input type="number" min="0" step="0.01" value={fRewardValue} onChange={e => setFRewardValue(e.target.value)} placeholder={fRewardKind === 'pct' ? '30' : '500'} style={{ width: '110px' }} autoFocus={false} />}
                     {fRewardKind === 'pct' && <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>от цены услуги</span>}
                   </div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem' }}>Сумма автоматически подставится мастеру в чеке (её можно изменить)</div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem' }}>Сумма автоматически подставится мастеру в чеке (ее можно изменить)</div>
                 </div>
               )}
               <div className="form-row">
@@ -1102,7 +1102,7 @@ export default function Products() {
       </Modal>
 
       {/* Модалка подтверждения удаления */}
-      <Modal open={showRemoveModal} onClose={() => { setShowRemoveModal(false); setRemoveTarget(null); }} title="Удалить товар?" subtitle="Он перенесётся в корзину и будет удалён через 30 дней" width="narrow"
+      <Modal open={showRemoveModal} onClose={() => { setShowRemoveModal(false); setRemoveTarget(null); }} title="Удалить товар?" subtitle="Он перенесется в корзину и будет удален через 30 дней" width="narrow"
         actions={<>
           <button className="btn btn-ghost" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmRemove}>Да</button>
@@ -1193,7 +1193,7 @@ export default function Products() {
                               <div className="prod-name">{p.name}</div>
                               <div className="prod-sku">{p.sku || '—'}</div>
                             </td>
-                            <td style={{fontSize:'.75rem',color:'#555'}}>ещё {daysLeft} дн.</td>
+                            <td style={{fontSize:'.75rem',color:'#555'}}>еще {daysLeft} дн.</td>
                             <td style={{textAlign:'right'}}>
                               <button className="act-btn" onClick={async () => {
                                 let trash = getTrash();

@@ -86,7 +86,7 @@ export default function Plans() {
 
   const switchPeriod = (k) => {
     if (k === period) return;
-    if (dirty && !window.confirm('Есть несохранённые изменения. Переключить период без сохранения?')) return;
+    if (dirty && !window.confirm('Есть несохраненные изменения. Переключить период без сохранения?')) return;
     setPeriod(k);
   };
 
@@ -153,7 +153,7 @@ export default function Plans() {
       const errs = results.filter(r => r && r.error);
       if (errs.length) throw errs[0].error;
 
-      // Офлайн: планы ушли в очередь — показываем сохранённое сразу
+      // Офлайн: планы ушли в очередь — показываем сохраненное сразу
       const anyQueued = results.some(r => r && r.queued);
       showToast('Планы успешно сохранены!');
       setDirty(false);

@@ -17,7 +17,7 @@ export default function Variant4() {
           Бухгалтерия, склад и зарплата<br/>в одной экосистеме
         </h1>
         <p style={{fontSize:16,color:"rgba(0,0,0,.54)",maxWidth:500,margin:"0 auto 28px"}}>
-          Более 100 компаний уже используют AtlasPos для учёта своего бизнеса
+          Более 100 компаний уже используют AtlasPos для учета своего бизнеса
         </p>
         <div style={{display:"flex",gap:10,justifyContent:"center"}}>
           <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Попробовать бесплатно</button>
@@ -28,9 +28,9 @@ export default function Variant4() {
       <section style={{maxWidth:1104,margin:"0 auto 60px",padding:"0 24px"}}>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
           {[
-            {name:"Базовый",price:"Бесплатно",desc:"Для одного пользователя",features:["Учёт доходов/расходов","База клиентов","Базовая аналитика"],popular:false},
-            {name:"Бизнес",price:"2 900 ₽",desc:"Для команды до 5 человек",features:["Всё из Базового","Складской учёт","Зарплата и табель","5 пользователей"],popular:true},
-            {name:"Профи",price:"6 900 ₽",desc:"Без ограничений",features:["Всё из Бизнес","Неограниченно пользователей","API","Поддержка 24/7"],popular:false},
+            {name:"Базовый",price:"Бесплатно",desc:"Для одного пользователя",features:["Учет доходов/расходов","База клиентов","Базовая аналитика"],popular:false},
+            {name:"Бизнес",price:"2 900 ₽",desc:"Для команды до 5 человек",features:["Все из Базового","Складской учет","Зарплата и табель","5 пользователей"],popular:true},
+            {name:"Профи",price:"6 900 ₽",desc:"Без ограничений",features:["Все из Бизнес","Неограниченно пользователей","API","Поддержка 24/7"],popular:false},
           ].map((t,i)=>(
             <div key={i} style={{
               border:`1.5px solid ${t.popular?"#ffdd2d":"rgba(0,0,0,.08)"}`,

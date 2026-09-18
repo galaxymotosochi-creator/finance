@@ -14,13 +14,13 @@ import CenterSpinner from '../../components/CenterSpinner';
 
 const CAT_LABELS = {material:'Материалы',tool:'Инструменты',equipment:'Оборудование',other:'Прочее'};
 
-// Лёгкая миниатюра для списков (сервер ресайзит до 120px)
+// Легкая миниатюра для списков (сервер ресайзит до 120px)
 const thumbUrl = (u) => u ? '/api/thumb?file=' + encodeURIComponent(String(u).split('/').pop()) : u;
 
 function recalcTotals(doc) {
   let tb = 0, ta = 0, sh = 0, su = 0;
   doc.items.forEach(it => {
-    // actual = null → товар ещё не посчитан, считаем = учтено (без изменений)
+    // actual = null → товар еще не посчитан, считаем = учтено (без изменений)
     const actual = (it.actual === null || it.actual === undefined || it.actual === '') ? it.expected : it.actual;
     const cb = it.expected * it.cost, ca = actual * it.cost;
     tb += cb; ta += ca;
@@ -182,7 +182,7 @@ export default function Inventory() {
   const cancelEdit = async () => {
     if (showResult) { setShowResult(null); setEditing(null); await load(); return; }
     if (editing) {
-      if (!confirm('Удалить черновик ' + editing.number + '? Введённые данные пропадут.')) return;
+      if (!confirm('Удалить черновик ' + editing.number + '? Введенные данные пропадут.')) return;
       const delRes = await supabase.from('inventory').delete().eq('id', editing.id); if (!delRes.queued) await load();
     }
     setEditing(null);
@@ -219,7 +219,7 @@ export default function Inventory() {
     setEditing(updated);
   };
 
-  // «+» — добавить товар в посчитанные (если поле пустое — берём учтённое количество)
+  // «+» — добавить товар в посчитанные (если поле пустое — берем учтенное количество)
   const addItem = (idx) => {
     const items = [...editing.items];
     const it = items[idx];
@@ -282,7 +282,7 @@ export default function Inventory() {
           soldQtyTotal += Number(it.quantity) || 0;
         });
       }
-      // Эффективный факт (с учётом проданного); непосчитанные (null) = учтено, без изменений
+      // Эффективный факт (с учетом проданного); непосчитанные (null) = учтено, без изменений
       const effItems = doc.items.map(it => {
         const base = (it.actual === null || it.actual === undefined || it.actual === '') ? it.expected : it.actual;
         return { ...it, actualEff: base + (soldMap[it.name] || 0) };
@@ -330,7 +330,7 @@ export default function Inventory() {
       setEditing(null); // закрываем модалку редактирования
       const completedDoc = { ...doc, totals: result, soldQtyTotal, soldMap };
       if (shAmount > 0) {
-        // Есть недостача — спрашиваем, куда её отнести
+        // Есть недостача — спрашиваем, куда ее отнести
         setPendingDoc(completedDoc); setAssignValuation('cost'); setAssignAmts({});
         setShowAssign(true);
       } else {
@@ -361,7 +361,7 @@ export default function Inventory() {
       return alert('Сумма распределения (' + Math.round(totalAssigned).toLocaleString() + ' ' + cur + ') больше максимальной суммы недостачи (' + Math.round(maxAllowed).toLocaleString() + ' ' + cur + ')');
     }
     try {
-      // Создаём долги сотрудникам
+      // Создаем долги сотрудникам
       if (assigned.length) {
         await Promise.all(assigned.map(a =>
           supabase.from('employee_debts').insert({
@@ -421,7 +421,7 @@ export default function Inventory() {
             <h1>Инвентаризация</h1>
             <SectionHelp
               title="Раздел «Инвентаризация»"
-              intro="Инвентаризация — это сверка: сколько товара должно быть по учёту и сколько реально лежит на складе. Помогает вовремя найти недостачи и излишки."
+              intro="Инвентаризация — это сверка: сколько товара должно быть по учету и сколько реально лежит на складе. Помогает вовремя найти недостачи и излишки."
               blocks={[
                 { title: 'Как провести инвентаризацию (по шагам)', items: [
                   <>Нажмите «<b>Добавить</b>» — создастся документ со списком всех товаров (остатки на момент начала).</>,
@@ -430,7 +430,7 @@ export default function Inventory() {
                   <>Не успели досчитать — «<b>Отложить</b>»: черновик сохранится, продолжите позже (кнопка «Продолжить» в списке).</>,
                   <>Нажмите «<b>Завершить</b>» — программа спишет недостачу, оприходует излишек и покажет итог.</>,
                 ]},
-                { title: 'Продажи во время инвентаризации', text: <>Если кассир продаёт товары, пока вы считаете — не страшно: при завершении программа сама добавит проданное к факту и покажет это в итоге. «Факт на начало» = посчитали + продали за время подсчёта.</> },
+                { title: 'Продажи во время инвентаризации', text: <>Если кассир продает товары, пока вы считаете — не страшно: при завершении программа сама добавит проданное к факту и покажет это в итоге. «Факт на начало» = посчитали + продали за время подсчета.</> },
                 { title: 'Столбцы таблицы', items: [
                   <><b>Остаток</b> — остаток по данным программы (поставки + начальные остатки − списания).</>,
                   <><b>Факт</b> — реальное количество, которое вы пересчитали. Вводится вручную.</>,
@@ -438,8 +438,8 @@ export default function Inventory() {
                   <><b>Сумма</b> — разница в деньгах, по себестоимости.</>,
                 ]},
                 { title: 'Результат инвентаризации', items: [
-                  <><b>Недостача</b> — товара меньше, чем по учёту. Программа спишет её (остаток уменьшится) и спросит: отнести на расходы бизнеса или на сотрудника (повиснет долг, который можно удержать из зарплаты).</>,
-                  <><b>Излишек</b> — товара больше, чем по учёту. Программа оприходует его (остаток увеличится), это доход.</>,
+                  <><b>Недостача</b> — товара меньше, чем по учету. Программа спишет ее (остаток уменьшится) и спросит: отнести на расходы бизнеса или на сотрудника (повиснет долг, который можно удержать из зарплаты).</>,
+                  <><b>Излишек</b> — товара больше, чем по учету. Программа оприходует его (остаток увеличится), это доход.</>,
                   <>После завершения показывается итог: было, стало, сумма недостачи и излишка, куда отнесена недостача.</>,
                 ]},
                 { title: 'Список инвентаризаций', items: [
@@ -667,7 +667,7 @@ export default function Inventory() {
             </div>
           </div>
           <div style={{fontSize:'.74rem',color:'#888',marginBottom:'.6rem'}}>
-            На сотрудника можно повесить любую сумму — по закупке или по продаже, как решите. Не распределённое уйдёт в расходы бизнеса по цене закупа.
+            На сотрудника можно повесить любую сумму — по закупке или по продаже, как решите. Не распределенное уйдет в расходы бизнеса по цене закупа.
           </div>
           {pendingDoc.soldQtyTotal > 0 && (
             <div style={{fontSize:'.76rem',color:'#2563eb',marginBottom:'.6rem',background:'#eff6ff',borderRadius:'.5rem',padding:'.4rem .6rem'}}>
@@ -676,7 +676,7 @@ export default function Inventory() {
           )}
           <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',marginBottom:'.6rem',maxHeight:'260px',overflowY:'auto'}}>
             {employees.length === 0 ? (
-              <div style={{padding:'.6rem',color:'var(--muted)',fontSize:'.8rem',textAlign:'center'}}>Сотрудники не добавлены — вся недостача уйдёт в расходы бизнеса</div>
+              <div style={{padding:'.6rem',color:'var(--muted)',fontSize:'.8rem',textAlign:'center'}}>Сотрудники не добавлены — вся недостача уйдет в расходы бизнеса</div>
             ) : employees.map(emp => (
               <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0',borderBottom:'1px solid var(--border)'}}>
                 <span style={{flex:1,fontSize:'.82rem',color:'#222'}}>{emp.name}</span>
@@ -704,7 +704,7 @@ export default function Inventory() {
           return (
             <>
               <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#555'}}>
-                <span>Стоимость по учёту (было)</span><span className="num">{Math.round(t.totalBefore||0).toLocaleString()} {cur}</span>
+                <span>Стоимость по учету (было)</span><span className="num">{Math.round(t.totalBefore||0).toLocaleString()} {cur}</span>
               </div>
               <div style={{display:'flex',justifyContent:'space-between',padding:'.45rem 0',borderBottom:'1px solid var(--border)',fontSize:'.82rem',color:'#555'}}>
                 <span>Стоимость по факту (стало)</span><span className="num">{Math.round(t.totalAfter||0).toLocaleString()} {cur}</span>

@@ -56,7 +56,7 @@ const menu = [
     ],
   },
   {
-    label: 'Отчёты', icon: 'reports', path: '/reports',
+    label: 'Отчеты', icon: 'reports', path: '/reports',
   },
   {
     label: 'Настройки', icon: 'settings', children: [
@@ -77,7 +77,7 @@ export default function Sidebar() {
     return found ? found.label : 'Финансы';
   });
 
-  // Синхронизация expanded с текущим путём при переходах
+  // Синхронизация expanded с текущим путем при переходах
   React.useEffect(() => {
     const path = location.pathname;
     const found = menu.find(m => m.children && m.children.some(c => path === c.path));
@@ -130,7 +130,7 @@ export default function Sidebar() {
               if (!employeeData) return true;
               var perms = employeeData.permissions || [];
               if (!perms || perms.length === 0) return true;
-              var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Отчёты':'reports', 'Настройки':'settings' };
+              var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Отчеты':'reports', 'Настройки':'settings' };
               var p = permMap[item.label];
               if (!p) return true;
               // Если есть родительский доступ — показываем раздел
@@ -157,9 +157,9 @@ export default function Sidebar() {
                         if (!employeeData) return true;
                         var perms = employeeData.permissions || [];
                         if (!perms || perms.length === 0) return true;
-                        var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Отчёты':'reports', 'Настройки':'settings' };
+                        var permMap = { 'Панель управления':'dashboard', 'Касса':'registers', 'Финансы':'finance', 'Склад':'stock', 'Клиенты':'clients', 'Команда':'team', 'Отчеты':'reports', 'Настройки':'settings' };
                         var parentPerm = permMap[item.label];
-                        // Если родитель разрешён — все дети видны
+                        // Если родитель разрешен — все дети видны
                         if (parentPerm && perms.includes(parentPerm)) return true;
                         var childId = parentPerm + '.' + child.path.split('/').pop();
                         return perms.includes(childId);

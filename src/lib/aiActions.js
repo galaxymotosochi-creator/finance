@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 
 const daysMap = { today: 1, week: 7, month: 30, all: 9999 };
 
-// Простой текстовый отчёт по транзакциям
+// Простой текстовый отчет по транзакциям
 export async function getReport(period, user, { asTable } = {}) {
   const d = daysMap[period] || 30;
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - d);
@@ -14,20 +14,20 @@ export async function getReport(period, user, { asTable } = {}) {
   const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
   const expense = txs.filter(t => t.type !== 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
   const profit = income - expense;
-  const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'всё время' }[period] || period;
+  const periodLabel = { today: 'сегодня', week: 'неделю', month: 'месяц', all: 'все время' }[period] || period;
   return {
-    text: `📊 Отчёт за ${periodLabel}:\nДоходы: +${income.toLocaleString()} ₽\nРасходы: −${expense.toLocaleString()} ₽\nПрибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`,
+    text: `📊 Отчет за ${periodLabel}:\nДоходы: +${income.toLocaleString()} ₽\nРасходы: −${expense.toLocaleString()} ₽\nПрибыль: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽`,
     table: asTable ? [
       ['Показатель', 'Сумма'],
       ['Доходы', income],
       ['Расходы', expense],
       ['Прибыль', profit],
     ] : null,
-    title: `📊 Отчёт за ${periodLabel}`,
+    title: `📊 Отчет за ${periodLabel}`,
   };
 }
 
-// Полный еженедельный отчёт с Excel
+// Полный еженедельный отчет с Excel
 export async function getWeeklyReport(user) {
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
   const cs = cutoff.toISOString().split('T')[0];
@@ -46,7 +46,7 @@ export async function getWeeklyReport(user) {
   const topProduct = txs.filter(t=>t.type==='sale').reduce((s,t)=>s+Number(t.amount||0),0);
   return {
     text: [
-      `📊 Отчёт за неделю (${cs} – ${new Date().toISOString().split('T')[0]})`,
+      `📊 Отчет за неделю (${cs} – ${new Date().toISOString().split('T')[0]})`,
       ``,
       `💰 Доходы: +${income.toLocaleString()} ₽`,
       `💸 Расходы: −${expense.toLocaleString()} ₽`,
@@ -73,7 +73,7 @@ export async function getWeeklyReport(user) {
         ...recs.map(r => [(r.date||'').slice(0,10), r.client_name||'—', Number(r.total_amount||0)]),
       ],
     },
-    title: '📊 Отчёт за неделю',
+    title: '📊 Отчет за неделю',
   };
 }
 

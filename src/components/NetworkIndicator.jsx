@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Индикатор подключения: зелёный кружок — интернет есть, красный — нет.
+ * Индикатор подключения: зеленый кружок — интернет есть, красный — нет.
  * При появлении сети отправляет Service Worker'у команду синхронизации очереди.
  */
 export default function NetworkIndicator() {
@@ -19,14 +19,14 @@ export default function NetworkIndicator() {
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage('sync');
     }
-    // Страховка: если ответ SW не придёт — закрываем окно через 12 сек
+    // Страховка: если ответ SW не придет — закрываем окно через 12 сек
     if (syncTimer.current) clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(() => setSyncing(false), 12000);
   };
 
   // Проверка реальной связи с сервером (не только navigator.onLine)
   const check = async () => {
-    // Браузер уже знает, что сети нет — не ждём fetch
+    // Браузер уже знает, что сети нет — не ждем fetch
     if (navigator.onLine === false) {
       setOnline(false);
       wasOnlineRef.current = false;

@@ -22,7 +22,7 @@ export default function Variant2() {
             Управляйте бизнесом<br/>с умом
           </h1>
           <p style={{fontSize:16,color:"rgba(0,0,0,.54)",lineHeight:1.5,marginBottom:28}}>
-            Единая платформа для учёта доходов, расходов, склада, зарплаты и клиентов. Без сложных настроек и лишних кнопок.
+            Единая платформа для учета доходов, расходов, склада, зарплаты и клиентов. Без сложных настроек и лишних кнопок.
           </p>
           <div style={{display:"flex",gap:10}}>
             <button onClick={()=>n('/login')} style={{padding:"12px 28px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Зарегистрироваться</button>
@@ -67,7 +67,7 @@ export default function Variant2() {
         </div>
       </section>
       <section style={{maxWidth:1104,margin:"60px auto",padding:"0 24px",display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
-        {[["📊","Реальные цифры","Все доходы и расходы в одном месте с детализацией","#fff8d6"],["🎯","Простой учёт","Интуитивный интерфейс без сложных настроек","#e8f0ff"],["🔒","Безопасно","Данные защищены, авторизация по email","#f0fdf4"]].map((f,i)=>(
+        {[["📊","Реальные цифры","Все доходы и расходы в одном месте с детализацией","#fff8d6"],["🎯","Простой учет","Интуитивный интерфейс без сложных настроек","#e8f0ff"],["🔒","Безопасно","Данные защищены, авторизация по email","#f0fdf4"]].map((f,i)=>(
           <div key={i} style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:f[3],textAlign:"center"}}>
             <div style={{fontSize:32,marginBottom:8}}>{f[0]}</div>
             <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>{f[1]}</div>

@@ -22,7 +22,7 @@ export default function Settings() {
   const TG_PREFS_LIST = [
     { id: 'sale', label: 'Каждая продажа в кассе' },
     { id: 'low_stock', label: 'Критические остатки (менее 3 шт)' },
-    { id: 'daily', label: 'Ежедневный отчёт (итог дня)' },
+    { id: 'daily', label: 'Ежедневный отчет (итог дня)' },
     { id: 'big_sale', label: 'Крупная продажа (от 10 000 ₽)' },
   ];
   const [tab, setTab] = useState('main');
@@ -115,7 +115,7 @@ export default function Settings() {
       ['Asia/Almaty','Алматы','+5'],['Asia/Almaty','Астана','+5'],['Asia/Almaty','Шымкент','+5'],['Asia/Almaty','Караганда','+5'],['Asia/Almaty','Павлодар','+5'],['Asia/Almaty','Семей','+5'],['Asia/Almaty','Усть-Каменогорск','+5'],['Asia/Almaty','Талдыкорган','+5'],['Asia/Almaty','Туркестан','+5'],
       ['Asia/Qostanay','Костанай','+5'],['Asia/Aqtobe','Актобе','+5'],['Asia/Atyrau','Атырау','+5'],['Asia/Aqtau','Актау','+5'],['Asia/Oral','Уральск','+5'],['Asia/Qyzylorda','Кызылорда','+5'],
     ],
-    'Беларусь': [['Europe/Minsk','Минск','+3'],['Europe/Minsk','Гомель','+3'],['Europe/Minsk','Брест','+3'],['Europe/Minsk','Витебск','+3'],['Europe/Minsk','Гродно','+3'],['Europe/Minsk','Могилёв','+3']],
+    'Беларусь': [['Europe/Minsk','Минск','+3'],['Europe/Minsk','Гомель','+3'],['Europe/Minsk','Брест','+3'],['Europe/Minsk','Витебск','+3'],['Europe/Minsk','Гродно','+3'],['Europe/Minsk','Могилев','+3']],
     'Армения': [['Asia/Yerevan','Ереван','+4'],['Asia/Yerevan','Гюмри','+4'],['Asia/Yerevan','Ванадзор','+4']],
     'Узбекистан': [['Asia/Tashkent','Ташкент','+5'],['Asia/Samarkand','Самарканд','+5'],['Asia/Samarkand','Бухара','+5'],['Asia/Tashkent','Наманган','+5'],['Asia/Tashkent','Андижан','+5'],['Asia/Tashkent','Фергана','+5']],
     'Кыргызстан': [['Asia/Bishkek','Бишкек','+6'],['Asia/Bishkek','Ош','+6'],['Asia/Bishkek','Джалал-Абад','+6'],['Asia/Bishkek','Каракол','+6']],
@@ -237,7 +237,7 @@ export default function Settings() {
           <div>
             <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 500, marginBottom: 4 }}>Страна</label>
             <select value={country} onChange={e => { setCountry(e.target.value); setCurrency({Россия:'RUB',Казахстан:'KZT',Беларусь:'BYN',Армения:'AMD',Узбекистан:'UZS',Кыргызстан:'KGS'}[e.target.value] || 'RUB');
-                // При смене страны подставляем первый её часовой пояс
+                // При смене страны подставляем первый ее часовой пояс
                 const zones = TZ_BY_COUNTRY[e.target.value] || [];
                 if (zones.length > 0) { setTz(zones[0][0]); setTzSearch(zones[0][1]); }
               }}
@@ -326,7 +326,7 @@ export default function Settings() {
         </div>
         {piecework.enabled && (
           <>
-            <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Способ расчёта</div>
+            <div style={{ fontSize: '.75rem', fontWeight: 500, marginBottom: 8 }}>Способ расчета</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
               {[['auto', 'Автоматически'], ['manual', 'Вручную']].map(([key, label]) => (
                 <button key={key} onClick={() => setPiecework({ ...piecework, mode: key })}
@@ -337,7 +337,7 @@ export default function Settings() {
             </div>
             <div style={{ padding: '10px 14px', background: '#f8f9fa', borderRadius: 'var(--radius-md)', fontSize: '.78rem', color: 'var(--muted)', lineHeight: 1.6 }}>
               {piecework.mode === 'auto' ? (
-                <>В карточке каждой <b>услуги</b> появляется поле «Сдельная оплата» — можно задать <b>сумму (₽)</b> или <b>процент (%)</b> от цены услуги. В кассе при выборе мастера сумма подставится сама (её можно изменить).</>
+                <>В карточке каждой <b>услуги</b> появляется поле «Сдельная оплата» — можно задать <b>сумму (₽)</b> или <b>процент (%)</b> от цены услуги. В кассе при выборе мастера сумма подставится сама (ее можно изменить).</>
               ) : (
                 <>Сумма мастеру вводится в кассе вручную при каждом чеке (как сейчас). В карточках услуг поле не показывается.</>
               )}

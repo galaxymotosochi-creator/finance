@@ -114,7 +114,7 @@ export default function SalesReport() {
         const rew = rewByEmp[String(e.empId)] ? rewByEmp[String(e.empId)].total : 0;
         // Вознаграждение = бонус по правилам ИЛИ/ПЛЮС сумма за выбор продавцом/исполнителем
         const itemsRew = (st && st.stack === false) ? rew : itemsBonus + rew;
-        // выплачено/не выплачено Позиций: если за период есть выплаченный (paid) начисления вознаграждения — позиция с ним "выплачена", иначе остаётся невыплаченной
+        // выплачено/не выплачено Позиций: если за период есть выплаченный (paid) начисления вознаграждения — позиция с ним "выплачена", иначе остается невыплаченной
         const salEmpRows = (salaries || []).filter(s => String(s.employee_id || '') === String(e.empId));
         const inPer = salEmpRows.filter(s => { const pf = String(s.period_from || '').slice(0, 10), pt = String(s.period_to || '').slice(0, 10); return (!pf || pf <= to) && (!pt || pt >= from); });
         const rewSum = (s) => (Number(s.sales_bonus) || 0) + (Number(s.reward_amount) || 0);
@@ -125,7 +125,7 @@ export default function SalesReport() {
           const itemRew = rewByItem[x.id] && rewByItem[x.id][String(e.empId)] ? rewByItem[x.id][String(e.empId)] : 0;
           const rw = (st && st.stack === false) ? itemRew : x.bonus + itemRew;
           const isPaid = (paidRows || []).some(s => (s.sales_items || []).some(i => String(i.itemId || '') === String(x.id)) || (s.reward_items || []).some(i => String(i.itemId || '') === String(x.id)));
-          // если начислений за период вовсе нет — позиция ещё не выплачена
+          // если начислений за период вовсе нет — позиция еще не выплачена
           const recPaid = inPer.length ? isPaid : false;
           return { ...x, reward: rw, recPaid, recNotPaid: !recPaid };
         }).sort((a, b) => (String(b.created || '')).localeCompare(String(a.created || '')) || b.total - a.total);

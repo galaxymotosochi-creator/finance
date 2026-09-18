@@ -59,7 +59,7 @@ const reports = [
   },
   {
     key: 'annual',
-    title: 'Годовой отчёт',
+    title: 'Годовой отчет',
     sub: 'Доходы и расходы по категориям за 12 месяцев года',
     path: '/reports/annual',
     gradient: 'linear-gradient(135deg,#f59e0b,#fbbf24)',
@@ -72,8 +72,8 @@ export default function ReportsHome() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Отчёты</h1>
-          <div className="sub">Выберите отчёт — дальше добавим новые</div>
+          <h1>Отчеты</h1>
+          <div className="sub">Выберите отчет — дальше добавим новые</div>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0 1rem', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />

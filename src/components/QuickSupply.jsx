@@ -39,7 +39,7 @@ export default function QuickSupply({ onClose }) {
   const total = cart.reduce((s, i) => s + i.cost * i.qty, 0);
 
   const process = async () => {
-    if (!cart.length || !payMode) return setToast('⚠️ Добавьте товары и выберите счёт');
+    if (!cart.length || !payMode) return setToast('⚠️ Добавьте товары и выберите счет');
     const items = cart.map(i => ({ prodId: i.id, name: i.name, qty: i.qty, cost: i.cost || 0 }));
     const { error } = await supabase.from('supplies').insert({
       user_id: user.id, supplier: supplier.trim() || null, items,
@@ -93,7 +93,7 @@ export default function QuickSupply({ onClose }) {
           )}
         </div>
         <div style={{padding:'0 24px 12px'}}>
-          <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Счёт списания</label>
+          <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Счет списания</label>
           <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'8px'}}>
             {accounts.map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{

@@ -8,7 +8,7 @@ const TABLE_LABELS = {
   products: 'Товар / услуга',
   categories: 'Фин. категория',
   stock_categories: 'Категория склада',
-  accounts: 'Счёт',
+  accounts: 'Счет',
   transactions: 'Операция',
   suppliers: 'Поставщик',
   supplies: 'Поставка',
@@ -29,7 +29,7 @@ const TABLE_LABELS = {
   stock_units: 'Ед. измерения',
 };
 
-// Достаём «имя» записи из данных — для каждой таблицы своё поле
+// Достаем «имя» записи из данных — для каждой таблицы свое поле
 function recordName(table, d) {
   const data = d.data || {};
   if (typeof data === 'string') { try { return JSON.parse(data).name || ''; } catch (e) { return ''; } }
@@ -85,7 +85,7 @@ export default function Trash() {
       <div className="page-header">
         <div>
           <h1>Корзина</h1>
-          <div className="sub">Удалённые записи хранятся 30 дней — можно восстановить</div>
+          <div className="sub">Удаленные записи хранятся 30 дней — можно восстановить</div>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%' }} />
@@ -104,7 +104,7 @@ export default function Trash() {
           <tbody>
             {list.length === 0 ? (
               <tr><td colSpan="5"><div className="empty-products"><div className="big-icon">🗑️</div><p>Корзина пуста</p>
-                <p style={{ fontSize: '.82rem', color: 'var(--muted)', margin: '.5rem 0 0' }}>Удалённые записи появятся здесь и будут храниться 30 дней</p></div></td></tr>
+                <p style={{ fontSize: '.82rem', color: 'var(--muted)', margin: '.5rem 0 0' }}>Удаленные записи появятся здесь и будут храниться 30 дней</p></div></td></tr>
             ) : list.map(t => (
               <tr key={t.id}>
                 <td style={{ textAlign: 'left' }}><span className="prod-cat">{TABLE_LABELS[t.table_name] || t.table_name}</span></td>

@@ -96,7 +96,7 @@ export default function QuickSale({ onClose }) {
 
   const findPromo = (product) => {
     const today = tzToday();
-    // Активные акции (даты в БД — timestamptz, берём только дату)
+    // Активные акции (даты в БД — timestamptz, берем только дату)
     const active = promos.filter(p => {
       const sd = String(p.start_date || '').slice(0, 10);
       const ed = String(p.end_date || '').slice(0, 10);
@@ -212,7 +212,7 @@ export default function QuickSale({ onClose }) {
     const paidAmtQS = payAmount ? parseFloat(payAmount) : finalTotal;
     const earnedPointsQS = (bonusProgQS && selectedClient && !payUnpaid) ? Math.round(Math.min(Math.max(paidAmtQS, 0), finalTotal)) : 0;
 
-    // Создаём чек
+    // Создаем чек
     var clientObj = clients.find(c => c.id === selectedClient);
     var { data: newReceipt, error: receiptErr } = await supabase.from('receipts').insert({
       user_id: user.id, receipt_number: receiptNum,
@@ -263,7 +263,7 @@ export default function QuickSale({ onClose }) {
 
     if (!payMode) return setToast('⚠️ Выберите способ оплаты');
     const selectedAc = accounts.find(a => a.id === payMode);
-    // Наличные → перенаправляем на счёт Касса
+    // Наличные → перенаправляем на счет Касса
     var targetAc = selectedAc;
     if (selectedAc && selectedAc.type === 'cash') {
       targetAc = accounts.find(a => a.type === 'cash_register') || selectedAc;
@@ -292,7 +292,7 @@ export default function QuickSale({ onClose }) {
     // Лояльность: начисление баллов за оплату (1 {cur} = 1 балл, бонусная программа)
     const bonusProg = (loyaltyPrograms || []).find(p => p.type === 'bonus');
     if (bonusProg && selectedClient) {
-      const earned = earnedPointsQS; // считаем как при записи в чек (по оплаченному с учётом скидки)
+      const earned = earnedPointsQS; // считаем как при записи в чек (по оплаченному с учетом скидки)
       if (earned > 0) {
         const client = clients.find(c => c.id === selectedClient);
         const cur = Number(client?.points) || 0;

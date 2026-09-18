@@ -19,7 +19,7 @@ export default function QuickExpense({ onClose }) {
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); } }, [toast]);
 
   const process = async () => {
-    if (!amount || !payMode) return setToast('⚠️ Укажите сумму и выберите счёт');
+    if (!amount || !payMode) return setToast('⚠️ Укажите сумму и выберите счет');
     const date = new Date().toISOString().split('T')[0];
     const catName = (cats.find(c => c.id === catId) || {}).name || '';
     const { error } = await supabase.from('transactions').insert({
@@ -52,7 +52,7 @@ export default function QuickExpense({ onClose }) {
             <input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" autoFocus />
           </div>
           <div className="form-group">
-            <label>Счёт списания</label>
+            <label>Счет списания</label>
             <div style={{display:'flex',gap:'4px',flexWrap:'wrap'}}>
               {accounts.map(a => (
                 <button key={a.id} onClick={() => setPayMode(a.id)} style={{

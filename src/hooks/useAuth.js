@@ -36,7 +36,7 @@ export function useAuth() {
         }
       } catch(e) {
         console.error('Auth check failed:', e);
-        // При ошибке сети — всё равно пускаем, но без ограничений
+        // При ошибке сети — все равно пускаем, но без ограничений
         setEmployeeData(null);
       }
       setLoading(false);

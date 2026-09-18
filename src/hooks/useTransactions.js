@@ -21,7 +21,7 @@ export function useTransactions() {
   const add = async (tx) => {
     const { error, queued } = await supabase.from('transactions').insert(tx);
     if (error) throw error;
-    // Офлайн: запись ушла в очередь — показываем сразу с пометкой «ждёт синхронизации»
+    // Офлайн: запись ушла в очередь — показываем сразу с пометкой «ждет синхронизации»
     if (queued) setTransactions(prev => [{ ...tx, id: Date.now(), pending: true }, ...(prev || [])]);
     else await fetch();
   };
