@@ -190,7 +190,10 @@ export default function Employees() {
 
   // Закрытие подсказок поиска (категории/позиции) при клике в любом месте экрана
   useEffect(() => {
-    const h = () => { setCatDrop(false); setItemDrop(false); };
+    const h = (e) => {
+      if (e.target.closest && e.target.closest('.emp-search-wrap')) return;
+      setCatDrop(false); setItemDrop(false);
+    };
     document.addEventListener('click', h);
     return () => document.removeEventListener('click', h);
   }, []);
@@ -678,7 +681,7 @@ export default function Employees() {
                   ))}
                   {showCatForm ? (
                     <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
-                      <div style={{ position: 'relative', marginBottom: '7px' }}>
+                      <div className="emp-search-wrap" style={{ position: 'relative', marginBottom: '7px' }}>
                         <input type="text" value={catSearch}
                           onChange={e => { setCatSearch(e.target.value); setCatDrop(true); setCatRef(''); }}
                           onFocus={() => setCatDrop(true)}
@@ -729,7 +732,7 @@ export default function Employees() {
                   ))}
                   {showItemForm ? (
                     <div style={{ background: '#fff', border: '1px dashed #d1d5db', borderRadius: '10px', padding: '9px' }}>
-                      <div style={{ position: 'relative', marginBottom: '7px' }}>
+                      <div className="emp-search-wrap" style={{ position: 'relative', marginBottom: '7px' }}>
                         <input type="text" value={itemSearch}
                           onChange={e => { setItemSearch(e.target.value); setItemDrop(true); setItemRef(''); }}
                           onFocus={() => setItemDrop(true)}
