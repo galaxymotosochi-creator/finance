@@ -271,6 +271,33 @@ export default function Transactions() {
 
   const catNameById = (id) => { const c = (cats || []).find(x => x.id === id); return c ? c.name : ''; };
 
+  // Прямое сохранение дохода/расхода с выбранным в форме счетом (без промежуточной модалки)
+  const doTx = async (txData) => {
+    try {
+      let list = accs;
+      if (list.length === 0) {
+        await supabase.from('accounts').insert([{ user_id: user.id, name: 'Наличные', type: 'cash' }]);
+        const r = await refreshAccounts();
+        list = r || [];
+      }
+      const acct = list.find(a => a && String(a.id) === String(selectedAcc)) || list[0];
+      if (!acct) { alert('Нет доступных счетов. Сначала создайте счет в разделе «Счета».'); return; }
+      if (txData.type === 'expense') {
+        const curBal = accBalance[acct.id] || 0;
+        if (txData.amount > curBal) {
+          alert('На счете «' + acct.name + '» недостаточно средств (доступно ' + Math.round(curBal).toLocaleString() + ' ' + cur + ').\nВыберите другой счет.');
+          return;
+        }
+      }
+      await add({ ...txData, account_id: acct.id });
+      setShowIncome(false);
+      setShowExpense(false);
+      setEditingId(null);
+      resetForms();
+      setToast((txData.type === 'income' ? 'Доход' : 'Расход') + ' успешно добавлен!');
+    } catch (err) { alert(err.message); }
+  };
+
   const submitIncome = (e) => {
     e.preventDefault();
     if (!incAmount) { alert('Введите сумму'); return; }
@@ -784,7 +811,7 @@ export default function Transactions() {
       </Modal>
       <Modal open={showIncome} onClose={function(){setShowIncome(false);setEditingId(null)}} title={editingId ? "Редактировать доход" : "Добавить доход"} subtitle="Поступление средств" width="medium">
 
-            <form onSubmit={function(e){
+            <form onSubmit={async function(e){
               e.preventDefault();
               if(!incAmount){alert("Введите сумму");return}
               if(editingId){
@@ -800,8 +827,8 @@ export default function Transactions() {
                   setToast('Сумма успешно изменена!');
                 }
               }else{
-                setPendingTx({type:"income",user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});
+                // Доход добавляется сразу с выбранным в форме счетом (без промежуточной модалки)
+                await doTx({type:"income",user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
               }
             }}>
               {!editingId && (
@@ -857,7 +884,7 @@ export default function Transactions() {
       </Modal>
 
       <Modal open={showExpense} onClose={function(){setShowExpense(false);setEditingId(null)}} title={editingId ? "Редактировать расход" : "Добавить расход"} subtitle="Списание средств" width="medium">
-            <form onSubmit={function(e){
+            <form onSubmit={async function(e){
               e.preventDefault();
               if(!expAmount){alert("Введите сумму");return}
               if(editingId){
@@ -873,8 +900,8 @@ export default function Transactions() {
                   setToast('Сумма успешно изменена!');
                 }
               }else{
-                setPendingTx({type:"expense",user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});
+                // Расход добавляется сразу с выбранным в форме счетом (без промежуточной модалки)
+                await doTx({type:"expense",user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
               }
             }}>
               {!editingId && (
