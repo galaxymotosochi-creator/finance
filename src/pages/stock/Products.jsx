@@ -127,6 +127,9 @@ export default function Products() {
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
+  const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [activeCols, setActiveColsState] = useState(getCols);
   // Подсказка скролла таблицы (как в Чеках и Счетах)
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
@@ -148,9 +151,6 @@ export default function Products() {
     window.addEventListener('resize', checkTbl);
     return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
   }, [loaded, activeCols]);
-  const [search, setSearch] = useState('');
-  const [searchFocus, setSearchFocus] = useState(false);
-  const [activeCols, setActiveColsState] = useState(getCols);
   const [selectedCats, setSelectedCats] = useState(new Set());
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
