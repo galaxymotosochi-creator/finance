@@ -752,7 +752,7 @@ export default function Products() {
           <div className="sub">Каталог товаров, услуг и комбо</div>
         </div>
         <div className="sk-bar-acts">
-          <button className="sk-dd-btn" onClick={openAdd}>Добавить товар, услугу</button>
+          <button className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -864,10 +864,10 @@ export default function Products() {
       {!loaded ? (
         <div style={{flex:1,minHeight:0}} />
       ) : (
-      <div className="***">
+      <div className="sk-tablewrap">
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
         <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
-        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table ***" style={{minWidth:'900px'}}>
           <thead id="colHeaders">
             <tr>
@@ -1128,7 +1128,7 @@ export default function Products() {
                 {editId && fHidden && (
                   <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
                 )}
-                <button type="submit" className="btn btn-dark" style={{fontWeight:600}} disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
+                <button type="submit" className="sk-dd-btn" disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
               </div>
             </form>
       </Modal>
