@@ -409,78 +409,84 @@ export default function Transactions() {
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
-      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'nowrap'}}>
-        <div className="stock-search" style={{display:"inline-flex",alignItems:"center",gap:".6rem",flex:"0 1 auto",width:"auto",minWidth:0,maxWidth:"100%",border:"1px solid "+(searchFocus?'#111':'#e2e2e6'),borderRadius:"100px",padding:'5px 12px',background:"#fff",boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
-          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+      {/* Панель фильтров — одна капсула, как в «Чеках» */}
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+        onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
           <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
           <input type="text" placeholder="Поиск…" value={search} onChange={function(e){setSearch(e.target.value)}}
             autoComplete="off"
-            style={{border:"none",outline:"none",width:'150px',minWidth:0,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
+            style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+        <div className="sk-dd-wrap">
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car-tri">▾</span></button>
+          <div className="sk-dd-menu">
+            {[
+              { v:null, label:'Все' },
+              { v:'income', label:'Доходы' },
+              { v:'expense', label:'Расходы' },
+            ].map(o => (
+              <button key={String(o.v)} type="button"
+                style={typeFilter===o.v?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+                onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setTypeFilter(o.v)}}>{o.label}</button>
+            ))}
+          </div>
         </div>
-        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".15rem",marginLeft:"auto",flexWrap:'wrap',justifyContent:'flex-end'}}>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-            <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:'.28rem .6rem',fontSize:'.72rem',color:'#555',cursor:'pointer',border:'1px solid #e0e0e4',borderRadius:'100px',lineHeight:1,whiteSpace:'nowrap',background:'#fff'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
-              onClick={e=>{e.stopPropagation();setShowPeriod(!showPeriod);setShowDownload(false)}}>{periodLabel}</span>
-            {showPeriod && (
-              <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
-                {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>{
-                  const isActive = period === p.key;
-                  return (
-                    <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
-                      style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.78rem',color:'#555',background:'transparent'}}>
-                      <input type="checkbox" checked={isActive} onChange={()=>{}} style={{cursor:"pointer",margin:0}} />
-                      {p.label}
-                    </div>
-                  );
-                })}
-                <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.15rem'}}>
-                  <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem',marginBottom:'.25rem'}}>Свой период</div>
-                  <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
-                    <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
-                    <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
+        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setShowDownload(false);setShowPeriod(!showPeriod)}}>
+            {periodLabel}
+            <span className="car-tri">▾</span>
+          </button>
+          {showPeriod && (
+            <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>{
+                const isActive = period === p.key;
+                return (
+                  <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.4rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.78rem',color:'#3a3a3f',background:isActive?'#E6F0FF':'transparent',fontWeight:isActive?700:400}}>
+                    <span className="dd-cb" style={{borderColor:isActive?'#111':'#c9c9d1',background:isActive?'#111':'#fff'}}>
+                      {isActive && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                    </span>
+                    {p.label}
                   </div>
-                  <div style={{padding:'.25rem .5rem'}}>
-                    <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setShowPeriod(false)}}
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--secondary)',color:'#fff',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
-                  </div>
+                );
+              })}
+              <div style={{borderTop:'1px solid rgba(29,120,252,.12)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                <div style={{fontSize:'.72rem',color:'#9aa3b0',padding:'.2rem .55rem',marginBottom:'.25rem'}}>Свой период</div>
+                <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                  <input type="date" value={periodFrom} onChange={e=>setPeriodFrom(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.25rem',border:'1px solid #e2e2e6',borderRadius:'.5rem',fontFamily:'var(--font)',outline:'none'}} />
+                  <input type="date" value={periodTo} onChange={e=>setPeriodTo(e.target.value)} style={{flex:1,minWidth:0,fontSize:'.72rem',padding:'.25rem',border:'1px solid #e2e2e6',borderRadius:'.5rem',fontFamily:'var(--font)',outline:'none'}} />
+                </div>
+                <div style={{padding:'.35rem .55rem .15rem'}}>
+                  <button onClick={()=>{if(!periodFrom||!periodTo)return alert('Выберите обе даты');setPeriod('custom');setPeriodLabel(periodFrom.split('-').reverse().join('.')+' — '+periodTo.split('-').reverse().join('.'));setShowPeriod(false)}}
+                    style={{width:'100%',padding:'.4rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'#111',color:'#fff',border:'none',borderRadius:'100px',cursor:'pointer',fontWeight:600}}>Применить</button>
                 </div>
               </div>
-            )}
-          </div>
-          <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",fontWeight:typeFilter==='expense'?600:400,color:typeFilter==='expense'?'#111':'#555',cursor:"pointer",border:'1px solid '+(typeFilter==='expense'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=typeFilter==='expense'?'#bbb':'#e0e0e4';e.currentTarget.style.color=typeFilter==='expense'?'#111':'#555'}}
-            onClick={()=>setTypeFilter(typeFilter==='expense'?null:'expense')}>Расходы</span>
-          <span className="stock-filter-link" style={{display:'inline-flex',alignItems:'center',padding:".28rem .6rem",fontSize:".72rem",fontWeight:typeFilter==='income'?600:400,color:typeFilter==='income'?'#111':'#555',cursor:"pointer",border:'1px solid '+(typeFilter==='income'?'#bbb':'#e0e0e4'),borderRadius:'100px',lineHeight:1,background:'#fff'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=typeFilter==='income'?'#bbb':'#e0e0e4';e.currentTarget.style.color=typeFilter==='income'?'#111':'#555'}}
-            onClick={()=>setTypeFilter(typeFilter==='income'?null:'income')}>Доходы</span>
-          <div style={{position:'relative',display:'inline-flex',alignItems:'center'}}>
-            <button type="button" title="Скачать" aria-label="Скачать"
-              style={{width:'22px',height:'22px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor='#bbb';e.currentTarget.style.color='#111'}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}
-              onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-            </button>
-            {showDownload && (
-              <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'230px',padding:'.35rem',zIndex:100}}>
-                <div style={{fontSize:'.72rem',color:'var(--muted)',marginBottom:'.5rem',padding:'0 .25rem'}}>
-                  Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>.
-                </div>
-                <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
-                  <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}}
-                    style={{padding:'.35rem .7rem',fontSize:'.75rem',fontWeight:600,borderRadius:'6px',cursor:'pointer',background:'var(--secondary)',color:'#fff',border:'none',fontFamily:'var(--font)'}}>Скачать</span>
-                  <span onClick={()=>{setShowDownload(false);setShowPeriod(true)}}
-                    style={{padding:'.35rem .7rem',fontSize:'.75rem',borderRadius:'6px',cursor:'pointer',background:'transparent',border:'1px solid var(--border)',color:'var(--muted)',fontFamily:'var(--font)'}}>Изменить даты</span>
-                </div>
+            </div>
+          )}
+        </div>
+        <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button type="button" title="Скачать" aria-label="Скачать"
+            style={{width:'26px',height:'26px',flexShrink:0,border:'1px solid rgba(29,120,252,.22)',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s'}}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='none'}}
+            onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          </button>
+          {showDownload && (
+            <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'230px',padding:'.5rem',zIndex:100}}>
+              <div style={{fontSize:'.72rem',color:'#9aa3b0',marginBottom:'.5rem',padding:'0 .25rem'}}>
+                Вы скачиваете отчет за <b>{periodLabel.toLowerCase()}</b>.
               </div>
-            )}
-          </div>
+              <div style={{display:'flex',gap:'.35rem',justifyContent:'center'}}>
+                <span onClick={()=>{exportCsv(filtered);setShowDownload(false)}}
+                  style={{padding:'.4rem .8rem',fontSize:'.75rem',fontWeight:600,borderRadius:'100px',cursor:'pointer',background:'#111',color:'#fff',border:'none',fontFamily:'var(--font)'}}>Скачать</span>
+                <span onClick={()=>{setShowDownload(false);setShowPeriod(true)}}
+                  style={{padding:'.4rem .8rem',fontSize:'.75rem',borderRadius:'100px',cursor:'pointer',background:'transparent',border:'1px solid rgba(29,120,252,.22)',color:'#1567d8',fontFamily:'var(--font)'}}>Изменить даты</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
