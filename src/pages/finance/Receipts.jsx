@@ -555,7 +555,8 @@ export default function Receipts() {
       {/* Таблица чеков */}
       <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-          <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table sk-receipts">
           <thead id="colHeaders">
             <tr>
@@ -574,9 +575,9 @@ export default function Receipts() {
           <tbody>
             {filtered.length === 0 ? (
               <tr><td colSpan="10" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Чеков не найдено</td></tr>
-            ) : filtered.map((r, idx) => (
+            ) : filtered.map(r => (
               <tr key={r.id} onClick={() => openReceipt(r)}
-                style={{ cursor: 'pointer', position: 'relative' }}>
+                style={{ cursor: 'pointer' }}>
                 <td>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{fmtDate(r.date)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
@@ -607,7 +608,6 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left', color:'#222' }}>{r.cashier_name && r.cashier_name.includes('@') ? '—' : abbreviateName(r.cashier_name)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
-                  <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                 </td>
               </tr>
             ))}

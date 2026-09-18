@@ -383,7 +383,8 @@ export default function Accounts() {
           })()}
           <div className="sk-tablewrap">
             <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-              <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+            <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+          <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
             <table className="sk-table">
               <thead id="colHeaders">
                 <tr>
@@ -398,11 +399,11 @@ export default function Accounts() {
               <tbody id="dirTableBody">
                 {sorted.length === 0 ? (
                   <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
-                ) : sorted.map((a, idx) => {
+                ) : sorted.map(a => {
                   var m=ACC_TYPES.find(t=>t.type===a.type), lb=m?m.label:a.type;
                   var bl=getBal(a), mv=getMv(a), in0=parseFloat(a.balance)||0;
                   return (
-                    <tr key={a.id} style={{position:'relative'}}>
+                    <tr key={a.id}>
                       <td style={{textAlign:'left'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                           <div style={{cursor:'pointer'}} onClick={()=>setViewAcTx(a)}>
@@ -425,7 +426,6 @@ export default function Accounts() {
                             </div>
                           </div>
                         ) : null}
-                        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                       </td>
                     </tr>
                   );

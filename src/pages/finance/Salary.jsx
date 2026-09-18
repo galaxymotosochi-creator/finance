@@ -747,7 +747,8 @@ export default function Salary() {
       ) : (
       <div className="sk-tablewrap">
           <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-          <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table sal-table">
           <thead id="salaryColHeaders"><tr>
             <th style={{ textAlign: 'left' }}>Сотрудник</th><th style={{ textAlign: 'left' }}>Период</th><th style={{ textAlign: 'left' }}>Оклад</th><th style={{ textAlign: 'left' }}>Премия</th>
@@ -756,8 +757,8 @@ export default function Salary() {
           <tbody id="salaryTableBody">
             {salFiltered.length === 0 ? (
               <tr><td colSpan="8" style={{padding:"40px 20px",textAlign:"center",color:"#5b6472",fontSize:"13px"}}>Начислений не найдено</td></tr>
-            ) : salFiltered.map((s, idx) => (
-              <tr key={s.id} style={{position:'relative'}}>
+            ) : salFiltered.map(s => (
+              <tr key={s.id}>
                 <td><span style={{whiteSpace:'nowrap'}}>{abbreviateName(s.employee_name)||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                 <td>{s.period_from?fmtD(s.period_from)+' – '+fmtD(s.period_to):'—'}</td>
                 <td>{s.base_salary?s.base_salary.toLocaleString()+' ₽':'—'}</td>
@@ -777,7 +778,6 @@ export default function Salary() {
                       <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
-                  <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                 </td>
               </tr>
             ))}

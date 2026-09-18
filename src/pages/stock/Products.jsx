@@ -866,6 +866,7 @@ export default function Products() {
       ) : (
       <div className="sk-tablewrap">
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
         <div className="sk-card" style={{position:'relative',flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table ***" style={{minWidth:'900px'}}>
           <thead id="colHeaders">
@@ -886,8 +887,8 @@ export default function Products() {
                   <div className="sk-empty">Каталог пуст — добавьте первый товар или услугу</div>
                 </td>
               </tr>
-            ) : filtered.map((p, idx) => (
-              <tr key={p.id} style={Object.assign({position:'relative'}, p.hidden ? {opacity:0.35,transition:'opacity .2s'} : {})}>
+            ) : filtered.map(p => (
+              <tr key={p.id} style={p.hidden ? {opacity:0.35,transition:'opacity .2s'} : {}}>
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
@@ -917,7 +918,6 @@ export default function Products() {
                       <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
-                  <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                 </td>
               </tr>
             ))}
