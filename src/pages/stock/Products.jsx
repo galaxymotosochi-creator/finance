@@ -127,6 +127,27 @@ export default function Products() {
   const { user } = useAuth();
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
+  // Подсказка скролла таблицы (как в Чеках и Счетах)
+  const [tblPos, setTblPos] = useState({ left: false, right: false });
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 150);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  }, [loaded, activeCols]);
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
   const [activeCols, setActiveColsState] = useState(getCols);
@@ -474,6 +495,12 @@ export default function Products() {
     setTypeFilterSet(next);
   };
 
+  // Тип — выбор только одного значения (radio-поведение)
+  const pickType = (t) => {
+    setTypeFilterSet(t === null ? new Set() : new Set([t]));
+    setTypeOpen(false);
+  };
+
   const selectAllTypes = () => {
     setTypeFilterSet(new Set(['product','service','combo']));
   };
@@ -745,25 +772,18 @@ export default function Products() {
             <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>{typeLabel} <span className="car-tri">▾</span></button>
             {typeOpen && (
               <div className="f-menu">
-                {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
-                  const checked = typeFilterSet.has(t.v);
+                <div className="f-list">
+                {[{v:null,l:'Все'},{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
+                  const checked = (t.v === null && typeFilterSet.size === 0) || typeFilterSet.has(t.v);
                   return (
-                    <div key={t.v} onClick={() => toggleType(t.v)}
+                    <div key={String(t.v)} onClick={() => pickType(t.v)}
                       style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
                       <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                       {t.l}
                     </div>
                   );
                 })}
-                {typeFilterSet.size > 0 && (
-                  <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
-                    <div onClick={clearAllTypes}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
-                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
-                      Очистить
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             )}</div>
           <div className="sk-dd-wrap">
@@ -844,8 +864,11 @@ export default function Products() {
       {!loaded ? (
         <div style={{flex:1,minHeight:0}} />
       ) : (
-      <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
-        <table className="data-table">
+      <div className="***">
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-card" style={{flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table ***" style={{minWidth:'900px'}}>
           <thead id="colHeaders">
             <tr>
               {COL_ORDER.map(col => {
@@ -861,11 +884,7 @@ export default function Products() {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={2 + activeCols.size}>
-                  <div className="empty-products">
-                    <div className="big-icon">📦</div>
-                    <p>Каталог пуст</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Добавьте первый товар или услугу, чтобы начать работу</p>
-                  </div>
+                  <div className="sk-empty">Каталог пуст — добавьте первый товар или услугу</div>
                 </td>
               </tr>
             ) : filtered.map(p => (
@@ -881,7 +900,7 @@ export default function Products() {
                 })}
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
-                    <button className="act-btn prod-more-btn" onClick={(e) => {
+                    <button className="sk-more" onClick={(e) => {
                       e.stopPropagation();
                       const dd = e.currentTarget.nextElementSibling;
                       document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
@@ -904,7 +923,8 @@ export default function Products() {
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+        </div>
       )}
 
       {/* Кружок по центру экрана, пока грузятся товары (не перекрывает интерфейс, без надписи) */}
