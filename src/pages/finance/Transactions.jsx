@@ -441,7 +441,7 @@ export default function Transactions() {
                 act:function(){setEditingId(null);resetForms();openIncome()}
               },{
                 label:'Перевод между счетами', sub:'Перемещение средств',
-                act:function(){setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}
+                act:function(){setTrFrom(accs.length > 0 ? accs[0].id : '');setTrTo(accs.length > 1 ? accs[1].id : '');setTrAmt('');setShowTransfer(true)}
               },{
                 label:'Взнос / вывод своих денег', sub:'Личные деньги владельца',
                 act:function(){setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}
@@ -674,14 +674,14 @@ export default function Transactions() {
               } catch(err) {alert(err.message);}
             }}>
               <div className="form-group">
-                <label>С какого счета</label>
+                <label>С какого счета списать</label>
                 <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
                   {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
                   {accs.map(function(a){
                     const sel=String(a.id)===String(trFrom);
                     return (
                       <div key={a.id} onClick={function(){setTrFrom(a.id);if(String(a.id)===String(trTo))setTrTo('')}}
-                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1.5px solid '+(sel?'#ffdd2d':'rgba(0,0,0,.26)')}}>
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
                         <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
                         <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                         <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
@@ -691,14 +691,14 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>На какой счет</label>
+                <label>На какой счет зачислить</label>
                 <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
                   {accs.filter(function(a){return String(a.id)!==String(trFrom)}).length===0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
                   {accs.filter(function(a){return String(a.id)!==String(trFrom)}).map(function(a){
                     const sel=String(a.id)===String(trTo);
                     return (
                       <div key={a.id} onClick={function(){setTrTo(a.id)}}
-                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1.5px solid '+(sel?'#ffdd2d':'rgba(0,0,0,.26)')}}>
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
                         <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
                         <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                         <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
@@ -712,7 +712,7 @@ export default function Transactions() {
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">Перевести</button>
+                <button type="submit" className="sk-dd-btn">Перевести</button>
               </div>
             </form>
       </Modal>
@@ -760,7 +760,7 @@ export default function Transactions() {
                     const sel = String(a.id) === String(ownerAcct);
                     return (
                       <div key={a.id} onClick={()=>setOwnerAcct(a.id)}
-                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1.5px solid '+(sel?'#ffdd2d':'rgba(0,0,0,.26)')}}>
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
                         <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
                         <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                         <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
