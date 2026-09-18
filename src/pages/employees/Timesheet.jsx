@@ -517,7 +517,7 @@ export default function Timesheet() {
                 {employees.map(emp => (
                   <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.35rem'}}>
                     <span style={{fontSize:'.82rem',minWidth:'120px',fontWeight:500}}>{emp.name}</span>
-                    <select style={{flex:1,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}
+                    <select style={{width:'140px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.8125rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}
                       value={localStatuses[emp.id]||'present'}
                       onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}>
                       {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
