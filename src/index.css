@@ -907,7 +907,10 @@ input:focus, select:focus, textarea:focus {
 .sk-fade.at-start{opacity:0}
 .sk-fade.at-end{opacity:0}
 .sk-fade-r:after{content:"›";position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:22px;font-weight:700;color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
-@keyframes sknudge{0%,100%{transform:translateY(-50%) translateX(0);opacity:.3}50%{transform:translateY(-50%) translateX(4px);opacity:.7}}
+@keyframes sknudge{0%,100%{transform:translateX(0);opacity:.3}50%{transform:translateX(4px);opacity:.7}}
+/* вариант для прижатой к низу подсказки — без вертикального сдвига */
+.sk-tablewrap > .sk-fade-r:after{animation:sknudge2 1.6s ease-in-out infinite}
+@keyframes sknudge2{0%,100%{transform:translateX(0);opacity:.3}50%{transform:translateX(4px);opacity:.7}}
 /* шторки показываем на мобильных и планшетах (до 1024px), на десктопе таблица помещается целиком */
 @media(min-width:1025px){.sk-fade{display:none}}
 
@@ -983,6 +986,9 @@ input:focus, select:focus, textarea:focus {
 .sk-more-btn:disabled{opacity:.6;cursor:default;transform:none}
 /* Чеки: подсказка скролла ровно по границам табличной карточки (без «уезжания» вниз) */
 .sk-card > .sk-fade{top:0;bottom:0}
+/* Подсказка скролла липнет к НИЗУ области просмотра, а не висит по центру длинной таблицы */
+.sk-tablewrap > .sk-fade{top:auto;bottom:14px;height:30px;display:flex;align-items:center}
+.sk-tablewrap > .sk-fade-r:after{position:static;transform:none;right:auto}
 /* «Все время ▾» — та же пульсация, что у кнопки «Тип» (дизайн не меняется) */
 .sk-period{animation:skperiodpulse 2s ease-in-out infinite}
 .sk-period:hover{animation-play-state:paused}
