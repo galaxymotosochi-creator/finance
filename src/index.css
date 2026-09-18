@@ -843,7 +843,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ===== Доходы и расходы: карточка «круг + структура» (дизайн tx-panels v3) ===== */
-.tx-card{background:#fff;border:none;border-radius:20px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,18,32,.04)}
+.tx-card{background:transparent;border:none;border-radius:0;padding:0;margin-bottom:16px;box-shadow:none}
 .tx-ring-block{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
 .tx-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 30px 55px -18px rgba(11,18,32,.55),0 18px 34px -14px rgba(11,18,32,.35),0 8px 16px -8px rgba(11,18,32,.25)}
 .tx-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
