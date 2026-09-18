@@ -844,9 +844,9 @@ input:focus, select:focus, textarea:focus {
 /* ===== Доходы и расходы: карточка «круг + структура» (дизайн tx-panels v3) ===== */
 .tx-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;padding:20px 22px;margin-bottom:14px}
 .tx-ring-block{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
-.tx-ring{width:164px;height:164px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 30px 55px -18px rgba(11,18,32,.55),0 18px 34px -14px rgba(11,18,32,.35),0 8px 16px -8px rgba(11,18,32,.25),0 0 0 1px rgba(255,255,255,.6) inset}
+.tx-ring{width:164px;height:164px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 30px 55px -18px rgba(11,18,32,.55),0 18px 34px -14px rgba(11,18,32,.35),0 8px 16px -8px rgba(11,18,32,.25)}
 .tx-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
-.tx-ring:after{content:"";position:absolute;inset:30px;background:#fff;border-radius:50%;box-shadow:0 0 0 1px rgba(11,18,32,.08),0 0 0 6px rgba(255,255,255,.4) inset,0 14px 28px -12px rgba(11,18,32,.42),0 -3px 10px -4px rgba(11,18,32,.16) inset}
+.tx-ring:after{content:"";position:absolute;inset:30px;background:#fff;border-radius:50%;box-shadow:0 14px 28px -12px rgba(11,18,32,.42),0 -3px 10px -4px rgba(11,18,32,.16) inset}
 .tx-ring .in{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .tx-ring .in .t{font-size:10.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;line-height:1.2}
 .tx-ring .in .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.15;color:#111}
