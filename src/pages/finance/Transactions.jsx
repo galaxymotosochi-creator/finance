@@ -42,6 +42,7 @@ export default function Transactions() {
   }, []);
   const [origAmount, setOrigAmount] = useState(null);
   const [search, setSearch] = useState('');
+  const [txRingOpen, setTxRingOpen] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -207,7 +208,6 @@ export default function Transactions() {
     const to = txAccPct / txTurnover * 100;
     return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
   }).join(', ');
-  const [txRingOpen, setTxRingOpen] = useState(false);
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
