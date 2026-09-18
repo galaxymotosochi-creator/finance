@@ -101,8 +101,6 @@ export default function Employees() {
   const [show, setShow] = useState(false);
   const [editId, setEditId] = useState(null);
   const [wStep, setWStep] = useState(0);
-  const [search, setSearch] = useState('');
-  const [searchFocus, setSearchFocus] = useState(false);
   const [tblPos, setTblPos] = useState({left:false, right:false});
   const tblElRef = useRef(null);
   const onTblScroll = (e) => {
@@ -396,9 +394,7 @@ export default function Employees() {
     return rules.map(r => scopeLabel(r.scope) + (r.ref ? ': ' + refName(r) : '') + ' — ' + (r.vt === 'fixed' ? r.val + ' ₽/шт' : r.val + '%')).join(', ');
   };
 
-  const q = search.toLowerCase().trim();
-  let filtered = employees;
-  if (q) filtered = filtered.filter(e => e.name.toLowerCase().includes(q) || (e.phone||'').includes(q) || (e.email||'').toLowerCase().includes(q));
+  const filtered = employees;
 
   const prodCats = allCats.filter(c => c.type === 'product');
   const svcCats = allCats.filter(c => c.type === 'service');
@@ -475,16 +471,6 @@ export default function Employees() {
         <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
-      </div>
-
-      {/* Панель фильтров — одна планка, эталон «Поставки» */}
-      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
-        <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        </span>
-        <input type="text" placeholder="Поиск…" value={search} onChange={e=>setSearch(e.target.value)}
-          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}
-          style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
       </div>
 
       {loading ? (
