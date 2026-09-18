@@ -172,6 +172,15 @@ export default function Products() {
   const [catOpen, setCatOpen] = useState(false);
   const [colsOpen, setColsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const typeLabel = (() => {
+    const st = typeFilterSet;
+    if (!st || st.size === 0 || st.size === 3) return 'Тип';
+    const names = [];
+    if (st.has('product')) names.push('Товары');
+    if (st.has('service')) names.push('Услуги');
+    if (st.has('combo')) names.push('Комбо');
+    return names.join(', ');
+  })();
   const [catFilter, setCatFilter] = useState('');
   const fileInputRef = useRef(null);
   const [importing, setImporting] = useState(false);
@@ -732,35 +741,29 @@ export default function Products() {
             autoComplete="off"
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
           <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".25rem",flexShrink:0}}>
-          <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <button style={yellowPill}
-              onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>Тип<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
+          <div className="sk-dd-wrap">
+            <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setTypeOpen(!typeOpen);setCatOpen(false);setColsOpen(false);setExportOpen(false)}}>{typeLabel} <span className="car-tri">▾</span></button>
             {typeOpen && (
-              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'180px',padding:'8px',zIndex:100}}>
-                <div className="cat-dd-list">
-                  {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
-                    const checked = typeFilterSet.has(t.v);
-                    return (
-                      <div key={t.v} className={'cat-dd-item'+(checked?' sel':'')} onClick={() => toggleType(t.v)}>
-                        <DdCheck />
-                        <span>{t.l}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="cat-dd-actions">
-                  <span className="cat-dd-action" onClick={selectAllTypes}>Выбрать все</span>
-                  <span className="cat-dd-action ghost" onClick={clearAllTypes}>Очистить</span>
+              <div className="f-menu">
+                {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
+                  const checked = typeFilterSet.has(t.v);
+                  return (
+                    <div key={t.v} className={'f-item'+(checked?' sel':'')} onClick={() => toggleType(t.v)}>
+                      <DdCheck />
+                      <span>{t.l}</span>
+                    </div>
+                  );
+                })}
+                <div className="f-actions">
+                  <span className="f-action" onClick={selectAllTypes}>Выбрать все</span>
+                  <span className="f-action ghost" onClick={clearAllTypes}>Очистить</span>
                 </div>
               </div>
             )}</div>
-          <div className="cat-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <button style={yellowPill}
-              onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setCatOpen(!catOpen);setColsOpen(false);setExportOpen(false)}}>Категории<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
+          <div className="sk-dd-wrap">
+            <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setCatOpen(!catOpen);setTypeOpen(false);setColsOpen(false);setExportOpen(false)}}>Категории <span className="car-tri">▾</span></button>
             {catOpen && (
-              <div className="cat-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'200px',padding:'8px',zIndex:100}}>
+              <div className="f-menu" style={{minWidth:'220px'}}>
                 <div className="cat-dd-search">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                   <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
@@ -795,12 +798,10 @@ export default function Products() {
               </div>
             )}
           </div>
-          <div className="cols-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-            <button style={yellowPill}
-              onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
-              onClick={()=>{setColsOpen(!colsOpen);setCatOpen(false);setExportOpen(false)}}>Столбцы<span style={{fontSize:'.6rem',opacity:.7}}>▾</span></button>
+          <div className="sk-dd-wrap">
+            <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setColsOpen(!colsOpen);setTypeOpen(false);setCatOpen(false);setExportOpen(false)}}>Столбцы <span className="car-tri">▾</span></button>
             {colsOpen && (
-              <div className="cols-dropdown" style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'210px',padding:'8px',zIndex:100}}>
+              <div className="f-menu" style={{minWidth:'230px'}}>
                 <div className="cols-list">
                 {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
                   const active = activeCols.has(col.id);
@@ -813,14 +814,13 @@ export default function Products() {
                 })}
               </div></div>
             )}</div>
-          <button style={pillStyle(showTrash)}
-            onMouseEnter={e=>pillHover(e, showTrash, true)} onMouseLeave={e=>pillHover(e, showTrash, false)}
+          <button type="button" className={'f-pill'+(showTrash?' on':'')}
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
           <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} type="button" title="Скачать" aria-label="Скачать"
-            style={{width:'22px',height:'22px',flexShrink:0,border:'1px solid #e0e0e4',borderRadius:'100px',background:'#fff',color:'#555',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 1px 2px rgba(0,0,0,.03)',transition:'all .12s',marginLeft:'.15rem'}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor='#999';e.currentTarget.style.color='#111'}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor='#e0e0e4';e.currentTarget.style.color='#555'}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'skpulse 2s ease-in-out infinite'}}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.animationPlayState='paused'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.animationPlayState='running'}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
           </div>
         </div>
