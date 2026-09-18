@@ -749,7 +749,7 @@ export default function Products() {
                   const checked = typeFilterSet.has(t.v);
                   return (
                     <div key={t.v} onClick={() => toggleType(t.v)}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
                       <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                       {t.l}
                     </div>
@@ -758,7 +758,7 @@ export default function Products() {
                 {typeFilterSet.size > 0 && (
                   <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
                     <div onClick={clearAllTypes}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
                       <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
                       Очистить
                     </div>
@@ -790,7 +790,7 @@ export default function Products() {
                     const checked = selectedCats.has(c.name);
                     return (
                       <div key={c.name} onClick={() => toggleCat(c.name)}
-                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
                         <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                         {c.name}
                       </div>
@@ -801,7 +801,7 @@ export default function Products() {
                 {selectedCats.size > 0 && (
                   <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
                     <div onClick={clearAllCats}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
                       <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
                       Очистить
                     </div>
@@ -819,7 +819,7 @@ export default function Products() {
                   const active = activeCols.has(col.id);
                   return (
                     <div key={col.id} onClick={() => toggleCol(col.id)}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:active?'#0d4ea8':'#5b6472',fontWeight:active?700:500,background:active?'#E6F0FF':'transparent'}}>
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:active?'#0d4ea8':'#5b6472',fontWeight:active?700:500,background:active?'#E6F0FF':'transparent'}}>
                       <span style={{width:'8px',height:'8px',borderRadius:'50%',background:active?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                       {col.label}
                     </div>
