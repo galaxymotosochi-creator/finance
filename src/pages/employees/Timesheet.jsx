@@ -94,6 +94,13 @@ export default function Timesheet() {
   // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
   useOptimisticSync({ table: 'timesheet_entries', setList: setEntries, onSynced: load });
 
+  // Проверка подсказок скролла — как в «Сотрудниках»
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
+
   // Закрытие дропдаунов при клике вне
   useEffect(() => {
     const handler = () => {
