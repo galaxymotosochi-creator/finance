@@ -295,7 +295,7 @@ export default function Transactions() {
       description: expName, amount: parseFloat(expAmount),
       date: expDate, category_id: expCategory || null,
     });
-    setSelectedAcc('cash');
+    setSelectedAcc(accs.length > 0 ? accs[0].id : null);
     setSplitMode(false);
     setSplitAmounts({});
     setShowAccSelect(true);
@@ -990,7 +990,7 @@ function CategorySelect({ cats, value, onChange, placeholder }) {
   return (
     <div className="cat-sel-wrap" style={{position:'relative'}}>
       <button type="button" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
-        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .7rem',borderRadius:'.6rem',border:'1.5px solid ' + (open ? '#1F75FF' : '#e4e4e8'),background:'#fff',fontFamily:'inherit',fontSize:'.8125rem',color:sel ? '#222' : '#8a93a2',cursor:'pointer',textAlign:'left'}}>
+        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .65rem',border:'1.5px solid ' + (open ? '#111' : 'rgba(0,0,0,.26)'),borderRadius:'var(--radius-md)',background:'var(--body-bg)',fontFamily:'var(--font)',fontSize:'.875rem',color:sel ? '#333' : '#8a93a2',cursor:'pointer',textAlign:'left',boxSizing:'border-box',minHeight:'38px',outline:'none',boxShadow:open ? '0 0 0 3px rgba(17,17,17,.07)' : 'none',transition:'border-color .15s, box-shadow .15s'}}>
         <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{sel ? sel.name : (placeholder || 'Выберите категорию')}</span>
         <span style={{fontSize:'9px',color:'#5b6472',transform:open?'rotate(180deg)':'none',transition:'transform .2s'}}>▾</span>
       </button>
