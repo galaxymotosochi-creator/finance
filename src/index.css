@@ -849,8 +849,8 @@ input:focus, select:focus, textarea:focus {
 .tx-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
 .tx-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
 .tx-ring .in{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.tx-ring .in .t{font-size:10.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;line-height:1.2}
-.tx-ring .in .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.15;color:#111}
+.tx-ring .in .t{font-size:9.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;line-height:1.15;white-space:nowrap}
+.tx-ring .in .v{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.12;color:#111;white-space:nowrap}
 .tx-ring-pct{position:absolute;z-index:4;font-size:10px;font-weight:800;letter-spacing:-.01em;background:#fff;border-radius:100px;padding:1px 5px;box-shadow:0 4px 10px rgba(11,18,32,.3),0 1px 2px rgba(11,18,32,.2);transform:translate(-50%,-50%)}
 .tx-legend{flex:1;min-width:280px;display:flex;flex-direction:column;gap:10px}
 .tx-leg{display:flex;align-items:center;gap:10px}
