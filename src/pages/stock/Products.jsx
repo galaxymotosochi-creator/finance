@@ -667,8 +667,8 @@ export default function Products() {
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       <div style={{flexShrink:0}}>
-        <div className="page-header">
-        <div>
+        <div className="sk-bar">
+        <div className="grow">
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>Товары и услуги</h1>
             <SectionHelp
@@ -715,24 +715,23 @@ export default function Products() {
           </div>
           <div className="sub">Каталог товаров, услуг и комбо</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить товар, услугу</button>
+        <div className="sk-bar-acts">
+          <button className="sk-dd-btn" onClick={openAdd}>Добавить товар, услугу</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
 
 
-      <div className="search-row" style={{display:"flex",alignItems:"center",marginBottom:".5rem",width:'100%',flexWrap:'wrap',gap:'.4rem'}}>
-        <div className="stock-search" style={{display:"inline-flex",alignItems:"center",gap:".4rem",width:"auto",border:"1px solid "+(searchFocus?'#111':'#e2e2e6'),borderRadius:"100px",padding:'5px 12px',background:"#fff",boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
-          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
-          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+        onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
           <input type="text" placeholder="Поиск…" value={search} onChange={e=>setSearch(e.target.value)}
-            style={{border:"none",outline:"none",width:"150px",minWidth:0,fontSize:".8rem",fontFamily:"var(--font)",background:"none",padding:0}} />
-        </div>
-        <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".25rem",marginLeft:"auto"}}>
+            autoComplete="off"
+            style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+          <div className="stock-filter-links" style={{display:"flex",alignItems:"center",gap:".25rem",flexShrink:0}}>
           <div className="type-wrapper" style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
             <button style={yellowPill}
               onMouseEnter={e=>yellowHover(e, true)} onMouseLeave={e=>yellowHover(e, false)}
