@@ -984,7 +984,7 @@ export default function Products() {
                   <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
                     <select value={fRewardKind} onChange={e => { setFRewardKind(e.target.value); if (!e.target.value) setFRewardValue(''); }} style={{ width: 'auto', minWidth: '140px' }}>
                       <option value="">— не задана —</option>
-                      <option value="rub">Сумма (₽)</option>
+                      <option value="rub">Сумма </option>
                       <option value="pct">Процент (%)</option>
                     </select>
                     {fRewardKind && <input type="number" min="0" step="0.01" value={fRewardValue} onChange={e => setFRewardValue(e.target.value)} placeholder={fRewardKind === 'pct' ? '30' : '500'} style={{ width: '110px' }} autoFocus={false} />}

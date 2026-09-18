@@ -458,7 +458,7 @@ export default function Accounts() {
               )}
               {!editingId && (
                 <div className="form-group">
-                  <label>Начальный остаток (₽)</label>
+                  <label>Начальный остаток </label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
                 </div>
               )}
@@ -485,7 +485,7 @@ export default function Accounts() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Сумма (₽)</label>
+                  <label>Сумма </label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={corAmt} onChange={e=>setCorAmt(e.target.value)} required />
                 </div>
               </div>
@@ -605,7 +605,7 @@ export default function Accounts() {
                 <AcctPick accounts={accounts.filter(a=>String(a.id)!==String(trFrom))} value={trTo} onChange={setTrTo} cur={cur} balOf={balOfId} placeholder="— выберите —" />
               </div>
               <div className="form-group">
-                <label>Сумма (₽)</label>
+                <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
               <div className="modal-actions">
@@ -668,7 +668,7 @@ export default function Accounts() {
                 } catch(err) {alert(err.message);}
               }}>
                 <div className="form-group">
-                  <label>Сумма (₽)</label>
+                  <label>Сумма </label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={colAmt} onChange={function(e){setColAmt(e.target.value)}} required autoFocus />
                 </div>
                 <div className="form-group">

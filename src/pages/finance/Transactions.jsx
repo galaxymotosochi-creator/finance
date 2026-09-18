@@ -708,7 +708,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Сумма (₽)</label>
+                <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
               <div className="modal-actions">
@@ -826,7 +826,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Сумма (₽)</label>
+                <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
               </div>
               <div className="form-group">
@@ -899,7 +899,7 @@ export default function Transactions() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Сумма (₽)</label>
+                <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
               </div>
               <div className="form-group">

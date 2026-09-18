@@ -863,7 +863,7 @@ export default function Receipts() {
       <Modal open={!!payReceipt} onClose={() => setPayReceipt(null)} title={payReceipt ? 'Оплата долга по чеку №' + payReceipt.receipt_number : ''} subtitle={payReceipt ? 'Клиент: ' + (payReceipt.client_name || '—') + ' • Остаток долга: ' + receiptRemain(payReceipt).toLocaleString() + ' ₽' : ''} width="medium">
         {payReceipt && (<>
           <div className="form-group">
-            <label>Сумма (₽)</label>
+            <label>Сумма </label>
             <input type="number" min="0" step="0.01" value={payAmt} onChange={e => setPayAmt(e.target.value)} autoFocus />
           </div>
           <div className="form-group">
