@@ -478,7 +478,7 @@ export default function Employees() {
       ) : (
       <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
         <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
-        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}} data-arrow="top"></div>
         <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
         <table className="sk-table emp-table">
           <thead id="empColHeaders"><tr>
