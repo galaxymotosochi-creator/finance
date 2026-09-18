@@ -907,10 +907,6 @@ input:focus, select:focus, textarea:focus {
 .sk-fade.at-start{opacity:0}
 .sk-fade.at-end{opacity:0}
 .sk-fade-r:after{content:"›";position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:22px;font-weight:700;color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
-/* Стрелка внутри компактной полосы-подсказки */
-.sk-fade-r[style*="30px"]:after{top:50%}
-/* Прижата к НИЖНЕМУ краю полосы (как в ячейке «Услуга») */
-.sk-fade-r[data-pos="bottom"]:after{top:auto;bottom:0;transform:translateX(0)}
 @keyframes sknudge{0%,100%{transform:translateX(0);opacity:.3}50%{transform:translateX(4px);opacity:.7}}
 /* шторки показываем на мобильных и планшетах (до 1024px), на десктопе таблица помещается целиком */
 @media(min-width:1025px){.sk-fade{display:none}}
