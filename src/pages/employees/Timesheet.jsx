@@ -1,5 +1,5 @@
 import Modal from '../../components/Modal';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -54,6 +54,22 @@ export default function Timesheet() {
   const [tsEmpFilter, setTsEmpFilter] = useState([]);
   const [tsShowEmp, setTsShowEmp] = useState(false);
   const [tsTypeFilter, setTsTypeFilter] = useState('all');
+  // Подсказки скролла таблицы (как в «Сотрудниках»)
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   const [tsSearch, setTsSearch] = useState('');
   const [tsSearchFocus, setTsSearchFocus] = useState(false);
   const [tsTypeOpen, setTsTypeOpen] = useState(false);
@@ -429,35 +445,39 @@ export default function Timesheet() {
           </div>
 
           {/* ТАБЛИЦА */}
-          <div className="product-table" style={{overflowY:'auto',flex:1,minHeight:0}}>
-            <table>
-              <thead id="colHeaders" style={{fontSize:'.72rem',fontWeight:400,color:'var(--muted)',textTransform:'uppercase'}}>
-                <tr>
-                  <th style={{textAlign:'left',paddingLeft:0,width:'12%'}}>Дата</th>
-                  <th style={{width:'26%',textAlign:'left'}}>Сотрудник</th>
-                  <th style={{width:'26%',textAlign:'left'}}>Статус</th>
-                  <th style={{textAlign:'left',width:'15%'}}>Бонус</th>
-                  <th style={{textAlign:'left',width:'15%'}}>Штраф</th>
-                  <th style={{width:'6%',textAlign:'left'}}></th>
-                </tr>
-              </thead>
+          <div className="sk-tablewrap" style={{flex:'none',minHeight:'auto'}}>
+            <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+            <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+            <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
+            <table className="sk-table ts-table">
+              <thead><tr>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Дата</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Статус</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Бонус</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Штраф</th>
+                <th style={{width:'70px',textAlign:'left'}}></th>
+              </tr></thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
-                  <tr><td colSpan={6} style={{padding:'2rem',textAlign:'center',color:'var(--muted)',fontSize:'.82rem'}}>Нет записей за выбранный период</td></tr>
+                  <tr><td colSpan={6}><div className="empty-products"><div className="big-icon">📅</div><p>Нет записей за выбранный период</p>
+                        <p style={{color:'var(--muted)',margin:'.5rem 0 0'}}>Отметьте день в календаре выше</p></div></td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',paddingLeft:0,color:'#555',whiteSpace:'nowrap'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
-                    <td style={{color:'#555',textAlign:'left',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}}>{getEmpName(e.employee_id)}</td>
-                    <td style={{color:'#555',textAlign:'left'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
-                    <td style={{color:'#555'}}>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
+                      {getEmpName(e.employee_id)}{e.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
+                    </td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#16a34a'}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
-                    <td style={{color:'#555'}}>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#dc2626'}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                        <button className="act-btn prod-more-btn" onClick={(ev) => {
+                        <button className="sk-more" onClick={(ev) => {
                           ev.stopPropagation();
                           var dd=ev.currentTarget.nextElementSibling;
                           document.querySelectorAll('.prod-dropdown.open').forEach(function(d){if(d!==dd)d.classList.remove('open');});
@@ -473,6 +493,7 @@ export default function Timesheet() {
                 )))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}
