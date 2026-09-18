@@ -809,31 +809,25 @@ export default function Transactions() {
                 <label>Тип операции</label>
                 <div style={{display:'flex',gap:'.4rem'}}>
                   <button type="button" onClick={function(){setIncCategory('')}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',transition:'all .12s'}}>+ Доход</button>
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>+ Доход</button>
                   <button type="button" onClick={function(){setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setShowExpense(true)}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>− Расход</button>
                 </div>
               </div>
               )}
-              <div className="form-group">
-                <label>Категория</label>
-                <div style={{display:'flex',flexWrap:'wrap',gap:'.35rem'}}>
-                  {incomeCats.length === 0 && <div style={{padding:'.2rem 0',fontSize:'.8rem',color:'var(--muted)'}}>Нет категорий — добавьте в разделе «Категории»</div>}
-                  {incomeCats.map(function(c){const on=String(incCategory)===String(c.id);return (
-                    <button key={c.id} type="button" onClick={function(){setIncCategory(on?'':c.id)}}
-                      style={{padding:'.42rem .85rem',borderRadius:'100px',border:'1.5px solid '+(on?'#111':'#e4e4e8'),background:on?'#111':'#fff',fontSize:'.78rem',fontWeight:500,color:on?'#fff':'#666',cursor:'pointer',fontFamily:'var(--font)',transition:'all .12s'}}>{c.name}</button>
-                  );})}
-                </div>
-              </div>
               <div className="form-row">
-                <div className="form-group">
-                  <label>Сумма (₽)</label>
-                  <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
-                </div>
                 <div className="form-group">
                   <label>Дата</label>
                   <input type="date" value={incDate} onChange={function(e){setIncDate(e.target.value)}} />
                 </div>
+                <div className="form-group">
+                  <label>Категория</label>
+                  <CategorySelect cats={incomeCats} value={incCategory} onChange={setIncCategory} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Сумма (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={incAmount} onChange={function(e){setIncAmount(e.target.value)}} required />
               </div>
               <div className="form-group">
                 <label>Комментарий</label>
@@ -890,29 +884,23 @@ export default function Transactions() {
                   <button type="button" onClick={function(){setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setShowIncome(true)}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>+ Доход</button>
                   <button type="button" onClick={function(){setExpCategory('')}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',transition:'all .12s'}}>− Расход</button>
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>− Расход</button>
                 </div>
               </div>
               )}
-              <div className="form-group">
-                <label>Категория</label>
-                <div style={{display:'flex',flexWrap:'wrap',gap:'.35rem'}}>
-                  {expenseCats.length === 0 && <div style={{padding:'.2rem 0',fontSize:'.8rem',color:'var(--muted)'}}>Нет категорий — добавьте в разделе «Категории»</div>}
-                  {expenseCats.map(function(c){const on=String(expCategory)===String(c.id);return (
-                    <button key={c.id} type="button" onClick={function(){setExpCategory(on?'':c.id)}}
-                      style={{padding:'.42rem .85rem',borderRadius:'100px',border:'1.5px solid '+(on?'#111':'#e4e4e8'),background:on?'#111':'#fff',fontSize:'.78rem',fontWeight:500,color:on?'#fff':'#666',cursor:'pointer',fontFamily:'var(--font)',transition:'all .12s'}}>{c.name}</button>
-                  );})}
-                </div>
-              </div>
               <div className="form-row">
-                <div className="form-group">
-                  <label>Сумма (₽)</label>
-                  <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
-                </div>
                 <div className="form-group">
                   <label>Дата</label>
                   <input type="date" value={expDate} onChange={function(e){setExpDate(e.target.value)}} />
                 </div>
+                <div className="form-group">
+                  <label>Категория</label>
+                  <CategorySelect cats={expenseCats} value={expCategory} onChange={setExpCategory} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Сумма (₽)</label>
+                <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
               </div>
               <div className="form-group">
                 <label>Комментарий</label>
@@ -983,6 +971,44 @@ export default function Transactions() {
       {toast && (
         <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.65rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999}}>
           {toast}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Выпадающий список категорий в фирменном стиле (квадрат-чекбокс, поиск не нужен — как в «Товарах»)
+function CategorySelect({ cats, value, onChange, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const list = cats || [];
+  const sel = list.find(c => String(c.id) === String(value));
+  useEffect(() => {
+    const h = (e) => { if (!e.target.closest('.cat-sel-wrap')) setOpen(false); };
+    document.addEventListener('click', h);
+    return () => document.removeEventListener('click', h);
+  }, []);
+  return (
+    <div className="cat-sel-wrap" style={{position:'relative'}}>
+      <button type="button" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
+        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .7rem',borderRadius:'.6rem',border:'1.5px solid ' + (open ? '#1F75FF' : '#e4e4e8'),background:'#fff',fontFamily:'inherit',fontSize:'.8125rem',color:sel ? '#222' : '#8a93a2',cursor:'pointer',textAlign:'left'}}>
+        <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{sel ? sel.name : (placeholder || 'Выберите категорию')}</span>
+        <span style={{fontSize:'9px',color:'#5b6472',transform:open?'rotate(180deg)':'none',transition:'transform .2s'}}>▾</span>
+      </button>
+      {open && (
+        <div style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',padding:'.35rem',zIndex:80,maxHeight:'220px',overflowY:'auto'}}>
+          {list.length === 0 && <div style={{padding:'.4rem .55rem',fontSize:'.78rem',color:'#8a93a2'}}>Нет категорий</div>}
+          {list.map(c => {
+            const on = String(c.id) === String(value);
+            return (
+              <button key={c.id} type="button" onClick={() => { onChange(on ? '' : c.id); setOpen(false); }}
+                style={{display:'flex',alignItems:'center',gap:'.5rem',width:'100%',padding:'.45rem .55rem',borderRadius:'.5rem',border:'none',background:on?'#E6F0FF':'none',fontFamily:'inherit',fontSize:'.8rem',fontWeight:on?700:400,color:'#3a3a3f',cursor:'pointer',textAlign:'left'}}>
+                <span className="dd-cb" style={{borderColor:on?'#111':'#c9c9d1',background:on?'#111':'#fff'}}>
+                  {on && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                </span>
+                {c.name}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
