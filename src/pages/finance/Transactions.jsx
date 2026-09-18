@@ -748,8 +748,8 @@ export default function Transactions() {
               <div className="form-group">
                 <label>Операция</label>
                 <div style={{display:'flex',gap:'.5rem'}}>
-                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='deposit'?'#111':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
-                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#ffdd2d,#fff9db)':'#fff',color:ownerMode==='withdraw'?'#111':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
+                  <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='deposit'?'#fff':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
+                  <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='withdraw'?'#fff':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
                 </div>
               </div>
               <div className="form-group">
@@ -778,7 +778,7 @@ export default function Transactions() {
                 <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
               </div>
               <div className="modal-actions">
-                <button type="submit" style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}} onMouseEnter={e=>{e.currentTarget.style.background='#000'}} onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>{ownerMode==='deposit' ? 'Внести деньги' : 'Забрать деньги'}</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
