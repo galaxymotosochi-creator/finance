@@ -674,7 +674,7 @@ export default function Salary() {
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setSalPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Статус <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setSalPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{salStatus === 'pending' ? 'Начислено' : salStatus === 'paid' ? 'Выплачено' : 'Все'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },

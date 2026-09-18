@@ -504,7 +504,7 @@ export default function Receipts() {
           <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)} style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setPeriodOpen(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{statusFilter === 'paid' ? 'Оплаченные' : statusFilter === 'partially_paid' ? 'Частично' : statusFilter === 'unpaid' ? 'Не оплаченные' : statusFilter === 'refunded' ? 'Возвраты' : 'Все'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
