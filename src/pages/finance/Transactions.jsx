@@ -220,7 +220,6 @@ export default function Transactions() {
   const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
   const txProfit = Math.max(0, incomeTotal - expenseTotal);
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
-  const txTurnover = incomeTotal + expenseTotal || 1;
   const INC_COLORS = ['#1F75FF', '#4a92ff', '#74aefe', '#a9c8ff', '#cfe2ff'];
   const EXP_COLORS = ['#ffcf2e', '#ffdd2d', '#ffe680', '#fff2b8', '#fff9db'];
   const txRingSegs = [
@@ -230,8 +229,6 @@ export default function Transactions() {
   // Дуги круга: доходы занимают свои 100% (половина круга), расходы — свои 100% (вторая половина).
   // Внутри каждой группы сегменты нормируются на её итог — «одна категория дохода» = 100% группы.
   const txIncDeg = (incomeTotal > 0 && expenseTotal > 0) ? 180 : 360;
-  const txGross = incomeTotal + expenseTotal || 1;
-  const txIncShare = txIncDeg / 360;
   let txAccDeg = 0;
   const txRingStops = txRingSegs.map(s => {
     const span = s.side === 'inc'
@@ -242,7 +239,6 @@ export default function Transactions() {
     const to = txAccDeg / 360 * 100;
     return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
   }).join(', ');
-  const txIncCut = txIncShare * 100;
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
