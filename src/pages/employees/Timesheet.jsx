@@ -54,6 +54,9 @@ export default function Timesheet() {
   const [tsEmpFilter, setTsEmpFilter] = useState([]);
   const [tsShowEmp, setTsShowEmp] = useState(false);
   const [tsTypeFilter, setTsTypeFilter] = useState('all');
+  const [tsSearch, setTsSearch] = useState('');
+  const [tsSearchFocus, setTsSearchFocus] = useState(false);
+  const [tsTypeOpen, setTsTypeOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -80,6 +83,7 @@ export default function Timesheet() {
     const handler = () => {
       setTsShowPeriod(false);
       setTsShowEmp(false);
+      setTsTypeOpen(false);
     };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
@@ -196,6 +200,16 @@ export default function Timesheet() {
   // Фильтрация записей для таблицы
   const filteredEntries = useMemo(() => {
     let result = [...entries];
+    // Поиск по сотруднику, статусу, комментарию
+    const q = tsSearch.toLowerCase().trim();
+    if (q) {
+      result = result.filter(e => {
+        const name = (employees.find(x => x.id === e.employee_id)?.name || '').toLowerCase();
+        const stat = (STATUS_MAP[e.status] || '').toLowerCase();
+        const cmt = (e.comment || '').toLowerCase();
+        return name.includes(q) || stat.includes(q) || cmt.includes(q);
+      });
+    }
     if (tsEmpFilter.length > 0) {
       result = result.filter(e => tsEmpFilter.includes(e.employee_id));
     }
@@ -238,7 +252,7 @@ export default function Timesheet() {
       return 0;
     });
     return result;
-  }, [entries, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo, tsTypeFilter]);
+  }, [entries, employees, tsSearch, tsEmpFilter, tsPeriod, tsPeriodFrom, tsPeriodTo, tsTypeFilter]);
 
   const deleteEntry = async (id) => {
     if (!confirm('Удалить запись?')) return;
@@ -315,67 +329,100 @@ export default function Timesheet() {
             </div>
           </div>
 
-          {/* ФИЛЬТРЫ */}
-          <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'auto',marginBottom:'.5rem'}}>
-            {/* Период */}
-            <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsPeriod!=='all'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1,whiteSpace:'nowrap'}}
-                onClick={e=>{e.stopPropagation();togglePeriod(!tsShowPeriod);}}>{tsPeriodLabel}</span>
+          {/* ПЛАШКА: ПОИСК + ФИЛЬТРЫ (эталон «Поставки») */}
+          <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(tsSearchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:tsSearchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}>
+            <span style={{display:'flex',color:tsSearchFocus?'#111':'#999',transition:'color .15s'}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            </span>
+            <input type="text" placeholder="Поиск…" value={tsSearch} onChange={e => setTsSearch(e.target.value)}
+              onFocus={()=>setTsSearchFocus(true)} onBlur={()=>setTsSearchFocus(false)}
+              style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+            <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+
+            {/* Фильтр «Период» */}
+            <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+              <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+                onClick={e=>{e.stopPropagation(); setTsShowEmp(false); setTsTypeOpen(false); setTsShowPeriod(!tsShowPeriod);}}>
+                {tsPeriod !== 'all' ? tsPeriodLabel : 'Период'} <span className="car-tri">▾</span>
+              </button>
               {tsShowPeriod && (
-                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'210px',padding:'.35rem',zIndex:100}}>
-                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
-                    <span className="cat-dd-action" onClick={()=>{setTsPeriod('all');setTsPeriodLabel('Все время');}}>Очистить</span>
-                  </div>
-                  <div style={{maxHeight:'200px',overflowY:'auto'}}>
-                    {PERIOD_OPTS.map(p => {
-                      const isActive = tsPeriod === p.key;
-                      return (
-                        <div key={p.key} className="cat-dd-item" onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false)}}
-                          style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.3rem .5rem',borderRadius:'4px',cursor:'pointer',fontSize:'.8rem',color:isActive?'var(--secondary)':'var(--body-color)',fontWeight:isActive?600:400,background:isActive?'var(--secondary-light)':'transparent'}}>
-                          <input type="checkbox" checked={isActive} onChange={()=>{}} style={{accentColor:'#111',cursor:'pointer',margin:0}} />
-                          {p.label}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div style={{borderTop:'1px solid var(--border)',marginTop:'.35rem',paddingTop:'.35rem'}}>
-                    <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.2rem .5rem',marginBottom:'.25rem'}}>Свой период</div>
-                    <div style={{display:'flex',gap:'.25rem',padding:'.25rem .5rem'}}>
-                      <input type="date" value={tsPeriodFrom} onChange={e=>setTsPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
-                      <input type="date" value={tsPeriodTo} onChange={e=>setTsPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.2rem',border:'1px solid var(--border)',borderRadius:'4px',fontFamily:'var(--font)',outline:'none'}} />
+                <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'215px',padding:'.4rem',zIndex:100}}>
+                  {PERIOD_OPTS.map(p => {
+                    const isActive = tsPeriod === p.key;
+                    return (
+                      <div key={p.key} onClick={()=>{setTsPeriod(p.key);setTsPeriodLabel(p.label);setTsShowPeriod(false);}}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {p.label}
+                      </div>
+                    );
+                  })}
+                  <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+                    <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+                    <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                      <input type="date" value={tsPeriodFrom} onChange={e=>setTsPeriodFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                      <input type="date" value={tsPeriodTo} onChange={e=>setTsPeriodTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
                     </div>
-                    <div style={{padding:'.25rem .5rem'}}>
-                      <button onClick={()=>{if(!tsPeriodFrom||!tsPeriodTo)return alert('Выберите обе даты');setTsPeriod('custom');setTsPeriodLabel(fmtShort(tsPeriodFrom)+' — '+fmtShort(tsPeriodTo));setTsShowPeriod(false)}}
-                        style={{width:'100%',padding:'.35rem .5rem',fontSize:'.75rem',fontFamily:'var(--font)',background:'var(--secondary)',color:'#fff',border:'none',borderRadius:'4px',cursor:'pointer',fontWeight:600}}>Применить</button>
+                    <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
+                      <button type="button" onClick={()=>{if(!tsPeriodFrom||!tsPeriodTo)return alert('Выберите обе даты');setTsPeriod('custom');setTsPeriodLabel(fmtShort(tsPeriodFrom)+' — '+fmtShort(tsPeriodTo));setTsShowPeriod(false);}}
+                        className="sk-dd-btn" style={{padding:'.5rem 1.1rem',animation:'none'}}>Применить</button>
                     </div>
                   </div>
                 </div>
               )}
             </div>
-            {/* Тип */}
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='bonus'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-              onClick={()=>setTsTypeFilter(tsTypeFilter==='bonus'?'all':'bonus')}>Бонусы</span>
-            <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsTypeFilter==='deduct'?600:400,color:'#555',cursor:'pointer',borderRight:'1px solid var(--border)',lineHeight:1}}
-              onClick={()=>setTsTypeFilter(tsTypeFilter==='deduct'?'all':'deduct')}>Штрафы</span>
-            {/* Сотрудник */}
-            <div style={{position:'relative',display:'inline-flex',alignItems:'center',lineHeight:1,flexShrink:0}}>
-              <span className="stock-filter-link" style={{padding:'.15rem .4rem',fontSize:'.75rem',fontWeight:tsEmpFilter.length>0?600:400,color:'#555',cursor:'pointer',borderRight:'none',lineHeight:1,whiteSpace:'nowrap'}}
-                onClick={e=>{e.stopPropagation();toggleEmp(!tsShowEmp);}}>{tsEmpFilter.length>0 ? 'Сотр. '+tsEmpFilter.length : 'Сотрудник'}</span>
+
+            {/* Фильтр «Тип» */}
+            <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+              <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+                onClick={e=>{e.stopPropagation(); setTsShowEmp(false); setTsShowPeriod(false); setTsTypeOpen(!tsTypeOpen);}}>
+                {tsTypeFilter === 'bonus' ? 'Бонусы' : tsTypeFilter === 'deduct' ? 'Штрафы' : 'Тип'} <span className="car-tri">▾</span>
+              </button>
+              {tsTypeOpen && (
+                <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'180px',padding:'.4rem',zIndex:100}}>
+                  {[{v:'all',l:'Все записи'},{v:'bonus',l:'Только бонусы'},{v:'deduct',l:'Только штрафы'}].map(o => {
+                    const isActive = tsTypeFilter === o.v;
+                    return (
+                      <div key={o.v} onClick={()=>{setTsTypeFilter(o.v);setTsTypeOpen(false);}}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {o.l}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Фильтр «Сотрудник» */}
+            <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+              <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+                onClick={e=>{e.stopPropagation(); setTsShowPeriod(false); setTsTypeOpen(false); setTsShowEmp(!tsShowEmp);}}>
+                {tsEmpFilter.length > 0 ? 'Сотрудник · ' + tsEmpFilter.length : 'Сотрудник'} <span className="car-tri">▾</span>
+              </button>
               {tsShowEmp && (
-                <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:'100%',left:0,marginTop:'4px',background:'var(--body-bg)',border:'1px solid var(--border)',borderRadius:'.6rem',boxShadow:'0 .3rem .8rem rgba(0,0,0,.1)',minWidth:'200px',padding:'.35rem',zIndex:100}}>
-                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.25rem',borderBottom:'1px solid var(--border)',paddingBottom:'.35rem'}}>
-                    <span className="cat-dd-action" onClick={()=>{setTsEmpFilter([]);}}>Очистить</span>
-                  </div>
-                  <div style={{maxHeight:'180px',overflowY:'auto'}}>
-                    {employees.map(emp => (
-                      <div key={emp.id} className="cat-dd-item" onClick={()=>{
-                        setTsEmpFilter(prev => prev.includes(emp.id) ? prev.filter(e => e !== emp.id) : [...prev, emp.id]);
-                      }}>
-                        <input type="checkbox" checked={tsEmpFilter.includes(emp.id)} onChange={()=>{}} style={{accentColor:'#111',cursor:'pointer',margin:0}} />
+                <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
+                  {employees.length === 0 ? (
+                    <div style={{padding:'.5rem .55rem',fontSize:'.78rem',color:'#5b6472'}}>Сотрудников пока нет</div>
+                  ) : employees.map(emp => {
+                    const isActive = tsEmpFilter.includes(emp.id);
+                    return (
+                      <div key={emp.id} onClick={()=>{ setTsEmpFilter(prev => prev.includes(emp.id) ? prev.filter(x => x !== emp.id) : [...prev, emp.id]); }}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                         {emp.name}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
+                  {tsEmpFilter.length > 0 && (
+                    <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                      <div onClick={()=>setTsEmpFilter([])}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                        Очистить
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
