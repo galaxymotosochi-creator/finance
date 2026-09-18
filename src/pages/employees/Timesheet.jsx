@@ -326,8 +326,8 @@ export default function Timesheet() {
           {/* КАЛЕНДАРЬ */}
           <div className="promo-calendar-wrap" style={{background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'var(--sk-radius)',padding:'14px 16px',marginBottom:'10px',boxShadow:'none'}}>
             <div className="promo-cal-header" style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
-              <div className="promo-cal-month" style={{flex:1,fontSize:'.8125rem',fontWeight:600,color:'#333'}}>{MONTHS[month]} {year}</div>
               <button className="promo-cal-nav" onClick={prevMonth} style={{width:'26px',height:'26px',fontSize:'.9rem',borderRadius:'50%',background:'#f8f9fa',border:'1px solid var(--border)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontFamily:'inherit',color:'#333'}}>‹</button>
+              <div className="promo-cal-month" style={{flex:1,textAlign:'center',fontSize:'.8125rem',fontWeight:600,color:'#333'}}>{MONTHS[month]} {year}</div>
               <button className="promo-cal-nav" onClick={nextMonth} style={{width:'26px',height:'26px',fontSize:'.9rem',borderRadius:'50%',background:'#f8f9fa',border:'1px solid var(--border)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontFamily:'inherit',color:'#333'}}>›</button>
             </div>
             <div className="promo-cal-grid" style={{gap:'4px'}}>
