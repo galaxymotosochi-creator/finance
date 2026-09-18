@@ -430,39 +430,30 @@ export default function Transactions() {
           <div className="sub">Поступления, списания и переводы между счетами</div>
         </div>
         <div className="sk-bar-acts">
-          <div style={{position:'relative',display:'inline-block'}}>
-            <button className="sk-dd-btn" onClick={function(){setDdOpen(!ddOpen)}}>Добавить <span className="car">▾</span></button>
-            {ddOpen && (
-              <div>
-                <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,zIndex:75}} onClick={function(){setDdOpen(false)}} />
-                <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,background:'#fff',borderRadius:'16px',boxShadow:'0 14px 40px rgba(0,0,0,.16)',padding:'7px',minWidth:'280px',zIndex:76}}>
-                  <button type="button" onClick={function(){setDdOpen(false);setEditingId(null);resetForms();setShowExpense(true)}}
-                    style={{display:'block',width:'100%',padding:'.5rem .7rem',borderRadius:'10px',cursor:'pointer',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
-                    <span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Добавить расход</span>
-                    <span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Списание средств</span>
+          <div className="sk-dd-wrap" style={{position:'relative'}}>
+            <button className="sk-dd-btn" onClick={function(e){e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(function(w){w.classList.remove('open')});e.currentTarget.parentElement.classList.toggle('open')}}>Добавить <span className="car">▾</span></button>
+            <div className="sk-dd-menu" style={{minWidth:'260px'}}>
+              {[{
+                label:'Добавить расход', sub:'Списание средств',
+                act:function(){setEditingId(null);resetForms();setShowExpense(true)}
+              },{
+                label:'Добавить доход', sub:'Поступление средств',
+                act:function(){setEditingId(null);resetForms();setShowIncome(true)}
+              },{
+                label:'Перевод между счетами', sub:'Перемещение средств',
+                act:function(){setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}
+              },{
+                label:'Взнос / вывод своих денег', sub:'Личные деньги владельца',
+                act:function(){setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}
+              }].map(function(o){
+                return (
+                  <button key={o.label} type="button" onClick={function(e){e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');o.act()}} style={{display:'block',padding:'10px 12px'}}>
+                    <span style={{display:'block',fontSize:'13px',fontWeight:600,color:'#040506'}}>{o.label}</span>
+                    <span style={{display:'block',fontSize:'11px',color:'#8a93a2',marginTop:'2px'}}>{o.sub}</span>
                   </button>
-                  <button type="button" onClick={function(){setDdOpen(false);setEditingId(null);resetForms();setShowIncome(true)}}
-                    style={{display:'block',width:'100%',padding:'.5rem .7rem',borderRadius:'10px',cursor:'pointer',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
-                    <span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Добавить доход</span>
-                    <span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Поступление средств</span>
-                  </button>
-                  <button type="button" onClick={function(){setDdOpen(false);setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}}
-                    style={{display:'block',width:'100%',padding:'.5rem .7rem',borderRadius:'10px',cursor:'pointer',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
-                    <span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Перевод между счетами</span>
-                    <span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Перемещение средств</span>
-                  </button>
-                  <button type="button" onClick={function(){setDdOpen(false);setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}}
-                    style={{display:'block',width:'100%',padding:'.5rem .7rem',borderRadius:'10px',cursor:'pointer',border:'none',background:'none',fontFamily:'var(--font)',textAlign:'left',transition:'background .1s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#f6f6f8'}} onMouseLeave={e=>{e.currentTarget.style.background='none'}}>
-                    <span style={{display:'block',fontSize:'.8125rem',fontWeight:600,color:'#222'}}>Взнос / вывод своих денег</span>
-                    <span style={{display:'block',fontSize:'.7rem',color:'#999',marginTop:'1px'}}>Личные деньги владельца</span>
-                  </button>
-                </div>
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -479,7 +470,7 @@ export default function Transactions() {
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Тип <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Все'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
@@ -525,9 +516,9 @@ export default function Transactions() {
         </div>
         <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
           <button type="button" title="Скачать" aria-label="Скачать"
-            style={{width:'26px',height:'26px',flexShrink:0,border:'1px solid rgba(29,120,252,.22)',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s'}}
-            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)'}}
-            onMouseLeave={e=>{e.currentTarget.style.transform='none'}}
+            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'skpulse 2s ease-in-out infinite'}}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.animationPlayState='paused'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.animationPlayState='running'}}
             onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
