@@ -99,6 +99,27 @@ export default function Transactions() {
     }
   }, [transactions, accounts]);
 
+  const [tblPos, setTblPos] = useState({left:false, right:false});
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left:false, right:false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 120);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  });
+
   // Закрытие выпадающих списков («Тип» и «Все время») по клику в любом месте.
   // Открытие одного автоматически закрывает другой — как в разделе «Чеки».
   useEffect(() => {
@@ -582,35 +603,36 @@ export default function Transactions() {
 
 
       {txs.length > 0 ? (
-        <div className="product-table" style={{ overflowX: 'auto', marginTop: '.5rem' }}>
-          <table className="data-table" style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse' }}>
+        <div className="sk-tablewrap">
+          <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+          <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
+          <div className="sk-card" style={{position:'relative',flex:1,overflowX:'auto',overflowY:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+          <table className="sk-table sk-tx-table">
             <thead id="colHeaders">
               <tr>
-                <th style={{width:'9%',paddingLeft:0,textAlign:'left'}}>Дата</th>
-                <th style={{width:'6%',textAlign:'left'}}>Время</th>
-                <th style={{width:'30%',textAlign:'left'}}>Название</th>
-                <th style={{width:'12%',textAlign:'left'}}>Сумма</th>
-                <th style={{width:'15%',textAlign:'left'}}>Счет</th>
-                <th style={{width:'15%',textAlign:'left'}}>Категория</th>
-                <th style={{width:'10%',textAlign:'left'}}>Автор</th>
-                <th style={{width:'0',padding:0,textAlign:'left'}}></th>
+                <th style={{textAlign:'left'}}>Дата</th>
+                <th style={{textAlign:'left'}}>Время</th>
+                <th style={{textAlign:'left'}}>Название</th>
+                <th style={{textAlign:'left'}}>Сумма</th>
+                <th style={{textAlign:'left'}}>Счет</th>
+                <th style={{textAlign:'left'}}>Категория</th>
+                <th style={{textAlign:'left'}}>Автор</th>
+                <th className="actions"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id}>
-                  <td style={{ padding: '.5rem .5rem .5rem 0', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{fmtTime(tx)}</td>
-                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
-                  <td style={{ padding: '.5rem', color: '#222', whiteSpace: 'nowrap', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>
-                    <span>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</span>
-                  </td>
-                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
-                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}><span className="prod-cat">{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</span></td>
-                  <td style={{ padding: '.5rem', color: '#222', textAlign: 'left',borderRight:'1px solid rgba(0,0,0,.08)' }}>{userMap[tx.user_id] || '—'}</td>
-                  <td style={{ textAlign: 'left', whiteSpace: 'nowrap',borderRight:'none' }}>
+                  <td style={{textAlign:'left'}}>{tx.date ? ((tx.date||'').split('T')[0]||'').split('-').reverse().join('.') : '—'}</td>
+                  <td style={{textAlign:'left'}}>{fmtTime(tx)}</td>
+                  <td style={{textAlign:'left'}}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
+                  <td style={{textAlign:'left'}}>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
+                  <td style={{textAlign:'left'}}>{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</td>
+                  <td style={{textAlign:'left'}}>{userMap[tx.user_id] || '—'}</td>
+                  <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                      <button className="act-btn prod-more-btn" onClick={function(e){
+                      <button className="sk-more" onClick={function(e){
                         e.stopPropagation();
                         var el = e.currentTarget.nextElementSibling;
                         el.classList.add('open');
@@ -627,13 +649,10 @@ export default function Transactions() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       ) : (
-        <div className="empty-products">
-          <div className="big-icon">💸</div>
-          <p>История операций пуста</p>
-          <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Зафиксируйте первую финансовую операцию, чтобы начать учет</p>
-        </div>
+        <div className="sk-card"><div className="sk-empty">История операций пуста</div></div>
       )}
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств со счета на счет" width="medium">
             <form onSubmit={async function(e){
