@@ -968,6 +968,10 @@ input:focus, select:focus, textarea:focus {
 .sk-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;background:none;padding:0}
 /* таблица чеков */
 .sk-table.sk-receipts{min-width:1150px}
+.sk-table.sk-tx-table{min-width:980px}
+.sk-table.sk-tx-table thead th:nth-child(3),.sk-table.sk-tx-table tbody td:nth-child(3){min-width:260px;white-space:normal}
+.sk-table.sk-tx-table thead th:nth-child(4),.sk-table.sk-tx-table tbody td:nth-child(4){min-width:130px}
+.sk-table.sk-tx-table thead th:nth-child(8),.sk-table.sk-tx-table tbody td:nth-child(8){width:60px;text-align:right}
 /* Чеки: первая колонка «№ чека» — компактная (вмещается номер вида 64837) */
 .sk-table.sk-receipts thead th:nth-child(1),.sk-table.sk-receipts tbody td:nth-child(1){min-width:96px;width:96px}
 .sk-table.sk-receipts tbody tr{cursor:pointer}
@@ -1076,7 +1080,7 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.stock-cat-table tbody td:last-child{border-right:none !important;text-align:left !important}
 
 /* Фирменное пустое состояние таблиц — без рамки и без иконок */
-.main .content .sk-empty{max-width:460px;margin:0 auto;text-align:center;padding:26px 18px;border:none;background:none}
+.main .content .sk-empty{max-width:460px;margin:0 auto;text-align:center;padding:26px 18px;border:none;background:none;font-size:.86rem;font-weight:600;color:var(--sk-muted)}
 .main .content .sk-empty p{font-size:.86rem;font-weight:700;color:var(--sk-ink);margin:0 0 5px}
 .main .content .sk-empty p + p{font-size:.78rem;font-weight:500;color:var(--muted);margin:0}
 
