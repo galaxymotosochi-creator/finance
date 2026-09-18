@@ -43,6 +43,9 @@ export default function Transactions() {
   const [origAmount, setOrigAmount] = useState(null);
   const [search, setSearch] = useState('');
   const [txRingOpen, setTxRingOpen] = useState(false);
+  const [txKind, setTxKind] = useState('income');
+  const openIncome = () => { setTxKind('income'); setShowIncome(true); };
+  const openExpense = () => { setTxKind('expense'); setShowExpense(true); };
   const [searchFocus, setSearchFocus] = useState(false);
   const [showIncome, setShowIncome] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
@@ -259,9 +262,6 @@ export default function Transactions() {
     } catch (e) { console.error(e); }
   };
 
-  const openIncome = () => {
-    setShowIncome(true);
-  };
 
   // Сброс всех полей форм операции (доход/расход)
   const resetForms = function() {
@@ -793,7 +793,7 @@ export default function Transactions() {
                   update(editingId,{description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
                   setPendingTx({id:editingId,type:'income',user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
+                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));
                 } else {
                   update(editingId,{description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
                   setShowIncome(false);setEditingId(null);resetForms();
@@ -801,7 +801,7 @@ export default function Transactions() {
                 }
               }else{
                 setPendingTx({type:"income",user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
-                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
+                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});
               }
             }}>
               {!editingId && (
@@ -839,8 +839,25 @@ export default function Transactions() {
                 <label>Комментарий</label>
                 <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} />
               </div>
+          <div className="form-group">
+            <label>{txKind === 'expense' ? 'С какого счета списать' : 'На какой счет зачислить'}</label>
+            <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+              {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+              {accs.map(function(a){
+                var sel = String(a.id) === String(selectedAcc);
+                return (
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}}
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
+                    <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                    <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
@@ -855,7 +872,7 @@ export default function Transactions() {
                   update(editingId,{description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
                   setPendingTx({id:editingId,type:'expense',user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));setShowAccSelect(true);
+                  setSelectedAcc(txAccountId || (accs.length > 0 ? accs[0].id : null));
                 } else {
                   update(editingId,{description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
                   setShowExpense(false);setEditingId(null);resetForms();
@@ -863,7 +880,7 @@ export default function Transactions() {
                 }
               }else{
                 setPendingTx({type:"expense",user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
-                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});setShowAccSelect(true);
+                setSelectedAcc(accs.length > 0 ? accs[0].id : null);setSplitMode(false);setSplitAmounts({});
               }
             }}>
               {!editingId && (
@@ -901,8 +918,25 @@ export default function Transactions() {
                 <label>Комментарий</label>
                 <input type="text" placeholder="Например: аренда за сентябрь, запчасти на скутер" value={expName} onChange={function(e){setExpName(e.target.value)}} />
               </div>
+          <div className="form-group">
+            <label>{txKind === 'expense' ? 'С какого счета списать' : 'На какой счет зачислить'}</label>
+            <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+              {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+              {accs.map(function(a){
+                var sel = String(a.id) === String(selectedAcc);
+                return (
+                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}}
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
+                    <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                    <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{editingId ? "Сохранить" : "Добавить"}</button>
+                <button type="submit" className="sk-dd-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
