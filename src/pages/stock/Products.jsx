@@ -748,16 +748,22 @@ export default function Products() {
                 {[{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
                   const checked = typeFilterSet.has(t.v);
                   return (
-                    <div key={t.v} className={'f-item'+(checked?' sel':'')} onClick={() => toggleType(t.v)}>
-                      <DdCheck />
-                      <span>{t.l}</span>
+                    <div key={t.v} onClick={() => toggleType(t.v)}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                      {t.l}
                     </div>
                   );
                 })}
-                <div className="f-actions">
-                  <span className="f-action" onClick={selectAllTypes}>Выбрать все</span>
-                  <span className="f-action ghost" onClick={clearAllTypes}>Очистить</span>
-                </div>
+                {typeFilterSet.size > 0 && (
+                  <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                    <div onClick={clearAllTypes}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                      Очистить
+                    </div>
+                  </div>
+                )}
               </div>
             )}</div>
           <div className="sk-dd-wrap">
@@ -783,18 +789,24 @@ export default function Products() {
                   }).map(c => {
                     const checked = selectedCats.has(c.name);
                     return (
-                      <div key={c.name} className={'cat-dd-item'+(checked?' sel':'')} onClick={() => toggleCat(c.name)}>
-                        <DdCheck />
-                        <span>{c.name}</span>
+                      <div key={c.name} onClick={() => toggleCat(c.name)}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {c.name}
                       </div>
                     );
                   })}
                   {cats.length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
                 </div>
-                <div className="cat-dd-actions">
-                  <span className="cat-dd-action" onClick={selectAllCats}>Выбрать все</span>
-                  <span className="cat-dd-action ghost" onClick={clearAllCats}>Очистить</span>
-                </div>
+                {selectedCats.size > 0 && (
+                  <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                    <div onClick={clearAllCats}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                      Очистить
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -806,9 +818,10 @@ export default function Products() {
                 {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
                   const active = activeCols.has(col.id);
                   return (
-                    <div key={col.id} className={'cols-item'+(active?' sel':'')} onClick={() => toggleCol(col.id)}>
-                      <DdCheck />
-                      <span>{col.label}</span>
+                    <div key={col.id} onClick={() => toggleCol(col.id)}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.35rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:active?'#0d4ea8':'#5b6472',fontWeight:active?700:500,background:active?'#E6F0FF':'transparent'}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:active?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                      {col.label}
                     </div>
                   );
                 })}
@@ -1171,7 +1184,7 @@ export default function Products() {
             {(() => {
               const trash = getTrash();
               if (!trash.length) {
-                return <div className="empty-products"><div className="big-icon">🗑️</div><p>В корзине пока ничего нет</p></div>;
+                return <div className="sk-empty">В корзине пока ничего нет</div>;
               }
               return (
                 <div className="product-table" style={{maxHeight:'280px',overflowY:'auto'}}>
