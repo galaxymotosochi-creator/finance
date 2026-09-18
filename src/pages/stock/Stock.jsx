@@ -303,8 +303,8 @@ export default function Stock() {
     <>
       {toast && <div className="toast toast-success">{toast}</div>}
 
-      <div className="page-header">
-        <div>
+      <div className="sk-bar">
+        <div className="grow">
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>Остатки</h1>
             <SectionHelp
@@ -337,74 +337,59 @@ export default function Stock() {
           </div>
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-dark" onClick={openInitialStock} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Ввести начальные остатки</button>
+        <div className="sk-bar-acts">
+          <button className="sk-dd-btn" onClick={openInitialStock}>Ввести начальные остатки</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
-      <div className="search-row" style={{display:'flex',alignItems:'center',marginBottom:'.5rem',width:'100%',flexWrap:'wrap',gap:'.4rem'}}>
-        <div className="stock-search" style={{display:'flex',alignItems:'center',gap:'.4rem',width:'auto',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'5px 12px',background:'#fff',boxShadow:searchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
-          onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
-          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+        onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
+          <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
           <input type="text" placeholder="Поиск…" value={search} onChange={e => setSearch(e.target.value)}
-            style={{border:'none',outline:'none',width:'150px',minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
-        </div>
-        <div style={{display:'flex',alignItems:'center',gap:'.25rem',marginLeft:'auto',position:'relative',flexWrap:'wrap',justifyContent:'flex-end'}}>
-          {/* Фильтр по наличию — нитральные капсулы как «Все время/Расходы/Доходы», активная — темнее */}
+            autoComplete="off"
+            style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+        <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.25rem',flexShrink:0,position:'relative'}}>
+          {/* Фильтр по наличию — фирменные пилюли, как «Тип» в «Товарах» */}
           {[['all', 'Все'], ['in', 'В наличии'], ['low', 'Заканчиваются'], ['out', 'Закончились']].map(([v, l]) => (
-            <button key={v} onClick={() => setStStatus(v)}
-              style={{
-                border: stStatus === v ? '1px solid #bbb' : '1px solid #e0e0e4',
-                background: '#fff', color: stStatus === v ? '#111' : '#555', padding: '.3rem .6rem', borderRadius: '100px',
-                fontSize: '.72rem', fontWeight: stStatus === v ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap', lineHeight: 1, transition: 'all .12s',
-              }}
-              onMouseEnter={e => { if (stStatus !== v) { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; } }}
-              onMouseLeave={e => { if (stStatus !== v) { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; } }}>{l}</button>
+            <button key={v} type="button" className={'f-pill'+(stStatus === v ? ' on' : '')}
+              onClick={() => setStStatus(v)}>{l}</button>
           ))}
 
-          {/* Категории — нитральная капсула */}
-          <button
-            onClick={e => { e.stopPropagation(); setCatOpen(!catOpen); }}
-            style={{
-              border: catOpen ? '1px solid #bbb' : '1px solid #e0e0e4', background: '#fff', color: catOpen ? '#111' : '#555',
-              padding: '.28rem .6rem', borderRadius: '100px', fontSize: '.72rem', fontWeight: 400, cursor: 'pointer',
-              fontFamily: 'inherit', whiteSpace: 'nowrap', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '4px',
-              marginLeft: '.25rem', transition: 'all .12s',
-            }}
-            onMouseEnter={e => { if (!catOpen) { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; } }}
-            onMouseLeave={e => { if (!catOpen) { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; } }}
-          >Категории<span style={{ fontSize: '.6rem', opacity: .7 }}>▾</span></button>
-
-          {catOpen && (
-            <div onClick={e => e.stopPropagation()} style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'none',borderRadius:'16px',boxShadow:'0 12px 36px rgba(0,0,0,.12)',minWidth:'180px',padding:'8px',zIndex:100}}>
-              {allCats.map(cat => {
-                const checked = selectedCats && selectedCats.has(cat);
-                return (
-                  <div key={cat} onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}
-                    className={'cat-dd-item'+(checked?' sel':'')}>
-                    <span className="dd-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
-                    {cat}
+          {/* Категории — фирменная пилюля с меню, как в «Товарах» */}
+          <div className="sk-dd-wrap">
+            <button type="button" className={'f-pill'+(catOpen?' on':'')} onClick={e=>{e.stopPropagation();setCatOpen(!catOpen)}}>Категории <span className="car-tri">▾</span></button>
+            {catOpen && (
+              <div className="f-menu" style={{minWidth:'220px'}}>
+                <div className="cat-dd-list">
+                  {allCats.map(cat => {
+                    const checked = selectedCats && selectedCats.has(cat);
+                    return (
+                      <div key={cat} className={'cat-dd-item'+(checked?' sel':'')}
+                        onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}>
+                        <span className="dd-cb" style={{borderColor:checked?'#111':'#c9c9d1',background:checked?'#111':'#fff'}}>
+                          {checked && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                        </span>
+                        {cat}
+                      </div>
+                    );
+                  })}
+                </div>
+                {selectedCats && selectedCats.size > 0 && (
+                  <div className="cat-dd-actions">
+                    <span className="cat-dd-action ghost" onClick={()=>setSelectedCats(null)}>Очистить</span>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
 
-          {/* Выгрузка в Excel — нейтральная круглая кнопка */}
+          {/* Выгрузка в Excel — фирменная синяя кнопка с пульсацией */}
           <button onClick={exportStock} type="button" title="Скачать" aria-label="Скачать"
-            style={{
-              width: '22px', height: '22px', flexShrink: 0, border: '1px solid #e0e0e4', borderRadius: '100px',
-              background: '#fff', color: '#555', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit',
-              boxShadow: '0 1px 2px rgba(0,0,0,.03)', transition: 'all .12s', marginLeft: '.15rem',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#999'; e.currentTarget.style.color = '#111'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e4'; e.currentTarget.style.color = '#555'; }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            className="sk-dd-btn"
+            style={{width:'26px',height:'26px',padding:0,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
           </button>
         </div>
       </div>
@@ -416,8 +401,8 @@ export default function Stock() {
       {!loading && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px', margin: '.75rem 0' }}>
           {stockTiles.map(t => (
-            <div key={t.label} style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '14px', padding: '10px 12px', boxShadow: '0 2px 10px rgba(255,205,0,.3)' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(0,0,0,.55)', marginBottom: '4px', lineHeight: 1.25 }}>{t.label}</div>
+            <div key={t.label} style={{ background:'#fff', border:'1px solid rgba(29,120,252,.14)', borderRadius:'14px', padding:'10px 12px', boxShadow:'0 8px 20px -14px rgba(29,120,252,.35)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--sk-muted)', marginBottom: '4px', lineHeight: 1.25 }}>{t.label}</div>
               <div style={{ fontSize: '20px', fontWeight: 800, color: t.color || '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.value}</div>
             </div>
           ))}
