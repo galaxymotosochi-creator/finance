@@ -607,7 +607,7 @@ export default function Receipts() {
                 <td style={{ textAlign: 'left', color:'#222' }}>{r.cashier_name && r.cashier_name.includes('@') ? '—' : abbreviateName(r.cashier_name)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>
                   {r.source === 'quick_sale' ? 'Быстрая' : 'Касса'}
-                  {idx === 0 && tblPos.right && <div className="sk-fade sk-fade-r"></div>}
+                  <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                 </td>
               </tr>
             ))}

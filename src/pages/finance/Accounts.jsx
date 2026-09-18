@@ -425,7 +425,7 @@ export default function Accounts() {
                             </div>
                           </div>
                         ) : null}
-                        {idx === 0 && tblPos.right && <div className="sk-fade sk-fade-r"></div>}
+                        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}}></div>
                       </td>
                     </tr>
                   );
