@@ -886,8 +886,8 @@ export default function Products() {
                   <div className="sk-empty">Каталог пуст — добавьте первый товар или услугу</div>
                 </td>
               </tr>
-            ) : filtered.map(p => (
-              <tr key={p.id} style={p.hidden ? {opacity:0.35,transition:'opacity .2s'} : {}}>
+            ) : filtered.map((p, idx) => (
+              <tr key={p.id} style={Object.assign({position:'relative'}, p.hidden ? {opacity:0.35,transition:'opacity .2s'} : {})}>
                 {COL_ORDER.map(col => {
                   if (col === 'name' || activeCols.has(col)) {
                     if (col === 'name') {
@@ -917,6 +917,7 @@ export default function Products() {
                       <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
                     </div>
                   </div>
+                  {idx === 0 && tblPos.right && <div className="sk-fade sk-fade-r"></div>}
                 </td>
               </tr>
             ))}
