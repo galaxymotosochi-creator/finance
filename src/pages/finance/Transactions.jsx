@@ -435,10 +435,10 @@ export default function Transactions() {
             <div className="sk-dd-menu" style={{minWidth:'260px'}}>
               {[{
                 label:'Добавить расход', sub:'Списание средств',
-                act:function(){setEditingId(null);resetForms();setShowExpense(true)}
+                act:function(){setEditingId(null);resetForms();openExpense()}
               },{
                 label:'Добавить доход', sub:'Поступление средств',
-                act:function(){setEditingId(null);resetForms();setShowIncome(true)}
+                act:function(){setEditingId(null);resetForms();openIncome()}
               },{
                 label:'Перевод между счетами', sub:'Перемещение средств',
                 act:function(){setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}
