@@ -856,6 +856,7 @@ input:focus, select:focus, textarea:focus {
 .tx-leg{display:flex;align-items:center;gap:10px}
 .tx-leg .dot{width:11px;height:11px;border-radius:3px;flex:none}
 .tx-leg .nm{flex:1;font-size:12.5px;color:var(--sk-muted);font-weight:600}
+.tx-leg .pct{font-size:12px;font-weight:700;color:#0d4ea8;min-width:38px;text-align:right}
 .tx-leg .amt{font-size:13.5px;font-weight:800;min-width:104px;text-align:right;color:#111}
 .tx-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
 .tx-leg-bar i{display:block;height:100%;border-radius:3px}
