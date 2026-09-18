@@ -188,6 +188,12 @@ export default function Employees() {
   // Оптимистичная синхронизация: офлайн-записи появляются сразу (с красной точкой)
   useOptimisticSync({ table: 'employees', setList: setEmployees, onSynced: load });
 
+  // Закрытие подсказок поиска (категории/позиции) при клике в любом месте экрана
+  useEffect(() => {
+    const h = () => { setCatDrop(false); setItemDrop(false); };
+    document.addEventListener('click', h);
+    return () => document.removeEventListener('click', h);
+  }, []);
   // Закрытие дропдауна «⋯» при клике в любом месте экрана
   useEffect(() => {
     const handler = (e) => {
