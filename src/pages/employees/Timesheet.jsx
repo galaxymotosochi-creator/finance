@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 const STATUS_OPTS = [
@@ -251,13 +252,35 @@ export default function Timesheet() {
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
-      <div className="page-header">
-        <div>
-          <h1>Табель</h1>
-          <div className="sub">Учет рабочего времени, бонусы и штрафы</div>
+      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+        <div className="grow" style={{minWidth:0}}>
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Табель</h1>
+            <SectionHelp
+              title="Раздел «Табель»"
+              intro="Табель — учёт рабочего времени. Здесь отмечаются отработанные дни, больничные и отпуска. От табеля считается процент от выручки."
+              faq={[
+                { q: 'Как отметить день?', a: (
+                  <div>Нажмите на день в <b>календаре</b> — откроется окно со статусами сотрудников за этот день.</div>
+                ) },
+                { q: 'Что за цветные точки в календаре?', a: (
+                  <div><b>Зелёная</b> точка — в этот день был бонус, <b>красная</b> — штраф.</div>
+                ) },
+                { q: 'Зачем нужен табель?', a: (
+                  <div>От количества отработанных дней считается <b>процент от выручки</b>. Нет табеля — начислится полный процент.</div>
+                ) },
+                { q: 'Как переключить месяц?', a: (
+                  <div>Стрелками <b>‹ ›</b> над календарём.</div>
+                ) },
+                { q: 'Кто видит табель?', a: (
+                  <div>Все, у кого открыт доступ к разделу <b>«Команда»</b>.</div>
+                ) },
+              ]}
+            />
+          </div>
+          <div className="sub" style={{maxWidth:'210px'}}>Учет рабочего времени, бонусы и штрафы</div>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
       {loading ? (
         <CenterSpinner />
