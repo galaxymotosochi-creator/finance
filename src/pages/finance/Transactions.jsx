@@ -185,7 +185,7 @@ export default function Transactions() {
   const buildCatBreakdown = (list, total) => {
     const map = new Map();
     list.forEach(t => {
-      const nm = catNameById(t.category_id) || 'Без категории';
+      const nm = (cats.find(x => x && x.id === t.category_id) || {}).name || 'Без категории';
       map.set(nm, (map.get(nm) || 0) + (Number(t.amount) || 0));
     });
     return Array.from(map.entries()).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
