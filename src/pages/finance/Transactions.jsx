@@ -595,8 +595,8 @@ export default function Transactions() {
                 {incomeCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет доходов за период</div>}
                 {incomeCatsList.map((c, i) => (
                   <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:INC_COLORS[i % INC_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:INC_COLORS[i % INC_COLORS.length]}}></i></div>
+                    <div className="tx-leg"><span className="dot" style={{background:INC_COLORS[i % INC_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{Math.round(c.amount / txTurnover * 100)}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(c.amount / txTurnover * 100) + '%', background:INC_COLORS[i % INC_COLORS.length]}}></i></div>
                   </div>
                 ))}
               </div>
@@ -605,8 +605,8 @@ export default function Transactions() {
                 {expenseCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет расходов за период</div>}
                 {expenseCatsList.map((c, i) => (
                   <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:EXP_COLORS[i % EXP_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:EXP_COLORS[i % EXP_COLORS.length]}}></i></div>
+                    <div className="tx-leg"><span className="dot" style={{background:EXP_COLORS[i % EXP_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{Math.round(c.amount / txTurnover * 100)}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(c.amount / txTurnover * 100) + '%', background:EXP_COLORS[i % EXP_COLORS.length]}}></i></div>
                   </div>
                 ))}
               </div>
