@@ -345,6 +345,19 @@ export default function Accounts() {
             return (
               <div className="sk-ring-block">
                 <div className="sk-ring" style={{background:'conic-gradient('+stops+')'}}>
+                  {vals.map((v,i) => {
+                    const prev = vals.slice(0,i).reduce((x,y)=>x+y,0);
+                    const midPct = (prev + v/2)/sum;
+                    const ang = midPct*360 - 90;
+                    const rad = ang*Math.PI/180;
+                    const x = Math.round(Math.cos(rad)*52);
+                    const y = Math.round(Math.sin(rad)*52);
+                    const pct = Math.round(v/sum*100);
+                    if (pct < 4) return null;
+                    const col = COLORS[i%COLORS.length];
+                    const light = i % 2 === 1;
+                    return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:col, color:light ? '#0b1220' : '#fff'}}>{pct}%</span>;
+                  })}
                   <div className="in"><div className="t">Общий баланс</div><div className="v">{(total||0).toLocaleString()} {cur}</div></div>
                 </div>
                 <div className="sk-legend">
