@@ -227,13 +227,22 @@ export default function Transactions() {
     ...incomeCatsList.map((c, i) => ({ ...c, color: INC_COLORS[i % INC_COLORS.length], side: 'inc' })),
     ...expenseCatsList.map((c, i) => ({ ...c, color: EXP_COLORS[i % EXP_COLORS.length], side: 'exp' })),
   ].filter(s => s.amount > 0);
-  let txAccPct = 0;
+  // Дуги круга: доходы занимают свои 100% (половина круга), расходы — свои 100% (вторая половина).
+  // Внутри каждой группы сегменты нормируются на её итог — «одна категория дохода» = 100% группы.
+  const txIncDeg = (incomeTotal > 0 && expenseTotal > 0) ? 180 : 360;
+  const txGross = incomeTotal + expenseTotal || 1;
+  const txIncShare = txIncDeg / 360;
+  let txAccDeg = 0;
   const txRingStops = txRingSegs.map(s => {
-    const from = txAccPct / txTurnover * 100;
-    txAccPct += s.amount;
-    const to = txAccPct / txTurnover * 100;
+    const span = s.side === 'inc'
+      ? (incomeTotal ? s.amount / incomeTotal : 0) * txIncDeg
+      : (expenseTotal ? s.amount / expenseTotal : 0) * (360 - txIncDeg);
+    const from = txAccDeg / 360 * 100;
+    txAccDeg += span;
+    const to = txAccDeg / 360 * 100;
     return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
   }).join(', ');
+  const txIncCut = txIncShare * 100;
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
@@ -574,13 +583,17 @@ export default function Transactions() {
           <div className="tx-ring-block">
             <div className="tx-ring" style={{background: txRingStops ? 'conic-gradient(' + txRingStops + ')' : '#eef4ff'}}>
               {txRingSegs.map((s, i) => {
-                const prev = txRingSegs.slice(0, i).reduce((x, y) => x + y.amount, 0);
-                const midPct = (prev + s.amount / 2) / txTurnover;
-                const ang = midPct * 360 - 90;
+                const total = s.side === 'inc' ? incomeTotal : expenseTotal;
+                const spanDeg = total ? (s.amount / total) * (s.side === 'inc' ? txIncDeg : (360 - txIncDeg)) : 0;
+                const beforeDeg = txRingSegs.slice(0, i).reduce((x, y) => {
+                  const t = y.side === 'inc' ? incomeTotal : expenseTotal;
+                  return x + (t ? (y.amount / t) * (y.side === 'inc' ? txIncDeg : (360 - txIncDeg)) : 0);
+                }, 0);
+                const ang = (beforeDeg + spanDeg / 2) - 90;
                 const rad = ang * Math.PI / 180;
                 const x = Math.round(Math.cos(rad) * 56);
                 const y = Math.round(Math.sin(rad) * 56);
-                const pct = Math.round(s.amount / txTurnover * 100);
+                const pct = total ? Math.round(s.amount / total * 100) : 0;
                 if (pct < 4) return null;
                 return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.side === 'inc' ? '#1F75FF' : '#ffcf2e', color:s.side === 'inc' ? '#fff' : '#111'}}>{pct}%</span>;
               })}
@@ -595,8 +608,8 @@ export default function Transactions() {
                 {incomeCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет доходов за период</div>}
                 {incomeCatsList.map((c, i) => (
                   <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:INC_COLORS[i % INC_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{Math.round(c.amount / txTurnover * 100)}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(c.amount / txTurnover * 100) + '%', background:INC_COLORS[i % INC_COLORS.length]}}></i></div>
+                    <div className="tx-leg"><span className="dot" style={{background:INC_COLORS[i % INC_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:INC_COLORS[i % INC_COLORS.length]}}></i></div>
                   </div>
                 ))}
               </div>
@@ -605,8 +618,8 @@ export default function Transactions() {
                 {expenseCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет расходов за период</div>}
                 {expenseCatsList.map((c, i) => (
                   <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:EXP_COLORS[i % EXP_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{Math.round(c.amount / txTurnover * 100)}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(c.amount / txTurnover * 100) + '%', background:EXP_COLORS[i % EXP_COLORS.length]}}></i></div>
+                    <div className="tx-leg"><span className="dot" style={{background:EXP_COLORS[i % EXP_COLORS.length]}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
+                    <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:EXP_COLORS[i % EXP_COLORS.length]}}></i></div>
                   </div>
                 ))}
               </div>
