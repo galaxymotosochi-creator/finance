@@ -814,9 +814,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Круг «Структура денег» на странице Счета */
 .sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
-.sk-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 26px 48px -16px rgba(11,18,32,.5),0 16px 30px -12px rgba(11,18,32,.32),0 7px 14px -7px rgba(11,18,32,.22)}
+.sk-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
 .sk-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
-.sk-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 13px 26px -11px rgba(11,18,32,.4),0 -3px 9px -4px rgba(11,18,32,.15) inset}
+.sk-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
 .sk-ring .in{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .sk-ring .in .t{font-size:9.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;line-height:1.15;white-space:nowrap}
 .sk-ring .in .v{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.12;white-space:nowrap}
@@ -845,9 +845,9 @@ input:focus, select:focus, textarea:focus {
 /* ===== Доходы и расходы: карточка «круг + структура» (дизайн tx-panels v3) ===== */
 .tx-card{background:transparent;border:none;border-radius:0;padding:0;margin-bottom:16px;box-shadow:none}
 .tx-ring-block{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
-.tx-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 30px 55px -18px rgba(11,18,32,.55),0 18px 34px -14px rgba(11,18,32,.35),0 8px 16px -8px rgba(11,18,32,.25)}
+.tx-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
 .tx-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
-.tx-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 14px 28px -12px rgba(11,18,32,.42),0 -3px 10px -4px rgba(11,18,32,.16) inset}
+.tx-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
 .tx-ring .in{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .tx-ring .in .t{font-size:10.5px;color:var(--sk-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;line-height:1.2}
 .tx-ring .in .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.15;color:#111}
