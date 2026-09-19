@@ -1142,7 +1142,7 @@ input:focus, select:focus, textarea:focus {
 .main .content .sk-table.sup-table tbody td:last-child{border-right:none !important;text-align:left !important}
 /* Ширины колонок таблицы «Поставки» — перебивают общие min-width от .sk-table */
 .main .content .sk-table.sup-table thead th:nth-child(1),
-.main .content .sk-table.sup-table tbody td:nth-child(1){min-width:0 !important;width:30px !important;max-width:30px !important}
+.main .content .sk-table.sup-table tbody td:nth-child(1){min-width:0 !important;width:60px !important;max-width:60px !important}
 .main .content .sk-table.sup-table thead th:nth-child(2),
 .main .content .sk-table.sup-table tbody td:nth-child(2){min-width:0 !important;width:130px !important}
 .main .content .sk-table.sup-table thead th:nth-child(3),
