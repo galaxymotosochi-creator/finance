@@ -361,7 +361,7 @@ export default function Stock() {
           <div className="sub">Учет количества и фактического наличия товаров</div>
         </div>
         <div className="sk-bar-acts">
-          <button className="sk-dd-btn" onClick={openInitialStock}>Ввести начальные остатки</button>
+          <button className="sk-dd-btn" onClick={openInitialStock}>Начальные остатки</button>
         </div>
       </div>
       <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
@@ -596,7 +596,7 @@ export default function Stock() {
             </div>
 
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
-              <button type="button" className="btn btn-dark" onClick={saveInitialStock}>Сохранить остатки</button>
+              <button type="button" className="sk-dd-btn" onClick={saveInitialStock}>Сохранить</button>
             </div>
       </Modal>
     </>

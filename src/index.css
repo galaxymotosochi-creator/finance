@@ -328,12 +328,9 @@ body {
 .product-table .stock-low { color: var(--danger); font-weight: 500; }
 
 /* Все таблицы — единый стиль */
-#stockColHeaders th {
-  font-size: .68rem; font-weight: 500; color: var(--muted);
-  text-transform: uppercase; padding: .5rem .4rem;
-  white-space: nowrap; border-bottom: 1.5px solid var(--border);
-  background: transparent; text-align: left;
-}
+/* Остатки: таблица переведена на sk-table — старые правила шапки отключены, чтобы не перебивать фирменный стиль */
+.main .content .sk-table.*** thead th:not(:first-child),
+.main .content .sk-table.*** tbody td:not(:first-child){border-right:1px solid rgba(29,120,252,.09)}
 #clientColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
@@ -346,7 +343,7 @@ body {
 #salaryTableBody td:first-child { text-align: left; padding-left: 0; }
 #supplierTableBody td:first-child { text-align: left; padding-left: 0; }
 #supplyTableBody td:first-child { padding-left: 0; }
-#stockTableBody td:first-child { text-align: left; padding-left: 0; }
+
 
 
 
