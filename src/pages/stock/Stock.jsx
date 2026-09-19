@@ -61,6 +61,8 @@ export default function Stock() {
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
   const [stStatus, setStStatus] = useState('all'); // all | in (в наличии) | low (заканчиваются) | out (закончились)
+  const [stOpen, setStOpen] = useState(false);
+  const [catFilter, setCatFilter] = useState('');
   const [stockMap, setStockMap] = useState({});
   const [showInitModal, setShowInitModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -351,34 +353,59 @@ export default function Stock() {
             autoComplete="off"
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <div className="stock-filter-links" style={{display:'flex',alignItems:'center',gap:'.25rem',flexShrink:0,position:'relative'}}>
-          {/* Фильтр по наличию — фирменные пилюли, как «Тип» в «Товарах» */}
-          {[['all', 'Все'], ['in', 'В наличии'], ['low', 'Заканчиваются'], ['out', 'Закончились']].map(([v, l]) => (
-            <button key={v} type="button" className={'f-pill'+(stStatus === v ? ' on' : '')}
-              onClick={() => setStStatus(v)}>{l}</button>
-          ))}
-
-          {/* Категории — фирменная пилюля с меню, как в «Товарах» */}
+          {/* Фильтр по наличию — пилюля с выпадающим списком, как «Тип» в «Товарах и услугах» */}
           <div className="sk-dd-wrap">
-            <button type="button" className={'f-pill'+(catOpen?' on':'')} onClick={e=>{e.stopPropagation();setCatOpen(!catOpen)}}>Категории <span className="car-tri">▾</span></button>
-            {catOpen && (
-              <div className="f-menu" style={{minWidth:'220px'}}>
-                <div className="cat-dd-list">
-                  {allCats.map(cat => {
-                    const checked = selectedCats && selectedCats.has(cat);
+            <button type="button" className={'f-pill'+(stStatus !== 'all' ? ' on' : '')}
+              onClick={e=>{e.stopPropagation();setStOpen(!stOpen);setCatOpen(false)}}>
+              {({all:'Все', in:'В наличии', low:'Заканчиваются', out:'Закончились'})[stStatus]} <span className="car-tri">▾</span>
+            </button>
+            {stOpen && (
+              <div className="f-menu">
+                <div className="f-list">
+                  {[['all','Все'],['in','В наличии'],['low','Заканчиваются'],['out','Закончились']].map(([v,l]) => {
+                    const checked = stStatus === v;
                     return (
-                      <div key={cat} className={'cat-dd-item'+(checked?' sel':'')}
-                        onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}>
-                        <span className="dd-cb" style={{borderColor:checked?'#111':'#c9c9d1',background:checked?'#111':'#fff'}}>
-                          {checked && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                        </span>
-                        {cat}
+                      <div key={v} onClick={()=>{setStStatus(v);setStOpen(false)}}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {l}
                       </div>
                     );
                   })}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Категории — пилюля с меню, точно как в «Товарах и услугах» */}
+          <div className="sk-dd-wrap">
+            <button type="button" className={'f-pill'+(catOpen?' on':'')} onClick={e=>{e.stopPropagation();setCatOpen(!catOpen);setStOpen(false)}}>Категории <span className="car-tri">▾</span></button>
+            {catOpen && (
+              <div className="f-menu" style={{minWidth:'220px'}}>
+                <div className="cat-dd-search">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                  <input type="text" placeholder="Поиск..." value={catFilter} onChange={e => setCatFilter(e.target.value)} />
+                </div>
+                <div className="cat-dd-list">
+                  {allCats.filter(c => !catFilter || c.toLowerCase().includes(catFilter.toLowerCase())).map(cat => {
+                    const checked = selectedCats && selectedCats.has(cat);
+                    return (
+                      <div key={cat} onClick={()=>{const s=new Set(selectedCats);if(s.has(cat))s.delete(cat);else s.add(cat);setSelectedCats(s.size?s:null)}}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {cat}
+                      </div>
+                    );
+                  })}
+                  {allCats.length === 0 && <div style={{padding:'.5rem',color:'var(--muted)',fontSize:'.78rem'}}>Нет категорий</div>}
+                </div>
                 {selectedCats && selectedCats.size > 0 && (
-                  <div className="cat-dd-actions">
-                    <span className="cat-dd-action ghost" onClick={()=>setSelectedCats(null)}>Очистить</span>
+                  <div style={{borderTop:'1px solid rgba(29,120,252,.14)',marginTop:'.25rem',paddingTop:'.35rem'}}>
+                    <div onClick={()=>setSelectedCats(null)}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:'#dc2626',fontWeight:600}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fecaca',flexShrink:0}}></span>
+                      Очистить
+                    </div>
                   </div>
                 )}
               </div>
@@ -409,6 +436,7 @@ export default function Stock() {
         </div>
       )}
 
+      {!loading && (
       <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <table className="data-table" style={{minWidth:'680px'}}>
           <thead id="stockColHeaders">
@@ -497,6 +525,7 @@ export default function Stock() {
           </tbody>
         </table>
       </div>
+      )}
 
       <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow"
         actions={<>
