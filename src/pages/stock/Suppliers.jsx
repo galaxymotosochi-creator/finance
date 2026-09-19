@@ -9,13 +9,12 @@ import CenterSpinner from '../../components/CenterSpinner';
 
 
 const CONTACT_LABELS = {
-  ozon:'OZON', wb:'Wildberries', yandex:'Яндекс.Маркет',
-  telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX', link:'Ссылка на товар',
+  link:'Ссылка на товар',
+  telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX',
 };
-// Каналы заказа: маркетплейсы и мессенджеры — для них поле меняется под канал
-const MARKETPLACES = ['ozon', 'wb', 'yandex'];
+// «Ссылка на товар» — подпись-способ заказа: товар заказывается по ссылке (OZON, WB, Маркет и т.п.)
 const MESSENGERS = ['telegram', 'whatsapp', 'max'];
-const isMarketplace = (m) => MARKETPLACES.indexOf(m) !== -1;
+const isLinkOrder = (m) => m === 'link';
 
 export default function Suppliers() {
   const cur = getCurrencySymbol();
@@ -307,32 +306,36 @@ export default function Suppliers() {
                 if (s.contact_method === 'whatsapp') return 'https://wa.me/' + raw.replace(/[^0-9]/g, '');
                 if (s.contact_method === 'telegram') return 'https://t.me/' + raw.replace(/^@/, '');
                 if (s.contact_method === 'max') return raw;
-                return /^https?:\/\//.test(raw) ? raw : 'https://' + raw;
+                return null;
               })();
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.contact||'—'}</td>
                   <td style={{textAlign:'left',color:'#222'}}>{s.phone||'—'}</td>
-                  <td style={{textAlign:'left',color:'#222'}}>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                     {s.contact_method ? (
-                      orderLink ? (
-                        <a href={orderLink} target="_blank" rel="noopener noreferrer" className="prod-cat"
-                          style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:'4px'}}>
-                          {label} <span style={{fontSize:'.7rem',opacity:.7}}>↗</span>
-                        </a>
-                      ) : <span className="prod-cat">{label}</span>
+                      <span>
+                        {isLinkOrder(s.contact_method) ? s.name + ' — ' + label : label}
+                        {orderLink && (
+                          <a href={orderLink} target="_blank" rel="noopener noreferrer"
+                            style={{textDecoration:'none',color:'#222',marginLeft:'5px',opacity:.7}}>↗</a>
+                        )}
+                      </span>
                     ) : '—'}
                   </td>
                   <td style={{textAlign:'left',color:'#222'}}>{supplyCount}</td>
                   <td style={{textAlign:'left',color:'#222'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={(e) => {
+                      <button className="sk-more" onClick={(e) => {
                         e.stopPropagation();
                         const dd = e.currentTarget.nextElementSibling;
                         document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                        dd.classList.toggle('open');
+                        // Меню последней строки разворачиваем ВВЕРХ, чтобы не уходило за край таблицы
+                        var _r = dd.getBoundingClientRect();
+                        if (_r.bottom > window.innerHeight - 8) dd.classList.add('up'); else dd.classList.remove('up');
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => openEdit(s)}>Редактировать</button>
@@ -369,21 +372,12 @@ export default function Suppliers() {
             <label>Способ заказа</label>
             <select value={fMethod} onChange={e=>{setFMethod(e.target.value);setFOrderLink('')}}>
               <option value="">— выберите —</option>
-              <option value="ozon">OZON</option>
-              <option value="wb">Wildberries</option>
-              <option value="yandex">Яндекс.Маркет</option>
+              <option value="link">Ссылка на товар</option>
               <option value="telegram">Telegram</option>
               <option value="whatsapp">WhatsApp</option>
               <option value="max">MAX</option>
             </select>
           </div>
-          {isMarketplace(fMethod) && (
-            <div className="form-group">
-              <label>Ссылка на товар</label>
-              <input type="url" value={fOrderLink} onChange={e=>setFOrderLink(e.target.value)} placeholder="https://ozon.ru/t/..." />
-              <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Откроется в новой вкладке при нажатии «Заказать»</div>
-            </div>
-          )}
           {MESSENGERS.indexOf(fMethod) !== -1 && (
             <div className="form-group">
               <label>{fMethod === 'whatsapp' ? 'Телефон для чата' : 'Ник для чата'}</label>
