@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import Modal from '../../components/Modal';
 
 export default function Health() {
   const cur = getCurrencySymbol();
@@ -12,11 +13,17 @@ export default function Health() {
   const [suppliesCache, setSuppliesCache] = useState([]);
   const [writeoffs, setWriteoffs] = useState([]);
   const [soldByProduct, setSoldByProduct] = useState({});
+  const [suppliesList, setSuppliesList] = useState([]); // поставки целиком — для последней закупки и ссылок
+  const [suppliersList, setSuppliersList] = useState([]); // справочник поставщиков — способ заказа и контакт
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState(30);
   const [topSort, setTopSort] = useState('qty'); // qty | revenue | profit
   const [showDead, setShowDead] = useState(false);
   const [showOrder, setShowOrder] = useState(false);
+  // Модалка «Заказ»: выбранные позиции и количество к закупке
+  const [orderModal, setOrderModal] = useState(false);
+  const [orderPicked, setOrderPicked] = useState({});  // { productId: true }
+  const [orderQty, setOrderQty] = useState({});        // { productId: число }
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
 
@@ -27,17 +34,20 @@ export default function Health() {
         const from = new Date();
         from.setDate(from.getDate() - period);
         const fromStr = from.toISOString().split('T')[0];
-        const [prodRes, supRes, woRes, recRes] = await Promise.all([
+        const [prodRes, supRes, woRes, recRes, supListRes] = await Promise.all([
           supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-          supabase.from('supplies').select('items').eq('user_id', user.id),
+          supabase.from('supplies').select('*').eq('user_id', user.id).order('date', { ascending: true }),
           supabase.from('writeoffs').select('*').eq('user_id', user.id),
           supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', fromStr),
+          supabase.from('suppliers').select('*').eq('user_id', user.id),
         ]);
         if (prodRes.error) throw prodRes.error;
         if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden && p.type !== 'service'));
         const supplies = [];
         (supRes.data || []).forEach(sp => { (sp.items || []).forEach(it => { supplies.push(it); }); });
         setSuppliesCache(supplies);
+        setSuppliesList(supRes.data || []);
+        setSuppliersList(supListRes.data || []);
         setWriteoffs(woRes.data || []);
 
         // Продажи из чеков: количество, выручка, с учётом возвратов
@@ -116,6 +126,47 @@ export default function Health() {
     return map;
   }, [suppliesCache, writeoffs]);
 
+  // Последняя закупка по каждому товару: поставщик, дата, цена, ссылка на товар
+  const lastPurchase = useMemo(() => {
+    const map = {};
+    suppliesList.forEach(sp => {
+      const date = sp.date || (sp.created_at || '').slice(0, 10) || '';
+      (sp.items || []).forEach(it => {
+        const pid = it.prodId != null ? String(it.prodId) : null;
+        if (!pid) return;
+        const prev = map[pid];
+        const cur = {
+          date,
+          supplierName: sp.supplier_name || sp.supplierName || '',
+          supplierId: sp.supplier_id || null,
+          cost: Number(it.cost) || 0,
+          orderUrl: it.orderUrl || '',
+        };
+        if (!prev || date >= (prev.date || '')) map[pid] = cur;
+      });
+    });
+    // Дополняем из справочника поставщиков: способ заказа и контакт для чата
+    Object.keys(map).forEach(pid => {
+      const rec = map[pid];
+      const sup = suppliersList.find(x => (rec.supplierId && String(x.id) === String(rec.supplierId)) || x.name === rec.supplierName);
+      rec.method = sup ? (sup.contact_method || '') : '';
+      rec.link = sup ? (sup.order_link || '') : '';
+    });
+    return map;
+  }, [suppliesList, suppliersList]);
+
+  // Ссылка для заказа: сначала ссылка на товар из последней закупки, затем канал поставщика
+  const orderAction = (pid) => {
+    const rec = lastPurchase[String(pid)];
+    if (!rec) return null;
+    const url = (rec.orderUrl || '').trim();
+    if (url) return { kind: 'link', url, label: 'Открыть' };
+    if (rec.method === 'whatsapp' && rec.link) return { kind: 'whatsapp', url: 'https://wa.me/' + rec.link.replace(/[^0-9]/g, ''), label: 'WhatsApp' };
+    if (rec.method === 'telegram' && rec.link) return { kind: 'telegram', url: 'https://t.me/' + rec.link.replace(/^@/, ''), label: 'Telegram' };
+    if (rec.method === 'max' && rec.link) return { kind: 'max', url: rec.link, label: 'MAX' };
+    return null;
+  };
+
   // Данные по каждому товару: продажи за период, деньги, остаток, прогноз
   const rows = useMemo(() => {
     return products.map(p => {
@@ -129,9 +180,80 @@ export default function Health() {
       const revenue = Math.round(sold.revenue);
       const cost = Math.round(costPrice * sold.qty);
       const profit = revenue - cost;
-      return { ...p, qty, costPrice, retailPrice, soldQty: sold.qty, revenue, profit, dailySales, daysLeft, sumValue: costPrice * qty };
+      const lp = lastPurchase[String(p.id)];
+      const lastCost = lp && lp.cost > 0 ? lp.cost : costPrice;
+      return { ...p, qty, costPrice, retailPrice, soldQty: sold.qty, revenue, profit, dailySales, daysLeft, sumValue: costPrice * qty,
+        lastCost, lastSupplier: lp ? lp.supplierName : '', lastDate: lp ? lp.date : '' };
     });
-  }, [products, stockMap, soldByProduct, period]);
+  }, [products, stockMap, soldByProduct, period, lastPurchase]);
+
+  // Блок 2 — что заказать
+  const orderRows = useMemo(() => {
+    return rows
+      .filter(r => r.qty === 0 || (r.dailySales > 0 && r.daysLeft <= 7))
+      .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
+  }, [rows]);
+
+  // Позиции к заказу с данными последней закупки, каналом и предложенным количеством
+  const orderData = useMemo(() => {
+    return orderRows.map(r => {
+      const rec = lastPurchase[String(r.id)] || {};
+      const act = orderAction(r.id);
+      const suggest = Math.max(1, Math.ceil((r.dailySales || 0) * 14) - r.qty);
+      return {
+        ...r,
+        suggest,
+        lastCost: r.lastCost || 0,
+        supplierName: r.lastSupplier || rec.supplierName || '',
+        method: rec.method || '',
+        contact: rec.link || '',
+        action: act,
+      };
+    });
+  }, [orderRows, lastPurchase]);
+
+  // Группировка отмеченных позиций по поставщику — для формирования заказов
+  const orderGroups = useMemo(() => {
+    const picked = orderData.filter(r => orderPicked[String(r.id)]);
+    const byKey = {};
+    picked.forEach(r => {
+      const key = r.supplierName || '— без поставщика —';
+      if (!byKey[key]) byKey[key] = { name: key, method: r.method, contact: r.contact, items: [] };
+      byKey[key].items.push(r);
+      if (!byKey[key].method && r.method) { byKey[key].method = r.method; byKey[key].contact = r.contact; }
+    });
+    return Object.values(byKey).map(g => ({
+      ...g,
+      total: g.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.lastCost || 0), 0),
+    }));
+  }, [orderData, orderPicked, orderQty]);
+
+  const orderPickedCount = Object.values(orderPicked).filter(Boolean).length;
+  const orderPickedSum = orderGroups.reduce((s, g) => s + g.total, 0);
+
+  // Открытие модалки: по умолчанию отмечены все, количество — предложенное
+  const openOrderModal = () => {
+    const picked = {}; const qty = {};
+    orderData.forEach(r => { picked[String(r.id)] = true; qty[String(r.id)] = r.suggest; });
+    setOrderPicked(picked); setOrderQty(qty); setOrderModal(true);
+  };
+
+  // Текст заказа для мессенджера
+  const orderText = (group) => {
+    const lines = group.items.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`);
+    const sum = group.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.lastCost || 0), 0);
+    return 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + group.items.length + ' поз., ' + sum.toLocaleString() + ' ' + cur;
+  };
+
+  const sendOrder = (group) => {
+    const text = encodeURIComponent(orderText(group));
+    const raw = (group.contact || '').trim();
+    if (group.method === 'whatsapp' && raw) return window.open('https://wa.me/' + raw.replace(/[^0-9]/g, '') + '?text=' + text, '_blank');
+    if (group.method === 'telegram' && raw) return window.open('https://t.me/' + raw.replace(/^@/, '') + '?text=' + text, '_blank');
+    if (group.method === 'max' && raw) return window.open(raw, '_blank');
+    // Ссылки на товары — открываем каждую
+    group.items.forEach(r => { if (r.action && r.action.url) window.open(r.action.url, '_blank'); });
+  };
 
   // Плитки-итоги
   const tiles = useMemo(() => {
@@ -153,13 +275,6 @@ export default function Health() {
     else list.sort((a, b) => b.soldQty - a.soldQty);
     return list.slice(0, 10);
   }, [rows, topSort]);
-
-  // Блок 2 — что заказать
-  const orderRows = useMemo(() => {
-    return rows
-      .filter(r => r.qty === 0 || (r.dailySales > 0 && r.daysLeft <= 7))
-      .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
-  }, [rows]);
 
   // Блок 3 — замороженные деньги
   const frozenRows = useMemo(() => {
@@ -297,11 +412,16 @@ export default function Health() {
         <div style={{ fontSize: '.92rem', fontWeight: 800, color: 'var(--sk-ink)' }}>
           Что заказать <span style={{ fontSize: '.78rem', fontWeight: 500, color: 'var(--sk-muted)' }}>— заканчивается при текущих продажах</span>
         </div>
-        {orderRows.length > 6 && (
-          <button type="button" className={'f-pill' + (showOrder ? ' on' : '')} onClick={() => setShowOrder(!showOrder)}>
-            {showOrder ? 'Скрыть список' : 'Показать список'} <span className="car-tri" style={{ display: 'inline-block', transform: showOrder ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▾</span>
-          </button>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.35rem', flexWrap: 'wrap' }}>
+          {orderRows.length > 6 && (
+            <button type="button" className={'f-pill' + (showOrder ? ' on' : '')} onClick={() => setShowOrder(!showOrder)}>
+              {showOrder ? 'Скрыть список' : 'Показать список'} <span className="car-tri" style={{ display: 'inline-block', transform: showOrder ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▾</span>
+            </button>
+          )}
+          {orderRows.length > 0 && (
+            <button type="button" className="sk-dd-btn" onClick={openOrderModal}>Сформировать заказ</button>
+          )}
+        </div>
       </div>
       {orderRows.length === 0 ? (
         <div className="sk-card"><div className="sk-empty">Все товары обеспечены — заказывать нечего</div></div>
@@ -326,9 +446,23 @@ export default function Health() {
                   <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '6px' }}>
                     За {period} дней продано {r.soldQty} шт / Выручка {r.revenue.toLocaleString()} {cur}
                   </div>
+                  {r.lastSupplier && (
+                    <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '4px' }}>
+                      Последняя закупка: {r.lastSupplier}{r.lastDate ? ' · ' + r.lastDate : ''} · по {r.lastCost.toLocaleString()} {cur}
+                    </div>
+                  )}
+                  {orderAction(r.id) && (
+                    <div style={{ fontSize: '.72rem', marginTop: '4px' }}>
+                      <span style={{ color: 'var(--sk-muted)' }}>Заказ: </span>
+                      <a href={orderAction(r.id).url} target="_blank" rel="noopener noreferrer"
+                        style={{ color: '#111', fontWeight: 600, textDecoration: 'none' }}>
+                        {orderAction(r.id).label} <span className="car-tri" style={{ fontSize: '12px' }}>↗</span>
+                      </a>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
                     <button type="button" className="sk-dd-btn" style={{ width: 'auto' }}
-                      onClick={() => navigateTo('/stock/supply/new')}>
+                      onClick={openOrderModal}>
                       {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
                     </button>
                   </div>
@@ -405,6 +539,105 @@ export default function Health() {
           </div>
         )}
       </div>
+
+      {/* Модалка «Заказ»: галочки, количество, последняя цена закупки, отправка поставщикам */}
+      <Modal open={orderModal} onClose={() => setOrderModal(false)} title="Заказ товаров"
+        subtitle={orderPickedCount > 0 ? `Отмечено ${orderPickedCount} поз. · ${orderPickedSum.toLocaleString()} ${cur}` : 'Отметьте товары, которые нужно заказать'}
+        width="large"
+        actions={<>
+          <button type="button" className="btn btn-outline" onClick={() => setOrderModal(false)}>Закрыть</button>
+          <button type="button" className="btn btn-outline" onClick={() => {
+            const all = orderPickedCount === orderData.length;
+            const picked = {}; 
+            orderData.forEach(r => { picked[String(r.id)] = !all; });
+            setOrderPicked(picked);
+          }}>{orderPickedCount === orderData.length ? 'Снять все' : 'Выбрать все'}</button>
+        </>}>
+        {orderData.length === 0 ? (
+          <div className="sk-empty">Нет позиций к заказу</div>
+        ) : (
+          <>
+            {/* Позиции с галочками */}
+            <div style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, overflow: 'hidden', marginBottom: '.75rem' }}>
+              <div style={{ display: 'flex', padding: '.5rem .75rem', background: 'rgba(29,120,252,.04)', fontSize: '.68rem', fontWeight: 700, color: 'var(--sk-muted)', textTransform: 'uppercase', letterSpacing: '.3px', gap: '.5rem' }}>
+                <span style={{ width: 20 }}></span>
+                <span style={{ flex: 1 }}>Товар</span>
+                <span style={{ width: 80, textAlign: 'center' }}>Закупить</span>
+                <span style={{ width: 80, textAlign: 'right' }}>Цена</span>
+                <span style={{ width: 90, textAlign: 'right' }}>Сумма</span>
+                <span style={{ width: 90, textAlign: 'center' }}>Заказ</span>
+              </div>
+              <div style={{ maxHeight: 340, overflowY: 'auto' }}>
+                {orderData.map(r => {
+                  const id = String(r.id);
+                  const on = !!orderPicked[id];
+                  const q = orderQty[id] ?? r.suggest;
+                  const act = r.action;
+                  return (
+                    <div key={r.id} style={{ display: 'flex', alignItems: 'center', padding: '.5rem .75rem', borderTop: '1px solid rgba(29,120,252,.08)', gap: '.5rem', background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
+                      <span style={{ width: 20, display: 'flex' }}>
+                        <span className="dd-cb" onClick={() => setOrderPicked(prev => ({ ...prev, [id]: !prev[id] }))}
+                          style={{ width: 16, height: 16, border: '1.5px solid ' + (on ? '#1F75FF' : '#c9c9d1'), borderRadius: '50%', background: on ? '#1F75FF' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+                          {on && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                        </span>
+                      </span>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.78rem', fontWeight: 600, color: '#222', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
+                        <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>
+                          остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
+                          {r.lastSupplier ? ' · последняя закупка: ' + r.lastSupplier : ''}
+                        </div>
+                      </span>
+                      <span style={{ width: 80, display: 'flex', justifyContent: 'center' }}>
+                        <input type="number" min="0" value={q}
+                          onChange={e => setOrderQty(prev => ({ ...prev, [id]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                          style={{ width: 64, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                      </span>
+                      <span style={{ width: 80, textAlign: 'right', fontSize: '.75rem', color: '#222' }}>{r.lastCost.toLocaleString()} {cur}</span>
+                      <span style={{ width: 90, textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111' }}>{(q * r.lastCost).toLocaleString()} {cur}</span>
+                      <span style={{ width: 90, textAlign: 'center' }}>
+                        {act ? (
+                          <a href={act.url} target="_blank" rel="noopener noreferrer"
+                            style={{ fontSize: '.72rem', fontWeight: 600, color: '#1F75FF', textDecoration: 'none' }}>
+                            {act.label} <span style={{ fontSize: '11px' }}>↗</span>
+                          </a>
+                        ) : <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>—</span>}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Итого */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '.5rem .75rem', background: 'linear-gradient(135deg,#4a92ff 0%,#1d78fc 45%,#0d4ea8 100%)', borderRadius: 12, color: '#fff', marginBottom: '.75rem' }}>
+              <span style={{ fontSize: '.8rem', fontWeight: 600 }}>Отмечено: {orderPickedCount} поз.</span>
+              <span style={{ fontSize: '1rem', fontWeight: 800 }}>{orderPickedSum.toLocaleString()} {cur}</span>
+            </div>
+
+            {/* Группы по поставщикам — кнопки отправки */}
+            {orderGroups.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                {orderGroups.map((g, gi) => (
+                  <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, padding: '.6rem .75rem', flexWrap: 'wrap' }}>
+                    <span style={{ flex: 1, minWidth: 140 }}>
+                      <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222' }}>{g.name}</div>
+                      <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>
+                        {g.items.length} поз. · {g.total.toLocaleString()} {cur}
+                        {g.method === 'link' ? ' · заказ по ссылкам' : g.method === 'whatsapp' ? ' · WhatsApp' : g.method === 'telegram' ? ' · Telegram' : g.method === 'max' ? ' · MAX' : ''}
+                      </div>
+                    </span>
+                    <button type="button" className="sk-dd-btn"
+                      onClick={() => sendOrder(g)}>
+                      {g.method === 'whatsapp' ? 'Отправить в WhatsApp' : g.method === 'telegram' ? 'Отправить в Telegram' : g.method === 'max' ? 'Отправить в MAX' : 'Открыть ссылки'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </Modal>
     </>
   );
 }
