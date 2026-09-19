@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -187,10 +188,8 @@ export default function Health() {
     return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
   }, [loading, topSort, period]);
 
-  const navigateTo = (path) => {
-    window.location.hash = path;
-    window.dispatchEvent(new Event('hashchange'));
-  };
+  const navigate = useNavigate();
+  const navigateTo = (path) => navigate(path);
 
   const dot = (r) => r.qty === 0 ? '#dc2626' : (r.dailySales > 0 && r.daysLeft <= 7 ? '#dc2626' : (r.dailySales > 0 && r.daysLeft <= 30 ? '#ffcf2e' : '#1F75FF'));
 
