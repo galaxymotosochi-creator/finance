@@ -344,8 +344,6 @@ const load = async () => {
     showToast('Оплата проведена');
   };
 
-  const totalItems = (s) => (s.items||[s]).length;
-  
   if (loading) return <CenterSpinner />;
 
   return (
@@ -509,7 +507,6 @@ const load = async () => {
               <th style={{textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Поставщик</th>
               <th style={{textAlign:'left'}}>Товары</th>
-              <th style={{width:'50px',textAlign:'left'}}>Кол-во</th>
               <th style={{textAlign:'left'}}>Поставка</th>
               <th style={{textAlign:'left'}}>Оплата</th>
               <th style={{textAlign:'left'}}>Сумма</th>
@@ -560,7 +557,6 @@ const load = async () => {
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
-                  <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>{totalItems(s)}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:"#222",background:supColor+'18',cursor:'pointer',whiteSpace:'nowrap'}}
                       onClick={() => s.status !== 'received' && cycleStatus(s.id)}>{supSt}</span>
