@@ -421,7 +421,7 @@ export default function Health() {
                   </div>
                   {r.lastSupplier && (
                     <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '4px' }}>
-                      Последняя закупка: {r.lastSupplier}{r.lastDate ? ' · ' + r.lastDate : ''} · по {r.lastCost.toLocaleString()} {cur}
+                      Последняя закупка: {r.lastSupplier}{r.lastDate ? ' / ' + r.lastDate : ''} / {r.lastCost.toLocaleString()} {cur}
                     </div>
                   )}
                   {orderAction(r.id) && (
