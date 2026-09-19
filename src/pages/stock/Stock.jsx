@@ -134,7 +134,7 @@ export default function Stock() {
   let allCats = [...new Set(products.map(p => CAT_LABELS[p.cat] || p.cat || 'Без категории'))].sort(sortCats);
   // Статус наличия товара: out — закончился, low — заканчивается (≤ мин. остатка), in — в наличии
   const stOf = (p) => { const stq = stockMap[p.id]?.qty || 0; const mn = p.min_qty || 0; return stq === 0 ? 'out' : (mn > 0 && stq <= mn ? 'low' : 'in'); };
-  let items = products.filter(p => p && !p.hidden);
+  let items = products.filter(p => p && !p.hidden && p.type !== 'service');
   if (selectedCats && selectedCats.size > 0) {
     items = items.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || 'Без категории'));
   }
