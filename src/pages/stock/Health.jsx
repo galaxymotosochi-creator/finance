@@ -32,7 +32,7 @@ export default function Health() {
           supabase.from('receipts').select('*').eq('user_id', user.id).gte('date', fromStr),
         ]);
         if (prodRes.error) throw prodRes.error;
-        if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden));
+        if (prodRes.data) setProducts(prodRes.data.filter(p => !p.hidden && p.type !== 'service'));
         const supplies = [];
         (supRes.data || []).forEach(sp => { (sp.items || []).forEach(it => { supplies.push(it); }); });
         setSuppliesCache(supplies);
