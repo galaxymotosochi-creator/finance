@@ -8,8 +8,14 @@ import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 
 
-const CONTACT_ICONS = { telegram:'📱', whatsapp:'💬', max:'🧑‍💼' };
-const CONTACT_LABELS = { telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX' };
+const CONTACT_LABELS = {
+  ozon:'OZON', wb:'Wildberries', yandex:'Яндекс.Маркет',
+  telegram:'Telegram', whatsapp:'WhatsApp', max:'MAX', link:'Ссылка на товар',
+};
+// Каналы заказа: маркетплейсы и мессенджеры — для них поле меняется под канал
+const MARKETPLACES = ['ozon', 'wb', 'yandex'];
+const MESSENGERS = ['telegram', 'whatsapp', 'max'];
+const isMarketplace = (m) => MARKETPLACES.indexOf(m) !== -1;
 
 export default function Suppliers() {
   const cur = getCurrencySymbol();
@@ -22,6 +28,7 @@ export default function Suppliers() {
   const [fContact, setFContact] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fMethod, setFMethod] = useState('');
+  const [fOrderLink, setFOrderLink] = useState(''); // ссылка на товар (маркетплейсы) или ник/номер (мессенджеры)
   // Панель фильтров (эталон — Поставки)
   const [supSearch, setSupSearch] = useState('');
   const [supSearchFocus, setSupSearchFocus] = useState(false);
@@ -107,14 +114,14 @@ export default function Suppliers() {
 
   const openEdit = (s) => {
     setEditId(s.id); setFName(s.name); setFContact(s.contact||'');
-    setFPhone(s.phone||''); setFMethod(s.contact_method||'');
+    setFPhone(s.phone||''); setFMethod(s.contact_method||''); setFOrderLink(s.order_link||'');
     setShowModal(true);
   };
 
   const save = async (e) => {
     e.preventDefault();
     if (!fName.trim()) return alert('Введите название');
-    const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contact_method: fMethod };
+    const obj = { name: fName.trim(), contact: fContact.trim(), phone: fPhone.trim(), contact_method: fMethod, order_link: fOrderLink.trim() };
     let queued = false;
     if (editId) {
       const res = await supabase.from('suppliers').update(obj).eq('id', editId);
@@ -259,7 +266,7 @@ export default function Suppliers() {
               <th style={{textAlign:'left'}}>Название</th>
               <th style={{textAlign:'left'}}>Контакт</th>
               <th style={{textAlign:'left'}}>Телефон</th>
-              <th style={{textAlign:'left'}}>Способ связи</th>
+              <th style={{textAlign:'left'}}>Способ заказа</th>
               <th style={{textAlign:'left'}}>Поставок</th>
               <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{width:'130px',textAlign:'left'}}></th>
@@ -292,14 +299,31 @@ export default function Suppliers() {
               const supSupplies = supplies.filter(sp => (sp.supplier_name || sp.supplierName) === s.name);
               const supplyCount = supSupplies.length;
               const totalSum = supSupplies.reduce((sum, sp) => sum + (Number(sp.total) || 0), 0);
-              const icon = CONTACT_ICONS[s.contact_method] || '📞';
               const label = CONTACT_LABELS[s.contact_method] || s.contact_method || '—';
+              // Ссылка для мгновенного перехода: чат в мессенджере или товар на маркетплейсе
+              const orderLink = (() => {
+                const raw = (s.order_link || '').trim();
+                if (!raw) return null;
+                if (s.contact_method === 'whatsapp') return 'https://wa.me/' + raw.replace(/[^0-9]/g, '');
+                if (s.contact_method === 'telegram') return 'https://t.me/' + raw.replace(/^@/, '');
+                if (s.contact_method === 'max') return raw;
+                return /^https?:\/\//.test(raw) ? raw : 'https://' + raw;
+              })();
               return (
                 <tr key={s.id}>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><div className="prod-name">{s.name}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</div></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{s.contact||'—'}</td>
                   <td style={{textAlign:'left',color:'#222'}}>{s.phone||'—'}</td>
-                  <td style={{textAlign:'left',color:'#222'}}><span className="prod-cat">{label}</span></td>
+                  <td style={{textAlign:'left',color:'#222'}}>
+                    {s.contact_method ? (
+                      orderLink ? (
+                        <a href={orderLink} target="_blank" rel="noopener noreferrer" className="prod-cat"
+                          style={{textDecoration:'none',display:'inline-flex',alignItems:'center',gap:'4px'}}>
+                          {label} <span style={{fontSize:'.7rem',opacity:.7}}>↗</span>
+                        </a>
+                      ) : <span className="prod-cat">{label}</span>
+                    ) : '—'}
+                  </td>
                   <td style={{textAlign:'left',color:'#222'}}>{supplyCount}</td>
                   <td style={{textAlign:'left',color:'#222'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
@@ -341,18 +365,33 @@ export default function Suppliers() {
               <input type="text" value={fPhone} onChange={e=>setFPhone(e.target.value)} placeholder="+7 (999) 123-45-67" />
             </div>
           </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Способ связи</label>
-              <select value={fMethod} onChange={e=>setFMethod(e.target.value)}>
-                <option value="">— нет —</option>
-                <option value="telegram">📱 Telegram</option>
-                <option value="whatsapp">💬 WhatsApp</option>
-                <option value="max">🧑‍💼 MAX</option>
-              </select>
-            </div>
-            <div className="form-group"></div>
+          <div className="form-group">
+            <label>Способ заказа</label>
+            <select value={fMethod} onChange={e=>{setFMethod(e.target.value);setFOrderLink('')}}>
+              <option value="">— выберите —</option>
+              <option value="ozon">OZON</option>
+              <option value="wb">Wildberries</option>
+              <option value="yandex">Яндекс.Маркет</option>
+              <option value="telegram">Telegram</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="max">MAX</option>
+            </select>
           </div>
+          {isMarketplace(fMethod) && (
+            <div className="form-group">
+              <label>Ссылка на товар</label>
+              <input type="url" value={fOrderLink} onChange={e=>setFOrderLink(e.target.value)} placeholder="https://ozon.ru/t/..." />
+              <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Откроется в новой вкладке при нажатии «Заказать»</div>
+            </div>
+          )}
+          {MESSENGERS.indexOf(fMethod) !== -1 && (
+            <div className="form-group">
+              <label>{fMethod === 'whatsapp' ? 'Телефон для чата' : 'Ник для чата'}</label>
+              <input type="text" value={fOrderLink} onChange={e=>setFOrderLink(e.target.value)}
+                placeholder={fMethod === 'whatsapp' ? '+7 999 123-45-67' : '@postavshchik'} />
+              <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Ссылка на чат появится в таблице — один клик для связи</div>
+            </div>
+          )}
           <div className="modal-actions">
             {editId && <button type="button" className="btn btn-outline" onClick={() => { const id = editId; setShowModal(false); remove(id); }}>Удалить</button>}
             <button type="submit" className="sk-dd-btn">{editId?'Сохранить':'Добавить'}</button>
