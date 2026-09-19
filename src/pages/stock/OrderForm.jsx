@@ -9,6 +9,14 @@ import CenterSpinner from '../../components/CenterSpinner';
 // «Формирование поставки» — рабочая страница заказа товаров
 // Собирается из аналитики (что заказать): позиции, поставщик, какая закупка (ссылка/цена), количество
 
+// Склонение: 1 позиция, 2 позиции, 5 позиций
+function posWord(n) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return 'позиция';
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return 'позиции';
+  return 'позиций';
+}
+
 // Выпадающий список 1-в-1 как фильтр «Тип» в «Товарах» (f-menu / f-list / f-item)
 function OrdSelect({ open, onToggle, value, options, onPick, placeholder }) {
   const current = options.find(o => String(o.v) === String(value));
@@ -273,7 +281,7 @@ export default function OrderForm() {
     const list = Object.values(byKey).map(g => {
       const total = g.items.reduce((s, r) => s + r.sum, 0);
       const lines = g.items.map((r, i) => `${i + 1}. ${r.name} — ${r.qty} шт`);
-      const text = 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + g.items.length + ' поз.' + (total > 0 ? ', ' + total.toLocaleString() + ' ' + cur : '');
+      const text = 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + g.items.length + ' ' + posWord(g.items.length) + (total > 0 ? ', ' + total.toLocaleString() + ' ' + cur : '');
       return { ...g, total, text };
     });
     return { list, noSupplier };
