@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import { fmtDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 
 // «Формирование поставки» — рабочая страница заказа товаров
@@ -160,7 +161,8 @@ export default function OrderForm() {
   const purchasesByProduct = useMemo(() => {
     const map = {};
     suppliesList.forEach(sp => {
-      const date = sp.date || (sp.created_at || '').slice(0, 10) || '';
+      const rawDate = sp.date || sp.created_at || '';
+      const date = fmtDate(rawDate);
       (sp.items || []).forEach(it => {
         const pid = it.prodId != null ? String(it.prodId) : null;
         if (!pid) return;
@@ -380,7 +382,7 @@ export default function OrderForm() {
                               onToggle={() => setDdOpen(prev => prev === 'pur:' + r.pid ? null : 'pur:' + r.pid)}
                               value={r.purIdx}
                               placeholder="—"
-                              options={r.supHistory.map((h, ix) => ({ v: ix, l: (h.date || '—') + ' · ' + h.cost.toLocaleString() + ' ' + cur + (h.orderUrl ? ' · ссылка' : '') }))}
+                              options={r.supHistory.map((h, ix) => ({ v: ix, l: (h.date || '—') + ' / ' + h.cost.toLocaleString() + ' ' + cur }))}
                               onPick={v => {
                                 setPur(prev => ({ ...prev, [r.pid]: parseInt(v) || 0 }));
                                 setCost(prev => { const n = { ...prev }; delete n[r.pid]; return n; });
