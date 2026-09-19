@@ -791,6 +791,16 @@ export default function Salary() {
       <Modal open={show} onClose={()=>setShow(false)} title={editId?'Редактировать':'Начислить зарплату'} subtitle="Выберите сотрудника и период" width="wide">
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
+              {/* Тип выплаты: Зарплата / Аванс */}
+              <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Тип</div>
+              <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
+                {[{value:'salary',label:'Зарплата'},{value:'advance',label:'Аванс'}].map(t => (
+                  <span key={t.value} onClick={()=>setFPayType(t.value)}
+                    style={{display:'inline-flex',alignItems:'center',gap:'4px',padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'100px',cursor:'pointer',fontWeight:500,
+                      background:fPayType===t.value?'var(--primary)':'#f1f3f5',color:fPayType===t.value?'#000':'var(--muted)'}}>{t.label}</span>
+                ))}
+              </div>
+
               {/* Сотрудник + период */}
               <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
               <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
@@ -1120,25 +1130,29 @@ export default function Salary() {
                     <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                   </div>
                   );
-                }) : accsList.map(a => (
-                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.35rem 0'}}>
-                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222'}}>{a.name}</span>
-                    <span style={{fontSize:'.75rem',color:'#888'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
+                }) : accsList.map(a => {
+                  const amt = parseFloat(salarySplitAmounts[a.id]) || 0;
+                  const filled = amt > 0;
+                  return (
+                  <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',borderRadius:'.6rem',background:filled?'#E6F0FF':'#fff',border:'1.5px solid '+(filled?'#1F75FF':'rgba(0,0,0,.26)')}}>
+                    <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(filled?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:filled?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                    <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                     <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
                       style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
                   </div>
-                ))}
+                  );
+                })}
                 {accsList.length > 1 && (
                   <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.35rem',padding:'.5rem .75rem',cursor:'pointer',borderRadius:'.6rem',border:'1.5px dashed #cfcfd6',fontSize:'.78rem',color:'#888',fontWeight:600,transition:'background .12s',marginTop:'.15rem'}}
                     onClick={()=>{if(!salarySplitMode){var amt=Math.round((payTotal||0)/accsList.length);var total=payTotal||0;var sa={};accsList.forEach(function(a,i){sa[a.id]=i<accsList.length-1?amt:total-amt*(accsList.length-1)});setSalarySplitAmounts(sa)};setSalarySplitMode(!salarySplitMode);setPayAcctId('')}}>{salarySplitMode ? '− Не разделять' : '+ Разделить на несколько счетов'}</div>
                 )}
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-outline" onClick={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}}>Отмена</button>
                 {salarySplitMode ? (
-                  <button type="button" className="btn btn-dark" onClick={()=>confirmPay(null, salarySplitAmounts)}>Подтвердить разделение</button>
+                  <button type="button" className="sk-dd-btn" onClick={()=>confirmPay(null, salarySplitAmounts)}>Подтвердить разделение</button>
                 ) : (
-                  <button type="button" className="btn btn-dark" onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}>Выплатить{payTotal ? ' ' + payTotal.toLocaleString() + ' ' + cur : ''}</button>
+                  <button type="button" className="sk-dd-btn" onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}>Выплатить{payTotal ? ' ' + payTotal.toLocaleString() + ' ' + cur : ''}</button>
                 )}
               </div>
         </>
