@@ -1135,22 +1135,13 @@ input:focus, select:focus, textarea:focus {
   white-space:nowrap !important; vertical-align:bottom !important;
   background:transparent !important;
 }
-.main .content .sk-table.sup-table thead th:first-child{padding-left:16px !important;padding-right:4px !important}
+.main .content .sk-table.sup-table thead th:first-child{padding-left:24px !important}
 .main .content .sk-table.sup-table tbody td{padding:6px 16px !important;text-align:left !important;border-right:1px solid rgba(29,120,252,.09) !important}
-.main .content .sk-table.sup-table tbody td:first-child{padding-left:16px !important;padding-right:4px !important}
+.main .content .sk-table.sup-table tbody td:first-child{padding-left:24px !important}
 .main .content .sk-table.sup-table thead th:last-child,
 .main .content .sk-table.sup-table tbody td:last-child{border-right:none !important;text-align:left !important}
-/* Ширины колонок таблицы «Поставки» — перебивают общие min-width от .sk-table */
-.main .content .sk-table.sup-table thead th:nth-child(1),
-.main .content .sk-table.sup-table tbody td:nth-child(1){min-width:0 !important;width:80px !important;max-width:80px !important}
-.main .content .sk-table.sup-table thead th:nth-child(2),
-.main .content .sk-table.sup-table tbody td:nth-child(2){min-width:0 !important;width:130px !important}
-.main .content .sk-table.sup-table thead th:nth-child(3),
-.main .content .sk-table.sup-table tbody td:nth-child(3){min-width:0 !important;width:150px !important}
-.main .content .sk-table.sup-table thead th:nth-child(4),
-.main .content .sk-table.sup-table tbody td:nth-child(4){min-width:0 !important;width:180px !important}
-.main .content .sk-table.sup-table thead th:nth-child(5),
-.main .content .sk-table.sup-table tbody td:nth-child(5){min-width:0 !important;width:auto !important}
+/* Поставки: первая колонка «№» — как в «Чеках» (sk-receipts) */
+.sk-table.sup-table thead th:nth-child(1),.sk-table.sup-table tbody td:nth-child(1){min-width:80px;width:80px}
 
 /* Модалка «Инвентаризация» — адаптив и скролл на мобильной */
 .modal-box.inv-modal{max-height:92vh;display:flex;flex-direction:column;overflow:hidden;padding:1.2rem}
