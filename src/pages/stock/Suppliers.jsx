@@ -330,12 +330,22 @@ export default function Suppliers() {
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                       <button className="sk-more" onClick={(e) => {
                         e.stopPropagation();
-                        const dd = e.currentTarget.nextElementSibling;
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');
-                        // Меню последней строки разворачиваем ВВЕРХ, чтобы не уходило за край таблицы
-                        var _r = dd.getBoundingClientRect();
-                        if (_r.bottom > window.innerHeight - 8) dd.classList.add('up'); else dd.classList.remove('up');
+                        const btn = e.currentTarget;
+                        const dd = btn.nextElementSibling;
+                        const isOpen = dd.classList.contains('open');
+                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.cssText = ''; });
+                        if (isOpen) return;
+                        // Меню показываем position:fixed — иначе его обрезает overflowX у контейнера таблицы
+                        dd.classList.add('open');
+                        dd.style.position = 'fixed';
+                        dd.style.right = (window.innerWidth - btn.getBoundingClientRect().right) + 'px';
+                        const below = btn.getBoundingClientRect().bottom + 6;
+                        const menuH = dd.offsetHeight || 84;
+                        if (below + menuH > window.innerHeight - 8) {
+                          dd.style.top = (btn.getBoundingClientRect().top - menuH - 4) + 'px';
+                        } else {
+                          dd.style.top = below + 'px';
+                        }
                       }}>⋯</button>
                       <div className="prod-dropdown">
                         <button onClick={() => openEdit(s)}>Редактировать</button>
