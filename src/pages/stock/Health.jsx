@@ -557,55 +557,61 @@ export default function Health() {
           <div className="sk-empty">Нет позиций к заказу</div>
         ) : (
           <>
-            {/* Позиции с галочками */}
+            {/* Позиции с галочками — таблица со скроллом (мобильная + планшет) */}
             <div style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, overflow: 'hidden', marginBottom: '.75rem' }}>
-              <div style={{ display: 'flex', padding: '.5rem .75rem', background: 'rgba(29,120,252,.04)', fontSize: '.68rem', fontWeight: 700, color: 'var(--sk-muted)', textTransform: 'uppercase', letterSpacing: '.3px', gap: '.5rem' }}>
-                <span style={{ width: 20 }}></span>
-                <span style={{ flex: 1 }}>Товар</span>
-                <span style={{ width: 80, textAlign: 'center' }}>Закупить</span>
-                <span style={{ width: 80, textAlign: 'right' }}>Цена</span>
-                <span style={{ width: 90, textAlign: 'right' }}>Сумма</span>
-                <span style={{ width: 90, textAlign: 'center' }}>Заказ</span>
-              </div>
-              <div style={{ maxHeight: 340, overflowY: 'auto' }}>
-                {orderData.map(r => {
-                  const id = String(r.id);
-                  const on = !!orderPicked[id];
-                  const q = orderQty[id] ?? r.suggest;
-                  const act = r.action;
-                  return (
-                    <div key={r.id} style={{ display: 'flex', alignItems: 'center', padding: '.5rem .75rem', borderTop: '1px solid rgba(29,120,252,.08)', gap: '.5rem', background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
-                      <span style={{ width: 20, display: 'flex' }}>
-                        <span className="dd-cb" onClick={() => setOrderPicked(prev => ({ ...prev, [id]: !prev[id] }))}
-                          style={{ width: 16, height: 16, border: '1.5px solid ' + (on ? '#1F75FF' : '#c9c9d1'), borderRadius: '50%', background: on ? '#1F75FF' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-                          {on && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                        </span>
-                      </span>
-                      <span style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '.78rem', fontWeight: 600, color: '#222', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
-                        <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>
-                          остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
-                          {r.lastSupplier ? ' · последняя закупка: ' + r.lastSupplier : ''}
-                        </div>
-                      </span>
-                      <span style={{ width: 80, display: 'flex', justifyContent: 'center' }}>
-                        <input type="number" min="0" value={q}
-                          onChange={e => setOrderQty(prev => ({ ...prev, [id]: Math.max(0, parseInt(e.target.value) || 0) }))}
-                          style={{ width: 64, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
-                      </span>
-                      <span style={{ width: 80, textAlign: 'right', fontSize: '.75rem', color: '#222' }}>{r.lastCost.toLocaleString()} {cur}</span>
-                      <span style={{ width: 90, textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111' }}>{(q * r.lastCost).toLocaleString()} {cur}</span>
-                      <span style={{ width: 90, textAlign: 'center' }}>
-                        {act ? (
-                          <a href={act.url} target="_blank" rel="noopener noreferrer"
-                            style={{ fontSize: '.72rem', fontWeight: 600, color: '#1F75FF', textDecoration: 'none' }}>
-                            {act.label} <span style={{ fontSize: '11px' }}>↗</span>
-                          </a>
-                        ) : <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>—</span>}
-                      </span>
-                    </div>
-                  );
-                })}
+              <div className="ord-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: 380, overflowY: 'auto' }}>
+                <table className="ord-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 34 }}></th>
+                      <th style={{ minWidth: 170, textAlign: 'left' }}>Товар</th>
+                      <th style={{ width: 84, textAlign: 'center' }}>Закупить</th>
+                      <th style={{ width: 82, textAlign: 'right' }}>Цена</th>
+                      <th style={{ width: 96, textAlign: 'right' }}>Сумма</th>
+                      <th style={{ width: 104, textAlign: 'center' }}>Заказ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orderData.map(r => {
+                      const id = String(r.id);
+                      const on = !!orderPicked[id];
+                      const q = orderQty[id] ?? r.suggest;
+                      const act = r.action;
+                      return (
+                        <tr key={r.id} style={{ background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
+                          <td style={{ textAlign: 'center' }}>
+                            <span className="dd-cb" onClick={() => setOrderPicked(prev => ({ ...prev, [id]: !prev[id] }))}
+                              style={{ width: 17, height: 17, border: '1.5px solid ' + (on ? '#1F75FF' : '#c9c9d1'), borderRadius: '50%', background: on ? '#1F75FF' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                              {on && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '.78rem', fontWeight: 600, color: '#222', whiteSpace: 'normal', lineHeight: 1.25 }}>{r.name}</div>
+                            <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>
+                              остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
+                              {r.lastSupplier ? ' · ' + r.lastSupplier : ''}
+                            </div>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <input type="number" min="0" value={q}
+                              onChange={e => setOrderQty(prev => ({ ...prev, [id]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                              style={{ width: 64, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                          </td>
+                          <td style={{ textAlign: 'right', fontSize: '.75rem', color: '#222', whiteSpace: 'nowrap' }}>{r.lastCost.toLocaleString()} {cur}</td>
+                          <td style={{ textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>{(q * r.lastCost).toLocaleString()} {cur}</td>
+                          <td style={{ textAlign: 'center' }}>
+                            {act ? (
+                              <a href={act.url} target="_blank" rel="noopener noreferrer"
+                                style={{ fontSize: '.72rem', fontWeight: 600, color: '#1F75FF', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                                {act.label} <span style={{ fontSize: '11px' }}>↗</span>
+                              </a>
+                            ) : <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>—</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
 
