@@ -11,6 +11,19 @@ import CenterSpinner from '../../components/CenterSpinner';
 
 
 
+// Категория расходов «Оплата поставок» — находим по имени или создаём один раз
+async function ensureSupplyCategory(userId) {
+  const { data: found } = await supabase.from('categories')
+    .select('*').eq('user_id', userId).eq('name', 'Оплата поставок').eq('type', 'expense');
+  if (found && found.length > 0) return found[0].id;
+  const newId = Date.now();
+  const { error } = await supabase.from('categories').insert({
+    id: newId, user_id: userId, name: 'Оплата поставок', type: 'expense',
+  });
+  if (error) return null;
+  return newId;
+}
+
 const SUPPLY_STATUSES = ['ordered','transit','received'];
 const SUPPLY_LABELS = {ordered:'Заказано',transit:'В пути',received:'Оприходовано'};
 const SUPPLY_COLORS = {ordered:'#2563eb',transit:'#d97706',received:'#16a34a'};
@@ -306,6 +319,8 @@ const load = async () => {
     const total = s.total || (s.items||[]).reduce((sum,it)=>sum+it.qty*it.cost,0) || 0;
     const paid = s.paid || 0;
     const debt = total - paid;
+    // Расход пишем в категорию «Оплата поставок» (создаём при первой оплате)
+    const payCatId = await ensureSupplyCategory(user.id);
     if (paySplit) {
       for (const ac of payAccounts) {
         const amt = parseFloat(splitAmts[ac.id]) || 0;
@@ -315,6 +330,7 @@ const load = async () => {
         if (bal < amt) return alert('Недостаточно средств на ' + ac.name + '. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счет.');
         await supabase.from('transactions').insert({
           user_id: user.id, account_id: ac.id, type: 'expense', amount: amt,
+          category_id: payCatId,
           description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
         });
         if (!Array.isArray(s.payments)) s.payments = [];
@@ -332,6 +348,7 @@ const load = async () => {
       if (bal < amount) return alert('Недостаточно средств на счете. Доступно: ' + bal.toLocaleString() + ' ' + cur + '. Разделите оплату на несколько счетов или выберите другой счет.');
       const { error: txErr } = await supabase.from('transactions').insert({
         user_id: user.id, account_id: acId, type: 'expense', amount: amount,
+        category_id: payCatId,
         description: 'Оплата поставки ' + (s.invoice||''), date: new Date().toISOString().split('T')[0]
       });
       if (txErr) return alert('Ошибка создания операции: ' + txErr.message);
