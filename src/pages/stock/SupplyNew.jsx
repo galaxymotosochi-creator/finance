@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -28,6 +28,7 @@ export default function SupplyNew() {
   const [supName, setSupName] = useState('');
   const [supCustom, setSupCustom] = useState('');
   const [supId, setSupId] = useState(null); // id выбранного поставщика (для связи с закупками)
+  const [supMethod, setSupMethod] = useState(''); // способ заказа: link | telegram | whatsapp | max
   const [invoice, setInvoice] = useState('');
   const now = useMemo(() => new Date(), []);
   const [dateStr, setDateStr] = useState(now.toISOString().split('T')[0]);
@@ -83,7 +84,7 @@ export default function SupplyNew() {
     const cost = parseFloat(addCost) || 0;
     setItems(prev => [...prev, {
       prodId: prod.id, name: prod.name, sku: prod.article || '',
-      qty, unit: addUnit, cost, sum: qty * cost
+      qty, unit: addUnit, cost, sum: qty * cost, orderUrl: ''
     }]);
     setAddSearch(''); setAddProdId(''); setAddQty('1'); setAddCost('');
     setAddUnit('шт'); setAddDrop(false);
@@ -92,6 +93,9 @@ export default function SupplyNew() {
   const removeItem = (idx) => setItems(prev => prev.filter((_, i) => i !== idx));
   const updateItemQty = (idx, qty) => {
     setItems(prev => prev.map((it, i) => i === idx ? { ...it, qty: parseFloat(qty) || 0, sum: (parseFloat(qty) || 0) * it.cost } : it));
+  };
+  const updateItemLink = (idx, url) => {
+    setItems(prev => prev.map((it, i) => i === idx ? { ...it, orderUrl: url } : it));
   };
   const updateItemCost = (idx, cost) => {
     setItems(prev => prev.map((it, i) => i === idx ? { ...it, cost: parseFloat(cost) || 0, sum: it.qty * (parseFloat(cost) || 0) } : it));
@@ -113,7 +117,7 @@ export default function SupplyNew() {
       invoice: invoice.trim() || '—',
       date: dateStr,
       status: 'received',
-      items: items.map(it => ({ prodId: it.prodId, name: it.name, qty: it.qty, cost: it.cost })),
+      items: items.map(it => ({ prodId: it.prodId, name: it.name, qty: it.qty, cost: it.cost, orderUrl: (it.orderUrl || '').trim() })),
       total: totalSum,
       paid: totalPaid,
       payments,
@@ -210,6 +214,7 @@ export default function SupplyNew() {
               setSupName(e.target.value);
               const sel = suppliers.find(s => s.name === e.target.value);
               setSupId(sel ? sel.id : null);
+              setSupMethod(sel ? (sel.contact_method || '') : '');
               if (e.target.value) setSupCustom('');
             }}
               style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)', color: supName ? 'inherit' : '#999' }}>
@@ -361,7 +366,8 @@ export default function SupplyNew() {
                 </thead>
                 <tbody>
                   {items.map((it, i) => (
-                    <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
+                    <React.Fragment key={i}>
+                    <tr style={{ borderTop: '1px solid var(--border)' }}>
                       <td style={{ padding: '.35rem .5rem', fontWeight: 500 }}>{it.name}</td>
                       <td style={{ padding: '.35rem .5rem', textAlign: 'center' }}>
                         <input type="number" value={it.qty} onChange={e => updateItemQty(i, e.target.value)}
@@ -376,6 +382,22 @@ export default function SupplyNew() {
                         <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '.8rem' }}>✕</button>
                       </td>
                     </tr>
+                    {supMethod === 'link' && (
+                      <tr key={i + '-link'} style={{ background: 'rgba(29,120,252,.03)' }}>
+                        <td colSpan={5} style={{ padding: '0 .5rem .45rem 1.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                            <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>Ссылка на товар</span>
+                            <input type="url" value={it.orderUrl || ''} onChange={e => updateItemLink(i, e.target.value)}
+                              placeholder="https://ozon.ru/t/..."
+                              style={{ flex: 1, maxWidth: 420, padding: '.25rem .45rem', border: '1px solid rgba(29,120,252,.18)', borderRadius: 6, fontSize: '.75rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
+                            {it.orderUrl && (
+                              <a href={it.orderUrl} target="_blank" rel="noopener noreferrer" className="car-tri" style={{ textDecoration: 'none', color: '#111' }}>↗</a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

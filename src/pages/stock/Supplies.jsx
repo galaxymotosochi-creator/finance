@@ -601,10 +601,20 @@ const load = async () => {
                             <span style={{width:"80px",textAlign:"right"}}>СУММА</span>
                           </div>
                           {items.map((it,i) => (
-                            <div key={i} style={{display:"flex",fontSize:".78rem",color:"#222",padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
-                              <span style={{flex:1}}>{it.name}</span>
-                              <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
-                              <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} {cur}</span>
+                            <div key={i} style={{padding:"4px 0",borderBottom:"1px solid #f8f8f8"}}>
+                              <div style={{display:"flex",fontSize:".78rem",color:"#222"}}>
+                                <span style={{flex:1}}>{it.name}</span>
+                                <span style={{width:"70px",textAlign:"center"}}>{it.qty}</span>
+                                <span style={{width:"80px",textAlign:"right"}}>{(it.qty*it.cost).toLocaleString()} {cur}</span>
+                              </div>
+                              {it.orderUrl && (
+                                <div style={{marginTop:"2px"}}>
+                                  <a href={it.orderUrl} target="_blank" rel="noopener noreferrer"
+                                    style={{fontSize:".7rem",color:"#222",textDecoration:"none"}}>
+                                    Ссылка на товар <span className="car-tri" style={{fontSize:"13px",textDecoration:"none"}}>↗</span>
+                                  </a>
+                                </div>
+                              )}
                             </div>
                           ))}
                           <div style={{display:"flex",justifyContent:"space-between",fontSize:".78rem",color:"#222",fontWeight:500,paddingTop:"8px",marginTop:"0"}}>
