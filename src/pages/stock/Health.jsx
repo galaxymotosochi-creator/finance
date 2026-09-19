@@ -310,13 +310,13 @@ export default function Health() {
                   <span className="f-pill on" style={{ fontSize: '.62rem', padding: '2px 8px', cursor: 'default' }}>{r.qty === 0 ? 'Закончился' : '≤ ' + r.daysLeft + ' дн'}</span>
                 </div>
                 <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', margin: '6px 0' }}>
-                  Осталось {r.qty} шт · продаётся {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
+                  Осталось {r.qty} шт / Продается в день {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт
                 </div>
                 <div style={{ background: '#eef4ff', borderRadius: '6px', height: '6px', overflow: 'hidden' }}>
                   <div style={{ width: pct + '%', height: '100%', background: pct <= 15 ? '#dc2626' : '#1F75FF', borderRadius: '6px', transition: 'width .3s ease' }}></div>
                 </div>
                 <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '6px' }}>
-                  За {period} дн продано {r.soldQty} шт · выручка {r.revenue.toLocaleString()} {cur}
+                  За {period} дней продано {r.soldQty} шт / Выручка {r.revenue.toLocaleString()} {cur}
                 </div>
                 <button type="button" className="sk-dd-btn" style={{ marginTop: '10px', width: '100%' }}
                   onClick={() => navigateTo('/stock/supply/new')}>
