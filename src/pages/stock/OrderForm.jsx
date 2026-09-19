@@ -103,7 +103,8 @@ export default function OrderForm() {
         // Остатки: приход − списание
         // ВАЖНО: ключ всегда String(prodId) — иначе число/строка не совпадут с p.id и остатки «потеряются»
         const map = {};
-        (supRes.data || []).forEach(sp => {
+        // «Заказано» (ordered) — товара ещё нет физически, в остаток НЕ идёт
+        (supRes.data || []).filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => {
           (sp.items || []).forEach(it => {
             const pid = it.prodId != null ? String(it.prodId) : null;
             if (!pid) return;
@@ -289,6 +290,53 @@ export default function OrderForm() {
     return { list, noSupplier };
   }, [pickedRows, cur]);
 
+  // Создание накладных в «Поставках» по группам поставщиков (статус «Заказано»)
+  const [creating, setCreating] = useState(false);
+  const createInvoices = async () => {
+    const groupsToCreate = groups.list.filter(g => g.items.length > 0);
+    if (groupsToCreate.length === 0) return showToast('Отметьте товары с поставщиком');
+    if (groups.noSupplier.length > 0) {
+      return showToast('У части позиций не выбран поставщик — выберите его');
+    }
+    setCreating(true);
+    const today = new Date().toISOString().split('T')[0];
+    let created = 0;
+    try {
+      for (const g of groupsToCreate) {
+        const items = g.items.map(r => ({
+          prodId: r.pid,
+          name: r.name,
+          qty: Number(r.qty) || 1,
+          cost: Number(r.cost) || 0,
+          orderUrl: (r.orderUrl || '').trim(),
+        }));
+        const total = items.reduce((s, it) => s + it.qty * it.cost, 0);
+        const supObj = suppliersList.find(x => x.name === g.name);
+        const { error } = await supabase.from('supplies').insert({
+          id: Date.now() + created,
+          user_id: user.id,
+          supplier_name: g.name,
+          supplier_id: supObj ? supObj.id : null,
+          invoice: '—',
+          date: today,
+          status: 'ordered',
+          items,
+          total,
+          paid: 0,
+          payments: [],
+          comment: 'Заказ из «Формирования поставки»',
+        });
+        if (error) throw error;
+        created++;
+      }
+      showToast('Создано накладных: ' + created);
+      setTimeout(() => navigate('/stock/supplies'), 1200);
+    } catch (e) {
+      showToast('Ошибка: ' + (e.message || 'не удалось создать'));
+      setCreating(false);
+    }
+  };
+
   const sendGroup = (g) => {
     const text = encodeURIComponent(g.text);
     const raw = (g.contact || '').trim();
@@ -320,6 +368,10 @@ export default function OrderForm() {
             rows.forEach(r => { p[r.pid] = !all; });
             setPicked(p);
           }}>{pickedCount === rows.length ? 'Снять все' : 'Выбрать все'}</button>
+          <button className="sk-dd-btn" onClick={createInvoices} disabled={creating || pickedCount === 0}
+            style={{ marginLeft: 8, opacity: (creating || pickedCount === 0) ? .55 : 1, cursor: (creating || pickedCount === 0) ? 'default' : 'pointer' }}>
+            {creating ? 'Создаю…' : 'Создать накладные'}
+          </button>
         </div>
       </div>
 
