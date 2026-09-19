@@ -21,17 +21,15 @@ function OrdSelect({ open, onToggle, value, options, onPick, placeholder }) {
         <span className="car-tri" style={{ fontSize: 15 }}>▾</span>
       </button>
       {open && (
-        <div className="f-menu" style={{ left: 0, right: 'auto', maxHeight: 280, overflowY: 'auto' }}>
-          <div className="f-list" style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+        <div className="f-menu" style={{ left: 0, right: 'auto' }}>
+          <div className="f-list" style={{display:'block'}}>
             {options.map(o => {
               const checked = String(o.v) === String(value);
               return (
                 <div key={String(o.v)} onClick={() => onPick(o.v)}
-                  style={{display:'block',padding:'.5rem .55rem',marginBottom:'2px',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent',whiteSpace:'nowrap'}}>
-                  <span style={{display:'inline-flex',alignItems:'center',gap:'.4rem'}}>
-                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0,display:'inline-block'}}></span>
-                    {o.l}
-                  </span>
+                  style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',marginBottom:'6px',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:checked?'#0d4ea8':'#5b6472',fontWeight:checked?700:500,background:checked?'#E6F0FF':'transparent',boxSizing:'border-box'}}>
+                  <span style={{width:'8px',height:'8px',borderRadius:'50%',background:checked?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                  {o.l}
                 </div>
               );
             })}
