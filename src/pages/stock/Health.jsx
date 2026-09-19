@@ -205,7 +205,7 @@ export default function Health() {
           <div className="sub">Что продаётся, что заказать и где заморожены деньги</div>
         </div>
         <div className="***">
-          {[[7, '7 дней'], [30, '30 дней'], [90, '90 дней']].map(([v, l]) => (
+          {[[7, '7 дн'], [30, '30 дн'], [90, '90 дн']].map(([v, l]) => (
             <button key={v} type="button" className={'f-pill' + (period === v ? ' on' : '')}
               onClick={() => setPeriod(v)}>{l}</button>
           ))}
