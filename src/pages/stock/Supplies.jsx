@@ -412,7 +412,7 @@ const load = async () => {
             <span className="car-tri">▾</span>
           </button>
           {supOpen && (
-            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
+            <div onClick={e => e.stopPropagation()} style={{display:'flex',flexDirection:'column',gap:'4px',position:'absolute',top:'100%',left:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'220px',maxHeight:'300px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
               {Array.from(new Set([
                 ...suppliers.map(x => x.name).filter(Boolean),
                 ...supplies.map(x => x.supplier_name).filter(Boolean),
@@ -420,7 +420,7 @@ const load = async () => {
                 const isActive = supFilter.has(nm);
                 return (
                   <div key={nm} onClick={() => setSupFilter(prev => { const n = new Set(prev); if (n.has(nm)) n.delete(nm); else n.add(nm); return n; })}
-                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',marginBottom:'4px',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
                     <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                     {nm}
                   </div>
@@ -469,7 +469,7 @@ const load = async () => {
             <span className="car-tri">▾</span>
           </button>
           {periodOpen && (
-            <div onClick={e => e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
+            <div onClick={e => e.stopPropagation()} style={{display:'flex',flexDirection:'column',gap:'4px',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
               {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'},{key:'month',label:'Этот месяц'}].map(p => {
                 const isActive = period === p.key;
                 return (
