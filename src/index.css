@@ -1250,7 +1250,10 @@ input:focus, select:focus, textarea:focus {
 
 /* Выпадающие списки в таблице «Формирование поставки» */
 .ord-sel{
-  max-width:100%;padding:.28rem .4rem;border:1px solid rgba(29,120,252,.2);border-radius:6px;
-  font-size:.74rem;font-family:inherit;color:var(--sk-ink);background:#fff;outline:none;cursor:pointer;
+  max-width:100%;padding:.35rem 1.6rem .35rem .5rem;border:1px solid rgba(29,120,252,.2);border-radius:8px;
+  font-size:.75rem;font-family:inherit;color:var(--sk-ink);background:#fff;outline:none;cursor:pointer;
+  line-height:1.4;
 }
 .ord-sel:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.1)}
+/* Расстояние между пунктами выпадающего списка — как в «Товарах» (Тип) */
+.ord-sel option{padding:10px 10px;line-height:2.2;font-size:.8rem}
