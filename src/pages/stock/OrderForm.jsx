@@ -447,14 +447,29 @@ export default function OrderForm() {
                         {g.items.length} поз.{g.total > 0 ? ' · ' + g.total.toLocaleString() + ' ' + cur : ''}
                       </div>
                     </span>
-                    <button type="button" className="sk-dd-btn" onClick={() => sendGroup(g)}>
-                      {(g.method === 'whatsapp' || g.method === 'telegram' || g.method === 'max')
-                        ? 'Отправить в ' + (g.method === 'whatsapp' ? 'WhatsApp' : g.method === 'telegram' ? 'Telegram' : 'MAX')
-                        : 'Открыть ссылки (' + g.items.filter(x => x.orderUrl).length + ')'}
-                    </button>
+                    {(g.method === 'whatsapp' || g.method === 'telegram' || g.method === 'max') && (
+                      <button type="button" className="sk-dd-btn" onClick={() => sendGroup(g)}>
+                        {'Отправить в ' + (g.method === 'whatsapp' ? 'WhatsApp' : g.method === 'telegram' ? 'Telegram' : 'MAX')}
+                      </button>
+                    )}
                   </div>
-                  <div style={{ marginTop: '.5rem', background: '#f6f9ff', border: '1px solid rgba(29,120,252,.1)', borderRadius: 8, padding: '.55rem .65rem', fontSize: '.73rem', color: '#3b4657', whiteSpace: 'pre-line', lineHeight: 1.45 }}>
-                    {g.text}
+                  <div style={{ marginTop: '.5rem', background: '#f6f9ff', border: '1px solid rgba(29,120,252,.1)', borderRadius: 8, padding: '.55rem .65rem', fontSize: '.73rem', color: '#3b4657', lineHeight: 1.5 }}>
+                    <div style={{ fontWeight: 600, marginBottom: '.25rem' }}>Заказ:</div>
+                    {g.items.map((r, ri) => (
+                      <div key={ri} style={{ display: 'flex', alignItems: 'baseline', gap: '.4rem', flexWrap: 'wrap' }}>
+                        <span>{ri + 1}. {r.name} — {r.qty} шт</span>
+                        {r.orderUrl ? (
+                          <a href={(/^https?:\/\//i.test(r.orderUrl) ? r.orderUrl : 'https://' + r.orderUrl)}
+                            target="_blank" rel="noopener noreferrer"
+                            style={{ color: '#1F75FF', textDecoration: 'none', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            открыть ссылку ↗
+                          </a>
+                        ) : null}
+                      </div>
+                    ))}
+                    <div style={{ marginTop: '.3rem', fontWeight: 600 }}>
+                      Итого: {g.items.length} {posWord(g.items.length)}{g.total > 0 ? ', ' + g.total.toLocaleString() + ' ' + cur : ''}
+                    </div>
                   </div>
                 </div>
               ))}
