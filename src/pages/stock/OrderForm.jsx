@@ -344,7 +344,7 @@ export default function OrderForm() {
                     <th style={{ minWidth: 140, textAlign: 'left' }}>Поставщик</th>
                     <th style={{ minWidth: 200, textAlign: 'left' }}>Закупка</th>
                     <th style={{ width: 90, textAlign: 'center' }}>Закупить</th>
-                    <th style={{ width: 92, textAlign: 'right' }}>Последняя</th>
+                    <th style={{ width: 120, textAlign: 'right' }}>Последняя цена</th>
                     <th style={{ width: 100, textAlign: 'center' }}>Цена закупки</th>
                     <th style={{ width: 104, textAlign: 'right' }}>Сумма</th>
                   </tr>
@@ -354,7 +354,7 @@ export default function OrderForm() {
                     const on = !!picked[r.pid];
                     const supNames = Array.from(new Set((r.history || []).map(h => h.supplierName).filter(Boolean)));
                     return (
-                      <tr key={r.pid} style={{ background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
+                      <tr key={r.pid} style={{ background: '#fff' }}>
                         <td style={{ textAlign: 'center' }}>
                           <span className="dd-cb" onClick={() => setPicked(prev => ({ ...prev, [r.pid]: !prev[r.pid] }))}
                             style={{ width: 17, height: 17, border: '1.5px solid ' + (on ? '#1F75FF' : '#c9c9d1'), borderRadius: '50%', background: on ? '#1F75FF' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -443,10 +443,10 @@ export default function OrderForm() {
                     <span style={{ flex: 1, minWidth: 150 }}>
                       <div style={{ fontSize: '.84rem', fontWeight: 700, color: '#222' }}>
                         {g.name}
-                        {g.method === 'whatsapp' ? ' · WhatsApp' : g.method === 'telegram' ? ' · Telegram' : g.method === 'max' ? ' · MAX' : g.method === 'link' ? ' · маркетплейс' : ''}
+                        {g.method === 'whatsapp' ? ' / WhatsApp' : g.method === 'telegram' ? ' / Telegram' : g.method === 'max' ? ' / MAX' : g.method === 'link' ? ' / Маркетплейс' : ''}
                       </div>
                       <div style={{ fontSize: '.7rem', color: 'var(--sk-muted)' }}>
-                        {g.items.length} поз.{g.total > 0 ? ' · ' + g.total.toLocaleString() + ' ' + cur : ''}
+                        {g.items.length} {posWord(g.items.length)}{g.total > 0 ? ' / ' + g.total.toLocaleString() + ' ' + cur : ''}
                       </div>
                     </span>
                     {(g.method === 'whatsapp' || g.method === 'telegram' || g.method === 'max') && (

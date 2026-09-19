@@ -1241,8 +1241,9 @@ input:focus, select:focus, textarea:focus {
   color:var(--sk-muted);padding:9px 10px;white-space:nowrap;
   border-bottom:1px solid rgba(29,120,252,.14);
 }
+.ord-table thead th.bg-white{background:#fff}
 .ord-table tbody td{
-  padding:9px 10px;font-size:.78rem;color:var(--sk-ink);
+  padding:9px 10px;font-size:.78rem;color:var(--sk-ink);background:#fff;
   border-bottom:1px solid rgba(29,120,252,.08);vertical-align:middle;
 }
 .ord-table tbody tr:last-child td{border-bottom:none}
