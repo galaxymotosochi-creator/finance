@@ -1,6 +1,6 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
@@ -77,6 +77,27 @@ export default function Stock() {
   const [productsFromDB, setProductsFromDB] = useState([]);
   const [selectedCats, setSelectedCats] = useState(null);
   const [catOpen, setCatOpen] = useState(false);
+  // Подсказка горизонтального скролла таблицы (как в «Товарах» и «Чеках»)
+  const [tblPos, setTblPos] = useState({ left: false, right: false });
+  const tblElRef = useRef(null);
+  const onTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left: false, right: false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkTbl = () => {
+    const el = tblElRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setTblPos({ left: false, right: false }); return; }
+    setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  useEffect(() => {
+    const t = setTimeout(checkTbl, 150);
+    window.addEventListener('resize', checkTbl);
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+  }, [loading, selectedCats, stStatus, search]);
 
   const load = async () => {
     setLoading(true);
@@ -437,8 +458,11 @@ export default function Stock() {
       )}
 
       {!loading && (
-      <div className="product-table" style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-        <table className="data-table" style={{minWidth:'680px'}}>
+      <div className="sk-tablewrap">
+        <div className="sk-fade sk-fade-l" style={{opacity:tblPos.left?1:0}}></div>
+        <div className="sk-fade sk-fade-r" style={{opacity:tblPos.right?1:0}} data-arrow="top"></div>
+        <div className="sk-card" style={{position:'relative',flex:1,overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={tblElRef} onScroll={onTblScroll}>
+        <table className="sk-table ***" style={{minWidth:'900px'}}>
           <thead id="stockColHeaders">
             <tr>
               <th style={{minWidth:'200px',textAlign:'left'}}>Товар</th>
@@ -524,6 +548,7 @@ export default function Stock() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
       )}
 
