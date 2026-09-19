@@ -61,6 +61,10 @@ export default function Suppliers() {
     const handler = (e) => {
       if (!e.target.closest('.supname-dd-wrap')) setSupNamesOpen(false);
       if (!e.target.closest('.supp-period-wrap')) setSupPeriodOpen(false);
+      // Меню ⋯ — закрываем только при клике ВНЕ кнопки и вне самого меню
+      if (!e.target.closest('.prod-more-wrap') && !e.target.closest('.prod-dropdown')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.cssText = ''; });
+      }
     };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
