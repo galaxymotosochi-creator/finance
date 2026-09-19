@@ -7,6 +7,39 @@ import CenterSpinner from '../../components/CenterSpinner';
 
 // «Формирование поставки» — рабочая страница заказа товаров
 // Собирается из аналитики (что заказать): позиции, поставщик, какая закупка (ссылка/цена), количество
+
+// Выпадающий список 1-в-1 как фильтр «Тип» в «Товарах» (f-menu / f-list / f-item)
+function OrdSelect({ open, onToggle, value, options, onPick, placeholder }) {
+  const current = options.find(o => String(o.v) === String(value));
+  return (
+    <div className="ord-dd" style={{ position: 'relative' }}>
+      <button type="button" className={'f-pill' + (open ? ' on' : '')} style={{ paddingLeft: 0 }}
+        onClick={e => { e.stopPropagation(); onToggle(); }}>
+        <span style={{ maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', verticalAlign: 'bottom' }}>
+          {current ? current.l : (placeholder || 'не выбран')}
+        </span>
+        <span className="car-tri" style={{ fontSize: 15 }}>▾</span>
+      </button>
+      {open && (
+        <div className="f-menu" style={{ left: 0, right: 'auto', maxHeight: 280, overflowY: 'auto' }}>
+          <div className="f-list">
+            {options.map(o => {
+              const checked = String(o.v) === String(value);
+              return (
+                <div key={String(o.v)} onClick={() => onPick(o.v)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem .55rem', borderRadius: '.5rem', cursor: 'pointer', fontSize: '.8rem', color: checked ? '#0d4ea8' : '#5b6472', fontWeight: checked ? 700 : 500, background: checked ? '#E6F0FF' : 'transparent', whiteSpace: 'nowrap' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: checked ? '#1F75FF' : '#dfe6f2', flexShrink: 0 }}></span>
+                  {o.l}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OrderForm() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
@@ -27,8 +60,17 @@ export default function OrderForm() {
   const [pur, setPur] = useState({});
   const [cost, setCost] = useState({});
 
+  const [ddOpen, setDdOpen] = useState(null); // 'sup:<pid>' | 'pur:<pid>' | null
   const [toast, setToast] = useState(null);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.ord-dd')) setDdOpen(null);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -308,32 +350,35 @@ export default function OrderForm() {
                         </td>
                         <td style={{ textAlign: 'left' }}>
                           {supNames.length > 0 ? (
-                            <select value={r.supplierName || ''} className="ord-sel"
-                              onChange={e => {
-                                setSup(prev => ({ ...prev, [r.pid]: e.target.value }));
+                            <OrdSelect
+                              open={ddOpen === 'sup:' + r.pid}
+                              onToggle={() => setDdOpen(prev => prev === 'sup:' + r.pid ? null : 'sup:' + r.pid)}
+                              value={r.supplierName || ''}
+                              placeholder="не выбран"
+                              options={[{ v: '', l: 'не выбран' }].concat(supNames.map(n => ({ v: n, l: n })))}
+                              onPick={v => {
+                                setSup(prev => ({ ...prev, [r.pid]: v }));
                                 setPur(prev => ({ ...prev, [r.pid]: 0 }));
                                 setCost(prev => { const n = { ...prev }; delete n[r.pid]; return n; });
-                              }}>
-                              <option value="">не выбран</option>
-                              {supNames.map(n => <option key={n} value={n}>{n}</option>)}
-                            </select>
+                                setDdOpen(null);
+                              }} />
                           ) : (
                             <span style={{ fontSize: '.72rem', color: '#dc2626', fontWeight: 600 }}>Поставщик не выбран</span>
                           )}
                         </td>
                         <td style={{ textAlign: 'left' }}>
                           {r.supHistory && r.supHistory.length > 0 ? (
-                            <select value={r.purIdx} className="ord-sel"
-                              onChange={e => {
-                                setPur(prev => ({ ...prev, [r.pid]: parseInt(e.target.value) || 0 }));
+                            <OrdSelect
+                              open={ddOpen === 'pur:' + r.pid}
+                              onToggle={() => setDdOpen(prev => prev === 'pur:' + r.pid ? null : 'pur:' + r.pid)}
+                              value={r.purIdx}
+                              placeholder="—"
+                              options={r.supHistory.map((h, ix) => ({ v: ix, l: (h.date || '—') + ' · ' + h.cost.toLocaleString() + ' ' + cur + (h.orderUrl ? ' · ссылка' : '') }))}
+                              onPick={v => {
+                                setPur(prev => ({ ...prev, [r.pid]: parseInt(v) || 0 }));
                                 setCost(prev => { const n = { ...prev }; delete n[r.pid]; return n; });
-                              }}>
-                              {r.supHistory.map((h, ix) => (
-                                <option key={ix} value={ix}>
-                                  {h.date || '—'} · {h.cost.toLocaleString()} {cur}{h.orderUrl ? ' · ссылка' : ''}
-                                </option>
-                              ))}
-                            </select>
+                                setDdOpen(null);
+                              }} />
                           ) : (
                             <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>закупок не было</span>
                           )}
