@@ -997,7 +997,7 @@ export default function Products() {
                   <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0" />
                 </div>
                 {fType !== 'service' && <div className="form-group">
-                  <label>Минимальный остаток</label>
+                  <label>Мин. остаток</label>
                   <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
                 </div>}
               </div>

@@ -195,8 +195,13 @@ export default function OrderForm() {
       const dailySales = sold.qty / (period || 1);
       const daysLeft = dailySales > 0 ? Math.floor(q / dailySales) : (q > 0 ? 999 : 0);
       const costPrice = st.qty > 0 && st.cost > 0 ? Math.round(st.cost / st.qty) : 0;
-      return { ...p, qty: q, dailySales, daysLeft, costPrice };
-    }).filter(r => r.qty === 0 || (r.dailySales > 0 && r.daysLeft <= 7))
+      const minStock = Number(p.min_qty) || 0;
+      // Причина попадания в список — показываем пользователю
+      let why = '';
+      if (q <= minStock) why = 'остаток ≤ мин. ' + minStock;
+      else if (dailySales > 0 && daysLeft <= 7) why = 'хватит на ' + daysLeft + ' дн.';
+      return { ...p, qty: q, dailySales, daysLeft, costPrice, minStock, why };
+    }).filter(r => r.qty <= (r.minStock || 0) || (r.dailySales > 0 && r.daysLeft <= 7))
       .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
   }, [products, stockMap, soldByProduct, period]);
 
