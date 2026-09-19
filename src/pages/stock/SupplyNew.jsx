@@ -391,7 +391,8 @@ export default function SupplyNew() {
                               placeholder="https://ozon.ru/t/..."
                               style={{ flex: 1, maxWidth: 420, padding: '.25rem .45rem', border: '1px solid rgba(29,120,252,.18)', borderRadius: 6, fontSize: '.75rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
                             {it.orderUrl && (
-                              <a href={it.orderUrl} target="_blank" rel="noopener noreferrer" className="car-tri" style={{ textDecoration: 'none', color: '#111' }}>↗</a>
+                              <a href={(/^https?:\/\//i.test(it.orderUrl.trim()) ? it.orderUrl.trim() : 'https://' + it.orderUrl.trim())}
+                                target="_blank" rel="noopener noreferrer" className="car-tri" style={{ textDecoration: 'none', color: '#111' }}>↗</a>
                             )}
                           </div>
                         </td>

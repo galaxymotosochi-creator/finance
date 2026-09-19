@@ -609,7 +609,7 @@ const load = async () => {
                               </div>
                               {it.orderUrl && (
                                 <div style={{marginTop:"2px"}}>
-                                  <a href={it.orderUrl} target="_blank" rel="noopener noreferrer"
+                                  <a href={(/^https?:\/\//i.test(String(it.orderUrl).trim()) ? String(it.orderUrl).trim() : 'https://' + String(it.orderUrl).trim())} target="_blank" rel="noopener noreferrer"
                                     style={{fontSize:".7rem",color:"#222",textDecoration:"none"}}>
                                     Ссылка на товар <span className="car-tri" style={{fontSize:"13px",textDecoration:"none"}}>↗</span>
                                   </a>
