@@ -363,9 +363,8 @@ export default function OrderForm() {
                         </td>
                         <td style={{ textAlign: 'left' }}>
                           <div style={{ fontSize: '.8rem', fontWeight: 600, color: '#222', lineHeight: 1.25 }}>{r.name}</div>
-                          <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>
-                            остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
-                          </div>
+                          <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>Остаток: {r.qty} шт</div>
+                          <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>Обычно продается: {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт / день</div>
                         </td>
                         <td style={{ textAlign: 'left' }}>
                           {supNames.length > 0 ? (
