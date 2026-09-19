@@ -24,6 +24,9 @@ export default function Health() {
   const [orderModal, setOrderModal] = useState(false);
   const [orderPicked, setOrderPicked] = useState({});  // { productId: true }
   const [orderQty, setOrderQty] = useState({});        // { productId: число }
+  const [orderSup, setOrderSup] = useState({});        // { productId: имя поставщика } — у кого заказываем
+  const [orderPur, setOrderPur] = useState({});        // { productId: индекс закупки } — какая ссылка/цена
+  const [orderCost, setOrderCost] = useState({});      // { productId: цена закупки (редактируемая) }
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
 
@@ -126,6 +129,39 @@ export default function Health() {
     return map;
   }, [suppliesCache, writeoffs]);
 
+  // История закупок по каждому товару: [{supplierName, date, cost, orderUrl, method, contact}]
+  // Нужна для выбора: «у кого» и «по какой ссылке/цене» заказывать
+  const purchasesByProduct = useMemo(() => {
+    const map = {};
+    suppliesList.forEach(sp => {
+      const date = sp.date || (sp.created_at || '').slice(0, 10) || '';
+      (sp.items || []).forEach(it => {
+        const pid = it.prodId != null ? String(it.prodId) : null;
+        if (!pid) return;
+        if (!map[pid]) map[pid] = [];
+        map[pid].push({
+          date,
+          supplierName: sp.supplier_name || sp.supplierName || '',
+          supplierId: sp.supplier_id || null,
+          cost: Number(it.cost) || 0,
+          orderUrl: (it.orderUrl || '').trim(),
+          supplyId: sp.id,
+        });
+      });
+    });
+    // Дополняем каналом заказа из справочника поставщиков и сортируем: свежие сверху
+    Object.keys(map).forEach(pid => {
+      map[pid].forEach(rec => {
+        const sup = suppliersList.find(x => (rec.supplierId && String(x.id) === String(rec.supplierId)) || x.name === rec.supplierName);
+        rec.method = sup ? (sup.contact_method || '') : '';
+        rec.contact = sup ? (sup.order_link || '') : '';
+        rec.supplierId = sup ? sup.id : rec.supplierId;
+      });
+      map[pid].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    });
+    return map;
+  }, [suppliesList, suppliersList]);
+
   // Последняя закупка по каждому товару: поставщик, дата, цена, ссылка на товар
   const lastPurchase = useMemo(() => {
     const map = {};
@@ -194,56 +230,78 @@ export default function Health() {
       .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
   }, [rows]);
 
-  // Позиции к заказу с данными последней закупки, каналом и предложенным количеством
+  // Позиции к заказу: история закупок, выбранный поставщик и выбранная закупка (ссылка/цена)
   const orderData = useMemo(() => {
     return orderRows.map(r => {
-      const rec = lastPurchase[String(r.id)] || {};
-      const act = orderAction(r.id);
+      const pid = String(r.id);
+      const hist = purchasesByProduct[pid] || [];
+      // Выбранный поставщик: из состояния, иначе — из последней закупки
+      const chosenSup = orderSup[pid] !== undefined ? orderSup[pid] : (hist[0] ? hist[0].supplierName : '');
+      // Закупки только выбранного поставщика («где брали в прошлый раз»)
+      const supHist = chosenSup ? hist.filter(h => h.supplierName === chosenSup) : [];
+      const purIdx = orderPur[pid] !== undefined ? orderPur[pid] : 0;
+      const pur = supHist[purIdx] || supHist[0] || null;
       const suggest = Math.max(1, Math.ceil((r.dailySales || 0) * 14) - r.qty);
+      const lastCost = pur ? pur.cost : (r.lastCost || 0);
+      const cost = orderCost[pid] !== undefined ? orderCost[pid] : lastCost;
       return {
         ...r,
         suggest,
-        lastCost: r.lastCost || 0,
-        supplierName: r.lastSupplier || rec.supplierName || '',
-        method: rec.method || '',
-        contact: rec.link || '',
-        action: act,
+        history: hist,
+        supHistory: supHist,
+        supplierName: chosenSup,
+        chosenName: chosenSup,
+        purIdx,
+        purchase: pur,
+        lastCost,
+        cost,
+        orderUrl: pur ? pur.orderUrl : '',
+        method: pur ? pur.method : '',
+        contact: pur ? pur.contact : '',
       };
     });
-  }, [orderRows, lastPurchase]);
+  }, [orderRows, purchasesByProduct, orderSup, orderPur, orderCost]);
 
-  // Группировка отмеченных позиций по поставщику — для формирования заказов
+  // Группы отмеченных позиций по ВЫБРАННОМУ поставщику (позиции без поставщика — отдельный список)
   const orderGroups = useMemo(() => {
     const picked = orderData.filter(r => orderPicked[String(r.id)]);
     const byKey = {};
+    const noSupplier = [];
     picked.forEach(r => {
-      const key = r.supplierName || '— без поставщика —';
+      if (!r.supplierName) { noSupplier.push(r); return; }
+      const key = r.supplierName;
       if (!byKey[key]) byKey[key] = { name: key, method: r.method, contact: r.contact, items: [] };
       byKey[key].items.push(r);
       if (!byKey[key].method && r.method) { byKey[key].method = r.method; byKey[key].contact = r.contact; }
     });
-    return Object.values(byKey).map(g => ({
-      ...g,
-      total: g.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.lastCost || 0), 0),
-    }));
+    const groups = Object.values(byKey).map(g => {
+      const total = g.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.cost || 0), 0);
+      const lines = g.items.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`);
+      const text = 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + g.items.length + ' поз.' + (total > 0 ? ', ' + total.toLocaleString() + ' ' + cur : '');
+      return { ...g, total, text };
+    });
+    return { groups, noSupplier };
   }, [orderData, orderPicked, orderQty]);
 
   const orderPickedCount = Object.values(orderPicked).filter(Boolean).length;
-  const orderPickedSum = orderGroups.reduce((s, g) => s + g.total, 0);
+  const orderPickedSum = orderGroups.groups.reduce((s, g) => s + g.total, 0);
 
-  // Открытие модалки: по умолчанию отмечены все, количество — предложенное
+  // Открытие модалки: отмечены все, количество — предложенное, поставщик — из последней закупки
   const openOrderModal = () => {
-    const picked = {}; const qty = {};
-    orderData.forEach(r => { picked[String(r.id)] = true; qty[String(r.id)] = r.suggest; });
-    setOrderPicked(picked); setOrderQty(qty); setOrderModal(true);
+    const picked = {}; const qty = {}; const sup = {}; const pur = {}; const cost = {};
+    orderData.forEach(r => {
+      const pid = String(r.id);
+      picked[pid] = true; qty[pid] = r.suggest;
+      sup[pid] = r.supplierName || '';
+      pur[pid] = 0;
+      cost[pid] = r.cost || 0;
+    });
+    setOrderPicked(picked); setOrderQty(qty); setOrderSup(sup); setOrderPur(pur); setOrderCost(cost);
+    setOrderModal(true);
   };
 
   // Текст заказа для мессенджера
-  const orderText = (group) => {
-    const lines = group.items.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`);
-    const sum = group.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.lastCost || 0), 0);
-    return 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + group.items.length + ' поз., ' + sum.toLocaleString() + ' ' + cur;
-  };
+  const orderText = (group) => group.text;
 
   const sendOrder = (group) => {
     const text = encodeURIComponent(orderText(group));
@@ -559,16 +617,18 @@ export default function Health() {
           <>
             {/* Позиции с галочками — таблица со скроллом (мобильная + планшет) */}
             <div style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, overflow: 'hidden', marginBottom: '.75rem' }}>
-              <div className="ord-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: 380, overflowY: 'auto' }}>
+              <div className="ord-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: 400, overflowY: 'auto' }}>
                 <table className="ord-table">
                   <thead>
                     <tr>
                       <th style={{ width: 34 }}></th>
-                      <th style={{ minWidth: 170, textAlign: 'left' }}>Товар</th>
+                      <th style={{ minWidth: 160, textAlign: 'left' }}>Товар</th>
+                      <th style={{ minWidth: 130, textAlign: 'left' }}>Поставщик</th>
+                      <th style={{ minWidth: 190, textAlign: 'left' }}>Закупка</th>
                       <th style={{ width: 84, textAlign: 'center' }}>Закупить</th>
-                      <th style={{ width: 82, textAlign: 'right' }}>Цена</th>
+                      <th style={{ width: 88, textAlign: 'right' }}>Последняя</th>
+                      <th style={{ width: 96, textAlign: 'center' }}>Цена закупки</th>
                       <th style={{ width: 96, textAlign: 'right' }}>Сумма</th>
-                      <th style={{ width: 104, textAlign: 'center' }}>Заказ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -576,7 +636,8 @@ export default function Health() {
                       const id = String(r.id);
                       const on = !!orderPicked[id];
                       const q = orderQty[id] ?? r.suggest;
-                      const act = r.action;
+                      const cost = orderCost[id] !== undefined ? orderCost[id] : r.lastCost;
+                      const supNames = Array.from(new Set((r.history || []).map(h => h.supplierName).filter(Boolean)));
                       return (
                         <tr key={r.id} style={{ background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
                           <td style={{ textAlign: 'center' }}>
@@ -589,23 +650,64 @@ export default function Health() {
                             <div style={{ fontSize: '.78rem', fontWeight: 600, color: '#222', whiteSpace: 'normal', lineHeight: 1.25 }}>{r.name}</div>
                             <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>
                               остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
-                              {r.lastSupplier ? ' · ' + r.lastSupplier : ''}
                             </div>
+                          </td>
+                          <td style={{ textAlign: 'left' }}>
+                            {supNames.length > 0 ? (
+                              <select value={r.supplierName || ''} className="ord-sel"
+                                onChange={e => {
+                                  setOrderSup(prev => ({ ...prev, [id]: e.target.value }));
+                                  setOrderPur(prev => ({ ...prev, [id]: 0 }));
+                                  setOrderCost(prev => { const n = { ...prev }; delete n[id]; return n; });
+                                }}>
+                                <option value="">не выбран</option>
+                                {supNames.map(n => <option key={n} value={n}>{n}</option>)}
+                              </select>
+                            ) : (
+                              <span style={{ fontSize: '.72rem', color: '#dc2626', fontWeight: 600 }}>Поставщик не выбран</span>
+                            )}
+                          </td>
+                          <td style={{ textAlign: 'left' }}>
+                            {(r.supHistory && r.supHistory.length > 0) ? (
+                              <select value={r.purIdx} className="ord-sel"
+                                onChange={e => {
+                                  const ix = parseInt(e.target.value) || 0;
+                                  setOrderPur(prev => ({ ...prev, [id]: ix }));
+                                  setOrderCost(prev => { const n = { ...prev }; delete n[id]; return n; });
+                                }}>
+                                {r.supHistory.map((h, ix) => (
+                                  <option key={ix} value={ix}>
+                                    {h.date || '—'} · {h.cost.toLocaleString()} {cur}{h.orderUrl ? ' · ссылка' : ''}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>закупок не было</span>
+                            )}
+                            {r.orderUrl && (
+                              <div style={{ marginTop: '2px' }}>
+                                <a href={(/^https?:\/\//i.test(r.orderUrl) ? r.orderUrl : 'https://' + r.orderUrl)} target="_blank" rel="noopener noreferrer"
+                                  style={{ fontSize: '.68rem', color: '#1F75FF', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                                  Открыть ссылку ↗
+                                </a>
+                              </div>
+                            )}
                           </td>
                           <td style={{ textAlign: 'center' }}>
                             <input type="number" min="0" value={q}
-                              onChange={e => setOrderQty(prev => ({ ...prev, [id]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                              onChange={e => setOrderQty(prev => ({ ...prev, [id]: e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value) || 0) }))}
                               style={{ width: 64, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
                           </td>
-                          <td style={{ textAlign: 'right', fontSize: '.75rem', color: '#222', whiteSpace: 'nowrap' }}>{r.lastCost.toLocaleString()} {cur}</td>
-                          <td style={{ textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>{(q * r.lastCost).toLocaleString()} {cur}</td>
+                          <td style={{ textAlign: 'right', fontSize: '.75rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>
+                            {r.lastCost > 0 ? r.lastCost.toLocaleString() + ' ' + cur : '—'}
+                          </td>
                           <td style={{ textAlign: 'center' }}>
-                            {act ? (
-                              <a href={act.url} target="_blank" rel="noopener noreferrer"
-                                style={{ fontSize: '.72rem', fontWeight: 600, color: '#1F75FF', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                                {act.label} <span style={{ fontSize: '11px' }}>↗</span>
-                              </a>
-                            ) : <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>—</span>}
+                            <input type="number" min="0" value={cost}
+                              onChange={e => setOrderCost(prev => ({ ...prev, [id]: e.target.value === '' ? '' : Math.max(0, parseFloat(e.target.value) || 0) }))}
+                              style={{ width: 74, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
+                          </td>
+                          <td style={{ textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
+                            {(((q === '' ? 0 : q) * (cost === '' ? 0 : cost))).toLocaleString()} {cur}
                           </td>
                         </tr>
                       );
@@ -621,26 +723,59 @@ export default function Health() {
               <span style={{ fontSize: '1rem', fontWeight: 800 }}>{orderPickedSum.toLocaleString()} {cur}</span>
             </div>
 
-            {/* Группы по поставщикам — кнопки отправки */}
-            {orderGroups.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                {orderGroups.map((g, gi) => (
-                  <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, padding: '.6rem .75rem', flexWrap: 'wrap' }}>
-                    <span style={{ flex: 1, minWidth: 140 }}>
-                      <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#222' }}>{g.name}</div>
-                      <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)' }}>
-                        {g.items.length} поз. · {g.total.toLocaleString()} {cur}
-                        {g.method === 'link' ? ' · заказ по ссылкам' : g.method === 'whatsapp' ? ' · WhatsApp' : g.method === 'telegram' ? ' · Telegram' : g.method === 'max' ? ' · MAX' : ''}
-                      </div>
-                    </span>
-                    <button type="button" className="sk-dd-btn"
-                      onClick={() => sendOrder(g)}>
-                      {g.method === 'whatsapp' ? 'Отправить в WhatsApp' : g.method === 'telegram' ? 'Отправить в Telegram' : g.method === 'max' ? 'Отправить в MAX' : 'Открыть ссылки'}
-                    </button>
+            {/* Группы по поставщикам — понятные кнопки + видимый текст заказа */}
+            {orderGroups.groups.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
+                {orderGroups.groups.map((g, gi) => (
+                  <div key={gi} style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, padding: '.65rem .8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', flexWrap: 'wrap' }}>
+                      <span style={{ flex: 1, minWidth: 150 }}>
+                        <div style={{ fontSize: '.82rem', fontWeight: 700, color: '#222' }}>
+                          {g.name}
+                          {g.method === 'whatsapp' ? ' · WhatsApp' : g.method === 'telegram' ? ' · Telegram' : g.method === 'max' ? ' · MAX' : g.method === 'link' ? ' · маркетплейс' : ''}
+                        </div>
+                        <div style={{ fontSize: '.7rem', color: 'var(--sk-muted)' }}>
+                          {g.items.length} поз.{g.total > 0 ? ' · ' + g.total.toLocaleString() + ' ' + cur : ''}
+                        </div>
+                      </span>
+                      {(g.method === 'whatsapp' || g.method === 'telegram' || g.method === 'max') ? (
+                        <button type="button" className="sk-dd-btn" onClick={() => sendOrder(g)}>
+                          Отправить в {g.method === 'whatsapp' ? 'WhatsApp' : g.method === 'telegram' ? 'Telegram' : 'MAX'}
+                        </button>
+                      ) : (
+                        <button type="button" className="sk-dd-btn" onClick={() => sendOrder(g)}>
+                          Открыть ссылки ({g.items.filter(x => x.orderUrl).length})
+                        </button>
+                      )}
+                    </div>
+                    {/* Текст заказа — видно, что уйдёт, ДО отправки */}
+                    <div style={{ marginTop: '.5rem', background: '#f6f9ff', border: '1px solid rgba(29,120,252,.1)', borderRadius: 8, padding: '.5rem .6rem', fontSize: '.72rem', color: '#3b4657', whiteSpace: 'pre-line', lineHeight: 1.45 }}>
+                      {g.text}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
+
+            {/* Позиции без поставщика — понятное предупреждение */}
+            {orderGroups.noSupplier.length > 0 && (
+              <div style={{ marginTop: '.6rem', border: '1px solid rgba(220,38,38,.25)', background: '#fff7f7', borderRadius: 12, padding: '.6rem .8rem' }}>
+                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#dc2626' }}>
+                  Поставщик не выбран — {orderGroups.noSupplier.length} поз.
+                </div>
+                <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '2px' }}>
+                  Выберите поставщика в колонке «Поставщик», чтобы отправить заказ
+                </div>
+                <button type="button" className="f-pill" style={{ marginTop: '.45rem' }}
+                  onClick={() => {
+                    const text = 'Заказ:\n' + orderGroups.noSupplier.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`).join('\n');
+                    navigator.clipboard.writeText(text);
+                  }}>
+                  Скопировать список
+                </button>
+              </div>
+            )}
+
           </>
         )}
       </Modal>
