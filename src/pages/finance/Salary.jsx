@@ -1139,7 +1139,7 @@ export default function Salary() {
                     <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                     <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
                     <input type="number" value={salarySplitAmounts[a.id]||''} onChange={e=>{var v=parseFloat(e.target.value)||0;setSalarySplitAmounts(prev=>({...prev,[a.id]:v}))}}
-                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)'}} />
+                      style={{width:'100px',padding:'.35rem .5rem',fontSize:'.78rem',border:'none',borderRadius:'8px',outline:'none',textAlign:'right',fontFamily:'var(--font)',background:'#f1f3f5'}} />
                   </div>
                   );
                 })}
