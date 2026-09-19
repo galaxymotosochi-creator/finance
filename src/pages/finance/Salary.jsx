@@ -1102,7 +1102,7 @@ export default function Salary() {
       </Modal>
 
       {/* МОДАЛКА ВЫБОРА СЧЕТА */}
-      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}} title="Выплата зарплаты" subtitle="Выберите счет для выплаты" width="medium">
+      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}} title="Выплата зарплаты" subtitle={(()=>{const ps=list.find(x=>String(x.id)===String(pendingPayId));return 'Сумма выплаты: ' + (ps ? Number(ps.amount||0).toLocaleString() + ' ' + cur : '0 ' + cur);})()} width="medium">
         {(()=>{
         const accsList = accs.filter(a => a.type !== 'credit');
         const ps = list.find(x => String(x.id) === String(pendingPayId));
@@ -1114,7 +1114,7 @@ export default function Salary() {
                   const sel = String(a.id) === String(payAcctId);
                   return (
                   <div key={a.id} onClick={()=>setPayAcctId(a.id)}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#fff9db':'#fff',border:'1.5px solid '+(sel?'#ffdd2d':'rgba(0,0,0,.26)')}}>
+                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'.6rem',background:sel?'#E6F0FF':'#fff',border:'1.5px solid '+(sel?'#1F75FF':'rgba(0,0,0,.26)')}}>
                     <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
                     <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                     <span style={{fontSize:'.875rem',fontWeight:700,color:'#111',whiteSpace:'nowrap'}}>{Math.round(getAccountBalance(a)).toLocaleString()} {cur}</span>
@@ -1134,16 +1134,11 @@ export default function Salary() {
                 )}
               </div>
               <div className="modal-actions">
+                <button type="button" className="btn btn-outline" onClick={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}}>Отмена</button>
                 {salarySplitMode ? (
-                  <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                    style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#000'}}
-                    onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>Подтвердить разделение</button>
+                  <button type="button" className="btn btn-dark" onClick={()=>confirmPay(null, salarySplitAmounts)}>Подтвердить разделение</button>
                 ) : (
-                  <button onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}
-                    style={{display:'block',margin:'0 auto',padding:'12px 34px',border:'none',borderRadius:'10px',background:'#111',color:'#fff',fontFamily:'inherit',fontSize:'14px',fontWeight:700,cursor:'pointer',boxShadow:'0 2px 8px rgba(0,0,0,.15)',transition:'all .12s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background='#000'}}
-                    onMouseLeave={e=>{e.currentTarget.style.background='#111'}}>Выплатить {payTotal ? payTotal.toLocaleString() + ' ' + cur : ''}</button>
+                  <button type="button" className="btn btn-dark" onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}>Выплатить{payTotal ? ' ' + payTotal.toLocaleString() + ' ' + cur : ''}</button>
                 )}
               </div>
         </>
