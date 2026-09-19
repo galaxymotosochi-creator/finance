@@ -503,7 +503,7 @@ const load = async () => {
         <table className="sk-table sup-table">
           <thead id="supplyColHeaders">
             <tr>
-              <th style={{width:'34px',textAlign:'left',paddingRight:0,whiteSpace:'nowrap'}}>№</th>
+              <th style={{width:'28px',textAlign:'left',paddingRight:0,whiteSpace:'nowrap'}}>№</th>
               <th style={{textAlign:'left'}}>Дата</th>
               <th style={{textAlign:'left'}}>Поставщик</th>
               <th style={{textAlign:'left'}}>Товары</th>
