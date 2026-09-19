@@ -327,10 +327,12 @@ export default function Health() {
                   <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '6px' }}>
                     За {period} дней продано {r.soldQty} шт / Выручка {r.revenue.toLocaleString()} {cur}
                   </div>
-                  <button type="button" className="sk-dd-btn" style={{ marginTop: '10px', width: '100%' }}
-                    onClick={() => navigateTo('/stock/supply/new')}>
-                    {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
-                  </button>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                    <button type="button" className="sk-dd-btn" style={{ width: 'auto' }}
+                      onClick={() => navigateTo('/stock/supply/new')}>
+                      {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
+                    </button>
+                  </div>
                 </div>
               );
             })}
