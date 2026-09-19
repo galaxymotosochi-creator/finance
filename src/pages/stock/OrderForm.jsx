@@ -27,7 +27,8 @@ function OrdSelect({ open, onToggle, value, options, onPick, placeholder }) {
               const checked = String(o.v) === String(value);
               return (
                 <div key={String(o.v)} onClick={() => onPick(o.v)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem .55rem', borderRadius: '.5rem', cursor: 'pointer', fontSize: '.8rem', color: checked ? '#0d4ea8' : '#5b6472', fontWeight: checked ? 700 : 500, background: checked ? '#E6F0FF' : 'transparent', whiteSpace: 'nowrap' }}>
+                  className={'f-item' + (checked ? ' sel' : '')}
+                  style={{ whiteSpace: 'nowrap' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: checked ? '#1F75FF' : '#dfe6f2', flexShrink: 0 }}></span>
                   {o.l}
                 </div>
