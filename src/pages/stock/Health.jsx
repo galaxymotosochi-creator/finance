@@ -15,6 +15,7 @@ export default function Health() {
   const [period, setPeriod] = useState(30);
   const [topSort, setTopSort] = useState('qty'); // qty | revenue | profit
   const [showDead, setShowDead] = useState(false);
+  const [showOrder, setShowOrder] = useState(false);
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
 
@@ -293,39 +294,53 @@ export default function Health() {
       )}
 
       {/* Блок 2 — Что заказать */}
-      <div style={{ fontSize: '.92rem', fontWeight: 800, color: 'var(--sk-ink)', margin: '1.1rem 0 .5rem' }}>
-        Что заказать <span style={{ fontSize: '.78rem', fontWeight: 500, color: 'var(--sk-muted)' }}>— заканчивается при текущих продажах</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '1.1rem 0 .5rem', flexWrap: 'wrap', gap: '.5rem' }}>
+        <div style={{ fontSize: '.92rem', fontWeight: 800, color: 'var(--sk-ink)' }}>
+          Что заказать <span style={{ fontSize: '.78rem', fontWeight: 500, color: 'var(--sk-muted)' }}>— заканчивается при текущих продажах</span>
+        </div>
+        {orderRows.length > 6 && (
+          <button type="button" className={'f-pill' + (showOrder ? ' on' : '')} onClick={() => setShowOrder(!showOrder)}>
+            {showOrder ? 'Скрыть список' : 'Показать список'} <span className="car-tri" style={{ display: 'inline-block', transform: showOrder ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▾</span>
+          </button>
+        )}
       </div>
       {orderRows.length === 0 ? (
         <div className="sk-card"><div className="sk-empty">Все товары обеспечены — заказывать нечего</div></div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
-          {orderRows.map(r => {
-            const pct = r.qty === 0 ? 0 : Math.min(100, Math.round(((r.daysLeft === 999 ? 90 : r.daysLeft) / 90) * 100));
-            const need = Math.max(1, Math.ceil(r.dailySales * 14) - r.qty);
-            return (
-              <div key={r.id} className="sk-tile" style={{ padding: '14px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem' }}>
-                  <div style={{ fontSize: '.82rem', fontWeight: 700, color: 'var(--sk-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
-                  <span className="f-pill on" style={{ fontSize: '.62rem', padding: '2px 8px', cursor: 'default' }}>{r.qty === 0 ? 'Закончился' : '≤ ' + r.daysLeft + ' дн'}</span>
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+            {(showOrder ? orderRows : orderRows.slice(0, 6)).map(r => {
+              const pct = r.qty === 0 ? 0 : Math.min(100, Math.round(((r.daysLeft === 999 ? 90 : r.daysLeft) / 90) * 100));
+              const need = Math.max(1, Math.ceil(r.dailySales * 14) - r.qty);
+              return (
+                <div key={r.id} className="sk-tile" style={{ padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem' }}>
+                    <div style={{ fontSize: '.82rem', fontWeight: 700, color: 'var(--sk-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
+                    <span className="f-pill on" style={{ fontSize: '.62rem', padding: '2px 8px', cursor: 'default' }}>{r.qty === 0 ? 'Закончился' : '≤ ' + r.daysLeft + ' дн'}</span>
+                  </div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', margin: '6px 0' }}>
+                    Осталось {r.qty} шт / Продается в день {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт
+                  </div>
+                  <div style={{ background: '#eef4ff', borderRadius: '6px', height: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: pct + '%', height: '100%', background: pct <= 15 ? '#dc2626' : '#1F75FF', borderRadius: '6px', transition: 'width .3s ease' }}></div>
+                  </div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '6px' }}>
+                    За {period} дней продано {r.soldQty} шт / Выручка {r.revenue.toLocaleString()} {cur}
+                  </div>
+                  <button type="button" className="sk-dd-btn" style={{ marginTop: '10px', width: '100%' }}
+                    onClick={() => navigateTo('/stock/supply/new')}>
+                    {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
+                  </button>
                 </div>
-                <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', margin: '6px 0' }}>
-                  Осталось {r.qty} шт / Продается в день {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт
-                </div>
-                <div style={{ background: '#eef4ff', borderRadius: '6px', height: '6px', overflow: 'hidden' }}>
-                  <div style={{ width: pct + '%', height: '100%', background: pct <= 15 ? '#dc2626' : '#1F75FF', borderRadius: '6px', transition: 'width .3s ease' }}></div>
-                </div>
-                <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '6px' }}>
-                  За {period} дней продано {r.soldQty} шт / Выручка {r.revenue.toLocaleString()} {cur}
-                </div>
-                <button type="button" className="sk-dd-btn" style={{ marginTop: '10px', width: '100%' }}
-                  onClick={() => navigateTo('/stock/supply/new')}>
-                  {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+          {!showOrder && orderRows.length > 6 && (
+            <div style={{ fontSize: '.74rem', color: 'var(--sk-muted)', marginTop: '.5rem', textAlign: 'center' }}>
+              Показаны первые 6 из {orderRows.length} — раскройте список, чтобы увидеть все
+            </div>
+          )}
+        </>
       )}
 
       {/* Блок 3 — Замороженные деньги */}
