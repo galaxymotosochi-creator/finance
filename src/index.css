@@ -1247,3 +1247,10 @@ input:focus, select:focus, textarea:focus {
 }
 .ord-table tbody tr:last-child td{border-bottom:none}
 @keyframes cartripulse{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(3px);opacity:1}}
+
+/* Выпадающие списки в таблице «Формирование поставки» */
+.ord-sel{
+  max-width:100%;padding:.28rem .4rem;border:1px solid rgba(29,120,252,.2);border-radius:6px;
+  font-size:.74rem;font-family:inherit;color:var(--sk-ink);background:#fff;outline:none;cursor:pointer;
+}
+.ord-sel:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.1)}

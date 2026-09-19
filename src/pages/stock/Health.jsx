@@ -4,7 +4,6 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
-import Modal from '../../components/Modal';
 
 export default function Health() {
   const cur = getCurrencySymbol();
@@ -20,13 +19,6 @@ export default function Health() {
   const [topSort, setTopSort] = useState('qty'); // qty | revenue | profit
   const [showDead, setShowDead] = useState(false);
   const [showOrder, setShowOrder] = useState(false);
-  // Модалка «Заказ»: выбранные позиции и количество к закупке
-  const [orderModal, setOrderModal] = useState(false);
-  const [orderPicked, setOrderPicked] = useState({});  // { productId: true }
-  const [orderQty, setOrderQty] = useState({});        // { productId: число }
-  const [orderSup, setOrderSup] = useState({});        // { productId: имя поставщика } — у кого заказываем
-  const [orderPur, setOrderPur] = useState({});        // { productId: индекс закупки } — какая ссылка/цена
-  const [orderCost, setOrderCost] = useState({});      // { productId: цена закупки (редактируемая) }
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
 
@@ -230,89 +222,6 @@ export default function Health() {
       .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0));
   }, [rows]);
 
-  // Позиции к заказу: история закупок, выбранный поставщик и выбранная закупка (ссылка/цена)
-  const orderData = useMemo(() => {
-    return orderRows.map(r => {
-      const pid = String(r.id);
-      const hist = purchasesByProduct[pid] || [];
-      // Выбранный поставщик: из состояния, иначе — из последней закупки
-      const chosenSup = orderSup[pid] !== undefined ? orderSup[pid] : (hist[0] ? hist[0].supplierName : '');
-      // Закупки только выбранного поставщика («где брали в прошлый раз»)
-      const supHist = chosenSup ? hist.filter(h => h.supplierName === chosenSup) : [];
-      const purIdx = orderPur[pid] !== undefined ? orderPur[pid] : 0;
-      const pur = supHist[purIdx] || supHist[0] || null;
-      const suggest = Math.max(1, Math.ceil((r.dailySales || 0) * 14) - r.qty);
-      const lastCost = pur ? pur.cost : (r.lastCost || 0);
-      const cost = orderCost[pid] !== undefined ? orderCost[pid] : lastCost;
-      return {
-        ...r,
-        suggest,
-        history: hist,
-        supHistory: supHist,
-        supplierName: chosenSup,
-        chosenName: chosenSup,
-        purIdx,
-        purchase: pur,
-        lastCost,
-        cost,
-        orderUrl: pur ? pur.orderUrl : '',
-        method: pur ? pur.method : '',
-        contact: pur ? pur.contact : '',
-      };
-    });
-  }, [orderRows, purchasesByProduct, orderSup, orderPur, orderCost]);
-
-  // Группы отмеченных позиций по ВЫБРАННОМУ поставщику (позиции без поставщика — отдельный список)
-  const orderGroups = useMemo(() => {
-    const picked = orderData.filter(r => orderPicked[String(r.id)]);
-    const byKey = {};
-    const noSupplier = [];
-    picked.forEach(r => {
-      if (!r.supplierName) { noSupplier.push(r); return; }
-      const key = r.supplierName;
-      if (!byKey[key]) byKey[key] = { name: key, method: r.method, contact: r.contact, items: [] };
-      byKey[key].items.push(r);
-      if (!byKey[key].method && r.method) { byKey[key].method = r.method; byKey[key].contact = r.contact; }
-    });
-    const groups = Object.values(byKey).map(g => {
-      const total = g.items.reduce((s, r) => s + (orderQty[String(r.id)] ?? r.suggest) * (r.cost || 0), 0);
-      const lines = g.items.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`);
-      const text = 'Заказ:\n' + lines.join('\n') + '\nИтого: ' + g.items.length + ' поз.' + (total > 0 ? ', ' + total.toLocaleString() + ' ' + cur : '');
-      return { ...g, total, text };
-    });
-    return { groups, noSupplier };
-  }, [orderData, orderPicked, orderQty]);
-
-  const orderPickedCount = Object.values(orderPicked).filter(Boolean).length;
-  const orderPickedSum = orderGroups.groups.reduce((s, g) => s + g.total, 0);
-
-  // Открытие модалки: отмечены все, количество — предложенное, поставщик — из последней закупки
-  const openOrderModal = () => {
-    const picked = {}; const qty = {}; const sup = {}; const pur = {}; const cost = {};
-    orderData.forEach(r => {
-      const pid = String(r.id);
-      picked[pid] = true; qty[pid] = r.suggest;
-      sup[pid] = r.supplierName || '';
-      pur[pid] = 0;
-      cost[pid] = r.cost || 0;
-    });
-    setOrderPicked(picked); setOrderQty(qty); setOrderSup(sup); setOrderPur(pur); setOrderCost(cost);
-    setOrderModal(true);
-  };
-
-  // Текст заказа для мессенджера
-  const orderText = (group) => group.text;
-
-  const sendOrder = (group) => {
-    const text = encodeURIComponent(orderText(group));
-    const raw = (group.contact || '').trim();
-    if (group.method === 'whatsapp' && raw) return window.open('https://wa.me/' + raw.replace(/[^0-9]/g, '') + '?text=' + text, '_blank');
-    if (group.method === 'telegram' && raw) return window.open('https://t.me/' + raw.replace(/^@/, '') + '?text=' + text, '_blank');
-    if (group.method === 'max' && raw) return window.open(raw, '_blank');
-    // Ссылки на товары — открываем каждую
-    group.items.forEach(r => { if (r.action && r.action.url) window.open(r.action.url, '_blank'); });
-  };
-
   // Плитки-итоги
   const tiles = useMemo(() => {
     const soldItems = rows.filter(r => r.soldQty > 0);
@@ -477,7 +386,7 @@ export default function Health() {
             </button>
           )}
           {orderRows.length > 0 && (
-            <button type="button" className="sk-dd-btn" onClick={openOrderModal}>Сформировать заказ</button>
+            <button type="button" className="sk-dd-btn" onClick={() => navigateTo('/stock/order')}>Сформировать заказ</button>
           )}
         </div>
       </div>
@@ -520,7 +429,7 @@ export default function Health() {
                   )}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
                     <button type="button" className="sk-dd-btn" style={{ width: 'auto' }}
-                      onClick={openOrderModal}>
+                      onClick={() => navigateTo('/stock/order')}>
                       {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
                     </button>
                   </div>
@@ -598,187 +507,6 @@ export default function Health() {
         )}
       </div>
 
-      {/* Модалка «Заказ»: галочки, количество, последняя цена закупки, отправка поставщикам */}
-      <Modal open={orderModal} onClose={() => setOrderModal(false)} title="Заказ товаров"
-        subtitle={orderPickedCount > 0 ? `Отмечено ${orderPickedCount} поз. · ${orderPickedSum.toLocaleString()} ${cur}` : 'Отметьте товары, которые нужно заказать'}
-        width="large"
-        actions={<>
-          <button type="button" className="btn btn-outline" onClick={() => setOrderModal(false)}>Закрыть</button>
-          <button type="button" className="btn btn-outline" onClick={() => {
-            const all = orderPickedCount === orderData.length;
-            const picked = {}; 
-            orderData.forEach(r => { picked[String(r.id)] = !all; });
-            setOrderPicked(picked);
-          }}>{orderPickedCount === orderData.length ? 'Снять все' : 'Выбрать все'}</button>
-        </>}>
-        {orderData.length === 0 ? (
-          <div className="sk-empty">Нет позиций к заказу</div>
-        ) : (
-          <>
-            {/* Позиции с галочками — таблица со скроллом (мобильная + планшет) */}
-            <div style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, overflow: 'hidden', marginBottom: '.75rem' }}>
-              <div className="ord-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: 400, overflowY: 'auto' }}>
-                <table className="ord-table">
-                  <thead>
-                    <tr>
-                      <th style={{ width: 34 }}></th>
-                      <th style={{ minWidth: 160, textAlign: 'left' }}>Товар</th>
-                      <th style={{ minWidth: 130, textAlign: 'left' }}>Поставщик</th>
-                      <th style={{ minWidth: 190, textAlign: 'left' }}>Закупка</th>
-                      <th style={{ width: 84, textAlign: 'center' }}>Закупить</th>
-                      <th style={{ width: 88, textAlign: 'right' }}>Последняя</th>
-                      <th style={{ width: 96, textAlign: 'center' }}>Цена закупки</th>
-                      <th style={{ width: 96, textAlign: 'right' }}>Сумма</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orderData.map(r => {
-                      const id = String(r.id);
-                      const on = !!orderPicked[id];
-                      const q = orderQty[id] ?? r.suggest;
-                      const cost = orderCost[id] !== undefined ? orderCost[id] : r.lastCost;
-                      const supNames = Array.from(new Set((r.history || []).map(h => h.supplierName).filter(Boolean)));
-                      return (
-                        <tr key={r.id} style={{ background: on ? 'rgba(29,120,252,.03)' : '#fff' }}>
-                          <td style={{ textAlign: 'center' }}>
-                            <span className="dd-cb" onClick={() => setOrderPicked(prev => ({ ...prev, [id]: !prev[id] }))}
-                              style={{ width: 17, height: 17, border: '1.5px solid ' + (on ? '#1F75FF' : '#c9c9d1'), borderRadius: '50%', background: on ? '#1F75FF' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                              {on && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                            </span>
-                          </td>
-                          <td style={{ textAlign: 'left' }}>
-                            <div style={{ fontSize: '.78rem', fontWeight: 600, color: '#222', whiteSpace: 'normal', lineHeight: 1.25 }}>{r.name}</div>
-                            <div style={{ fontSize: '.68rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>
-                              остаток {r.qty} шт · {r.dailySales >= 1 ? Math.round(r.dailySales) : r.dailySales.toFixed(2)} шт/день
-                            </div>
-                          </td>
-                          <td style={{ textAlign: 'left' }}>
-                            {supNames.length > 0 ? (
-                              <select value={r.supplierName || ''} className="ord-sel"
-                                onChange={e => {
-                                  setOrderSup(prev => ({ ...prev, [id]: e.target.value }));
-                                  setOrderPur(prev => ({ ...prev, [id]: 0 }));
-                                  setOrderCost(prev => { const n = { ...prev }; delete n[id]; return n; });
-                                }}>
-                                <option value="">не выбран</option>
-                                {supNames.map(n => <option key={n} value={n}>{n}</option>)}
-                              </select>
-                            ) : (
-                              <span style={{ fontSize: '.72rem', color: '#dc2626', fontWeight: 600 }}>Поставщик не выбран</span>
-                            )}
-                          </td>
-                          <td style={{ textAlign: 'left' }}>
-                            {(r.supHistory && r.supHistory.length > 0) ? (
-                              <select value={r.purIdx} className="ord-sel"
-                                onChange={e => {
-                                  const ix = parseInt(e.target.value) || 0;
-                                  setOrderPur(prev => ({ ...prev, [id]: ix }));
-                                  setOrderCost(prev => { const n = { ...prev }; delete n[id]; return n; });
-                                }}>
-                                {r.supHistory.map((h, ix) => (
-                                  <option key={ix} value={ix}>
-                                    {h.date || '—'} · {h.cost.toLocaleString()} {cur}{h.orderUrl ? ' · ссылка' : ''}
-                                  </option>
-                                ))}
-                              </select>
-                            ) : (
-                              <span style={{ fontSize: '.72rem', color: 'var(--sk-muted)' }}>закупок не было</span>
-                            )}
-                            {r.orderUrl && (
-                              <div style={{ marginTop: '2px' }}>
-                                <a href={(/^https?:\/\//i.test(r.orderUrl) ? r.orderUrl : 'https://' + r.orderUrl)} target="_blank" rel="noopener noreferrer"
-                                  style={{ fontSize: '.68rem', color: '#1F75FF', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                                  Открыть ссылку ↗
-                                </a>
-                              </div>
-                            )}
-                          </td>
-                          <td style={{ textAlign: 'center' }}>
-                            <input type="number" min="0" value={q}
-                              onChange={e => setOrderQty(prev => ({ ...prev, [id]: e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value) || 0) }))}
-                              style={{ width: 64, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
-                          </td>
-                          <td style={{ textAlign: 'right', fontSize: '.75rem', color: 'var(--sk-muted)', whiteSpace: 'nowrap' }}>
-                            {r.lastCost > 0 ? r.lastCost.toLocaleString() + ' ' + cur : '—'}
-                          </td>
-                          <td style={{ textAlign: 'center' }}>
-                            <input type="number" min="0" value={cost}
-                              onChange={e => setOrderCost(prev => ({ ...prev, [id]: e.target.value === '' ? '' : Math.max(0, parseFloat(e.target.value) || 0) }))}
-                              style={{ width: 74, padding: '.2rem .3rem', border: '1px solid rgba(29,120,252,.2)', borderRadius: 6, fontSize: '.75rem', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }} />
-                          </td>
-                          <td style={{ textAlign: 'right', fontSize: '.78rem', fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
-                            {(((q === '' ? 0 : q) * (cost === '' ? 0 : cost))).toLocaleString()} {cur}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Итого */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '.5rem .75rem', background: 'linear-gradient(135deg,#4a92ff 0%,#1d78fc 45%,#0d4ea8 100%)', borderRadius: 12, color: '#fff', marginBottom: '.75rem' }}>
-              <span style={{ fontSize: '.8rem', fontWeight: 600 }}>Отмечено: {orderPickedCount} поз.</span>
-              <span style={{ fontSize: '1rem', fontWeight: 800 }}>{orderPickedSum.toLocaleString()} {cur}</span>
-            </div>
-
-            {/* Группы по поставщикам — понятные кнопки + видимый текст заказа */}
-            {orderGroups.groups.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-                {orderGroups.groups.map((g, gi) => (
-                  <div key={gi} style={{ border: '1px solid rgba(29,120,252,.14)', borderRadius: 12, padding: '.65rem .8rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', flexWrap: 'wrap' }}>
-                      <span style={{ flex: 1, minWidth: 150 }}>
-                        <div style={{ fontSize: '.82rem', fontWeight: 700, color: '#222' }}>
-                          {g.name}
-                          {g.method === 'whatsapp' ? ' · WhatsApp' : g.method === 'telegram' ? ' · Telegram' : g.method === 'max' ? ' · MAX' : g.method === 'link' ? ' · маркетплейс' : ''}
-                        </div>
-                        <div style={{ fontSize: '.7rem', color: 'var(--sk-muted)' }}>
-                          {g.items.length} поз.{g.total > 0 ? ' · ' + g.total.toLocaleString() + ' ' + cur : ''}
-                        </div>
-                      </span>
-                      {(g.method === 'whatsapp' || g.method === 'telegram' || g.method === 'max') ? (
-                        <button type="button" className="sk-dd-btn" onClick={() => sendOrder(g)}>
-                          Отправить в {g.method === 'whatsapp' ? 'WhatsApp' : g.method === 'telegram' ? 'Telegram' : 'MAX'}
-                        </button>
-                      ) : (
-                        <button type="button" className="sk-dd-btn" onClick={() => sendOrder(g)}>
-                          Открыть ссылки ({g.items.filter(x => x.orderUrl).length})
-                        </button>
-                      )}
-                    </div>
-                    {/* Текст заказа — видно, что уйдёт, ДО отправки */}
-                    <div style={{ marginTop: '.5rem', background: '#f6f9ff', border: '1px solid rgba(29,120,252,.1)', borderRadius: 8, padding: '.5rem .6rem', fontSize: '.72rem', color: '#3b4657', whiteSpace: 'pre-line', lineHeight: 1.45 }}>
-                      {g.text}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Позиции без поставщика — понятное предупреждение */}
-            {orderGroups.noSupplier.length > 0 && (
-              <div style={{ marginTop: '.6rem', border: '1px solid rgba(220,38,38,.25)', background: '#fff7f7', borderRadius: 12, padding: '.6rem .8rem' }}>
-                <div style={{ fontSize: '.8rem', fontWeight: 700, color: '#dc2626' }}>
-                  Поставщик не выбран — {orderGroups.noSupplier.length} поз.
-                </div>
-                <div style={{ fontSize: '.72rem', color: 'var(--sk-muted)', marginTop: '2px' }}>
-                  Выберите поставщика в колонке «Поставщик», чтобы отправить заказ
-                </div>
-                <button type="button" className="f-pill" style={{ marginTop: '.45rem' }}
-                  onClick={() => {
-                    const text = 'Заказ:\n' + orderGroups.noSupplier.map((r, i) => `${i + 1}. ${r.name} — ${orderQty[String(r.id)] ?? r.suggest} шт`).join('\n');
-                    navigator.clipboard.writeText(text);
-                  }}>
-                  Скопировать список
-                </button>
-              </div>
-            )}
-
-          </>
-        )}
-      </Modal>
     </>
   );
 }

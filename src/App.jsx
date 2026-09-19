@@ -35,6 +35,7 @@ const Suppliers = lazy(() => import('./pages/stock/Suppliers'));
 const Writeoffs = lazy(() => import('./pages/stock/Writeoffs'));
 const Inventory = lazy(() => import('./pages/stock/Inventory'));
 const Health = lazy(() => import('./pages/stock/Health'));
+const OrderForm = lazy(() => import('./pages/stock/OrderForm'));
 const Subscription = lazy(() => import('./pages/Subscription'));
 const AiAssistant = lazy(() => import('./pages/AiAssistant'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
@@ -102,6 +103,7 @@ function AppRoutes() {
       <Route path="/stock/writeoffs" element={<ProtectedRoute><AppLayout><Writeoffs /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/inventory" element={<ProtectedRoute><AppLayout><Inventory /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/health" element={<ProtectedRoute><AppLayout><Health /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/order" element={<ProtectedRoute><AppLayout><OrderForm /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/turnover" element={<ProtectedRoute><AppLayout><Health /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
       <Route path="/clients" element={<ProtectedRoute><AppLayout><Clients /></AppLayout></ProtectedRoute>} />
