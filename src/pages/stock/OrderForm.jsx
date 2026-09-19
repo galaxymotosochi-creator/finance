@@ -92,11 +92,12 @@ export default function OrderForm() {
         setSuppliersList(supListRes.data || []);
 
         // Остатки: приход − списание
+        // ВАЖНО: ключ всегда String(prodId) — иначе число/строка не совпадут с p.id и остатки «потеряются»
         const map = {};
         (supRes.data || []).forEach(sp => {
           (sp.items || []).forEach(it => {
-            const pid = it.prodId;
-            if (pid == null) return;
+            const pid = it.prodId != null ? String(it.prodId) : null;
+            if (!pid) return;
             if (!map[pid]) map[pid] = { qty: 0, cost: 0 };
             const q = Number(it.qty) || 0;
             map[pid].qty += q;
@@ -105,8 +106,9 @@ export default function OrderForm() {
         });
         (woRes.data || []).forEach(w => {
           (w.items || []).forEach(it => {
-            const pid = it.prodId;
-            if (pid == null || !map[pid]) return;
+            const pid = it.prodId != null ? String(it.prodId) : null;
+            if (!pid) return;
+            if (!map[pid]) map[pid] = { qty: 0, cost: 0 };
             const q = Number(it.qty) || 0;
             const prevQty = map[pid].qty || 0;
             const avg = prevQty > 0 ? map[pid].cost / prevQty : 0;
@@ -187,7 +189,7 @@ export default function OrderForm() {
   // Позиции «что заказать»: заканчивается или уже нет
   const orderRows = useMemo(() => {
     return products.map(p => {
-      const st = stockMap[p.id] || { qty: 0, cost: 0 };
+      const st = stockMap[String(p.id)] || { qty: 0, cost: 0 };
       const q = Math.max(0, st.qty);
       const sold = soldByProduct[String(p.id)] || { qty: 0 };
       const dailySales = sold.qty / (period || 1);
