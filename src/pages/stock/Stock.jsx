@@ -103,7 +103,7 @@ export default function Stock() {
     setLoading(true);
     try {
       const [supRes, prodRes, initRes, woRes] = await Promise.all([
-        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('supplies').select('items,status').eq('user_id', user.id),
         supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('initial_stocks').select('*').eq('user_id', user.id).single(),
         supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id)
@@ -111,7 +111,9 @@ export default function Stock() {
       if (supRes.error) throw supRes.error;
       const items = supRes.data || [];
       const supplies = [];
-      items.forEach(sp => { (sp.items||[]).forEach(it => { supplies.push(it); }); });
+      // «Заказано» (ordered) — товара ещё нет физически, на склад НЕ ставим
+      items.filter(sp => (sp.status || 'received') !== 'ordered')
+        .forEach(sp => { (sp.items||[]).forEach(it => { supplies.push(it); }); });
       setSuppliesCache(supplies);
       const initial = initRes.data || getInitialStock();
       if (!initRes.data && initial && initial.done) {

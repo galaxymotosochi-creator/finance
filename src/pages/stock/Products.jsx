@@ -68,11 +68,11 @@ const getCostMap = () => {
 };
 const refreshCostMap = async (userId) => {
   const [suppliesRes, initialRes] = await Promise.all([
-    supabase.from('supplies').select('items').eq('user_id', userId),
+    supabase.from('supplies').select('items,status').eq('user_id', userId),
     supabase.from('initial_stocks').select('*').eq('user_id', userId).maybeSingle(),
   ]);
   const map = {};
-  (suppliesRes.data || []).forEach(sp => { (sp.items||[]).forEach(it => {
+  (suppliesRes.data || []).filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => { (sp.items||[]).forEach(it => {
     if (!it || !it.prodId) return;
     if (!map[it.prodId]) map[it.prodId] = { qty:0, cost:0 };
     map[it.prodId].qty += it.qty || 0;

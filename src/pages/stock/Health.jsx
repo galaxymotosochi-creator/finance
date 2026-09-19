@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import { fmtDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 
 export default function Health() {
@@ -125,8 +126,10 @@ export default function Health() {
   // Нужна для выбора: «у кого» и «по какой ссылке/цене» заказывать
   const purchasesByProduct = useMemo(() => {
     const map = {};
-    suppliesList.forEach(sp => {
-      const date = sp.date || (sp.created_at || '').slice(0, 10) || '';
+    suppliesList.filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => {
+      const raw = sp.date || sp.created_at || '';
+      const sortDate = String(raw).slice(0, 10);
+      const date = fmtDate(raw);
       (sp.items || []).forEach(it => {
         const pid = it.prodId != null ? String(it.prodId) : null;
         if (!pid) return;
@@ -149,7 +152,7 @@ export default function Health() {
         rec.contact = sup ? (sup.order_link || '') : '';
         rec.supplierId = sup ? sup.id : rec.supplierId;
       });
-      map[pid].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      map[pid].sort((a, b) => (b.sortDate || '').localeCompare(a.sortDate || ''));
     });
     return map;
   }, [suppliesList, suppliersList]);
@@ -157,20 +160,23 @@ export default function Health() {
   // Последняя закупка по каждому товару: поставщик, дата, цена, ссылка на товар
   const lastPurchase = useMemo(() => {
     const map = {};
-    suppliesList.forEach(sp => {
-      const date = sp.date || (sp.created_at || '').slice(0, 10) || '';
+    suppliesList.filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => {
+      const raw = sp.date || sp.created_at || '';
+      const sortDate = String(raw).slice(0, 10);   // YYYY-MM-DD — для сравнения
+      const date = fmtDate(raw);                   // ДД.ММ.ГГГГ — для показа
       (sp.items || []).forEach(it => {
         const pid = it.prodId != null ? String(it.prodId) : null;
         if (!pid) return;
         const prev = map[pid];
         const cur = {
           date,
+          sortDate,
           supplierName: sp.supplier_name || sp.supplierName || '',
           supplierId: sp.supplier_id || null,
           cost: Number(it.cost) || 0,
           orderUrl: it.orderUrl || '',
         };
-        if (!prev || date >= (prev.date || '')) map[pid] = cur;
+        if (!prev || sortDate >= (prev.sortDate || '')) map[pid] = cur;
       });
     });
     // Дополняем из справочника поставщиков: способ заказа и контакт для чата
@@ -427,12 +433,7 @@ export default function Health() {
                       </a>
                     </div>
                   )}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                    <button type="button" className="sk-dd-btn" style={{ width: 'auto' }}
-                      onClick={() => navigateTo('/stock/order')}>
-                      {r.qty === 0 ? 'Заказать товар' : 'Заказать ещё ' + need + ' шт'}
-                    </button>
-                  </div>
+
                 </div>
               );
             })}

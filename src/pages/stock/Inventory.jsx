@@ -87,7 +87,7 @@ export default function Inventory() {
       const [invRes, prodRes, supRes, initRes, woRes, empRes] = await Promise.all([
         supabase.from('inventory').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('supplies').select('items').eq('user_id', user.id),
+        supabase.from('supplies').select('items,status').eq('user_id', user.id),
         supabase.from('initial_stocks').select('*').eq('user_id', user.id).single(),
         supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id),
         supabase.from('employees').select('id,name,status').eq('user_id', user.id)
@@ -98,7 +98,7 @@ export default function Inventory() {
       if (empRes.data) setEmployees((empRes.data || []).filter(e => e.status !== 'fired'));
       // Остаток = поставки + начальные − списания (как в разделе «Остатки» и кассе)
       const map = {};
-      (supRes.data || []).forEach(sp => {
+      (supRes.data || []).filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => {
         (sp.items||[]).forEach(it => {
           if (!map[it.prodId]) map[it.prodId] = { qty: 0, cost: 0 };
           map[it.prodId].qty += it.qty || 0;

@@ -168,8 +168,9 @@ export default function OrderForm() {
   // История закупок по каждому товару
   const purchasesByProduct = useMemo(() => {
     const map = {};
-    suppliesList.forEach(sp => {
+    suppliesList.filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => {
       const rawDate = sp.date || sp.created_at || '';
+      const sortDate = String(rawDate).slice(0, 10);
       const date = fmtDate(rawDate);
       (sp.items || []).forEach(it => {
         const pid = it.prodId != null ? String(it.prodId) : null;
@@ -177,6 +178,7 @@ export default function OrderForm() {
         if (!map[pid]) map[pid] = [];
         map[pid].push({
           date,
+          sortDate,
           supplierName: sp.supplier_name || '',
           supplierId: sp.supplier_id || null,
           cost: Number(it.cost) || 0,
@@ -191,7 +193,7 @@ export default function OrderForm() {
         rec.contact = s ? (s.order_link || '') : '';
         rec.supplierId = s ? s.id : rec.supplierId;
       });
-      map[pid].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      map[pid].sort((a, b) => (b.sortDate || '').localeCompare(a.sortDate || ''));
     });
     return map;
   }, [suppliesList, suppliersList]);

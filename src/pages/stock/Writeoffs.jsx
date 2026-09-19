@@ -108,12 +108,12 @@ export default function Writeoffs() {
 
   const getStockData = async (prodId) => {
     const [supRes, woRes, initRes] = await Promise.all([
-      supabase.from('supplies').select('items').eq('user_id', user.id),
+      supabase.from('supplies').select('items,status').eq('user_id', user.id),
       supabase.from('writeoffs').select('quantity,product_id').eq('user_id', user.id),
       supabase.from('initial_stocks').select('*').eq('user_id', user.id).single()
     ]);
     let inQty = 0, inCost = 0;
-    (supRes.data || []).forEach(s => (s.items || []).forEach(it => {
+    (supRes.data || []).filter(s => (s.status || 'received') !== 'ordered').forEach(s => (s.items || []).forEach(it => {
       if (it.prodId == prodId) { inQty += it.qty || 0; inCost += (it.cost || 0) * (it.qty || 0); }
     }));
     // Начальные остатки тоже учитываем (иначе товар только из них — «на складе 0»)
