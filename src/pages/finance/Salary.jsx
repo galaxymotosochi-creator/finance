@@ -463,13 +463,15 @@ export default function Salary() {
   const storeNote = (storeInfo && hasTs && dayFactor < 1) ? ' × ' + tsWorked + '/' + periodDays + ' дн.' : '';
   // Галочки блоков влияют на итог: снял галочку → сумма не входит в начисление
   const storeBonusOn = storeOn ? storeBonus : 0;
-  const salesBonusOn = salesOn ? itemsBonusTotal : 0;
-  const rewardOnTotal = rewardOn ? rewardTotal : 0;
-  const bonusOnTotal = bonusOpen ? checkedBonusTotal : 0;
-  const deductOnTotal = fineOpen ? checkedDeductTotal : 0;
+  const salesBonusOn = (salesOn && !doneSales) ? itemsBonusTotal : 0;
+  const storeBonusOnFinal = (storeOn && !doneStore) ? storeBonusOn : 0;
+  const rewardOnTotal = (rewardOn && !doneReward) ? rewardTotal : 0;
+  const bonusOnTotal = (bonusOpen && !doneBonus) ? checkedBonusTotal : 0;
+  const deductOnTotal = (fineOpen && !doneDeduct) ? checkedDeductTotal : 0;
   const debtOnTotal = debtOpen ? checkedDebtTotal : 0;
   const debtIncludeTotal = debtInclude ? existingDebt : 0;
-  const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOn + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal - debtIncludeTotal;
+  // Итог = только то, что отмечено галочками И ещё не начислено прошлым начислением за период
+  const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOnFinal + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal - debtIncludeTotal;
 
   const openAdd = () => {
     // Период по умолчанию: сегодня → тот же день следующего месяца (в поясе программы)
