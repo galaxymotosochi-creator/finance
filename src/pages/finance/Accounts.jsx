@@ -469,18 +469,10 @@ export default function Accounts() {
                   </tr>
                   {(ownerIn > 0 || ownerOut > 0) && (
                     <tr>
-                      <td style={{textAlign:'left'}} colSpan={2}>
-                        <span style={{color:'#7a6412'}}>🟡 Свои средства владельца</span>
-                      </td>
-                      <td style={{textAlign:'left'}}>
-                        <span style={{fontWeight:700,color:'#0d4ea8'}}>внесено {ownerIn.toLocaleString()} {cur}</span>
-                      </td>
-                      <td style={{textAlign:'left'}}>
-                        <span style={{fontWeight:700,color:'#c0392b'}}>выведено {ownerOut.toLocaleString()} {cur}</span>
-                      </td>
-                      <td style={{textAlign:'left'}}>
-                        <span style={{fontWeight:700,color:'#7a6412'}}>итог {(ownerIn-ownerOut).toLocaleString()} {cur}</span>
-                      </td>
+                      <td style={{textAlign:'left'}} colSpan={2}>Собственные средства владельца</td>
+                      <td style={{textAlign:'left'}}>+{ownerIn.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>−{ownerOut.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{(ownerIn-ownerOut).toLocaleString()} {cur}</td>
                       <td></td>
                     </tr>
                   )}
