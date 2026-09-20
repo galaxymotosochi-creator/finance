@@ -14,6 +14,8 @@ export default function PnL() {
   const [data, setData] = useState(null);
   const [errMsg, setErrMsg] = useState(null);
   const [pnlOpen, setPnlOpen] = useState({ inc: true, exp: false });
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
 
   // Локальная дата без UTC-сдвига (toISOString уводит границу на день назад в Москве)
   const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -27,6 +29,8 @@ export default function PnL() {
       from = new Date(now.getFullYear(), q, 1);
     } else if (period === 'year') {
       from = new Date(now.getFullYear(), 0, 1);
+    } else if (period === 'custom') {
+      return { from: customFrom || toDateStr(new Date(now.getFullYear(), now.getMonth(), 1)), to: customTo || toDateStr(now) };
     }
     return { from: toDateStr(from), to: toDateStr(now) };
   };
@@ -220,19 +224,7 @@ export default function PnL() {
       }
       setLoading(false);
     })();
-  }, [user, period]);
-
-  const Btn = ({ p, label }) => (
-    <button
-      onClick={() => setPeriod(p)}
-      style={{
-        padding: '5px 14px', borderRadius: '100px', border: '1.5px solid rgba(0,0,0,.12)',
-        background: period === p ? '#111' : 'transparent',
-        color: period === p ? '#fff' : '#555',
-        fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.72rem',
-      }}
-    >{label}</button>
-  );
+  }, [user, period, customFrom, customTo]);
 
   if (loading) {
     return <CenterSpinner />;
@@ -290,12 +282,32 @@ export default function PnL() {
           </div>
           <div className="sub">{d.month}</div>
         </div>
-        <div style={{display:'flex',gap:'4px',flexWrap:'nowrap',alignItems:'center'}}>
-          <Btn p="month" label="Месяц" />
-          <Btn p="quarter" label="Квартал" />
-          <Btn p="year" label="Год" />
+        <div className="sal-dd-wrap sk-dd-wrap" onClick={e => e.stopPropagation()}>
+          <button type="button" className="sk-dd-btn sal-cat-btn" style={{animation:'none'}}
+            onClick={e => { e.stopPropagation(); document.querySelectorAll('.sal-dd-wrap').forEach(w => { if (!w.contains(e.currentTarget)) w.classList.remove('open'); }); e.currentTarget.parentElement.classList.toggle('open'); }}>
+            {period === 'custom' ? 'Свой период' : (period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год')}
+            <span className="car">▼</span>
+          </button>
+          <div className="sk-dd-menu sal-dd-menu">
+            {[['month','Месяц'],['quarter','Квартал'],['year','Год'],['custom','Свой период']].map(([k,l]) => (
+              <button key={k} type="button"
+                style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
+                onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod(k); }}>
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+
+      {period === 'custom' && (
+        <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexWrap:'wrap', marginBottom:'12px' }}>
+          <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>С</span>
+          <input type="date" className="sal-input" style={{ width:'150px' }} value={customFrom} onChange={e => setCustomFrom(e.target.value)} />
+          <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>по</span>
+          <input type="date" className="sal-input" style={{ width:'150px' }} value={customTo} onChange={e => setCustomTo(e.target.value)} />
+        </div>
+      )}
 
       {/* Окно — фирменные сине-жёлтые цвета */}
       <div className="pnl-frame">
