@@ -1060,7 +1060,7 @@ export default function Salary() {
                   </div>
                 );
               })()}
-              <div className="sal-sub" style={{display: (noEmp || (storeOn && storeInfo && storeInfo.pct != null)) ? 'block' : 'none'}}>
+              <div className="sal-sub" style={{display: (!fEmpId || (storeOn && storeInfo && storeInfo.pct != null)) ? 'block' : 'none'}}>
                 {!fEmpId ? (
                   <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.4rem .65rem'}}>Выберите сотрудника</div>
                 ) : (
