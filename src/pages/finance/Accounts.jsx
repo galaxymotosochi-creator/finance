@@ -174,6 +174,37 @@ export default function Accounts() {
   };
   // Выплата прибыли владельцу — забрал заработанное, прибыли бизнеса не касается
   var isProfitTx = (t) => !!t && (t.kind === 'owner_profit' || String(t.description||'').startsWith('Выплата прибыли'));
+
+  // Заработано за текущий месяц и уже выплачено — для сводки в модалке «Выплата прибыли»
+  var profitEarnedMonth = (function(){
+    var now = new Date();
+    var y = now.getFullYear(), mo = now.getMonth();
+    var income = 0, expense = 0;
+    (transactions||[]).forEach(function(t){
+      var ds = String(t.date || t.created_at || '').split('T')[0];
+      if (!ds) return;
+      var parts = ds.split('-');
+      if (Number(parts[0]) !== y || Number(parts[1]) - 1 !== mo) return;
+      if (t.kind === 'transfer' || t.kind === 'collection' || t.kind === 'owner_deposit') return;
+      if (isProfitTx(t) || t.kind === 'owner_withdraw') return;
+      var amt = Number(t.amount)||0;
+      if (t.type === 'income') income += amt; else expense += amt;
+    });
+    return income - expense;
+  })();
+  var profitPaidMonth = (function(){
+    var now = new Date();
+    var y = now.getFullYear(), mo = now.getMonth();
+    var sum = 0;
+    (transactions||[]).forEach(function(t){
+      if (!isProfitTx(t)) return;
+      var ds = String(t.date || t.created_at || '').split('T')[0];
+      var parts = ds.split('-');
+      if (Number(parts[0]) !== y || Number(parts[1]) - 1 !== mo) return;
+      sum += Number(t.amount)||0;
+    });
+    return sum;
+  })();
   var getMv = (ac) => {
     if (!ac) return {i:0,e:0,od:0,ow:0,pr:0};
     var i=0,e=0,od=0,ow=0,pr=0;
@@ -765,6 +796,17 @@ export default function Accounts() {
             setToast('Выплата прибыли: ' + amt.toLocaleString() + ' ' + cur);
           } catch(err) { alert('Ошибка: ' + err.message); }
         }}>
+          <div style={{background:'#F6F9FF',border:'1px solid #dbe6fb',borderRadius:'12px',padding:'.7rem .85rem',marginBottom:'.85rem'}}>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#33405a',padding:'.15rem 0'}}>
+              <span>Заработано за месяц</span><b style={{color:'#0d4ea8'}}>{profitEarnedMonth.toLocaleString()} {cur}</b>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#33405a',padding:'.15rem 0'}}>
+              <span>Уже выплачено</span><b style={{color:'#c0392b'}}>{profitPaidMonth.toLocaleString()} {cur}</b>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.9rem',fontWeight:700,borderTop:'1px dashed #c9d9f5',marginTop:'.35rem',paddingTop:'.45rem'}}>
+              <span>Доступно к выплате</span><b style={{color:'#0d4ea8'}}>{Math.max(0, profitEarnedMonth - profitPaidMonth).toLocaleString()} {cur}</b>
+            </div>
+          </div>
           <div className="form-group">
             <label>Счет</label>
             <AcctPick accounts={accounts} value={profitAcct} onChange={setProfitAcct} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
