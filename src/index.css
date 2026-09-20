@@ -1370,14 +1370,8 @@ input:focus, select:focus, textarea:focus {
 .sal-tblwrap{position:relative;margin:0 -2px}
 .sal-tblscroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .sal-tblscroll::-webkit-scrollbar{display:none}
-.sal-tblscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.sal-tblscroll::-webkit-scrollbar{display:none}
 .sal-tblscroll .sal-tbl{min-width:520px}
-.sal-hintscroll{display:none;font-size:.68rem;color:var(--muted);padding:.35rem .2rem .1rem;text-align:right}
-@media(max-width:768px){
-  .sal-tblscroll .sal-tbl{min-width:560px}
-  .sal-hintscroll{display:block}
-}
+@media(max-width:768px){.sal-tblscroll .sal-tbl{min-width:560px}}
 
 /* Подсказка скролла вложенных таблиц — тень и стрелка, как у остальных таблиц сайта */
 .sal-scrollhint{display:none}

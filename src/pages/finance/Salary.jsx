@@ -1027,7 +1027,7 @@ export default function Salary() {
                   ) : (
                     <>
                       <div className="sal-tblwrap">
-                        <div className="sal-scrollhint" style={{opacity: salesPos.right?1:0}}>›</div>
+                        <div className="sal-scrollhint" style={{opacity: salesPos.right?1:0}}></div>
                         <div className="sal-tblscroll" ref={salesWrapRef} onScroll={onSalesScroll}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
@@ -1098,7 +1098,7 @@ export default function Salary() {
                   ) : (
                     <>
                       <div className="sal-tblwrap">
-                        <div className="sal-scrollhint" style={{opacity: rewardPos.right?1:0}}>›</div>
+                        <div className="sal-scrollhint" style={{opacity: rewardPos.right?1:0}}></div>
                         <div className="sal-tblscroll" ref={rewardWrapRef} onScroll={onRewardScroll}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
