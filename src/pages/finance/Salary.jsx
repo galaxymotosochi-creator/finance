@@ -1045,17 +1045,18 @@ export default function Salary() {
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
               <div className="sal-seclab">Включить в начисление</div>
               {(()=>{
+                const noEmp = !fEmpId;
                 const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
                 const blocked = doneStore;
-                const on = storeOn && hasStoreRate && !blocked;
+                const on = noEmp ? true : (storeOn && hasStoreRate && !blocked);
                 return (
                   <div className={'sal-pick'+(on?' on':'')}
-                    title={blocked ? 'Уже начислено за этот период' : (hasStoreRate ? '' : 'У сотрудника не задан процент от выручки в карточке')}
-                    style={(hasStoreRate && !blocked) ? {} : {opacity:.5, cursor:'not-allowed'}}
-                    onClick={()=>{ if (!hasStoreRate || blocked) return; setStoreOn(!storeOn); }}>
+                    title={noEmp ? '' : (blocked ? 'Уже начислено за этот период' : (hasStoreRate ? '' : 'У сотрудника не задан процент от выручки в карточке'))}
+                    style={noEmp ? {} : ((hasStoreRate && !blocked) ? {} : {opacity:.5, cursor:'not-allowed'})}
+                    onClick={()=>{ if (noEmp) return; if (!hasStoreRate || blocked) return; setStoreOn(!storeOn); }}>
                     <span className="cb">{on ? '✓' : ''}</span>
                     <span className="nm">Бонус от выручки магазина</span>
-                    <span className="vl">{blocked ? 'уже начислено' : (hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки')}</span>
+                    <span className="vl">{noEmp ? 'Выберите сотрудника' : (blocked ? 'уже начислено' : (hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки'))}</span>
                   </div>
                 );
               })()}
