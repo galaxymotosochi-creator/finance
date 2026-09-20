@@ -1347,7 +1347,6 @@ input:focus, select:focus, textarea:focus {
   border:1.5px solid rgba(0,0,0,.26);border-radius:8px;outline:none;background:#fff;
   min-height:38px;flex:1;min-width:0;box-sizing:border-box;transition:border-color .15s,box-shadow .15s}
 /* только для date — убрать серый браузерный фон */
-.sal-input[type="date"]{-webkit-appearance:none;appearance:none}
 .sal-input:focus,.sal-input[type="date"]:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.07);background:#fff}
 .sal-row .sal-input{flex:1;width:100%}
 .sal-row2 .sal-input{flex:1;width:100%}
@@ -1357,7 +1356,7 @@ input:focus, select:focus, textarea:focus {
 /* Выпадающий список — браузерная стрелка, как в превью */
 .sal-select{cursor:pointer}
 /* иконка календаря — как у обычных полей (не тёмная от браузера) */
-.sal-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.45;cursor:pointer}
+.sal-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.55;cursor:pointer;margin-left:.25rem}
 .sal-input:disabled{background:#fff;color:#333;opacity:1;-webkit-text-fill-color:#333}
 
 /* Таблица продаж: цветные рамки ввода + легенда (как в превью) */
