@@ -1326,7 +1326,7 @@ input:focus, select:focus, textarea:focus {
 /* Поля формы «Начислить зарплату»: сотрудник и период */
 .sal-row{display:flex;gap:.35rem;align-items:center}
 .sal-row2{display:flex;gap:.35rem;align-items:center}
-.sal-input,.sal-input[type="date"]{font-family:var(--font);font-size:.8125rem;color:#111;padding:.45rem .6rem;
+.sal-input,.sal-input[type="date"]{font-family:var(--font);font-size:.875rem;color:#333;padding:.5rem .65rem;
   border:1.5px solid rgba(0,0,0,.26);border-radius:8px;outline:none;background:#fff;
   min-height:38px;flex:1;min-width:0;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;
   -webkit-appearance:none;appearance:none}
@@ -1337,3 +1337,4 @@ input:focus, select:focus, textarea:focus {
 .sal-ph{color:var(--muted)}
 /* иконка календаря — как у обычных полей (не тёмная от браузера) */
 .sal-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.45;cursor:pointer}
+.sal-input:disabled{background:#fff;color:#333;opacity:1;-webkit-text-fill-color:#333}
