@@ -286,11 +286,13 @@ export default function Salary() {
         // Вознаграждение исполнителю: суммы из employee_splits чеков (сколько указано мастеру в кассе)
         const rewRows = [];
         (items || []).forEach(it => {
+          // ТОЛЬКО УСЛУГИ — товары сюда не попадают никогда
+          if (!isService(it.product_id)) return;
           const sps = it.employee_splits || [];
           const mine = sps.filter(function(s){ return String(s.employee_id || '') === String(fEmpId); });
           const isMine = String(it.employee_id || '') === String(fEmpId);
           // Берём: либо есть доля мастера в чеке, либо он исполнитель услуги
-          if (!mine.length && !(isService(it.product_id) && isMine)) return;
+          if (!mine.length && !isMine) return;
           const r = rlist.find(x => x.id === it.receipt_id);
           if (!r) return;
           const qty = Number(it.quantity) || 1;
@@ -299,14 +301,13 @@ export default function Salary() {
           const availQty = Math.max(0, qty - retQty);
           if (availQty <= 0) return;
           const factor = qty > 0 ? availQty / qty : 1;
-          const itemTotal = Math.round((Number(it.total) || 0) * factor);
           const amt = Math.round(mine.reduce(function(s2, sp){ return s2 + (parseFloat(sp.amount) || 0); }, 0) * factor);
           rewRows.push({
             itemId: it.id,
             date: String(r.date || '').split('T')[0],
             name: it.product_name,
             amount: amt,
-            fromReceipt: amt > 0 ? amt : itemTotal,   // «Из чека»: доля мастера, иначе сумма позиции
+            fromReceipt: amt > 0 ? amt : null,   // «Из чека»: доля мастера из чека, иначе «—»
           });
         });
         setSalesRows(rows);
@@ -1048,11 +1049,13 @@ export default function Salary() {
                             <tr key={row.itemId}>
                               <td className="date">{fmtDate(row.date)}</td>
                               <td className="name">{row.name}</td>
-                              <td className="num mut">{(row.fromReceipt || row.amount).toLocaleString()} {cur}</td>
+                              <td className="num mut">{row.fromReceipt ? row.fromReceipt.toLocaleString() + ' ' + cur : '—'}</td>
                               <td className="ctr">
                                 <span className="sal-cell">
-                                  <input type="number" min="0" className="sal-rin auto"
-                                    value={rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount}
+                                  <input type="number" min="0"
+                                    className={'sal-rin '+((rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) > 0 ? 'auto' : 'empty')}
+                                    value={(rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) || ''}
+                                    placeholder="0"
                                     onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))} />
                                   <span className="sal-unit">₽</span>
                                 </span>
