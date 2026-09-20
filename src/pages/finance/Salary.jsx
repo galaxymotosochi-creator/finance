@@ -807,11 +807,15 @@ export default function Salary() {
       )}
 
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId?'Редактировать':'Начислить зарплату'} subtitle="Выберите сотрудника и период" width="wide">
+      <Modal open={show} onClose={()=>setShow(false)} width="wide" hideHead>
+        <div className="sal-head">
+          <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
+          <p className="modal-sub">Выберите сотрудника и период</p>
+        </div>
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
               {/* Сотрудник + период */}
-              <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
+              <div className="sal-seclab">Сотрудник и период</div>
               <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
                 <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required
                   style={{flex:3,minWidth:'180px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
@@ -836,7 +840,7 @@ export default function Salary() {
 
               {/* Расчет */}
               <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'.75rem'}}>
-                <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'.5rem'}}>Расчет</div>
+                <div className="sal-seclab">Расчет</div>
                 <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap',marginBottom:'.65rem'}}>
                   {SALARY_TYPES.map(t => (
                     <span key={t.value} onClick={()=>setFSalaryType(t.value)}
@@ -1101,18 +1105,14 @@ export default function Salary() {
               )}
 
               {/* Итого */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px'}}>
-                <div style={{fontSize:'.72rem',color:'var(--muted)'}}>
-                  {(()=>{const parts=[];if(fSalaryTotal>0)parts.push((fSalaryType==='shift'?'За смену ':'Оклад ')+fSalaryTotal.toLocaleString()+' ₽');if(storeBonus>0)parts.push('С выручки +'+storeBonus.toLocaleString()+' ₽');if(itemsBonusTotal>0)parts.push('С продаж +'+itemsBonusTotal.toLocaleString()+' ₽');if(rewardTotal>0)parts.push('Исполнителю +'+rewardTotal.toLocaleString()+' ₽');if(checkedBonusTotal>0)parts.push('Премии '+checkedBonusTotal.toLocaleString()+' ₽');if(checkedDeductTotal>0)parts.push('Штрафы '+checkedDeductTotal.toLocaleString()+' ₽');if(checkedDebtTotal>0)parts.push('Долги '+checkedDebtTotal.toLocaleString()+' ₽');return parts.join(' − ');})()}
-                </div>
-                <div style={{fontSize:'1.15rem',fontWeight:700}}>{grandTotal.toLocaleString()} {cur}</div>
+              <div className="sal-total">
+                <div className="cap">К начислению</div>
+                <div className="big">{grandTotal.toLocaleString()} {cur}</div>
               </div>
 
               {/* Кнопки */}
-              <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem',alignItems:'center'}}>
-                <span style={{fontSize:'.72rem',color:'var(--muted)'}}>Статус: Начислено (выплата — через кнопку «Выплатить» со счета)</span>
-                <button type="submit"
-                  style={{padding:'.4rem 1.2rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',fontFamily:'var(--font)',background:'var(--primary)',color:'var(--primary-text)',display:'inline-flex',alignItems:'center',gap:'.3rem',width:'auto'}}>
+              <div className="modal-actions">
+                <button type="submit" className="sk-dd-btn">
                   {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}
                 </button>
               </div>

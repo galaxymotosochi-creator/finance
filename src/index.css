@@ -1260,3 +1260,63 @@ input:focus, select:focus, textarea:focus {
 .ord-sel:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.1)}
 /* Расстояние между пунктами выпадающего списка — как в «Товарах» (Тип) */
 .ord-sel option{padding:10px 10px;line-height:2.2;font-size:.8rem}
+
+/* ===== Форма «Начислить зарплату» — фирменный стиль (перенос из превью) ===== */
+.sal-head{background:#E6F0FF;margin:-1.5rem -1.5rem 1.15rem;padding:1.15rem 1.5rem}
+.sal-head .modal-title{margin:0}
+.sal-head .modal-sub{margin:.15rem 0 0;color:#5b6472}
+
+.sal-seclab{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
+
+/* выпадашка: .f-pill / .f-menu / .car-tri уже есть в базовых стилях */
+.sal-dd{position:relative;display:inline-block}
+
+/* блоки-галочки */
+.sal-pick{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:.6rem;cursor:pointer;
+  margin-bottom:.35rem;border:1.5px solid rgba(0,0,0,.12);background:#fff;transition:var(--transition);user-select:none}
+.sal-pick.on{border-color:var(--secondary);background:var(--secondary-light)}
+.sal-pick .cb{width:17px;height:17px;flex:none;border-radius:5px;border:2px solid #c3ccd8;display:grid;place-items:center;
+  font-size:11px;color:#fff;font-weight:700;transition:var(--transition)}
+.sal-pick.on .cb{background:var(--secondary);border-color:var(--secondary)}
+.sal-pick .nm{flex:1;font-size:.8125rem;font-weight:600}
+.sal-pick .vl{font-size:.8125rem;font-weight:700;white-space:nowrap;color:#111}
+
+.sal-sub{margin:-.35rem 0 .6rem;padding:0 .75rem}
+.sal-hint{font-size:.72rem;color:var(--muted);padding:.35rem .45rem .55rem;line-height:1.5}
+
+/* вложенные таблицы — единое выравнивание */
+.sal-tbl{width:100%;border-collapse:collapse;font-size:.78rem;table-layout:fixed}
+.sal-tbl thead th{font-size:.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;
+  text-align:left;padding:.45rem .5rem;border-bottom:1.5px solid var(--border);white-space:nowrap}
+.sal-tbl thead th.num{text-align:right}
+.sal-tbl thead th.ctr{text-align:center}
+.sal-tbl tbody td{padding:.55rem .5rem;border-bottom:1px solid #f0f1f3;font-size:.78rem;vertical-align:middle}
+.sal-tbl tbody tr:last-child td{border-bottom:none}
+.sal-tbl td.date{color:var(--muted);white-space:nowrap}
+.sal-tbl td.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sal-tbl td.num{text-align:right;white-space:nowrap;color:#111;font-weight:600}
+.sal-tbl td.num.mut{color:var(--muted);font-weight:500}
+.sal-tbl td.ctr{text-align:center}
+.sal-cell{display:inline-flex;align-items:center;gap:.3rem;justify-content:center}
+.sal-tbl input{width:62px;padding:.32rem .4rem;font-size:.78rem;font-family:var(--font);text-align:center;
+  border:1.5px solid rgba(0,0,0,.26);border-radius:6px;outline:none;background:#fff;
+  transition:border-color var(--transition),box-shadow var(--transition)}
+.sal-tbl input:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.07)}
+.sal-tbl input.auto{border-color:var(--secondary);background:var(--secondary-light)}
+.sal-tbl input.empty{border-style:dashed;background:#fff}
+.sal-tbl input.manual{border-color:#f59e0b;background:#fffbeb}
+.sal-unit{font-size:.72rem;color:var(--muted)}
+
+.sal-foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:.6rem .5rem 0;border-top:1.5px solid var(--border);margin-top:.2rem}
+.sal-foot .l{font-size:.78rem;font-weight:700;color:#111}
+.sal-foot .r{font-size:.85rem;font-weight:800;color:#111}
+
+/* итог */
+.sal-total{display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:.7rem .9rem;background:#f8f9fa;border-radius:10px;margin:1.35rem 0 .95rem}
+.sal-total .cap{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.sal-total .big{font-size:1.05rem;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:#111}
+
+.sal-legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.7rem;color:var(--muted);padding:.35rem .5rem .5rem}
+.sal-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}
