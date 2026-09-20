@@ -1345,7 +1345,7 @@ input:focus, select:focus, textarea:focus {
 .sal-row .sal-input{flex:1;width:100%}
 .sal-row2 .sal-input{flex:1;width:100%}
 .sal-field{flex:1;min-width:0;display:flex;flex-direction:column;gap:.3rem}
-.sal-cap{font-size:.72rem;color:var(--muted);line-height:1.4}
+.sal-cap{font-size:.72rem;color:var(--muted);line-height:1.4;text-align:center}
 .sal-ph{color:var(--muted)}
 /* Выпадающий список — браузерная стрелка, как в превью */
 .sal-select{cursor:pointer}

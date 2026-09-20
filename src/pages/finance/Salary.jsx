@@ -384,7 +384,10 @@ export default function Salary() {
   const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + rewardTotal + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
 
   const openAdd = () => {
-    setEditId(null); setFEmpId(''); setFPeriodFrom(''); setFPeriodTo('');
+    const _t = new Date();
+    const _from = _t.toISOString().split('T')[0];
+    const _to = new Date(_t.getFullYear(), _t.getMonth(), _t.getDate() + 30).toISOString().split('T')[0];
+    setEditId(null); setFEmpId(''); setFPeriodFrom(_from); setFPeriodTo(_to);
     setFBaseSalary(0); setFSalaryType('fixed'); setFSalaryTotal(0); setFDays(0);
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
     setExistingDebt(0); setTsEntries([]); setBonusChecks({}); setDeductChecks({});
@@ -834,12 +837,14 @@ export default function Salary() {
               </div>
               <div className="sal-row2">
                 <div className="sal-field">
+                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input"
+                    onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
                   <span className="sal-cap">Начало периода</span>
-                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
                 </div>
                 <div className="sal-field">
+                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input"
+                    onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
                   <span className="sal-cap">Конец периода</span>
-                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
                 </div>
               </div>
 
