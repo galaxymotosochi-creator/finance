@@ -17,6 +17,8 @@ export default function PnL() {
   const [periodOpen, setPeriodOpen] = useState(false);
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const [appliedFrom, setAppliedFrom] = useState('');
+  const [appliedTo, setAppliedTo] = useState('');
 
   // Локальная дата без UTC-сдвига (toISOString уводит границу на день назад в Москве)
   const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -31,7 +33,7 @@ export default function PnL() {
     } else if (period === 'year') {
       from = new Date(now.getFullYear(), 0, 1);
     } else if (period === 'custom') {
-      return { from: customFrom || toDateStr(new Date(now.getFullYear(), now.getMonth(), 1)), to: customTo || toDateStr(now) };
+      return { from: appliedFrom || toDateStr(new Date(now.getFullYear(), now.getMonth(), 1)), to: appliedTo || toDateStr(now) };
     }
     return { from: toDateStr(from), to: toDateStr(now) };
   };
@@ -225,7 +227,7 @@ export default function PnL() {
       }
       setLoading(false);
     })();
-  }, [user, period, customFrom, customTo]);
+  }, [user, period, appliedFrom, appliedTo]);
 
   // Закрытие меню «Период» по клику вне него
   useEffect(() => {
@@ -313,7 +315,7 @@ export default function PnL() {
               </div>
               <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
                 <button type="button" className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}
-                  onClick={e => { e.stopPropagation(); if (!customFrom || !customTo) return; setPeriodOpen(false); setPeriod('custom'); }}>Применить</button>
+                  onClick={e => { e.stopPropagation(); if (!customFrom || !customTo) return; setAppliedFrom(customFrom); setAppliedTo(customTo); setPeriodOpen(false); setPeriod('custom'); }}>Применить</button>
               </div>
             </div>
           </div>
