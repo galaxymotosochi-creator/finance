@@ -175,7 +175,6 @@ export default function Salary() {
   const [bonusOpen, setBonusOpen] = useState(true);
   const [fineOpen, setFineOpen] = useState(true);
   const [debtOpen, setDebtOpen] = useState(true);
-  const [debtInclude, setDebtInclude] = useState(true);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
   const [dupSalary, setDupSalary] = useState(null); // уже есть начисление за этот период (защита от дублей)
   // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
@@ -474,9 +473,9 @@ export default function Salary() {
   const bonusOnTotal = (bonusOpen && !doneBonus) ? checkedBonusTotal : 0;
   const deductOnTotal = (fineOpen && !doneDeduct) ? checkedDeductTotal : 0;
   const debtOnTotal = debtOpen ? checkedDebtTotal : 0;
-  const debtIncludeTotal = debtInclude ? existingDebt : 0;
   // Итог = только то, что отмечено галочками И ещё не начислено прошлым начислением за период
-  const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOnFinal + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal - debtIncludeTotal;
+  // Долги по недостачам уже учтены в debtOnTotal — отдельного вычитания больше нет
+  const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOnFinal + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal;
 
   const openAdd = () => {
     // Период по умолчанию: сегодня → тот же день следующего месяца (в поясе программы)
@@ -492,7 +491,7 @@ export default function Salary() {
     // Новое начисление — это доначисление: сбрасываем галочки и данные прошлого расчёта,
     // чтобы в итог попало только то, что ещё НЕ начислено за период
     setSalesOn(true); setStoreOn(true); setRewardOn(true); setBonusOpen(true);
-    setFineOpen(true); setDebtOpen(true); setDebtInclude(true);
+    setFineOpen(true); setDebtOpen(true);
     setSalesRows([]); setSalesBonus({}); setStoreInfo(null);
     setRewardRows([]); setRewardEdit({}); setSalesLoaded(false);
     setShow(true);
@@ -1329,15 +1328,6 @@ export default function Salary() {
                   </div>
                 </div>
               </>
-
-              {/* Учесть долг перед сотрудником — только если долг реально есть */}
-              {existingDebt > 0 && (
-                <div className={'sal-pick'+(debtInclude?' on':'')} onClick={()=>setDebtInclude(!debtInclude)}>
-                  <span className="cb">{debtInclude ? '✓' : ''}</span>
-                  <span className="nm">Учесть долг перед сотрудником</span>
-                  <span className="vl">{existingDebt.toLocaleString()} {cur}</span>
-                </div>
-              )}
 
               {/* Итого */}
               <div className="sal-total">
