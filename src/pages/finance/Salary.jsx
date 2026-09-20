@@ -1087,7 +1087,6 @@ export default function Salary() {
                 <span className="vl">+{rewardTotal.toLocaleString()} {cur}</span>
               </div>
               <div className="sal-sub" style={{display: rewardOn ? 'block' : 'none'}}>
-                <div className="sal-hint">Суммы из чеков кассы, где он указан исполнителем — можно поправить.</div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {!fEmpId ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>
