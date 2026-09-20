@@ -951,6 +951,7 @@ export default function Salary() {
                     // Что ещё НЕ вошло в уже сохранённое начисление
                     const items = [];
                     const hasStore = Math.abs(Number(dupSalary.sales_bonus) || 0) > 0;
+                    const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
                     if (hasStoreRate && storeOn && !hasStore) items.push({ n:'Бонус от выручки', v: storeBonus });
                     if (salesOn && salesBonusTotal > 0 && !(dupSalary.sales_items && dupSalary.sales_items.some(i => Number(i.bonus) > 0))) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
                     if (rewardOn && rewardTotal > 0 && !(dupSalary.reward_items && dupSalary.reward_items.length)) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
