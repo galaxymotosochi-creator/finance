@@ -247,12 +247,6 @@ export default function PnL() {
   const periodLabel = `${fmtIso(dr.from)} — ${fmtIso(dr.to)}`;
   const fmt = (n) => (Math.round((Number(n) || 0) * 100) / 100).toLocaleString();
 
-  // Донат: шкала рентабельности — полный круг = 40% (в макете 27,5% → дуга ~2/3)
-  const ARC = 540;
-  const MAX_RENT = 40;
-  const donutFrac = Math.max(0, Math.min(1, (d.profitability || 0) / MAX_RENT));
-  const donutOffset = ARC * (1 - donutFrac);
-
   // Строки отчета: группа «Доходы» (итог зеленым) → группа «Расходы» (итог красным)
   const incomeTotal = (d.salesRev + d.discounts) + d.otherIncome + d.surpluses;
   const expenseTotal = d.discounts + d.totalCogs + d.opTotal + d.shortages;
@@ -269,7 +263,7 @@ export default function PnL() {
   ];
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: "'Golos Text',system-ui,sans-serif" }}>
+    <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: 'var(--font)' }}>
       {/* Шапка — фирменный стиль: голубая плашка + подсказка (как в «Чеках» и остальных разделах) */}
       <div className="sk-bar">
         <div className="grow">
@@ -310,23 +304,15 @@ export default function PnL() {
         border: '1px solid #dce9ff',
         display: 'flex', gap: '30px', alignItems: 'center', flexWrap: 'wrap',
       }}>
-        {/* Донат-круг */}
-        <div style={{ position: 'relative', width: '210px', height: '210px', flexShrink: 0, margin: '0 auto' }}>
-          <svg width="210" height="210" viewBox="0 0 210 210">
-            <defs>
-              <linearGradient id="pnlDonutGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#ffdd2d" />
-                <stop offset="1" stopColor="#ffb300" />
-              </linearGradient>
-            </defs>
-            <circle cx="105" cy="105" r="86" fill="none" stroke="#e6eefc" strokeWidth="18" />
-            <circle cx="105" cy="105" r="86" fill="none" stroke="url(#pnlDonutGrad)" strokeWidth="18" strokeLinecap="round" strokeDasharray="540" strokeDashoffset={donutOffset} transform="rotate(-90 105 105)" />
-          </svg>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#999', fontWeight: 500 }}>Чистая прибыль</div>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#111', letterSpacing: '-.02em' }}>{fmt(d.netProfit)} {cur}</div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: d.profitability >= 0 ? '#16a34a' : '#dc2626' }}>{d.profitability}%</div>
-            <div style={{ fontSize: '10.5px', color: '#bbb', fontWeight: 500 }}>рентабельность</div>
+        {/* KPI: чистая прибыль и рентабельность — без круга */}
+        <div style={{ width: '230px', flexShrink: 0, margin: '0 auto' }}>
+          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '18px 18px 16px', boxShadow: '0 12px 28px -14px rgba(255,205,0,.65)' }}>
+            <div style={{ fontSize: '11px', color: '#7a6a12', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>Чистая прибыль</div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#111', letterSpacing: '-.02em', marginTop: '2px' }}>{fmt(d.netProfit)} {cur}</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '1px solid #dce9ff', borderRadius: '14px', padding: '12px 16px', marginTop: '10px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--sk-muted)', fontWeight: 500 }}>Рентабельность</span>
+            <b style={{ fontSize: '18px', fontWeight: 800, color: d.profitability >= 0 ? '#0d4ea8' : '#dc2626' }}>{d.profitability}%</b>
           </div>
         </div>
 
