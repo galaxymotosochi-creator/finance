@@ -289,25 +289,27 @@ export default function PnL() {
             <span className="car">▼</span>
           </button>
           <div className="sk-dd-menu sal-dd-menu">
-            {[['month','Месяц'],['quarter','Квартал'],['year','Год'],['custom','Свой период']].map(([k,l]) => (
+            {[['month','Месяц'],['quarter','Квартал'],['year','Год']].map(([k,l]) => (
               <button key={k} type="button"
                 style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
                 onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod(k); }}>
                 {l}
               </button>
             ))}
+            <div style={{borderTop:'1px solid rgba(29,120,252,.14)',paddingTop:'.4rem',marginTop:'.25rem'}}>
+              <div style={{fontSize:'.72rem',color:'#5b6472',padding:'.2rem .55rem',marginBottom:'.3rem',fontWeight:600}}>Свой период</div>
+              <div style={{display:'flex',gap:'.3rem',padding:'.2rem .55rem'}}>
+                <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+                <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
+              </div>
+              <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
+                <button type="button" className="sk-dd-btn" style={{padding:'.5rem 1.1rem',animation:'none',width:'100%',justifyContent:'center'}}
+                  onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod('custom'); }}>Применить</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {period === 'custom' && (
-        <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexWrap:'wrap', marginBottom:'12px' }}>
-          <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>С</span>
-          <input type="date" className="sal-input" style={{ width:'150px' }} value={customFrom} onChange={e => setCustomFrom(e.target.value)} />
-          <span style={{ fontSize:'.78rem', color:'var(--muted)' }}>по</span>
-          <input type="date" className="sal-input" style={{ width:'150px' }} value={customTo} onChange={e => setCustomTo(e.target.value)} />
-        </div>
-      )}
 
       {/* Окно — фирменные сине-жёлтые цвета */}
       <div className="pnl-frame">
