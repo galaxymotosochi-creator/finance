@@ -316,7 +316,14 @@ export default function Salary() {
         const rules = (emp && emp.bonus_rules) || [];
         const bonus = {};
         rows.forEach(row => { const c = calcSalesBonus(rules, row, pr, cr); bonus[row.itemId] = { rub: c.rub, pct: c.pct }; });
-        setSalesBonus(bonus);
+        // Сохраняем ручные правки — не затираем то, что менеджер вписал руками
+        setSalesBonus(prev => {
+          const next = { ...bonus };
+          Object.keys(prev || {}).forEach(k => {
+            if (prev[k] && prev[k].manual) next[k] = prev[k];
+          });
+          return next;
+        });
         // Бонус от всей выручки (управленческий процент): выручка = сумма чеков периода − возвраты
         const revenue = rlist.reduce((sum, r) => sum + Math.max(0, (Number(r.total_amount) || 0) - (Number(r.refund_amount) || 0)), 0);
         const st = rules.find(r => r.scope === 'store_sales');
@@ -422,6 +429,13 @@ export default function Salary() {
     if (s.bonus_items && Array.isArray(s.bonus_items)) s.bonus_items.forEach(i => { if (i.tsEntryId) bc[i.tsEntryId] = true; });
     if (s.deduct_items && Array.isArray(s.deduct_items)) s.deduct_items.forEach(i => { if (i.tsEntryId) dc[i.tsEntryId] = true; });
     setBonusChecks(bc); setDeductChecks(dc);
+    // Восстанавливаем ручные бонусы с продаж и выплаты исполнителю
+    const sb = {};
+    if (s.sales_items && Array.isArray(s.sales_items)) s.sales_items.forEach(i => { if (i.itemId) sb[i.itemId] = { rub: Number(i.bonus) || 0, pct: i.total > 0 ? Math.round((Number(i.bonus)||0) / i.total * 1000) / 10 : 0, manual: true }; });
+    setSalesBonus(sb);
+    const re = {};
+    if (s.reward_items && Array.isArray(s.reward_items)) s.reward_items.forEach(i => { if (i.itemId) re[i.itemId] = i.amount; });
+    setRewardEdit(re);
     setShow(true);
   };
 
