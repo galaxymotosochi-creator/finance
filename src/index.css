@@ -1303,6 +1303,10 @@ input:focus, select:focus, textarea:focus {
 .sal-tbl thead th.num{text-align:right}
 .sal-tbl thead th.ctr{text-align:center}
 .sal-tbl tbody td{padding:.55rem .5rem;border-bottom:1px solid #f0f1f3;font-size:.78rem;vertical-align:middle}
+/* Выравнивание заголовков и ячеек строго одинаково */
+.sal-tbl thead th.num, .sal-tbl tbody td.num{text-align:right}
+.sal-tbl thead th.ctr, .sal-tbl tbody td.ctr{text-align:center}
+.sal-tbl tbody td.date, .sal-tbl tbody td.name{text-align:left}
 .sal-tbl tbody tr:last-child td{border-bottom:none}
 .sal-tbl td.date{color:var(--muted);white-space:nowrap}
 .sal-tbl td.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
