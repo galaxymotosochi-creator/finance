@@ -13,6 +13,7 @@ export default function PnL() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [errMsg, setErrMsg] = useState(null);
+  const [pnlOpen, setPnlOpen] = useState({ inc: true, exp: false });
 
   // Локальная дата без UTC-сдвига (toISOString уводит границу на день назад в Москве)
   const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -297,47 +298,67 @@ export default function PnL() {
       </div>
 
       {/* Окно — фирменные сине-жёлтые цвета */}
-      <div style={{
-        background: 'linear-gradient(150deg,#ffffff 0%,#f4f8ff 55%,#fff8e0 100%)',
-        borderRadius: '22px', padding: '26px',
-        boxShadow: '0 18px 44px -18px rgba(13,78,168,.28), 0 2px 0 rgba(255,255,255,.8) inset',
-        border: '1px solid #dce9ff',
-        display: 'flex', gap: '30px', alignItems: 'center', flexWrap: 'wrap',
-      }}>
-        {/* KPI: чистая прибыль и рентабельность — без круга */}
-        <div style={{ width: '230px', flexShrink: 0, margin: '0 auto' }}>
-          <div style={{ background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', borderRadius: '16px', padding: '18px 18px 16px', boxShadow: '0 12px 28px -14px rgba(255,205,0,.65)' }}>
-            <div style={{ fontSize: '11px', color: '#7a6a12', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>Чистая прибыль</div>
-            <div style={{ fontSize: '26px', fontWeight: 800, color: '#111', letterSpacing: '-.02em', marginTop: '2px' }}>{fmt(d.netProfit)} {cur}</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '1px solid #dce9ff', borderRadius: '14px', padding: '12px 16px', marginTop: '10px' }}>
-            <span style={{ fontSize: '12px', color: 'var(--sk-muted)', fontWeight: 500 }}>Рентабельность</span>
-            <b style={{ fontSize: '18px', fontWeight: 800, color: d.profitability >= 0 ? '#0d4ea8' : '#dc2626' }}>{d.profitability}%</b>
+      <div className="pnl-frame">
+        <div className="pnl-top">
+        {/* KPI: чистая прибыль (жёлтый блок 1-в-1 с макетом) */}
+        <div className="pnl-kpi">
+          <div className="pnl-kpi-card">
+            <div className="lbl">Чистая прибыль</div>
+            <div className="big">{fmt(d.netProfit)} {cur}</div>
+            <div className="chips">
+              <div className="chip"><div className="lbl">Рентабельность</div><b>{d.profitability}%</b></div>
+              <div className="chip"><div className="lbl">Выручка</div><b>{fmt(incomeTotal)} {cur}</b></div>
+            </div>
           </div>
         </div>
 
-        {/* Отчет о прибыли */}
+        {/* Отчет о прибыли — Доходы/Расходы раскрываются */}
         <div style={{ flex: 1, minWidth: '290px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid #0d4ea8', paddingBottom: '6px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>Отчет о прибыли</span>
-            <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>{periodLabel}</span>
+          <div className="pnl-rhead">
+            <span>Отчёт о прибыли</span>
+            <span>{periodLabel}</span>
           </div>
 
-          {rowData.map((r, i) => (
-            <Line key={r.key} name={r.name} value={r.value} nameColor={r.nameColor} valueColor={r.valueColor} valueWeight={r.valueWeight} last={i === rowData.length - 1} />
-          ))}
-
-          {/* Итог — желтый градиент */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '10px', padding: '12px 14px', marginTop: '10px', background: 'linear-gradient(135deg,#ffdd2d,#fff9db)', color: '#111' }}>
-            <span style={{ fontSize: '15px', fontWeight: 700 }}>Чистая прибыль</span>
-            <b style={{ fontSize: '20px', fontWeight: 800 }}>{fmt(d.netProfit)} {cur}</b>
+          <div className={'pnl-acc' + (pnlOpen.inc ? ' open' : '')}>
+            <div className="pnl-acc-head" onClick={() => setPnlOpen(o => ({ ...o, inc: !o.inc }))}>
+              <div className="pnl-acc-left">
+                <span className="pnl-acc-car">▼</span>
+                <span>Доходы</span>
+              </div>
+              <span className="pnl-acc-val inc">{fmt(incomeTotal)} {cur}</span>
+            </div>
+            <div className="pnl-acc-body">
+              <div className="pnl-r"><span className="nm">Доход от продаж</span><span className="v">{fmt(d.salesRev + d.discounts)} {cur}</span></div>
+              <div className="pnl-r"><span className="nm">Прочие доходы</span><span className="v">{fmt(d.otherIncome)} {cur}</span></div>
+              <div className="pnl-r"><span className="nm">Излишки по инвентаризации</span><span className="v">{fmt(d.surpluses)} {cur}</span></div>
+            </div>
           </div>
 
-          {/* Показатели: запас и деньги на счетах */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-            <MiniStat label="Товарный запас" value={`${fmt(d.stockValue)} ${cur}`} />
-            <MiniStat label="Деньги на счетах" value={`${fmt(d.totalCash)} ${cur}`} />
+          <div className={'pnl-acc' + (pnlOpen.exp ? ' open' : '')}>
+            <div className="pnl-acc-head" onClick={() => setPnlOpen(o => ({ ...o, exp: !o.exp }))}>
+              <div className="pnl-acc-left">
+                <span className="pnl-acc-car">▼</span>
+                <span>Расходы</span>
+              </div>
+              <span className="pnl-acc-val exp">{fmt(expenseTotal)} {cur}</span>
+            </div>
+            <div className="pnl-acc-body">
+              {d.discounts > 0 && <div className="pnl-r"><span className="nm">Скидки с продаж</span><span className="v">{fmt(d.discounts)} {cur}</span></div>}
+              <div className="pnl-r"><span className="nm">Закупка товара</span><span className="v">{fmt(d.totalCogs)} {cur}</span></div>
+              {d.opList.map(([name, amt], i) => (
+                <div className="pnl-r" key={i}><span className="nm">{name}</span><span className="v">{fmt(amt)} {cur}</span></div>
+              ))}
+              {d.shortages > 0 && <div className="pnl-r"><span className="nm">Недостачи по инвентаризации</span><span className="v">{fmt(d.shortages)} {cur}</span></div>}
+            </div>
           </div>
+
+          {/* Мини-плашки: закупка, запас, деньги */}
+          <div className="pnl-grid3">
+            <div className="pnl-mini"><div className="lbl">ЗАКУПКА ТОВАРА</div><b>{fmt(d.totalCogs)} {cur}</b></div>
+            <div className="pnl-mini"><div className="lbl">ТОВАРНЫЙ ЗАПАС</div><b>{fmt(d.stockValue)} {cur}</b></div>
+            <div className="pnl-mini"><div className="lbl">ДЕНЬГИ НА СЧЕТАХ</div><b>{fmt(d.totalCash)} {cur}</b></div>
+          </div>
+        </div>
         </div>
       </div>
     </div>

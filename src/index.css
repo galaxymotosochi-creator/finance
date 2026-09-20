@@ -1388,3 +1388,43 @@ input:focus, select:focus, textarea:focus {
 
 /* Кнопка «Открыть» в плашке доначисления — фирменная синяя пульсирующая, компактная */
 .sal-open-btn{padding:.42rem 1.1rem;font-size:.72rem;border-radius:100px}
+
+/* ======== ЧИСТАЯ ПРИБЫЛЬ: плашка (1-в-1 с утверждённым макетом) ======== */
+.pnl-frame{background:#fff;border-radius:22px;padding:22px;border:1px solid #dfe7f3;box-shadow:0 14px 34px -24px rgba(11,18,32,.4)}
+.pnl-top{display:grid;grid-template-columns:290px 1fr;gap:20px;align-items:start}
+.pnl-kpi{display:block}
+.pnl-kpi-card{background:linear-gradient(150deg,#ffdd2d 0%,#ffe97a 55%,#fff9db 100%);border-radius:18px;padding:22px;box-shadow:0 18px 40px -20px rgba(255,199,0,.75);position:relative;overflow:hidden}
+.pnl-kpi-card:after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.45)}
+.pnl-kpi-card .lbl{color:#7a6412;position:relative;font-size:12.5px;letter-spacing:.04em;font-weight:700;text-transform:uppercase}
+.pnl-kpi-card .big{font-size:34px;font-weight:900;letter-spacing:-.035em;margin:6px 0 14px;position:relative;color:#0b1220}
+.pnl-kpi-card .chips{display:flex;gap:8px;position:relative}
+.pnl-kpi-card .chip{background:rgba(255,255,255,.75);border-radius:10px;padding:8px 11px;flex:1}
+.pnl-kpi-card .chip .lbl{color:#7a6412;font-size:9.5px}
+.pnl-kpi-card .chip b{font-size:14px;font-weight:800;color:#0d4ea8;display:block;margin-top:2px}
+
+.pnl-rhead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0d4ea8;padding-bottom:8px;margin-bottom:8px}
+.pnl-rhead span{font-size:13.5px;font-weight:600;color:#33405a}
+
+.pnl-acc{border:1px solid #e3e9f2;border-radius:14px;overflow:hidden;margin-bottom:10px;background:#fff;transition:box-shadow .2s,border-color .2s}
+.pnl-acc.open{border-color:#c9deff;box-shadow:0 12px 28px -20px rgba(31,117,255,.5)}
+.pnl-acc-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none;background:linear-gradient(180deg,#fff,#fbfdff)}
+.pnl-acc.open .pnl-acc-head{background:linear-gradient(120deg,#f4f8ff,#eaf2ff)}
+.pnl-acc-left{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700}
+.pnl-acc-val{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.pnl-acc-val.inc{color:#0d4ea8}
+.pnl-acc-val.exp{color:#c0392b}
+.pnl-acc-car{font-size:19px;font-weight:800;line-height:1;color:#1F75FF;display:inline-block;transition:transform .25s;animation:cartripulse 1.6s ease-in-out infinite}
+.pnl-acc.open .pnl-acc-car{transform:rotate(180deg);animation:none}
+.pnl-acc-body{display:none;padding:4px 16px 12px;border-top:1px solid #eef3fb}
+.pnl-acc.open .pnl-acc-body{display:block;animation:pnlaccin .22s ease}
+@keyframes pnlaccin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pnl-r{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #eef1f6;font-size:13.5px}
+.pnl-r:last-child{border-bottom:none}
+.pnl-r .nm{color:#33405a}
+.pnl-r .v{font-weight:600;font-variant-numeric:tabular-nums}
+
+.pnl-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.pnl-mini{background:#E6F0FF;border-radius:14px;padding:14px 16px}
+.pnl-mini .lbl{color:#4a72b8;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.pnl-mini b{font-size:15px;font-weight:800;color:#0d4ea8;display:block;margin-top:4px}
+@media(max-width:700px){ .pnl-top{grid-template-columns:1fr} .pnl-grid3{grid-template-columns:1fr} }
