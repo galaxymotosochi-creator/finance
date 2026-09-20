@@ -282,13 +282,14 @@ export default function PnL() {
           </div>
           <div className="sub">{d.month}</div>
         </div>
-        <div className="sal-dd-wrap sk-dd-wrap" onClick={e => e.stopPropagation()}>
-          <button type="button" className="sk-dd-btn sal-cat-btn" style={{animation:'none'}}
-            onClick={e => { e.stopPropagation(); document.querySelectorAll('.sal-dd-wrap').forEach(w => { if (!w.contains(e.currentTarget)) w.classList.remove('open'); }); e.currentTarget.parentElement.classList.toggle('open'); }}>
+        <div className="sk-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+          <button type="button"
+            style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+            onClick={e => { e.stopPropagation(); document.querySelectorAll('.sk-period-wrap').forEach(w => { if (!w.contains(e.currentTarget)) w.classList.remove('open'); }); e.currentTarget.parentElement.classList.toggle('open'); }}>
             {period === 'custom' ? 'Свой период' : (period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год')}
-            <span className="car">▼</span>
+            <span className="car-tri">▾</span>
           </button>
-          <div className="sk-dd-menu sal-dd-menu">
+          <div className="sk-period-menu" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'260px',padding:'.4rem',zIndex:100,display:'none'}}>
             {[['month','Месяц'],['quarter','Квартал'],['year','Год']].map(([k,l]) => (
               <button key={k} type="button"
                 style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}

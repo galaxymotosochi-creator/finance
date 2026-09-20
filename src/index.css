@@ -1428,3 +1428,5 @@ input:focus, select:focus, textarea:focus {
 .pnl-mini .lbl{color:#4a72b8;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .pnl-mini b{font-size:15px;font-weight:800;color:#0d4ea8;display:block;margin-top:4px}
 @media(max-width:700px){ .pnl-top{grid-template-columns:1fr} .pnl-grid3{grid-template-columns:1fr} }
+.sk-period-wrap.open .sk-period-menu{display:block !important;animation:skpop .16s ease}
+.sk-period-wrap.open .car-tri{transform:rotate(180deg);animation:none}
