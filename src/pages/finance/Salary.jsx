@@ -1114,9 +1114,10 @@ export default function Salary() {
                             const val = (rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) || 0;
                             const sum = Number(row.fromReceipt) || 0;
                             const pct = sum > 0 ? Math.round(Number(val) / sum * 1000) / 10 : 0;
-                            // Источник как в продажах: правка вручную (в начислении) → manual, из чека → card, пусто → none
+                            // Вознаграждение не берётся из карточки: сумма либо из чека (доля мастера), либо вписана вручную.
+                            // Обе — «вписано вручную» (оранжевый). «Ставка из карточки» тут не бывает.
                             const edited = rewardEdit[row.itemId] !== undefined && rewardEdit[row.itemId] !== '';
-                            const src = edited ? 'manual' : (Number(val) > 0 ? 'card' : 'none');
+                            const src = (edited || sum > 0 || Number(val) > 0) ? 'manual' : 'none';
                             return (
                               <tr key={row.itemId}>
                                 <td className="date">{fmtDate(row.date)}</td>
