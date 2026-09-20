@@ -469,7 +469,7 @@ export default function Accounts() {
                   </tr>
                   {(ownerIn > 0 || ownerOut > 0) && (
                     <tr>
-                      <td style={{textAlign:'left'}} colSpan={2}>Собственные средства владельца</td>
+                      <td style={{textAlign:'left'}} colSpan={2}><span className="sk-name">Собственные средства владельца</span></td>
                       <td style={{textAlign:'left'}}>{ownerIn.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{ownerOut.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{(ownerIn-ownerOut).toLocaleString()} {cur}</td>
