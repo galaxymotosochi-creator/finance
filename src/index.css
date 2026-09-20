@@ -1353,3 +1353,15 @@ input:focus, select:focus, textarea:focus {
 /* иконка календаря — как у обычных полей (не тёмная от браузера) */
 .sal-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.45;cursor:pointer}
 .sal-input:disabled{background:#fff;color:#333;opacity:1;-webkit-text-fill-color:#333}
+
+/* Таблица продаж: цветные рамки ввода + легенда (как в превью) */
+.sal-rin{width:62px;padding:.32rem .4rem;font-size:.78rem;font-family:var(--font);text-align:center;
+  border:1.5px solid rgba(0,0,0,.26);border-radius:6px;outline:none;background:#fff;
+  transition:border-color .15s,box-shadow .15s}
+.sal-rin:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.07)}
+.sal-rin.auto{border-color:#428bf9;background:#e8f0ff}
+.sal-rin.empty{border-style:dashed;background:#fff}
+.sal-rin.manual{border-color:#f59e0b;background:#fffbeb}
+.sal-cell{display:inline-flex;align-items:center;gap:.3rem;justify-content:center}
+.sal-legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.7rem;color:var(--muted);padding:.35rem .5rem .5rem}
+.sal-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}

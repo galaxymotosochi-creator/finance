@@ -935,28 +935,38 @@ export default function Salary() {
                   ) : (
                     <>
                       <table className="sal-tbl">
+                        <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
-                          <th style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
-                          <th style={{padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Позиция</th>
-                          <th style={{width:'58px',padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'right'}}>Сумма</th>
-                          <th style={{width:'70px',padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'center'}}>₽</th>
-                          <th style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'center'}}>%</th>
+                          <th>Дата</th>
+                          <th>Наименование</th>
+                          <th className="num">Сумма</th>
+                          <th className="ctr">%</th>
+                          <th className="ctr">Бонус</th>
                         </tr></thead>
                         <tbody>
                           {salesRows.map(row => {
                             const b = salesBonus[row.itemId] || { rub: 0, pct: 0 };
+                            const src = b.pct > 0 ? (b.manual ? 'manual' : 'card') : 'none';
                             return (
                               <tr key={row.itemId}>
-                                <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f0f0f0',color:'var(--muted)',fontSize:'.7rem',textAlign:'left'}}>{fmtDate(row.date)}</td>
-                                <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f0f0f0',color:'var(--body-color)',fontSize:'.72rem',textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.name}{row.qty > 1 ? ' x' + row.qty : ''}</td>
-                                <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f0f0f0',color:'var(--muted)',fontSize:'.7rem',textAlign:'right'}}>{row.total.toLocaleString()}</td>
-                                <td style={{padding:'.25rem .2rem',borderBottom:'1px solid #f0f0f0',textAlign:'center'}}>
-                                  <input type="number" min="0" value={b.rub} onChange={e => { const v = Math.max(0, parseFloat(e.target.value) || 0); setSalesBonus(prev => ({ ...prev, [row.itemId]: { rub: v, pct: row.total > 0 ? Math.round(v / row.total * 1000) / 10 : 0 } })); }}
-                                    style={{width:'58px',padding:'.2rem .25rem',fontSize:'.7rem',textAlign:'center',fontFamily:'inherit',border:'1px solid #bfdbfe',borderRadius:'5px',outline:'none'}} />
+                                <td className="date">{fmtDate(row.date)}</td>
+                                <td className="name">{row.name}{row.qty > 1 ? ' x' + row.qty : ''}</td>
+                                <td className="num mut">{row.total.toLocaleString()} {cur}</td>
+                                <td className="ctr">
+                                  <span className="sal-cell">
+                                    <input type="number" min="0" className={'sal-rin '+(src === 'card' ? 'auto' : src === 'manual' ? 'manual' : 'empty')}
+                                      value={b.pct || ''} placeholder="—"
+                                      onChange={e => { const pct = Math.max(0, parseFloat(e.target.value) || 0); const rub = row.total > 0 ? Math.round(row.total * pct / 100) : 0; setSalesBonus(prev => ({ ...prev, [row.itemId]: { rub, pct, manual: true } })); }} />
+                                    <span className="sal-unit">%</span>
+                                  </span>
                                 </td>
-                                <td style={{padding:'.25rem .2rem',borderBottom:'1px solid #f0f0f0',textAlign:'center'}}>
-                                  <input type="number" min="0" value={b.pct} onChange={e => { const pct = Math.max(0, parseFloat(e.target.value) || 0); const rub = row.total > 0 ? Math.round(row.total * pct / 100) : 0; setSalesBonus(prev => ({ ...prev, [row.itemId]: { rub, pct } })); }}
-                                    style={{width:'42px',padding:'.2rem .25rem',fontSize:'.7rem',textAlign:'center',fontFamily:'inherit',border:'1px solid #bfdbfe',borderRadius:'5px',outline:'none'}} />
+                                <td className="ctr">
+                                  <span className="sal-cell">
+                                    <input type="number" min="0" className={'sal-rin '+(src === 'card' ? 'auto' : src === 'manual' ? 'manual' : 'empty')}
+                                      value={b.rub || ''} placeholder="0"
+                                      onChange={e => { const v = Math.max(0, parseFloat(e.target.value) || 0); setSalesBonus(prev => ({ ...prev, [row.itemId]: { rub: v, pct: row.total > 0 ? Math.round(v / row.total * 1000) / 10 : 0, manual: true } })); }} />
+                                    <span className="sal-unit">₽</span>
+                                  </span>
                                 </td>
                               </tr>
                             );
@@ -964,6 +974,11 @@ export default function Salary() {
                         </tbody>
                       </table>
                       <div className="sal-foot"><span className="l">Итого за продажи: {itemsBonusTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
+                      <div className="sal-legend">
+                        <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>
+                        <span><i style={{background:'#f59e0b'}}></i>вписано вручную</span>
+                        <span><i style={{background:'#fff',border:'1.5px dashed #c3ccd8'}}></i>ставки нет</span>
+                      </div>
                     </>
                   )}
                 </div>
