@@ -52,6 +52,11 @@ export default function Accounts() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteAc, setPendingDeleteAc] = useState(null);
   const [showCollection, setShowCollection] = useState(false);
+  const [showOwner, setShowOwner] = useState(false);
+  const [ownerMode, setOwnerMode] = useState('deposit');
+  const [ownerAcct, setOwnerAcct] = useState('');
+  const [ownerAmt, setOwnerAmt] = useState('');
+  const [ownerDesc, setOwnerDesc] = useState('');
   const [colAmt, setColAmt] = useState('');
   const [colTo, setColTo] = useState('');
   const [viewAcTx, setViewAcTx] = useState(null);
@@ -155,10 +160,27 @@ export default function Accounts() {
     var d = t.description || '';
     return d.startsWith('Перевод со счета') || d.startsWith('Перевод на счет') || d.startsWith('Инкассация');
   };
+  // Взнос/вывод своих денег владельца — не поступления/расходы бизнеса,
+  // а личные средства: показываем отдельной строкой, чтобы не смешивать с выручкой.
+  var isOwnerTx = (t) => {
+    if (!t) return false;
+    if (t.kind === 'owner_deposit' || t.kind === 'owner_withdraw') return true;
+    var d = t.description || '';
+    return d.startsWith('Взнос своих денег') || d.startsWith('Вывод своих денег');
+  };
   var getMv = (ac) => {
-    if (!ac) return {i:0,e:0};
-    var i=0,e=0; (transactions||[]).forEach(t=>{if(t.account_id===ac.id && !isInternalTx(t)){if(t.type==='income')i+=Number(t.amount||0);else e+=Number(t.amount||0);}});
-    return {i,e};
+    if (!ac) return {i:0,e:0,od:0,ow:0};
+    var i=0,e=0,od=0,ow=0;
+    (transactions||[]).forEach(t=>{
+      if (t.account_id !== ac.id || isInternalTx(t)) return;
+      if (isOwnerTx(t)) {
+        if (t.kind === 'owner_deposit' || t.type === 'income') od += Number(t.amount||0);
+        else ow += Number(t.amount||0);
+        return;
+      }
+      if (t.type==='income') i += Number(t.amount||0); else e += Number(t.amount||0);
+    });
+    return {i,e,od,ow};
   };
   var getTypeMeta = (ac) => {
     try {
@@ -321,6 +343,7 @@ export default function Accounts() {
                 { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
                 { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
                 { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
+                { onClick: ()=>{setOwnerMode('deposit');setOwnerAcct(accounts.length?accounts[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}, label:'Взнос / вывод своих денег' },
               ].map(a => (
                 <button key={a.label} type="button" onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');a.onClick()}}>{a.label}</button>
               ))}
@@ -433,7 +456,9 @@ export default function Accounts() {
                 {sorted.length > 0 && (() => {
                   const incTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.i; }, 0);
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
-                  return (
+                  const ownerIn = accounts.reduce((s,a) => { const mv=getMv(a); return s + (mv.od||0); }, 0);
+                  const ownerOut = accounts.reduce((s,a) => { const mv=getMv(a); return s + (mv.ow||0); }, 0);
+                  return (<>
                   <tr className="sk-total">
                     <td style={{textAlign:'left'}}>Итого:</td>
                     <td style={{textAlign:'left'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
@@ -442,7 +467,24 @@ export default function Accounts() {
                     <td style={{textAlign:'left'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
                     <td></td>
                   </tr>
-                  );
+                  {(ownerIn > 0 || ownerOut > 0) && (
+                    <tr>
+                      <td style={{textAlign:'left'}} colSpan={2}>
+                        <span style={{color:'#7a6412'}}>🟡 Свои средства владельца</span>
+                      </td>
+                      <td style={{textAlign:'left'}}>
+                        <span style={{fontWeight:700,color:'#0d4ea8'}}>внесено {ownerIn.toLocaleString()} {cur}</span>
+                      </td>
+                      <td style={{textAlign:'left'}}>
+                        <span style={{fontWeight:700,color:'#c0392b'}}>выведено {ownerOut.toLocaleString()} {cur}</span>
+                      </td>
+                      <td style={{textAlign:'left'}}>
+                        <span style={{fontWeight:700,color:'#7a6412'}}>итог {(ownerIn-ownerOut).toLocaleString()} {cur}</span>
+                      </td>
+                      <td></td>
+                    </tr>
+                  )}
+                  </>);
                 })()}
               </tbody>
             </table>
@@ -635,6 +677,59 @@ export default function Accounts() {
       </Modal>
 
       {/* Инкассация */}
+      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
+        <form onSubmit={async function(e){
+          e.preventDefault();
+          const amt = parseFloat(ownerAmt);
+          if (!amt || amt <= 0) return alert('Введите сумму');
+          const acct = accounts.find(a => a.id === ownerAcct);
+          if (!acct) return alert('Выберите счет');
+          if (ownerMode === 'withdraw') {
+            const bal = balOfId(acct.id) || 0;
+            if (amt > bal) return alert('Недостаточно средств на счете «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
+          }
+          try {
+            const isDeposit = ownerMode === 'deposit';
+            await supabase.from('transactions').insert({
+              user_id: user.id,
+              account_id: acct.id,
+              type: isDeposit ? 'income' : 'expense',
+              amount: amt,
+              description: (isDeposit ? 'Взнос своих денег' : 'Вывод своих денег') + (ownerDesc.trim() ? ' — ' + ownerDesc.trim() : ''),
+              date: new Date().toISOString().split('T')[0],
+              kind: isDeposit ? 'owner_deposit' : 'owner_withdraw',
+              category_id: null,
+            });
+            setShowOwner(false); setOwnerAmt(''); setOwnerDesc('');
+            await fetchTx();
+            setToast((isDeposit ? 'Взнос' : 'Вывод') + ' своих денег: ' + amt.toLocaleString() + ' ' + cur);
+          } catch(err) { alert('Ошибка: ' + err.message); }
+        }}>
+          <div className="form-group">
+            <label>Операция</label>
+            <div style={{display:'flex',gap:'.5rem'}}>
+              <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='deposit'?'#fff':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
+              <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='withdraw'?'#fff':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Счет</label>
+            <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
+          </div>
+          <div className="form-group">
+            <label>Сумма</label>
+            <input type="number" min="0" step="0.01" value={ownerAmt} onChange={e=>setOwnerAmt(e.target.value)} placeholder="0" autoFocus />
+          </div>
+          <div className="form-group">
+            <label>Комментарий</label>
+            <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="sk-dd-btn">Сохранить</button>
+          </div>
+        </form>
+      </Modal>
+
       <Modal open={showCollection} onClose={()=>setShowCollection(false)} title="Инкассация" subtitle="Изъятие наличных из кассы" width="medium">
         {(()=>{
         var cashRegAc = accounts.find(a => a.type === 'cash_register');
