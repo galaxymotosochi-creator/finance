@@ -1003,6 +1003,8 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
                   ) : (
                     <>
+                      <div className="sal-tblwrap">
+                        <div className="sal-scrollhint">→</div>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
@@ -1042,6 +1044,7 @@ export default function Salary() {
                           })}
                         </tbody>
                       </table>
+                      </div>
                       <div className="sal-foot"><span className="l">Итого за продажи: {itemsBonusTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                       <div className="sal-legend">
                         <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>
@@ -1070,6 +1073,8 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
                   ) : (
                     <>
+                      <div className="sal-tblwrap">
+                        <div className="sal-scrollhint">→</div>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
@@ -1114,6 +1119,7 @@ export default function Salary() {
                           })}
                         </tbody>
                       </table>
+                      </div>
                       <div className="sal-foot"><span className="l">Итого исполнителю: {rewardTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                       <div className="sal-legend">
                         <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>

@@ -1295,8 +1295,7 @@ input:focus, select:focus, textarea:focus {
 .sal-sub{margin:-.35rem 0 .6rem;padding:0 .75rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .sal-sub::-webkit-scrollbar{display:none}
 .sal-sub .sal-tbl{min-width:520px}
-@media(max-width:768px){.sal-sub .sal-tbl{min-width:560px}
-.sal-sub:after{content:'← проведите, чтобы увидеть все колонки →';display:block;font-size:.66rem;color:var(--muted);text-align:center;padding-top:.3rem}}
+@media(max-width:768px){.sal-sub .sal-tbl{min-width:560px}}
 .sal-hint{font-size:.72rem;color:var(--muted);padding:.35rem .45rem .55rem;line-height:1.5}
 
 /* вложенные таблицы — единое выравнивание */
@@ -1377,4 +1376,15 @@ input:focus, select:focus, textarea:focus {
 @media(max-width:768px){
   .sal-tblscroll .sal-tbl{min-width:560px}
   .sal-hintscroll{display:block}
+}
+
+/* Подсказка скролла вложенных таблиц — тень и стрелка, как у остальных таблиц сайта */
+.sal-tblwrap{position:relative}
+.sal-scrollhint{display:none}
+@media(max-width:1024px){
+  .sal-tblscroll,.sal-sub{scrollbar-width:none}
+  .sal-scrollhint{display:block;position:absolute;top:0;bottom:0;right:0;width:34px;pointer-events:none;z-index:5;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.75))}
+  .sal-scrollhint:after{content:"›";position:absolute;top:52px;right:8px;font-size:22px;font-weight:700;
+    color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
 }
