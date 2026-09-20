@@ -897,11 +897,19 @@ export default function Salary() {
 
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
               <div className="sal-seclab">Включить в начисление</div>
-              <div className={'sal-pick'+(storeOn?' on':'')} onClick={()=>setStoreOn(!storeOn)}>
-                <span className="cb">{storeOn ? '✓' : ''}</span>
-                <span className="nm">Бонус от выручки магазина</span>
-                <span className="vl">+{storeBonus.toLocaleString()} {cur}</span>
-              </div>
+              {(()=>{
+                const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
+                const on = storeOn && hasStoreRate;
+                return (
+                  <div className={'sal-pick'+(on?' on':'')} title={hasStoreRate ? '' : 'У сотрудника не задан процент от выручки в карточке'}
+                    style={hasStoreRate ? {} : {opacity:.5, cursor:'not-allowed'}}
+                    onClick={()=>{ if (!hasStoreRate) return; setStoreOn(!storeOn); }}>
+                    <span className="cb">{on ? '✓' : ''}</span>
+                    <span className="nm">Бонус от выручки магазина</span>
+                    <span className="vl">{hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки'}</span>
+                  </div>
+                );
+              })()}
               <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
                 <span className="cb">{salesOn ? '✓' : ''}</span>
                 <span className="nm">Продажи сотрудника (он продавец)</span>
@@ -1079,14 +1087,13 @@ export default function Salary() {
               </div>
 
               {/* Долги по недостачам (инвентаризация) */}
-              {empDebts.length > 0 && (
-                <>
-                <div className={'sal-pick'+((debtOpen && empDebts.length>0)?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
-                <span className="cb">{(debtOpen && empDebts.length>0) ? '✓' : ''}</span>
+              <>
+                <div className={'sal-pick'+(debtOpen?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
+                <span className="cb">{debtOpen ? '✓' : ''}</span>
                 <span className="nm">Долги по недостачам</span>
                 <span className="vl">−{checkedDebtTotal.toLocaleString()} {cur}</span>
               </div>
-              <div className="sal-sub" style={{display: debtOpen ? 'block' : 'none'}}>
+              <div className="sal-sub" style={{display: (debtOpen && empDebts.length > 0) ? 'block' : 'none'}}>
                   <div style={{padding:'.5rem .65rem'}}>
                     <table className="sal-tbl">
                       <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
@@ -1111,11 +1118,10 @@ export default function Salary() {
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
                   </div>
                 </div>
-                </>
-              )}
+              </>
 
               {/* Учесть долг перед сотрудником — галочка */}
-              {existingDebt !== 0 && (
+              {(
                 <div className={'sal-pick'+(debtInclude?' on':'')} onClick={()=>setDebtInclude(!debtInclude)}>
                   <span className="cb">{debtInclude ? '✓' : ''}</span>
                   <span className="nm">Учесть долг перед сотрудником</span>
