@@ -984,8 +984,8 @@ export default function Salary() {
                     if (bonusOpen && checkedBonusTotal > 0 && !doneBonus) items.push({ n:'Премии', v: checkedBonusTotal });
                     if (!items.length) return null;
                     return (
-                      <div style={{ marginTop:'.35rem', fontSize:'.72rem', color:'var(--muted)' }}>
-                        Не вошло: {items.map((x, i) => <span key={i}>{i > 0 ? ', ' : ''}<b style={{ color:'#0b1220' }}>{x.n} {x.v.toLocaleString()} {cur}</b></span>)}
+                      <div style={{ marginTop:'.35rem', fontSize:'.76rem', color:'#0b1220' }}>
+                        Не вошло: {items.map((x, i) => <span key={i}>{i > 0 ? ', ' : ''}<b>{x.n} {x.v.toLocaleString()} {cur}</b></span>)}
                       </div>
                     );
                   })()}
