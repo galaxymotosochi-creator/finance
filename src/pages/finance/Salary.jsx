@@ -146,6 +146,10 @@ export default function Salary() {
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
   const [salesOn, setSalesOn] = useState(true);
+  const [rewardOn, setRewardOn] = useState(true);
+  const [bonusOpen, setBonusOpen] = useState(true);
+  const [fineOpen, setFineOpen] = useState(true);
+  const [debtOpen, setDebtOpen] = useState(true);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
   const [dupSalary, setDupSalary] = useState(null); // уже есть начисление за этот период (защита от дублей)
   // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
@@ -941,11 +945,13 @@ export default function Salary() {
               </div>
 
               {/* Вознаграждение исполнителю из чеков */}
-              <div style={{border:'1px solid #fde68a',borderRadius:'12px',overflow:'hidden'}}>
-                <div style={{padding:'.5rem .65rem',background:'#fffbeb',borderBottom:'1px solid #fde68a',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#b45309'}}>Вознаграждение исполнителю (из чеков)</span>
-                  <span style={{fontSize:'.68rem',color:'#b45309',fontWeight:600}}>+{rewardTotal.toLocaleString()} {cur}</span>
-                </div>
+              <div className={'sal-pick'+(rewardOn?' on':'')} onClick={()=>setRewardOn(!rewardOn)}>
+                <span className="cb">{rewardOn ? '✓' : ''}</span>
+                <span className="nm">Вознаграждение исполнителю (он мастер)</span>
+                <span className="vl">+{rewardTotal.toLocaleString()} {cur}</span>
+              </div>
+              <div className="sal-sub" style={{display: rewardOn ? 'block' : 'none'}}>
+                <div className="sal-hint">Суммы из чеков кассы, где он указан исполнителем — можно поправить.</div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {!fEmpId ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>
@@ -955,8 +961,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
                   ) : (
                     <>
-                      <div style={{fontSize:'.7rem',color:'#b45309',marginBottom:'.3rem'}}>Суммы из чеков кассы (раздел «Мастера») — можно поправить вручную</div>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.74rem',tableLayout:'fixed'}}>
+                      <table className="sal-tbl">
                         <tbody>
                           {rewardRows.map(row => (
                             <tr key={row.itemId}>
@@ -971,27 +976,25 @@ export default function Salary() {
                           ))}
                         </tbody>
                       </table>
-                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.75rem',fontWeight:600,color:'#b45309',paddingTop:'.4rem'}}>
-                        <span>Исполнителю за период</span>
-                        <span>+{rewardTotal.toLocaleString()} {cur}</span>
-                      </div>
+                      <div className="sal-foot"><span className="l">Итого исполнителю: {rewardTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                     </>
                   )}
                 </div>
               </div>
 
               {/* Премии из табеля */}
-              <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden'}}>
-                <div style={{padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#16a34a'}}>Премии из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#16a34a'}}>{checkedBonusTotal.toLocaleString()} {cur}</span>
-                </div>
+              <div className={'sal-pick'+(bonusOpen?' on':'')} onClick={()=>setBonusOpen(!bonusOpen)}>
+                <span className="cb">{bonusOpen ? '✓' : ''}</span>
+                <span className="nm">Премии из табеля</span>
+                <span className="vl">+{checkedBonusTotal.toLocaleString()} {cur}</span>
+              </div>
+              <div className="sal-sub" style={{display: bonusOpen ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsBonuses.length === 0 ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет премий за этот период'}</div>
                   ) : (
                     <>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
+                      <table className="sal-tbl">
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
@@ -1017,24 +1020,21 @@ export default function Salary() {
                     </>
                   )}
                 </div>
-              {salarySplitMode && (
-                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
-              )}
               </div>
 
               {/* Штрафы из табеля */}
-              <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden'}}>
-                <div style={{padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#dc2626'}}>Штрафы из табеля</span>
-                  <span style={{fontSize:'.68rem',color:'#dc2626'}}>-{checkedDeductTotal.toLocaleString()} {cur}</span>
-                </div>
+              <div className={'sal-pick'+(fineOpen?' on':'')} onClick={()=>setFineOpen(!fineOpen)}>
+                <span className="cb">{fineOpen ? '✓' : ''}</span>
+                <span className="nm">Штрафы из табеля</span>
+                <span className="vl">−{checkedDeductTotal.toLocaleString()} {cur}</span>
+              </div>
+              <div className="sal-sub" style={{display: fineOpen ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsDeducts.length === 0 ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет штрафов за этот период'}</div>
                   ) : (
                     <>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
+                      <table className="sal-tbl">
                         <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                           <th style={{width:'65px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Дата</th>
                           <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
@@ -1056,25 +1056,22 @@ export default function Salary() {
                           ))}
                         </tbody>
                       </table>
-                      <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Снимите галочку — штраф останется на будущее</div>
                     </>
                   )}
                 </div>
-              {salarySplitMode && (
-                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
-              )}
               </div>
 
               {/* Долги по недостачам (инвентаризация) */}
               {empDebts.length > 0 && (
-                <div style={{border:'1px solid #fed7aa',borderRadius:'12px',overflow:'hidden'}}>
-                  <div style={{padding:'.5rem .65rem',background:'#fff7ed',borderBottom:'1px solid #fed7aa',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <span style={{fontSize:'.78rem',fontWeight:600,color:'#ea580c'}}>Долги по недостачам</span>
-                    <span style={{fontSize:'.68rem',color:'#ea580c'}}>-{checkedDebtTotal.toLocaleString()} {cur}</span>
-                  </div>
+                <>
+                <div className={'sal-pick'+((debtOpen && empDebts.length>0)?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
+                <span className="cb">{(debtOpen && empDebts.length>0) ? '✓' : ''}</span>
+                <span className="nm">Долги по недостачам</span>
+                <span className="vl">−{checkedDebtTotal.toLocaleString()} {cur}</span>
+              </div>
+              <div className="sal-sub" style={{display: debtOpen ? 'block' : 'none'}}>
                   <div style={{padding:'.5rem .65rem'}}>
-                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.75rem',tableLayout:'fixed'}}>
+                    <table className="sal-tbl">
                       <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
                         <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
                         <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>За что</th>
@@ -1097,6 +1094,7 @@ export default function Salary() {
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
                   </div>
                 </div>
+                </>
               )}
 
               {/* Долг */}
