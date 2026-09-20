@@ -1090,7 +1090,9 @@ export default function Salary() {
                     <div style={{fontSize:'.7rem',color:'#d97706',marginBottom:'6px'}}>⚠️ Включен процент от всей выручки без суммирования — бонусы за свои продажи ниже не начисляются</div>
                   )}
                   {salesRows.length === 0 ? (
-                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
+                    (!fPeriodFrom || !fPeriodTo) ? (
+                      <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Заполните даты периода — продажи сотрудника появятся здесь</div>
+                    ) : null
                   ) : (
                     <>
                       <div className="sal-tblwrap">
