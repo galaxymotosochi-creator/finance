@@ -263,9 +263,14 @@ export default function Salary() {
         const rlist = recs || [];
         if (rlist.length === 0) { setSalesRows([]); setSalesBonus({}); setRewardRows([]); setRewardEdit({}); setSalesLoaded(true); return; }
         const { data: items } = await supabase.from('receipt_items').select('*').in('receipt_id', rlist.map(r => r.id));
+        const isService = (pid) => {
+          const p = pr.find(x => String(x.id) === String(pid));
+          return !!(p && p.type === 'service');
+        };
         const rows = [];
         (items || []).forEach(it => {
           if (String(it.employee_id || '') !== String(fEmpId)) return;
+          if (isService(it.product_id)) return;   // услуги → в «Вознаграждение», не в продажи
           const r = rlist.find(x => x.id === it.receipt_id);
           if (!r) return;
           const qty = Number(it.quantity) || 1;
@@ -282,9 +287,10 @@ export default function Salary() {
         const rewRows = [];
         (items || []).forEach(it => {
           const sps = it.employee_splits || [];
-          if (!sps.length) return;
           const mine = sps.filter(function(s){ return String(s.employee_id || '') === String(fEmpId); });
-          if (!mine.length) return;
+          const isMine = String(it.employee_id || '') === String(fEmpId);
+          // Берём: либо есть доля мастера в чеке, либо он исполнитель услуги
+          if (!mine.length && !(isService(it.product_id) && isMine)) return;
           const r = rlist.find(x => x.id === it.receipt_id);
           if (!r) return;
           const qty = Number(it.quantity) || 1;
@@ -293,9 +299,15 @@ export default function Salary() {
           const availQty = Math.max(0, qty - retQty);
           if (availQty <= 0) return;
           const factor = qty > 0 ? availQty / qty : 1;
+          const itemTotal = Math.round((Number(it.total) || 0) * factor);
           const amt = Math.round(mine.reduce(function(s2, sp){ return s2 + (parseFloat(sp.amount) || 0); }, 0) * factor);
-          if (amt <= 0) return;
-          rewRows.push({ itemId: it.id, date: String(r.date || '').split('T')[0], name: it.product_name, amount: amt });
+          rewRows.push({
+            itemId: it.id,
+            date: String(r.date || '').split('T')[0],
+            name: it.product_name,
+            amount: amt,
+            fromReceipt: amt > 0 ? amt : itemTotal,   // «Из чека»: доля мастера, иначе сумма позиции
+          });
         });
         setSalesRows(rows);
         setRewardRows(rewRows);
@@ -1024,15 +1036,26 @@ export default function Salary() {
                   ) : (
                     <>
                       <table className="sal-tbl">
+                        <colgroup><col style={{width:'20%'}} /><col style={{width:'42%'}} /><col style={{width:'18%'}} /><col style={{width:'20%'}} /></colgroup>
+                        <thead><tr>
+                          <th>Дата</th>
+                          <th>Услуга</th>
+                          <th className="num">Из чека</th>
+                          <th className="ctr">К выплате</th>
+                        </tr></thead>
                         <tbody>
                           {rewardRows.map(row => (
                             <tr key={row.itemId}>
-                              <td style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--muted)',fontSize:'.7rem',textAlign:'left'}}>{fmtDate(row.date)}</td>
-                              <td style={{padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',color:'var(--body-color)',fontSize:'.72rem',textAlign:'left',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.name}</td>
-                              <td style={{width:'100px',padding:'.25rem .3rem',borderBottom:'1px solid #f5f5f0',textAlign:'right'}}>
-                                <input type="number" min="0" value={rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount}
-                                  onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))}
-                                  style={{width:'72px',padding:'.2rem .25rem',fontSize:'.72rem',textAlign:'center',fontFamily:'inherit',border:'1px solid #fde68a',borderRadius:'5px',outline:'none',color:'#b45309',fontWeight:600}} />
+                              <td className="date">{fmtDate(row.date)}</td>
+                              <td className="name">{row.name}</td>
+                              <td className="num mut">{(row.fromReceipt || row.amount).toLocaleString()} {cur}</td>
+                              <td className="ctr">
+                                <span className="sal-cell">
+                                  <input type="number" min="0" className="sal-rin auto"
+                                    value={rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount}
+                                    onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))} />
+                                  <span className="sal-unit">₽</span>
+                                </span>
                               </td>
                             </tr>
                           ))}
