@@ -267,13 +267,7 @@ export default function Salary() {
     const emp = employees.find(e => e.id === fEmpId);
     if (!emp) return;
     // Если за этот период уже есть начисление с окладом — не подставляем оклад повторно
-    const alreadyBase = (list || []).some(s2 =>
-      s2.employee_id === fEmpId &&
-      String(s2.period_from || '').slice(0, 10) === fPeriodFrom &&
-      String(s2.period_to || '').slice(0, 10) === fPeriodTo &&
-      s2.status !== 'cancelled' && s2.id !== editId &&
-      Number(s2.base_salary) > 0
-    );
+    const alreadyBase = dupBaseSum > 0;
     if (alreadyBase && !editId) { setFBaseSalary(0); return; }
     setFBaseSalary(emp.base_salary || 0);
   }, [fEmpId, employees, fPeriodFrom, fPeriodTo, list, editId]);
@@ -340,13 +334,23 @@ export default function Salary() {
           const availQty = Math.max(0, qty - retQty);
           if (availQty <= 0) return;
           const factor = qty > 0 ? availQty / qty : 1;
-          const amt = Math.round(mine.reduce(function(s2, sp){ return s2 + (parseFloat(sp.amount) || 0); }, 0) * factor);
+          const fromSplits = Math.round(mine.reduce(function(s2, sp){ return s2 + (parseFloat(sp.amount) || 0); }, 0) * factor);
+          // Если доли мастера в чеке нет — считаем по правилам карточки сотрудника (как для товаров)
+          let amt = fromSplits;
+          let byRule = false;
+          if (fromSplits <= 0) {
+            const unit = qty > 0 ? (Number(it.total) || 0) / qty : 0;
+            const c = calcSalesBonus(rules, { product_id: it.product_id, total: Math.round(unit * availQty), qty: availQty }, pr, cr);
+            amt = c.rub;
+            byRule = c.rub > 0;
+          }
           rewRows.push({
             itemId: it.id,
             date: String(r.date || '').split('T')[0],
             name: it.product_name,
             amount: amt,
-            fromReceipt: amt > 0 ? amt : null,   // «Из чека»: доля мастера из чека, иначе «—»
+            byRule,
+            fromReceipt: fromSplits > 0 ? fromSplits : null,   // «Из чека»: доля мастера из чека, иначе «—»
           });
         });
         setSalesRows(rows);
@@ -402,19 +406,12 @@ export default function Salary() {
     setFDays(calcDays(fPeriodFrom, fPeriodTo));
   }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalaryType]);
 
-  // Долг
+  // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
+  // Берём из empDebts — реальные долги, которые ещё висят. Никаких «авансов» здесь нет.
   useEffect(() => {
-    if (!fEmpId) return;
-    let debt = list
-      .filter(s => s.employee_id === fEmpId && s.status !== 'cancelled' && s.pay_type !== 'bonus')
-      .reduce((sum, s) => {
-        const amt = Number(s.amount) || 0;
-        // Выданное — закрытый расчёт (0). Аванс без выплаты — его долг нам.
-        if (s.status === 'paid') return sum;
-        return s.pay_type === 'advance' ? sum + amt : sum;
-      }, 0);
+    const debt = (empDebts || []).reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
     setExistingDebt(debt);
-  }, [fEmpId, list]);
+  }, [empDebts]);
 
   // Защита от дублей: если за выбранный период сотруднику уже начислено — предупреждаем и не даем сохранить
   useEffect(() => {
@@ -429,14 +426,22 @@ export default function Salary() {
     setDupSalary(d);
   }, [fEmpId, fPeriodFrom, fPeriodTo, list, editId]);
 
-  // Что уже погашено прошлым начислением за этот период (блоки становятся неактивными)
-  const dup = dupSalary;
-  // Выручка — по маркеру store в sales_items; продажи — по строчным бонусам (не путать!)
-  const doneStore = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => i && i.store === true));
-  const doneSales = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => i && !i.store && Number(i.bonus) > 0));
-  const doneReward = !!(dup && dup.reward_items && Array.isArray(dup.reward_items) && dup.reward_items.length > 0);
-  const doneBonus = !!(dup && Number(dup.bonus_amount) > 0);
-  const doneDeduct = !!(dup && Number(dup.deduct_amount) > 0);
+  // ВСЕ начисления за этот период (основное + доначисления) — учитываем суммарно
+  const dupAll = (list || []).filter(s =>
+    s.employee_id === fEmpId &&
+    String(s.period_from || '').slice(0, 10) === fPeriodFrom &&
+    String(s.period_to || '').slice(0, 10) === fPeriodTo &&
+    s.status !== 'cancelled' &&
+    s.id !== editId
+  );
+  const dupBaseSum = dupAll.reduce((sum, s) => sum + (Number(s.base_salary) || 0), 0);
+  const dupTotalSum = dupAll.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+  // Выручка — по маркеру store; продажи — по строчным бонусам; проверяем ПО ВСЕМ начислениям периода
+  const doneStore = dupAll.some(s => s.sales_items && Array.isArray(s.sales_items) && s.sales_items.some(i => i && i.store === true));
+  const doneSales = dupAll.some(s => s.sales_items && Array.isArray(s.sales_items) && s.sales_items.some(i => i && !i.store && Number(i.bonus) > 0));
+  const doneReward = dupAll.some(s => s.reward_items && Array.isArray(s.reward_items) && s.reward_items.length > 0);
+  const doneBonus = dupAll.some(s => Number(s.bonus_amount) > 0);
+  const doneDeduct = dupAll.some(s => Number(s.deduct_amount) > 0);
 
   const tsBonuses = tsEntries.filter(e => (e.bonus_amount||0) > 0);
   const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
@@ -912,10 +917,20 @@ export default function Salary() {
                   const paid = Number(s.paid_from) || 0;
                   const total = Number(s.amount) || 0;
                   const partial = paid > 0 && paid < total - 0.01;
-                  if (s.status === 'paid') return <span className="sk-tag sk-tag-ok" title={paid.toLocaleString()+' из '+total.toLocaleString()+' '+cur}>Выплачено</span>;
+                  // Доначисление = за этот же период у сотрудника есть ДРУГОЕ начисление
+                  const isAdd = (list || []).some(o => o.id !== s.id && o.employee_id === s.employee_id && o.status !== 'cancelled' &&
+                    String(o.period_from || '').slice(0,10) === String(s.period_from || '').slice(0,10) &&
+                    String(o.period_to || '').slice(0,10) === String(s.period_to || '').slice(0,10));
+                  if (s.status === 'paid') return <span style={{display:'inline-flex',gap:'.3rem',alignItems:'center'}}>
+                    <span className="sk-tag sk-tag-ok" title={paid.toLocaleString()+' из '+total.toLocaleString()+' '+cur}>Выплачено</span>
+                    {isAdd && <span className="sk-tag" title="Доначисление за тот же период">Доначисление</span>}
+                  </span>;
                   if (s.status !== 'pending' && s.status !== 'accrued') return <span className="sk-tag">{STATUS_LABELS[s.status]||s.status}</span>;
-                  return <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setPayAmount('');setShowAcc(true)}}>
-                    {partial ? 'Выплачено ' + paid.toLocaleString() + ' из ' + total.toLocaleString() : 'Выплатить'}
+                  return <span style={{display:'inline-flex',gap:'.3rem',alignItems:'center'}}>
+                    <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setPayAmount('');setShowAcc(true)}}>
+                      {partial ? 'Выплачено ' + paid.toLocaleString() + ' из ' + total.toLocaleString() : 'Выплатить'}
+                    </span>
+                    {isAdd && <span className="sk-tag" title="Доначисление за тот же период">Доначисление</span>}
                   </span>;
                 })()}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
@@ -968,7 +983,7 @@ export default function Salary() {
                 <div style={{ background:'#E6F0FF', border:'1px solid #c7ddff', borderRadius: 10, padding:'.55rem .75rem', fontSize:'.76rem', color:'#0b1220' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexWrap:'wrap' }}>
                     <span style={{ flex:1, minWidth:'200px' }}>
-                      За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{Number(dupSalary.amount || 0).toLocaleString()} {cur}</b>
+                      За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{dupTotalSum.toLocaleString()} {cur}</b>{dupAll.length > 1 ? ' (в ' + dupAll.length + ' начислениях)' : ''}
                     </span>
                     {dupSalary.status !== 'paid' && (
                       <button type="button" className="sk-dd-btn sal-open-btn" onClick={() => openEdit(dupSalary)}>Открыть</button>
