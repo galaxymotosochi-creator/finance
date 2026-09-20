@@ -152,6 +152,7 @@ export default function Salary() {
   const [bonusOpen, setBonusOpen] = useState(true);
   const [fineOpen, setFineOpen] = useState(true);
   const [debtOpen, setDebtOpen] = useState(true);
+  const [debtInclude, setDebtInclude] = useState(true);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
   const [dupSalary, setDupSalary] = useState(null); // уже есть начисление за этот период (защита от дублей)
   // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
@@ -1113,13 +1114,12 @@ export default function Salary() {
                 </>
               )}
 
-              {/* Долг */}
+              {/* Учесть долг перед сотрудником — галочка */}
               {existingDebt !== 0 && (
-                <div style={{background:'#fffbeb',border:'1px solid #f59e0b',borderRadius:'10px',padding:'.5rem .65rem',fontSize:'.78rem',display:'flex',gap:'.5rem',alignItems:'center'}}>
-                  <span style={{color:'#f59e0b',fontWeight:700}}>⚠</span>
-                  <span>Невыплаченных: <b>{Math.abs(existingDebt).toLocaleString()} {cur}</b>
-                    <span style={{fontSize:'.72rem',color:'var(--muted)',marginLeft:'.35rem'}}>после начисления будет {(existingDebt+grandTotal).toLocaleString()} {cur}</span>
-                  </span>
+                <div className={'sal-pick'+(debtInclude?' on':'')} onClick={()=>setDebtInclude(!debtInclude)}>
+                  <span className="cb">{debtInclude ? '✓' : ''}</span>
+                  <span className="nm">Учесть долг перед сотрудником</span>
+                  <span className="vl">{Math.abs(existingDebt).toLocaleString()} {cur}</span>
                 </div>
               )}
 
