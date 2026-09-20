@@ -91,6 +91,7 @@ export default function Salary() {
   const [showAcc, setShowAcc] = useState(false);
   const [pendingPayId, setPendingPayId] = useState(null);
   const [payAcctId, setPayAcctId] = useState(''); // выбранный счет в модалке выплаты
+  const [payAmount, setPayAmount] = useState(''); // сумма к выплате (можно выплатить часть)
   // Фильтры (как в разделе «Чеки»)
   const [salStatus, setSalStatus] = useState(null);
   const [salSearch, setSalSearch] = useState('');
@@ -416,7 +417,7 @@ export default function Salary() {
         base_salary: fBaseSalary, days_worked: fDays,
         // Статус всегда «Начислено» — выплата выполняется только через кнопку «Выплатить» с выбором счета,
         // иначе зарплата помечалась выплаченной без создания расходной операции
-        amount: grandTotal, status: 'pending', pay_type: fPayType,
+        amount: grandTotal, status: 'pending', pay_type: 'salary',
         bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
         sales_bonus: salesBonusTotal, sales_items: salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: Number(salesBonus[row.itemId]?.rub) || 0 })),
         reward_amount: rewardTotal, reward_items: rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }),
@@ -447,11 +448,14 @@ export default function Salary() {
     return b;
   };
 
-  const confirmPay = async (accId, splitAmts) => {
+  const confirmPay = async (accId, splitAmts, customAmount) => {
     try {
       const { data: rows } = await supabase.from('salary').select('*').eq('id', pendingPayId);
       if (!rows || !rows.length) return;
       const s = rows[0];
+      // Частичная выплата: сколько уже отдано и сколько платим сейчас
+      const alreadyPaid = Number(s.paid_from) || 0;
+      const payNow = (customAmount != null && customAmount > 0) ? Number(customAmount) : (Number(s.amount) || 0);
 
       // Найти или создать категорию «Зарплата»
       var salaryCatId = null;
@@ -465,7 +469,7 @@ export default function Salary() {
         if (newCat) salaryCatId = newCat.id;
       }
 
-      // Проверка баланса
+      // Проверка баланса — по фактической сумме к выплате
       const payDate = new Date().toISOString().split('T')[0]; // дата выплаты — сегодня
       if (splitAmts && Object.keys(splitAmts).length > 0) {
         let totalSplit = 0;
@@ -478,14 +482,11 @@ export default function Salary() {
             return alert('Недостаточно средств на счету ' + (acct?.name || 'счет') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + ', нужно: ' + amt.toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов или выберите другой счет.');
           }
         }
-        if (Math.abs(totalSplit - Number(s.amount)) > 0.01) {
-          return alert('Сумма разделения (' + Math.round(totalSplit).toLocaleString() + ' ₽) не совпадает с суммой начисления (' + Number(s.amount).toLocaleString() + ' ₽)');
-        }
       } else {
         const acct = accs.find(a => a.id === accId);
         const balance = acct ? getAccountBalance(acct) : 0;
-        if (balance < s.amount) {
-          return alert('Недостаточно средств на счету ' + (acct?.name || 'счет') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов (кнопка «+ Разделить») или выберите другой счет.');
+        if (balance < payNow) {
+          return alert('Недостаточно средств на счету ' + (acct?.name || 'счет') + '. Доступно: ' + Math.round(balance).toLocaleString() + ' ' + cur + ', нужно: ' + payNow.toLocaleString() + ' ' + cur + '. Разделите выплату на несколько счетов (кнопка «+ Разделить») или выберите другой счет.');
         }
       }
 
@@ -503,15 +504,23 @@ export default function Salary() {
       } else {
         const { error } = await supabase.from('transactions').insert({
           user_id: user.id, account_id: accId,
-          type: 'expense', amount: s.amount,
+          type: 'expense', amount: payNow,
           description: 'Зарплата: ' + (s.employee_name || 'Сотрудник') + ' — ' + fmtD(s.period_from) + ' / ' + fmtD(s.period_to),
           date: payDate, category_id: salaryCatId,
         });
         if (error) throw error;
       }
-      const { error: updErr, queued: payQueued } = await supabase.from('salary').update({ status: 'paid', paid_at: payDate }).eq('id', pendingPayId);
+      // Частичная выплата: считаем итог по факту. Оплачено полностью → статус «paid», иначе остаётся «pending» с накопленным paid_from
+      const splitTotal = (splitAmts && Object.keys(splitAmts).length > 0)
+        ? Object.values(splitAmts).reduce((a,b)=>a+(parseFloat(b)||0),0)
+        : payNow;
+      const paidTotal = alreadyPaid + splitTotal;
+      const fullyPaid = paidTotal >= (Number(s.amount) || 0) - 0.01;
+      const { error: updErr, queued: payQueued } = await supabase.from('salary')
+        .update({ paid_from: paidTotal, status: fullyPaid ? 'paid' : 'pending', paid_at: fullyPaid ? payDate : (s.paid_at || null) })
+        .eq('id', pendingPayId);
       if (updErr) throw updErr;
-      if (!payQueued) await load(); setShowAcc(false); setPendingPayId(null); setPayAcctId(''); setSalarySplitMode(false); setSalarySplitAmounts({});
+      if (!payQueued) await load(); setShowAcc(false); setPendingPayId(null); setPayAcctId(''); setSalarySplitMode(false); setSalarySplitAmounts({}); setPayAmount('');
     } catch (err) { alert('Ошибка выплаты: ' + err.message); }
   };
 
@@ -531,7 +540,12 @@ export default function Salary() {
 
   // Итоги по зарплате: общая сумма начислений, выплачено, не выплачено
   const salTotal = (list || []).reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
-  const salPaid = (list || []).filter(s => s.status === 'paid').reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+  // Выплачено — по факту: накопленное paid_from, а для старых записей со статусом paid — вся сумма
+  const salPaid = (list || []).reduce((sum, s) => {
+    const paid = Number(s.paid_from) || 0;
+    if (paid > 0) return sum + paid;
+    return s.status === 'paid' ? sum + (Number(s.amount) || 0) : sum;
+  }, 0);
   const salDue = salTotal - salPaid;
 
   // Закрытие выпадающих списков зарплаты по клику в любом месте
@@ -765,11 +779,16 @@ export default function Salary() {
                 <td>{s.bonus_amount?s.bonus_amount.toLocaleString()+' ₽':'—'}</td>
                 <td>{s.deduct_amount?s.deduct_amount.toLocaleString()+' ₽':'—'}</td>
                 <td>{Number(s.amount).toLocaleString()} {cur}</td>
-                <td>{(s.status==='pending'||s.status==='accrued')
-                  ? <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setShowAcc(true)}}>Выплатить</span>
-                  : s.status==='paid'
-                    ? <span className="sk-tag sk-tag-ok">Выплачено</span>
-                    : <span className="sk-tag">{STATUS_LABELS[s.status]||s.status}</span>}</td>
+                <td>{(()=>{
+                  const paid = Number(s.paid_from) || 0;
+                  const total = Number(s.amount) || 0;
+                  const partial = paid > 0 && paid < total - 0.01;
+                  if (s.status === 'paid') return <span className="sk-tag sk-tag-ok" title={paid.toLocaleString()+' из '+total.toLocaleString()+' '+cur}>Выплачено</span>;
+                  if (s.status !== 'pending' && s.status !== 'accrued') return <span className="sk-tag">{STATUS_LABELS[s.status]||s.status}</span>;
+                  return <span className="sk-tag sk-tag-pay" onClick={()=>{var first=accs.find(a=>a.type!=='credit');setPendingPayId(s.id);setPayAcctId(first?first.id:'');setPayAmount('');setShowAcc(true)}}>
+                    {partial ? 'Выплачено ' + paid.toLocaleString() + ' из ' + total.toLocaleString() : 'Выплатить'}
+                  </span>;
+                })()}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="sk-more" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
@@ -790,16 +809,6 @@ export default function Salary() {
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
       <Modal open={show} onClose={()=>setShow(false)} title={editId?'Редактировать':'Начислить зарплату'} subtitle="Выберите сотрудника и период" width="wide">
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
-
-              {/* Тип выплаты: Зарплата / Аванс */}
-              <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Тип</div>
-              <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap'}}>
-                {[{value:'salary',label:'Зарплата'},{value:'advance',label:'Аванс'}].map(t => (
-                  <span key={t.value} onClick={()=>setFPayType(t.value)}
-                    style={{display:'inline-flex',alignItems:'center',gap:'4px',padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'100px',cursor:'pointer',fontWeight:500,
-                      background:fPayType===t.value?'var(--primary)':'#f1f3f5',color:fPayType===t.value?'#000':'var(--muted)'}}>{t.label}</span>
-                ))}
-              </div>
 
               {/* Сотрудник + период */}
               <div style={{fontSize:'.72rem',fontWeight:600,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}}>Сотрудник и период</div>
@@ -1112,12 +1121,30 @@ export default function Salary() {
       </Modal>
 
       {/* МОДАЛКА ВЫБОРА СЧЕТА */}
-      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('')}} title="Выплата зарплаты" subtitle={(()=>{const ps=list.find(x=>String(x.id)===String(pendingPayId));return 'Сумма выплаты: ' + (ps ? Number(ps.amount||0).toLocaleString() + ' ' + cur : '0 ' + cur);})()} width="medium">
+      <Modal open={showAcc} onClose={()=>{setShowAcc(false);setPendingPayId(null);setPayAcctId('');setPayAmount('')}} title="Выплата зарплаты" subtitle="Можно выплатить всю сумму или часть" width="medium">
         {(()=>{
         const accsList = accs.filter(a => a.type !== 'credit');
         const ps = list.find(x => String(x.id) === String(pendingPayId));
         const payTotal = ps ? Number(ps.amount || 0) : 0;
+        const paidBefore = ps ? (Number(ps.paid_from) || 0) : 0;
+        const leftToPay = Math.max(0, payTotal - paidBefore);
+        const amountToPay = payAmount === '' ? leftToPay : (parseFloat(payAmount) || 0);
         return (<>
+              {paidBefore > 0 && (
+                <div style={{background:'#f8f9fa',borderRadius:'10px',padding:'.55rem .7rem',marginBottom:'.6rem',fontSize:'.78rem',lineHeight:1.9}}>
+                  <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Начислено:</span><span style={{color:'#111'}}>{payTotal.toLocaleString()} {cur}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Уже выплачено:</span><span style={{color:'#111'}}>{paidBefore.toLocaleString()} {cur}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between',borderTop:'1px solid #e8e8e8',paddingTop:'2px',marginTop:'2px'}}><span style={{color:'#111',fontWeight:600}}>Остаток:</span><span style={{color:'#111',fontWeight:700}}>{leftToPay.toLocaleString()} {cur}</span></div>
+                </div>
+              )}
+              <div className="form-group">
+                <label style={{fontSize:'.78rem',color:'#222'}}>Сумма к выплате</label>
+                <input type="number" min="0" step="0.01" value={payAmount === '' ? (leftToPay || '') : payAmount}
+                  onChange={e=>setPayAmount(e.target.value)} placeholder="0" />
+                {amountToPay > 0 && amountToPay < leftToPay - 0.01 && (
+                  <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Частичная выплата — останется {Math.round((leftToPay - amountToPay)).toLocaleString()} {cur}</div>
+                )}
+              </div>
               <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
                 {accsList.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет доступных счетов</div>}
                 {!salarySplitMode ? accsList.map(a => {
@@ -1152,7 +1179,7 @@ export default function Salary() {
                 {salarySplitMode ? (
                   <button type="button" className="sk-dd-btn" onClick={()=>confirmPay(null, salarySplitAmounts)}>Подтвердить разделение</button>
                 ) : (
-                  <button type="button" className="sk-dd-btn" onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); confirmPay(payAcctId)}}>Выплатить{payTotal ? ' ' + payTotal.toLocaleString() + ' ' + cur : ''}</button>
+                  <button type="button" className="sk-dd-btn" onClick={()=>{if(!payAcctId) return alert('Выберите счет для выплаты'); if(!(amountToPay > 0)) return alert('Введите сумму к выплате'); confirmPay(payAcctId, null, amountToPay)}}>Выплатить{amountToPay ? ' ' + amountToPay.toLocaleString() + ' ' + cur : ''}</button>
                 )}
               </div>
         </>
