@@ -1084,6 +1084,9 @@ export default function Salary() {
                             const val = (rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) || 0;
                             const sum = Number(row.fromReceipt) || 0;
                             const pct = sum > 0 ? Math.round(Number(val) / sum * 1000) / 10 : 0;
+                            // Источник как в продажах: правка вручную (в начислении) → manual, из чека → card, пусто → none
+                            const edited = rewardEdit[row.itemId] !== undefined && rewardEdit[row.itemId] !== '';
+                            const src = edited ? 'manual' : (Number(val) > 0 ? 'card' : 'none');
                             return (
                               <tr key={row.itemId}>
                                 <td className="date">{fmtDate(row.date)}</td>
@@ -1091,7 +1094,7 @@ export default function Salary() {
                                 <td className="num mut">{sum > 0 ? sum.toLocaleString() + ' ' + cur : '—'}</td>
                                 <td className="ctr">
                                   <span className="sal-cell">
-                                    <input type="number" min="0" className="sal-rin"
+                                    <input type="number" min="0" className={'sal-rin '+(src === 'card' ? 'auto' : src === 'manual' ? 'manual' : 'empty')}
                                       value={pct || ''} placeholder="—"
                                       onChange={e => { const np = Math.max(0, parseFloat(e.target.value) || 0); const nv = sum > 0 ? Math.round(sum * np / 100) : 0; setRewardEdit(prev => ({ ...prev, [row.itemId]: nv })); }} />
                                     <span className="sal-unit">%</span>
@@ -1100,7 +1103,7 @@ export default function Salary() {
                                 <td className="ctr">
                                   <span className="sal-cell">
                                     <input type="number" min="0"
-                                      className={'sal-rin '+((Number(val) > 0 && Number(val) !== sum) ? 'manual' : Number(val) > 0 ? 'auto' : 'empty')}
+                                      className={'sal-rin '+(src === 'card' ? 'auto' : src === 'manual' ? 'manual' : 'empty')}
                                       value={val || ''} placeholder="0"
                                       onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))} />
                                     <span className="sal-unit">₽</span>
@@ -1112,6 +1115,11 @@ export default function Salary() {
                         </tbody>
                       </table>
                       <div className="sal-foot"><span className="l">Итого исполнителю: {rewardTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
+                      <div className="sal-legend">
+                        <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>
+                        <span><i style={{background:'#f59e0b'}}></i>вписано вручную</span>
+                        <span><i style={{background:'#fff',border:'1.5px dashed #c3ccd8'}}></i>ставки нет</span>
+                      </div>
                     </>
                   )}
                 </div>
