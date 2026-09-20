@@ -419,6 +419,14 @@ export default function Salary() {
     setDupSalary(d);
   }, [fEmpId, fPeriodFrom, fPeriodTo, list, editId]);
 
+  // Что уже погашено прошлым начислением за этот период (блоки становятся неактивными)
+  const dup = dupSalary;
+  const doneStore = !!(dup && Math.abs(Number(dup.sales_bonus) || 0) > 0);
+  const doneSales = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => Number(i.bonus) > 0));
+  const doneReward = !!(dup && dup.reward_items && Array.isArray(dup.reward_items) && dup.reward_items.length > 0);
+  const doneBonus = !!(dup && Number(dup.bonus_amount) > 0);
+  const doneDeduct = !!(dup && Number(dup.deduct_amount) > 0);
+
   const tsBonuses = tsEntries.filter(e => (e.bonus_amount||0) > 0);
   const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
   const checkedBonusTotal = tsBonuses.filter(e => bonusChecks[e.id]).reduce((s,e) => s + Number(e.bonus_amount||0), 0);
@@ -948,12 +956,11 @@ export default function Salary() {
                   {(() => {
                     // Что ещё НЕ вошло в уже сохранённое начисление
                     const items = [];
-                    const hasStore = Math.abs(Number(dupSalary.sales_bonus) || 0) > 0;
                     const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
-                    if (hasStoreRate && storeOn && !hasStore) items.push({ n:'Бонус от выручки', v: storeBonus });
-                    if (salesOn && salesBonusTotal > 0 && !(dupSalary.sales_items && dupSalary.sales_items.some(i => Number(i.bonus) > 0))) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
-                    if (rewardOn && rewardTotal > 0 && !(dupSalary.reward_items && dupSalary.reward_items.length)) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
-                    if (bonusOpen && checkedBonusTotal > 0 && !(Number(dupSalary.bonus_amount) > 0)) items.push({ n:'Премии', v: checkedBonusTotal });
+                    if (hasStoreRate && storeOn && !doneStore) items.push({ n:'Бонус от выручки', v: storeBonus });
+                    if (salesOn && salesBonusTotal > 0 && !doneSales) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
+                    if (rewardOn && rewardTotal > 0 && !doneReward) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
+                    if (bonusOpen && checkedBonusTotal > 0 && !doneBonus) items.push({ n:'Премии', v: checkedBonusTotal });
                     if (!items.length) return null;
                     return (
                       <div style={{ marginTop:'.35rem', fontSize:'.72rem', color:'var(--muted)' }}>
@@ -1004,14 +1011,16 @@ export default function Salary() {
               <div className="sal-seclab">Включить в начисление</div>
               {(()=>{
                 const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
-                const on = storeOn && hasStoreRate;
+                const blocked = doneStore;
+                const on = storeOn && hasStoreRate && !blocked;
                 return (
-                  <div className={'sal-pick'+(on?' on':'')} title={hasStoreRate ? '' : 'У сотрудника не задан процент от выручки в карточке'}
-                    style={hasStoreRate ? {} : {opacity:.5, cursor:'not-allowed'}}
-                    onClick={()=>{ if (!hasStoreRate) return; setStoreOn(!storeOn); }}>
+                  <div className={'sal-pick'+(on?' on':'')}
+                    title={blocked ? 'Уже начислено за этот период' : (hasStoreRate ? '' : 'У сотрудника не задан процент от выручки в карточке')}
+                    style={(hasStoreRate && !blocked) ? {} : {opacity:.5, cursor:'not-allowed'}}
+                    onClick={()=>{ if (!hasStoreRate || blocked) return; setStoreOn(!storeOn); }}>
                     <span className="cb">{on ? '✓' : ''}</span>
                     <span className="nm">Бонус от выручки магазина</span>
-                    <span className="vl">{hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки'}</span>
+                    <span className="vl">{blocked ? 'уже начислено' : (hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки')}</span>
                   </div>
                 );
               })()}
@@ -1022,10 +1031,13 @@ export default function Salary() {
                   <b style={{color:'#111'}}>{storeBonus.toLocaleString()} {cur}</b>
                 </div>
               </div>
-              <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
-                <span className="cb">{salesOn ? '✓' : ''}</span>
+              <div className={'sal-pick'+((salesOn && !doneSales)?' on':'')}
+                title={doneSales ? 'Уже начислено за этот период' : ''}
+                style={doneSales ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (doneSales) return; setSalesOn(!salesOn); }}>
+                <span className="cb">{(salesOn && !doneSales) ? '✓' : ''}</span>
                 <span className="nm">Продажи сотрудника (он продавец)</span>
-                <span className="vl">+{itemsBonusTotal.toLocaleString()} {cur}</span>
+                <span className="vl">{doneSales ? 'уже начислено' : '+' + itemsBonusTotal.toLocaleString() + ' ' + cur}</span>
               </div>
               <div className="sal-sub" style={{display: salesOn ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
@@ -1101,10 +1113,13 @@ export default function Salary() {
               </div>
 
               {/* Вознаграждение исполнителю из чеков */}
-              <div className={'sal-pick'+(rewardOn?' on':'')} onClick={()=>setRewardOn(!rewardOn)}>
-                <span className="cb">{rewardOn ? '✓' : ''}</span>
+              <div className={'sal-pick'+((rewardOn && !doneReward)?' on':'')}
+                title={doneReward ? 'Уже начислено за этот период' : ''}
+                style={doneReward ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (doneReward) return; setRewardOn(!rewardOn); }}>
+                <span className="cb">{(rewardOn && !doneReward) ? '✓' : ''}</span>
                 <span className="nm">Вознаграждение исполнителю (он мастер)</span>
-                <span className="vl">+{rewardTotal.toLocaleString()} {cur}</span>
+                <span className="vl">{doneReward ? 'уже начислено' : '+' + rewardTotal.toLocaleString() + ' ' + cur}</span>
               </div>
               <div className="sal-sub" style={{display: rewardOn ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
