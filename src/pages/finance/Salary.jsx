@@ -1026,8 +1026,9 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
                   ) : (
                     <>
-                      <div className="sal-tblwrap" ref={salesWrapRef} onScroll={onSalesScroll}>
+                      <div className="sal-tblwrap">
                         <div className="sal-scrollhint" style={{opacity: salesPos.right?1:0}}>›</div>
+                        <div className="sal-tblscroll" ref={salesWrapRef} onScroll={onSalesScroll}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
@@ -1067,7 +1068,7 @@ export default function Salary() {
                           })}
                         </tbody>
                       </table>
-                      </div>
+                      </div></div>
                       <div className="sal-foot"><span className="l">Итого за продажи: {itemsBonusTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                       <div className="sal-legend">
                         <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>
@@ -1096,8 +1097,9 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
                   ) : (
                     <>
-                      <div className="sal-tblwrap" ref={rewardWrapRef} onScroll={onRewardScroll}>
+                      <div className="sal-tblwrap">
                         <div className="sal-scrollhint" style={{opacity: rewardPos.right?1:0}}>›</div>
+                        <div className="sal-tblscroll" ref={rewardWrapRef} onScroll={onRewardScroll}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
@@ -1142,7 +1144,7 @@ export default function Salary() {
                           })}
                         </tbody>
                       </table>
-                      </div>
+                      </div></div>
                       <div className="sal-foot"><span className="l">Итого исполнителю: {rewardTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                       <div className="sal-legend">
                         <span><i style={{background:'#428bf9'}}></i>ставка из карточки</span>
