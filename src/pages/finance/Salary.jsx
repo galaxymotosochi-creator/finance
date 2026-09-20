@@ -279,7 +279,14 @@ export default function Salary() {
           const availQty = Math.max(0, qty - retQty);
           if (availQty <= 0) return;
           const unit = qty > 0 ? (Number(it.total) || 0) / qty : 0;
-          rows.push({ itemId: it.id, created: it.created_at || r.created_at || r.date || '', date: String(r.date || '').split('T')[0], name: it.product_name, product_id: it.product_id, qty: availQty, total: Math.round(unit * availQty) });
+          // Ручной бонус из кассы (доля сотрудника в чеке) — приоритетнее правил
+          const sps = it.employee_splits || [];
+          const mineSplit = sps
+            .filter(sp => String(sp.employee_id || '') === String(fEmpId))
+            .reduce((s2, sp) => s2 + (parseFloat(sp.amount) || 0), 0);
+          const splitBonus = Math.round(mineSplit * (availQty / qty));
+          rows.push({ itemId: it.id, created: it.created_at || r.created_at || r.date || '', date: String(r.date || '').split('T')[0], name: it.product_name, product_id: it.product_id, qty: availQty, total: Math.round(unit * availQty),
+            splitRub: splitBonus > 0 ? splitBonus : null });
         });
         // Новые продажи — первыми (по времени создания позиции/чека)
         rows.sort((a, b) => String(b.created).localeCompare(String(a.created)));
@@ -316,7 +323,15 @@ export default function Salary() {
         const emp = employees.find(e => e.id === fEmpId);
         const rules = (emp && emp.bonus_rules) || [];
         const bonus = {};
-        rows.forEach(row => { const c = calcSalesBonus(rules, row, pr, cr); bonus[row.itemId] = { rub: c.rub, pct: c.pct }; });
+        rows.forEach(row => {
+          if (row.splitRub) {
+            // Бонус указан в кассе вручную — показываем его как «из карточки»
+            bonus[row.itemId] = { rub: row.splitRub, pct: row.total > 0 ? Math.round(row.splitRub / row.total * 1000) / 10 : 0 };
+          } else {
+            const c = calcSalesBonus(rules, row, pr, cr);
+            bonus[row.itemId] = { rub: c.rub, pct: c.pct };
+          }
+        });
         // Сохраняем ручные правки — не затираем то, что менеджер вписал руками
         setSalesBonus(prev => {
           const next = { ...bonus };
