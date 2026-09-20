@@ -403,11 +403,6 @@ export default function Salary() {
         if (s.status === 'paid') return sum;
         return s.pay_type === 'advance' ? sum + amt : sum;
       }, 0);
-    // Минус уже зачтённые долги (чтобы не вычитать дважды) и закрытые выплатой авансы
-    const offset = list
-      .filter(s => s.employee_id === fEmpId && s.status !== 'cancelled')
-      .reduce((sum, s) => sum + (Number(s.debt_offset) || 0), 0);
-    debt = Math.max(0, debt - offset);
     setExistingDebt(debt);
   }, [fEmpId, list]);
 
@@ -518,7 +513,6 @@ export default function Salary() {
         sales_bonus: salesBonusOn + storeBonusOn, sales_items: (salesOn || storeOn) ? salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: salesOn ? (Number(salesBonus[row.itemId]?.rub) || 0) : 0 })) : [],
         reward_amount: rewardOnTotal, reward_items: rewardOn ? rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }) : [],
         deduct_amount: deductOnTotal + debtOnTotal, deduct_items: (fineOpen ? takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })) : []).concat(debtOpen ? debtItems : []),
-        debt_offset: debtIncludeTotal,   // сколько долга сотрудника зачтено этим начислением
         paid_at: null,
       };
       if (editId) { const { error, queued } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; saveQueued = queued; }
