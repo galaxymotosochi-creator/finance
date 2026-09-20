@@ -838,14 +838,14 @@ export default function Salary() {
               </div>
               <div className="sal-row2">
                 <div className="sal-field">
+                  <span className="sal-cap">Начало периода</span>
                   <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input"
                     onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
-                  <span className="sal-cap">Начало периода</span>
                 </div>
                 <div className="sal-field">
+                  <span className="sal-cap">Конец периода</span>
                   <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input"
                     onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
-                  <span className="sal-cap">Конец периода</span>
                 </div>
               </div>
 

@@ -381,11 +381,12 @@ body {
 .modal-box.modal-medium { max-width: 480px; }
 .modal-box.modal-wide { max-width: 560px; }
 /* Карточка: воздух сверху и снизу, шапка не прилипает к экрану */
+.modal-overlay:has(.modal-salary) { align-items: flex-start; overflow-y: auto; }
 .modal-box.modal-salary { max-width: 660px; padding: 0 1.5rem 1.5rem; overflow: hidden;
   border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border: none;
-  display: flex; flex-direction: column; max-height: calc(100vh - 5rem); margin: 0 auto; }
-.modal-box.modal-salary .modal-body { padding-top: 0; }
-.modal-box.modal-salary .modal-body { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
+  display: flex; flex-direction: column; height: auto;
+  max-height: calc(100vh - 8rem); margin: 4rem auto; }
+.modal-box.modal-salary .modal-body { padding-top: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
 /* Шапка не сжимается и не сбивается при скролле */
 .modal-box.modal-salary .sal-head { flex: none; }
 .modal-close { position: absolute; top: .75rem; right: .75rem; background: none; border: none; font-size: 1.125rem; color: #888; cursor: pointer; line-height: 1; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background .15s; }
@@ -1345,7 +1346,7 @@ input:focus, select:focus, textarea:focus {
 .sal-row .sal-input{flex:1;width:100%}
 .sal-row2 .sal-input{flex:1;width:100%}
 .sal-field{flex:1;min-width:0;display:flex;flex-direction:column;gap:.3rem}
-.sal-cap{font-size:.72rem;color:var(--muted);line-height:1.4;text-align:center}
+.sal-cap{font-size:.72rem;color:var(--muted);line-height:1.4}
 .sal-ph{color:var(--muted)}
 /* Выпадающий список — браузерная стрелка, как в превью */
 .sal-select{cursor:pointer}
