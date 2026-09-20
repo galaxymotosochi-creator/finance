@@ -1071,31 +1071,44 @@ export default function Salary() {
                   ) : (
                     <>
                       <table className="sal-tbl">
-                        <colgroup><col style={{width:'20%'}} /><col style={{width:'42%'}} /><col style={{width:'18%'}} /><col style={{width:'20%'}} /></colgroup>
+                        <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
                           <th>Дата</th>
-                          <th>Услуга</th>
-                          <th className="num">Из чека</th>
-                          <th className="ctr">К выплате</th>
+                          <th>Наименование</th>
+                          <th className="num">Сумма</th>
+                          <th className="ctr">%</th>
+                          <th className="ctr">Бонус</th>
                         </tr></thead>
                         <tbody>
-                          {rewardRows.map(row => (
-                            <tr key={row.itemId}>
-                              <td className="date">{fmtDate(row.date)}</td>
-                              <td className="name">{row.name}</td>
-                              <td className="num mut">{row.fromReceipt ? row.fromReceipt.toLocaleString() + ' ' + cur : '—'}</td>
-                              <td className="ctr">
-                                <span className="sal-cell">
-                                  <input type="number" min="0"
-                                    className={'sal-rin '+((rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) > 0 ? 'auto' : 'empty')}
-                                    value={(rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) || ''}
-                                    placeholder="0"
-                                    onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))} />
-                                  <span className="sal-unit">₽</span>
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                          {rewardRows.map(row => {
+                            const val = (rewardEdit[row.itemId] !== undefined ? rewardEdit[row.itemId] : row.amount) || 0;
+                            const sum = Number(row.fromReceipt) || 0;
+                            const pct = sum > 0 ? Math.round(Number(val) / sum * 1000) / 10 : 0;
+                            return (
+                              <tr key={row.itemId}>
+                                <td className="date">{fmtDate(row.date)}</td>
+                                <td className="name">{row.name}</td>
+                                <td className="num mut">{sum > 0 ? sum.toLocaleString() + ' ' + cur : '—'}</td>
+                                <td className="ctr">
+                                  <span className="sal-cell">
+                                    <input type="number" min="0" className="sal-rin"
+                                      value={pct || ''} placeholder="—"
+                                      onChange={e => { const np = Math.max(0, parseFloat(e.target.value) || 0); const nv = sum > 0 ? Math.round(sum * np / 100) : 0; setRewardEdit(prev => ({ ...prev, [row.itemId]: nv })); }} />
+                                    <span className="sal-unit">%</span>
+                                  </span>
+                                </td>
+                                <td className="ctr">
+                                  <span className="sal-cell">
+                                    <input type="number" min="0"
+                                      className={'sal-rin '+((Number(val) > 0 && Number(val) !== sum) ? 'manual' : Number(val) > 0 ? 'auto' : 'empty')}
+                                      value={val || ''} placeholder="0"
+                                      onChange={e => setRewardEdit(prev => ({ ...prev, [row.itemId]: e.target.value }))} />
+                                    <span className="sal-unit">₽</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                       <div className="sal-foot"><span className="l">Итого исполнителю: {rewardTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
