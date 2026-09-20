@@ -1056,16 +1056,20 @@ export default function Salary() {
                     onClick={()=>{ if (noEmp) return; if (!hasStoreRate || blocked) return; setStoreOn(!storeOn); }}>
                     <span className="cb">{on ? '✓' : ''}</span>
                     <span className="nm">Бонус от выручки магазина</span>
-                    <span className="vl">{noEmp ? 'Выберите сотрудника' : (blocked ? 'уже начислено' : (hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : 'нет ставки'))}</span>
+                    <span className="vl">{blocked ? 'уже начислено' : (hasStoreRate ? '+' + storeBonus.toLocaleString() + ' ' + cur : '')}</span>
                   </div>
                 );
               })()}
-              <div className="sal-sub" style={{display: (storeOn && storeInfo && storeInfo.pct != null) ? 'block' : 'none'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'.4rem',fontSize:'.78rem',color:'var(--muted)',padding:'.55rem .5rem .5rem',flexWrap:'wrap'}}>
-                  <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.pct : 0}%</b> от выручки магазина за период</span>
-                  <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.revenue.toLocaleString() : 0} {cur}</b>{storeNote} =</span>
-                  <b style={{color:'#111'}}>{storeBonus.toLocaleString()} {cur}</b>
-                </div>
+              <div className="sal-sub" style={{display: (noEmp || (storeOn && storeInfo && storeInfo.pct != null)) ? 'block' : 'none'}}>
+                {!fEmpId ? (
+                  <div style={{fontSize:'.72rem',color:'var(--muted)',padding:'.4rem .65rem'}}>Выберите сотрудника</div>
+                ) : (
+                  <div style={{display:'flex',alignItems:'center',gap:'.4rem',fontSize:'.78rem',color:'var(--muted)',padding:'.55rem .5rem .5rem',flexWrap:'wrap'}}>
+                    <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.pct : 0}%</b> от выручки магазина за период</span>
+                    <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.revenue.toLocaleString() : 0} {cur}</b>{storeNote} =</span>
+                    <b style={{color:'#111'}}>{storeBonus.toLocaleString()} {cur}</b>
+                  </div>
+                )}
               </div>
               <div className={'sal-pick'+((salesOn && !doneSales)?' on':'')}
                 title={doneSales ? 'Уже начислено за этот период' : ''}
