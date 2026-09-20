@@ -823,13 +823,19 @@ export default function Salary() {
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
                 <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input">
-                  <option value="">— выберите сотрудника —</option>
+                  <option value="">Выберите сотрудника</option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
               </div>
               <div className="sal-row2">
-                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
-                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
+                <div className="sal-field">
+                  <span className="sal-cap">Начало</span>
+                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
+                </div>
+                <div className="sal-field">
+                  <span className="sal-cap">Конец</span>
+                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
+                </div>
               </div>
 
               {dupSalary && (
