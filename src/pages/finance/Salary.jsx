@@ -145,6 +145,7 @@ export default function Salary() {
   const [debtChecks, setDebtChecks] = useState({});
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
+  const [salesOn, setSalesOn] = useState(true);
   const [salarySplitAmounts, setSalarySplitAmounts] = useState({});
   const [dupSalary, setDupSalary] = useState(null); // уже есть начисление за этот период (защита от дублей)
   // Транзакции по счетам — чтобы проверять реальный баланс при выплате (начальный остаток + движения)
@@ -873,11 +874,19 @@ export default function Salary() {
               </div>
 
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
-              <div style={{border:'1px solid #bfdbfe',borderRadius:'12px',overflow:'hidden',marginTop:'.65rem'}}>
-                <div style={{padding:'.5rem .65rem',background:'#eff6ff',borderBottom:'1px solid #bfdbfe',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:'.78rem',fontWeight:600,color:'#2563eb'}}>Продажи и услуги сотрудника</span>
-                  <span style={{fontSize:'.68rem',color:'#2563eb',fontWeight:600}}>+{(itemsBonusTotal + storeBonus).toLocaleString()} {cur}</span>
-                </div>
+              <div className="sal-seclab">Включить в начисление</div>
+              <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
+                <span className="cb">{salesOn ? '✓' : ''}</span>
+                <span className="nm">Бонус от выручки магазина</span>
+                <span className="vl">+{storeBonus.toLocaleString()} {cur}</span>
+              </div>
+              <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
+                <span className="cb">{salesOn ? '✓' : ''}</span>
+                <span className="nm">Продажи сотрудника (он продавец)</span>
+                <span className="vl">+{itemsBonusTotal.toLocaleString()} {cur}</span>
+              </div>
+              <div className="sal-sub" style={{display: salesOn ? 'block' : 'none'}}>
+                <div className="sal-hint">Процент подставляется из карточки сотрудника — можно поправить вручную.</div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {!fEmpId ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>
@@ -896,8 +905,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
                   ) : (
                     <>
-                      <div style={{fontSize:'.7rem',color:'#2563eb',marginBottom:'.3rem'}}>Бонус рассчитан по правилам сотрудника — суммы и % можно поправить вручную</div>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'.74rem',tableLayout:'fixed'}}>
+                      <table className="sal-tbl">
                         <thead><tr>
                           <th style={{width:'52px',padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Дата</th>
                           <th style={{padding:'.25rem .3rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.7rem',textAlign:'left'}}>Позиция</th>
@@ -926,10 +934,7 @@ export default function Salary() {
                           })}
                         </tbody>
                       </table>
-                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.75rem',fontWeight:600,color:'#2563eb',paddingTop:'.4rem'}}>
-                        <span>Бонус с продаж за период</span>
-                        <span>+{(itemsBonusTotal + storeBonus).toLocaleString()} {cur}</span>
-                      </div>
+                      <div className="sal-foot"><span className="l">Итого за продажи: {itemsBonusTotal.toLocaleString()} {cur}</span><span className="r"></span></div>
                     </>
                   )}
                 </div>
