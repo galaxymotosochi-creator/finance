@@ -812,7 +812,7 @@ export default function Salary() {
       )}
 
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
-      <Modal open={show} onClose={()=>setShow(false)} width="wide" hideHead>
+      <Modal open={show} onClose={()=>setShow(false)} width={660} hideHead className="modal-salary">
         <div className="sal-head">
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
           <p className="modal-sub">Выберите сотрудника и период</p>
@@ -821,16 +821,15 @@ export default function Salary() {
 
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
-              <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
-                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required
-                  style={{flex:3,minWidth:'180px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111'}}>
-                  <option value="">— выберите —</option>
+              <div className="sal-row">
+                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input">
+                  <option value="">— выберите сотрудника —</option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
-                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required
-                  style={{flex:1,minWidth:'115px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
-                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required
-                  style={{flex:1,minWidth:'115px',padding:'.3rem .4rem',fontSize:'.72rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
+              </div>
+              <div className="sal-row2">
+                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
+                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
               </div>
 
               {dupSalary && (
