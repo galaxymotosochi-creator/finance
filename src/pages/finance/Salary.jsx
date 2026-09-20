@@ -97,6 +97,7 @@ export default function Salary() {
   const [salSearch, setSalSearch] = useState('');
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
   const [salTypeOpen, setSalTypeOpen] = useState(false);
+  const [salPayOpen, setSalPayOpen] = useState(false);
   const [salPeriod, setSalPeriod] = useState('all');
   const [salSearchFocus, setSalSearchFocus] = useState(false);
   const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
