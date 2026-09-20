@@ -147,6 +147,7 @@ export default function Salary() {
   const [tsLoaded, setTsLoaded] = useState(false);
   const [salarySplitMode, setSalarySplitMode] = useState(false);
   const [salesOn, setSalesOn] = useState(true);
+  const [storeOn, setStoreOn] = useState(true);
   const [rewardOn, setRewardOn] = useState(true);
   const [bonusOpen, setBonusOpen] = useState(true);
   const [fineOpen, setFineOpen] = useState(true);
@@ -854,7 +855,7 @@ export default function Salary() {
 
               {/* Расчет */}
               <div className="sal-seclab">Расчёт</div>
-              <div className="sk-dd-wrap" style={{marginBottom:'.5rem'}}>
+              <div className="sk-dd-wrap sal-dd-wrap" style={{marginBottom:'.5rem'}}>
                 <button type="button" className={'f-pill'+(fSalaryType ? ' on' : '')}
                   onClick={e=>{e.stopPropagation();setSalTypeOpen(!salTypeOpen)}}>
                   {(SALARY_TYPES.find(t=>t.value===fSalaryType)||SALARY_TYPES[0]).label} <span className="car-tri">▾</span>
@@ -890,8 +891,8 @@ export default function Salary() {
 
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
               <div className="sal-seclab">Включить в начисление</div>
-              <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
-                <span className="cb">{salesOn ? '✓' : ''}</span>
+              <div className={'sal-pick'+(storeOn?' on':'')} onClick={()=>setStoreOn(!storeOn)}>
+                <span className="cb">{storeOn ? '✓' : ''}</span>
                 <span className="nm">Бонус от выручки магазина</span>
                 <span className="vl">+{storeBonus.toLocaleString()} {cur}</span>
               </div>
@@ -901,7 +902,6 @@ export default function Salary() {
                 <span className="vl">+{itemsBonusTotal.toLocaleString()} {cur}</span>
               </div>
               <div className="sal-sub" style={{display: salesOn ? 'block' : 'none'}}>
-                <div className="sal-hint">Процент подставляется из карточки сотрудника — можно поправить вручную.</div>
                 <div style={{padding:'.5rem .65rem'}}>
                   {!fEmpId ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Выберите сотрудника</div>

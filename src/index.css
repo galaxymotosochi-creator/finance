@@ -381,7 +381,9 @@ body {
 .modal-box.modal-medium { max-width: 480px; }
 .modal-box.modal-wide { max-width: 560px; }
 .modal-box.modal-salary { max-width: 660px; padding: 0 1.5rem 1.5rem; overflow: hidden;
-  border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border: none; }
+  border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border: none;
+  display: flex; flex-direction: column; max-height: 90vh; }
+.modal-box.modal-salary .modal-body { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; padding-right: 2px; }
 .modal-close { position: absolute; top: .75rem; right: .75rem; background: none; border: none; font-size: 1.125rem; color: #888; cursor: pointer; line-height: 1; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background .15s; }
 .modal-close:hover { background: #f1f3f5; color: #555; }
 .modal-box .modal-title {
@@ -1092,6 +1094,9 @@ input:focus, select:focus, textarea:focus {
 .f-pill:hover{color:#111}
 .f-pill.on{background:#E6F0FF;color:#0d4ea8;font-weight:700}
 .f-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:#fff;border:1px solid rgba(29,120,252,.16);border-radius:14px;box-shadow:0 24px 50px -20px rgba(29,120,252,.55);padding:8px;z-index:60;animation:skpop .16s ease}
+/* Выпадашка в форме «Начислить зарплату» — открывается под кнопкой слева (как в превью) */
+.sal-dd-wrap{display:inline-block}
+.sal-dd-wrap .f-menu{left:0;right:auto;min-width:210px}
 .f-menu .cols-list,.f-menu .cat-dd-list,.f-menu .f-list{display:flex;flex-direction:column;gap:4px}
 .f-item{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:9px;cursor:pointer;font-size:13px;color:#3a3a3f;transition:background .15s}
 .f-item:hover{background:#f2f7ff}
