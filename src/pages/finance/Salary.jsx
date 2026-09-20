@@ -940,11 +940,9 @@ export default function Salary() {
                   <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexWrap:'wrap' }}>
                     <span style={{ flex:1, minWidth:'200px' }}>
                       За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{Number(dupSalary.amount || 0).toLocaleString()} {cur}</b>
-                      <span style={{ color:'var(--muted)' }}> ({dupSalary.status === 'paid' ? 'выплачено' : 'начислено'})</span>
                     </span>
                     {dupSalary.status !== 'paid' && (
-                      <button type="button" onClick={() => openEdit(dupSalary)}
-                        style={{ padding:'.3rem .8rem', borderRadius:100, border:'none', background:'#111', color:'#fff', fontSize:'.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>Открыть</button>
+                      <button type="button" className="sk-dd-btn sal-open-btn" onClick={() => openEdit(dupSalary)}>Открыть</button>
                     )}
                   </div>
                   {(() => {

@@ -1382,3 +1382,6 @@ input:focus, select:focus, textarea:focus {
   .sal-scrollhint:after{content:"›";position:absolute;top:52px;right:8px;font-size:22px;font-weight:700;
     color:#0d4ea8;opacity:.5;animation:sknudge 1.6s ease-in-out infinite}
 }
+
+/* Кнопка «Открыть» в плашке доначисления — фирменная синяя пульсирующая, компактная */
+.sal-open-btn{padding:.42rem 1.1rem;font-size:.72rem;border-radius:100px}
