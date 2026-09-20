@@ -493,7 +493,16 @@ export default function Salary() {
 
   const remove = async (id) => {
     if (!confirm('Удалить начисление?')) return;
-    try { const res = await supabase.from('salary').delete().eq('id', id); if (!res.queued) await load(); }
+    try {
+      // Возвращаем списанные долги по недостачам обратно в статус «висит»
+      const row = list.find(s => s.id === id);
+      const its = (row && Array.isArray(row.deduct_items)) ? row.deduct_items.filter(i => i.debtId) : [];
+      if (its.length) {
+        await Promise.all(its.map(i => supabase.from('employee_debts').update({ status: 'pending', deducted_at: null }).eq('id', i.debtId)));
+      }
+      const res = await supabase.from('salary').delete().eq('id', id);
+      if (!res.queued) await load();
+    }
     catch (err) { alert('Ошибка удаления: ' + err.message); }
   };
 
