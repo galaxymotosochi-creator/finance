@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import SectionHelp from '../../components/SectionHelp';
 
 
 export default function PnL() {
@@ -269,10 +270,32 @@ export default function PnL() {
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: "'Golos Text',system-ui,sans-serif" }}>
-      {/* Шапка */}
-      <div className="page-header" style={{ marginBottom: '14px' }}>
-        <div><h1>Чистая прибыль</h1><div className="sub">{d.month}</div></div>
-        <div className="page-actions" style={{ display: 'flex', gap: '4px' }}>
+      {/* Шапка — фирменный стиль: голубая плашка + подсказка (как в «Чеках» и остальных разделах) */}
+      <div className="sk-bar">
+        <div className="grow">
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Чистая прибыль</h1>
+            <SectionHelp
+              title="Раздел «Чистая прибыль»"
+              intro="Здесь видно, сколько бизнес заработал за период: выручка минус закупка товара, расходы и недостачи. Ниже — из чего сложилась сумма."
+              faq={[
+                { q: 'Что такое чистая прибыль?', a: (
+                  <div>Это <b>выручка</b> за период минус <b>себестоимость товара</b>, минус <b>расходы</b> и минус <b>недостачи</b> по инвентаризации.</div>
+                ) },
+                { q: 'Как выбрать период?', a: (
+                  <div>Кнопками справа вверху: <b>Месяц</b>, <b>Квартал</b> или <b>Год</b>. Данные пересчитываются сразу.</div>
+                ) },
+                { q: 'Что показывает круг?', a: (
+                  <div><b>Круг</b> — доля прибыли от выручки. Если он заполнен мало при большой выручке — много уходит на закупку и расходы.</div>
+                ) },
+                { q: 'Почему прибыль может быть минусовой?', a: (
+                  <div>Если <b>расходы и закупка выше выручки</b> — период убыточный. Смотрите строку «Закупка товара» и список расходов ниже.</div>
+                ) },
+              ]} />
+          </div>
+          <div className="sub">{d.month}</div>
+        </div>
+        <div style={{display:'flex',gap:'4px',flexWrap:'nowrap',alignItems:'center'}}>
           <Btn p="month" label="Месяц" />
           <Btn p="quarter" label="Квартал" />
           <Btn p="year" label="Год" />
