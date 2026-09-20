@@ -828,6 +828,27 @@ export default function Salary() {
         </div>
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
+              {/* Тип */}
+              <div className="sal-seclab">Тип</div>
+              <div className="sk-dd-wrap sal-dd-wrap" style={{marginBottom:'.85rem'}}>
+                <button type="button" className="f-pill on"
+                  onClick={e=>{e.stopPropagation();setSalPayOpen(!salPayOpen)}}>
+                  {fPayType === 'advance' ? 'Аванс' : 'Зарплата'} <span className="car-tri">▾</span>
+                </button>
+                {salPayOpen && (
+                  <div className="f-menu">
+                    <div className="f-list">
+                      {[{v:'salary',l:'Зарплата'},{v:'advance',l:'Аванс'}].map(o => (
+                        <div key={o.v} className={'f-opt'+(fPayType===o.v?' sel':'')}
+                          onClick={()=>{setFPayType(o.v);setSalPayOpen(false)}}>
+                          <span className="dot"></span>{o.l}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
@@ -922,9 +943,9 @@ export default function Salary() {
                   ) : !salesLoaded ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Загрузка...</div>
                   ) : storeInfo && storeInfo.bonus > 0 ? (
-                    <div style={{background:'#fff',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'8px 10px',marginBottom:'8px',fontSize:'.76rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                      <span style={{color:'#2563eb',fontWeight:600}}>🏪 От всей выручки</span>
-                      <span style={{color:'#555'}}>{storeInfo.pct != null ? storeInfo.pct + '% от ' : ''}{storeInfo.revenue.toLocaleString()} {cur}{storeNote} = <b style={{color:'#2563eb'}}>+{storeBonus.toLocaleString()} {cur}</b></span>
+                    <div style={{display:'flex',alignItems:'center',gap:'.4rem',fontSize:'.78rem',color:'var(--muted)',padding:'.1rem .5rem .45rem'}}>
+                      <span><b style={{color:'#111'}}>{storeInfo.pct != null ? storeInfo.pct + '%' : ''}</b> от <b style={{color:'#111'}}>{storeInfo.revenue.toLocaleString()} {cur}</b>{storeNote} =</span>
+                      <b style={{color:'#111'}}>{storeBonus.toLocaleString()} {cur}</b>
                     </div>
                   ) : null}
                   {storeInfo && storeInfo.stack === false && salesRows.length > 0 && (
