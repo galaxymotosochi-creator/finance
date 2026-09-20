@@ -1431,5 +1431,9 @@ input:focus, select:focus, textarea:focus {
 .sk-period-wrap.open .car-tri{transform:rotate(180deg);animation:none}
 
 /* Пункты меню «Период» в «Чистой прибыли» — как в «Доходах и расходах» */
-.sk-period-menu button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#040506;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .16s,color .16s}
-.sk-period-menu button:hover{background:#f2f7ff;color:#0d4ea8}
+/* только пункты списка — НЕ трогаем кнопку «Применить» (.sk-dd-btn) */
+.sk-period-menu button:not(.sk-dd-btn){display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#040506;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .16s,color .16s}
+.sk-period-menu button:not(.sk-dd-btn):hover{background:#f2f7ff;color:#0d4ea8}
+/* кнопка «Применить» — фирменная синяя, по центру, как в эталоне */
+.sk-period-menu .sk-dd-btn{display:inline-flex;align-items:center;justify-content:center;width:auto;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12.5px;font-weight:700;padding:.5rem 1.1rem;border-radius:9999px;box-shadow:0 12px 26px -12px rgba(29,120,252,.8);animation:skpulse 2s ease-in-out infinite}
+.sk-period-menu .sk-dd-btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px -12px rgba(29,120,252,.9);animation-play-state:paused}
