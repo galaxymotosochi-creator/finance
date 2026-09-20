@@ -261,12 +261,22 @@ export default function Salary() {
     })();
   }, [fEmpId, user, show]);
 
-  // Подтянуть оклад из сотрудника
+  // Подтянуть оклад из сотрудника (только в новом начислении и если оклад ещё не начислялся за период)
   useEffect(() => {
     if (!fEmpId) return;
     const emp = employees.find(e => e.id === fEmpId);
-    if (emp) setFBaseSalary(emp.base_salary || 0);
-  }, [fEmpId, employees]);
+    if (!emp) return;
+    // Если за этот период уже есть начисление с окладом — не подставляем оклад повторно
+    const alreadyBase = (list || []).some(s2 =>
+      s2.employee_id === fEmpId &&
+      String(s2.period_from || '').slice(0, 10) === fPeriodFrom &&
+      String(s2.period_to || '').slice(0, 10) === fPeriodTo &&
+      s2.status !== 'cancelled' && s2.id !== editId &&
+      Number(s2.base_salary) > 0
+    );
+    if (alreadyBase && !editId) { setFBaseSalary(0); return; }
+    setFBaseSalary(emp.base_salary || 0);
+  }, [fEmpId, employees, fPeriodFrom, fPeriodTo, list, editId]);
 
   // Продажи и услуги сотрудника за период (для авто-бонусов)
   useEffect(() => {
@@ -472,6 +482,12 @@ export default function Salary() {
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
     setExistingDebt(0); setTsEntries([]); setBonusChecks({}); setDeductChecks({});
     setEmpDebts([]); setDebtChecks({});
+    // Новое начисление — это доначисление: сбрасываем галочки и данные прошлого расчёта,
+    // чтобы в итог попало только то, что ещё НЕ начислено за период
+    setSalesOn(true); setStoreOn(true); setRewardOn(true); setBonusOpen(true);
+    setFineOpen(true); setDebtOpen(true); setDebtInclude(true);
+    setSalesRows([]); setSalesBonus({}); setStoreInfo(null);
+    setRewardRows([]); setRewardEdit({}); setSalesLoaded(false);
     setShow(true);
   };
 
