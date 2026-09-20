@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
+import { tzToday } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 import SectionHelp from '../../components/SectionHelp';
 
@@ -419,9 +420,11 @@ export default function Salary() {
   const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOn + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal - debtIncludeTotal;
 
   const openAdd = () => {
-    const _t = new Date();
-    const _from = _t.toISOString().split('T')[0];
-    const _to = new Date(_t.getFullYear(), _t.getMonth(), _t.getDate() + 30).toISOString().split('T')[0];
+    // Период по умолчанию: сегодня → тот же день следующего месяца (в поясе программы)
+    const _from = tzToday();
+    const _d = new Date(_from + 'T12:00:00');
+    _d.setMonth(_d.getMonth() + 1);
+    const _to = _d.toLocaleDateString('en-CA');
     setEditId(null); setFEmpId(''); setFPeriodFrom(_from); setFPeriodTo(_to);
     setFBaseSalary(0); setFSalaryType('fixed'); setFSalaryTotal(0); setFDays(0);
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
