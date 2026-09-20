@@ -1292,7 +1292,11 @@ input:focus, select:focus, textarea:focus {
 .sal-pick .nm{flex:1;font-size:.8125rem;font-weight:600}
 .sal-pick .vl{font-size:.8125rem;font-weight:700;white-space:nowrap;color:#111}
 
-.sal-sub{margin:-.35rem 0 .6rem;padding:0 .75rem}
+.sal-sub{margin:-.35rem 0 .6rem;padding:0 .75rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sal-sub::-webkit-scrollbar{display:none}
+.sal-sub .sal-tbl{min-width:520px}
+@media(max-width:768px){.sal-sub .sal-tbl{min-width:560px}
+.sal-sub:after{content:'← проведите, чтобы увидеть все колонки →';display:block;font-size:.66rem;color:var(--muted);text-align:center;padding-top:.3rem}}
 .sal-hint{font-size:.72rem;color:var(--muted);padding:.35rem .45rem .55rem;line-height:1.5}
 
 /* вложенные таблицы — единое выравнивание */
@@ -1364,3 +1368,14 @@ input:focus, select:focus, textarea:focus {
 .sal-rin.auto{border-color:#428bf9;background:#e8f0ff}
 .sal-rin.empty{border-style:dashed;background:#fff}
 .sal-rin.manual{border-color:#f59e0b;background:#fffbeb}
+
+/* Вложенные таблицы в модалке зарплаты: скролл на телефоне + подсказка */
+.sal-tblwrap{position:relative;overflow:hidden;margin:0 -2px}
+.sal-tblscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sal-tblscroll::-webkit-scrollbar{display:none}
+.sal-tblscroll .sal-tbl{min-width:520px}
+.sal-hintscroll{display:none;font-size:.68rem;color:var(--muted);padding:.35rem .2rem .1rem;text-align:right}
+@media(max-width:768px){
+  .sal-tblscroll .sal-tbl{min-width:560px}
+  .sal-hintscroll{display:block}
+}

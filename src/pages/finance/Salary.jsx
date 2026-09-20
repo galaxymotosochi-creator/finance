@@ -97,7 +97,6 @@ export default function Salary() {
   const [salSearch, setSalSearch] = useState('');
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
   const [salTypeOpen, setSalTypeOpen] = useState(false);
-  const [salPayOpen, setSalPayOpen] = useState(false);
   const [salPeriod, setSalPeriod] = useState('all');
   const [salSearchFocus, setSalSearchFocus] = useState(false);
   const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
@@ -841,27 +840,6 @@ export default function Salary() {
           <p className="modal-sub">Выберите сотрудника и период</p>
         </div>
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
-
-              {/* Тип */}
-              <div className="sal-seclab">Тип</div>
-              <div className="sk-dd-wrap sal-dd-wrap" style={{marginBottom:'.85rem'}}>
-                <button type="button" className="f-pill on"
-                  onClick={e=>{e.stopPropagation();setSalPayOpen(!salPayOpen)}}>
-                  {fPayType === 'advance' ? 'Аванс' : 'Зарплата'} <span className="car-tri">▾</span>
-                </button>
-                {salPayOpen && (
-                  <div className="f-menu">
-                    <div className="f-list">
-                      {[{v:'salary',l:'Зарплата'},{v:'advance',l:'Аванс'}].map(o => (
-                        <div key={o.v} className={'f-opt'+(fPayType===o.v?' sel':'')}
-                          onClick={()=>{setFPayType(o.v);setSalPayOpen(false)}}>
-                          <span className="dot"></span>{o.l}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
