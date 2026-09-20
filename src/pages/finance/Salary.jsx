@@ -829,14 +829,8 @@ export default function Salary() {
                 </select>
               </div>
               <div className="sal-row2">
-                <div className="sal-field">
-                  <span className="sal-cap">Начало</span>
-                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
-                </div>
-                <div className="sal-field">
-                  <span className="sal-cap">Конец</span>
-                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
-                </div>
+                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
+                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
               </div>
 
               {dupSalary && (

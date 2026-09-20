@@ -1324,14 +1324,15 @@ input:focus, select:focus, textarea:focus {
 .sal-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}
 
 /* Поля формы «Начислить зарплату»: сотрудник и период */
-.sal-row{display:flex;gap:.35rem;align-items:center}
-.sal-row2{display:flex;gap:.35rem;align-items:center}
+.sal-row{display:flex;gap:.65rem;align-items:center}
+.sal-row2{display:flex;gap:.65rem;align-items:center}
 .sal-input,.sal-input[type="date"]{font-family:var(--font);font-size:.875rem;color:#333;padding:.5rem .65rem;
   border:1.5px solid rgba(0,0,0,.26);border-radius:8px;outline:none;background:#fff;
   min-height:38px;flex:1;min-width:0;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;
   -webkit-appearance:none;appearance:none}
 .sal-input:focus,.sal-input[type="date"]:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.07);background:#fff}
-.sal-row .sal-input{flex:1}
+.sal-row .sal-input{flex:1;width:100%}
+.sal-row2 .sal-input{flex:1;width:100%}
 .sal-field{flex:1;min-width:0;display:flex;flex-direction:column;gap:.25rem}
 .sal-cap{font-size:.72rem;font-weight:600;color:var(--muted)}
 .sal-ph{color:var(--muted)}
