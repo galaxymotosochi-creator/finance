@@ -403,7 +403,15 @@ export default function Salary() {
     ? Math.round(storeInfo.revenue * storeInfo.pct / 100 * dayFactor)
     : Math.round((storeInfo.fixed || 0) * dayFactor)) : 0;
   const storeNote = (storeInfo && hasTs && dayFactor < 1) ? ' × ' + tsWorked + '/' + periodDays + ' дн.' : '';
-  const grandTotal = fSalaryTotal + itemsBonusTotal + storeBonus + rewardTotal + checkedBonusTotal - checkedDeductTotal - checkedDebtTotal;
+  // Галочки блоков влияют на итог: снял галочку → сумма не входит в начисление
+  const storeBonusOn = storeOn ? storeBonus : 0;
+  const salesBonusOn = salesOn ? itemsBonusTotal : 0;
+  const rewardOnTotal = rewardOn ? rewardTotal : 0;
+  const bonusOnTotal = bonusOpen ? checkedBonusTotal : 0;
+  const deductOnTotal = fineOpen ? checkedDeductTotal : 0;
+  const debtOnTotal = debtOpen ? checkedDebtTotal : 0;
+  const debtIncludeTotal = debtInclude ? existingDebt : 0;
+  const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOn + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal - debtIncludeTotal;
 
   const openAdd = () => {
     const _t = new Date();
@@ -460,10 +468,10 @@ export default function Salary() {
         // Статус всегда «Начислено» — выплата выполняется только через кнопку «Выплатить» с выбором счета,
         // иначе зарплата помечалась выплаченной без создания расходной операции
         amount: grandTotal, status: 'pending', pay_type: 'salary',
-        bonus_amount: checkedBonusTotal, bonus_items: takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })),
-        sales_bonus: salesBonusTotal, sales_items: salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: Number(salesBonus[row.itemId]?.rub) || 0 })),
-        reward_amount: rewardTotal, reward_items: rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }),
-        deduct_amount: checkedDeductTotal + checkedDebtTotal, deduct_items: takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })).concat(debtItems),
+        bonus_amount: bonusOnTotal, bonus_items: bonusOpen ? takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })) : [],
+        sales_bonus: salesBonusOn + storeBonusOn, sales_items: (salesOn || storeOn) ? salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: salesOn ? (Number(salesBonus[row.itemId]?.rub) || 0) : 0 })) : [],
+        reward_amount: rewardOnTotal, reward_items: rewardOn ? rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }) : [],
+        deduct_amount: deductOnTotal + debtOnTotal, deduct_items: (fineOpen ? takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })) : []).concat(debtOpen ? debtItems : []),
         paid_at: null,
       };
       if (editId) { const { error, queued } = await supabase.from('salary').update(obj).eq('id', editId); if (error) throw error; saveQueued = queued; }
