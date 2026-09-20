@@ -325,8 +325,8 @@ export default function Salary() {
         const bonus = {};
         rows.forEach(row => {
           if (row.splitRub) {
-            // Бонус указан в кассе вручную — показываем его как «из карточки»
-            bonus[row.itemId] = { rub: row.splitRub, pct: row.total > 0 ? Math.round(row.splitRub / row.total * 1000) / 10 : 0 };
+            // Бонус указан в кассе вручную → источник «вписано вручную» (оранжевый)
+            bonus[row.itemId] = { rub: row.splitRub, pct: row.total > 0 ? Math.round(row.splitRub / row.total * 1000) / 10 : 0, manual: true };
           } else {
             const c = calcSalesBonus(rules, row, pr, cr);
             bonus[row.itemId] = { rub: c.rub, pct: c.pct };
