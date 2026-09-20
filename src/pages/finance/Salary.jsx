@@ -96,6 +96,7 @@ export default function Salary() {
   const [salStatus, setSalStatus] = useState(null);
   const [salSearch, setSalSearch] = useState('');
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
+  const [salTypeOpen, setSalTypeOpen] = useState(false);
   const [salPeriod, setSalPeriod] = useState('all');
   const [salSearchFocus, setSalSearchFocus] = useState(false);
   const [salPeriodLabel, setSalPeriodLabel] = useState('Все время');
@@ -849,37 +850,39 @@ export default function Salary() {
               )}
 
               {/* Расчет */}
-              <div style={{background:'#f8f9fa',borderRadius:'12px',padding:'.75rem'}}>
-                <div className="sal-seclab">Расчет</div>
-                <div style={{display:'flex',gap:'.35rem',flexWrap:'wrap',marginBottom:'.65rem'}}>
-                  {SALARY_TYPES.map(t => (
-                    <span key={t.value} onClick={()=>setFSalaryType(t.value)}
-                      style={{display:'inline-flex',alignItems:'center',gap:'4px',padding:'.2rem .5rem',fontSize:'.72rem',borderRadius:'100px',cursor:'pointer',fontWeight:500,
-                        background:fSalaryType===t.value?'var(--primary)':'#f1f3f5',color:fSalaryType===t.value?'#000':'var(--muted)'}}>{t.label}</span>
-                  ))}
-                </div>
-                <div style={{display:'flex',gap:'.35rem',alignItems:'flex-start'}}>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>{fSalaryType === 'shift' ? 'Ставка за смену ' : 'Оклад (мес.)'}</div>
-                    <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)}
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none'}} />
-                  </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>Отработано</div>
-                    <div style={{padding:'.35rem .5rem',fontSize:'.78rem',fontWeight:600,lineHeight:'1.3',boxSizing:'border-box',background:'#f8f9fa',borderRadius:'8px',border:'1.5px solid var(--border)'}}>
-                      {fDays} дн. / {calcDays(fPeriodFrom,fPeriodTo)||'?'} дн.
+              <div className="sal-seclab">Расчёт</div>
+              <div className="sk-dd-wrap" style={{marginBottom:'.5rem'}}>
+                <button type="button" className={'f-pill'+(fSalaryType ? ' on' : '')}
+                  onClick={e=>{e.stopPropagation();setSalTypeOpen(!salTypeOpen)}}>
+                  {(SALARY_TYPES.find(t=>t.value===fSalaryType)||SALARY_TYPES[0]).label} <span className="car-tri">▾</span>
+                </button>
+                {salTypeOpen && (
+                  <div className="f-menu">
+                    <div className="f-list">
+                      {SALARY_TYPES.map(t => {
+                        const sel = fSalaryType === t.value;
+                        return (
+                          <div key={t.value} onClick={()=>{setFSalaryType(t.value);setSalTypeOpen(false)}}
+                            className={'f-opt'+(sel?' sel':'')}>
+                            <span className="dot"></span>{t.label}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:'.68rem',color:'var(--muted)',marginBottom:'4px'}}>За период</div>
-                    <input type="text" value={fSalaryTotal.toLocaleString()+' ₽'} disabled
-                      style={{width:'100%',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',lineHeight:'1.3',boxSizing:'border-box',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'#f8f9fa'}} />
-                  </div>
+                )}
+              </div>
+              <div className="form-row" style={{marginBottom:'1rem'}}>
+                <div className="form-group" style={{marginBottom:0}}>
+                  <label>{fSalaryType === 'shift' ? 'Ставка за смену' : fSalaryType === 'piecework' ? 'Сумма за сделанное' : 'Оклад (мес.)'}</label>
+                  <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} />
                 </div>
-              {salarySplitMode && (
-                <button onClick={()=>confirmPay(null, salarySplitAmounts)}
-                  style={{width:'100%',padding:'.45rem 1rem',fontSize:'.8rem',fontWeight:600,borderRadius:'100px',border:'none',cursor:'pointer',background:'var(--secondary)',color:'#fff',fontFamily:'var(--font)',marginTop:'.35rem'}}>Подтвердить разделение</button>
-              )}
+                {fSalaryType !== 'piecework' && (
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label>Отработано</label>
+                    <input type="text" value={fDays + ' дн. / ' + (calcDays(fPeriodFrom,fPeriodTo)||'?') + ' дн.'} disabled />
+                  </div>
+                )}
               </div>
 
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
