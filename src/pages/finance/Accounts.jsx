@@ -57,6 +57,10 @@ export default function Accounts() {
   const [ownerAcct, setOwnerAcct] = useState('');
   const [ownerAmt, setOwnerAmt] = useState('');
   const [ownerDesc, setOwnerDesc] = useState('');
+  const [showProfit, setShowProfit] = useState(false);
+  const [profitAcct, setProfitAcct] = useState('');
+  const [profitAmt, setProfitAmt] = useState('');
+  const [profitDesc, setProfitDesc] = useState('');
   const [colAmt, setColAmt] = useState('');
   const [colTo, setColTo] = useState('');
   const [viewAcTx, setViewAcTx] = useState(null);
@@ -168,11 +172,14 @@ export default function Accounts() {
     var d = t.description || '';
     return d.startsWith('Взнос своих денег') || d.startsWith('Вывод своих денег');
   };
+  // Выплата прибыли владельцу — забрал заработанное, прибыли бизнеса не касается
+  var isProfitTx = (t) => !!t && (t.kind === 'owner_profit' || String(t.description||'').startsWith('Выплата прибыли'));
   var getMv = (ac) => {
-    if (!ac) return {i:0,e:0,od:0,ow:0};
-    var i=0,e=0,od=0,ow=0;
+    if (!ac) return {i:0,e:0,od:0,ow:0,pr:0};
+    var i=0,e=0,od=0,ow=0,pr=0;
     (transactions||[]).forEach(t=>{
       if (t.account_id !== ac.id || isInternalTx(t)) return;
+      if (isProfitTx(t)) { pr += Number(t.amount||0); return; }
       if (isOwnerTx(t)) {
         if (t.kind === 'owner_deposit' || t.type === 'income') od += Number(t.amount||0);
         else ow += Number(t.amount||0);
@@ -180,7 +187,7 @@ export default function Accounts() {
       }
       if (t.type==='income') i += Number(t.amount||0); else e += Number(t.amount||0);
     });
-    return {i,e,od,ow};
+    return {i,e,od,ow,pr};
   };
   var getTypeMeta = (ac) => {
     try {
@@ -344,6 +351,7 @@ export default function Accounts() {
                 { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
                 { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
                 { onClick: ()=>{setOwnerMode('deposit');setOwnerAcct(accounts.length?accounts[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}, label:'Взнос / вывод своих денег' },
+                { onClick: ()=>{setProfitAcct(accounts.length?accounts[0].id:'');setProfitAmt('');setProfitDesc('');setShowProfit(true)}, label:'Выплата прибыли' },
               ].map(a => (
                 <button key={a.label} type="button" onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');a.onClick()}}>{a.label}</button>
               ))}
@@ -458,6 +466,7 @@ export default function Accounts() {
                   const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e; }, 0);
                   const ownerIn = accounts.reduce((s,a) => { const mv=getMv(a); return s + (mv.od||0); }, 0);
                   const ownerOut = accounts.reduce((s,a) => { const mv=getMv(a); return s + (mv.ow||0); }, 0);
+                  const profitPaid = accounts.reduce((s,a) => { const mv=getMv(a); return s + (mv.pr||0); }, 0);
                   return (<>
                   <tr className="sk-total">
                     <td style={{textAlign:'left'}}>Итого:</td>
@@ -473,6 +482,15 @@ export default function Accounts() {
                       <td style={{textAlign:'left'}}>{ownerIn.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{ownerOut.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{(ownerIn-ownerOut).toLocaleString()} {cur}</td>
+                      <td></td>
+                    </tr>
+                  )}
+                  {profitPaid > 0 && (
+                    <tr>
+                      <td style={{textAlign:'left'}} colSpan={2}><span className="sk-name">Выплачено прибыли</span></td>
+                      <td style={{textAlign:'left'}}>0 {cur}</td>
+                      <td style={{textAlign:'left'}}>{profitPaid.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>−{profitPaid.toLocaleString()} {cur}</td>
                       <td></td>
                     </tr>
                   )}
@@ -718,6 +736,49 @@ export default function Accounts() {
           </div>
           <div className="modal-actions">
             <button type="submit" className="sk-dd-btn">Сохранить</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={showProfit} onClose={()=>setShowProfit(false)} title="Выплата прибыли" subtitle="Вы забираете заработанную прибыль. На саму прибыль это не влияет" width="medium">
+        <form onSubmit={async function(e){
+          e.preventDefault();
+          const amt = parseFloat(profitAmt);
+          if (!amt || amt <= 0) return alert('Введите сумму');
+          const acct = accounts.find(a => a.id === profitAcct);
+          if (!acct) return alert('Выберите счет');
+          const bal = balOfId(acct.id) || 0;
+          if (amt > bal) return alert('Недостаточно средств на счете «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
+          try {
+            await supabase.from('transactions').insert({
+              user_id: user.id,
+              account_id: acct.id,
+              type: 'expense',
+              amount: amt,
+              description: 'Выплата прибыли' + (profitDesc.trim() ? ' — ' + profitDesc.trim() : ''),
+              date: new Date().toISOString().split('T')[0],
+              kind: 'owner_profit',
+              category_id: null,
+            });
+            setShowProfit(false); setProfitAmt(''); setProfitDesc('');
+            await fetchTx();
+            setToast('Выплата прибыли: ' + amt.toLocaleString() + ' ' + cur);
+          } catch(err) { alert('Ошибка: ' + err.message); }
+        }}>
+          <div className="form-group">
+            <label>Счет</label>
+            <AcctPick accounts={accounts} value={profitAcct} onChange={setProfitAcct} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
+          </div>
+          <div className="form-group">
+            <label>Сумма</label>
+            <input type="number" min="0" step="0.01" value={profitAmt} onChange={e=>setProfitAmt(e.target.value)} placeholder="0" autoFocus />
+          </div>
+          <div className="form-group">
+            <label>Комментарий</label>
+            <input type="text" value={profitDesc} onChange={e=>setProfitDesc(e.target.value)} placeholder="Например: за сентябрь" />
+          </div>
+          <div className="modal-actions">
+            <button type="submit" className="sk-dd-btn">Выплатить</button>
           </div>
         </form>
       </Modal>
