@@ -498,7 +498,7 @@ export default function Salary() {
     e.preventDefault();
     if (!fEmpId) return alert('Выберите сотрудника');
     if (!fPeriodFrom || !fPeriodTo) return alert('Выберите период');
-    if (dupSalary) return alert('За период ' + fPeriodFrom + ' – ' + fPeriodTo + ' начисление уже есть (' + Number(dupSalary.amount || 0).toLocaleString() + ' ' + cur + '). Откройте его кнопкой «Редактировать», чтобы изменить.');
+    // Доначисление разрешено: за тот же период может быть второе начисление (остаток бонусов и т.п.)
     if (!user) return alert('Ошибка: пользователь не авторизован');
     const emp = employees.find(e => e.id === fEmpId);
     try {
@@ -942,12 +942,32 @@ export default function Salary() {
               </div>
 
               {dupSalary && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '.5rem .65rem', fontSize: '.76rem', color: '#b91c1c', flexWrap: 'wrap' }}>
-                  <span style={{ flex: 1, minWidth: '200px' }}>⚠️ За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже есть начисление: <b>{Number(dupSalary.amount || 0).toLocaleString()} {cur}</b> ({dupSalary.status === 'paid' ? 'выплачено' : 'начислено'})</span>
-                  {dupSalary.status !== 'paid' && (
-                    <button type="button" onClick={() => openEdit(dupSalary)}
-                      style={{ padding: '.3rem .8rem', borderRadius: 100, border: 'none', background: '#b91c1c', color: '#fff', fontSize: '.72rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Открыть его</button>
-                  )}
+                <div style={{ background:'#E6F0FF', border:'1px solid #c7ddff', borderRadius: 10, padding:'.55rem .75rem', fontSize:'.76rem', color:'#0b1220' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexWrap:'wrap' }}>
+                    <span style={{ flex:1, minWidth:'200px' }}>
+                      За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{Number(dupSalary.amount || 0).toLocaleString()} {cur}</b>
+                      <span style={{ color:'var(--muted)' }}> ({dupSalary.status === 'paid' ? 'выплачено' : 'начислено'})</span>
+                    </span>
+                    {dupSalary.status !== 'paid' && (
+                      <button type="button" onClick={() => openEdit(dupSalary)}
+                        style={{ padding:'.3rem .8rem', borderRadius:100, border:'none', background:'#111', color:'#fff', fontSize:'.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>Открыть</button>
+                    )}
+                  </div>
+                  {(() => {
+                    // Что ещё НЕ вошло в уже сохранённое начисление
+                    const items = [];
+                    const hasStore = Math.abs(Number(dupSalary.sales_bonus) || 0) > 0;
+                    if (hasStoreRate && storeOn && !hasStore) items.push({ n:'Бонус от выручки', v: storeBonus });
+                    if (salesOn && salesBonusTotal > 0 && !(dupSalary.sales_items && dupSalary.sales_items.some(i => Number(i.bonus) > 0))) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
+                    if (rewardOn && rewardTotal > 0 && !(dupSalary.reward_items && dupSalary.reward_items.length)) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
+                    if (bonusOpen && checkedBonusTotal > 0 && !(Number(dupSalary.bonus_amount) > 0)) items.push({ n:'Премии', v: checkedBonusTotal });
+                    if (!items.length) return null;
+                    return (
+                      <div style={{ marginTop:'.35rem', fontSize:'.72rem', color:'var(--muted)' }}>
+                        Не вошло: {items.map((x, i) => <span key={i}>{i > 0 ? ', ' : ''}<b style={{ color:'#0b1220' }}>{x.n} {x.v.toLocaleString()} {cur}</b></span>)}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
