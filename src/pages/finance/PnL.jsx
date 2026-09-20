@@ -293,7 +293,7 @@ export default function PnL() {
             {[['month','Месяц'],['quarter','Квартал'],['year','Год']].map(([k,l]) => (
               <button key={k} type="button"
                 style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
-                onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod(k); }}>
+                onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sk-period-wrap').classList.remove('open'); setPeriod(k); }}>
                 {l}
               </button>
             ))}
@@ -305,7 +305,7 @@ export default function PnL() {
               </div>
               <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
                 <button type="button" className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}
-                  onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod('custom'); }}>Применить</button>
+                  onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sk-period-wrap').classList.remove('open'); setPeriod('custom'); }}>Применить</button>
               </div>
             </div>
           </div>

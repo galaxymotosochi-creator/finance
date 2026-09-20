@@ -329,8 +329,7 @@ body {
 
 /* Все таблицы — единый стиль */
 /* Остатки: таблица переведена на sk-table — старые правила шапки отключены, чтобы не перебивать фирменный стиль */
-.main .content .sk-table.*** thead th:not(:first-child),
-.main .content .sk-table.*** tbody td:not(:first-child){border-right:1px solid rgba(29,120,252,.09)}
+
 #clientColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
@@ -1430,3 +1429,7 @@ input:focus, select:focus, textarea:focus {
 @media(max-width:700px){ .pnl-top{grid-template-columns:1fr} .pnl-grid3{grid-template-columns:1fr} }
 .sk-period-wrap.open .sk-period-menu{display:block !important;animation:skpop .16s ease}
 .sk-period-wrap.open .car-tri{transform:rotate(180deg);animation:none}
+
+/* Пункты меню «Период» в «Чистой прибыли» — как в «Доходах и расходах» */
+.sk-period-menu button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:#040506;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .16s,color .16s}
+.sk-period-menu button:hover{background:#f2f7ff;color:#0d4ea8}
