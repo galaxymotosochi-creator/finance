@@ -421,8 +421,9 @@ export default function Salary() {
 
   // Что уже погашено прошлым начислением за этот период (блоки становятся неактивными)
   const dup = dupSalary;
-  const doneStore = !!(dup && Math.abs(Number(dup.sales_bonus) || 0) > 0);
-  const doneSales = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => Number(i.bonus) > 0));
+  // Выручка — по маркеру store в sales_items; продажи — по строчным бонусам (не путать!)
+  const doneStore = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => i && i.store === true));
+  const doneSales = !!(dup && dup.sales_items && Array.isArray(dup.sales_items) && dup.sales_items.some(i => i && !i.store && Number(i.bonus) > 0));
   const doneReward = !!(dup && dup.reward_items && Array.isArray(dup.reward_items) && dup.reward_items.length > 0);
   const doneBonus = !!(dup && Number(dup.bonus_amount) > 0);
   const doneDeduct = !!(dup && Number(dup.deduct_amount) > 0);
@@ -518,7 +519,9 @@ export default function Salary() {
         // иначе зарплата помечалась выплаченной без создания расходной операции
         amount: grandTotal, status: 'pending', pay_type: 'salary',
         bonus_amount: bonusOnTotal, bonus_items: bonusOpen ? takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })) : [],
-        sales_bonus: salesBonusOn + storeBonusOn, sales_items: (salesOn || storeOn) ? salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: salesOn ? (Number(salesBonus[row.itemId]?.rub) || 0) : 0 })) : [],
+        sales_bonus: salesBonusOn + storeBonusOn,
+        sales_items: ((salesOn || storeOn) ? salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: salesOn ? (Number(salesBonus[row.itemId]?.rub) || 0) : 0 })) : [])
+          .concat(storeOn ? [{ store: true, amount: storeBonusOn }] : [])   // маркер: бонус от выручки начислен
         reward_amount: rewardOnTotal, reward_items: rewardOn ? rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }) : [],
         deduct_amount: deductOnTotal + debtOnTotal, deduct_items: (fineOpen ? takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })) : []).concat(debtOpen ? debtItems : []),
         paid_at: null,
