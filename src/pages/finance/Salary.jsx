@@ -1002,6 +1002,13 @@ export default function Salary() {
                   </div>
                 );
               })()}
+              <div className="sal-sub" style={{display: (storeOn && storeInfo && storeInfo.pct != null) ? 'block' : 'none'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'.4rem',fontSize:'.78rem',color:'var(--muted)',padding:'.55rem .5rem .5rem',flexWrap:'wrap'}}>
+                  <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.pct : 0}%</b> от выручки магазина за период</span>
+                  <span><b style={{color:'#111'}}>{storeInfo ? storeInfo.revenue.toLocaleString() : 0} {cur}</b>{storeNote} =</span>
+                  <b style={{color:'#111'}}>{storeBonus.toLocaleString()} {cur}</b>
+                </div>
+              </div>
               <div className={'sal-pick'+(salesOn?' on':'')} onClick={()=>setSalesOn(!salesOn)}>
                 <span className="cb">{salesOn ? '✓' : ''}</span>
                 <span className="nm">Продажи сотрудника (он продавец)</span>
