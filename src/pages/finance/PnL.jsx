@@ -303,7 +303,7 @@ export default function PnL() {
                 <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)} style={{flex:1,fontSize:'.72rem',padding:'.3rem',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.5rem',fontFamily:'inherit',outline:'none'}} />
               </div>
               <div style={{padding:'.3rem .55rem 0',textAlign:'center'}}>
-                <button type="button" className="sk-dd-btn" style={{padding:'.5rem 1.1rem',animation:'none',width:'100%',justifyContent:'center'}}
+                <button type="button" className="sk-dd-btn" style={{padding:'.5rem 1.1rem'}}
                   onClick={e => { e.stopPropagation(); e.currentTarget.closest('.sal-dd-wrap').classList.remove('open'); setPeriod('custom'); }}>Применить</button>
               </div>
             </div>
