@@ -478,9 +478,6 @@ export default function Transactions() {
               },{
                 label:'Перевод между счетами', sub:'Перемещение средств',
                 act:function(){setTrFrom(accs.length > 0 ? accs[0].id : '');setTrTo(accs.length > 1 ? accs[1].id : '');setTrAmt('');setShowTransfer(true)}
-              },{
-                label:'Взнос / вывод своих денег', sub:'Личные деньги владельца',
-                act:function(){setOwnerMode('deposit');setOwnerAcct(accs.length?accs[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}
               }].map(function(o){
                 return (
                   <button key={o.label} type="button" onClick={function(e){e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');o.act()}} style={{display:'block',padding:'10px 12px'}}>
