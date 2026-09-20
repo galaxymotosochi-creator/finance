@@ -1014,7 +1014,6 @@ input:focus, select:focus, textarea:focus {
 .sal-ring-card .rs{font-size:11px;color:var(--sk-muted);margin-top:2px}
 .sal-ring-card .rb{font-size:11px;font-weight:600;margin-top:4px}
 /* Зарплата: таблица в стиле scanurik */
-.sal-tbl{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
 .sk-table.sal-table{min-width:1080px}
 .sk-table.sal-table thead th:nth-child(1),.sk-table.sal-table tbody td:nth-child(1){min-width:170px}
 .sk-table.sal-table thead th:nth-child(2),.sk-table.sal-table tbody td:nth-child(2){min-width:150px}
