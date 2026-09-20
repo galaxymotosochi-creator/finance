@@ -1399,7 +1399,7 @@ input:focus, select:focus, textarea:focus {
 .pnl-kpi-card{background:linear-gradient(150deg,#ffdd2d 0%,#ffe97a 55%,#fff9db 100%);border-radius:18px;padding:22px;box-shadow:0 18px 40px -20px rgba(255,199,0,.75);position:relative;overflow:hidden}
 .pnl-kpi-card:after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.45)}
 .pnl-kpi-card .lbl{color:#7a6412;position:relative;font-size:12.5px;letter-spacing:.04em;font-weight:700;text-transform:uppercase}
-.pnl-kpi-card .big{font-size:34px;font-weight:900;letter-spacing:-.035em;margin:6px 0 14px;position:relative;color:#0b1220}
+.pnl-kpi-card .big{font-size:27px;font-weight:800;letter-spacing:-.025em;margin:5px 0 14px;position:relative;color:#0b1220}
 .pnl-kpi-card .chips{display:flex;gap:8px;position:relative}
 .pnl-kpi-card .chip{background:rgba(255,255,255,.75);border-radius:10px;padding:8px 11px;flex:1}
 .pnl-kpi-card .chip .lbl{color:#7a6412;font-size:9.5px}
