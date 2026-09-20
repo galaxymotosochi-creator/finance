@@ -107,6 +107,27 @@ export default function Salary() {
   // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
   const [tblPos, setTblPos] = useState({left:false, right:false});
   const tblElRef = useRef(null);
+  // Подсказка скролла вложенных таблиц: гаснет, когда прокрутили до конца
+  const [salesPos, setSalesPos] = useState({left:false, right:true});
+  const [rewardPos, setRewardPos] = useState({left:false, right:true});
+  const salesWrapRef = useRef(null);
+  const rewardWrapRef = useRef(null);
+  const mkScroll = (setter) => (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setter({ left:false, right:false }); return; }
+    setter({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const onSalesScroll = mkScroll(setSalesPos);
+  const onRewardScroll = mkScroll(setRewardPos);
+  const checkInner = () => {
+    [ [salesWrapRef, setSalesPos], [rewardWrapRef, setRewardPos] ].forEach(([ref, setter]) => {
+      const el = ref.current; if (!el) return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 4) { setter({ left:false, right:false }); return; }
+      setter({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    });
+  };
   const onTblScroll = (e) => {
     const el = e.currentTarget;
     const max = el.scrollWidth - el.clientWidth;
@@ -121,9 +142,10 @@ export default function Salary() {
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
   useEffect(() => {
-    const t = setTimeout(checkTbl, 120);
-    window.addEventListener('resize', checkTbl);
-    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+    const run = () => { checkTbl(); checkInner(); };
+    const t = setTimeout(run, 120);
+    window.addEventListener('resize', run);
+    return () => { clearTimeout(t); window.removeEventListener('resize', run); };
   });
 
   // Form
@@ -351,6 +373,7 @@ export default function Salary() {
         }
       } catch (e) {}
       setSalesLoaded(true);
+      setTimeout(() => { try { checkInner(); } catch (e) {} }, 80);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fEmpId, fPeriodFrom, fPeriodTo]);
@@ -1003,8 +1026,8 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода — продажи сотрудника появятся здесь' : 'Нет продаж/услуг за этот период'}</div>
                   ) : (
                     <>
-                      <div className="sal-tblwrap">
-                        <div className="sal-scrollhint">→</div>
+                      <div className="sal-tblwrap" ref={salesWrapRef} onScroll={onSalesScroll}>
+                        <div className="sal-scrollhint" style={{opacity: salesPos.right?1:0}}>›</div>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
@@ -1073,8 +1096,8 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
                   ) : (
                     <>
-                      <div className="sal-tblwrap">
-                        <div className="sal-scrollhint">→</div>
+                      <div className="sal-tblwrap" ref={rewardWrapRef} onScroll={onRewardScroll}>
+                        <div className="sal-scrollhint" style={{opacity: rewardPos.right?1:0}}>›</div>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'20%'}} /><col style={{width:'26%'}} /><col style={{width:'18%'}} /><col style={{width:'13%'}} /><col style={{width:'23%'}} /></colgroup>
                         <thead><tr>
