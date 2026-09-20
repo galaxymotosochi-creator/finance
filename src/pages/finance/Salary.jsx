@@ -177,7 +177,10 @@ export default function Salary() {
       ]);
       if (salRes.error) { alert('Ошибка загрузки: ' + salRes.error.message); setLoading(false); return; }
       if (salRes.data) setList(salRes.data);
-      if (empRes.data) setEmployees(empRes.data);
+      if (empRes.data) {
+        setEmployees(empRes.data);
+        setFEmpId(prev => prev || (empRes.data[0] ? empRes.data[0].id : ''));
+      }
       if (accRes.data) setAccs(accRes.data);
       if (txRes.data) setAccTxs(txRes.data);
     } catch (e) { alert('Ошибка загрузки: ' + e.message); }
@@ -823,14 +826,20 @@ export default function Salary() {
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
-                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input">
+                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input sal-select">
                   <option value="">Выберите сотрудника</option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
               </div>
               <div className="sal-row2">
-                <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
-                <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
+                <div className="sal-field">
+                  <span className="sal-cap">Начало периода</span>
+                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input" />
+                </div>
+                <div className="sal-field">
+                  <span className="sal-cap">Конец периода</span>
+                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input" />
+                </div>
               </div>
 
               {dupSalary && (
