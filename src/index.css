@@ -381,10 +381,11 @@ body {
 .modal-box.modal-medium { max-width: 480px; }
 .modal-box.modal-wide { max-width: 560px; }
 /* Карточка: воздух сверху и снизу, шапка не прилипает к экрану */
-.modal-box.modal-salary { max-width: 660px; padding: 0 1.5rem 1.5rem; overflow: hidden;
+.modal-box.modal-salary { max-width: 660px; padding: 0 0 1.5rem; overflow: hidden;
   border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border: none;
   display: flex; flex-direction: column; max-height: 90vh; }
 .modal-box.modal-salary .modal-body { padding: 0 1.5rem 0; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
+.modal-box.modal-salary .modal-body > .sal-head { padding-left: 1.5rem; padding-right: 1.5rem; margin-left: -1.5rem; margin-right: -1.5rem; }
 /* Шапка не сжимается и не сбивается при скролле */
 .modal-box.modal-salary .sal-head { flex: none; }
 .modal-close { position: absolute; top: .75rem; right: .75rem; background: none; border: none; font-size: 1.125rem; color: #888; cursor: pointer; line-height: 1; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background .15s; }
@@ -1271,8 +1272,8 @@ input:focus, select:focus, textarea:focus {
 .ord-sel option{padding:10px 10px;line-height:2.2;font-size:.8rem}
 
 /* ===== Форма «Начислить зарплату» — фирменный стиль (перенос из превью) ===== */
-.sal-head{background:#E6F0FF;margin:0 -1.5rem 1.15rem;padding:1.15rem 3rem 1.15rem 1.5rem;
-  border-radius:16px 16px 0 0;display:block;box-sizing:content-box;width:auto}
+.sal-head{background:#E6F0FF;margin:0 0 1.15rem;padding:1.15rem 3rem 1.15rem 1.5rem;
+  border-radius:16px 16px 0 0;display:block;box-sizing:border-box;width:auto}
 .sal-head .modal-title{font-size:1.125rem;font-weight:700;margin:0;color:#0b1220;letter-spacing:-.01em}
 .sal-head .modal-sub{font-size:.8125rem;color:#5b6472;margin:.15rem 0 0;font-weight:400}
 
