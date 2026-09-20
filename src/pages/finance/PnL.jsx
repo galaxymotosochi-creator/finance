@@ -302,11 +302,12 @@ export default function PnL() {
         </div>
       </div>
 
-      {/* Окно (эталон pnl-donut-v5) */}
+      {/* Окно — фирменные сине-жёлтые цвета */}
       <div style={{
-        background: 'linear-gradient(150deg,#fff,#fff8e6)',
+        background: 'linear-gradient(150deg,#ffffff 0%,#f4f8ff 55%,#fff8e0 100%)',
         borderRadius: '22px', padding: '26px',
-        boxShadow: '0 14px 40px rgba(0,0,0,.08)', border: '1px solid #f2ecdc',
+        boxShadow: '0 18px 44px -18px rgba(13,78,168,.28), 0 2px 0 rgba(255,255,255,.8) inset',
+        border: '1px solid #dce9ff',
         display: 'flex', gap: '30px', alignItems: 'center', flexWrap: 'wrap',
       }}>
         {/* Донат-круг */}
@@ -318,7 +319,7 @@ export default function PnL() {
                 <stop offset="1" stopColor="#ffb300" />
               </linearGradient>
             </defs>
-            <circle cx="105" cy="105" r="86" fill="none" stroke="#f1ece0" strokeWidth="18" />
+            <circle cx="105" cy="105" r="86" fill="none" stroke="#e6eefc" strokeWidth="18" />
             <circle cx="105" cy="105" r="86" fill="none" stroke="url(#pnlDonutGrad)" strokeWidth="18" strokeLinecap="round" strokeDasharray="540" strokeDashoffset={donutOffset} transform="rotate(-90 105 105)" />
           </svg>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -331,7 +332,7 @@ export default function PnL() {
 
         {/* Отчет о прибыли */}
         <div style={{ flex: 1, minWidth: '290px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid #111', paddingBottom: '6px', marginBottom: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid #0d4ea8', paddingBottom: '6px', marginBottom: '6px' }}>
             <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>Отчет о прибыли</span>
             <span style={{ fontSize: '16px', fontWeight: 500, color: '#999' }}>{periodLabel}</span>
           </div>
