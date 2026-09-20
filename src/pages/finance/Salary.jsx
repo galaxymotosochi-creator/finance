@@ -360,8 +360,9 @@ export default function Salary() {
       .filter(s => s.employee_id === fEmpId && s.status !== 'cancelled' && s.pay_type !== 'bonus')
       .reduce((sum, s) => {
         const amt = Number(s.amount) || 0;
-        return s.status === 'paid' ? sum - amt :
-          s.pay_type === 'advance' ? sum - amt : sum + amt;
+        // Выданное — закрытый расчёт (0). Аванс без выплаты — его долг нам.
+        if (s.status === 'paid') return sum;
+        return s.pay_type === 'advance' ? sum + amt : sum;
       }, 0);
     setExistingDebt(debt);
   }, [fEmpId, list]);
@@ -1165,12 +1166,12 @@ export default function Salary() {
                 </div>
               </>
 
-              {/* Учесть долг перед сотрудником — галочка */}
-              {(
+              {/* Учесть долг перед сотрудником — только если долг реально есть */}
+              {existingDebt > 0 && (
                 <div className={'sal-pick'+(debtInclude?' on':'')} onClick={()=>setDebtInclude(!debtInclude)}>
                   <span className="cb">{debtInclude ? '✓' : ''}</span>
                   <span className="nm">Учесть долг перед сотрудником</span>
-                  <span className="vl">{Math.abs(existingDebt).toLocaleString()} {cur}</span>
+                  <span className="vl">{existingDebt.toLocaleString()} {cur}</span>
                 </div>
               )}
 
