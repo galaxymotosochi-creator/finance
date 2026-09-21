@@ -1567,12 +1567,12 @@ input:focus, select:focus, textarea:focus {
 .sk-tri{font-size:19px;font-weight:800;color:#1F75FF;display:inline-block;line-height:1;transition:transform .2s;animation:cartripulse 1.6s ease-in-out infinite}
 .sk-tri.open{transform:rotate(180deg);animation:none}
 .acct-det-wrap{padding:.35rem .75rem .6rem 1.6rem;display:flex;flex-direction:column;gap:4px}
-.acct-det-i{display:grid;grid-template-columns:78px 1fr 132px 110px;align-items:center;gap:.7rem;font-size:.78rem;color:#33405a;padding:.35rem .5rem;border-radius:8px;white-space:nowrap}
+.acct-det-i{display:flex;align-items:center;gap:.7rem;font-size:.78rem;color:#33405a;padding:.35rem .5rem;border-radius:8px;white-space:nowrap}
 .acct-det-i:hover{background:#f8f9fa}
-.acct-det-i .d{color:var(--muted);font-weight:600}
-.acct-det-i .a{font-weight:600;overflow:hidden;text-overflow:ellipsis}
-.acct-det-i .k{font-weight:600;font-size:.72rem}
-.acct-det-i .v{font-weight:700;text-align:right;color:#111}
+.acct-det-i .d{color:var(--muted);font-weight:600;flex:none;min-width:74px}
+.acct-det-i .a{font-weight:600;flex:none}
+.acct-det-i .k{font-weight:600;font-size:.72rem;flex:none;margin-left:14px}
+.acct-det-i .v{font-weight:700;text-align:right;color:#111;flex:1}
 .acct-det-total{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);padding:.5rem .6rem 0;border-top:1px solid var(--border);margin-top:.25rem}
 .acct-det-total b{font-weight:700;color:#111}
 .acct-det-empty{font-size:.78rem;color:var(--muted);padding:.5rem .6rem}
