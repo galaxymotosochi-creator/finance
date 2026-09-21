@@ -1476,12 +1476,12 @@ input:focus, select:focus, textarea:focus {
 /* ЖЁЛТАЯ ПЛАШКА ПРИБЫЛИ — дизайн прежний, РАЗМЕРЫ 1-в-1 с эталоном «Чистая прибыль» */
 .hero{background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:22px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 20px 44px -22px rgba(255,199,0,.75)}
 .hero:before{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,255,255,0) 70%)}
-.hero .lbl{font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dash-yellow-d);opacity:.85;position:relative}
-.hero .val{font-size:27px;font-weight:900;letter-spacing:-.035em;margin:6px 0 2px;line-height:1.15;position:relative}
+.hero .lbl{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--dash-yellow-d);opacity:.85;position:relative}
+.hero .val{font-size:27px;font-weight:800;letter-spacing:-.025em;margin:6px 0 2px;line-height:1.15;position:relative}
 .hero .delta{font-size:13.5px;font-weight:700;color:#1a7f37;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.6);padding:4px 11px;border-radius:999px;margin-top:8px;position:relative}
 .hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
-.hero .chip{background:rgba(255,255,255,.62);border-radius:12px;padding:8px 13px;font-size:12px;font-weight:600;color:#5b5210;flex:1;min-width:110px}
-.hero .chip b{font-size:15px;font-weight:800;color:#3d3607;display:block;margin-top:2px}
+.hero .chip{background:rgba(255,255,255,.62);border-radius:12px;padding:8px 13px;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7a6412;flex:1;min-width:110px}
+.hero .chip b{font-size:14px;font-weight:800;color:#0d4ea8;display:block;margin-top:2px;letter-spacing:0;text-transform:none}
 
 /* КАРТОЧКИ */
 .dash .card{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 14px rgba(11,18,32,.06)}
