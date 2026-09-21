@@ -93,8 +93,10 @@ body {
 .sidebar.collapsed .sidebar-user-info { display: none; }
 
 @media (max-width: 768px) {
-  .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; z-index: 200; transition: left .3s; }
-  .sidebar.open { left: 0; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 200;
+    transform: translateX(-105%); transition: transform .32s cubic-bezier(.4,0,.2,1);
+    will-change: transform; }
+  .sidebar.open { transform: translateX(0); }
   .sidebar-inner { width: 250px; min-width: 250px; }
   .sidebar.collapsed .sidebar-inner { width: 250px; min-width: 250px; }
   .sidebar.collapsed .sidebar-user { font-size: 1rem; padding: .5rem; }
