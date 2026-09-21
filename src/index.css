@@ -1457,33 +1457,31 @@ input:focus, select:focus, textarea:focus {
   --dash-yellow:#ffdd2d; --dash-yellow-soft:#fff9db; --dash-yellow-d:#7a6412;
   --dash-ink:#0b1220; --dash-muted:#5b6472; --dash-line:#e8edf5;
   font-family:var(--font);
-  background:#f4f7fc;
+  background:#fff;
   color:var(--dash-ink);
-  padding:18px 14px 60px;
+  padding:0 0 40px;
   max-width:1180px;
   margin:0 auto;
-  border-radius:20px;
 }
-.dash *{box-sizing:border-box}
 
-/* ШАПКА */
-.dash-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-.dash-head h1{font-size:24px;font-weight:800;letter-spacing:-.025em}
-.dash-date{font-size:13px;color:var(--dash-muted);margin-top:2px}
+/* ШАПКА — голубая, как в остальных разделах */
+.dash-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;background:#E6F0FF;border-radius:16px;padding:1.15rem 1.5rem}
+.dash-head h1{font-size:1.2rem;font-weight:700;letter-spacing:-.025em}
+.dash-date{font-size:.8rem;color:var(--dash-muted);margin-top:2px}
 .dash-spacer{flex:1}
 .seg{display:inline-flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(11,18,32,.07);gap:2px}
 .seg button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--dash-muted);padding:7px 15px;border-radius:999px;cursor:pointer;transition:all .15s}
 .seg button.on{background:linear-gradient(135deg,var(--dash-blue),var(--dash-blue-d));color:#fff;box-shadow:0 6px 16px -6px rgba(31,117,255,.7)}
 
-/* ЖЁЛТАЯ ПЛАШКА ПРИБЫЛИ */
-.hero{background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:22px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 20px 44px -22px rgba(255,199,0,.75)}
-.hero:before{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,255,255,0) 70%)}
-.hero .lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dash-yellow-d);opacity:.85}
-.hero .val{font-size:44px;font-weight:900;letter-spacing:-.035em;margin:6px 0 2px;line-height:1;position:relative}
-.hero .delta{font-size:13.5px;font-weight:700;color:#1a7f37;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.6);padding:4px 11px;border-radius:999px;margin-top:8px;position:relative}
-.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
-.hero .chip{background:rgba(255,255,255,.62);border-radius:12px;padding:8px 13px;font-size:12px;font-weight:600;color:#5b5210}
-.hero .chip b{font-size:15px;font-weight:800;color:#3d3607;display:block;margin-top:2px}
+/* ЖЁЛТАЯ ПЛАШКА ПРИБЫЛИ — размеры 1-в-1 с эталоном «Чистая прибыль» */
+.hero{background:linear-gradient(150deg,#ffdd2d 0%,#ffe97a 55%,#fff9db 100%);border-radius:18px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 18px 40px -20px rgba(255,199,0,.75)}
+.hero:before{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.45)}
+.hero .lbl{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7a6412;opacity:1;position:relative}
+.hero .val{font-size:27px;font-weight:800;letter-spacing:-.025em;margin:5px 0 14px;line-height:1.15;position:relative;color:#0b1220}
+.hero .delta{font-size:9.5px;font-weight:700;color:#7a6412;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.75);padding:8px 11px;border-radius:10px;margin:0 0 14px;position:relative}
+.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:0;position:relative;z-index:1}
+.hero .chip{background:rgba(255,255,255,.75);border-radius:10px;padding:8px 11px;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7a6412;flex:1;min-width:110px}
+.hero .chip b{font-size:14px;font-weight:800;color:#0d4ea8;display:block;margin-top:2px;letter-spacing:0;text-transform:none}
 
 /* КАРТОЧКИ */
 .dash .card{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 14px rgba(11,18,32,.06)}
@@ -1553,9 +1551,10 @@ input:focus, select:focus, textarea:focus {
 
 .dash-empty{text-align:center;padding:3rem;color:#999;font-size:.85rem}
 
+.dash *{box-sizing:border-box}
 @media(max-width:640px){
-  .dash-head h1{font-size:19px}
-  .hero .val{font-size:33px}
+  .dash-head h1{font-size:1.05rem}
+  .hero .val{font-size:22px}
   .bars{height:130px;gap:3px}
   .kpi .k-val{font-size:20px}
   .seg button{padding:6px 10px;font-size:11.5px}
