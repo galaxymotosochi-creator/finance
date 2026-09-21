@@ -66,17 +66,18 @@ export default function Dashboard() {
     (async () => {
       try {
         const dr = getDateRange();
-        const [{ data: txs }, { data: allTx }, { data: accts }, { data: debtClients }, { data: prods }, { data: supRaw }, { data: wo }, { data: recs }, { data: allClients }, { data: receiptsAll }] = await Promise.all([
+        const [{ data: txs }, { data: allTx }, { data: accts }, { data: debtClients }, { data: prods }, { data: supRaw }, { data: wo }, { data: recs }, { data: allClients }, { data: receiptsAll }, { data: initStock }] = await Promise.all([
           supabase.from('transactions').select('type,amount,category_id,status,account_id,date,kind,description').eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
           supabase.from('transactions').select('type,amount,account_id,date,status,kind,description').eq('user_id', user.id),
           supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id),
           supabase.from('clients').select('name,debt').eq('user_id', user.id).not('debt', 'is', null).lt('debt', 0).order('debt', { ascending: true }),
           supabase.from('products').select('id,name,type,price,min_qty').eq('user_id', user.id).eq('hidden', false),
-          supabase.from('supplies').select('items').eq('user_id', user.id),
-          supabase.from('writeoffs').select('items').eq('user_id', user.id),
+          supabase.from('supplies').select('items,status').eq('user_id', user.id),
+          supabase.from('writeoffs').select('product_id,quantity').eq('user_id', user.id),
           supabase.from('receipts').select('id,total_amount,date,client_id').eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
           supabase.from('clients').select('id').eq('user_id', user.id),
           supabase.from('receipts').select('total_amount,date,client_id').eq('user_id', user.id),
+          supabase.from('initial_stocks').select('*').eq('user_id', user.id).maybeSingle(),
         ]);
         if (!alive) return;
 
@@ -116,17 +117,44 @@ export default function Dashboard() {
         });
         const salesRev = (recs || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
 
-        // Склад
+        // Склад — как в разделе «Остатки»: поставки (без «Заказано») + начальные остатки − списания
         const sm = {};
-        (supRaw || []).forEach(sp => (sp.items || []).forEach(it => { if (!sm[it.prodId]) sm[it.prodId] = { qty: 0, cost: 0 }; sm[it.prodId].qty += it.qty || 0; sm[it.prodId].cost += (it.cost || 0) * (it.qty || 0); }));
-        (wo || []).forEach(w => { const pid = w.product_id; if (pid != null && sm[pid]) sm[pid].qty -= w.quantity || 0; });
+        (supRaw || []).filter(sp => (sp.status || 'received') !== 'ordered').forEach(sp => (sp.items || []).forEach(it => {
+          if (!it || !it.prodId) return;
+          if (!sm[it.prodId]) sm[it.prodId] = { qty: 0, cost: 0 };
+          sm[it.prodId].qty += it.qty || 0;
+          sm[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+        }));
+        // Начальные остатки
+        const init = initStock;
+        if (init && init.done && init.items) {
+          Object.keys(init.items).forEach(id => {
+            const q = parseInt(init.items[id]) || 0;
+            const c = (init.costs && parseInt(init.costs[id])) || 0;
+            if (q > 0) {
+              if (!sm[id]) sm[id] = { qty: 0, cost: 0 };
+              sm[id].qty += q;
+              sm[id].cost += c * q;
+            }
+          });
+        }
+        // Списания уменьшают остаток (и стоимость по средней)
+        (wo || []).forEach(w => {
+          const pid = w.product_id;
+          if (pid != null && sm[pid]) {
+            const avg = sm[pid].qty > 0 ? sm[pid].cost / sm[pid].qty : 0;
+            sm[pid].qty -= w.quantity || 0;
+            sm[pid].cost -= avg * (w.quantity || 0);
+          }
+        });
         const deficit = (prods || [])
           .filter(p => p.type !== 'service' && p.type !== 'combo' && p.min_qty > 0)
           .map(p => ({ name: p.name, qty: sm[p.id]?.qty || 0, min: p.min_qty, need: Math.max(0, p.min_qty - (sm[p.id]?.qty || 0)) }))
           .filter(p => p.qty < p.min).sort((a, b) => (a.qty / a.min) - (b.qty / b.min));
-        const stockCost = Object.values(sm).reduce((s, v) => s + v.cost, 0);
-        const stockRetail = (prods || []).reduce((s, p) => s + ((sm[p.id]?.qty || 0) * (p.price || 0)), 0);
-        const stockPositions = (prods || []).filter(p => p.type !== 'service').length;
+        const stockCost = Object.values(sm).reduce((s, v) => s + Math.max(0, v.cost), 0);
+        const stockRetail = (prods || []).reduce((s, p) => s + (Math.max(0, sm[p.id]?.qty || 0) * (p.price || 0)), 0);
+        const stockPositions = (prods || []).filter(p => p.type !== 'service' && p.type !== 'combo').length;
+        const lowStockCount = deficit.length;
 
         // Клиенты
         const debt = Math.abs((debtClients || []).reduce((s, c) => s + (c.debt || 0), 0));
@@ -216,7 +244,7 @@ export default function Dashboard() {
           rev, exp, profit: rev - exp, salesRev, cogs,
           cashBal, bankBal, totalCash, acctList, cashForecast,
           debt, debtors: debtClients || [], totalClients, repeatClients,
-          deficit, stockCost, stockRetail, stockPositions,
+          deficit, stockCost, stockRetail, stockPositions, lowStockCount,
           bars, barsTotal, barsMax, cmp,
           monthRev: cmp.month, monthProfit: (cmp.month - (exp || 0)),
           avgCheck, sold, buyers: (recs || []).length, topProducts,
@@ -389,7 +417,7 @@ export default function Dashboard() {
         <div className="kpi yellow">
           <div className="k-lbl">Товарный запас</div>
           <div className="k-val">{(d.stockCost || 0).toLocaleString('ru-RU')} {cur}</div>
-          <div className={'k-sub ' + ((d.deficit || []).length > 0 ? 'warn' : 'ok')}>{(d.deficit || []).length} на исходе</div>
+          <div className={'k-sub ' + ((d.lowStockCount || 0) > 0 ? 'warn' : 'ok')}>{(d.lowStockCount || 0) > 0 ? `${d.lowStockCount} ${d.lowStockCount === 1 ? 'позиция' : (d.lowStockCount < 5 ? 'позиции' : 'позиций')} ниже минимума` : 'все позиции в норме'}</div>
         </div>
       </div>
 
@@ -398,7 +426,7 @@ export default function Dashboard() {
         <div className="card-h"><span className="t">Показатели периода</span></div>
         <div className="metrics">
           <div className="metric"><div className="m-l">Прибыль</div><div className="m-v">{(d.profit || 0).toLocaleString('ru-RU')} {cur}</div><div className={'m-d ' + (d.profit >= 0 ? 'up' : 'down')}>{d.profit >= 0 ? '▲' : '▼'} {profitPct}%</div></div>
-          <div className="metric"><div className="m-l">Средний чек</div><div className="m-v">{(d.avgCheck || 0).toLocaleString('ru-RU')} {cur}</div><div className="m-d up">{d.buyers || 0} чеков</div></div>
+          <div className="metric"><div className="m-l">Средний чек</div><div className="m-v">{(d.avgCheck || 0).toLocaleString('ru-RU')} {cur}</div></div>
           <div className="metric"><div className="m-l">Выручка сегодня</div><div className="m-v">{(d.cmp?.today || 0).toLocaleString('ru-RU')} {cur}</div><div className="m-d up">&nbsp;</div></div>
           <div className="metric"><div className="m-l">Клиенты</div><div className="m-v">{d.totalClients || 0}</div><div className="m-d up">{d.repeatClients || 0}% повторных</div></div>
         </div>
