@@ -220,8 +220,16 @@ export default function Transactions() {
   const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
   const txProfit = Math.max(0, incomeTotal - expenseTotal);
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
-  const INC_COLORS = ['#1F75FF', '#4a92ff', '#74aefe', '#a9c8ff', '#cfe2ff'];
-  const EXP_COLORS = ['#ffcf2e', '#ffdd2d', '#ffe680', '#fff2b8', '#fff9db'];
+  // Палитра категорий: каждый сегмент круга — свой цвет, чтобы структура читалась
+  const CAT_COLORS = [
+    '#1F75FF', '#00B8A9', '#FF6B6B', '#FFB300', '#8E7CFF',
+    '#00A3FF', '#2ED47A', '#FF8A3D', '#E052C4', '#12B5CB',
+    '#F45B69', '#7A5AF8', '#0d4ea8', '#61C454', '#FFC700',
+  ];
+  // Доходы и расходы идут по общей палитре, но начинают с разных сторон,
+  // чтобы соседние сегменты не сливались
+  const INC_COLORS = CAT_COLORS;
+  const EXP_COLORS = CAT_COLORS.slice().reverse();
   const txRingSegs = [
     ...incomeCatsList.map((c, i) => ({ ...c, color: INC_COLORS[i % INC_COLORS.length], side: 'inc' })),
     ...expenseCatsList.map((c, i) => ({ ...c, color: EXP_COLORS[i % EXP_COLORS.length], side: 'exp' })),
