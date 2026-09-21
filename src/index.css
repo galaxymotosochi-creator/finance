@@ -133,11 +133,13 @@ body {
 .nav-parent.active { background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff; font-weight: 600; }
 .nav-parent .ic { width: 1.5rem; text-align: center; font-size: 1.1rem; line-height: 1; flex-shrink: 0; opacity: .6; display: inline-flex; align-items: center; justify-content: center; }
 .nav-parent.active .ic { opacity: 1; }
-.nav-parent .arrow { margin-left: auto; font-size: .5rem; opacity: .4; transition: transform var(--transition); }
-.nav-parent.open .arrow { transform: rotate(90deg); }
-/* Треугольник у активного раздела — фирменный, пульсирующий */
-.nav-parent.active .arrow { opacity: 1; color: #fff; animation:cartripulse 1.6s ease-in-out infinite; }
-.nav-parent.active.open .arrow { animation: none; transform: rotate(90deg); }
+/* Стрелка раздела — крупная фирменная, как «▾» в Доходах и расходах (Все) */
+.nav-parent .arrow { margin-left: auto; font-size: 19px; font-weight: 800; line-height: 1; color: #1F75FF; display: inline-block; opacity: .75; transition: transform .2s; animation:cartripulse 1.6s ease-in-out infinite; }
+.nav-parent:hover .arrow { opacity: 1; }
+.nav-parent.open .arrow { transform: rotate(90deg); animation: none; opacity: 1; }
+/* Активный раздел: на синем фоне стрелка белая, продолжает мигать */
+.nav-parent.active .arrow { color: #fff; opacity: 1; animation:cartripulse 1.6s ease-in-out infinite; }
+.nav-parent.active.open .arrow { color: #fff; animation: none; transform: rotate(90deg); }
 .nav-children { display: none; flex-direction: column; }
 .nav-children.open { display: flex !important; }
 .nav-child {
