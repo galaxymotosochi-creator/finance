@@ -885,7 +885,8 @@ input:focus, select:focus, textarea:focus {
 .tx-toggle .car{font-size:9px;transition:transform .2s;display:inline-block}
 .tx-toggle.open .car{transform:rotate(180deg)}
 .tx-toggle-row{display:flex;justify-content:center;margin-top:14px}
-@media(max-width:760px){.tx-ring-block{flex-direction:column;align-items:flex-start;gap:16px}.tx-ring{align-self:center}.tx-legend{width:100%;min-width:0}}
+@media(max-width:760px){.tx-ring-block{flex-direction:column;align-items:flex-start;gap:16px}.tx-ring{align-self:center;width:128px;height:128px}.tx-ring .in .t{font-size:9.5px}.tx-ring .in .v{font-size:16px}.tx-legend{width:100%;min-width:0}}
+@media(max-width:400px){.tx-ring{width:112px;height:112px}.tx-ring .in .v{font-size:14px}}
 
 /* Раскрывающаяся кнопка «Действия» на странице Счета */
 .sk-dd-wrap{position:relative}
