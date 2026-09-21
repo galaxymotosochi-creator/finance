@@ -1561,21 +1561,21 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ===== Счета: системные строки владельца и прибыли ===== */
-.acct-sys-row{cursor:pointer;background:#F6F9FF}
-.acct-sys-row:hover{background:#EDF4FF}
-.acct-sys-row td{padding-top:.55rem;padding-bottom:.55rem;border-top:1px dashed #d8e4f7}
+.acct-sys-row{cursor:pointer}
+.acct-sys-row:hover{background:#f8f9fa}
+.acct-sys-row td{padding-top:.55rem;padding-bottom:.55rem;border-top:1px solid var(--border)}
 .sk-tri{font-size:19px;font-weight:800;color:#1F75FF;display:inline-block;line-height:1;transition:transform .2s;animation:cartripulse 1.6s ease-in-out infinite}
 .sk-tri.open{transform:rotate(180deg);animation:none}
-.acct-det-wrap{padding:.4rem .75rem .7rem 1.9rem;display:flex;flex-direction:column;gap:5px;background:#FBFDFF}
-.acct-det-i{display:flex;align-items:center;gap:.7rem;font-size:.78rem;color:#33405a;padding:.4rem .6rem;border-radius:8px;background:#F2F7FF}
-.acct-det-i .d{color:#8595ad;font-weight:600;min-width:78px}
+.acct-det-wrap{padding:.4rem .75rem .7rem 1.9rem;display:flex;flex-direction:column;gap:5px}
+.acct-det-i{display:flex;align-items:center;gap:.7rem;font-size:.78rem;color:#33405a;padding:.4rem .6rem;border-radius:8px;background:#f8f9fa}
+.acct-det-i .d{color:var(--muted);font-weight:600;min-width:78px}
 .acct-det-i .a{font-weight:600}
 .acct-det-i .k{margin-left:auto;font-weight:600;font-size:.72rem}
-.acct-det-i .v{font-weight:800;min-width:110px;text-align:right}
-.acct-det-total{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.75rem;color:#5b6472;padding:.5rem .6rem 0;border-top:1px dashed #d8e4f7;margin-top:.25rem}
-.acct-det-total b{font-weight:800;color:#0b1220}
-.acct-det-empty{font-size:.78rem;color:#8595ad;padding:.5rem .6rem}
+.acct-det-i .v{font-weight:700;min-width:110px;text-align:right;color:#111}
+.acct-det-total{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);padding:.5rem .6rem 0;border-top:1px solid var(--border);margin-top:.25rem}
+.acct-det-total b{font-weight:700;color:#111}
+.acct-det-empty{font-size:.78rem;color:var(--muted);padding:.5rem .6rem}
 
 /* Счета: значок «есть операции владельца» */
-.acct-owner-note{margin-left:6px;font-size:.7rem;color:#1F75FF;cursor:help;font-weight:700}
+.acct-owner-note{margin-left:6px;font-size:.7rem;color:var(--muted);cursor:help;font-weight:700}
 .acct-owner-card{margin-top:14px}

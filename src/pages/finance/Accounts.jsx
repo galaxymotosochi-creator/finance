@@ -487,7 +487,7 @@ export default function Accounts() {
                       <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{(mv.i + (mv.od||0)).toLocaleString()} {cur}</td>
                       <td style={{textAlign:'left'}}>{((mv.e||0) + (mv.ow||0) + (mv.pr||0)).toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',fontWeight:700}}>{bl.toLocaleString()} {cur}{hasOwner && <span className="acct-owner-note" title="Есть операции владельца">ⓘ</span>}</td>
+                      <td style={{textAlign:'left',fontWeight:700}}>{bl.toLocaleString()} {cur}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -543,9 +543,9 @@ export default function Accounts() {
                       </div>
                     </div>
                   </td>
-                  <td style={{textAlign:'left',color:'#1a7f37',fontWeight:600}}>+{ownerInSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{ownerOutSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',fontWeight:700}}>{(ownerInSum-ownerOutSum)>=0?'+':''}{(ownerInSum-ownerOutSum).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}>{ownerInSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}>{ownerOutSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',fontWeight:700}}>{(ownerInSum-ownerOutSum).toLocaleString()} {cur}</td>
                   <td></td>
                 </tr>
                 {openOwner && (
@@ -557,8 +557,8 @@ export default function Accounts() {
                           <div key={t.id||i} className="acct-det-i">
                             <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
                             <span className="a">{acName(t.account_id)}</span>
-                            <span className="k" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'Взнос владельца':'Вывод владельца'}</span>
-                            <span className="v" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'+':'−'}{Number(t.amount||0).toLocaleString()} {cur}</span>
+                            <span className="k">{isIn?'Взнос владельца':'Вывод владельца'}</span>
+                            <span className="v" style={{color:isIn?'#111':'#111'}}>{Number(t.amount||0).toLocaleString()} {cur}</span>
                           </div>
                         );
                       })}
@@ -577,8 +577,8 @@ export default function Accounts() {
                     </div>
                   </td>
                   <td style={{textAlign:'left'}}>0 {cur}</td>
-                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{profitSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',fontWeight:700,color:'#d9534f'}}>−{profitSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}>{profitSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',fontWeight:700}}>{profitSum.toLocaleString()} {cur}</td>
                   <td></td>
                 </tr>
                 {openProfitSys && (
@@ -588,8 +588,8 @@ export default function Accounts() {
                         <div key={t.id||i} className="acct-det-i">
                           <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
                           <span className="a">{acName(t.account_id)}</span>
-                          <span className="k" style={{color:'#d9534f'}}>Выплата прибыли</span>
-                          <span className="v" style={{color:'#d9534f'}}>−{Number(t.amount||0).toLocaleString()} {cur}</span>
+                          <span className="k">Выплата прибыли</span>
+                          <span className="v">{Number(t.amount||0).toLocaleString()} {cur}</span>
                         </div>
                       ))}
                     </div>
