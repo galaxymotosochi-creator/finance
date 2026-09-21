@@ -1,139 +1,151 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
-import { fmtDate } from '../lib/dates';
 import { getCurrencySymbol } from '../lib/currency';
 import CenterSpinner from '../components/CenterSpinner';
 
+const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+
+function locStr(dt) {
+  return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+}
 
 export default function Dashboard() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('day');
-  const [customStart, setCustomStart] = useState('');
-  const [customEnd, setCustomEnd] = useState('');
+  const [period, setPeriod] = useState('month');
   const [data, setData] = useState(null);
+  const [openRow, setOpenRow] = useState(null);
 
-  const today = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const now = new Date();
+  const todayLabel = now.getDate() + ' ' + MONTHS_GEN[now.getMonth()] + ' ' + now.getFullYear();
 
+  // Диапазон дат для выбранного периода
   const getDateRange = () => {
-    const now = new Date();
-    let from, to = now.toISOString().split('T')[0];
-    if (period === 'day') { from = new Date(now); from.setHours(0,0,0,0); }
-    else if (period === 'week') { from = new Date(now); from.setDate(from.getDate() - from.getDay() + 1); from.setHours(0,0,0,0); }
-    else if (period === 'month') { from = new Date(now.getFullYear(), now.getMonth(), 1); }
-    else if (customStart) { from = new Date(customStart); to = customEnd || to; }
-    else return { from: now.toISOString().split('T')[0], to: now.toISOString().split('T')[0] };
-    return { from: from.toISOString().split('T')[0], to };
+    const n = new Date();
+    const to = locStr(n);
+    if (period === 'day') return { from: to, to };
+    if (period === 'week') { const f = new Date(n); f.setDate(f.getDate() - 6); return { from: locStr(f), to }; }
+    if (period === 'month') return { from: locStr(new Date(n.getFullYear(), n.getMonth(), 1)), to };
+    if (period === 'quarter') { const q = Math.floor(n.getMonth() / 3); return { from: locStr(new Date(n.getFullYear(), q * 3, 1)), to }; }
+    return { from: locStr(new Date(n.getFullYear(), 0, 1)), to }; // year
   };
 
   useEffect(() => {
     if (!user) return;
+    let alive = true;
     setLoading(true);
     (async () => {
       try {
         const dr = getDateRange();
-        const [{data:txs},{data:allTx},{data:accts},{data:clients},{data:prods},{data:supRaw},{data:wo},{data:recs},{data:activeShift},{data:lastRecs},{data:recsAllData}] = await Promise.all([
-          supabase.from('transactions').select('type,amount,category_id,status,account_id').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
-          supabase.from('transactions').select('account_id,type,amount,date,status').eq('user_id',user.id),
-          supabase.from('accounts').select('id,name,balance,type').eq('user_id',user.id),
-          supabase.from('clients').select('name,debt').eq('user_id',user.id).not('debt','is',null).lt('debt',0).order('debt',{ascending:true}),
-          supabase.from('products').select('id,name,type,price,min_qty').eq('user_id',user.id).eq('hidden',false),
-          supabase.from('supplies').select('items').eq('user_id',user.id),
-          supabase.from('writeoffs').select('items').eq('user_id',user.id),
-          supabase.from('receipts').select('id,total_amount').eq('user_id',user.id).gte('date',dr.from).lte('date',dr.to),
-          supabase.from('shifts').select('*').eq('user_id',user.id).is('closed_at',null).order('opened_at',{ascending:false}).limit(1).maybeSingle(),
-          supabase.from('receipts').select('id,total_amount,client_name,date').eq('user_id',user.id).order('date',{ascending:false}).limit(3),
-          supabase.from('receipts').select('total_amount,date,client_id').eq('user_id',user.id),
+        const [{ data: txs }, { data: allTx }, { data: accts }, { data: debtClients }, { data: prods }, { data: supRaw }, { data: wo }, { data: recs }, { data: allClients }, { data: receiptsAll }] = await Promise.all([
+          supabase.from('transactions').select('type,amount,category_id,status,account_id,date,kind,description').eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
+          supabase.from('transactions').select('type,amount,account_id,date,status,kind,description').eq('user_id', user.id),
+          supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id),
+          supabase.from('clients').select('name,debt').eq('user_id', user.id).not('debt', 'is', null).lt('debt', 0).order('debt', { ascending: true }),
+          supabase.from('products').select('id,name,type,price,min_qty').eq('user_id', user.id).eq('hidden', false),
+          supabase.from('supplies').select('items').eq('user_id', user.id),
+          supabase.from('writeoffs').select('items').eq('user_id', user.id),
+          supabase.from('receipts').select('id,total_amount,date,client_id').eq('user_id', user.id).gte('date', dr.from).lte('date', dr.to),
+          supabase.from('clients').select('id').eq('user_id', user.id),
+          supabase.from('receipts').select('total_amount,date,client_id').eq('user_id', user.id),
         ]);
-        const rids = (recs||[]).map(r=>r.id);
-        const {data:recItems} = rids.length ? (await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id',rids)) : {data:[]};
+        if (!alive) return;
 
-        let rev=0, exp=0;
-        (txs||[]).forEach(t=>{const a=t.amount||0;if(t.type==='income'&&(t.status==='paid'||!t.status)&&!t.kind)rev+=a;else if(t.type==='expense'&&!t.kind)exp+=a;});
-        // Баланс счетов = начальный остаток + ВСЕ транзакции (без фильтра по дате)
+        // Выручка / расходы за период
+        let rev = 0, exp = 0;
+        (txs || []).forEach(t => {
+          const a = Number(t.amount) || 0;
+          if (t.type === 'income' && (t.status === 'paid' || !t.status) && !t.kind) rev += a;
+          else if (t.type === 'expense' && !t.kind) exp += a;
+        });
+
+        // Баланс счетов = начальный остаток + все транзакции
         const txById = {};
-        (allTx||[]).forEach(t => {
-          if (!txById[t.account_id]) txById[t.account_id] = 0;
-          txById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
-        });
-        const acctList = (accts||[]).map(a => ({
-          name: a.name || a.type,
-          type: a.type,
-          id: a.id,
-          balance: (parseFloat(a.balance)||0) + (txById[a.id]||0)
-        }));
-        const cash = acctList.filter(a=>a.type==='cash_register').reduce((s,a)=>s+a.balance,0);
-        const bank = acctList.filter(a=>a.type!=='cash_register'&&a.type!=='cash').reduce((s,a)=>s+a.balance,0);
-        const reserve = acctList.filter(a=>a.type==='reserve').reduce((s,a)=>s+a.balance,0);
-        const sm={};
-        (supRaw||[]).forEach(sp=>(sp.items||[]).forEach(it=>{if(!sm[it.prodId])sm[it.prodId]={qty:0,cost:0};sm[it.prodId].qty+=it.qty||0;sm[it.prodId].cost+=(it.cost||0)*(it.qty||0);}));
-        (wo||[]).forEach(function(w){var pid=w.product_id;if(pid!=null&&sm[pid])sm[pid].qty-=w.quantity||0;});
-        const deficit = (prods||[]).filter(p=>p.type!=='service'&&p.type!=='combo'&&p.min_qty>0).map(p=>({name:p.name,qty:sm[p.id]?.qty||0,min:p.min_qty,need:Math.max(0,p.min_qty-(sm[p.id]?.qty||0))})).filter(p=>p.qty<p.min).sort((a,b)=>(a.qty/a.min)-(b.qty/b.min)).slice(0,5);
-        const sc = Object.values(sm).reduce((s,v)=>s+v.cost,0);
-        const sr = (prods||[]).reduce((s,p)=>s+((sm[p.id]?.qty||0)*(p.price||0)),0);
-        const sold = (recItems||[]).reduce((s,i)=>s+(i.quantity||0),0);
-        const tr = (recs||[]).reduce((s,r)=>s+(r.total_amount||0),0);
-        // Средняя себестоимость единицы из поставок
-        const costPerUnit = {};
-        const costTotals = {};
-        (supRaw||[]).forEach(sp => (sp.items||[]).forEach(it => {
-          if (!costTotals[it.prodId]) costTotals[it.prodId] = {qty:0, cost:0};
-          costTotals[it.prodId].qty += it.qty || 0;
-          costTotals[it.prodId].cost += (it.cost||0) * (it.qty||0);
-        }));
-        for (const [id, v] of Object.entries(costTotals)) {
-          if (v.qty > 0) costPerUnit[id] = v.cost / v.qty;
-        }
-        // Имя товара → id
-        const prodIdMap = {};
-        (prods||[]).forEach(p => { prodIdMap[p.name] = p.id; });
-        // Себестоимость проданного
-        let cogs = 0;
-        (recItems||[]).forEach(item => {
-          const pid = prodIdMap[item.product_name];
-          if (pid && costPerUnit[pid]) {
-            cogs += (item.quantity||0) * costPerUnit[pid];
-          }
-        });
-        const ac = (recs||[]).length>0 ? Math.round(tr/(recs||[]).length) : 0; // средний чек = выручка / число чеков
-        const top={};(recItems||[]).forEach(i=>{const n=i.product_name||'Товар';if(!top[n])top[n]={qty:0,rev:0};top[n].qty+=i.quantity||0;top[n].rev+=i.total||0;});
-        const tp = Object.entries(top).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([n,v])=>({name:n,qty:v.qty,rev:v.rev}));
-        const ce={};(txs||[]).filter(t=>t.type==='expense'&&!t.kind).forEach(t=>{const k=t.category_id||'other';if(!ce[k])ce[k]=0;ce[k]+=t.amount||0;});
-        const now2=new Date();const {data:plansData}=await supabase.from('plans').select('*').eq('user_id',user.id).eq('period','month').eq('year',now2.getFullYear()).eq('month',now2.getMonth()+1);const planMap={};(plansData||[]).forEach(function(p){planMap[p.target_type]=parseFloat(p.target_amount)||0});const {data:catNames}=await supabase.from('categories').select('id,name').eq('user_id',user.id);
-        const cm={};(catNames||[]).forEach(c=>{cm[c.id]=c.name;});
-        // Доп. данные
-        const { data: allClients } = await supabase.from('clients').select('id').eq('user_id', user.id);
-        const totalClients = (allClients || []).length;
-        // Повторные клиенты: 2+ покупки (по всем чекам)
-        const buyCount = {};
-        (recsAllData || []).forEach(r => { if (r.client_id) buyCount[r.client_id] = (buyCount[r.client_id]||0) + 1; });
-        const repeatClients = totalClients > 0 ? Math.round(Object.values(buyCount).filter(c => c >= 2).length / totalClients * 100) : 0;
-        // Факт за текущий месяц для блока Целей
-        const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
-        const ms = monthStart.toISOString().split('T')[0];
-        let monthRev=0, monthExp=0;
-        (allTx||[]).forEach(t => {
-          if (t.date && t.date >= ms) {
-            const a = t.amount||0;
-            if (t.type==='income' && (t.status==='paid'||!t.status) && !t.kind) monthRev += a;
-            else if (t.type==='expense' && !t.kind) monthExp += a;
-          }
-        });
+        (allTx || []).forEach(t => { txById[t.account_id] = (txById[t.account_id] || 0) + Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
+        const acctList = (accts || []).map(a => ({ name: a.name || a.type, type: a.type, id: a.id, balance: (parseFloat(a.balance) || 0) + (txById[a.id] || 0) }));
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
         const cashBal = acctList.find(a => a.type === 'cash_register')?.balance || 0;
-        // Сравнение: реальная выручка по чекам за периоды (вчера / 7 дней / месяц / год)
-        const recAll = (recsAllData || []).map(r => ({ d: String(r.date || '').slice(0, 10), amt: Number(r.total_amount) || 0 }));
-        const locStr = (dt) => dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+        const bankBal = acctList.filter(a => a.type === 'bank' || a.type === 'checking' || a.type === 'account').reduce((s, a) => s + a.balance, 0);
+
+        // Себестоимость проданного (средняя себестоимость единицы из поставок)
+        const costTotals = {};
+        (supRaw || []).forEach(sp => (sp.items || []).forEach(it => {
+          if (!costTotals[it.prodId]) costTotals[it.prodId] = { qty: 0, cost: 0 };
+          costTotals[it.prodId].qty += it.qty || 0;
+          costTotals[it.prodId].cost += (it.cost || 0) * (it.qty || 0);
+        }));
+        const costPerUnit = {};
+        Object.entries(costTotals).forEach(([id, v]) => { if (v.qty > 0) costPerUnit[id] = v.cost / v.qty; });
+        const prodIdMap = {};
+        (prods || []).forEach(p => { prodIdMap[p.name] = p.id; });
+        const rids = (recs || []).map(r => r.id);
+        const { data: recItems } = rids.length ? (await supabase.from('receipt_items').select('product_name,quantity,total').in('receipt_id', rids)) : { data: [] };
+        let cogs = 0;
+        (recItems || []).forEach(item => {
+          const pid = prodIdMap[item.product_name];
+          if (pid && costPerUnit[pid]) cogs += (item.quantity || 0) * costPerUnit[pid];
+        });
+        const salesRev = (recs || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+
+        // Склад
+        const sm = {};
+        (supRaw || []).forEach(sp => (sp.items || []).forEach(it => { if (!sm[it.prodId]) sm[it.prodId] = { qty: 0, cost: 0 }; sm[it.prodId].qty += it.qty || 0; sm[it.prodId].cost += (it.cost || 0) * (it.qty || 0); }));
+        (wo || []).forEach(w => { const pid = w.product_id; if (pid != null && sm[pid]) sm[pid].qty -= w.quantity || 0; });
+        const deficit = (prods || [])
+          .filter(p => p.type !== 'service' && p.type !== 'combo' && p.min_qty > 0)
+          .map(p => ({ name: p.name, qty: sm[p.id]?.qty || 0, min: p.min_qty, need: Math.max(0, p.min_qty - (sm[p.id]?.qty || 0)) }))
+          .filter(p => p.qty < p.min).sort((a, b) => (a.qty / a.min) - (b.qty / b.min));
+        const stockCost = Object.values(sm).reduce((s, v) => s + v.cost, 0);
+        const stockRetail = (prods || []).reduce((s, p) => s + ((sm[p.id]?.qty || 0) * (p.price || 0)), 0);
+        const stockPositions = (prods || []).filter(p => p.type !== 'service').length;
+
+        // Клиенты
+        const debt = Math.abs((debtClients || []).reduce((s, c) => s + (c.debt || 0), 0));
+        const totalClients = (allClients || []).length;
+        const buyCount = {};
+        (receiptsAll || []).forEach(r => { if (r.client_id) buyCount[r.client_id] = (buyCount[r.client_id] || 0) + 1; });
+        const repeatClients = totalClients > 0 ? Math.round(Object.values(buyCount).filter(c => c >= 2).length / totalClients * 100) : 0;
+
+        // Выручка по дням (или по месяцам при периоде «год»)
+        const recAll = (receiptsAll || []).map(r => ({ d: String(r.date || '').slice(0, 10), amt: Number(r.total_amount) || 0 }));
+        const sumR = (a, b) => recAll.filter(r => r.d >= a && r.d <= b).reduce((s, r) => s + r.amt, 0);
         const tStr = locStr(new Date());
-        const yStr = locStr(new Date(Date.now() - 86400000));
-        const wStr = locStr(new Date(Date.now() - 6 * 86400000));
-        const mStr = locStr(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-        const yS = new Date().getFullYear() + '-01-01';
-        const sumR = (from, to) => recAll.filter(r => r.d >= from && r.d <= to).reduce((s, r) => s + r.amt, 0);
-        const cmp = { today: sumR(tStr, tStr), yesterday: sumR(yStr, yStr), week: sumR(wStr, tStr), month: sumR(mStr, tStr), year: sumR(yS, tStr) };
-        // Свои деньги владельца (за все время): внесено / выведено / остаток в бизнесе
+        const cmp = {
+          today: sumR(tStr, tStr),
+          yesterday: sumR(locStr(new Date(Date.now() - 86400000)), locStr(new Date(Date.now() - 86400000))),
+          week: sumR(locStr(new Date(Date.now() - 6 * 86400000)), tStr),
+          month: sumR(locStr(new Date(now.getFullYear(), now.getMonth(), 1)), tStr),
+          year: sumR(now.getFullYear() + '-01-01', tStr),
+        };
+
+        // График: дни месяца (по умолчанию) или месяцы (при годе)
+        let bars = [];
+        let barsTotal = 0;
+        if (period === 'year') {
+          for (let m = 0; m < 12; m++) {
+            const f = locStr(new Date(now.getFullYear(), m, 1));
+            const l = locStr(new Date(now.getFullYear(), m + 1, 0));
+            const v = sumR(f, l);
+            bars.push({ label: MONTHS_SHORT[m], tip: MONTHS_SHORT[m] + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTotal = bars.reduce((s, b) => s + b.val, 0);
+        } else {
+          const y = now.getFullYear(), mo = now.getMonth();
+          const daysInMonth = new Date(y, mo + 1, 0).getDate();
+          const from = new Date(y, mo, 1), to = new Date(y, mo, daysInMonth);
+          for (let dd = 1; dd <= daysInMonth; dd++) {
+            const f = locStr(new Date(y, mo, dd));
+            const v = sumR(f, f);
+            bars.push({ label: dd, tip: dd + ' ' + MONTHS_SHORT[mo] + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTotal = sumR(locStr(from), locStr(to));
+        }
+        const barsMax = Math.max(1, ...bars.map(b => b.val));
+
+        // Свои деньги владельца
         let ownerIn = 0, ownerOut = 0;
         (allTx || []).forEach(t => {
           if (t.kind === 'owner_deposit') ownerIn += Number(t.amount || 0);
@@ -146,275 +158,224 @@ export default function Dashboard() {
             else if (dd.startsWith('Вывод своих денег')) ownerOut += Number(t.amount || 0);
           });
         }
-        setData({rev,exp,profit:rev-exp,salesRev:tr,cogs,grossProfit:tr-cogs,totalCash,monthRev,monthExp,monthProfit:monthRev-monthExp,cash,bank,reserve,debt:Math.abs((clients||[]).reduce((s,c)=>s+(c.debt||0),0)),deficit,stockCost:sc,stockRetail:sr,sold,avgCheck:ac,buyers:(recs||[]).length,topProducts:tp,debtors:clients||[],expensesByCat:ce,catMap:cm,totalClients,repeatClients,acctList,planMap,activeShift,cashBal,lastRecs:(lastRecs||[]).slice(0,3),cmp,ownerIn,ownerOut,ownerNet:ownerIn-ownerOut});
-      } catch(e) { console.error('Dashboard error:',e); }
-      setLoading(false);
+
+        // Зарплата
+        const { data: employees } = await supabase.from('employees').select('id,salary').eq('user_id', user.id);
+        const salaryAccrued = (employees || []).reduce((s, e) => s + (Number(e.salary) || 0), 0);
+        const empCount = (employees || []).length;
+
+        // Категории расходов
+        const ce = {};
+        (txs || []).filter(t => t.type === 'expense' && !t.kind).forEach(t => { const k = t.category_id || 'other'; ce[k] = (ce[k] || 0) + (Number(t.amount) || 0); });
+        const { data: catNames } = await supabase.from('categories').select('id,name').eq('user_id', user.id);
+        const cm = {};
+        (catNames || []).forEach(c => { cm[c.id] = c.name; });
+
+        // Продажи: средний чек, топ товаров
+        const avgCheck = (recs || []).length > 0 ? Math.round(salesRev / recs.length) : 0;
+        const sold = (recItems || []).reduce((s, i) => s + (i.quantity || 0), 0);
+        const top = {};
+        (recItems || []).forEach(i => { const n = i.product_name || 'Товар'; if (!top[n]) top[n] = { qty: 0, rev: 0 }; top[n].qty += i.quantity || 0; top[n].rev += i.total || 0; });
+        const topProducts = Object.entries(top).sort((a, b) => b[1].rev - a[1].rev).slice(0, 3).map(([n, v]) => ({ name: n, qty: v.qty, rev: v.rev }));
+
+        if (!alive) return;
+        setData({
+          rev, exp, profit: rev - exp, salesRev, cogs,
+          cashBal, bankBal, totalCash, acctList,
+          debt, debtors: debtClients || [], totalClients, repeatClients,
+          deficit, stockCost, stockRetail, stockPositions,
+          bars, barsTotal, barsMax, cmp,
+          monthRev: cmp.month, monthProfit: (cmp.month - (exp || 0)),
+          avgCheck, sold, buyers: (recs || []).length, topProducts,
+          ownerIn, ownerOut, ownerNet: ownerIn - ownerOut,
+          salaryAccrued, empCount,
+          expensesByCat: ce, catMap: cm,
+        });
+      } catch (e) { console.error('Dashboard error:', e); }
+      if (alive) setLoading(false);
     })();
-  }, [user,period,customStart,customEnd]);
+    return () => { alive = false; };
+  }, [user, period]);
 
   const d = data;
   if (loading) return <CenterSpinner />;
-  if (!d) return <div style={{textAlign:'center',padding:'3rem',color:'#999',fontSize:'.85rem'}}>Нет данных</div>;
-  try {
-    // Check for required data
-    if (typeof d.expensesByCat !== 'object') d.expensesByCat = {};
-    if (typeof d.topProducts !== 'object') d.topProducts = [];
-    if (typeof d.debtors !== 'object') d.debtors = [];
-  } catch(e) { return <div style={{textAlign:'center',padding:'3rem',color:'#dc2626',fontSize:'.82rem'}}>Ошибка данных: {e.message}</div>; }
+  if (!d) return <div className="dash-empty">Нет данных</div>;
 
-  const Btn = ({p,label}) => (<button onClick={()=>setPeriod(p)} style={{padding:'3px 10px',borderRadius:'100px',border:'1px solid rgba(0,0,0,.12)',background:period===p?'#000':'transparent',color:period===p?'#fff':'#555',fontWeight:600,cursor:'pointer',fontFamily:'inherit',fontSize:'.68rem'}}>{label}</button>);
+  const profitPct = d.rev > 0 ? Math.round(d.profit / d.rev * 100) : 0;
+  const prevMonthRev = d.bars ? d.bars.slice(0, -1).reduce((s, b) => s + b.val, 0) : 0;
 
-  const S = (w) => ({fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'3px',...w});
-  const V = (w) => ({fontSize:'1.15rem',fontWeight:800,...w});
-  const sec = {background:'#fff',borderRadius:'14px',padding:'14px',marginBottom:'8px',border:'1px solid rgba(0,0,0,.08)',boxShadow:'0 1px 3px rgba(0,0,0,.04)'};
-  const st = {fontSize:'.7rem',fontWeight:700,color:'rgba(0,0,0,.5)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'8px'};
-  const expCats = d.expensesByCat && typeof d.expensesByCat === 'object' ? Object.entries(d.expensesByCat).sort(function(a,b){return b[1]-a[1]}).slice(0,5) : [];
-  const totalExp = expCats.length > 0 ? expCats.reduce(function(s,v){return s+v[1]}, 0) : 0;
+  const subSections = [
+    {
+      key: 'finance', icon: '📊', name: 'Финансы', desc: 'Выручка, расходы, прибыль',
+      right: { v: `${(d.profit || 0).toLocaleString('ru-RU')} ${cur}`, s: 'прибыль' },
+      items: [
+        { l: 'Выручка', v: `${(d.rev || 0).toLocaleString('ru-RU')} ${cur}` },
+        { l: 'Расходы', v: `${(d.exp || 0).toLocaleString('ru-RU')} ${cur}`, c: 'bad' },
+        { l: 'Чистая прибыль', v: `${(d.profit || 0).toLocaleString('ru-RU')} ${cur}`, c: d.profit >= 0 ? 'good' : 'bad' },
+        { l: 'Рентабельность', v: `${profitPct}%` },
+      ],
+    },
+    {
+      key: 'accounts', icon: '🏦', name: 'Счета', desc: 'Касса, банк, резерв',
+      right: { v: `${(d.totalCash || 0).toLocaleString('ru-RU')} ${cur}`, s: 'всего' },
+      items: [
+        ...(d.acctList || []).map(a => ({ l: a.name, v: `${(a.balance || 0).toLocaleString('ru-RU')} ${cur}`, c: a.balance < 0 ? 'bad' : null })),
+        ...((d.acctList || []).length === 0 ? [{ l: 'Счетов нет', v: '—' }] : []),
+      ],
+    },
+    {
+      key: 'stock', icon: '📦', name: 'Склад', desc: 'Товарный запас',
+      right: { v: `${(d.stockCost || 0).toLocaleString('ru-RU')} ${cur}`, s: 'по себестоимости' },
+      items: [
+        { l: 'Позиций всего', v: String(d.stockPositions || 0) },
+        { l: 'На исходе (меньше нормы)', v: String((d.deficit || []).length), c: (d.deficit || []).length > 0 ? 'bad' : null },
+        { l: 'Себестоимость запаса', v: `${(d.stockCost || 0).toLocaleString('ru-RU')} ${cur}` },
+        { l: 'В продаже (розница)', v: `${(d.stockRetail || 0).toLocaleString('ru-RU')} ${cur}` },
+      ],
+    },
+    {
+      key: 'clients', icon: '👥', name: 'Клиенты', desc: 'База, долги',
+      right: { v: String(d.totalClients || 0), s: `долги ${(d.debt || 0).toLocaleString('ru-RU')} ${cur}` },
+      items: [
+        { l: 'Клиентов в базе', v: String(d.totalClients || 0) },
+        { l: 'Повторные покупки', v: `${d.repeatClients || 0}%`, c: 'good' },
+        { l: 'С задолженностью', v: String((d.debtors || []).length), c: (d.debtors || []).length > 0 ? 'bad' : null },
+        { l: 'Сумма долгов', v: `${(d.debt || 0).toLocaleString('ru-RU')} ${cur}`, c: d.debt > 0 ? 'bad' : null },
+      ],
+    },
+    {
+      key: 'salary', icon: '💰', name: 'Зарплата', desc: 'Начислено, сотрудники',
+      right: { v: `${(d.salaryAccrued || 0).toLocaleString('ru-RU')} ${cur}`, s: 'оклад в месяц' },
+      items: [
+        { l: 'Сотрудников', v: String(d.empCount || 0) },
+        { l: 'Начислено за месяц', v: `${(d.salaryAccrued || 0).toLocaleString('ru-RU')} ${cur}` },
+      ],
+    },
+  ];
+
+  const alerts = [];
+  if ((d.debtors || []).length > 0) alerts.push(`${d.debtors.length} клиентов с общей задолженностью ${(d.debt || 0).toLocaleString('ru-RU')} ${cur}`);
+  if ((d.deficit || []).length > 0) alerts.push(`${d.deficit.length} товаров на исходе — пора закупать`);
+  if (d.cashBal < 0) alerts.push(`Касса в минусе на ${Math.abs(d.cashBal || 0).toLocaleString('ru-RU')} ${cur}`);
 
   return (
-    <div style={{fontFamily:"'Inter',sans-serif",padding:'0',color:'#111'}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',flexWrap:'wrap',gap:'6px'}}>
-        <div><h1 style={{fontSize:'1.1rem',fontWeight:700,marginBottom:'2px'}}>Панель управления</h1><span style={{fontSize:'.65rem',color:'rgba(0,0,0,.4)'}}>{today}</span></div>
-        <div style={{display:'flex',gap:'4px',alignItems:'center',flexWrap:'wrap'}}>
-          <Btn p="day" label="День"/><Btn p="week" label="Неделя"/><Btn p="month" label="Месяц"/>
-          <button onClick={()=>setPeriod('custom')} style={{padding:'3px 8px',borderRadius:'100px',border:'1px solid rgba(0,0,0,.12)',background:period==='custom'?'#000':'transparent',color:period==='custom'?'#fff':'#555',fontWeight:600,cursor:'pointer',fontSize:'.68rem'}}>Свои</button>
-          {period==='custom'&&<><input type="date" value={customStart} onChange={e=>setCustomStart(e.target.value)} style={{padding:'2px 4px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'4px',fontFamily:'inherit'}}/><input type="date" value={customEnd} onChange={e=>setCustomEnd(e.target.value)} style={{padding:'2px 4px',fontSize:'.65rem',border:'1px solid rgba(0,0,0,.12)',borderRadius:'4px',fontFamily:'inherit'}}/></>}
+    <div className="dash">
+      {/* ШАПКА */}
+      <div className="dash-head">
+        <div>
+          <h1>Панель управления</h1>
+          <div className="dash-date">{todayLabel}</div>
+        </div>
+        <div className="dash-spacer" />
+        <div className="seg">
+          {[['day', 'День'], ['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['year', 'Год']].map(([k, l]) => (
+            <button key={k} className={period === k ? 'on' : ''} onClick={() => setPeriod(k)}>{l}</button>
+          ))}
         </div>
       </div>
 
-      {/* TOP 3 */}
-      <div style={{display:'flex',gap:'10px',marginBottom:'12px'}}>
-        <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Продажи</div><div style={V({color:'#000'})}>+{Number(d.salesRev||0).toLocaleString()} {cur}</div></div>
-        <div style={{flex:1,background:'#fff',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Себестоимость</div><div style={V({color:'#d97706'})}>-{Number(d.cogs||0).toLocaleString()} {cur}</div></div>
-        <div style={{flex:1,background:'#f0fdf4',borderRadius:'14px',padding:'14px',border:'1px solid rgba(0,0,0,.08)'}}>
-          <div style={S()}>Баланс счетов</div><div style={V({color:d.totalCash>=0?'#16a34a':'#dc2626'})}>{d.totalCash>=0?'+':''}{Number(d.totalCash||0).toLocaleString()} {cur}</div></div>
-      </div>
-
-      {/* Счета | Долги */}
-      <div style={sec}>
-        <div style={st}>Счета | Долги</div>
-        <div style={{display:'flex',gap:'4px',flexWrap:'wrap',fontSize:'.65rem',color:'rgba(0,0,0,.55)'}}>
-          {d.acctList&&d.acctList.length>0?d.acctList.map(function(a,i){
-            return <span key={i} style={a.balance<0?{color:'#dc2626'}:{}}>{a.name}: <b>{Number(a.balance||0).toLocaleString()} {cur}</b></span>;
-          }):<span>Нет счетов</span>}
-          <span style={{color:'#dc2626',marginLeft:'4px'}}>Долги: <b>{Number(d.debt||0).toLocaleString()} {cur}</b></span>
+      {/* ЖЁЛТАЯ ПЛАШКА ПРИБЫЛИ */}
+      <div className="hero">
+        <div className="lbl">Чистая прибыль за период</div>
+        <div className="val">{(d.profit || 0).toLocaleString('ru-RU')} {cur}</div>
+        <div className="delta">{`▲ рентабельность ${profitPct}%`}</div>
+        <div className="chips">
+          <div className="chip">Рентабельность <b>{profitPct}%</b></div>
+          <div className="chip">Выручка <b>{(d.rev || 0).toLocaleString('ru-RU')} {cur}</b></div>
+          <div className="chip">Расходы <b>{(d.exp || 0).toLocaleString('ru-RU')} {cur}</b></div>
         </div>
       </div>
 
-      {/* Свои деньги владельца — всегда видно, сколько внесено/выведено */}
-      <div style={{...sec,background:'linear-gradient(135deg,#ffdd2d,#fff9db)'}}>
-        <div style={st}>Свои деньги владельца</div>
-        <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
-          <div style={{flex:1,minWidth:'130px'}}>
-            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Внесено своих средств</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>+{Number(d.ownerIn||0).toLocaleString()} {cur}</div>
-          </div>
-          <div style={{flex:1,minWidth:'130px'}}>
-            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Выведено</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>-{Number(d.ownerOut||0).toLocaleString()} {cur}</div>
-          </div>
-          <div style={{flex:1,minWidth:'130px'}}>
-            <div style={{fontSize:'.66rem',color:'rgba(0,0,0,.5)',textTransform:'uppercase',marginBottom:'2px'}}>Сейчас в бизнесе</div>
-            <div style={{fontSize:'1.05rem',fontWeight:800,color:'#111'}}>{Number(d.ownerNet||0).toLocaleString()} {cur}</div>
-          </div>
+      {/* ВЫРУЧКА СТОЛБЦАМИ */}
+      <div className="card">
+        <div className="card-h">
+          <span className="t">{period === 'year' ? 'Выручка по месяцам' : 'Выручка по дням'}</span>
+          <span className="v">{(d.barsTotal || 0).toLocaleString('ru-RU')} {cur}</span>
+        </div>
+        <div className="bars">
+          {(d.bars || []).map((b, i) => {
+            const h = Math.max(2, Math.round((b.val / (d.barsMax || 1)) * 100));
+            const isPeak = b.val > 0 && b.val === d.barsMax;
+            return (
+              <div key={i} className={'bar' + (isPeak ? ' peak' : '')} style={{ height: h + '%' }}>
+                <span className="tip">{b.tip}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="bar-x">
+          {period === 'year'
+            ? MONTHS_SHORT.map((m, i) => <span key={i}>{m}</span>)
+            : (d.bars || []).filter(b => b.label % 2 === 1).map((b, i) => <span key={i}>{b.label}</span>)}
         </div>
       </div>
 
-      {/* Касса */}
-      {d.activeShift && (
-        <div style={sec}>
-          <div style={st}>Касса | Смена {d.activeShift.shift_number || ''}</div>
-          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-            <div style={{fontSize:'1.6rem'}}>🗄️</div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:'.78rem',fontWeight:600}}>{d.activeShift.cashier_name || 'Кассир'}</div>
-              <div style={{fontSize:'.68rem',color:'rgba(0,0,0,.4)'}}>
-                Открыта {new Date(d.activeShift.opened_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+      {/* KPI */}
+      <div className="kpis">
+        <div className="kpi">
+          <div className="k-lbl">Касса сейчас</div>
+          <div className="k-val">{(d.cashBal || 0).toLocaleString('ru-RU')} {cur}</div>
+          <div className={'k-sub ' + (d.cashBal >= 0 ? 'ok' : 'warn')}>{d.cashBal >= 0 ? 'в норме' : 'ниже нуля'}</div>
+        </div>
+        <div className="kpi">
+          <div className="k-lbl">На счетах</div>
+          <div className="k-val">{(d.bankBal || 0).toLocaleString('ru-RU')} {cur}</div>
+          <div className="k-sub">{d.acctList ? d.acctList.length : 0} счёта</div>
+        </div>
+        <div className="kpi red">
+          <div className="k-lbl">Долги клиентов</div>
+          <div className="k-val">{(d.debt || 0).toLocaleString('ru-RU')} {cur}</div>
+          <div className="k-sub warn">{(d.debtors || []).length} должников</div>
+        </div>
+        <div className="kpi yellow">
+          <div className="k-lbl">Товарный запас</div>
+          <div className="k-val">{(d.stockCost || 0).toLocaleString('ru-RU')} {cur}</div>
+          <div className={'k-sub ' + ((d.deficit || []).length > 0 ? 'warn' : 'ok')}>{(d.deficit || []).length} на исходе</div>
+        </div>
+      </div>
+
+      {/* ПОКАЗАТЕЛИ */}
+      <div className="card">
+        <div className="card-h"><span className="t">Показатели периода</span></div>
+        <div className="metrics">
+          <div className="metric"><div className="m-l">Прибыль</div><div className="m-v">{(d.profit || 0).toLocaleString('ru-RU')} {cur}</div><div className={'m-d ' + (d.profit >= 0 ? 'up' : 'down')}>{d.profit >= 0 ? '▲' : '▼'} {profitPct}%</div></div>
+          <div className="metric"><div className="m-l">Средний чек</div><div className="m-v">{(d.avgCheck || 0).toLocaleString('ru-RU')} {cur}</div><div className="m-d up">{d.buyers || 0} чеков</div></div>
+          <div className="metric"><div className="m-l">Выручка сегодня</div><div className="m-v">{(d.cmp?.today || 0).toLocaleString('ru-RU')} {cur}</div><div className="m-d up">&nbsp;</div></div>
+          <div className="metric"><div className="m-l">Клиенты</div><div className="m-v">{d.totalClients || 0}</div><div className="m-d up">{d.repeatClients || 0}% повторных</div></div>
+        </div>
+      </div>
+
+      {/* СВОД ПО РАЗДЕЛАМ */}
+      <div className="card">
+        <div className="card-h"><span className="t">Свод по разделам</span></div>
+        <div className="list">
+          {subSections.map(sec => (
+            <div key={sec.key}>
+              <div className={'row' + (openRow === sec.key ? ' open' : '')} onClick={() => setOpenRow(openRow === sec.key ? null : sec.key)}>
+                <div className="ic">{sec.icon}</div>
+                <div><div className="nm">{sec.name}</div><div className="ds">{sec.desc}</div></div>
+                <div className="rt"><b>{sec.right.v}</b><span>{sec.right.s}</span></div>
+                <div className="arr">▾</div>
+              </div>
+              <div className="sub">
+                <div className="sub-in">
+                  {sec.items.map((it, i) => (
+                    <div key={i} className="sub-i">{it.l}<span className={'sv' + (it.c ? ' ' + it.c : '')}>{it.v}</span></div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div style={{textAlign:'right'}}>
-              <div style={{fontSize:'1rem',fontWeight:800}}>+{Math.round(d.cashBal||0).toLocaleString()} {cur}</div>
-              <div style={{fontSize:'.6rem',color:'rgba(0,0,0,.35)'}}>в кассе</div>
-            </div>
-          </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ТРЕБУЕТ ВНИМАНИЯ */}
+      {alerts.length > 0 && (
+        <div className="alert">
+          <div className="a-h">⚠ Требует внимания</div>
+          <ul>{alerts.map((a, i) => <li key={i}>{a}</li>)}</ul>
         </div>
       )}
-
-      {/* Последние чеки */}
-      {d.lastRecs && d.lastRecs.length > 0 && (
-        <div style={sec}>
-          <div style={st}>Последние чеки</div>
-          <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
-            <thead><tr>
-              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'50%'}}>Клиент</th>
-              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'30%'}}>Дата</th>
-              <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px 3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right',width:'20%'}}>Сумма</th>
-            </tr></thead>
-            <tbody>{d.lastRecs.map((r, i) => (
-              <tr key={i}>
-                <td style={{padding:'3px 3px',fontWeight:500}}>{r.client_name || 'Без имени'}</td>
-                <td style={{padding:'3px 3px',textAlign:'left',color:'rgba(0,0,0,.4)',fontSize:'.65rem'}}>{fmtDate(r.date)}</td>
-                <td style={{padding:'3px 3px',textAlign:'right',fontWeight:700}}>+{(r.total_amount||0).toLocaleString()} {cur}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Дефицит склада */}
-      {d.deficit.length>0&&<div style={sec}>
-        <div style={st}>Склад — дефицит</div>
-        <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
-          <thead><tr>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Ост</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Мин</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'4px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Надо</th>
-          </tr></thead>
-          <tbody>{d.deficit.map((it,i)=>(
-            <tr key={i}>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',fontSize:'.74rem'}}>{it.name}</td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left'}}><span style={{display:'inline-block',background:'#fef2f2',color:'#dc2626',padding:'0 6px',borderRadius:'100px',fontSize:'.58rem',fontWeight:600}}>{it.qty}</span></td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left'}}>{it.min}</td>
-              <td style={{padding:'4px',borderBottom:'1px solid rgba(0,0,0,.04)',textAlign:'left',fontWeight:600}}>{it.need}</td>
-            </tr>
-          ))}</tbody>
-        </table>
-        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',fontSize:'.72rem',color:'rgba(0,0,0,.55)',marginTop:'6px'}}>
-          <span>По закупке: <b>{Number(d.stockCost||0).toLocaleString()} {cur}</b></span>
-          <span>В продаже: <b>{Number(d.stockRetail||0).toLocaleString()} {cur}</b></span>
-        </div>
-      </div>}
-
-{/* Цели */}
-      <div style={sec}>
-        <div style={st}>Цели на месяц</div>
-        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
-          <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка план</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.revenue?d.planMap.revenue:0)).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
-          <div style={{flex:1,background:'#f0fdf4',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Выручка факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>+{Number(d.monthRev||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.revenue>0?Math.round(d.monthRev/d.planMap.revenue*100)+'%':'нет плана'}</div></div>
-          <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль план</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{((d.planMap&&d.planMap.profit?d.planMap.profit:0)).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>план на месяц</div></div>
-          <div style={{flex:1,background:d.monthProfit>=0?'#f0fdf4':'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Прибыль факт</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:d.monthProfit>=0?'#16a34a':'#dc2626'}}>{d.monthProfit>=0?'+':''}{Number(d.monthProfit||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>{d.planMap&&d.planMap.profit>0?Math.round(d.monthProfit/d.planMap.profit*100)+'%':'нет плана'}</div></div>
-        </div>
-      </div>
-
-      {/* Продажи */}
-      <div style={sec}>
-        <div style={st}>Продажи</div>
-        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Продано</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{d.sold}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Ср.чек</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700}}>{Number(d.avgCheck||0).toLocaleString()} {cur}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Покуп.</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'#16a34a'}}>{d.buyers}</div></div>
-        </div>
-        {d.topProducts.length>0&&<table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse',marginBottom:'6px'}}>
-          <thead><tr>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left',width:'30px'}}>#</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Товар</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>Шт</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Выручка</th>
-          </tr></thead>
-          <tbody>{d.topProducts.map((p,i)=>(
-            <tr key={i}>
-              <td style={{padding:'3px',color:'rgba(0,0,0,.3)',fontWeight:700}}>{i+1}</td>
-              <td style={{padding:'3px'}}>{p.name}</td>
-              <td style={{padding:'3px',textAlign:'left'}}>{p.qty}</td>
-              <td style={{padding:'3px',textAlign:'right',fontWeight:600}}>{(p.rev||0).toLocaleString()} {cur}</td>
-            </tr>
-          ))}</tbody>
-        </table>}
-      </div>
-
-      {/* Клиенты */}
-      <div style={sec}>
-        <div style={st}>Клиенты</div>
-        <div style={{display:'flex',gap:'8px',marginBottom:'8px'}}>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Всего</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.totalClients||0}</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Повт.</div><div style={{fontSize:'1.1rem',fontWeight:700}}>{d.repeatClients||0}%</div></div>
-          <div style={{flex:1,background:'#fef2f2',borderRadius:'10px',padding:'8px',textAlign:'center'}}>
-            <div style={{fontSize:'.65rem',color:'rgba(0,0,0,.45)'}}>Должники</div><div style={{fontSize:'1.1rem',fontWeight:700,color:'#dc2626'}}>{d.debtors?.length||0}</div></div>
-        </div>
-        {d.debtors?.length>0&&<table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
-          <thead><tr>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)'}}>Клиент</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Сумма</th>
-          </tr></thead>
-          <tbody>{d.debtors.slice(0,5).map((c,i)=>(
-            <tr key={i}>
-              <td style={{padding:'3px'}}>{c.name}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{Math.abs(c.debt||0).toLocaleString()} {cur}</td>
-            </tr>
-          ))}</tbody>
-        </table>}
-      </div>
-
-{/* Сравнение — реальные суммы выручки по чекам */}
-      <div style={sec}>
-        <div style={st}>Сравнение</div>
-        <div style={{display:'flex',gap:'8px',marginBottom:'4px'}}>
-          <div style={{flex:1,background:'#f0fdf4',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
-            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Сегодня</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{Number((d.cmp||{}).today||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
-            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Вчера</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).yesterday||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>&nbsp;</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
-            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Неделя</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).week||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>7 дней</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
-            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Месяц</div>
-            <div style={{fontSize:'.95rem',fontWeight:700}}>+{Number((d.cmp||{}).month||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>с начала месяца</div></div>
-          <div style={{flex:1,background:'#f9f9f9',borderRadius:'8px',padding:'6px',textAlign:'center',minHeight:'60px'}}>
-            <div style={{fontSize:'.58rem',color:'rgba(0,0,0,.45)',textTransform:'uppercase'}}>Год</div>
-            <div style={{fontSize:'.95rem',fontWeight:700,color:'#16a34a'}}>+{Number((d.cmp||{}).year||0).toLocaleString()} {cur}</div>
-            <div style={{fontSize:'.55rem',color:'rgba(0,0,0,.4)'}}>с начала года</div></div>
-        </div>
-      </div>
-
-      {/* Расходы */}
-      {expCats.length>0&&<div style={sec}>
-        <div style={st}>Расходы по категориям</div>
-        <table style={{width:'100%',fontSize:'.74rem',borderCollapse:'collapse'}}>
-          <thead><tr>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)'}}>Категория</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'right'}}>Сумма</th>
-            <th style={{fontSize:'.58rem',color:'rgba(0,0,0,.5)',padding:'3px',borderBottom:'1px solid rgba(0,0,0,.08)',textAlign:'left'}}>%</th>
-          </tr></thead>
-          <tbody>{expCats.map(([catId,amt],i)=>{
-            const pct = totalExp>0?Math.round(amt/totalExp*100):0;
-            return <tr key={i}>
-              <td style={{padding:'3px'}}>{d.catMap[catId]||'Прочее'}</td>
-              <td style={{padding:'3px',textAlign:'right',color:'#dc2626',fontWeight:600}}>{amt.toLocaleString()} {cur}</td>
-              <td style={{padding:'3px',textAlign:'left',color:'rgba(0,0,0,.5)'}}>{pct}%</td>
-            </tr>;
-          })}</tbody>
-        </table>
-      </div>}
-
     </div>
   );
 }
