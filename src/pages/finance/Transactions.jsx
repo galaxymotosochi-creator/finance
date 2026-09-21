@@ -592,16 +592,10 @@ export default function Transactions() {
                 }, 0);
                 const ang = (beforeDeg + spanDeg / 2) - 90;
                 const rad = ang * Math.PI / 180;
+                const x = Math.round(Math.cos(rad) * 56);
+                const y = Math.round(Math.sin(rad) * 56);
                 const pct = total ? Math.round(s.amount / total * 100) : 0;
-                // Хватает ли места под плашку в этом сегменте (по градусам дуги).
-                // Мелкие сегменты «съедаются» соседями — тогда плашку не рисуем.
-                const fits = spanDeg >= 22;
-                if (!fits) return null;
-                // Крупные плашки — на внешнем радиусе, мелкие — ближе к центру,
-                // чтобы соседние подписи не налезали друг на друга
-                const radius = spanDeg >= 46 ? 56 : 40;
-                const x = Math.round(Math.cos(rad) * radius);
-                const y = Math.round(Math.sin(rad) * radius);
+                if (pct < 5) return null;   // мелкие категории — без плашки
                 return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
               })}
               <div className="in">
