@@ -130,22 +130,30 @@ body {
   border: none; border-radius: var(--radius-md);
 }
 .nav-parent:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
-.nav-parent.active { background: linear-gradient(135deg, #ffdd2d, #fff9db); color: #000; font-weight: 600; }
+.nav-parent.active { background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff; font-weight: 600; }
 .nav-parent .ic { width: 1.5rem; text-align: center; font-size: 1.1rem; line-height: 1; flex-shrink: 0; opacity: .6; display: inline-flex; align-items: center; justify-content: center; }
 .nav-parent.active .ic { opacity: 1; }
 .nav-parent .arrow { margin-left: auto; font-size: .5rem; opacity: .4; transition: transform var(--transition); }
 .nav-parent.open .arrow { transform: rotate(90deg); }
+/* Треугольник у активного раздела — фирменный, пульсирующий */
+.nav-parent.active .arrow { opacity: 1; color: #fff; animation:cartripulse 1.6s ease-in-out infinite; }
+.nav-parent.active.open .arrow { animation: none; transform: rotate(90deg); }
 .nav-children { display: none; flex-direction: column; }
 .nav-children.open { display: flex !important; }
 .nav-child {
   display: flex; align-items: center; gap: .5rem;
-  padding: .35rem .55rem .35rem 2.4rem;
+  padding: .35rem .55rem .35rem 2.15rem;
   font-size: .75rem; color: var(--sidebar-text);
   cursor: pointer; transition: all var(--transition); text-decoration: none;
   border-radius: var(--radius-sm);
 }
 .nav-child:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
-.nav-child.active { font-weight: 600; color: #000; background: #f0f0f0; border-radius: 0 .5rem .5rem 0; }
+/* Кружок слева у подраздела: серый по умолчанию, синий пульсирующий — если активен */
+.nav-child-dot{width:6px;height:6px;border-radius:50%;background:#d4d7dd;flex-shrink:0;transition:background .15s}
+.nav-child:hover .nav-child-dot{background:#aeb4bf}
+.nav-child.active .nav-child-dot{background:#1F75FF;animation:navdotpulse 1.5s ease-in-out infinite}
+@keyframes navdotpulse{0%,100%{transform:scale(1);opacity:.55;box-shadow:0 0 0 0 rgba(31,117,255,.45)}50%{transform:scale(1.35);opacity:1;box-shadow:0 0 0 5px rgba(31,117,255,0)}}
+.nav-child.active { font-weight: 600; color: var(--sidebar-text-hover); background: #fff; border-radius: 0 .5rem .5rem 0; }
 .nav-sep { height: 1px; background: #f5f5f5; margin: .2rem .65rem; }
 .nav-footer { margin-top: auto; }
 

@@ -166,7 +166,8 @@ export default function Sidebar() {
                       }).map((child) => (
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
-                          onClick={() => navigate(child.path)}>{child.label}</a>
+                          onClick={() => navigate(child.path)}>
+                          <span className="nav-child-dot" />{child.label}</a>
                       ))}
                     </div>
                   </div>
