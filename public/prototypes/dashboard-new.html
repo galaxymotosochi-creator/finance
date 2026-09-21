@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Панель управления — новое превью</title>
+<style>
+:root{
+  --blue:#1F75FF; --blue-d:#0d4ea8; --blue-soft:#E6F0FF;
+  --yellow:#ffdd2d; --yellow-soft:#fff9db; --yellow-d:#7a6412;
+  --ink:#0b1220; --muted:#5b6472; --line:#e8edf5;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#f4f7fc;color:var(--ink);padding:18px 14px 60px;max-width:1180px;margin:0 auto}
+
+/* ===== ШАПКА ===== */
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.head h1{font-size:24px;font-weight:800;letter-spacing:-.025em}
+.head .date{font-size:13px;color:var(--muted);margin-top:2px}
+.head .spacer{flex:1}
+.seg{display:inline-flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(11,18,32,.07);gap:2px}
+.seg button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);padding:7px 15px;border-radius:999px;cursor:pointer;transition:all .15s}
+.seg button.on{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;box-shadow:0 6px 16px -6px rgba(31,117,255,.7)}
+
+/* ===== ЖЁЛТАЯ ПЛАШКА ПРИБЫЛИ ===== */
+.hero{background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:22px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 20px 44px -22px rgba(255,199,0,.75)}
+.hero:before{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,255,255,0) 70%)}
+.hero .lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow-d);opacity:.85}
+.hero .val{font-size:44px;font-weight:900;letter-spacing:-.035em;margin:6px 0 2px;line-height:1}
+.hero .delta{font-size:13.5px;font-weight:700;color:#1a7f37;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.6);padding:4px 11px;border-radius:999px;margin-top:8px}
+.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
+.hero .chip{background:rgba(255,255,255,.62);border-radius:12px;padding:8px 13px;font-size:12px;font-weight:600;color:#5b5210}
+.hero .chip b{font-size:15px;font-weight:800;color:#3d3607;display:block;margin-top:2px}
+
+/* ===== ВЫРУЧКА СТОЛБЦАМИ ===== */
+.card{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 14px rgba(11,18,32,.06)}
+.card-h{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.card-h .t{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card-h .v{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-left:auto}
+.bars{display:flex;align-items:flex-end;gap:5px;height:170px;padding-top:8px}
+.bar{flex:1;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#5aa0ff,#1F75FF 55%,#0d4ea8);min-height:5px;position:relative;cursor:pointer;transition:all .18s}
+.bar:hover{filter:brightness(1.12);transform:translateY(-3px)}
+.bar.peak{background:linear-gradient(180deg,#ffe680,#ffdd2d 55%,#ffc700)}
+.bar .tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) scale(.9);background:#0b1220;color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .15s;z-index:5}
+.bar:hover .tip{opacity:1;transform:translateX(-50%) scale(1)}
+.bar-x{display:flex;gap:5px;margin-top:5px}
+.bar-x span{flex:1;text-align:center;font-size:9.5px;color:#9aa4b5;font-weight:600}
+
+/* ===== KPI КАРТОЧКИ ===== */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:#fff;border-radius:18px;padding:15px 16px;box-shadow:0 2px 14px rgba(11,18,32,.06);position:relative;overflow:hidden;border-left:4px solid var(--blue)}
+.kpi.yellow{border-left-color:var(--yellow)}
+.kpi.red{border-left-color:#f2545b}
+.kpi.green{border-left-color:#2ED47A}
+.kpi .k-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.kpi .k-val{font-size:23px;font-weight:800;letter-spacing:-.025em;margin:5px 0 2px}
+.kpi .k-sub{font-size:11.5px;color:var(--muted);font-weight:600}
+.kpi .k-sub.warn{color:#d9534f;font-weight:700}
+.kpi .k-sub.ok{color:#1a7f37;font-weight:700}
+
+/* ===== ПОКАЗАТЕЛИ ===== */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.metric{background:var(--blue-soft);border-radius:14px;padding:12px 14px}
+.metric .m-l{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#4a72b8}
+.metric .m-v{font-size:18px;font-weight:800;margin-top:3px;letter-spacing:-.02em}
+.metric .m-d{font-size:11.5px;font-weight:700;margin-top:2px}
+.up{color:#1a7f37}.down{color:#d9534f}
+
+/* ===== СВОД ПО РАЗДЕЛАМ ===== */
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:13px;cursor:pointer;transition:background .14s}
+.row:hover{background:#f5f9ff}
+.row .ic{width:38px;height:38px;border-radius:11px;background:var(--blue-soft);display:grid;place-items:center;font-size:18px;flex:none}
+.row .nm{font-size:14px;font-weight:700}
+.row .ds{font-size:12px;color:var(--muted);margin-top:1px}
+.row .rt{margin-left:auto;text-align:right}
+.row .rt b{font-size:15px;font-weight:800;display:block}
+.row .rt span{font-size:11.5px;color:var(--muted)}
+.row .arr{font-size:19px;font-weight:800;color:var(--blue);animation:cartripulse 1.6s ease-in-out infinite;margin-left:6px}
+@keyframes cartripulse{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(3px);opacity:1}}
+.row .badge{font-size:10.5px;font-weight:800;background:#fdecea;color:#c0392b;padding:3px 9px;border-radius:999px}
+
+/* ===== ВНИМАНИЕ ===== */
+.alert{background:#fff8f0;border:1.5px solid #ffe0bd;border-radius:18px;padding:16px 18px}
+.alert .a-h{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#b5651d;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.alert ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.alert li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;font-weight:600;color:#5c4423}
+.alert li:before{content:"";width:7px;height:7px;border-radius:50%;background:#f2994a;flex:none;margin-top:6px}
+
+@media(max-width:640px){
+  .head h1{font-size:19px}
+  .hero .val{font-size:33px}
+  .bars{height:130px;gap:3px}
+  .kpi .k-val{font-size:20px}
+  .seg button{padding:6px 10px;font-size:11.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div>
+    <h1>Панель управления</h1>
+    <div class="date">21 сентября 2026</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg">
+    <button>День</button><button>Неделя</button>
+    <button class="on">Месяц</button><button>Квартал</button><button>Год</button>
+  </div>
+</div>
+
+<!-- ЖЁЛТАЯ ПЛАШКА -->
+<div class="hero">
+  <div class="lbl">Чистая прибыль за месяц</div>
+  <div class="val">1 247 000 ₽</div>
+  <div class="delta">▲ +18% к прошлому месяцу</div>
+  <div class="chips">
+    <div class="chip">Рентабельность <b>23%</b></div>
+    <div class="chip">Выручка <b>5 400 000 ₽</b></div>
+    <div class="chip">Расходы <b>4 153 000 ₽</b></div>
+  </div>
+</div>
+
+<!-- ВЫРУЧКА СТОЛБЦАМИ -->
+<div class="card">
+  <div class="card-h">
+    <span class="t">Выручка по дням</span>
+    <span class="v">5 400 000 ₽</span>
+  </div>
+  <div class="bars">
+    <div class="bar" style="height:34%"><span class="tip">1 сент · 184 000 ₽</span></div>
+    <div class="bar" style="height:52%"><span class="tip">2 сент · 281 000 ₽</span></div>
+    <div class="bar" style="height:41%"><span class="tip">3 сент · 221 000 ₽</span></div>
+    <div class="bar" style="height:68%"><span class="tip">4 сент · 367 000 ₽</span></div>
+    <div class="bar peak" style="height:96%"><span class="tip">5 сент · 518 000 ₽</span></div>
+    <div class="bar" style="height:57%"><span class="tip">6 сент · 308 000 ₽</span></div>
+    <div class="bar" style="height:29%"><span class="tip">7 сент · 157 000 ₽</span></div>
+    <div class="bar" style="height:63%"><span class="tip">8 сент · 340 000 ₽</span></div>
+    <div class="bar" style="height:47%"><span class="tip">9 сент · 254 000 ₽</span></div>
+    <div class="bar" style="height:74%"><span class="tip">10 сент · 400 000 ₽</span></div>
+    <div class="bar" style="height:88%"><span class="tip">11 сент · 475 000 ₽</span></div>
+    <div class="bar" style="height:50%"><span class="tip">12 сент · 270 000 ₽</span></div>
+    <div class="bar" style="height:36%"><span class="tip">13 сент · 194 000 ₽</span></div>
+    <div class="bar" style="height:61%"><span class="tip">14 сент · 329 000 ₽</span></div>
+    <div class="bar" style="height:44%"><span class="tip">15 сент · 238 000 ₽</span></div>
+    <div class="bar" style="height:55%"><span class="tip">16 сент · 297 000 ₽</span></div>
+    <div class="bar" style="height:70%"><span class="tip">17 сент · 378 000 ₽</span></div>
+    <div class="bar" style="height:39%"><span class="tip">18 сент · 211 000 ₽</span></div>
+    <div class="bar" style="height:26%"><span class="tip">19 сент · 140 000 ₽</span></div>
+    <div class="bar" style="height:48%"><span class="tip">20 сент · 259 000 ₽</span></div>
+    <div class="bar" style="height:22%"><span class="tip">21 сент · 119 000 ₽</span></div>
+  </div>
+  <div class="bar-x">
+    <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span>
+    <span>13</span><span>15</span><span>17</span><span>19</span><span>21</span>
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="kpis">
+  <div class="kpi">
+    <div class="k-lbl">Касса сейчас</div>
+    <div class="k-val">480 000 ₽</div>
+    <div class="k-sub ok">прогноз 620 000 ₽</div>
+  </div>
+  <div class="kpi">
+    <div class="k-lbl">На счетах</div>
+    <div class="k-val">2 100 000 ₽</div>
+    <div class="k-sub">4 счёта</div>
+  </div>
+  <div class="kpi red">
+    <div class="k-lbl">Долги клиентов</div>
+    <div class="k-val">340 000 ₽</div>
+    <div class="k-sub warn">8 должников</div>
+  </div>
+  <div class="kpi yellow">
+    <div class="k-lbl">Товарный запас</div>
+    <div class="k-val">890 000 ₽</div>
+    <div class="k-sub warn">5 на исходе</div>
+  </div>
+</div>
+
+<!-- ПОКАЗАТЕЛИ -->
+<div class="card">
+  <div class="card-h"><span class="t">Показатели периода</span></div>
+  <div class="metrics">
+    <div class="metric"><div class="m-l">Прибыль</div><div class="m-v">1 247 000 ₽</div><div class="m-d up">▲ 18%</div></div>
+    <div class="metric"><div class="m-l">Средний чек</div><div class="m-v">8 450 ₽</div><div class="m-d up">▲ 7%</div></div>
+    <div class="metric"><div class="m-l">Выручка сегодня</div><div class="m-v">119 000 ₽</div><div class="m-d up">▲ 12%</div></div>
+    <div class="metric"><div class="m-l">Клиенты</div><div class="m-v">124</div><div class="m-d up">▲ 6 новых</div></div>
+  </div>
+</div>
+
+<!-- СВОД ПО РАЗДЕЛАМ -->
+<div class="card">
+  <div class="card-h"><span class="t">Свод по разделам</span></div>
+  <div class="list">
+    <div class="row">
+      <div class="ic">📊</div>
+      <div><div class="nm">Финансы</div><div class="ds">Выручка, расходы, прибыль</div></div>
+      <div class="rt"><b>1 247 000 ₽</b><span>прибыль</span></div>
+      <div class="arr">▾</div>
+    </div>
+    <div class="row">
+      <div class="ic">🏦</div>
+      <div><div class="nm">Счета</div><div class="ds">Касса, банк, резерв</div></div>
+      <div class="rt"><b>2 580 000 ₽</b><span>всего</span></div>
+      <div class="arr">▾</div>
+    </div>
+    <div class="row">
+      <div class="ic">📦</div>
+      <div><div class="nm">Склад</div><div class="ds">Товарный запас</div></div>
+      <div class="rt"><b>890 000 ₽</b><span>по себестоимости</span></div>
+      <div class="arr">▾</div>
+    </div>
+    <div class="row">
+      <div class="ic">👥</div>
+      <div><div class="nm">Клиенты</div><div class="ds">База, долги</div></div>
+      <div class="rt"><b>124</b><span>долги 340 000 ₽</span></div>
+      <div class="arr">▾</div>
+    </div>
+    <div class="row">
+      <div class="ic">💰</div>
+      <div><div class="nm">Зарплата</div><div class="ds">Начислено, выплачено</div></div>
+      <div class="rt"><b>380 000 ₽</b><span>выплатить</span></div>
+      <div class="arr">▾</div>
+    </div>
+  </div>
+</div>
+
+<!-- ТРЕБУЕТ ВНИМАНИЯ -->
+<div class="alert">
+  <div class="a-h">⚠ Требует внимания</div>
+  <ul>
+    <li>8 клиентов с общей задолженностью 340 000 ₽</li>
+    <li>5 товаров на исходе — пора закупать</li>
+    <li>Касса ниже нормы на 120 000 ₽</li>
+  </ul>
+</div>
+
+</body>
+</html>
