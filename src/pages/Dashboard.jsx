@@ -193,10 +193,28 @@ export default function Dashboard() {
         (recItems || []).forEach(i => { const n = i.product_name || 'Товар'; if (!top[n]) top[n] = { qty: 0, rev: 0 }; top[n].qty += i.quantity || 0; top[n].rev += i.total || 0; });
         const topProducts = Object.entries(top).sort((a, b) => b[1].rev - a[1].rev).slice(0, 3).map(([n, v]) => ({ name: n, qty: v.qty, rev: v.rev }));
 
+        // Прогноз кассы на конец месяца: текущая касса + средний дневной поток до конца месяца
+        const dayOfMonth = now.getDate();
+        const daysInMonthNow = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const daysLeft = Math.max(0, daysInMonthNow - dayOfMonth);
+        const monthIncome = (allTx || []).filter(t => {
+          const dstr = String(t.date || '').slice(0, 10);
+          return dstr >= locStr(new Date(now.getFullYear(), now.getMonth(), 1)) && dstr <= locStr(now);
+        }).reduce((s, t) => {
+          const a = Number(t.amount || 0);
+          const accountIsCash = (accts || []).some(acc => String(acc.id) === String(t.account_id) && acc.type === 'cash_register');
+          if (!accountIsCash) return s;
+          if (t.type === 'income' && !t.kind) return s + a;
+          if (t.type === 'expense' && !t.kind) return s - a;
+          return s;
+        }, 0);
+        const avgCashPerDay = dayOfMonth > 0 ? monthIncome / dayOfMonth : 0;
+        const cashForecast = Math.round(cashBal + avgCashPerDay * daysLeft);
+
         if (!alive) return;
         setData({
           rev, exp, profit: rev - exp, salesRev, cogs,
-          cashBal, bankBal, totalCash, acctList,
+          cashBal, bankBal, totalCash, acctList, cashForecast,
           debt, debtors: debtClients || [], totalClients, repeatClients,
           deficit, stockCost, stockRetail, stockPositions,
           bars, barsTotal, barsMax, cmp,
@@ -356,7 +374,7 @@ export default function Dashboard() {
         <div className="kpi">
           <div className="k-lbl">Касса сейчас</div>
           <div className="k-val">{(d.cashBal || 0).toLocaleString('ru-RU')} {cur}</div>
-          <div className={'k-sub ' + (d.cashBal >= 0 ? 'ok' : 'warn')}>{d.cashBal >= 0 ? 'в норме' : 'ниже нуля'}</div>
+          <div className={'k-sub ' + (d.cashForecast >= d.cashBal ? 'ok' : 'warn')}>прогноз {(d.cashForecast || 0).toLocaleString('ru-RU')} {cur}</div>
         </div>
         <div className="kpi">
           <div className="k-lbl">На счетах</div>
