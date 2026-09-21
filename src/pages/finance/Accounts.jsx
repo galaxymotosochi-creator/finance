@@ -521,7 +521,7 @@ export default function Accounts() {
           </div>
 
           {/* ВТОРАЯ ТАБЛИЦА: собственные средства и выплата прибыли */}
-          <div className="sk-card acct-owner-card" style={{flex:'none'}}>
+          <div className="acct-owner-card">
             <table className="sk-table">
               <thead>
                 <tr>
