@@ -1575,3 +1575,7 @@ input:focus, select:focus, textarea:focus {
 .acct-det-total{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.75rem;color:#5b6472;padding:.5rem .6rem 0;border-top:1px dashed #d8e4f7;margin-top:.25rem}
 .acct-det-total b{font-weight:800;color:#0b1220}
 .acct-det-empty{font-size:.78rem;color:#8595ad;padding:.5rem .6rem}
+
+/* Счета: значок «есть операции владельца» */
+.acct-owner-note{margin-left:6px;font-size:.7rem;color:#1F75FF;cursor:help;font-weight:700}
+.acct-owner-card{margin-top:14px}

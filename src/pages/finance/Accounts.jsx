@@ -468,87 +468,12 @@ export default function Accounts() {
                 </tr>
               </thead>
               <tbody id="dirTableBody">
-                {/* Системные строки: владельческие средства и выплата прибыли */}
-                <tr className="acct-sys-row" onClick={()=>setOpenOwner(!openOwner)}>
-                  <td style={{textAlign:'left'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                      <span className={'sk-tri' + (openOwner ? ' open' : '')}>▾</span>
-                      <div>
-                        <div className="sk-name">Собственные средства владельца</div>
-                        <div className="sk-sub">Личные деньги — не доход бизнеса</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{textAlign:'left'}}>—</td>
-                  <td style={{textAlign:'left',color:'#1a7f37',fontWeight:600}}>+{ownerInSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{ownerOutSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',fontWeight:700}}>{(ownerInSum-ownerOutSum)>=0?'+':''}{(ownerInSum-ownerOutSum).toLocaleString()} {cur}</td>
-                  <td></td>
-                </tr>
-                {openOwner && (
-                  <tr className="acct-sys-det"><td colSpan={6} style={{padding:0}}>
-                    <div className="acct-det-wrap">
-                      {ownerTxList.length === 0 ? <div className="acct-det-empty">Операций нет</div> : ownerTxList.map((t,i)=>{
-                        const isIn = t.kind === 'owner_deposit' || (!t.kind && t.type === 'income');
-                        return (
-                          <div key={t.id||i} className="acct-det-i">
-                            <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
-                            <span className="a">{acName(t.account_id)}</span>
-                            <span className="k" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'Взнос':'Вывод'}</span>
-                            <span className="v" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'+':'−'}{Number(t.amount||0).toLocaleString()} {cur}</span>
-                          </div>
-                        );
-                      })}
-                      <div className="acct-det-total">
-                        <span>Внесено <b style={{color:'#1a7f37'}}>+{ownerInSum.toLocaleString()} {cur}</b></span>
-                        <span>Выведено <b style={{color:'#d9534f'}}>−{ownerOutSum.toLocaleString()} {cur}</b></span>
-                        <span>Сейчас в бизнесе <b>{(ownerInSum-ownerOutSum).toLocaleString()} {cur}</b></span>
-                      </div>
-                    </div>
-                  </td></tr>
-                )}
-
-                <tr className="acct-sys-row" onClick={()=>setOpenProfitSys(!openProfitSys)}>
-                  <td style={{textAlign:'left'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
-                      <span className={'sk-tri' + (openProfitSys ? ' open' : '')}>▾</span>
-                      <div>
-                        <div className="sk-name">Выплачено прибыли</div>
-                        <div className="sk-sub">Забрали заработанное</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{textAlign:'left'}}>—</td>
-                  <td style={{textAlign:'left'}}>0 {cur}</td>
-                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{profitSum.toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',fontWeight:700,color:'#d9534f'}}>−{profitSum.toLocaleString()} {cur}</td>
-                  <td></td>
-                </tr>
-                {openProfitSys && (
-                  <tr className="acct-sys-det"><td colSpan={6} style={{padding:0}}>
-                    <div className="acct-det-wrap">
-                      {profitTxList.length === 0 ? <div className="acct-det-empty">Операций нет</div> : profitTxList.map((t,i)=>(
-                        <div key={t.id||i} className="acct-det-i">
-                          <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
-                          <span className="a">{acName(t.account_id)}</span>
-                          <span className="k" style={{color:'#d9534f'}}>Выплата</span>
-                          <span className="v" style={{color:'#d9534f'}}>−{Number(t.amount||0).toLocaleString()} {cur}</span>
-                        </div>
-                      ))}
-                      <div className="acct-det-total">
-                        <span>Всего выплачено <b style={{color:'#d9534f'}}>−{profitSum.toLocaleString()} {cur}</b></span>
-                        <span>За этот месяц <b style={{color:'#d9534f'}}>−{profitPaidMonth.toLocaleString()} {cur}</b></span>
-                        <span>Заработано за месяц <b>{profitEarnedMonth.toLocaleString()} {cur}</b></span>
-                      </div>
-                    </div>
-                  </td></tr>
-                )}
-
                 {sorted.length === 0 ? (
                   <tr><td colSpan="6"><div className="empty-products"><div className="big-icon">🏦</div><p>Нет счетов</p></div></td></tr>
                 ) : sorted.map(a => {
                   var m=ACC_TYPES.find(t=>t.type===a.type), lb=m?m.label:a.type;
                   var bl=getBal(a), mv=getMv(a), in0=parseFloat(a.balance)||0;
+                  var hasOwner = (mv.od||0) !== 0 || (mv.ow||0) !== 0 || (mv.pr||0) !== 0;
                   return (
                     <tr key={a.id}>
                       <td style={{textAlign:'left'}}>
@@ -560,9 +485,9 @@ export default function Accounts() {
                         </div>
                       </td>
                       <td style={{textAlign:'left'}}>{in0.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left'}}>{mv.i.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left'}}>{mv.e.toLocaleString()} {cur}</td>
-                      <td style={{textAlign:'left',fontWeight:700}}>{bl.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{(mv.i + (mv.od||0)).toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{((mv.e||0) + (mv.ow||0) + (mv.pr||0)).toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left',fontWeight:700}}>{bl.toLocaleString()} {cur}{hasOwner && <span className="acct-owner-note" title="Есть операции владельца">ⓘ</span>}</td>
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
@@ -577,6 +502,99 @@ export default function Accounts() {
                     </tr>
                   );
                 })}
+                {sorted.length > 0 && (() => {
+                  const incTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.i + (mv.od||0); }, 0);
+                  const expTot = accounts.reduce((s,a) => { const mv=getMv(a); return s + mv.e + (mv.ow||0) + (mv.pr||0); }, 0);
+                  return (
+                    <tr className="sk-total">
+                      <td style={{textAlign:'left'}}>Итого:</td>
+                      <td style={{textAlign:'left'}}>{accounts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>+{incTot.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>−{expTot.toLocaleString()} {cur}</td>
+                      <td style={{textAlign:'left'}}>{total>=0?'+':''}{total.toLocaleString()} {cur}</td>
+                      <td></td>
+                    </tr>
+                  );
+                })()}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ВТОРАЯ ТАБЛИЦА: собственные средства и выплата прибыли */}
+          <div className="sk-card acct-owner-card" style={{flex:'none'}}>
+            <table className="sk-table">
+              <thead>
+                <tr>
+                  <th style={{textAlign:'left'}}>Движение владельца</th>
+                  <th style={{textAlign:'left'}}>Внесено / Начислено</th>
+                  <th style={{textAlign:'left'}}>Выведено / Забрано</th>
+                  <th style={{textAlign:'left'}}>Баланс</th>
+                  <th className="actions" style={{textAlign:'left'}}></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="acct-sys-row" onClick={()=>setOpenOwner(!openOwner)}>
+                  <td style={{textAlign:'left'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                      <span className={'sk-tri' + (openOwner ? ' open' : '')}>▾</span>
+                      <div>
+                        <div className="sk-name">Собственные средства</div>
+                        <div className="sk-sub">Личные деньги — не доход бизнеса</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{textAlign:'left',color:'#1a7f37',fontWeight:600}}>+{ownerInSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{ownerOutSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',fontWeight:700}}>{(ownerInSum-ownerOutSum)>=0?'+':''}{(ownerInSum-ownerOutSum).toLocaleString()} {cur}</td>
+                  <td></td>
+                </tr>
+                {openOwner && (
+                  <tr className="acct-sys-det"><td colSpan={5} style={{padding:0}}>
+                    <div className="acct-det-wrap">
+                      {ownerTxList.length === 0 ? <div className="acct-det-empty">Операций нет</div> : ownerTxList.map((t,i)=>{
+                        const isIn = t.kind === 'owner_deposit' || (!t.kind && t.type === 'income');
+                        return (
+                          <div key={t.id||i} className="acct-det-i">
+                            <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
+                            <span className="a">{acName(t.account_id)}</span>
+                            <span className="k" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'Взнос владельца':'Вывод владельца'}</span>
+                            <span className="v" style={{color:isIn?'#1a7f37':'#d9534f'}}>{isIn?'+':'−'}{Number(t.amount||0).toLocaleString()} {cur}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </td></tr>
+                )}
+
+                <tr className="acct-sys-row" onClick={()=>setOpenProfitSys(!openProfitSys)}>
+                  <td style={{textAlign:'left'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
+                      <span className={'sk-tri' + (openProfitSys ? ' open' : '')}>▾</span>
+                      <div>
+                        <div className="sk-name">Выплачено прибыли</div>
+                        <div className="sk-sub">Забрали заработанное</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{textAlign:'left'}}>0 {cur}</td>
+                  <td style={{textAlign:'left',color:'#d9534f',fontWeight:600}}>−{profitSum.toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left',fontWeight:700,color:'#d9534f'}}>−{profitSum.toLocaleString()} {cur}</td>
+                  <td></td>
+                </tr>
+                {openProfitSys && (
+                  <tr className="acct-sys-det"><td colSpan={5} style={{padding:0}}>
+                    <div className="acct-det-wrap">
+                      {profitTxList.length === 0 ? <div className="acct-det-empty">Операций нет</div> : profitTxList.map((t,i)=>(
+                        <div key={t.id||i} className="acct-det-i">
+                          <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
+                          <span className="a">{acName(t.account_id)}</span>
+                          <span className="k" style={{color:'#d9534f'}}>Выплата прибыли</span>
+                          <span className="v" style={{color:'#d9534f'}}>−{Number(t.amount||0).toLocaleString()} {cur}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </td></tr>
+                )}
               </tbody>
             </table>
           </div>
