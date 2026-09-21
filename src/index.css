@@ -181,14 +181,20 @@ body {
   display: flex; align-items: center; justify-content: flex-end;
   padding: .5rem 1rem; background: var(--header-bg); gap: .5rem;
 }
-.app-header .user-email { font-size: .7rem; color: var(--header-text); opacity: .7; }
+.app-header .user-email { font-size: .82rem; color: var(--header-text); opacity: .75; }
 .app-header .logout-btn {
-  font-size: .65rem; color: var(--header-text); background: transparent;
-  border: 1px solid #ddd; padding: .2rem .5rem;
+  font-size: .78rem; color: var(--header-text); background: transparent;
+  border: 1px solid #ddd; padding: .34rem .85rem;
   border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font);
   transition: all var(--transition);
+  animation: logoutpulse 2.4s ease-in-out infinite;
 }
-.app-header .logout-btn:hover { background: #f0f0f0; border-color: #bbb; }
+.app-header .logout-btn:hover { background: #f0f0f0; border-color: #bbb; animation: none; }
+/* Пульсация кнопки «Выйти» — цвет не меняется, только мягкое свечение */
+@keyframes logoutpulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(31,117,255,0) }
+  50%     { box-shadow: 0 0 0 5px rgba(31,117,255,.14) }
+}
 
 @media (max-width: 768px) {
   .content { padding: .2rem .75rem .75rem .75rem; }
