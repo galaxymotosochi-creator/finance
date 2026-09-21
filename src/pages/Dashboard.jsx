@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrencySymbol } from '../lib/currency';
@@ -15,22 +15,48 @@ export default function Dashboard() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('month');
+  const [period, setPeriod] = useState('all');
+  const [periodLabel, setPeriodLabel] = useState('Все время');
+  const [showPeriod, setShowPeriod] = useState(false);
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
   const [data, setData] = useState(null);
   const [openRow, setOpenRow] = useState(null);
+  const periodWrapRef = useRef(null);
+
+  // Закрытие меню периода по клику вне (как в «Доходах и расходах»)
+  useEffect(() => {
+    if (!showPeriod) return;
+    const handler = (e) => {
+      const m = periodWrapRef.current;
+      if (m && m.contains(e.target)) return;
+      setShowPeriod(false);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [showPeriod]);
 
   const now = new Date();
   const todayLabel = now.getDate() + ' ' + MONTHS_GEN[now.getMonth()] + ' ' + now.getFullYear();
 
-  // Диапазон дат для выбранного периода
+  // Диапазон дат — как в «Доходах и расходах»
   const getDateRange = () => {
     const n = new Date();
     const to = locStr(n);
-    if (period === 'day') return { from: to, to };
+    if (period === 'all') return { from: '2000-01-01', to: '2999-12-31' };
+    if (period === 'today') return { from: to, to };
+    if (period === 'yesterday') { const y = locStr(new Date(Date.now() - 86400000)); return { from: y, to: y }; }
     if (period === 'week') { const f = new Date(n); f.setDate(f.getDate() - 6); return { from: locStr(f), to }; }
     if (period === 'month') return { from: locStr(new Date(n.getFullYear(), n.getMonth(), 1)), to };
-    if (period === 'quarter') { const q = Math.floor(n.getMonth() / 3); return { from: locStr(new Date(n.getFullYear(), q * 3, 1)), to }; }
-    return { from: locStr(new Date(n.getFullYear(), 0, 1)), to }; // year
+    if (period === 'month30') { const f = new Date(n); f.setDate(f.getDate() - 29); return { from: locStr(f), to }; }
+    if (period === 'custom') return { from: customFrom || '2000-01-01', to: customTo || to };
+    return { from: '2000-01-01', to: '2999-12-31' };
+  };
+
+  const applyPeriod = (k, label) => {
+    setPeriod(k);
+    if (label) setPeriodLabel(label);
+    setShowPeriod(false);
   };
 
   useEffect(() => {
@@ -124,25 +150,14 @@ export default function Dashboard() {
         // График: дни месяца (по умолчанию) или месяцы (при годе)
         let bars = [];
         let barsTotal = 0;
-        if (period === 'year') {
-          for (let m = 0; m < 12; m++) {
-            const f = locStr(new Date(now.getFullYear(), m, 1));
-            const l = locStr(new Date(now.getFullYear(), m + 1, 0));
-            const v = sumR(f, l);
-            bars.push({ label: MONTHS_SHORT[m], tip: MONTHS_SHORT[m] + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
-          }
-          barsTotal = bars.reduce((s, b) => s + b.val, 0);
-        } else {
-          const y = now.getFullYear(), mo = now.getMonth();
-          const daysInMonth = new Date(y, mo + 1, 0).getDate();
-          const from = new Date(y, mo, 1), to = new Date(y, mo, daysInMonth);
-          for (let dd = 1; dd <= daysInMonth; dd++) {
-            const f = locStr(new Date(y, mo, dd));
-            const v = sumR(f, f);
-            bars.push({ label: dd, tip: dd + ' ' + MONTHS_SHORT[mo] + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
-          }
-          barsTotal = sumR(locStr(from), locStr(to));
+        const y = now.getFullYear(), mo = now.getMonth();
+        const daysInMonth = new Date(y, mo + 1, 0).getDate();
+        for (let dd = 1; dd <= daysInMonth; dd++) {
+          const f = locStr(new Date(y, mo, dd));
+          const v = sumR(f, f);
+          bars.push({ label: dd, tip: dd + ' ' + MONTHS_SHORT[mo] + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
         }
+        barsTotal = sumR(locStr(new Date(y, mo, 1)), locStr(new Date(y, mo, daysInMonth)));
         const barsMax = Math.max(1, ...bars.map(b => b.val));
 
         // Свои деньги владельца
@@ -195,7 +210,7 @@ export default function Dashboard() {
       if (alive) setLoading(false);
     })();
     return () => { alive = false; };
-  }, [user, period]);
+  }, [user, period, customFrom, customTo]);
 
   const d = data;
   if (loading) return <CenterSpinner />;
@@ -267,10 +282,38 @@ export default function Dashboard() {
           <div className="dash-date">{todayLabel}</div>
         </div>
         <div className="dash-spacer" />
-        <div className="seg">
-          {[['day', 'День'], ['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['year', 'Год']].map(([k, l]) => (
-            <button key={k} className={period === k ? 'on' : ''} onClick={() => setPeriod(k)}>{l}</button>
-          ))}
+        <div className="sk-period-wrap" ref={periodWrapRef} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+          <button
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', border: 'none', borderRadius: '9999px', padding: '6px 6px', fontSize: '.76rem', fontWeight: 600, lineHeight: '18px', color: '#5b6472', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+            onClick={e => { e.stopPropagation(); setShowPeriod(!showPeriod); }}>
+            {periodLabel}
+            <span className="car-tri">▾</span>
+          </button>
+          {showPeriod && (
+            <div onClick={e => e.stopPropagation()} style={{ display: 'block', position: 'absolute', top: '100%', right: 0, marginTop: '4px', background: '#fff', border: '1px solid rgba(29,120,252,.18)', borderRadius: '.85rem', boxShadow: '0 16px 40px -14px rgba(11,18,32,.3)', minWidth: '210px', padding: '.4rem', zIndex: 100 }}>
+              {[{ key: 'all', label: 'Все время' }, { key: 'today', label: 'Сегодня' }, { key: 'yesterday', label: 'Вчера' }, { key: 'week', label: 'Эта неделя' }, { key: 'month30', label: '30 дней' }, { key: 'month', label: 'Этот месяц' }].map(p => {
+                const isActive = period === p.key;
+                return (
+                  <div key={p.key} onClick={() => applyPeriod(p.key, p.label)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem .55rem', borderRadius: '.5rem', cursor: 'pointer', fontSize: '.8rem', color: isActive ? '#0d4ea8' : '#5b6472', fontWeight: isActive ? 700 : 500, background: isActive ? '#E6F0FF' : 'transparent' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isActive ? '#1F75FF' : '#dfe6f2', flexShrink: 0 }}></span>
+                    {p.label}
+                  </div>
+                );
+              })}
+              <div style={{ borderTop: '1px solid rgba(29,120,252,.14)', paddingTop: '.4rem', marginTop: '.25rem' }}>
+                <div style={{ fontSize: '.72rem', color: '#5b6472', padding: '.2rem .55rem', marginBottom: '.3rem', fontWeight: 600 }}>Свой период</div>
+                <div style={{ display: 'flex', gap: '.3rem', padding: '.2rem .55rem' }}>
+                  <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)} style={{ flex: 1, minWidth: 0, fontSize: '.72rem', padding: '.3rem', border: '1px solid rgba(29,120,252,.18)', borderRadius: '.5rem', fontFamily: 'inherit', outline: 'none' }} />
+                  <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)} style={{ flex: 1, minWidth: 0, fontSize: '.72rem', padding: '.3rem', border: '1px solid rgba(29,120,252,.18)', borderRadius: '.5rem', fontFamily: 'inherit', outline: 'none' }} />
+                </div>
+                <div style={{ padding: '.3rem .55rem 0', textAlign: 'center' }}>
+                  <button onClick={() => { if (!customFrom || !customTo) return alert('Выберите обе даты'); applyPeriod('custom', customFrom.split('-').reverse().join('.') + ' — ' + customTo.split('-').reverse().join('.')); }}
+                    className="sk-dd-btn" style={{ padding: '.5rem 1.1rem' }}>Применить</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -289,7 +332,7 @@ export default function Dashboard() {
       {/* ВЫРУЧКА СТОЛБЦАМИ */}
       <div className="card">
         <div className="card-h">
-          <span className="t">{period === 'year' ? 'Выручка по месяцам' : 'Выручка по дням'}</span>
+          <span className="t">Выручка по дням</span>
           <span className="v">{(d.barsTotal || 0).toLocaleString('ru-RU')} {cur}</span>
         </div>
         <div className="bars">
@@ -304,9 +347,7 @@ export default function Dashboard() {
           })}
         </div>
         <div className="bar-x">
-          {period === 'year'
-            ? MONTHS_SHORT.map((m, i) => <span key={i}>{m}</span>)
-            : (d.bars || []).filter(b => b.label % 2 === 1).map((b, i) => <span key={i}>{b.label}</span>)}
+          {(d.bars || []).filter(b => b.label % 2 === 1).map((b, i) => <span key={i}>{b.label}</span>)}
         </div>
       </div>
 
