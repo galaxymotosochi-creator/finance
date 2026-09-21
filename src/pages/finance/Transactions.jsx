@@ -471,7 +471,7 @@ export default function Transactions() {
               ]}
             />
           </div>
-          <div className="sub">Поступления, списания и переводы между счетами</div>
+          <div className="sub" style={{maxWidth:'210px'}}>Поступления, списания<br />и переводы между счетами</div>
         </div>
         <div className="sk-bar-acts">
           <div className="sk-dd-wrap" style={{position:'relative'}}>
