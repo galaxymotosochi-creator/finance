@@ -187,14 +187,8 @@ body {
   border: 1px solid #ddd; padding: .34rem .85rem;
   border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font);
   transition: all var(--transition);
-  animation: logoutpulse 2.4s ease-in-out infinite;
 }
-.app-header .logout-btn:hover { background: #f0f0f0; border-color: #bbb; animation: none; }
-/* Пульсация кнопки «Выйти» — цвет не меняется, только мягкое свечение */
-@keyframes logoutpulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(31,117,255,0) }
-  50%     { box-shadow: 0 0 0 5px rgba(31,117,255,.14) }
-}
+.app-header .logout-btn:hover { background: #f0f0f0; border-color: #bbb; }
 
 @media (max-width: 768px) {
   .content { padding: .2rem .75rem .75rem .75rem; }
