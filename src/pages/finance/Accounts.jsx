@@ -555,10 +555,7 @@ export default function Accounts() {
                         const isIn = t.kind === 'owner_deposit' || (!t.kind && t.type === 'income');
                         return (
                           <div key={t.id||i} className="acct-det-i">
-                            <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
-                            <span className="a">{acName(t.account_id)}</span>
-                            <span className="k">{isIn?'Взнос владельца':'Вывод владельца'}</span>
-                            <span className="v" style={{color:isIn?'#111':'#111'}}>{Number(t.amount||0).toLocaleString()} {cur}</span>
+                            <b>{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</b> вы {isIn?'внесли на':'забрали со'} счёта «{acName(t.account_id)}» <b>{Number(t.amount||0).toLocaleString('ru-RU')} {cur}</b>
                           </div>
                         );
                       })}
@@ -586,10 +583,7 @@ export default function Accounts() {
                     <div className="acct-det-wrap">
                       {profitTxList.length === 0 ? <div className="acct-det-empty">Операций нет</div> : profitTxList.map((t,i)=>(
                         <div key={t.id||i} className="acct-det-i">
-                          <span className="d">{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</span>
-                          <span className="a">{acName(t.account_id)}</span>
-                          <span className="k">Выплата прибыли</span>
-                          <span className="v">{Number(t.amount||0).toLocaleString()} {cur}</span>
+                          <b>{String(t.date||t.created_at||'').split('T')[0].split('-').reverse().join('.')}</b> вы забрали прибыль со счёта «{acName(t.account_id)}» <b>{Number(t.amount||0).toLocaleString('ru-RU')} {cur}</b>
                         </div>
                       ))}
                     </div>
