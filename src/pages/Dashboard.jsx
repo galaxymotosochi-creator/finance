@@ -7,6 +7,15 @@ import CenterSpinner from '../components/CenterSpinner';
 const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const MONTHS_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
 
+// Иконки — 1-в-1 из бокового меню (src/components/Sidebar.jsx)
+const SIDE_ICONS = {
+  finance: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+  registers: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1" fill="#999"/><circle cx="20" cy="21" r="1" fill="#999"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
+  stock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="19.5" r="1.5"/><circle cx="18.5" cy="19.5" r="1.5"/></svg>',
+  clients: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" fill="#999" opacity=".15"/></svg>',
+  team: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4" fill="#999" opacity=".15"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+};
+
 function locStr(dt) {
   return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
 }
@@ -267,7 +276,7 @@ export default function Dashboard() {
 
   const subSections = [
     {
-      key: 'finance', icon: '📊', name: 'Финансы', desc: 'Выручка, расходы, прибыль',
+      key: 'finance', icon: 'finance', name: 'Финансы', desc: 'Выручка, расходы, прибыль',
       right: { v: `${(d.profit || 0).toLocaleString('ru-RU')} ${cur}`, s: 'прибыль' },
       items: [
         { l: 'Выручка', v: `${(d.rev || 0).toLocaleString('ru-RU')} ${cur}` },
@@ -277,7 +286,7 @@ export default function Dashboard() {
       ],
     },
     {
-      key: 'accounts', icon: '🏦', name: 'Счета', desc: 'Касса, банк, резерв',
+      key: 'accounts', icon: 'registers', name: 'Счета', desc: 'Касса, банк, резерв',
       right: { v: `${(d.totalCash || 0).toLocaleString('ru-RU')} ${cur}`, s: 'всего' },
       items: [
         ...(d.acctList || []).map(a => ({ l: a.name, v: `${(a.balance || 0).toLocaleString('ru-RU')} ${cur}`, c: a.balance < 0 ? 'bad' : null })),
@@ -285,7 +294,7 @@ export default function Dashboard() {
       ],
     },
     {
-      key: 'stock', icon: '📦', name: 'Склад', desc: 'Товарный запас',
+      key: 'stock', icon: 'stock', name: 'Склад', desc: 'Товарный запас',
       right: { v: `${(d.stockCost || 0).toLocaleString('ru-RU')} ${cur}`, s: 'по себестоимости' },
       items: [
         { l: 'Позиций всего', v: String(d.stockPositions || 0) },
@@ -295,7 +304,7 @@ export default function Dashboard() {
       ],
     },
     {
-      key: 'clients', icon: '👥', name: 'Клиенты', desc: 'База, долги',
+      key: 'clients', icon: 'clients', name: 'Клиенты', desc: 'База, долги',
       right: { v: String(d.totalClients || 0), s: `долги ${(d.debt || 0).toLocaleString('ru-RU')} ${cur}` },
       items: [
         { l: 'Клиентов в базе', v: String(d.totalClients || 0) },
@@ -305,7 +314,7 @@ export default function Dashboard() {
       ],
     },
     {
-      key: 'salary', icon: '💰', name: 'Зарплата', desc: 'Начислено, сотрудники',
+      key: 'salary', icon: 'team', name: 'Зарплата', desc: 'Начислено, сотрудники',
       right: { v: `${(d.salaryAccrued || 0).toLocaleString('ru-RU')} ${cur}`, s: 'оклад в месяц' },
       items: [
         { l: 'Сотрудников', v: String(d.empCount || 0) },
@@ -439,7 +448,7 @@ export default function Dashboard() {
           {subSections.map(sec => (
             <div key={sec.key}>
               <div className={'row' + (openRow === sec.key ? ' open' : '')} onClick={() => setOpenRow(openRow === sec.key ? null : sec.key)}>
-                <div className="ic">{sec.icon}</div>
+                <div className="ic" dangerouslySetInnerHTML={{ __html: SIDE_ICONS[sec.icon] }} />
                 <div><div className="nm">{sec.name}</div><div className="ds">{sec.desc}</div></div>
                 <div className="rt"><b>{sec.right.v}</b><span>{sec.right.s}</span></div>
                 <div className="arr">▾</div>
