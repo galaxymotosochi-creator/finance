@@ -595,7 +595,7 @@ export default function Transactions() {
                 const x = Math.round(Math.cos(rad) * 56);
                 const y = Math.round(Math.sin(rad) * 56);
                 const pct = total ? Math.round(s.amount / total * 100) : 0;
-                if (pct < 4) return null;
+                if (pct < 2) return null;
                 return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
               })}
               <div className="in">
