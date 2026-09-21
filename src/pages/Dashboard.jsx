@@ -339,7 +339,7 @@ export default function Dashboard() {
       <div className="hero">
         <div className="lbl">Чистая прибыль за период</div>
         <div className="val">{(d.profit || 0).toLocaleString('ru-RU')} {cur}</div>
-        <div className="delta">Рентабельность {profitPct}%</div>
+        <div className="delta">{`▲ рентабельность ${profitPct}%`}</div>
         <div className="chips">
           <div className="chip">Рентабельность <b>{profitPct}%</b></div>
           <div className="chip">Выручка <b>{(d.rev || 0).toLocaleString('ru-RU')} {cur}</b></div>
