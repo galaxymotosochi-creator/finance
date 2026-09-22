@@ -148,15 +148,39 @@ export default function Transactions() {
     return d.startsWith('Взнос своих денег') || d.startsWith('Вывод своих денег');
   };
 
+  // Локальная дата YYYY-MM-DD (без UTC-сдвига)
+  var locStr = function(dt) {
+    return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+  };
+  // Диапазон дат по периоду — единый стиль с Панелью
+  var periodRange = function() {
+    var n = new Date();
+    if (period === 'all') return { from: '2000-01-01', to: '2999-12-31' };
+    if (period === 'today') { var t = locStr(n); return { from: t, to: t }; }
+    if (period === 'yesterday') { var y = locStr(new Date(Date.now() - 86400000)); return { from: y, to: y }; }
+    if (period === 'week') {
+      // Неделя ПН–ВС (текущая)
+      var dow = (n.getDay() + 6) % 7;
+      var mon = new Date(n); mon.setDate(n.getDate() - dow);
+      var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+      return { from: locStr(mon), to: locStr(sun) };
+    }
+    if (period === 'month30') { var f30 = new Date(n); f30.setDate(f30.getDate() - 29); return { from: locStr(f30), to: locStr(n) }; }
+    if (period === 'month') return { from: locStr(new Date(n.getFullYear(), n.getMonth(), 1)), to: locStr(n) };
+    if (period === 'prevmonth') {
+      var pf = new Date(n.getFullYear(), n.getMonth() - 1, 1);
+      var pt = new Date(n.getFullYear(), n.getMonth(), 0);
+      return { from: locStr(pf), to: locStr(pt) };
+    }
+    if (period === 'custom') return { from: periodFrom || '2000-01-01', to: periodTo || '2999-12-31' };
+    return { from: '2000-01-01', to: '2999-12-31' };
+  };
   // Фильтр по дате
   var dateFilter = function(tx) {
     if (period === 'all') return true;
     var d = (tx.date || tx.created_at || '').split('T')[0];
-    if (period === 'today') return d === new Date().toISOString().split('T')[0];
-    if (period === 'yesterday') { var y = new Date(); y.setDate(y.getDate()-1); return d === y.toISOString().split('T')[0]; }
-    if (period === 'week') { var w = new Date(); w.setDate(w.getDate()-7); return d >= w.toISOString().split('T')[0]; }
-    if (period === 'custom') return d >= periodFrom && d <= periodTo;
-    return true;
+    var r = periodRange();
+    return d >= r.from && d <= r.to;
   };
   const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || (tx.type===typeFilter && !isOwner(tx))) && (!acctFilter || String(tx.account_id) === String(acctFilter)) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
@@ -521,7 +545,7 @@ export default function Transactions() {
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>{if(w!==e.currentTarget.parentElement)w.classList.remove('open')});const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{acctFilter ? (accs.find(a=>String(a.id)===String(acctFilter))?.name || 'Счет') : 'Все счета'} <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>{if(w!==e.currentTarget.parentElement)w.classList.remove('open')});const w=e.currentTarget.parentElement;w.classList.toggle('open')}} style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 10px',fontSize:'.76rem',fontWeight:acctFilter?700:600,lineHeight:'18px',color:acctFilter?'#0d4ea8':'#5b6472',background:acctFilter?'#E6F0FF':'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>{acctFilter ? (accs.find(a=>String(a.id)===String(acctFilter))?.name || 'Счет') : 'Все счета'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             <button type="button"
               style={!acctFilter?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
@@ -554,7 +578,7 @@ export default function Transactions() {
           </button>
           {showPeriod && (
             <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'210px',padding:'.4rem',zIndex:100}}>
-              {[{key:'all',label:'Все время'},{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'}].map(p=>{
+              {[{key:'today',label:'Сегодня'},{key:'yesterday',label:'Вчера'},{key:'week',label:'Эта неделя'},{key:'month30',label:'30 дней'},{key:'month',label:'Этот месяц'},{key:'prevmonth',label:'Прошлый месяц'},{key:'all',label:'Всё время'}].map(p=>{
                 const isActive = period === p.key;
                 return (
                   <div key={p.key} onClick={()=>{setPeriod(p.key);setPeriodLabel(p.label);setShowPeriod(false)}}
