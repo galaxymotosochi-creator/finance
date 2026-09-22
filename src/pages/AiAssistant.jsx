@@ -230,6 +230,18 @@ export default function AiAssistant() {
         <div className="ai-status"><span className="live"></span>Онлайн</div>
       </div>
 
+      {/* Окно ввода — как в превью */}
+      <div className="ai-composer">
+        <div className="ai-inputrow">
+          <input type="file" accept="image/*" ref={fileRef} onChange={handlePhoto} style={{ display: 'none' }} />
+          <input type="text" value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Спросите Атласа или загрузите фото накладной…"
+            disabled={loading} />
+          <button type="button" className="ai-clip" onClick={() => fileRef.current?.click()} title="Загрузить фото">📎</button>
+          <button type="button" className="ai-send" onClick={send} disabled={loading || !input.trim()}>➤</button>
+        </div>
+        <div className="ai-hint">Атлас может ошибаться — проверяйте важные цифры</div>
       {/* Чат */}
       <div className="ai-chatbox" ref={listRef}>
         {messages.length === 0 && (
@@ -269,18 +281,6 @@ export default function AiAssistant() {
         )}
       </div>
 
-      {/* Окно ввода — как в превью */}
-      <div className="ai-composer">
-        <div className="ai-inputrow">
-          <input type="file" accept="image/*" ref={fileRef} onChange={handlePhoto} style={{ display: 'none' }} />
-          <input type="text" value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Спросите Атласа или загрузите фото накладной…"
-            disabled={loading} />
-          <button type="button" className="ai-clip" onClick={() => fileRef.current?.click()} title="Загрузить фото">📎</button>
-          <button type="button" className="ai-send" onClick={send} disabled={loading || !input.trim()}>➤</button>
-        </div>
-        <div className="ai-hint">Атлас может ошибаться — проверяйте важные цифры</div>
       </div>
       </div>
     </div>
