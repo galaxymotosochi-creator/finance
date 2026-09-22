@@ -103,8 +103,10 @@ export default function Dashboard() {
         (allTx || []).forEach(t => { txById[t.account_id] = (txById[t.account_id] || 0) + Number(t.amount || 0) * (t.type === 'income' ? 1 : -1); });
         const acctList = (accts || []).map(a => ({ name: a.name || a.type, type: a.type, id: a.id, balance: (parseFloat(a.balance) || 0) + (txById[a.id] || 0) }));
         const totalCash = acctList.reduce((s, a) => s + a.balance, 0);
-        const cashBal = acctList.find(a => a.type === 'cash_register')?.balance || 0;
-        const bankBal = acctList.filter(a => a.type === 'bank' || a.type === 'checking' || a.type === 'account').reduce((s, a) => s + a.balance, 0);
+        // Касса — все наличные: cash + cash_register (не теряем ни один счёт)
+        const cashBal = acctList.filter(a => a.type === 'cash' || a.type === 'cash_register').reduce((s, a) => s + a.balance, 0);
+        // На счетах — всё остальное (банк, расчётные, карты и т.п.)
+        const bankBal = acctList.filter(a => a.type !== 'cash' && a.type !== 'cash_register').reduce((s, a) => s + a.balance, 0);
 
         // Себестоимость проданного (средняя себестоимость единицы из поставок)
         const costTotals = {};

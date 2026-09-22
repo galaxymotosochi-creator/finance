@@ -118,26 +118,42 @@ export default function Accounts() {
   const [corType, setCorType] = useState('income');
   const [corAmt, setCorAmt] = useState('');
   const [corDesc, setCorDesc] = useState('');
+  // Мьют от гонки при автосоздании системных счетов
+  const sysCreating = useRef(false);
 
   const fetchAccounts = async () => {
     try {
       var d = await supabase.from('accounts').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
       if (!d.data) return;
       var cl = d.data;
-      var need = {cash:!cl.some(a=>a.type==='cash'), cash_register:!cl.some(a=>a.type==='cash_register')};
-      if (user) {
-        var cr = [];
-        if (need.cash) cr.push({user_id:user.id,name:'Наличные в сейфе',type:'cash',balance:0,description:'Сюда поступают изъятые из кассы деньги'});
-        if (need.cash_register) cr.push({user_id:user.id,name:'Кассовый ящик',type:'cash_register',balance:0,description:'Наличные от продаж — лежат в ящике кассы'});
-        if (cr.length > 0) {
-          var r = await supabase.from('accounts').insert(cr).select();
-          if (r.data && !r.queued) {
-            cl = cl.concat(r.data);
-            var ids = r.data.map(x => x.id);
-            var prev = JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]');
-            localStorage.setItem(SYSTEM_KEY, JSON.stringify([...prev, ...ids]));
-            setSystemIds(new Set([...prev, ...ids]));
-          }
+      // Системные счета: ровно один типа cash и один cash_register.
+      // Защита от гонки: не создаём, если уже есть ЛЮБОЙ счёт такого типа.
+      // Плюс мьют на время запроса, чтобы два параллельных вызова не создали дубль.
+      if (user && !sysCreating.current) {
+        var hasCash = cl.some(a => a.type === 'cash');
+        var hasCashReg = cl.some(a => a.type === 'cash_register');
+        if (!hasCash || !hasCashReg) {
+          sysCreating.current = true;
+          try {
+            // Перепроверка перед вставкой — вдруг за время запроса уже создали
+            var re = await supabase.from('accounts').select('*').eq('user_id', user.id);
+            var cur = re.data || cl;
+            var cr = [];
+            if (!cur.some(a => a.type === 'cash')) cr.push({user_id:user.id,name:'Наличные в сейфе',type:'cash',balance:0,description:'Сюда поступают изъятые из кассы деньги'});
+            if (!cur.some(a => a.type === 'cash_register')) cr.push({user_id:user.id,name:'Кассовый ящик',type:'cash_register',balance:0,description:'Наличные от продаж — лежат в ящике кассы'});
+            if (cr.length > 0) {
+              var r = await supabase.from('accounts').insert(cr).select();
+              if (r.data && !r.queued) {
+                cl = cur.concat(r.data);
+                var ids = r.data.map(x => x.id);
+                var prev = JSON.parse(localStorage.getItem(SYSTEM_KEY)||'[]');
+                localStorage.setItem(SYSTEM_KEY, JSON.stringify([...prev, ...ids]));
+                setSystemIds(new Set([...prev, ...ids]));
+              } else {
+                cl = cur;
+              }
+            }
+          } finally { sysCreating.current = false; }
         }
       }
       setAccounts(cl);
@@ -632,8 +648,14 @@ export default function Accounts() {
                 <div className="form-group">
                   <label>Тип счета</label>
                   <select value={modalType} onChange={e=>setModalType(e.target.value)}>
-                    {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                    {ACC_TYPES.filter(t => {
+                      // Нельзя создать второй системный счёт: только один cash и один cash_register
+                      if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
+                      if (t.type === 'cash_register' && accounts.some(a => a.type === 'cash_register')) return false;
+                      return true;
+                    }).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                   </select>
+                  <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Системные счета «Наличные» и «Кассовый ящик» могут быть только в одном экземпляре</div>
                 </div>
               )}
               {!editingId && (
@@ -714,7 +736,11 @@ export default function Accounts() {
                       </div>
                       <input placeholder="Комментарий" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
                       <select value={na.type} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}}>
-                        {ACC_TYPES.filter(t => !((t.type==='cash'||t.type==='cash_register') && accounts.some(a=>a.type===t.type))).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
+                        {ACC_TYPES.filter(t => {
+                          if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
+                          if (t.type === 'cash_register' && accounts.some(a => a.type === 'cash_register')) return false;
+                          return true;
+                        }).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
                       </select>
                     </div>
                   );
