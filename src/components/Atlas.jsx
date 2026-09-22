@@ -11,7 +11,7 @@ export default function Atlas({ mood = 'calm', size = 1, onClick }) {
   const s = (v) => v * size;
 
   return (
-    <div className={'atlas atlas-' + m} style={{ transform: 'scale(' + size + ')', transformOrigin: 'center bottom', cursor: onClick ? 'pointer' : 'default' }} onClick={onClick}>
+    <div className={'atlas atlas-' + m} style={{ transform: 'scale(' + size + ')', transformOrigin: 'top center', cursor: onClick ? 'pointer' : 'default', height: 'auto' }} onClick={onClick}>
       <div className="atlas-stage">
         <div className="atlas-halo"></div>
         <div className="atlas-halo atlas-halo2"></div>
