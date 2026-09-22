@@ -1651,12 +1651,12 @@ input:focus, select:focus, textarea:focus {
 .atlas-ear{position:absolute;top:24px;width:9px;height:24px;border-radius:6px;background:linear-gradient(180deg,#dbe4f2,#aebfd8);border:1px solid #a3b4cf;transition:all .3s}
 .atlas-ear-l{left:-10px}.atlas-ear-r{right:-10px}
 .atlas-ant{position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:2.5px;height:16px;background:linear-gradient(#c3cee0,#8fa3c2);transition:all .3s}
-.atlas-ant:after{content:"";position:absolute;top:-10px;left:-6px;width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c4,var(--yellow));box-shadow:0 0 18px rgba(255,221,45,.95);animation:atlasGlow 1.8s infinite;transition:all .3s}
+.atlas-ant:after{content:"";position:absolute;top:-9px;left:-5px;width:12px;height:12px;border-radius:50%;background:#ffdd2d;box-shadow:0 0 14px rgba(255,221,45,.95);animation:atlasGlow 1.8s infinite;transition:all .3s}
 .atlas-torso-row{position:relative;display:flex;justify-content:center}
 .atlas-torso{width:74px;height:40px;border-radius:18px;margin-top:6px;position:relative;
   background:linear-gradient(160deg,#f6f9ff,#d5e0f1 60%,#bccce4);border:2px solid #aab9d3;
   box-shadow:inset 0 -6px 12px rgba(120,145,185,.32),inset 0 5px 10px rgba(255,255,255,.85);transition:all .3s}
-.atlas-torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c4 0%,#ffe98a 45%,var(--yellow) 100%);box-shadow:0 0 16px rgba(255,221,45,.9);transition:all .3s}
+.atlas-torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:#ffdd2d;box-shadow:0 0 13px rgba(255,221,45,.9);transition:all .3s}
 .atlas-arm{position:absolute;top:10px;width:12px;height:32px;border-radius:7px;background:linear-gradient(180deg,#e6ecf7,#c0cde2);border:2px solid #aab9d3;transition:all .3s}
 .atlas-arm-l{left:-18px;transform:rotate(8deg)}.atlas-arm-r{right:-18px;transform:rotate(-8deg)}
 .atlas-gloss{position:absolute;inset:0;overflow:hidden;border-radius:30px;pointer-events:none}
