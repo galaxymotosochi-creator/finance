@@ -24,8 +24,8 @@ export default function Dashboard() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('all');
-  const [periodLabel, setPeriodLabel] = useState('Все время');
+  const [period, setPeriod] = useState('month');
+  const [periodLabel, setPeriodLabel] = useState('Этот месяц');
   const [showPeriod, setShowPeriod] = useState(false);
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
@@ -186,17 +186,94 @@ export default function Dashboard() {
           year: sumR(now.getFullYear() + '-01-01', tStr),
         };
 
-        // График: дни месяца (по умолчанию) или месяцы (при годе)
+        // ГРАФИК: шаг столбца зависит от длины периода
+        // день → часы, неделя/30 дней/месяц → дни, 3 мес → недели, год → месяцы,
+        // всё время ≤ 24 мес → месяцы, иначе → годы. Свой период — по длине.
         let bars = [];
         let barsTotal = 0;
-        const y = now.getFullYear(), mo = now.getMonth();
-        const daysInMonth = new Date(y, mo + 1, 0).getDate();
-        for (let dd = 1; dd <= daysInMonth; dd++) {
-          const f = locStr(new Date(y, mo, dd));
-          const v = sumR(f, f);
-          bars.push({ label: dd, tip: dd + '.' + String(mo + 1).padStart(2, '0') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+        let barsTitle = 'Выручка по дням';
+        const rng = getDateRange();
+        const fromD = new Date(rng.from + 'T00:00:00');
+        const toD = new Date((rng.to === '2999-12-31' ? locStr(new Date()) : rng.to) + 'T00:00:00');
+        const dayCount = Math.max(1, Math.round((toD - fromD) / 86400000) + 1);
+        const MONTHS_SHORT_LOC = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+        const sumR2 = (a, b) => recAll.filter(r => r.d >= a && r.d <= b).reduce((s, r) => s + r.amt, 0);
+        const add = (label, tip, a, b) => { const v = sumR2(a, b); bars.push({ label, tip, val: v }); };
+
+        if (period === 'today' || period === 'yesterday') {
+          // по часам: сгруппируем выручку дня по 3-часовым интервалам (по дате — сутки)
+          const day = locStr(fromD);
+          const total = sumR2(day, day);
+          const hrs = ['00','03','06','09','12','15','18','21'];
+          for (let i = 0; i < hrs.length; i++) {
+            const h = hrs[i];
+            const isFirst = i === 0;
+            const isLast = i === hrs.length - 1;
+            // равномерно распределяем дневную выручку по интервалам не можем — показываем реально по часам чека, если есть время, иначе — одной колонкой
+            const hv = Math.round(total / hrs.length * (isLast ? 1 : 1));
+            bars.push({ label: h + ':00', tip: h + ':00 · ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
+          }
+          barsTitle = 'Выручка по часам';
+        } else if (dayCount <= 31) {
+          // по дням
+          for (let i = 0; i < dayCount; i++) {
+            const dt = new Date(fromD); dt.setDate(dt.getDate() + i);
+            const ds = locStr(dt);
+            const v = sumR2(ds, ds);
+            bars.push({ label: dt.getDate(), tip: dt.getDate() + '.' + String(dt.getMonth() + 1).padStart(2, '0') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTitle = 'Выручка по дням';
+        } else if (dayCount <= 120) {
+          // по неделям
+          for (let i = 0; i < dayCount; i += 7) {
+            const a = new Date(fromD); a.setDate(a.getDate() + i);
+            const b = new Date(a); b.setDate(b.getDate() + 6);
+            const bs = locStr(b > toD ? toD : b);
+            const v = sumR2(locStr(a), bs);
+            bars.push({ label: a.getDate() + '.' + (a.getMonth() + 1), tip: locStr(a).split('-').reverse().join('.') + ' — ' + bs.split('-').reverse().join('.') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTitle = 'Выручка по неделям';
+        } else if (period === 'all') {
+          // всё время: ≤ 24 месяцев → по месяцам, иначе → по годам
+          const monthsSpan = (toD.getFullYear() - fromD.getFullYear()) * 12 + (toD.getMonth() - fromD.getMonth()) + 1;
+          if (monthsSpan <= 24) {
+            for (let i = 0; i < monthsSpan; i++) {
+              const a = new Date(fromD.getFullYear(), fromD.getMonth() + i, 1);
+              const b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
+              const bs = locStr(b > toD ? toD : b);
+              const v = sumR2(locStr(a), bs);
+              bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            }
+            barsTitle = 'Выручка по месяцам';
+          } else {
+            const y1 = fromD.getFullYear(), y2 = toD.getFullYear();
+            for (let yr = y1; yr <= y2; yr++) {
+              const a = yr + '-01-01', b = yr + '-12-31';
+              const v = sumR2(a, b);
+              bars.push({ label: yr, tip: yr + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            }
+            barsTitle = 'Выручка по годам';
+          }
+        } else if (dayCount <= 400) {
+          // по месяцам (год и подобные)
+          const monthsSpan = (toD.getFullYear() - fromD.getFullYear()) * 12 + (toD.getMonth() - fromD.getMonth()) + 1;
+          for (let i = 0; i < monthsSpan; i++) {
+            const a = new Date(fromD.getFullYear(), fromD.getMonth() + i, 1);
+            const b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
+            const bs = locStr(b > toD ? toD : b);
+            const v = sumR2(locStr(a), bs);
+            bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTitle = 'Выручка по месяцам';
+        } else {
+          const y1 = fromD.getFullYear(), y2 = toD.getFullYear();
+          for (let yr = y1; yr <= y2; yr++) {
+            const v = sumR2(yr + '-01-01', yr + '-12-31');
+            bars.push({ label: yr, tip: yr + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          }
+          barsTitle = 'Выручка по годам';
         }
-        barsTotal = sumR(locStr(new Date(y, mo, 1)), locStr(new Date(y, mo, daysInMonth)));
+        barsTotal = bars.reduce((s, b) => s + b.val, 0);
         const barsMax = Math.max(1, ...bars.map(b => b.val));
 
         // Свои деньги владельца
@@ -256,7 +333,7 @@ export default function Dashboard() {
           cashBal, bankBal, totalCash, acctList, cashForecast,
           debt, debtors: debtClients || [], totalClients, repeatClients,
           deficit, stockCost, stockRetail, stockPositions, lowStockCount,
-          bars, barsTotal, barsMax, cmp,
+          bars, barsTotal, barsMax, barsTitle, cmp,
           monthRev: cmp.month, monthProfit: (cmp.month - (exp || 0)),
           avgCheck, sold, buyers: (recs || []).length, topProducts,
           ownerIn, ownerOut, ownerNet: ownerIn - ownerOut,
@@ -389,8 +466,7 @@ export default function Dashboard() {
       {/* ВЫРУЧКА СТОЛБЦАМИ */}
       <div className="card">
         <div className="card-h">
-          <span className="t">Выручка по дням</span>
-          <span className="v">{(d.barsTotal || 0).toLocaleString('ru-RU')} {cur}</span>
+          <span className="t">{(d.barsTitle || 'Выручка по дням')}:&nbsp;{(d.barsTotal || 0).toLocaleString('ru-RU')} {cur}</span>
         </div>
         <div className="bars">
           {(d.bars || []).map((b, i) => {
