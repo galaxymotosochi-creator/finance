@@ -213,6 +213,15 @@ export default function Receipts() {
     return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : d;
   };
 
+  // Только время чека (из created_at), формат 14:35
+  const fmtTime = (d) => {
+    if (!d) return '—';
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return '—';
+    if (String(d).indexOf('T') === -1 && String(d).indexOf(':') === -1) return '—';
+    return dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  };
+
   // Дата + время (время создания/закрытия чека)
   const fmtDateTime = (d) => {
     if (!d) return '—';
@@ -562,6 +571,7 @@ export default function Receipts() {
             <tr>
               <th>№ чека</th>
               <th style={{ textAlign: 'left' }}>Дата</th>
+              <th style={{ textAlign: 'left' }}>Время</th>
               <th style={{ textAlign: 'left' }}>Сумма</th>
               <th style={{ textAlign: 'left' }}>Возврат</th>
               <th style={{ textAlign: 'left' }}>Скидка</th>
@@ -580,6 +590,7 @@ export default function Receipts() {
                 style={{ cursor: 'pointer' }}>
                 <td>№{r.receipt_number}{r.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{fmtDate(r.date)}</td>
+                <td style={{ textAlign: 'left', color:'#222' }}>{fmtTime(r.created_at || r.date)}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>{Number(r.total_amount).toLocaleString()} {cur}</td>
                 <td style={{ textAlign: 'left', color:'#222' }}>
                   {Number(r.refund_amount) > 0 ? '−' + Number(r.refund_amount).toLocaleString() + ' ' + cur : '—'}
