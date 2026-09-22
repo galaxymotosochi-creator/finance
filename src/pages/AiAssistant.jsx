@@ -97,9 +97,7 @@ const QUICK_BUTTONS = [
 export default function AiAssistant() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
-  const [messages, setMessages] = useState([
-    { role: 'assistant', text: '👋 Привет! Чем могу помочь?', data: null },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [mood, setMood] = useState('calm');
@@ -110,6 +108,49 @@ export default function AiAssistant() {
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages]);
+
+  // Загрузка истории переписки пользователя (только своя — фильтр по user_id)
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await supabase.from('ai_messages')
+          .select('id,role,text,data,created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true })
+          .limit(300);
+        if (!alive) return;
+        setMessages((data || []).map(m => ({ role: m.role, text: m.text, data: m.data || null })));
+      } catch (e) { /* тихо */ }
+    })();
+    return () => { alive = false; };
+  }, [user]);
+
+  // Сохранение сообщения в базу (привязано к аккаунту)
+  const saveMsg = async (role, text, data) => {
+    if (!user) return;
+    try {
+      await supabase.from('ai_messages').insert({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        user_id: user.id,
+        role,
+        text: text || '',
+        data: data || null,
+      });
+    } catch (e) { /* тихо */ }
+  };
+
+  // Очистить историю (свою)
+  const clearHistory = async () => {
+    if (!user) return;
+    if (!window.confirm('Очистить всю историю переписки с Атласом?')) return;
+    try {
+      await supabase.from('ai_messages').delete().eq('user_id', user.id);
+      setMessages([]);
+      setToast && setToast('История очищена');
+    } catch (e) { /* тихо */ }
+  };
 
   // Эмоции Атласа: радость/грусть держим ~2с, затем спокойный
   const flashMood = (m, ms) => {
@@ -127,7 +168,9 @@ export default function AiAssistant() {
   const handleQuickReport = async (id) => {
     const fn = REPORT_ACTIONS[id];
     if (!fn) return;
-    setMessages(p => [...p, { role: 'user', text: QUICK_BUTTONS.find(b => b.id === id)?.label || 'Отчет', data: null }]);
+    const qLabel = QUICK_BUTTONS.find(b => b.id === id)?.label || 'Отчет';
+    setMessages(p => [...p, { role: 'user', text: qLabel, data: null }]);
+    saveMsg('user', qLabel, null);
     setLoading(true); setMood('think');
     try {
       const result = await fn(user);
@@ -135,9 +178,11 @@ export default function AiAssistant() {
       const table = result?.table || null;
       const title = result?.title || '';
       setMessages(p => [...p, { role: 'assistant', text, data: { table, title } }]);
+      saveMsg('assistant', text, { table, title });
       flashMood('joy', 2000);
     } catch (e) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка: ' + e.message, data: null }]);
+      saveMsg('assistant', '❌ Ошибка: ' + e.message, null);
       flashMood('sad', 2500);
     }
     setLoading(false);
@@ -149,6 +194,7 @@ export default function AiAssistant() {
     const userMsg = input.trim();
     setInput('');
     setMessages(p => [...p, { role: 'user', text: userMsg, data: null }]);
+    saveMsg('user', userMsg, null);
     setLoading(true); setMood('think');
     try {
       const res = await fetch('/api/ai/chat', {
@@ -169,9 +215,11 @@ export default function AiAssistant() {
         }
       }
       setMessages(p => [...p, { role: 'assistant', text: reply, data: null }]);
+      saveMsg('assistant', reply, null);
       flashMood(/^❌/.test(reply) ? 'sad' : 'joy', 2200);
     } catch (err) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка соединения с сервером', data: null }]);
+      saveMsg('assistant', '❌ Ошибка соединения с сервером', null);
       flashMood('sad', 2500);
     }
     setLoading(false);
@@ -182,6 +230,7 @@ export default function AiAssistant() {
     const file = e.target.files?.[0];
     if (!file) return;
     setMessages(p => [...p, { role: 'user', text: `📸 ${file.name}`, data: null }]);
+    saveMsg('user', `📸 ${file.name}`, null);
     setLoading(true); setMood('think');
     try {
       const b64 = await new Promise((res, rej) => {
@@ -195,13 +244,16 @@ export default function AiAssistant() {
       });
       if (error || !analysis?.text) {
         setMessages(p => [...p, { role: 'assistant', text: '❌ Не удалось обработать фото', data: null }]);
+        saveMsg('assistant', '❌ Не удалось обработать фото', null);
         flashMood('sad', 2500);
       } else {
         setMessages(p => [...p, { role: 'assistant', text: analysis.text, data: null }]);
+        saveMsg('assistant', analysis.text, null);
         flashMood('joy', 2200);
       }
     } catch (err) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка: ' + err.message, data: null }]);
+      saveMsg('assistant', '❌ Ошибка: ' + err.message, null);
       flashMood('sad', 2500);
     }
     setLoading(false);
@@ -227,14 +279,18 @@ export default function AiAssistant() {
         <Atlas mood={mood} size={0.72} />
         <h2>Привет! Я Атлас</h2>
         <p>Ваш помощник по бизнесу. Задайте мне вопрос!</p>
-        <div className="ai-status"><span className="live"></span>Онлайн</div>
+        <div style={{display:'flex',alignItems:'center',gap:8,marginTop:5}}>
+          <div className="ai-status"><span className="live"></span>Онлайн</div>
+          <button type="button" className="ai-clear" onClick={clearHistory} title="Очистить историю переписки">Очистить историю</button>
+        </div>
       </div>
 
       {/* Чат */}
       <div className="ai-chatbox" ref={listRef}>
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#999', fontSize: '.85rem' }}>
-            Задайте мне вопрос — и я отвечу по вашим цифрам
+          <div className="ai-msg bot">
+            <div className="ai-av bot">A</div>
+            <div className="ai-bub">👋 Привет! Чем могу помочь?</div>
           </div>
         )}
         {messages.map((m, i) => (
