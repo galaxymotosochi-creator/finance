@@ -42,6 +42,7 @@ export default function Transactions() {
   }, []);
   const [origAmount, setOrigAmount] = useState(null);
   const [search, setSearch] = useState('');
+  const [acctFilter, setAcctFilter] = useState(null);
   const [txRingOpen, setTxRingOpen] = useState(false);
   const [txKind, setTxKind] = useState('income');
   const openIncome = () => { setTxKind('income'); setSelectedAcc(accs.length > 0 ? accs[0].id : null); setShowIncome(true); };
@@ -157,7 +158,7 @@ export default function Transactions() {
     if (period === 'custom') return d >= periodFrom && d <= periodTo;
     return true;
   };
-  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || (tx.type===typeFilter && !isOwner(tx))) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
+  const filtered = txs.filter(function(tx){return dateFilter(tx) && (!typeFilter || (tx.type===typeFilter && !isOwner(tx))) && (!acctFilter || String(tx.account_id) === String(acctFilter)) && (!search || (tx.description||"").toLowerCase().includes(search.toLowerCase()))});
 
   // Время операции: реальный момент создания (created_at) в часовом поясе настроек программы
   const fmtTime = function(tx) {
@@ -510,6 +511,19 @@ export default function Transactions() {
             autoComplete="off"
             style={{border:'none',outline:'none',flex:'1 1 60px',minWidth:0,width:'100%',fontSize:'.78rem',fontFamily:'var(--font)',background:'none',padding:0}} />
         <span style={{width:'1px',height:'20px',background:'#eef1f6',flexShrink:0}}></span>
+        <div className="sk-dd-wrap">
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>{if(w!==e.currentTarget.parentElement)w.classList.remove('open')});const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{acctFilter ? (accs.find(a=>String(a.id)===String(acctFilter))?.name || 'Счет') : 'Все счета'} <span className="car-tri">▾</span></button>
+          <div className="sk-dd-menu">
+            <button type="button"
+              style={!acctFilter?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+              onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setAcctFilter(null)}}>Все счета</button>
+            {accs.map(a => (
+              <button key={a.id} type="button"
+                style={String(acctFilter)===String(a.id)?{background:'#E6F0FF',color:'#0d4ea8',fontWeight:700}:undefined}
+                onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setAcctFilter(a.id)}}>{a.name}</button>
+            ))}
+          </div>
+        </div>
         <div className="sk-dd-wrap">
           <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Все'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
