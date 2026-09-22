@@ -1491,13 +1491,13 @@ input:focus, select:focus, textarea:focus {
 
 /* ВЫРУЧКА СТОЛБЦАМИ */
 .bars{display:flex;align-items:flex-end;gap:5px;height:170px;padding-top:8px}
-.bar{flex:1;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#5aa0ff,#1F75FF 55%,#0d4ea8);min-height:5px;position:relative;cursor:pointer;transition:all .18s}
+.bar{flex:1;min-width:0;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#5aa0ff,#1F75FF 55%,#0d4ea8);min-height:5px;position:relative;cursor:pointer;transition:all .18s}
 .bar:hover{filter:brightness(1.12);transform:translateY(-3px)}
 .bar.peak{background:linear-gradient(180deg,#ffe680,#ffdd2d 55%,#ffc700)}
 .bar .tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) scale(.9);background:#0b1220;color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .15s;z-index:5}
 .bar:hover .tip{opacity:1;transform:translateX(-50%) scale(1)}
 .bar-x{display:flex;gap:5px;margin-top:5px}
-.bar-x span{flex:1;text-align:center;font-size:9.5px;color:#9aa4b5;font-weight:600}
+.bar-x span{flex:1;min-width:0;text-align:center;font-size:9.5px;color:#9aa4b5;font-weight:600;overflow:visible;white-space:nowrap}
 
 /* KPI */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:14px}
