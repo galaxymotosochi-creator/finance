@@ -692,7 +692,7 @@ export default function Transactions() {
               </button>
             </div>
           )}
-          <div className={'tx-legend-wrap' + (txRingOpen ? '' : ' tx-collapse')}>
+          {txRingOpen && (<div className={'tx-legend-wrap' + (txRingOpen ? '' : ' tx-collapse')}>
             {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
               <div className="tx-legend-col">
                 <div className="tx-grp-h">Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
@@ -719,7 +719,7 @@ export default function Transactions() {
                 </div>
               </div>
             )}
-          </div>
+          </div>)}
         </div>
       )}
 
