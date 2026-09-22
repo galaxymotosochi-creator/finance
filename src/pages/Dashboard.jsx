@@ -418,7 +418,7 @@ export default function Dashboard() {
         <div className="kpi">
           <div className="k-lbl">На счетах</div>
           <div className="k-val">{(d.totalCash || 0).toLocaleString('ru-RU')} {cur}</div>
-          <div className="k-sub">{d.acctList ? d.acctList.length : 0} счёта · всё вместе</div>
+          <div className="k-sub">{d.acctList ? d.acctList.length : 0} счёта</div>
         </div>
         <div className="kpi red">
           <div className="k-lbl">Долги клиентов</div>
