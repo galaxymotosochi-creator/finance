@@ -698,6 +698,20 @@ export default function Transactions() {
                 </tr>
               ))}
             </tbody>
+            {typeFilter && filtered.length > 0 && (
+              <tfoot>
+                <tr className="sk-total">
+                  <td style={{textAlign:'left'}}>Итого:</td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}>{typeFilter === 'income' ? '+' : '−'}{(typeFilter === 'income' ? incomeTotal : expenseTotal).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            )}
           </table>
           </div>
         </div>
