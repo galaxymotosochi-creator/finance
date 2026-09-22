@@ -194,7 +194,7 @@ export default function Dashboard() {
         for (let dd = 1; dd <= daysInMonth; dd++) {
           const f = locStr(new Date(y, mo, dd));
           const v = sumR(f, f);
-          bars.push({ label: dd + '.' + (mo + 1), tip: dd + '.' + String(mo + 1).padStart(2, '0') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+          bars.push({ label: dd, tip: dd + '.' + String(mo + 1).padStart(2, '0') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
         }
         barsTotal = sumR(locStr(new Date(y, mo, 1)), locStr(new Date(y, mo, daysInMonth)));
         const barsMax = Math.max(1, ...bars.map(b => b.val));
