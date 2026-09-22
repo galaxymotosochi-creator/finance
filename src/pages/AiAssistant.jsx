@@ -224,7 +224,7 @@ export default function AiAssistant() {
 
       {/* Шапка с Атласом */}
       <div className="ai-hero">
-        <Atlas mood={mood} />
+        <Atlas mood={mood} size={0.72} />
         <h2>Привет! Я Атлас</h2>
         <p>Ваш помощник по бизнесу. Задайте мне вопрос!</p>
         <div className="ai-status"><span className="live"></span>Онлайн</div>
