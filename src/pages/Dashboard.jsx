@@ -211,7 +211,7 @@ export default function Dashboard() {
             const isLast = i === hrs.length - 1;
             // равномерно распределяем дневную выручку по интервалам не можем — показываем реально по часам чека, если есть время, иначе — одной колонкой
             const hv = Math.round(total / hrs.length * (isLast ? 1 : 1));
-            bars.push({ label: h + ':00', tip: h + ':00 · ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
+            bars.push({ label: h + ':00', tip: h + ':00 ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
           }
           barsTitle = 'Выручка по часам';
         } else if (dayCount <= 31) {
@@ -220,7 +220,7 @@ export default function Dashboard() {
             const dt = new Date(fromD); dt.setDate(dt.getDate() + i);
             const ds = locStr(dt);
             const v = sumR2(ds, ds);
-            bars.push({ label: dt.getDate(), tip: dt.getDate() + '.' + String(dt.getMonth() + 1).padStart(2, '0') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            bars.push({ label: dt.getDate(), tip: dt.getDate() + '.' + String(dt.getMonth() + 1).padStart(2, '0') + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
           }
           barsTitle = 'Выручка по дням';
         } else if (dayCount <= 120) {
@@ -230,7 +230,7 @@ export default function Dashboard() {
             const b = new Date(a); b.setDate(b.getDate() + 6);
             const bs = locStr(b > toD ? toD : b);
             const v = sumR2(locStr(a), bs);
-            bars.push({ label: a.getDate() + '.' + (a.getMonth() + 1), tip: locStr(a).split('-').reverse().join('.') + ' — ' + bs.split('-').reverse().join('.') + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            bars.push({ label: a.getDate() + '.' + (a.getMonth() + 1), tip: locStr(a).split('-').reverse().join('.') + ' — ' + bs.split('-').reverse().join('.') + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
           }
           barsTitle = 'Выручка по неделям';
         } else if (period === 'all') {
@@ -242,7 +242,7 @@ export default function Dashboard() {
               const b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
               const bs = locStr(b > toD ? toD : b);
               const v = sumR2(locStr(a), bs);
-              bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+              bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
             }
             barsTitle = 'Выручка по месяцам';
           } else {
@@ -250,7 +250,7 @@ export default function Dashboard() {
             for (let yr = y1; yr <= y2; yr++) {
               const a = yr + '-01-01', b = yr + '-12-31';
               const v = sumR2(a, b);
-              bars.push({ label: yr, tip: yr + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+              bars.push({ label: yr, tip: yr + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
             }
             barsTitle = 'Выручка по годам';
           }
@@ -262,14 +262,14 @@ export default function Dashboard() {
             const b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
             const bs = locStr(b > toD ? toD : b);
             const v = sumR2(locStr(a), bs);
-            bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            bars.push({ label: MONTHS_SHORT_LOC[a.getMonth()], tip: MONTHS_SHORT_LOC[a.getMonth()] + ' ' + a.getFullYear() + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
           }
           barsTitle = 'Выручка по месяцам';
         } else {
           const y1 = fromD.getFullYear(), y2 = toD.getFullYear();
           for (let yr = y1; yr <= y2; yr++) {
             const v = sumR2(yr + '-01-01', yr + '-12-31');
-            bars.push({ label: yr, tip: yr + ' · ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            bars.push({ label: yr, tip: yr + ' ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
           }
           barsTitle = 'Выручка по годам';
         }
