@@ -670,7 +670,7 @@ export default function Transactions() {
           <div className="tx-legend-wrap">
             {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
               <div className="tx-legend-col">
-                <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#1F75FF'}}></span>Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
+                <div className="tx-grp-h">Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
                 <div className="tx-sub">
                   {incomeCatsList.map((c, i) => (
                     <div key={i}>
@@ -683,7 +683,7 @@ export default function Transactions() {
             )}
             {typeFilter !== 'income' && expenseCatsList.length > 0 && (
               <div className="tx-legend-col">
-                <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#ffcf2e'}}></span>Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
+                <div className="tx-grp-h">Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
                 <div className="tx-sub">
                   {expenseCatsList.map((c, i) => (
                     <div key={i}>
