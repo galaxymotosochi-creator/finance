@@ -1631,7 +1631,7 @@ input:focus, select:focus, textarea:focus {
 @keyframes atlasLean{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(3deg)}}
 
 .atlas{display:inline-block;line-height:0;vertical-align:top}
-.atlas-stage{position:relative;width:170px;height:100px;display:flex;align-items:flex-start;justify-content:center;margin-top:10px}
+.atlas-stage{position:relative;width:170px;height:108px;display:flex;align-items:flex-start;justify-content:center;margin-top:24px}
 .atlas-halo{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid rgba(29,120,252,.22);animation:atlasRing 3.4s ease-out infinite}
 .atlas-halo2{animation-delay:1.7s}
 .atlas-shadow{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:90px;height:16px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.25),transparent 70%);filter:blur(2px);transition:all .3s}
