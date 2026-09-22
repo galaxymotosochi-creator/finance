@@ -223,10 +223,10 @@ export default function Transactions() {
   const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
   const txProfit = Math.max(0, incomeTotal - expenseTotal);
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
-  // Палитры: доходы — оттенки СИНЕГО, расходы — оттенки ЖЁЛТОГО.
+  // Палитры: доходы — оттенки ЗЕЛЁНОГО, расходы — оттенки КРАСНОГО.
   // Тёмные тона для крупных категорий, светлые — для мелких (по порядку суммы).
-  const INC_COLORS = ['#0d4ea8', '#1F75FF', '#4A94FF', '#7FB4FF', '#A9CCFF', '#C9DEFF'];
-  const EXP_COLORS = ['#D99A00', '#F0B300', '#FFC700', '#FFD84D', '#FFE68A', '#FFF0BD'];
+  const INC_COLORS = ['#0F7B3E', '#16A34A', '#37C46E', '#6BD494', '#9AE3B6', '#C4EFD4'];
+  const EXP_COLORS = ['#B3261E', '#DC3A31', '#F0554B', '#F57C74', '#F9A8A2', '#FCD0CC'];
   // Цвет категории вычисляется ОДИН раз и хранится в карте:
   // квадратик, полоска и сегмент круга всегда берут его из одного места.
   // Индекс — по позиции в списке (список отсортирован по убыванию суммы).
@@ -642,8 +642,8 @@ export default function Transactions() {
                       const y = Math.round(Math.sin(rad) * 56);
                       const pct = expenseTotal ? Math.round(s.amount / expenseTotal * 100) : 0;
                       if (pct < 5) return null;
-                      const dark = ['#D99A00','#F0B300','#FFC700'].indexOf(s.color) >= 0;
-                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:dark?'#fff':'#5b4a00'}}>{pct}%</span>;
+                      const light = ['#F9A8A2','#FCD0CC'].indexOf(s.color) >= 0;
+                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:light?'#7a1710':'#fff'}}>{pct}%</span>;
                     })}
                     <div className="in">
                       <div className="t">Расходы</div>
