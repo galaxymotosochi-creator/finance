@@ -872,8 +872,8 @@ input:focus, select:focus, textarea:focus {
 .tx-leg .amt{font-size:13.5px;font-weight:800;min-width:104px;text-align:right;color:#111}
 .tx-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden}
 .tx-leg-bar i{display:block;height:100%;border-radius:3px}
-.tx-grp-h{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:800;color:var(--sk-ink);margin-top:4px}
-.tx-grp-h .grp-amt{font-size:13.5px;font-weight:800;color:#111;margin-left:6px}
+.tx-grp-h{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#111;margin-top:4px}
+.tx-grp-h .grp-amt{font-size:13px;font-weight:700;color:#111;margin-left:0}
 .tx-sub{padding-left:0;display:flex;flex-direction:column;gap:8px}
 .tx-legend-wrap.tx-collapse .tx-sub > *:nth-child(n+4){display:none}
 @keyframes tx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(29,120,252,.45),0 8px 20px -10px rgba(29,120,252,.55)}50%{box-shadow:0 0 0 8px rgba(29,120,252,0),0 12px 26px -10px rgba(29,120,252,.7)}}
