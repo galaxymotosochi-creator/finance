@@ -225,8 +225,8 @@ export default function Transactions() {
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
   // Палитры: доходы — оттенки ЗЕЛЁНОГО, расходы — оттенки КРАСНОГО.
   // Тёмные тона для крупных категорий, светлые — для мелких (по порядку суммы).
-  const INC_COLORS = ['#0F7B3E', '#16A34A', '#37C46E', '#6BD494', '#9AE3B6', '#C4EFD4'];
-  const EXP_COLORS = ['#B3261E', '#DC3A31', '#F0554B', '#F57C74', '#F9A8A2', '#FCD0CC'];
+  const INC_COLORS = ['#22C55E', '#4ADE80', '#86EFAC', '#A7F3C9', '#C6F6DC', '#E0FBEC'];
+  const EXP_COLORS = ['#EF4444', '#F87171', '#FCA5A5', '#FECACA', '#FEDDDD', '#FFEFEF'];
   // Цвет категории вычисляется ОДИН раз и хранится в карте:
   // квадратик, полоска и сегмент круга всегда берут его из одного места.
   // Индекс — по позиции в списке (список отсортирован по убыванию суммы).
@@ -642,7 +642,7 @@ export default function Transactions() {
                       const y = Math.round(Math.sin(rad) * 56);
                       const pct = expenseTotal ? Math.round(s.amount / expenseTotal * 100) : 0;
                       if (pct < 5) return null;
-                      const light = ['#F9A8A2','#FCD0CC'].indexOf(s.color) >= 0;
+                      const light = ['#FCA5A5','#FECACA','#FEDDDD','#FFEFEF','#A7F3C9','#C6F6DC','#E0FBEC'].indexOf(s.color) >= 0;
                       return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:light?'#7a1710':'#fff'}}>{pct}%</span>;
                     })}
                     <div className="in">
