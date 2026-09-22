@@ -269,42 +269,18 @@ export default function AiAssistant() {
         )}
       </div>
 
-      {/* Поле ввода + фото */}
-      <div style={{
-        display: 'flex', gap: '.5rem', alignItems: 'center',
-        background: '#fff', borderRadius: '14px',
-        border: '1px solid rgba(0,0,0,.08)',
-        padding: '.5rem .75rem',
-      }}>
-        <input type="file" accept="image/*" ref={fileRef} onChange={handlePhoto}
-          style={{ display: 'none' }} />
-        <button onClick={() => fileRef.current?.click()}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: '1.1rem', padding: '.25rem', lineHeight: 1,
-            fontFamily: 'inherit', color: '#555', flexShrink: 0,
-          }} title="Загрузить фото">📸
-        </button>
-        <input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Напишите сообщение..."
-          disabled={loading}
-          style={{
-            flex: 1, border: 'none', outline: 'none',
-            fontSize: '.82rem', fontFamily: 'inherit',
-            padding: '.35rem 0', color: '#333',
-          }} />
-        <button onClick={send} disabled={loading || !input.trim()}
-          style={{
-            background: '#000', color: '#fff', border: 'none',
-            borderRadius: '50%', width: '34px', height: '34px',
-            cursor: (loading || !input.trim()) ? 'default' : 'pointer',
-            fontSize: '.8rem', fontWeight: 600, flexShrink: 0,
-            fontFamily: 'inherit', opacity: (loading || !input.trim()) ? .4 : 1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-          ➤
-        </button>
+      {/* Окно ввода — как в превью */}
+      <div className="ai-composer">
+        <div className="ai-inputrow">
+          <input type="file" accept="image/*" ref={fileRef} onChange={handlePhoto} style={{ display: 'none' }} />
+          <input type="text" value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Спросите Атласа или загрузите фото накладной…"
+            disabled={loading} />
+          <button type="button" className="ai-clip" onClick={() => fileRef.current?.click()} title="Загрузить фото">📎</button>
+          <button type="button" className="ai-send" onClick={send} disabled={loading || !input.trim()}>➤</button>
+        </div>
+        <div className="ai-hint">Атлас может ошибаться — проверяйте важные цифры</div>
       </div>
       </div>
     </div>
