@@ -62,6 +62,16 @@ export default function Dashboard() {
     return { from: '2000-01-01', to: '2999-12-31' };
   };
 
+  // Дата в шапке — по выбранному периоду (для «своёго» — диапазон, для «дня» — одна дата)
+  const fmtRu = (d) => String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
+  const headDate = (() => {
+    const r = getDateRange();
+    const f = new Date((r.from === '2000-01-01' ? locStr(new Date()) : r.from) + 'T00:00:00');
+    const t = new Date((r.to === '2999-12-31' ? locStr(new Date()) : r.to) + 'T00:00:00');
+    if (locStr(f) === locStr(t)) return fmtRu(f);
+    return fmtRu(f) + ' — ' + fmtRu(t);
+  })();
+
   const applyPeriod = (k, label) => {
     setPeriod(k);
     if (label) setPeriodLabel(label);
@@ -422,7 +432,7 @@ export default function Dashboard() {
       <div className="dash-head">
         <div>
           <h1>Панель управления</h1>
-          <div className="dash-date">{todayLabel}</div>
+          <div className="dash-date">{headDate}</div>
         </div>
         <div className="dash-spacer" />
         <div className="sk-period-wrap" ref={periodWrapRef} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
