@@ -227,21 +227,27 @@ export default function Transactions() {
   // никогда не совпали цветом. Внутри группы — по индексу, без повторов.
   const INC_COLORS = ['#1F75FF', '#00B8A9', '#FF6B6B', '#FFB300', '#8E7CFF', '#00A3FF', '#2ED47A', '#FF8A3D', '#E052C4', '#12B5CB'];
   const EXP_COLORS = ['#F45B69', '#7A5AF8', '#0d4ea8', '#61C454', '#FFC700', '#FF8A3D', '#E052C4', '#12B5CB', '#7A5AF8', '#F45B69'];
-  // Цвет: сначала по имени (стабильность между фильтрами), затем — сдвиг,
-  // если цвет уже занят другим сегментом в этом же круге.
+  // Цвет категории вычисляется ОДИН раз и хранится в карте:
+  // квадратик, полоска и сегмент круга всегда берут его из одного места.
   const usedColors = new Set();
-  const pickColor = (nm, arr) => {
+  const colorMap = new Map();
+  const colorFor = (nm, arr) => {
+    const key = String(nm || '');
+    const mapKey = arr === INC_COLORS ? 'inc:' + key : 'exp:' + key;
+    if (colorMap.has(mapKey)) return colorMap.get(mapKey);
     let h = 0;
-    const str = String(nm || '');
-    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-    let idx = h % arr.length;
+    for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+    let color = arr[h % arr.length];
+    // если цвет уже занят в этом круге — берём следующий свободный
     for (let k = 0; k < arr.length; k++) {
-      const c = arr[(idx + k) % arr.length];
-      if (!usedColors.has(c)) { usedColors.add(c); return c; }
+      const c = arr[(h + k) % arr.length];
+      if (!usedColors.has(c)) { color = c; break; }
     }
-    return arr[idx];
+    usedColors.add(color);
+    colorMap.set(mapKey, color);
+    return color;
   };
-  const colorByName = (nm, arr) => pickColor(nm, arr);
+  const colorByName = (nm, arr) => colorFor(nm, arr);
   // Итог всего круга — проценты считаем как долю от него (сумма сегментов = 100%)
   const ringTotal = incomeTotal + expenseTotal;
   const txRingSegs = [
