@@ -203,6 +203,8 @@ export default function Transactions() {
   const salesIncome = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t) && ((saleCatTxId && String(t.category_id) === String(saleCatTxId)) || (t.description || '').indexOf('Кассовая смена') === 0 || (t.description || '').indexOf('по чеку') >= 0)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const otherIncomeTx = Math.max(0, incomeTotal - salesIncome);
   const expenseTotal = filtered.filter(t => t && t.type !== 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t)).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  // Значение в центре круга: Доходы / Расходы / Прибыль — по фильтру типа
+  const centerVal = typeFilter === 'income' ? incomeTotal : typeFilter === 'expense' ? expenseTotal : (incomeTotal - expenseTotal);
 
   // --- Структура доходов/расходов по категориям (для круга и легенды) ---
   const txIncomeList = filtered.filter(t => t && t.type === 'income' && (t.status === 'paid' || !t.status) && !isTransfer(t) && !isOwner(t));
@@ -525,7 +527,7 @@ export default function Transactions() {
           </div>
         </div>
         <div className="sk-dd-wrap">
-          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Все'} <span className="car-tri">▾</span></button>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();setShowPeriod(false);setShowDownload(false);document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>{if(w!==e.currentTarget.parentElement)w.classList.remove('open')});const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Все'} <span className="car-tri">▾</span></button>
           <div className="sk-dd-menu">
             {[
               { v:null, label:'Все' },
@@ -613,8 +615,8 @@ export default function Transactions() {
                 return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
               })}
               <div className="in">
-                <div className="t">Прибыль</div>
-                <div className="v">{(incomeTotal - expenseTotal) >= 0 ? '+' : ''}{(incomeTotal - expenseTotal).toLocaleString()} {cur}</div>
+                <div className="t">{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Прибыль'}</div>
+                <div className="v">{centerVal >= 0 ? '+' : ''}{centerVal.toLocaleString()} {cur}</div>
               </div>
             </div>
             <div className={'tx-legend' + (txRingOpen ? '' : ' tx-collapse')}>
@@ -680,7 +682,7 @@ export default function Transactions() {
                   <td style={{textAlign:'left'}}>Итого:</td>
                   <td style={{textAlign:'left'}}></td>
                   <td style={{textAlign:'left'}}></td>
-                  <td style={{textAlign:'left'}}>{typeFilter === 'income' ? '+' : '−'}{(typeFilter === 'income' ? incomeTotal : expenseTotal).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}>+{incomeTotal.toLocaleString()} / −{expenseTotal.toLocaleString()} {cur}</td>
                   <td style={{textAlign:'left'}}></td>
                   <td style={{textAlign:'left'}}></td>
                   <td style={{textAlign:'left'}}></td>
