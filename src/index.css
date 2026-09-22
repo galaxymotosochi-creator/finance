@@ -1719,7 +1719,7 @@ input:focus, select:focus, textarea:focus {
 .ai-hero{border-radius:0}
 
 /* Окно ввода AI — 1-в-1 с превью */
-.ai-composer{flex:none;padding:12px 22px 14px;border-bottom:1px solid rgba(29,120,252,.14);background:#fff}
+.ai-composer{flex:none;padding:14px 22px 18px;border-top:1px solid rgba(29,120,252,.14);background:#fff}
 .ai-inputrow{display:flex;gap:9px;align-items:center;border:none;border-radius:999px;padding:7px 7px 7px 18px;background:#f7f9fc;transition:background .15s,box-shadow .15s}
 .ai-inputrow:focus-within{background:#fff;box-shadow:none}
 .ai-inputrow input[type=text]{border:none;outline:none;flex:1;font-size:13px;font-family:inherit;background:none;color:#1f2b3d}
