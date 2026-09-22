@@ -956,7 +956,7 @@ export default function Transactions() {
                 <div style={{display:'flex',gap:'.4rem'}}>
                   <button type="button" onClick={function(){setIncCategory('')}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>+ Доход</button>
-                  <button type="button" onClick={function(){setTxKind('expense');setIncName('');setIncAmount('');setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null)}}
+                  <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>− Расход</button>
                 </div>
               </div>
@@ -1027,7 +1027,7 @@ export default function Transactions() {
               <div className="form-group">
                 <label>Тип операции</label>
                 <div style={{display:'flex',gap:'.4rem'}}>
-                  <button type="button" onClick={function(){setTxKind('income');setExpName('');setExpAmount('');setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null)}}
+                  <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>+ Доход</button>
                   <button type="button" onClick={function(){setExpCategory('')}}
                     style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>− Расход</button>
