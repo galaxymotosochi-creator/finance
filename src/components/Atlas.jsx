@@ -17,7 +17,7 @@ export default function Atlas({ mood = 'calm', size = 1, onClick }) {
         <div className="atlas-halo atlas-halo2"></div>
         <div className="atlas-shadow"></div>
         <div className="atlas-float">
-          <div className="atlas-body">
+          <div className="atlas-bot">
             <div className="atlas-ant"></div>
             <div className="atlas-ear atlas-ear-l"></div>
             <div className="atlas-ear atlas-ear-r"></div>

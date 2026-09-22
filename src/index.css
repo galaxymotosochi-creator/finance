@@ -1636,9 +1636,10 @@ input:focus, select:focus, textarea:focus {
 .atlas-halo2{animation-delay:1.7s}
 .atlas-shadow{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:90px;height:16px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.25),transparent 70%);filter:blur(2px);transition:all .3s}
 .atlas-float{position:relative;animation:atlasFloat 4s ease-in-out infinite}
-.atlas-body{position:relative;animation:atlasBreathe 3.6s ease-in-out infinite}
+.atlas-bot{position:relative;animation:atlasBreathe 3.6s ease-in-out infinite}
+.atlas-body{position:relative}
 .atlas-head{width:96px;height:80px;border-radius:28px;position:relative;
-  background:linear-gradient(160deg,#fff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);border:2px solid #a9bad4;
+  background:linear-gradient(160deg,#ffffff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);border:2px solid #a9bad4;
   box-shadow:0 14px 24px -14px rgba(11,18,32,.5),inset 0 -8px 16px rgba(120,145,185,.32),inset 0 6px 12px rgba(255,255,255,.9);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transition:filter .3s}
 .atlas-visor{width:62px;height:32px;border-radius:12px;background:linear-gradient(165deg,#0b1a33,#0d4ea8 60%,#1d78fc);
