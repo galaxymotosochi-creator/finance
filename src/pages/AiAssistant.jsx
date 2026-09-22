@@ -213,7 +213,7 @@ export default function AiAssistant() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: 'var(--font)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: '100%', minHeight: 0, overflow: 'hidden', fontFamily: 'var(--font)' }}>
       
       {/* Окно раздела: рамка с тенью + шапка с тремя точками */}
       <div className="ai-window">
