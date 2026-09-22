@@ -842,6 +842,15 @@ export default function Accounts() {
           }
           try {
             const isDeposit = ownerMode === 'deposit';
+            // Авто-категория для движений владельца
+            var ownerCatName = isDeposit ? 'Взнос своих денег' : 'Вывод своих денег';
+            var ownerCatId = null;
+            var { data: foundOwnerCat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', ownerCatName).maybeSingle();
+            if (foundOwnerCat) ownerCatId = foundOwnerCat.id;
+            else {
+              var { data: newOwnerCat } = await supabase.from('categories').insert({user_id:user.id,name:ownerCatName,type:isDeposit?'income':'expense'}).select('id').maybeSingle();
+              if (newOwnerCat) ownerCatId = newOwnerCat.id;
+            }
             await supabase.from('transactions').insert({
               user_id: user.id,
               account_id: acct.id,
@@ -850,7 +859,7 @@ export default function Accounts() {
               description: (isDeposit ? 'Взнос своих денег' : 'Вывод своих денег') + (ownerDesc.trim() ? ' — ' + ownerDesc.trim() : ''),
               date: new Date().toISOString().split('T')[0],
               kind: isDeposit ? 'owner_deposit' : 'owner_withdraw',
-              category_id: null,
+              category_id: ownerCatId,
             });
             setShowOwner(false); setOwnerAmt(''); setOwnerDesc('');
             await fetchTx();
@@ -892,6 +901,14 @@ export default function Accounts() {
           const bal = balOfId(acct.id) || 0;
           if (amt > bal) return alert('Недостаточно средств на счете «' + acct.name + '». Доступно: ' + Math.round(bal).toLocaleString() + ' ' + cur);
           try {
+            // Авто-категория «Выплата прибыли» — чтобы не уходило в «Без категории»
+            var profitCatId = null;
+            var { data: foundProfitCat } = await supabase.from('categories').select('id').eq('user_id', user.id).eq('name', 'Выплата прибыли').maybeSingle();
+            if (foundProfitCat) profitCatId = foundProfitCat.id;
+            else {
+              var { data: newProfitCat } = await supabase.from('categories').insert({user_id:user.id,name:'Выплата прибыли',type:'expense'}).select('id').maybeSingle();
+              if (newProfitCat) profitCatId = newProfitCat.id;
+            }
             await supabase.from('transactions').insert({
               user_id: user.id,
               account_id: acct.id,
@@ -900,7 +917,7 @@ export default function Accounts() {
               description: 'Выплата прибыли' + (profitDesc.trim() ? ' — ' + profitDesc.trim() : ''),
               date: new Date().toISOString().split('T')[0],
               kind: 'owner_profit',
-              category_id: null,
+              category_id: profitCatId,
             });
             setShowProfit(false); setProfitAmt(''); setProfitDesc('');
             await fetchTx();
