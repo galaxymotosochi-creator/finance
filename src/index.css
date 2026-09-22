@@ -1631,7 +1631,7 @@ input:focus, select:focus, textarea:focus {
 @keyframes atlasLean{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(3deg)}}
 
 .atlas{display:inline-block;line-height:0}
-.atlas-stage{position:relative;width:170px;height:150px;display:flex;align-items:center;justify-content:center}
+.atlas-stage{position:relative;width:170px;height:108px;display:flex;align-items:flex-start;justify-content:center;margin-top:14px}
 .atlas-halo{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid rgba(29,120,252,.22);animation:atlasRing 3.4s ease-out infinite}
 .atlas-halo2{animation-delay:1.7s}
 .atlas-shadow{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:90px;height:16px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.25),transparent 70%);filter:blur(2px);transition:all .3s}
@@ -1693,10 +1693,10 @@ input:focus, select:focus, textarea:focus {
 .atlas.atlas-listen .atlas-mouth{width:22px;height:8px;border-radius:6px;background:#5b6b85}
 
 /* зона робота в шапке AI */
-.ai-hero{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 20px 14px;background:linear-gradient(180deg,#f4f8ff 0%,#fff 100%);border-bottom:1px solid rgba(29,120,252,.14);border-radius:16px 16px 0 0}
-.ai-hero h2{font-size:18px;margin:8px 0 3px;font-weight:800}
+.ai-hero{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 20px 8px;background:linear-gradient(180deg,#f4f8ff 0%,#fff 100%);border-bottom:1px solid rgba(29,120,252,.14);border-radius:0}
+.ai-hero h2{font-size:17px;margin:2px 0 2px;font-weight:800}
 .ai-hero p{font-size:12.5px;color:var(--sk-muted);margin:0}
-.ai-status{display:inline-flex;align-items:center;gap:7px;background:#E6F0FF;color:#0d4ea8;border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:700;margin-top:8px}
+.ai-status{display:inline-flex;align-items:center;gap:7px;background:#E6F0FF;color:#0d4ea8;border-radius:999px;padding:3px 11px;font-size:11px;font-weight:700;margin-top:5px}
 .ai-status .live{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 8px #16a34a;animation:atlasGlow 1.8s infinite}
 .ai-chatbox{flex:1;min-height:300px;overflow-y:auto;background:#fff;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
 .ai-msg{display:flex;gap:9px;max-width:88%}
