@@ -618,6 +618,7 @@ export default function Transactions() {
               </div>
             </div>
             <div className={'tx-legend' + (txRingOpen ? '' : ' tx-collapse')}>
+              {typeFilter !== 'expense' && <>
               <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#1F75FF'}}></span>Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
               <div className="tx-sub">
                 {incomeCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет доходов за период</div>}
@@ -628,6 +629,8 @@ export default function Transactions() {
                   </div>
                 ))}
               </div>
+              </>}
+              {typeFilter !== 'income' && <>
               <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#ffcf2e'}}></span>Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
               <div className="tx-sub">
                 {expenseCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет расходов за период</div>}
@@ -638,6 +641,7 @@ export default function Transactions() {
                   </div>
                 ))}
               </div>
+              </>}
             </div>
           </div>
           {(incomeCatsList.length > 2 || expenseCatsList.length > 2) && (
@@ -670,6 +674,20 @@ export default function Transactions() {
                 <th className="actions"></th>
               </tr>
             </thead>
+            {typeFilter && filtered.length > 0 && (
+              <tbody className="sk-total-body">
+                <tr className="sk-total">
+                  <td style={{textAlign:'left'}}>Итого:</td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}>{typeFilter === 'income' ? '+' : '−'}{(typeFilter === 'income' ? incomeTotal : expenseTotal).toLocaleString()} {cur}</td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td style={{textAlign:'left'}}></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            )}
             <tbody>
               {filtered.map(tx => (
                 <tr key={tx.id}>
@@ -698,20 +716,6 @@ export default function Transactions() {
                 </tr>
               ))}
             </tbody>
-            {typeFilter && filtered.length > 0 && (
-              <tfoot>
-                <tr className="sk-total">
-                  <td style={{textAlign:'left'}}>Итого:</td>
-                  <td style={{textAlign:'left'}}></td>
-                  <td style={{textAlign:'left'}}></td>
-                  <td style={{textAlign:'left'}}>{typeFilter === 'income' ? '+' : '−'}{(typeFilter === 'income' ? incomeTotal : expenseTotal).toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left'}}></td>
-                  <td style={{textAlign:'left'}}></td>
-                  <td style={{textAlign:'left'}}></td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            )}
           </table>
           </div>
         </div>

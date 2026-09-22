@@ -1582,3 +1582,6 @@ input:focus, select:focus, textarea:focus {
 /* Счета: значок «есть операции владельца» */
 .acct-owner-note{margin-left:6px;font-size:.7rem;color:var(--muted);cursor:help;font-weight:700}
 .acct-owner-card{margin-top:14px}
+
+/* Доходы и расходы: строка Итого под заголовками (как в Счетах) */
+.sk-table tbody.sk-total-body td{background:var(--sk-soft);font-weight:700;color:var(--sk-ink);border-bottom:none;padding-top:10px;padding-bottom:10px;font-size:.82rem}
