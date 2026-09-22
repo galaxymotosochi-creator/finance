@@ -175,7 +175,7 @@ export default function Dashboard() {
         const repeatClients = totalClients > 0 ? Math.round(Object.values(buyCount).filter(c => c >= 2).length / totalClients * 100) : 0;
 
         // Выручка по дням (или по месяцам при периоде «год»)
-        const recAll = (receiptsAll || []).map(r => ({ d: String(r.date || '').slice(0, 10), amt: Number(r.total_amount) || 0 }));
+        const recAll = (receiptsAll || []).map(r => ({ d: String(r.date || '').slice(0, 10), amt: Number(r.total_amount) || 0, ts: (r.created_at || r.date || '') }));
         const sumR = (a, b) => recAll.filter(r => r.d >= a && r.d <= b).reduce((s, r) => s + r.amt, 0);
         const tStr = locStr(new Date());
         const cmp = {
@@ -203,17 +203,32 @@ export default function Dashboard() {
         if (period === 'today' || period === 'yesterday') {
           // по часам: сгруппируем выручку дня по 3-часовым интервалам (по дате — сутки)
           const day = locStr(fromD);
-          const total = sumR2(day, day);
-          const hrs = ['00','03','06','09','12','15','18','21'];
-          for (let i = 0; i < hrs.length; i++) {
-            const h = hrs[i];
-            const isFirst = i === 0;
-            const isLast = i === hrs.length - 1;
-            // равномерно распределяем дневную выручку по интервалам не можем — показываем реально по часам чека, если есть время, иначе — одной колонкой
-            const hv = Math.round(total / hrs.length * (isLast ? 1 : 1));
-            bars.push({ label: h + ':00', tip: h + ':00 ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
+          // Реальные часы: берём время чека (created_at), если есть; иначе — по 3-часовым интервалам ровно
+          const dayRecs = recAll.filter(r => r.d === day);
+          const hasTime = dayRecs.some(r => String(r.ts).indexOf('T') > -1 && String(r.ts).indexOf(':') > -1);
+          if (hasTime) {
+            // 24 колонки по часам
+            const hourly = new Array(24).fill(0);
+            dayRecs.forEach(r => {
+              const dt = new Date(r.ts);
+              if (!isNaN(dt.getTime())) { const hh = dt.getHours(); if (hh >= 0 && hh < 24) hourly[hh] += r.amt; }
+            });
+            for (let h = 0; h < 24; h++) {
+              const v = hourly[h];
+              bars.push({ label: (h % 2 === 0 ? h : ''), tip: String(h).padStart(2, '0') + ':00 ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
+            }
+            barsTitle = 'Выручка по часам';
+          } else {
+            // Времени нет — делим день ровно на 8 интервалов (заглушка)
+            const total = sumR2(day, day);
+            const hrs = ['00','03','06','09','12','15','18','21'];
+            for (let i = 0; i < hrs.length; i++) {
+              const h = hrs[i];
+              const hv = Math.round(total / hrs.length);
+              bars.push({ label: h + ':00', tip: h + ':00 ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
+            }
+            barsTitle = 'Выручка по часам (примерно)';
           }
-          barsTitle = 'Выручка по часам';
         } else if (dayCount <= 31) {
           // по дням
           for (let i = 0; i < dayCount; i++) {
