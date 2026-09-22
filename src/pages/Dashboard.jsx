@@ -203,11 +203,10 @@ export default function Dashboard() {
         if (period === 'today' || period === 'yesterday') {
           // по часам: сгруппируем выручку дня по 3-часовым интервалам (по дате — сутки)
           const day = locStr(fromD);
-          // Реальные часы: берём время чека (created_at), если есть; иначе — по 3-часовым интервалам ровно
+          // Реальные часы: берём время чека (created_at). Если времени нет — график пустой, без заглушек
           const dayRecs = recAll.filter(r => r.d === day);
           const hasTime = dayRecs.some(r => String(r.ts).indexOf('T') > -1 && String(r.ts).indexOf(':') > -1);
           if (hasTime) {
-            // 24 колонки по часам
             const hourly = new Array(24).fill(0);
             dayRecs.forEach(r => {
               const dt = new Date(r.ts);
@@ -217,18 +216,13 @@ export default function Dashboard() {
               const v = hourly[h];
               bars.push({ label: (h % 2 === 0 ? h : ''), tip: String(h).padStart(2, '0') + ':00 ' + v.toLocaleString('ru-RU') + ' ' + cur, val: v });
             }
-            barsTitle = 'Выручка по часам';
           } else {
-            // Времени нет — делим день ровно на 8 интервалов (заглушка)
-            const total = sumR2(day, day);
-            const hrs = ['00','03','06','09','12','15','18','21'];
-            for (let i = 0; i < hrs.length; i++) {
-              const h = hrs[i];
-              const hv = Math.round(total / hrs.length);
-              bars.push({ label: h + ':00', tip: h + ':00 ' + hv.toLocaleString('ru-RU') + ' ' + cur, val: hv });
+            // Времени нет — строим пустые часовые колонки (без выдуманных сумм)
+            for (let h = 0; h < 24; h++) {
+              bars.push({ label: (h % 2 === 0 ? h : ''), tip: String(h).padStart(2, '0') + ':00 0 ' + cur, val: 0 });
             }
-            barsTitle = 'Выручка по часам (примерно)';
           }
+          barsTitle = 'Выручка по часам';
         } else if (dayCount <= 31) {
           // по дням
           for (let i = 0; i < dayCount; i++) {
