@@ -660,7 +660,7 @@ export default function Transactions() {
             <span className="ttl-exp">Расходы <b>−{expenseTotal.toLocaleString()} {cur}</b></span>
             <span className={centerVal >= 0 ? 'ttl-prof' : 'ttl-loss'}>{centerVal >= 0 ? 'Прибыль' : 'Убыток'} <b>{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</b></span>
           </div>
-          <div className="tx-legend-wrap">
+          <div className={'tx-legend-wrap' + (txRingOpen ? '' : ' tx-collapse')}>
             {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
               <div className="tx-legend-col">
                 <div className="tx-grp-h">Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
@@ -688,7 +688,7 @@ export default function Transactions() {
               </div>
             )}
           </div>
-          {(incomeCatsList.length > 2 || expenseCatsList.length > 2) && (
+          {(incomeCatsList.length + expenseCatsList.length) >= 5 && (
             <div className="tx-toggle-row">
               <button type="button" className={'tx-toggle' + (txRingOpen ? ' open' : '')} onClick={() => setTxRingOpen(!txRingOpen)}>
                 <span className="car">▾</span><span>{txRingOpen ? 'Свернуть категории' : 'Раскрыть категории'}</span>
