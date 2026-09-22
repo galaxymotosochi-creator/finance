@@ -223,36 +223,28 @@ export default function Transactions() {
   const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
   const txProfit = Math.max(0, incomeTotal - expenseTotal);
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
-  // Палитры для круга. Доходы и расходы — РАЗНЫЕ наборы, чтобы сегменты
-  // никогда не совпали цветом. Внутри группы — по индексу, без повторов.
-  const INC_COLORS = ['#1F75FF', '#00B8A9', '#FF6B6B', '#FFB300', '#8E7CFF', '#00A3FF', '#2ED47A', '#FF8A3D', '#E052C4', '#12B5CB'];
-  const EXP_COLORS = ['#F45B69', '#7A5AF8', '#0d4ea8', '#61C454', '#FFC700', '#FF8A3D', '#E052C4', '#12B5CB', '#7A5AF8', '#F45B69'];
+  // Палитры: доходы — оттенки СИНЕГО, расходы — оттенки ЖЁЛТОГО.
+  // Тёмные тона для крупных категорий, светлые — для мелких (по порядку суммы).
+  const INC_COLORS = ['#0d4ea8', '#1F75FF', '#4A94FF', '#7FB4FF', '#A9CCFF', '#C9DEFF'];
+  const EXP_COLORS = ['#D99A00', '#F0B300', '#FFC700', '#FFD84D', '#FFE68A', '#FFF0BD'];
   // Цвет категории вычисляется ОДИН раз и хранится в карте:
   // квадратик, полоска и сегмент круга всегда берут его из одного места.
-  const usedColors = new Set();
+  // Индекс — по позиции в списке (список отсортирован по убыванию суммы).
   const colorMap = new Map();
-  const colorFor = (nm, arr) => {
+  const colorFor = (nm, arr, idx) => {
     const key = String(nm || '');
-    const mapKey = arr === INC_COLORS ? 'inc:' + key : 'exp:' + key;
+    const mapKey = (arr === INC_COLORS ? 'inc:' : 'exp:') + key;
     if (colorMap.has(mapKey)) return colorMap.get(mapKey);
-    let h = 0;
-    for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-    let color = arr[h % arr.length];
-    // если цвет уже занят в этом круге — берём следующий свободный
-    for (let k = 0; k < arr.length; k++) {
-      const c = arr[(h + k) % arr.length];
-      if (!usedColors.has(c)) { color = c; break; }
-    }
-    usedColors.add(color);
+    const color = arr[(idx != null ? idx : 0) % arr.length];
     colorMap.set(mapKey, color);
     return color;
   };
-  const colorByName = (nm, arr) => colorFor(nm, arr);
+  const colorByName = (nm, arr, idx) => colorFor(nm, arr, idx);
   // Итог всего оборота (для строки итогов)
   const ringTotal = incomeTotal + expenseTotal;
   // Два отдельных круга: каждый = 100% своей группы
-  const incRingSegs = incomeCatsList.map((c) => ({ ...c, color: colorByName(c.name, INC_COLORS) })).filter(s => s.amount > 0);
-  const expRingSegs = expenseCatsList.map((c) => ({ ...c, color: colorByName(c.name, EXP_COLORS) })).filter(s => s.amount > 0);
+  const incRingSegs = incomeCatsList.map((c, i) => ({ ...c, color: colorByName(c.name, INC_COLORS, i) })).filter(s => s.amount > 0);
+  const expRingSegs = expenseCatsList.map((c, i) => ({ ...c, color: colorByName(c.name, EXP_COLORS, i) })).filter(s => s.amount > 0);
   const buildStops = (segs, total) => {
     let acc = 0;
     return segs.map(s => {
@@ -650,7 +642,8 @@ export default function Transactions() {
                       const y = Math.round(Math.sin(rad) * 56);
                       const pct = expenseTotal ? Math.round(s.amount / expenseTotal * 100) : 0;
                       if (pct < 5) return null;
-                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
+                      const dark = ['#D99A00','#F0B300','#FFC700'].indexOf(s.color) >= 0;
+                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:dark?'#fff':'#5b4a00'}}>{pct}%</span>;
                     })}
                     <div className="in">
                       <div className="t">Расходы</div>
@@ -674,8 +667,8 @@ export default function Transactions() {
                 <div className="tx-sub">
                   {incomeCatsList.map((c, i) => (
                     <div key={i}>
-                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, INC_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
-                      <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:colorByName(c.name, INC_COLORS)}}></i></div>
+                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, INC_COLORS, i)}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
+                      <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:colorByName(c.name, INC_COLORS, i)}}></i></div>
                     </div>
                   ))}
                 </div>
@@ -687,8 +680,8 @@ export default function Transactions() {
                 <div className="tx-sub">
                   {expenseCatsList.map((c, i) => (
                     <div key={i}>
-                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, EXP_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
-                      <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:colorByName(c.name, EXP_COLORS)}}></i></div>
+                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, EXP_COLORS, i)}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
+                      <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:colorByName(c.name, EXP_COLORS, i)}}></i></div>
                     </div>
                   ))}
                 </div>
