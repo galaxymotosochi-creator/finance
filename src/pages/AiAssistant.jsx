@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { getReport, getWeeklyReport, getTopProducts, getZeroStock, getForecast, downloadExcel } from '../lib/aiActions';
 import { getCurrencySymbol } from '../lib/currency';
+import Atlas from '../components/Atlas';
 
 
 // ===== ДЕЙСТВИЯ AI (из AiChat.jsx) =====
@@ -101,6 +102,8 @@ export default function AiAssistant() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mood, setMood] = useState('calm');
+  const moodTimer = useRef(null);
   const listRef = useRef(null);
   const fileRef = useRef(null);
 
@@ -108,20 +111,34 @@ export default function AiAssistant() {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages]);
 
+  // Эмоции Атласа: радость/грусть держим ~2с, затем спокойный
+  const flashMood = (m, ms) => {
+    if (moodTimer.current) clearTimeout(moodTimer.current);
+    setMood(m);
+    moodTimer.current = setTimeout(() => setMood('calm'), ms || 2000);
+  };
+  // Слушает, когда есть текст в поле
+  useEffect(() => {
+    if (loading) return;
+    setMood(input.trim() ? 'listen' : 'calm');
+  }, [input, loading]);
+
   // Быстрый отчет
   const handleQuickReport = async (id) => {
     const fn = REPORT_ACTIONS[id];
     if (!fn) return;
     setMessages(p => [...p, { role: 'user', text: QUICK_BUTTONS.find(b => b.id === id)?.label || 'Отчет', data: null }]);
-    setLoading(true);
+    setLoading(true); setMood('think');
     try {
       const result = await fn(user);
       const text = typeof result === 'string' ? result : result.text;
       const table = result?.table || null;
       const title = result?.title || '';
       setMessages(p => [...p, { role: 'assistant', text, data: { table, title } }]);
+      flashMood('joy', 2000);
     } catch (e) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка: ' + e.message, data: null }]);
+      flashMood('sad', 2500);
     }
     setLoading(false);
   };
@@ -132,7 +149,7 @@ export default function AiAssistant() {
     const userMsg = input.trim();
     setInput('');
     setMessages(p => [...p, { role: 'user', text: userMsg, data: null }]);
-    setLoading(true);
+    setLoading(true); setMood('think');
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
@@ -152,8 +169,10 @@ export default function AiAssistant() {
         }
       }
       setMessages(p => [...p, { role: 'assistant', text: reply, data: null }]);
+      flashMood(/^❌/.test(reply) ? 'sad' : 'joy', 2200);
     } catch (err) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка соединения с сервером', data: null }]);
+      flashMood('sad', 2500);
     }
     setLoading(false);
   };
@@ -163,7 +182,7 @@ export default function AiAssistant() {
     const file = e.target.files?.[0];
     if (!file) return;
     setMessages(p => [...p, { role: 'user', text: `📸 ${file.name}`, data: null }]);
-    setLoading(true);
+    setLoading(true); setMood('think');
     try {
       const b64 = await new Promise((res, rej) => {
         const r = new FileReader();
@@ -176,11 +195,14 @@ export default function AiAssistant() {
       });
       if (error || !analysis?.text) {
         setMessages(p => [...p, { role: 'assistant', text: '❌ Не удалось обработать фото', data: null }]);
+        flashMood('sad', 2500);
       } else {
         setMessages(p => [...p, { role: 'assistant', text: analysis.text, data: null }]);
+        flashMood('joy', 2200);
       }
     } catch (err) {
       setMessages(p => [...p, { role: 'assistant', text: '❌ Ошибка: ' + err.message, data: null }]);
+      flashMood('sad', 2500);
     }
     setLoading(false);
     e.target.value = '';
@@ -193,60 +215,28 @@ export default function AiAssistant() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: 'var(--font)' }}>
       
-      {/* Шапка */}
-      <div style={{ marginBottom: '1rem' }}>
-        <h1 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>🤖 AI помощник</h1>
-        <div className="sub" style={{ fontSize: '.8rem', color: 'var(--muted)', marginTop: '.2rem' }}>
-          Спрашивай, загружай фото, получай отчеты
-        </div>
-      </div>
-
-      {/* Быстрые кнопки */}
-      <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '.75rem' }}>
-        {QUICK_BUTTONS.map(btn => (
-          <button key={btn.id} onClick={() => handleQuickReport(btn.id)} disabled={loading}
-            style={{
-              padding: '.4rem .75rem', fontSize: '.75rem', fontWeight: 500,
-              borderRadius: '100px', border: '1px solid rgba(0,0,0,.1)',
-              background: '#fff', cursor: loading ? 'default' : 'pointer',
-              fontFamily: 'inherit', color: '#555', transition: 'all .15s',
-              whiteSpace: 'nowrap', opacity: loading ? .6 : 1,
-            }}
-            onMouseEnter={e => { if(!loading) e.currentTarget.style.background = '#f5f5f5'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}>
-            {btn.label}
-          </button>
-        ))}
+      {/* Шапка с Атласом */}
+      <div className="ai-hero">
+        <Atlas mood={mood} />
+        <h2>Привет! Я Атлас</h2>
+        <p>Ваш помощник по бизнесу. Задайте мне вопрос!</p>
+        <div className="ai-status"><span className="live"></span>Онлайн</div>
       </div>
 
       {/* Чат */}
-      <div ref={listRef} style={{
-        flex: 1, minHeight: 0, overflowY: 'auto',
-        background: '#fff', borderRadius: '14px',
-        border: '1px solid rgba(0,0,0,.08)',
-        padding: '1rem', display: 'flex', flexDirection: 'column', gap: '.75rem',
-        marginBottom: '.75rem',
-      }}>
+      <div className="ai-chatbox" ref={listRef}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#999', fontSize: '.85rem' }}>
-            Начните диалог или выберите быстрый отчет 👆
+            Задайте мне вопрос — и я отвечу по вашим цифрам
           </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} style={{
-            maxWidth: '85%', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-          }}>
-            <div style={{
-              padding: '.6rem .85rem', borderRadius: '12px', fontSize: '.82rem', lineHeight: 1.5,
-              background: m.role === 'user' ? '#ffdd2d' : '#f5f5f5',
-              color: m.role === 'user' ? '#000' : '#333',
-              borderBottomRightRadius: m.role === 'user' ? '4px' : '12px',
-              borderBottomLeftRadius: m.role === 'user' ? '12px' : '4px',
-              whiteSpace: 'pre-wrap',
-            }}>
+          <div key={i} className={'ai-msg ' + (m.role === 'user' ? 'me' : 'bot')}>
+            <div className={'ai-av ' + (m.role === 'user' ? 'user' : 'bot')}>{m.role === 'user' ? 'Ю' : 'A'}</div>
+            <div className="ai-bub">
               {m.text}
             </div>
-
+            <div style={{display:'flex',flexDirection:'column'}}>
             {/* Кнопка Excel если есть таблица */}
             {m.data?.table && (
               <div style={{ marginTop: '.4rem' }}>
@@ -261,11 +251,13 @@ export default function AiAssistant() {
                 </button>
               </div>
             )}
+            </div>
           </div>
         ))}
         {loading && (
-          <div style={{ alignSelf: 'flex-start', padding: '.6rem .85rem', borderRadius: '12px', background: '#f5f5f5', color: '#999', fontSize: '.82rem' }}>
-            Печатает...
+          <div className="ai-msg bot">
+            <div className="ai-av bot">A</div>
+            <div className="ai-bub" style={{ color: '#8b93a3' }}>Атлас думает…</div>
           </div>
         )}
       </div>

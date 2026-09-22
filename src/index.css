@@ -1617,3 +1617,96 @@ input:focus, select:focus, textarea:focus {
 .toast-v2-title-ok{color:#166534}
 /* Раскрытая легенда: плавное появление */
 .tx-legend-wrap{margin-top:16px;transition:opacity .18s ease}
+
+/* ======== ATLAS — робот-помощник AI ======== */
+@keyframes atlasFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes atlasBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes atlasBlink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+@keyframes atlasFastBlink{0%,78%,100%{transform:scaleY(1)}84%{transform:scaleY(.1)}88%{transform:scaleY(1)}92%{transform:scaleY(.15)}}
+@keyframes atlasGlow{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.85;filter:brightness(1.4)}}
+@keyframes atlasRing{0%{transform:scale(.72);opacity:.6}100%{transform:scale(1.4);opacity:0}}
+@keyframes atlasSweep{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}
+@keyframes atlasWobble{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes atlasHop{0%,100%{transform:translateY(0)}30%{transform:translateY(-13px)}55%{transform:translateY(0)}}
+@keyframes atlasLean{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(3deg)}}
+
+.atlas{display:inline-block;line-height:0}
+.atlas-stage{position:relative;width:170px;height:150px;display:flex;align-items:center;justify-content:center}
+.atlas-halo{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid rgba(29,120,252,.22);animation:atlasRing 3.4s ease-out infinite}
+.atlas-halo2{animation-delay:1.7s}
+.atlas-shadow{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:90px;height:16px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.25),transparent 70%);filter:blur(2px);transition:all .3s}
+.atlas-float{position:relative;animation:atlasFloat 4s ease-in-out infinite}
+.atlas-body{position:relative;animation:atlasBreathe 3.6s ease-in-out infinite}
+.atlas-head{width:96px;height:80px;border-radius:28px;position:relative;
+  background:linear-gradient(160deg,#fff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);border:2px solid #a9bad4;
+  box-shadow:0 14px 24px -14px rgba(11,18,32,.5),inset 0 -8px 16px rgba(120,145,185,.32),inset 0 6px 12px rgba(255,255,255,.9);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transition:filter .3s}
+.atlas-visor{width:62px;height:32px;border-radius:12px;background:linear-gradient(165deg,#0b1a33,#0d4ea8 60%,#1d78fc);
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.6),0 0 18px rgba(29,120,252,.6);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;transition:all .3s}
+.atlas-visor:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.45) 0%,transparent 45%)}
+.atlas-eye{width:11px;height:11px;border-radius:50%;background:#bff0ff;box-shadow:0 0 11px #9ff0ff;animation:atlasBlink 4.4s infinite;transition:all .3s}
+.atlas-eye:nth-child(2){animation-delay:.1s}
+.atlas-mouth{width:28px;height:5px;border-radius:5px;background:linear-gradient(90deg,#cdd9ea,#8899b3);transition:all .3s}
+.atlas-ear{position:absolute;top:24px;width:9px;height:24px;border-radius:6px;background:linear-gradient(180deg,#dbe4f2,#aebfd8);border:1px solid #a3b4cf;transition:all .3s}
+.atlas-ear-l{left:-10px}.atlas-ear-r{right:-10px}
+.atlas-ant{position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:2.5px;height:16px;background:linear-gradient(#c3cee0,#8fa3c2);transition:all .3s}
+.atlas-ant:after{content:"";position:absolute;top:-9px;left:-5px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c4,var(--yellow));box-shadow:0 0 14px rgba(255,221,45,.95);animation:atlasGlow 1.8s infinite;transition:all .3s}
+.atlas-torso-row{position:relative;display:flex;justify-content:center}
+.atlas-torso{width:74px;height:40px;border-radius:18px;margin-top:6px;position:relative;
+  background:linear-gradient(160deg,#f6f9ff,#d5e0f1 60%,#bccce4);border:2px solid #aab9d3;
+  box-shadow:inset 0 -6px 12px rgba(120,145,185,.32),inset 0 5px 10px rgba(255,255,255,.85);transition:all .3s}
+.atlas-torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe98a,var(--yellow));box-shadow:0 0 13px rgba(255,221,45,.9);transition:all .3s}
+.atlas-arm{position:absolute;top:10px;width:12px;height:32px;border-radius:7px;background:linear-gradient(180deg,#e6ecf7,#c0cde2);border:2px solid #aab9d3;transition:all .3s}
+.atlas-arm-l{left:-18px;transform:rotate(8deg)}.atlas-arm-r{right:-18px;transform:rotate(-8deg)}
+.atlas-gloss{position:absolute;inset:0;overflow:hidden;border-radius:30px;pointer-events:none}
+.atlas-gloss:after{content:"";position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);animation:atlasSweep 4.5s ease-in-out infinite}
+.atlas-think-dots{position:absolute;top:-6px;right:-16px;font-size:15px;font-weight:800;color:#1d78fc;opacity:0;transition:opacity .3s;letter-spacing:1px}
+
+/* эмоции */
+.atlas.atlas-think .atlas-float{animation:atlasWobble 1s ease-in-out infinite}
+.atlas.atlas-think .atlas-eye{width:16px;height:6px;border-radius:3px;animation:atlasFastBlink 1.3s infinite}
+.atlas.atlas-think .atlas-ant:after{animation-duration:.7s}
+.atlas.atlas-think .atlas-think-dots{opacity:1;animation:atlasFloat 1.2s ease-in-out infinite}
+
+.atlas.atlas-joy .atlas-float{animation:atlasHop 1.15s ease-in-out infinite}
+.atlas.atlas-joy .atlas-head{filter:brightness(1.06)}
+.atlas.atlas-joy .atlas-eye{width:15px;height:9px;border-radius:9px 9px 2px 2px;background:#d8f6ff;box-shadow:0 0 15px #9ff0ff}
+.atlas.atlas-joy .atlas-mouth{width:26px;height:11px;border-radius:0 0 18px 18px;background:#3a4a63}
+.atlas.atlas-joy .atlas-arm-l{transform:rotate(28deg)}
+.atlas.atlas-joy .atlas-arm-r{transform:rotate(-28deg)}
+.atlas.atlas-joy .atlas-ant:after{background:radial-gradient(circle at 35% 30%,#d4ffdc,#22c55e);box-shadow:0 0 20px rgba(34,197,94,.95)}
+.atlas.atlas-joy .atlas-torso:after{width:24px;height:24px;background:radial-gradient(circle at 35% 30%,#d4ffdc,#22c55e);box-shadow:0 0 20px rgba(34,197,94,.95)}
+.atlas.atlas-joy .atlas-halo{border-color:rgba(255,221,45,.55)}
+
+.atlas.atlas-sad .atlas-float{animation:atlasFloat 7s ease-in-out infinite}
+.atlas.atlas-sad .atlas-head{filter:saturate(.6) brightness(.94)}
+.atlas.atlas-sad .atlas-eye{background:#8fb6d8;box-shadow:0 0 8px #7fa8cc;transform:translateY(3px)}
+.atlas.atlas-sad .atlas-mouth{width:24px;height:10px;border-radius:16px 16px 0 0;background:#8fa0b8}
+.atlas.atlas-sad .atlas-ear{transform:translateY(3px)}
+.atlas.atlas-sad .atlas-ant:after{background:radial-gradient(circle at 35% 30%,#d8dde6,#8c97a8);box-shadow:0 0 8px rgba(140,151,168,.6);opacity:.6}
+.atlas.atlas-sad .atlas-torso:after{background:radial-gradient(circle at 35% 30%,#e2e6ee,#98a2b3);box-shadow:0 0 8px rgba(152,162,179,.6)}
+.atlas.atlas-sad .atlas-halo{border-color:rgba(140,150,170,.3);animation-duration:5.5s}
+
+.atlas.atlas-listen .atlas-float{animation:atlasLean 2s ease-in-out infinite}
+.atlas.atlas-listen .atlas-eye{width:14px;height:14px;background:#d8f6ff;box-shadow:0 0 17px #9ff0ff}
+.atlas.atlas-listen .atlas-mouth{width:22px;height:8px;border-radius:6px;background:#5b6b85}
+
+/* зона робота в шапке AI */
+.ai-hero{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 20px 14px;background:linear-gradient(180deg,#f4f8ff 0%,#fff 100%);border-bottom:1px solid rgba(29,120,252,.14);border-radius:16px 16px 0 0}
+.ai-hero h2{font-size:18px;margin:8px 0 3px;font-weight:800}
+.ai-hero p{font-size:12.5px;color:var(--sk-muted);margin:0}
+.ai-status{display:inline-flex;align-items:center;gap:7px;background:#E6F0FF;color:#0d4ea8;border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:700;margin-top:8px}
+.ai-status .live{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 8px #16a34a;animation:atlasGlow 1.8s infinite}
+.ai-chatbox{flex:1;min-height:0;overflow-y:auto;background:#fff;border:1px solid rgba(29,120,252,.14);border-top:none;border-radius:0 0 16px 16px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;margin-bottom:.75rem}
+.ai-msg{display:flex;gap:9px;max-width:88%}
+.ai-msg.me{align-self:flex-end;flex-direction:row-reverse}
+.ai-av{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800}
+.ai-av.bot{background:linear-gradient(135deg,#1d78fc,#0d4ea8);color:#fff}
+.ai-av.user{background:#e8ecf4;color:#5b6472}
+.ai-bub{padding:10px 13px;border-radius:15px;font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+.ai-msg.bot .ai-bub{background:#f7f9fc;color:#1f2b3d;border-top-left-radius:5px}
+.ai-msg.me .ai-bub{background:linear-gradient(135deg,#1d78fc,#0d4ea8);color:#fff;border-top-right-radius:5px}
+.ai-inputrow{display:flex;gap:9px;align-items:center;border:1.5px solid rgba(29,120,252,.14);border-radius:999px;padding:6px 6px 6px 16px;background:#fff;transition:border-color .15s,box-shadow .15s;flex:none}
+.ai-inputrow:focus-within{border-color:#1d78fc;box-shadow:0 2px 14px rgba(29,120,252,.18)}
+.ai-inputrow input[type=text]{border:none;outline:none;flex:1;font-size:12.5px;font-family:inherit;background:none}
+.ai-hint{text-align:center;font-size:10.5px;color:var(--sk-muted);margin-top:7px}
