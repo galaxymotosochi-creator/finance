@@ -223,23 +223,25 @@ export default function Transactions() {
   const expenseCatsList = buildCatBreakdown(txExpenseList, expenseTotal);
   const txProfit = Math.max(0, incomeTotal - expenseTotal);
   const txMargin = incomeTotal > 0 ? Math.round(Math.max(0, incomeTotal - expenseTotal) / incomeTotal * 100) : 0;
-  // Палитра категорий: каждый сегмент круга — свой цвет, чтобы структура читалась
-  const CAT_COLORS = [
-    '#1F75FF', '#00B8A9', '#FF6B6B', '#FFB300', '#8E7CFF',
-    '#00A3FF', '#2ED47A', '#FF8A3D', '#E052C4', '#12B5CB',
-    '#F45B69', '#7A5AF8', '#0d4ea8', '#61C454', '#FFC700',
-  ];
-  // Доходы и расходы идут по общей палитре, но начинают с разных сторон,
-  // чтобы соседние сегменты не сливались
-  const INC_COLORS = CAT_COLORS;
-  const EXP_COLORS = CAT_COLORS.slice().reverse();
-  // Цвет привязан к ИМЕНИ категории (хэш) — одна категория всегда одного цвета
-  const colorByName = (nm, arr) => {
+  // Палитры для круга. Доходы и расходы — РАЗНЫЕ наборы, чтобы сегменты
+  // никогда не совпали цветом. Внутри группы — по индексу, без повторов.
+  const INC_COLORS = ['#1F75FF', '#00B8A9', '#FF6B6B', '#FFB300', '#8E7CFF', '#00A3FF', '#2ED47A', '#FF8A3D', '#E052C4', '#12B5CB'];
+  const EXP_COLORS = ['#F45B69', '#7A5AF8', '#0d4ea8', '#61C454', '#FFC700', '#FF8A3D', '#E052C4', '#12B5CB', '#7A5AF8', '#F45B69'];
+  // Цвет: сначала по имени (стабильность между фильтрами), затем — сдвиг,
+  // если цвет уже занят другим сегментом в этом же круге.
+  const usedColors = new Set();
+  const pickColor = (nm, arr) => {
     let h = 0;
     const str = String(nm || '');
     for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-    return arr[h % arr.length];
+    let idx = h % arr.length;
+    for (let k = 0; k < arr.length; k++) {
+      const c = arr[(idx + k) % arr.length];
+      if (!usedColors.has(c)) { usedColors.add(c); return c; }
+    }
+    return arr[idx];
   };
+  const colorByName = (nm, arr) => pickColor(nm, arr);
   const txRingSegs = [
     ...incomeCatsList.map((c) => ({ ...c, color: colorByName(c.name, INC_COLORS), side: 'inc' })),
     ...expenseCatsList.map((c) => ({ ...c, color: colorByName(c.name, EXP_COLORS), side: 'exp' })),
@@ -623,8 +625,8 @@ export default function Transactions() {
                 return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
               })}
               <div className="in">
-                <div className="t">{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : 'Прибыль'}</div>
-                <div className="v">{centerVal >= 0 ? '+' : ''}{centerVal.toLocaleString()} {cur}</div>
+                <div className="t">{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : (centerVal >= 0 ? 'Прибыль' : 'Убыток')}</div>
+                <div className="v">{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</div>
               </div>
             </div>
             <div className={'tx-legend' + (txRingOpen ? '' : ' tx-collapse')}>
