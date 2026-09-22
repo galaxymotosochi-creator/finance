@@ -1710,3 +1710,13 @@ input:focus, select:focus, textarea:focus {
 .ai-inputrow:focus-within{border-color:#1d78fc;box-shadow:0 2px 14px rgba(29,120,252,.18)}
 .ai-inputrow input[type=text]{border:none;outline:none;flex:1;font-size:12.5px;font-family:inherit;background:none}
 .ai-hint{text-align:center;font-size:10.5px;color:var(--sk-muted);margin-top:7px}
+
+/* Окно раздела AI: рамка с тенью + три точки */
+.ai-window{display:flex;flex-direction:column;flex:1;min-height:0;background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:20px;overflow:hidden;box-shadow:0 26px 56px -28px rgba(11,18,32,.45)}
+.ai-topbar{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid rgba(29,120,252,.14);background:#fbfcff;flex:none}
+.ai-topbar .tdot{width:9px;height:9px;border-radius:50%}
+.ai-topbar .tdot.r{background:#ff6058}
+.ai-topbar .tdot.y{background:#ffbd2e}
+.ai-topbar .tdot.g{background:#28c840}
+.ai-topbar-t{margin-left:8px;font-size:12px;font-weight:700;color:#5b6472}
+.ai-hero{border-radius:0}

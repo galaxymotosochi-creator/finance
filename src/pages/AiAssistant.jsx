@@ -215,6 +215,13 @@ export default function AiAssistant() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: 'var(--font)' }}>
       
+      {/* Окно раздела: рамка с тенью + шапка с тремя точками */}
+      <div className="ai-window">
+      <div className="ai-topbar">
+        <i className="tdot r"></i><i className="tdot y"></i><i className="tdot g"></i>
+        <span className="ai-topbar-t">AI помощник</span>
+      </div>
+
       {/* Шапка с Атласом */}
       <div className="ai-hero">
         <Atlas mood={mood} />
@@ -298,6 +305,7 @@ export default function AiAssistant() {
           }}>
           ➤
         </button>
+      </div>
       </div>
     </div>
   );
