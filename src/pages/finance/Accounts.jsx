@@ -85,10 +85,28 @@ export default function Accounts() {
     if (max <= 4) { setTblPos({ left:false, right:false }); return; }
     setTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
   };
+  // Вторая таблица (владелец/прибыль) — своя подсказка скролла
+  const [ownerTblPos, setOwnerTblPos] = useState({left:false, right:false});
+  const ownerTblRef = useRef(null);
+  const onOwnerTblScroll = (e) => {
+    const el = e.currentTarget;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setOwnerTblPos({ left:false, right:false }); return; }
+    setOwnerTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
+  const checkOwnerTbl = () => {
+    const el = ownerTblRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 4) { setOwnerTblPos({ left:false, right:false }); return; }
+    setOwnerTblPos({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+  };
   useEffect(() => {
     const t = setTimeout(checkTbl, 120);
+    const t2 = setTimeout(checkOwnerTbl, 180);
     window.addEventListener('resize', checkTbl);
-    return () => { clearTimeout(t); window.removeEventListener('resize', checkTbl); };
+    window.addEventListener('resize', checkOwnerTbl);
+    return () => { clearTimeout(t); clearTimeout(t2); window.removeEventListener('resize', checkTbl); window.removeEventListener('resize', checkOwnerTbl); };
   });
   useEffect(() => {
     if (toast) {
@@ -521,7 +539,10 @@ export default function Accounts() {
           </div>
 
           {/* ВТОРАЯ ТАБЛИЦА: собственные средства и выплата прибыли */}
-          <div className="acct-owner-card">
+          <div className="sk-tablewrap acct-owner-card">
+            <div className="sk-fade sk-fade-l" style={{opacity:ownerTblPos.left?1:0}}></div>
+            <div className="sk-fade sk-fade-r" style={{opacity:ownerTblPos.right?1:0}} data-arrow="top"></div>
+          <div className="sk-card" style={{overflowY:'auto',overflowX:'auto',WebkitOverflowScrolling:'touch',minHeight:0}} ref={ownerTblRef} onScroll={onOwnerTblScroll}>
             <table className="sk-table">
               <thead>
                 <tr>
@@ -591,6 +612,7 @@ export default function Accounts() {
                 )}
               </tbody>
             </table>
+          </div>
           </div>
           </div>
         </>
