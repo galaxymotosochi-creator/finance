@@ -353,10 +353,11 @@ export default function Accounts() {
   // Общий баланс: начальный остаток + транзакции по каждому счету (по id, а не по type)
   var balById = {};
   (transactions||[]).forEach(t => {
-    if (!balById[t.account_id]) balById[t.account_id] = 0;
-    balById[t.account_id] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
+    var key = String(t.account_id);
+    if (!balById[key]) balById[key] = 0;
+    balById[key] += Number(t.amount||0) * (t.type === 'income' ? 1 : -1);
   });
-  var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[a.id]||0), 0);
+  var total = accounts.reduce((s,a) => s + (parseFloat(a.balance)||0) + (balById[String(a.id)]||0), 0);
   const balOfId = (id) => { const a = accounts.find(x => String(x.id) === String(id)); return a ? Math.round(getBal(a)) : 0; };
 
   useEffect(() => {
@@ -440,7 +441,7 @@ export default function Accounts() {
           {/* Круг: структура денег по счетам (% от общего баланса) */}
           {(() => {
             const COLORS=['#1F75FF','#4a92ff','#74aefe','#a9c8ff','#cfe2ff','#0d4ea8'];
-            const vals = sorted.map(a => Math.max(0, (parseFloat(a.balance)||0) + (balById[a.id]||0)));
+            const vals = sorted.map(a => Math.max(0, (parseFloat(a.balance)||0) + (balById[String(a.id)]||0)));
             const sum = vals.reduce((x,y)=>x+y,0) || 1;
             let acc = 0;
             const stops = vals.map((v,i) => {
