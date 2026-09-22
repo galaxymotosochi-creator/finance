@@ -1615,3 +1615,5 @@ input:focus, select:focus, textarea:focus {
 .toast-v2-sub{font-size:.74rem;font-weight:600;color:#DC2626;line-height:1.2}
 @media(max-width:520px){.toast-v2{left:1rem;right:1rem;max-width:none;justify-content:center}}
 .toast-v2-title-ok{color:#166534}
+/* Раскрытая легенда: плавное появление */
+.tx-legend-wrap{margin-top:16px;transition:opacity .18s ease}
