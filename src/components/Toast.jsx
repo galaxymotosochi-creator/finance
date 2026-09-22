@@ -66,7 +66,9 @@ export default function Toast({ message, onDone, duration = 3500 }) {
           {text && <div className="toast-v2-title">{text}</div>}
           <div className="toast-v2-sub">Повторите попытку</div>
         </div>
-      ) : null}
+      ) : (
+        text ? <div className="toast-v2-body"><div className="toast-v2-title toast-v2-title-ok">{text}</div></div> : null
+      )}
     </div>
   );
 }

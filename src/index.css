@@ -1614,3 +1614,4 @@ input:focus, select:focus, textarea:focus {
 .toast-v2-title{font-size:.82rem;font-weight:600;color:#111;line-height:1.25}
 .toast-v2-sub{font-size:.74rem;font-weight:600;color:#DC2626;line-height:1.2}
 @media(max-width:520px){.toast-v2{left:1rem;right:1rem;max-width:none;justify-content:center}}
+.toast-v2-title-ok{color:#166534}
