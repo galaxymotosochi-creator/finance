@@ -1585,3 +1585,18 @@ input:focus, select:focus, textarea:focus {
 
 /* Доходы и расходы: строка Итого под заголовками (как в Счетах) */
 .sk-table tbody.sk-total-body td{background:var(--sk-soft);font-weight:700;color:var(--sk-ink);border-bottom:none;padding-top:10px;padding-bottom:10px;font-size:.82rem}
+
+/* Доходы и расходы: два круга рядом */
+.tx-rings{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.tx-ring-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.tx-ring-r{position:relative}
+.tx-ring-cap{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--sk-muted)}
+.tx-ring-totals{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid rgba(29,120,252,.12)}
+.tx-ring-totals > span{font-size:12.5px;color:var(--sk-muted)}
+.tx-ring-totals > span b{font-size:13.5px;margin-left:4px}
+.tx-ring-totals .ttl-inc b{color:#0d4ea8}
+.tx-ring-totals .ttl-exp b{color:#c0392b}
+.tx-ring-totals .ttl-prof b{color:#12864a}
+.tx-ring-totals .ttl-loss b{color:#c0392b}
+.tx-legend-wrap{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.tx-legend-col{flex:1;min-width:240px;max-width:420px}

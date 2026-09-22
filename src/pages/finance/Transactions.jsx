@@ -248,26 +248,23 @@ export default function Transactions() {
     return color;
   };
   const colorByName = (nm, arr) => colorFor(nm, arr);
-  // Итог всего круга — проценты считаем как долю от него (сумма сегментов = 100%)
+  // Итог всего оборота (для строки итогов)
   const ringTotal = incomeTotal + expenseTotal;
-  const txRingSegs = [
-    ...incomeCatsList.map((c) => ({ ...c, color: colorByName(c.name, INC_COLORS), side: 'inc' })),
-    ...expenseCatsList.map((c) => ({ ...c, color: colorByName(c.name, EXP_COLORS), side: 'exp' })),
-  ].filter(s => s.amount > 0);
-  // Дуги круга: доходы занимают свои 100% (половина круга), расходы — свои 100% (вторая половина).
-  // Внутри каждой группы сегменты нормируются на её итог — «одна категория дохода» = 100% группы.
-  const txIncDeg = incomeTotal > 0 && expenseTotal > 0 ? 180 : incomeTotal > 0 ? 360 : 0;
-  const txExpDeg = expenseTotal > 0 && incomeTotal > 0 ? 180 : expenseTotal > 0 ? 360 : 0;
-  let txAccDeg = 0;
-  const txRingStops = txRingSegs.map(s => {
-    const span = s.side === 'inc'
-      ? (incomeTotal ? s.amount / incomeTotal : 0) * txIncDeg
-      : (expenseTotal ? s.amount / expenseTotal : 0) * txExpDeg;
-    const from = txAccDeg / 360 * 100;
-    txAccDeg += span;
-    const to = txAccDeg / 360 * 100;
-    return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
-  }).join(', ');
+  // Два отдельных круга: каждый = 100% своей группы
+  const incRingSegs = incomeCatsList.map((c) => ({ ...c, color: colorByName(c.name, INC_COLORS) })).filter(s => s.amount > 0);
+  const expRingSegs = expenseCatsList.map((c) => ({ ...c, color: colorByName(c.name, EXP_COLORS) })).filter(s => s.amount > 0);
+  const buildStops = (segs, total) => {
+    let acc = 0;
+    return segs.map(s => {
+      const span = total ? (s.amount / total) * 360 : 0;
+      const from = acc / 360 * 100;
+      acc += span;
+      const to = acc / 360 * 100;
+      return s.color + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%';
+    }).join(', ');
+  };
+  const incRingStops = buildStops(incRingSegs, incomeTotal);
+  const expRingStops = buildStops(expRingSegs, expenseTotal);
   const sales = txs.filter(t => t && t.type === 'sale' && !isTransfer(t) && !isOwner(t));
   const avgCheck = sales.length ? Math.round(sales.reduce((s, t) => s + (Number(t.amount) || 0), 0) / sales.length) : 0;
   const balanceTotal = accs.reduce((s, a) => s + (accBalance[a.id] || 0), 0);
@@ -615,54 +612,88 @@ export default function Transactions() {
 
       {!loading && (
         <div className="tx-card">
-          <div className="tx-ring-block">
-            <div className="tx-ring" style={{background: txRingStops ? 'conic-gradient(' + txRingStops + ')' : '#eef4ff'}}>
-              {txRingSegs.map((s, i) => {
-                const total = s.side === 'inc' ? incomeTotal : expenseTotal;
-                const spanDeg = total ? (s.amount / total) * (s.side === 'inc' ? txIncDeg : txExpDeg) : 0;
-                const beforeDeg = txRingSegs.slice(0, i).reduce((x, y) => {
-                  const t = y.side === 'inc' ? incomeTotal : expenseTotal;
-                  return x + (t ? (y.amount / t) * (y.side === 'inc' ? txIncDeg : txExpDeg) : 0);
-                }, 0);
-                const ang = (beforeDeg + spanDeg / 2) - 90;
-                const rad = ang * Math.PI / 180;
-                const x = Math.round(Math.cos(rad) * 56);
-                const y = Math.round(Math.sin(rad) * 56);
-                const pct = ringTotal ? Math.round(s.amount / ringTotal * 100) : 0;
-                if (pct < 5) return null;   // мелкие категории — без плашки
-                return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
-              })}
-              <div className="in">
-                <div className="t">{typeFilter === 'income' ? 'Доходы' : typeFilter === 'expense' ? 'Расходы' : (centerVal >= 0 ? 'Прибыль' : 'Убыток')}</div>
-                <div className="v">{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</div>
-              </div>
-            </div>
-            <div className={'tx-legend' + (txRingOpen ? '' : ' tx-collapse')}>
-              {typeFilter !== 'expense' && <>
-              <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#1F75FF'}}></span>Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
-              <div className="tx-sub">
-                {incomeCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет доходов за период</div>}
-                {incomeCatsList.map((c, i) => (
-                  <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, INC_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{ringTotal ? Math.round(c.amount / ringTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(ringTotal ? c.amount / ringTotal * 100 : 0) + '%', background:colorByName(c.name, INC_COLORS)}}></i></div>
+          <div className="tx-rings">
+            {typeFilter !== 'expense' && (
+              <div className="tx-ring-col">
+                <div className="tx-ring-r">
+                  <div className="tx-ring" style={{background: incRingStops ? 'conic-gradient(' + incRingStops + ')' : '#eef4ff'}}>
+                    {incRingSegs.map((s, i) => {
+                      const spanDeg = incomeTotal ? (s.amount / incomeTotal) * 360 : 0;
+                      const beforeDeg = incRingSegs.slice(0, i).reduce((x, y) => x + (incomeTotal ? (y.amount / incomeTotal) * 360 : 0), 0);
+                      const ang = (beforeDeg + spanDeg / 2) - 90;
+                      const rad = ang * Math.PI / 180;
+                      const x = Math.round(Math.cos(rad) * 56);
+                      const y = Math.round(Math.sin(rad) * 56);
+                      const pct = incomeTotal ? Math.round(s.amount / incomeTotal * 100) : 0;
+                      if (pct < 5) return null;
+                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
+                    })}
+                    <div className="in">
+                      <div className="t">Доходы</div>
+                      <div className="v">+{incomeTotal.toLocaleString()} {cur}</div>
+                    </div>
                   </div>
-                ))}
+                </div>
+                <div className="tx-ring-cap">Доходы</div>
               </div>
-              </>}
-              {typeFilter !== 'income' && <>
-              <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#ffcf2e'}}></span>Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
-              <div className="tx-sub">
-                {expenseCatsList.length === 0 && <div style={{fontSize:'.78rem',color:'var(--sk-muted)'}}>Нет расходов за период</div>}
-                {expenseCatsList.map((c, i) => (
-                  <div key={i}>
-                    <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, EXP_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{ringTotal ? Math.round(c.amount / ringTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
-                    <div className="tx-leg-bar"><i style={{width:(ringTotal ? c.amount / ringTotal * 100 : 0) + '%', background:colorByName(c.name, EXP_COLORS)}}></i></div>
+            )}
+            {typeFilter !== 'income' && (
+              <div className="tx-ring-col">
+                <div className="tx-ring-r">
+                  <div className="tx-ring" style={{background: expRingStops ? 'conic-gradient(' + expRingStops + ')' : '#eef4ff'}}>
+                    {expRingSegs.map((s, i) => {
+                      const spanDeg = expenseTotal ? (s.amount / expenseTotal) * 360 : 0;
+                      const beforeDeg = expRingSegs.slice(0, i).reduce((x, y) => x + (expenseTotal ? (y.amount / expenseTotal) * 360 : 0), 0);
+                      const ang = (beforeDeg + spanDeg / 2) - 90;
+                      const rad = ang * Math.PI / 180;
+                      const x = Math.round(Math.cos(rad) * 56);
+                      const y = Math.round(Math.sin(rad) * 56);
+                      const pct = expenseTotal ? Math.round(s.amount / expenseTotal * 100) : 0;
+                      if (pct < 5) return null;
+                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
+                    })}
+                    <div className="in">
+                      <div className="t">Расходы</div>
+                      <div className="v">−{expenseTotal.toLocaleString()} {cur}</div>
+                    </div>
                   </div>
-                ))}
+                </div>
+                <div className="tx-ring-cap">Расходы</div>
               </div>
-              </>}
-            </div>
+            )}
+          </div>
+          <div className="tx-ring-totals">
+            <span className="ttl-inc">Доходы <b>+{incomeTotal.toLocaleString()} {cur}</b></span>
+            <span className="ttl-exp">Расходы <b>−{expenseTotal.toLocaleString()} {cur}</b></span>
+            <span className={centerVal >= 0 ? 'ttl-prof' : 'ttl-loss'}>{centerVal >= 0 ? 'Прибыль' : 'Убыток'} <b>{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</b></span>
+          </div>
+          <div className="tx-legend-wrap">
+            {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
+              <div className="tx-legend-col">
+                <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#1F75FF'}}></span>Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
+                <div className="tx-sub">
+                  {incomeCatsList.map((c, i) => (
+                    <div key={i}>
+                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, INC_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
+                      <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:colorByName(c.name, INC_COLORS)}}></i></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {typeFilter !== 'income' && expenseCatsList.length > 0 && (
+              <div className="tx-legend-col">
+                <div className="tx-grp-h"><span className="dot" style={{width:'11px',height:'11px',borderRadius:'3px',background:'#ffcf2e'}}></span>Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
+                <div className="tx-sub">
+                  {expenseCatsList.map((c, i) => (
+                    <div key={i}>
+                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, EXP_COLORS)}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
+                      <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:colorByName(c.name, EXP_COLORS)}}></i></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           {(incomeCatsList.length > 2 || expenseCatsList.length > 2) && (
             <div className="tx-toggle-row">
