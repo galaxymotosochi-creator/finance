@@ -246,12 +246,13 @@ export default function Transactions() {
   ].filter(s => s.amount > 0);
   // Дуги круга: доходы занимают свои 100% (половина круга), расходы — свои 100% (вторая половина).
   // Внутри каждой группы сегменты нормируются на её итог — «одна категория дохода» = 100% группы.
-  const txIncDeg = (incomeTotal > 0 && expenseTotal > 0) ? 180 : 360;
+  const txIncDeg = incomeTotal > 0 && expenseTotal > 0 ? 180 : incomeTotal > 0 ? 360 : 0;
+  const txExpDeg = expenseTotal > 0 && incomeTotal > 0 ? 180 : expenseTotal > 0 ? 360 : 0;
   let txAccDeg = 0;
   const txRingStops = txRingSegs.map(s => {
     const span = s.side === 'inc'
       ? (incomeTotal ? s.amount / incomeTotal : 0) * txIncDeg
-      : (expenseTotal ? s.amount / expenseTotal : 0) * (360 - txIncDeg);
+      : (expenseTotal ? s.amount / expenseTotal : 0) * txExpDeg;
     const from = txAccDeg / 360 * 100;
     txAccDeg += span;
     const to = txAccDeg / 360 * 100;
@@ -608,10 +609,10 @@ export default function Transactions() {
             <div className="tx-ring" style={{background: txRingStops ? 'conic-gradient(' + txRingStops + ')' : '#eef4ff'}}>
               {txRingSegs.map((s, i) => {
                 const total = s.side === 'inc' ? incomeTotal : expenseTotal;
-                const spanDeg = total ? (s.amount / total) * (s.side === 'inc' ? txIncDeg : (360 - txIncDeg)) : 0;
+                const spanDeg = total ? (s.amount / total) * (s.side === 'inc' ? txIncDeg : txExpDeg) : 0;
                 const beforeDeg = txRingSegs.slice(0, i).reduce((x, y) => {
                   const t = y.side === 'inc' ? incomeTotal : expenseTotal;
-                  return x + (t ? (y.amount / t) * (y.side === 'inc' ? txIncDeg : (360 - txIncDeg)) : 0);
+                  return x + (t ? (y.amount / t) * (y.side === 'inc' ? txIncDeg : txExpDeg) : 0);
                 }, 0);
                 const ang = (beforeDeg + spanDeg / 2) - 90;
                 const rad = ang * Math.PI / 180;
