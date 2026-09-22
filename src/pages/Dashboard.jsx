@@ -65,6 +65,7 @@ export default function Dashboard() {
   // Дата в шапке — по выбранному периоду (для «своёго» — диапазон, для «дня» — одна дата)
   const fmtRu = (d) => String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
   const headDate = (() => {
+    if (period === 'all') return '';
     const r = getDateRange();
     const f = new Date((r.from === '2000-01-01' ? locStr(new Date()) : r.from) + 'T00:00:00');
     const t = new Date((r.to === '2999-12-31' ? locStr(new Date()) : r.to) + 'T00:00:00');
@@ -328,28 +329,22 @@ export default function Dashboard() {
         (recItems || []).forEach(i => { const n = i.product_name || 'Товар'; if (!top[n]) top[n] = { qty: 0, rev: 0 }; top[n].qty += i.quantity || 0; top[n].rev += i.total || 0; });
         const topProducts = Object.entries(top).sort((a, b) => b[1].rev - a[1].rev).slice(0, 3).map(([n, v]) => ({ name: n, qty: v.qty, rev: v.rev }));
 
-        // Прогноз кассы на конец месяца: текущая касса + средний дневной поток до конца месяца
-        const dayOfMonth = now.getDate();
-        const daysInMonthNow = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const daysLeft = Math.max(0, daysInMonthNow - dayOfMonth);
-        const monthIncome = (allTx || []).filter(t => {
-          const dstr = String(t.date || '').slice(0, 10);
-          return dstr >= locStr(new Date(now.getFullYear(), now.getMonth(), 1)) && dstr <= locStr(now);
-        }).reduce((s, t) => {
-          const a = Number(t.amount || 0);
-          const accountIsCash = (accts || []).some(acc => String(acc.id) === String(t.account_id) && acc.type === 'cash_register');
-          if (!accountIsCash) return s;
-          if (t.type === 'income' && !t.kind) return s + a;
-          if (t.type === 'expense' && !t.kind) return s - a;
-          return s;
-        }, 0);
-        const avgCashPerDay = dayOfMonth > 0 ? monthIncome / dayOfMonth : 0;
-        const cashForecast = Math.round(cashBal + avgCashPerDay * daysLeft);
+        // Касса = выручка за выбранный период (чеки + быстрые продажи)
+        const periodRev = (recs || []).reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+        const drDays = (() => {
+          const f = new Date((dr.from === '2000-01-01' ? locStr(new Date()) : dr.from) + 'T00:00:00');
+          const t = new Date((dr.to === '2999-12-31' ? locStr(new Date()) : dr.to) + 'T00:00:00');
+          return Math.max(1, Math.round((t - f) / 86400000) + 1);
+        })();
+        // Прогноз: выручка за отработанные дни / кол-во дней × 30. Показываем при периоде ≥ 3 дней
+        const showForecast = drDays >= 3;
+        const cashForecast = showForecast ? Math.round(periodRev / drDays * 30) : 0;
+        const periodRevTotal = periodRev;
 
         if (!alive) return;
         setData({
           rev, exp, profit: rev - exp, salesRev, cogs,
-          cashBal, bankBal, totalCash, acctList, cashForecast,
+          cashBal, bankBal, totalCash, acctList, cashForecast, showForecast, periodRevTotal,
           debt, debtors: debtClients || [], totalClients, repeatClients,
           deficit, stockCost, stockRetail, stockPositions, lowStockCount,
           bars, barsTotal, barsMax, barsTitle, cmp,
@@ -432,7 +427,7 @@ export default function Dashboard() {
       <div className="dash-head">
         <div>
           <h1>Панель управления</h1>
-          <div className="dash-date">{headDate}</div>
+          {headDate ? <div className="dash-date">{headDate}</div> : null}
         </div>
         <div className="dash-spacer" />
         <div className="sk-period-wrap" ref={periodWrapRef} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
@@ -506,9 +501,13 @@ export default function Dashboard() {
       {/* KPI */}
       <div className="kpis">
         <div className="kpi">
-          <div className="k-lbl">Касса сейчас</div>
-          <div className="k-val">{(d.cashBal || 0).toLocaleString('ru-RU')} {cur}</div>
-          <div className={'k-sub ' + (d.cashForecast >= d.cashBal ? 'ok' : 'warn')}>прогноз {(d.cashForecast || 0).toLocaleString('ru-RU')} {cur}</div>
+          <div className="k-lbl">Касса</div>
+          <div className="k-val">{(d.periodRevTotal || 0).toLocaleString('ru-RU')} {cur}</div>
+          {d.showForecast ? (
+            <div className='k-sub ok'>прогноз за месяц {(d.cashForecast || 0).toLocaleString('ru-RU')} {cur}</div>
+          ) : (
+            <div className="k-sub">выручка за период</div>
+          )}
         </div>
         <div className="kpi">
           <div className="k-lbl">На счетах</div>
@@ -523,7 +522,7 @@ export default function Dashboard() {
         <div className="kpi yellow">
           <div className="k-lbl">Товарный запас</div>
           <div className="k-val">{(d.stockCost || 0).toLocaleString('ru-RU')} {cur}</div>
-          <div className={'k-sub ' + ((d.lowStockCount || 0) > 0 ? 'warn' : 'ok')}>{(d.lowStockCount || 0) > 0 ? `${d.lowStockCount} ${d.lowStockCount === 1 ? 'позиция' : (d.lowStockCount < 5 ? 'позиции' : 'позиций')} ниже минимума` : 'все позиции в норме'}</div>
+          <div className={'k-sub ' + ((d.lowStockCount || 0) > 0 ? 'warn' : 'ok')}>{(d.lowStockCount || 0) > 0 ? `${d.lowStockCount} ${d.lowStockCount === 1 ? 'позиция' : (d.lowStockCount < 5 ? 'позиции' : 'позиций')} пора закупать` : 'все позиции в норме'}</div>
         </div>
       </div>
 
