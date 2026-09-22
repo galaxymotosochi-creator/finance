@@ -97,7 +97,7 @@ const QUICK_BUTTONS = [
 export default function AiAssistant() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([{ role: 'assistant', text: '👋 Привет! Я Атлас. Чем могу помочь?', data: null, greeting: true }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [mood, setMood] = useState('calm');
@@ -121,7 +121,11 @@ export default function AiAssistant() {
           .order('created_at', { ascending: true })
           .limit(300);
         if (!alive) return;
-        setMessages((data || []).map(m => ({ role: m.role, text: m.text, data: m.data || null })));
+        if (data && data.length > 0) {
+          setMessages(data.map(m => ({ role: m.role, text: m.text, data: m.data || null })));
+        } else {
+          setMessages([{ role: 'assistant', text: '👋 Привет! Я Атлас. Чем могу помочь?', data: null, greeting: true }]);
+        }
       } catch (e) { /* тихо */ }
     })();
     return () => { alive = false; };
@@ -147,7 +151,7 @@ export default function AiAssistant() {
     if (!window.confirm('Очистить всю историю переписки с Атласом?')) return;
     try {
       await supabase.from('ai_messages').delete().eq('user_id', user.id);
-      setMessages([]);
+      setMessages([{ role: 'assistant', text: '👋 Привет! Я Атлас. Чем могу помочь?', data: null, greeting: true }]);
       setToast && setToast('История очищена');
     } catch (e) { /* тихо */ }
   };
@@ -202,7 +206,7 @@ export default function AiAssistant() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMsg,
-          history: messages.filter(m => m.role !== 'system').slice(-10).map(m => ({ role: m.role, text: m.text })),
+          history: messages.filter(m => m.role !== 'system' && !m.greeting).slice(-10).map(m => ({ role: m.role, text: m.text })),
         }),
       });
       const data = await res.json();
@@ -287,12 +291,6 @@ export default function AiAssistant() {
 
       {/* Чат */}
       <div className="ai-chatbox" ref={listRef}>
-        {messages.length === 0 && (
-          <div className="ai-msg bot">
-            <div className="ai-av bot">A</div>
-            <div className="ai-bub">👋 Привет! Чем могу помочь?</div>
-          </div>
-        )}
         {messages.map((m, i) => (
           <div key={i} className={'ai-msg ' + (m.role === 'user' ? 'me' : 'bot')}>
             <div className={'ai-av ' + (m.role === 'user' ? 'user' : 'bot')}>{m.role === 'user' ? 'Ю' : 'A'}</div>
