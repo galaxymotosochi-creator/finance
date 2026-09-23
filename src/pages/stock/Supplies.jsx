@@ -522,6 +522,7 @@ const load = async () => {
             <tr>
               <th style={{textAlign:'left'}}>№</th>
               <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left'}}>Время</th>
               <th style={{textAlign:'left'}}>Поставщик</th>
               <th style={{textAlign:'left'}}>Товары</th>
               <th style={{textAlign:'left'}}>Поставка</th>
@@ -533,7 +534,7 @@ const load = async () => {
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="10"><div className="sk-empty"><p>Список поставок пуст</p><p>Оформите первое поступление товаров от поставщика</p></div></td></tr>
+              <tr><td colSpan="11"><div className="sk-empty"><p>Список поставок пуст</p><p>Оформите первое поступление товаров от поставщика</p></div></td></tr>
             ) : supplies.filter(s => {
               if (supFilter.size > 0 && !supFilter.has(s.supplier_name || '')) return false;
               if (period !== 'all') {
@@ -571,7 +572,8 @@ const load = async () => {
                 <>
                 <tr key={s.id} onClick={function(e){if(!e.target.closest('span')&&!e.target.closest('.prod-more-wrap'))setExpandedId(s.id === expandedId ? null : s.id)}} style={{cursor:'pointer'}}>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',whiteSpace:'nowrap'}}>{i + 1}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T'),d=sp[0].split('-'),t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]+(t?', '+t:'')}catch(e){return s.date}})()}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var d=s.date.split('T')[0].split('-');if(d.length!==3)return s.date;var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];return parseInt(d[2])+' '+mn[parseInt(d[1])-1]}catch(e){return s.date}})()}</td>
+                  <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(()=>{if(!s.date)return'—';try{var sp=s.date.split('T');var t=sp[1]?sp[1].split(':').slice(0,2).join(':'):'';return t||'—'}catch(e){return'—'}})()}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}><span className="prod-cat">{s.supplier_name||'—'}{s.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem',maxWidth:'160px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(s.items||[]).map(it=>it.name).join(', ') || '—'}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
@@ -608,7 +610,7 @@ const load = async () => {
                   const payStatus = getPayStatus(s);
                   return (
                     <tr>
-                      <td colSpan="10" style={{padding:0}}>
+                      <td colSpan="11" style={{padding:0}}>
                         <div style={{margin:"8px 0",background:"#fff",borderRadius:"14px",padding:"14px 16px",boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #f0f0f0"}}>
                           <div style={{display:"flex",color:"#222",fontWeight:400,paddingBottom:"6px",marginBottom:"8px",borderBottom:"1px solid #f0f0f0"}}>
                             <span style={{flex:1}}>ТОВАР</span>
