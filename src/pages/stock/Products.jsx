@@ -752,7 +752,6 @@ export default function Products() {
           <button className="sk-dd-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
 
 
 

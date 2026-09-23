@@ -533,7 +533,6 @@ export default function Transactions() {
           </div>
         </div>
       </div>
-      <div className="nav-sep" style={{ margin: '.25rem 0', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       {/* Панель фильтров — одна капсула, как в «Чеках» */}
       <div className="sk-search" style={{display:'flex',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',padding:'5px 6px 5px 14px'}}
