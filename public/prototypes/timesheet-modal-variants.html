@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Табель — модалка статусов: 5 вариантов</title>
+<style>
+  :root{
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --blue:#1F75FF; --blue-dark:#0d4ea8;
+    --ink:#111; --muted:#98a1b0; --muted2:#5b6472;
+    --border:#eef1f6; --soft:#f6f9ff;
+    --green:#16a34a; --green-bg:#f0fdf4; --green-bd:#bbf7d0;
+    --red:#dc2626; --red-bg:#fef2f2; --red-bd:#fecaca;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 18px 80px;font-family:var(--font);background:#f4f7fc;color:var(--ink)}
+  .page-title{max-width:1160px;margin:0 auto 6px;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .page-sub{max-width:1160px;margin:0 auto 26px;font-size:13px;color:var(--muted2)}
+  .grid{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:22px}
+  .card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:16px;padding:18px;box-shadow:0 8px 20px -14px rgba(29,120,252,.35)}
+  .card h3{margin:0 0 3px;font-size:15px;font-weight:800}
+  .card .hint{margin:0 0 14px;font-size:11.5px;color:var(--muted2)}
+
+  /* общая модальная «шапка» */
+  .m-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .m-title{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .m-sub{font-size:11.5px;color:var(--muted2);margin-top:2px}
+  .m-x{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--muted2);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  .sec{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#fafbfe;border-bottom:1px solid var(--border)}
+  .sec-title{font-size:12.5px;font-weight:700}
+  .sec-body{padding:10px 12px}
+
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .name{font-size:12.5px;font-weight:500;min-width:118px}
+  select,input{font-family:var(--font);font-size:12px;border:1.5px solid var(--border);border-radius:9px;padding:6px 9px;outline:none;background:#fff;color:var(--ink)}
+  select:focus,input:focus{border-color:#c7dbff}
+  input[type=number]{width:86px}
+
+  .btn-save{border:none;border-radius:9999px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-family:var(--font);font-size:12.5px;font-weight:700;padding:11px 26px;cursor:pointer;box-shadow:0 12px 26px -12px rgba(29,120,252,.8)}
+  .btn-save.grey{background:#e8e8ec;color:#555;box-shadow:none}
+
+  /* ============ ВАРИАНТ 1 — Чистые строки (минимализм) ============ */
+  .v1 .emp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid #f4f6fa}
+  .v1 .emp-row:last-child{border-bottom:none}
+  .v1 .pill-status{font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--soft);color:var(--blue-dark)}
+
+  /* ============ ВАРИАНТ 2 — Карточки сотрудников ============ */
+  .v2 .emp-card{display:flex;align-items:center;gap:11px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;margin-bottom:7px}
+  .v2 .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  /* ============ ВАРИАНТ 3 — Плитка статусов ============ */
+  .v3 .chip-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #f4f6fa}
+  .v3 .chip{font-size:11px;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted2);cursor:pointer}
+  .v3 .chip.on{background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-color:transparent;color:#fff;box-shadow:0 6px 14px -8px rgba(29,120,252,.9)}
+
+  /* ============ ВАРИАНТ 4 — Жёлтый акцент (фирменный) ============ */
+  .v4 .top{background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+  .v4 .top .t{font-size:13px;font-weight:800}
+  .v4 .top .s{font-size:11.5px;color:#6b6b4a;margin-top:2px}
+  .v4 .sec-head{background:#fffbeb;border-bottom:1px solid #fde68a}
+  .v4 .total{display:flex;justify-content:space-between;background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:12px;padding:10px 13px;font-size:12.5px;font-weight:700;margin-bottom:12px}
+
+  /* ============ ВАРИАНТ 5 — Компактный список с иконками ============ */
+  .v5 .icon-row{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:8px 11px;margin-bottom:7px}
+  .v5 .ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--soft)}
+  .v5 .sec-head{background:#fff}
+  .v5 .money-row{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+</style>
+</head>
+<body>
+
+<div class="page-title">Модалка «Статусы сотрудников» — 5 вариантов</div>
+<div class="page-sub">Нажмите на день в календаре Табеля — сейчас открывается вот такая форма. Ниже 5 вариантов её дизайна в стиле сайта. Все поля сохранены: статусы, бонусы, штрафы, итог, «Сохранить».</div>
+
+<div class="grid">
+
+  <!-- ================= ВАРИАНТ 1 ================= -->
+  <div class="card v1">
+    <h3>Вариант 1 — Минимализм: чистые строки</h3>
+    <p class="hint">Сотрудники списком, разделители вместо рамок. Статус — пилюлей справа. Легко и чисто.</p>
+    <div class="m-head">
+      <div><div class="m-title">23.09.2026</div><div class="m-sub">Статусы сотрудников и события дня</div></div>
+      <button class="m-x">×</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Статусы сотрудников</span></div>
+      <div class="sec-body">
+        <div class="emp-row"><span class="name">Юлия Валерьевна</span>
+          <select><option>Работал</option><option>Больничный</option><option>Отпуск</option><option>Прогул</option><option>Удаленка</option></select>
+        </div>
+        <div class="emp-row"><span class="name">Ильнур</span>
+          <select><option>Удаленка</option><option>Работал</option><option>Больничный</option></select>
+        </div>
+        <div class="emp-row"><span class="name">Денис</span>
+          <select><option>Работал</option><option>Отпуск</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--green)">Бонусы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+          <input type="number" value="3000" placeholder="Сумма">
+          <input type="text" value="За смену" placeholder="За что" style="flex:1">
+          <span style="color:var(--green);font-weight:700;font-size:12px;white-space:nowrap">+3 000 ₽</span>
+        </div>
+        <div class="row" style="opacity:.6">
+          <select style="flex:1"><option value="">Сотрудник</option></select>
+          <input type="number" placeholder="Сумма">
+          <input type="text" placeholder="За что" style="flex:1">
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--red)">Штрафы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+          <input type="number" value="500" placeholder="Сумма">
+          <input type="text" value="Опоздание" placeholder="За что" style="flex:1">
+          <span style="color:var(--red);font-weight:700;font-size:12px;white-space:nowrap">−500 ₽</span>
+        </div>
+        <div class="row" style="opacity:.6">
+          <select style="flex:1"><option value="">Сотрудник</option></select>
+          <input type="number" placeholder="Сумма">
+          <input type="text" placeholder="За что" style="flex:1">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;background:#f8f9fa;border-radius:11px;padding:10px 13px;font-size:12.5px;margin-bottom:12px">
+      <span>Бонусов: <b style="color:var(--green)">3 000 ₽</b></span>
+      <span>Штрафов: <b style="color:var(--red)">500 ₽</b></span>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn-save">Сохранить</button></div>
+  </div>
+
+  <!-- ================= ВАРИАНТ 2 ================= -->
+  <div class="card v2">
+    <h3>Вариант 2 — Карточки сотрудников с аватарами</h3>
+    <p class="hint">Каждый сотрудник — карточкой. Круг с инициалом, имя, статус. Живо и наглядно.</p>
+    <div class="m-head">
+      <div><div class="m-title">23.09.2026</div><div class="m-sub">Статусы сотрудников и события дня</div></div>
+      <button class="m-x">×</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Статусы сотрудников</span></div>
+      <div class="sec-body">
+        <div class="emp-card"><span class="avatar">ЮВ</span><span class="name" style="flex:1">Юлия Валерьевна</span>
+          <select><option>Работал</option><option>Отпуск</option></select>
+        </div>
+        <div class="emp-card"><span class="avatar">ИЛ</span><span class="name" style="flex:1">Ильнур</span>
+          <select><option>Удаленка</option><option>Работал</option></select>
+        </div>
+        <div class="emp-card"><span class="avatar">ДЕ</span><span class="name" style="flex:1">Денис</span>
+          <select><option>Работал</option><option>Больничный</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--green)">Бонусы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+          <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+          <span style="color:var(--green);font-weight:700;font-size:12px;white-space:nowrap">+3 000 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--red)">Штрафы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+          <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+          <span style="color:var(--red);font-weight:700;font-size:12px;white-space:nowrap">−500 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;background:#f8f9fa;border-radius:11px;padding:10px 13px;font-size:12.5px;margin-bottom:12px">
+      <span>Бонусов: <b style="color:var(--green)">3 000 ₽</b></span>
+      <span>Штрафов: <b style="color:var(--red)">500 ₽</b></span>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn-save">Сохранить</button></div>
+  </div>
+
+  <!-- ================= ВАРИАНТ 3 ================= -->
+  <div class="card v3">
+    <h3>Вариант 3 — Плитка статусов (чипы в один клик)</h3>
+    <p class="hint">Статус выбирается не списком, а нажатием на цветную пилюлю. Быстрее всего отмечать день.</p>
+    <div class="m-head">
+      <div><div class="m-title">23.09.2026</div><div class="m-sub">Статусы сотрудников и события дня</div></div>
+      <button class="m-x">×</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Статусы сотрудников</span></div>
+      <div class="sec-body">
+        <div class="chip-row" style="border-top:none">
+          <span class="name" style="min-width:110px">Юлия В.</span>
+          <span class="chip on">Работал</span><span class="chip">Больничный</span><span class="chip">Отпуск</span><span class="chip">Прогул</span><span class="chip">Удаленка</span>
+        </div>
+        <div class="chip-row">
+          <span class="name" style="min-width:110px">Ильнур</span>
+          <span class="chip">Работал</span><span class="chip">Больничный</span><span class="chip">Отпуск</span><span class="chip">Прогул</span><span class="chip on">Удаленка</span>
+        </div>
+        <div class="chip-row">
+          <span class="name" style="min-width:110px">Денис</span>
+          <span class="chip on">Работал</span><span class="chip">Больничный</span><span class="chip">Отпуск</span><span class="chip">Прогул</span><span class="chip">Удаленка</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--green)">Бонусы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+          <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+          <span style="color:var(--green);font-weight:700;font-size:12px;white-space:nowrap">+3 000 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--red)">Штрафы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+          <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+          <span style="color:var(--red);font-weight:700;font-size:12px;white-space:nowrap">−500 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;background:#f8f9fa;border-radius:11px;padding:10px 13px;font-size:12.5px;margin-bottom:12px">
+      <span>Бонусов: <b style="color:var(--green)">3 000 ₽</b></span>
+      <span>Штрафов: <b style="color:var(--red)">500 ₽</b></span>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn-save">Сохранить</button></div>
+  </div>
+
+  <!-- ================= ВАРИАНТ 4 ================= -->
+  <div class="card v4">
+    <h3>Вариант 4 — Фирменный жёлтый акцент</h3>
+    <p class="hint">Шапка и итог в жёлтом градиенте сайта. Даты/суммы заметны сразу, стиль AtlasPos узнаваем.</p>
+    <div class="top">
+      <div class="t">23.09.2026</div>
+      <div class="s">Статусы сотрудников и события дня</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Статусы сотрудников</span></div>
+      <div class="sec-body">
+        <div class="row"><span class="name">Юлия Валерьевна</span>
+          <select style="flex:1"><option>Работал</option><option>Отпуск</option></select></div>
+        <div class="row"><span class="name">Ильнур</span>
+          <select style="flex:1"><option>Удаленка</option><option>Работал</option></select></div>
+        <div class="row" style="margin-bottom:0"><span class="name">Денис</span>
+          <select style="flex:1"><option>Работал</option><option>Больничный</option></select></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title" style="color:var(--green)">Бонусы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+          <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+          <span style="color:var(--green);font-weight:700;font-size:12px;white-space:nowrap">+3 000 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" style="border-color:#fde68a">
+      <div class="sec-head"><span class="sec-title" style="color:var(--red)">Штрафы</span></div>
+      <div class="sec-body">
+        <div class="row">
+          <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+          <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+          <span style="color:var(--red);font-weight:700;font-size:12px;white-space:nowrap">−500 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="total">
+      <span>Бонусов: 3 000 ₽</span><span>Штрафов: 500 ₽</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn-save">Сохранить</button></div>
+  </div>
+
+  <!-- ================= ВАРИАНТ 5 ================= -->
+  <div class="card v5">
+    <h3>Вариант 5 — Компактные карточки с иконками</h3>
+    <p class="hint">Сотрудник — карточка с иконкой статуса, бонусы/штрафы — цветные блоки. Самый «приложенческий» вид.</p>
+    <div class="m-head">
+      <div><div class="m-title">23.09.2026</div><div class="m-sub">Статусы сотрудников и события дня</div></div>
+      <button class="m-x">×</button>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Статусы сотрудников</span></div>
+      <div class="sec-body">
+        <div class="icon-row"><span class="ico">✅</span><span class="name" style="flex:1">Юлия Валерьевна</span>
+          <select><option>Работал</option><option>Отпуск</option></select></div>
+        <div class="icon-row"><span class="ico">🏠</span><span class="name" style="flex:1">Ильнур</span>
+          <select><option>Удаленка</option><option>Работал</option></select></div>
+        <div class="icon-row"><span class="ico">✅</span><span class="name" style="flex:1">Денис</span>
+          <select><option>Работал</option><option>Больничный</option></select></div>
+      </div>
+    </div>
+
+    <div class="sec" style="border-color:var(--green-bd)">
+      <div class="sec-head" style="background:var(--green-bg);border-bottom:1px solid var(--green-bd)">
+        <span class="sec-title" style="color:var(--green)">Бонусы</span></div>
+      <div class="sec-body">
+        <div class="money-row">
+          <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+          <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+          <span style="color:var(--green);font-weight:700;font-size:12px;white-space:nowrap">+3 000 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" style="border-color:var(--red-bd)">
+      <div class="sec-head" style="background:var(--red-bg);border-bottom:1px solid var(--red-bd)">
+        <span class="sec-title" style="color:var(--red)">Штрафы</span></div>
+      <div class="sec-body">
+        <div class="money-row">
+          <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+          <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+          <span style="color:var(--red);font-weight:700;font-size:12px;white-space:nowrap">−500 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;background:#f8f9fa;border-radius:11px;padding:10px 13px;font-size:12.5px;margin-bottom:12px">
+      <span>Бонусов: <b style="color:var(--green)">3 000 ₽</b></span>
+      <span>Штрафов: <b style="color:var(--red)">500 ₽</b></span>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn-save">Сохранить</button></div>
+  </div>
+
+</div>
+</body>
+</html>

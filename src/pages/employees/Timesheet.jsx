@@ -187,6 +187,12 @@ export default function Timesheet() {
   const getEntry = (empId, dateStr) => entries.find(e => e.employee_id === empId && e.date && e.date.startsWith(dateStr));
 
   const isToday = (d) => d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+  // Прошлые дни месяца — как в Акциях (не подсвечиваются)
+  const isPast = (d) => {
+    const dt = new Date(year, month, d);
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return dt < t;
+  };
   const fmtDate = (ds) => { if (!ds) return ''; const p = ds.split('-'); return p.length === 3 ? p[2] + '.' + p[1] : ds; };
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
@@ -336,7 +342,7 @@ export default function Timesheet() {
                 if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
                 const stat = getDayStat(d);
                 return (
-                  <div key={d} className={'day' + (isToday(d) ? ' today' : '') + (stat.hasEntries && !isToday(d) ? ' has-entries' : '')} onClick={() => openDay(d)}>
+                  <div key={d} className={'day' + (isToday(d) ? ' today' : '') + (stat.hasEntries && !isToday(d) ? ' has-entries' : '') + (isPast(d) && !stat.hasEntries && !isToday(d) ? ' other' : '')} onClick={() => openDay(d)}>
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
                       {stat.dots.map((c, idx) => <span key={idx} style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:c}} />)}
