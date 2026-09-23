@@ -665,6 +665,15 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(17, 17, 17, .08) !important;
   outline: none;
 }
+/* Поля внутри поисковых пилюль: серая рамка при фокусе не нужна — рамка уже у самой пилюли */
+.nav-search input:focus,
+.sk-search input:focus,
+.stock-search input:focus,
+.cat-dd-search input:focus,
+.kassa-search input:focus {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
 
 /* ======== ТАБЛИЦЫ ======== */
 .data-table,

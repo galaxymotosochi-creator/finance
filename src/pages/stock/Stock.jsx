@@ -605,13 +605,11 @@ export default function Stock() {
 
       <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
 
-            <div className="stock-search" style={{display:'inline-flex',alignItems:'center',gap:'.4rem',marginBottom:'.6rem',border:'1px solid '+(initSearchFocus?'#111':'#e2e2e6'),borderRadius:'100px',padding:'5px 12px',background:'#fff',boxShadow:initSearchFocus?'0 2px 8px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+            <div className="sk-search" style={{display:'flex',width:'100%',marginBottom:'.6rem'}}
               onFocus={()=>setInitSearchFocus(true)} onBlur={()=>setInitSearchFocus(false)}>
-              <span style={{display:'flex',color:initSearchFocus?'#111':'#999',transition:'color .15s'}}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{flexShrink:0}}><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
               <input type="text" placeholder="Поиск товара" value={initSearch} onChange={e=>setInitSearch(e.target.value)}
-                style={{border:'none',outline:'none',width:'110px',fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
+                style={{border:'none',outline:'none',flex:1,minWidth:0,fontSize:'.8rem',fontFamily:'var(--font)',background:'none',padding:0}} />
             </div>
 
             <div style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.25rem .5rem .35rem',borderBottom:'1px solid var(--border)'}}>
