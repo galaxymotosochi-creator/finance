@@ -587,8 +587,6 @@ const load = async () => {
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString()}₽</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString() + '₽' : '—'}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <span onClick={() => setExpandedId(s.id === expandedId ? null : s.id)}
-                      style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>Детали</span>
                     <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
                       <button className="sk-more" onClick={(e) => {
                         e.stopPropagation();
