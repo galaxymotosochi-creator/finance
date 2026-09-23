@@ -330,14 +330,13 @@ export default function Timesheet() {
               <div className="promo-cal-month">{MONTHS[month]} {year}</div>
               <button className="promo-cal-nav" onClick={nextMonth}>›</button>
             </div>
-            <div className="promo-cal-grid" style={{gap:'4px'}}>
-              {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd" style={{fontSize:'.68rem',fontWeight:600,color:'#98a1b0',paddingBottom:'.35rem'}}>{w}</div>)}
+            <div className="promo-cal-grid">
+              {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => <div key={w} className="wd">{w}</div>)}
               {days.map((d, i) => {
                 if (!d) return <div key={'e' + i} className="day other">&nbsp;</div>;
                 const stat = getDayStat(d);
                 return (
-                  <div key={d} className={'day' + (isToday(d) ? ' today' : '')} onClick={() => openDay(d)}
-                    style={{padding:'.45rem .2rem',borderRadius:'10px',fontSize:'.8125rem',...((stat.hasEntries && !isToday(d)) ? {background:'#f0fdf4'} : {})}}>
+                  <div key={d} className={'day' + (isToday(d) ? ' today' : '') + (stat.hasEntries && !isToday(d) ? ' has-entries' : '')} onClick={() => openDay(d)}>
                     {d}
                     <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
                       {stat.dots.map((c, idx) => <span key={idx} style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:c}} />)}
@@ -346,9 +345,9 @@ export default function Timesheet() {
                 );
               })}
             </div>
-            <div className="promo-cal-legend" style={{display:'flex',gap:'14px',marginTop:'10px',paddingTop:'10px',borderTop:'1px solid #f0f3f8',fontSize:'.75rem',color:'#5b6472'}}>
-              <span style={{display:'flex',alignItems:'center',gap:'5px'}}><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#16a34a'}} /> Бонус</span>
-              <span style={{display:'flex',alignItems:'center',gap:'5px'}}><span style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#dc2626'}} /> Штраф</span>
+            <div className="promo-cal-legend" style={{borderTop:'1px solid #f0f3f8',paddingTop:'10px',marginTop:'10px'}}>
+              <span><span className="promo-dot" style={{background:'#16a34a'}}></span> Бонус</span>
+              <span><span className="promo-dot" style={{background:'#dc2626'}}></span> Штраф</span>
             </div>
           </div>
 
