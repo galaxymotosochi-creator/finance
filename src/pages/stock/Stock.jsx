@@ -72,7 +72,7 @@ const STOCK_COL_LABELS = { name:'Товар', sku:'Артикул', barcode:'Ш�
 const getStockCols = () => {
   const def = new Set(STOCK_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('stockCols');
-  if (saved) { const set = new Set(JSON.parse(saved)); def.forEach(id => set.add(id)); return set; }
+  if (saved) { try { return new Set(JSON.parse(saved)); } catch (e) { return def; } }
   return def;
 };
 const setStockCols = (set) => localStorage.setItem('stockCols', JSON.stringify([...set]));

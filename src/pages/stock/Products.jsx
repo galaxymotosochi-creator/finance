@@ -103,10 +103,7 @@ const getCols = () => {
   const def = new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('productsCols');
   if (saved) {
-    // Добавляем новые колонки по умолчанию (например, «Мин. цена») к сохраненным настройкам
-    const set = new Set(JSON.parse(saved));
-    def.forEach(id => set.add(id));
-    return set;
+    try { return new Set(JSON.parse(saved)); } catch (e) { return def; }
   }
   return def;
 };
