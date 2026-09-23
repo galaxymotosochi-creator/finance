@@ -185,9 +185,16 @@ export default function Promos() {
 
   return (
     <>
-      <div className="page-header">
-        <div><h1 style={{fontSize:'1.2rem',fontWeight:600,margin:0}}>Акции</h1><div className="sub">Управление специальными предложениями и скидками</div></div>
-        <div className="page-actions"><button className="btn btn-dark" onClick={openAdd} style={{padding:'.5rem .9rem',fontWeight:600,borderRadius:'10px'}}>Добавить акцию</button></div>
+      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+        <div className="grow" style={{minWidth:0}}>
+          <div style={{display:'flex',alignItems:'center'}}>
+            <h1>Акции</h1>
+          </div>
+          <div className="sub" style={{maxWidth:'280px'}}>Управление специальными предложениями и скидками</div>
+        </div>
+        <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
+          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+        </div>
       </div>
 
       <div className="promo-calendar-wrap">
@@ -235,7 +242,7 @@ export default function Promos() {
             </div>
             <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
             <div className="prod-more-wrap">
-              <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
+              <button className="sk-more" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
               <div className="prod-dropdown">
                 <button onClick={function(e){e.stopPropagation();openEdit(p)}}>Редактировать</button>
                 <button onClick={function(e){e.stopPropagation();del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
