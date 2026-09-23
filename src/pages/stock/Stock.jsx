@@ -534,20 +534,6 @@ export default function Stock() {
                 </tr>
               );
             })}
-            {items.length > 0 && (
-              <tr className="total-row">
-                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>Итого:</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalQty}</td>
-                <td></td>
-                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalCost.toLocaleString()}</td>
-                <td></td>
-                <td></td>
-                <td style={{fontWeight:500,fontSize:'.78rem',color:'#222',textAlign:'left'}}>{totalRetail.toLocaleString()}</td>
-              </tr>
-            )}
           </tbody>
         </table>
         </div>
