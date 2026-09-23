@@ -513,12 +513,11 @@ export default function Timesheet() {
       {/* МОДАЛКА ДНЯ */}
       <Modal open={showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="Статусы сотрудников и события дня" width="wide">
 
-            <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',borderBottom:'1px solid var(--border)'}}>
-                <span style={{fontSize:'.82rem',fontWeight:600}}>Статусы сотрудников</span>
-                <span style={{fontSize:'.6rem',color:'var(--muted)'}}>▼</span>
+            <div style={{border:'1px solid var(--border)',borderRadius:'14px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.55rem .75rem',background:'#fafbfe',borderBottom:'1px solid var(--border)'}}>
+                <span style={{fontSize:'.82rem',fontWeight:700}}>Статусы сотрудников</span>
               </div>
-              <div style={{padding:'.5rem .65rem'}}>
+              <div style={{padding:'.6rem .75rem'}}>
                 {employees.map(emp => (
                   <div key={emp.id} style={{display:'flex',alignItems:'center',gap:'.5rem',marginBottom:'.35rem'}}>
                     <span style={{fontSize:'.82rem',minWidth:'120px',fontWeight:500}}>{emp.name}</span>
@@ -532,12 +531,11 @@ export default function Timesheet() {
               </div>
             </div>
 
-            <div style={{border:'1px solid #bbf7d0',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f0fdf4',borderBottom:'1px solid #bbf7d0'}}>
-                <span style={{fontSize:'.82rem',fontWeight:600,color:'#16a34a'}}>Бонусы</span>
-                <span style={{fontSize:'.6rem',color:'#16a34a'}}>▼</span>
+            <div style={{border:'1px solid #bbf7d0',borderRadius:'14px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.55rem .75rem',background:'#fafbfe',borderBottom:'1px solid #bbf7d0'}}>
+                <span style={{fontSize:'.82rem',fontWeight:700,color:'#16a34a'}}>Бонусы</span>
               </div>
-              <div style={{padding:'.5rem .65rem'}}>
+              <div style={{padding:'.6rem .75rem'}}>
                 {bonusRows.map((row, idx) => {
                   const isLast = idx === bonusRows.length - 1;
                   const hasValue = row.empId && row.amount;
@@ -561,12 +559,11 @@ export default function Timesheet() {
               </div>
             </div>
 
-            <div style={{border:'1px solid #fecaca',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#fef2f2',borderBottom:'1px solid #fecaca'}}>
-                <span style={{fontSize:'.82rem',fontWeight:600,color:'#dc2626'}}>Штрафы</span>
-                <span style={{fontSize:'.6rem',color:'#dc2626'}}>▼</span>
+            <div style={{border:'1px solid #fecaca',borderRadius:'14px',overflow:'hidden',marginBottom:'.65rem'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.55rem .75rem',background:'#fafbfe',borderBottom:'1px solid #fecaca'}}>
+                <span style={{fontSize:'.82rem',fontWeight:700,color:'#dc2626'}}>Штрафы</span>
               </div>
-              <div style={{padding:'.5rem .65rem'}}>
+              <div style={{padding:'.6rem .75rem'}}>
                 {deductRows.map((row, idx) => {
                   const isLast = idx === deductRows.length - 1;
                   const hasValue = row.empId && row.amount;
