@@ -598,8 +598,8 @@ export default function Stock() {
 
       <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow">
         <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem'}}>
+          <button type="button" onClick={cancelCorrection} style={{padding:'11px 22px',borderRadius:'9999px',border:'none',background:'#e8e8ec',color:'#555',fontWeight:700,fontSize:'12.5px',fontFamily:'inherit',cursor:'pointer'}}>Нет</button>
           <button type="button" className="sk-dd-btn" onClick={confirmCorrection} style={{padding:'11px 22px'}}>Да, откорректировать</button>
-          <button type="button" className="sk-dd-btn" onClick={cancelCorrection} style={{padding:'11px 22px'}}>Нет</button>
         </div>
       </Modal>
 
