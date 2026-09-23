@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Табель — 5 новых модалок статусов</title>
+<style>
+  :root{
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --blue:#1F75FF; --blue-dark:#0d4ea8; --ink:#111; --muted:#98a1b0; --muted2:#5b6472;
+    --border:#eef1f6; --soft:#f6f9ff; --yellow:#ffdd2d;
+    --green:#16a34a; --green-bg:#f0fdf4; --green-bd:#bbf7d0;
+    --red:#dc2626; --red-bg:#fef2f2; --red-bd:#fecaca;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 18px 90px;font-family:var(--font);background:#eef3fa;color:var(--ink)}
+  .pt{max-width:1180px;margin:0 auto 4px;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .ps{max-width:1180px;margin:0 auto 26px;font-size:13px;color:var(--muted2)}
+  .grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(540px,1fr));gap:24px}
+  .card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:18px;padding:18px;box-shadow:0 10px 26px -16px rgba(29,120,252,.45)}
+  .card h3{margin:0 0 3px;font-size:15px;font-weight:800}
+  .card .hint{margin:0 0 16px;font-size:11.5px;color:var(--muted2);line-height:1.5}
+
+  .modal{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}
+  select,input{font-family:var(--font);font-size:12px;border:1.5px solid var(--border);border-radius:9px;padding:6px 9px;outline:none;background:#fff;color:var(--ink)}
+  select:focus,input:focus{border-color:#c7dbff}
+  input[type=number]{width:84px}
+  .save{border:none;border-radius:9999px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-family:var(--font);font-size:12.5px;font-weight:700;padding:11px 28px;cursor:pointer;box-shadow:0 12px 26px -12px rgba(29,120,252,.85)}
+  .sum{color:var(--green);font-weight:700;font-size:12px;white-space:nowrap}
+  .sum.red{color:var(--red)}
+
+  /* ===== 1. БОКОВОЕ МЕНЮ СЛЕВА ===== */
+  .v1{display:flex;min-height:430px}
+  .v1 .side{width:168px;flex-shrink:0;background:linear-gradient(180deg,#f7faff,#eef4ff);border-right:1px solid var(--border);padding:14px 10px}
+  .v1 .side .dt{font-size:12.5px;font-weight:800;padding:0 6px 10px}
+  .v1 .side .sub{font-size:10.5px;color:var(--muted2);padding:0 6px 12px;border-bottom:1px solid var(--border);margin-bottom:10px}
+  .v1 .tab{display:flex;align-items:center;gap:7px;padding:9px 8px;border-radius:10px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;margin-bottom:3px}
+  .v1 .tab.on{background:linear-gradient(135deg,var(--yellow),#fff9db);color:#5c4b00;font-weight:800}
+  .v1 .main{flex:1;padding:16px 18px}
+  .v1 .row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #f4f6fa}
+  .v1 .row:last-child{border-bottom:none}
+
+  /* ===== 2. ДВЕ КОЛОНКИ: ЛЮДИ | ДЕНЬГИ ===== */
+  .v2 .head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .v2 .cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .v2 .col{padding:14px 16px}
+  .v2 .col+.col{border-left:1px solid var(--border)}
+  .v2 .ct{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted2);margin-bottom:12px}
+  .v2 .prow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f4f6fa}
+  .v2 .prow:last-child{border-bottom:none}
+  .v2 .money{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:9px}
+  .v2 .money.b{border-color:var(--green-bd);background:var(--green-bg)}
+  .v2 .money.d{border-color:var(--red-bd);background:var(--red-bg)}
+  .v2 .money .mt{font-size:11px;font-weight:800;margin-bottom:7px}
+  .v2 .foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfe}
+
+  /* ===== 3. ТАЙМЛАЙН / АККОРДЕОН ===== */
+  .v3 .head{padding:14px 18px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff}
+  .v3 .head .t{font-size:15px;font-weight:800}
+  .v3 .head .s{font-size:11px;opacity:.65;margin-top:2px}
+  .v3 .step{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+  .v3 .step:last-of-type{border-bottom:none}
+  .v3 .num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .v3 .num.g{background:var(--green)}
+  .v3 .num.r{background:var(--red)}
+  .v3 .st{font-size:12.5px;font-weight:800;margin-bottom:9px}
+  .v3 .row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .v3 .foot{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;background:#fafbfe;border-top:1px solid var(--border)}
+
+  /* ===== 4. ПЛАВАЮЩИЕ ПИЛЮЛИ-СТАТУСЫ ===== */
+  .v4 .head{padding:16px 18px 10px}
+  .v4 .head .dt{font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .v4 .head .s{font-size:11.5px;color:var(--muted2);margin-top:3px}
+  .v4 .pcard{padding:12px 18px;border-top:1px solid var(--border)}
+  .v4 .pname{font-size:12.5px;font-weight:700;margin-bottom:9px}
+  .v4 .pills{display:flex;flex-wrap:wrap;gap:6px}
+  .v4 .pl{font-size:11px;font-weight:600;padding:6px 13px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--muted2);cursor:pointer;transition:.15s}
+  .v4 .pl.on{background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-color:transparent;color:#fff;box-shadow:0 8px 16px -9px rgba(29,120,252,.95)}
+  .v4 .money{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:#fafbfe}
+  .v4 .foot{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--yellow),#fff9db)}
+
+  /* ===== 5. ТОП-ПАНЕЛЬ + СЕТКА ===== */
+  .v5 .top{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;background:#fafbfe;border-bottom:1px solid var(--border)}
+  .v5 .top .dt{font-size:14px;font-weight:800}
+  .v5 .stats{display:flex;gap:8px}
+  .v5 .st{background:#fff;border:1px solid var(--border);border-radius:10px;padding:5px 11px;font-size:11px;font-weight:700}
+  .v5 .body{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .v5 .box{border:1px solid var(--border);border-radius:13px;padding:11px}
+  .v5 .box.wide{grid-column:1 / -1}
+  .v5 .bt{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .v5 .line{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+  .v5 .line:last-child{margin-bottom:0}
+  .v5 .foot{padding:13px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--yellow),#fff9db)}
+</style>
+</head>
+<body>
+
+<div class="pt">Модалка «Статусы сотрудников» — 5 совершенно новых вариантов</div>
+<div class="ps">Другие компоновки и подходы к вводу. Все поля сохранены: статусы, бонусы, штрафы, итог, «Сохранить».</div>
+
+<div class="grid">
+
+  <!-- ================= 1. БОКОВОЕ МЕНЮ ================= -->
+  <div class="card">
+    <h3>Вариант 1 — Боковая навигация слева</h3>
+    <p class="hint">Слева дата и три раздела (Статусы / Бонусы / Штрафы), справа содержимое выбранного. Как мини-приложение внутри модалки.</p>
+    <div class="modal v1">
+      <div class="side">
+        <div class="dt">23.09.2026</div>
+        <div class="sub">События дня</div>
+        <div class="tab on">👥 Статусы</div>
+        <div class="tab">🎁 Бонусы</div>
+        <div class="tab">⚖️ Штрафы</div>
+      </div>
+      <div class="main">
+        <div style="font-size:12px;font-weight:800;margin-bottom:10px">Статусы сотрудников</div>
+        <div class="row"><span style="font-size:12.5px;font-weight:600;flex:1">Юлия Валерьевна</span>
+          <select><option>Работал</option><option>Отпуск</option></select></div>
+        <div class="row"><span style="font-size:12.5px;font-weight:600;flex:1">Ильнур</span>
+          <select><option>Удаленка</option><option>Работал</option></select></div>
+        <div class="row"><span style="font-size:12.5px;font-weight:600;flex:1">Денис</span>
+          <select><option>Работал</option><option>Больничный</option></select></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;padding:10px 13px;background:linear-gradient(135deg,var(--yellow),#fff9db);border-radius:11px;font-size:12.5px;font-weight:800">
+          <span>Бонусы: 3 000 ₽</span><span>Штрафы: 500 ₽</span>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="save">Сохранить</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 2. ДВЕ КОЛОНКИ ЛЮДИ | ДЕНЬГИ ================= -->
+  <div class="card">
+    <h3>Вариант 2 — Две колонки: «Люди» и «Деньги»</h3>
+    <p class="hint">Слева — статусы сотрудников, справа — бонусы и штрафы. Не надо листать вниз, всё видно сразу.</p>
+    <div class="modal v2">
+      <div class="head">
+        <div><div style="font-size:15px;font-weight:800">23.09.2026</div><div style="font-size:11px;color:var(--muted2)">Статусы и события дня</div></div>
+        <button style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--muted2);cursor:pointer;font-size:15px">×</button>
+      </div>
+      <div class="cols">
+        <div class="col">
+          <div class="ct">👥 Люди</div>
+          <div class="prow"><span style="font-size:12.5px;font-weight:600">Юлия В.</span>
+            <select><option>Работал</option><option>Отпуск</option></select></div>
+          <div class="prow"><span style="font-size:12.5px;font-weight:600">Ильнур</span>
+            <select><option>Удаленка</option><option>Работал</option></select></div>
+          <div class="prow"><span style="font-size:12.5px;font-weight:600">Денис</span>
+            <select><option>Работал</option><option>Больничный</option></select></div>
+        </div>
+        <div class="col">
+          <div class="ct">💰 Деньги</div>
+          <div class="money b">
+            <div class="mt" style="color:var(--green)">🎁 Бонусы</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+              <input type="number" value="3000"></div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <input type="text" value="За смену" style="flex:1">
+              <span class="sum">+3 000 ₽</span></div>
+          </div>
+          <div class="money d">
+            <div class="mt" style="color:var(--red)">⚖️ Штрафы</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+              <input type="number" value="500"></div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <input type="text" value="Опоздание" style="flex:1">
+              <span class="sum red">−500 ₽</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <span style="font-size:12.5px"><b style="color:var(--green)">+3 000 ₽</b> &nbsp; <b style="color:var(--red)">−500 ₽</b></span>
+        <button class="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. ТЁМНЫЙ ТАЙМЛАЙН ================= -->
+  <div class="card">
+    <h3>Вариант 3 — Тёмная шапка + шаги 1-2-3</h3>
+    <p class="hint">Контрастная тёмная шапка, ниже три пронумерованных шага. Ведёт по порядку: люди → бонусы → штрафы.</p>
+    <div class="modal v3">
+      <div class="head">
+        <div class="t">23.09.2026</div>
+        <div class="s">Статусы сотрудников и события дня</div>
+      </div>
+      <div class="step">
+        <span class="num">1</span>
+        <div style="flex:1">
+          <div class="st">Кто работал</div>
+          <div class="row"><span style="font-size:12.5px;font-weight:600;min-width:118px">Юлия Валерьевна</span>
+            <select style="flex:1"><option>Работал</option><option>Отпуск</option></select></div>
+          <div class="row"><span style="font-size:12.5px;font-weight:600;min-width:118px">Ильнур</span>
+            <select style="flex:1"><option>Удаленка</option><option>Работал</option></select></div>
+          <div class="row" style="margin-bottom:0"><span style="font-size:12.5px;font-weight:600;min-width:118px">Денис</span>
+            <select style="flex:1"><option>Работал</option><option>Больничный</option></select></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num g">2</span>
+        <div style="flex:1">
+          <div class="st" style="color:var(--green)">Начислить бонусы</div>
+          <div class="row" style="margin-bottom:0">
+            <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+            <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+            <span class="sum">+3 000 ₽</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num r">3</span>
+        <div style="flex:1">
+          <div class="st" style="color:var(--red)">Удержать штрафы</div>
+          <div class="row" style="margin-bottom:0">
+            <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+            <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+            <span class="sum red">−500 ₽</span></div>
+        </div>
+      </div>
+      <div class="foot">
+        <span style="font-size:12.5px"><b style="color:var(--green)">+3 000 ₽</b> &nbsp; <b style="color:var(--red)">−500 ₽</b></span>
+        <button class="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4. ПИЛЮЛИ-СТАТУСЫ ================= -->
+  <div class="card">
+    <h3>Вариант 4 — Плавающие пилюли статусов</h3>
+    <p class="hint">Крупная дата сверху, у каждого сотрудника статус выбирается нажатием на пилюлю. Бонусы/штрафы — тонкой полосой.</p>
+    <div class="modal v4">
+      <div class="head">
+        <div class="dt">23.09.2026</div>
+        <div class="s">Статусы сотрудников и события дня</div>
+      </div>
+      <div class="pcard">
+        <div class="pname">Юлия Валерьевна</div>
+        <div class="pills"><span class="pl on">Работал</span><span class="pl">Больничный</span><span class="pl">Отпуск</span><span class="pl">Прогул</span><span class="pl">Удаленка</span></div>
+      </div>
+      <div class="pcard">
+        <div class="pname">Ильнур</div>
+        <div class="pills"><span class="pl">Работал</span><span class="pl">Больничный</span><span class="pl">Отпуск</span><span class="pl">Прогул</span><span class="pl on">Удаленка</span></div>
+      </div>
+      <div class="pcard">
+        <div class="pname">Денис</div>
+        <div class="pills"><span class="pl on">Работал</span><span class="pl">Больничный</span><span class="pl">Отпуск</span><span class="pl">Прогул</span><span class="pl">Удаленка</span></div>
+      </div>
+      <div class="money">
+        <span style="font-size:11.5px;font-weight:800;color:var(--green)">🎁 +</span>
+        <select style="flex:1"><option>Ильнур</option><option>Денис</option></select>
+        <input type="number" value="3000"><input type="text" value="За смену" style="flex:1">
+      </div>
+      <div class="money">
+        <span style="font-size:11.5px;font-weight:800;color:var(--red)">⚖️ −</span>
+        <select style="flex:1"><option>Денис</option><option>Ильнур</option></select>
+        <input type="number" value="500"><input type="text" value="Опоздание" style="flex:1">
+      </div>
+      <div class="foot">
+        <span style="font-size:13px;font-weight:800">+3 000 ₽ / −500 ₽</span>
+        <button class="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5. ДАШБОРД-СЕТКА ================= -->
+  <div class="card">
+    <h3>Вариант 5 — Дашборд: плитки 2×2</h3>
+    <p class="hint">Сверху панель со сводкой дня (число работающих, суммы), ниже плитки блоков. Самый «аналитичный» вид.</p>
+    <div class="modal v5">
+      <div class="top">
+        <div class="dt">23.09.2026</div>
+        <div class="stats">
+          <span class="st">👥 3</span><span class="st" style="color:var(--green)">+3 000 ₽</span><span class="st" style="color:var(--red)">−500 ₽</span>
+        </div>
+      </div>
+      <div class="body">
+        <div class="box wide">
+          <div class="bt">👥 Статусы сотрудников</div>
+          <div class="line"><span style="font-size:12.5px;font-weight:600;flex:1">Юлия Валерьевна</span>
+            <select><option>Работал</option><option>Отпуск</option></select></div>
+          <div class="line"><span style="font-size:12.5px;font-weight:600;flex:1">Ильнур</span>
+            <select><option>Удаленка</option><option>Работал</option></select></div>
+          <div class="line"><span style="font-size:12.5px;font-weight:600;flex:1">Денис</span>
+            <select><option>Работал</option><option>Больничный</option></select></div>
+        </div>
+        <div class="box" style="border-color:var(--green-bd);background:var(--green-bg)">
+          <div class="bt" style="color:var(--green)">🎁 Бонусы</div>
+          <div class="line"><select style="flex:1"><option>Ильнур</option></select></div>
+          <div class="line"><input type="number" value="3000"><input type="text" value="За смену" style="flex:1"></div>
+          <div class="line"><span class="sum">+3 000 ₽</span></div>
+        </div>
+        <div class="box" style="border-color:var(--red-bd);background:var(--red-bg)">
+          <div class="bt" style="color:var(--red)">⚖️ Штрафы</div>
+          <div class="line"><select style="flex:1"><option>Денис</option></select></div>
+          <div class="line"><input type="number" value="500"><input type="text" value="Опоздание" style="flex:1"></div>
+          <div class="line"><span class="sum red">−500 ₽</span></div>
+        </div>
+      </div>
+      <div class="foot">
+        <span style="font-size:12.5px;font-weight:800">Бонусов: 3 000 ₽ &nbsp;·&nbsp; Штрафов: 500 ₽</span>
+        <button class="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
