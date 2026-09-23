@@ -475,14 +475,14 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 @media (max-width: 768px) { .loy-card { min-width: 200px; max-width: 240px; padding: 1rem; } .loy-arrow { display: none; } }
 
 /* ======== CALENDAR ======== */
-.promo-calendar-wrap { background: #fff; border: 1px solid rgba(29,120,252,.14); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 8px 20px -14px rgba(29,120,252,.35); max-width: 452px; }
+.promo-calendar-wrap { background: #fff; border: 1px solid rgba(29,120,252,.14); border-radius: 14px; padding: 14px 16px; margin: 0 auto 12px; box-shadow: 0 8px 20px -14px rgba(29,120,252,.35); max-width: 520px; }
 .promo-cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
 .promo-cal-grid .day { height: 38px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #eef1f6; border-radius: 10px; cursor: pointer; transition: all .15s; color: #222; font-size: .82rem; font-weight: 500; box-sizing: border-box; }
 .promo-cal-grid .day:hover { background: var(--primary-light); border-color: rgba(29,120,252,.35); }
 .promo-cal-grid .day.other { border-color: transparent; color: #c3cad6; }
 .promo-cal-grid .wd { font-size: .62rem; color: var(--muted); font-weight: 600; padding-bottom: .35rem; text-transform: uppercase; }
 .promo-cal-nav:hover { background: var(--primary); color: #000; border-color: var(--primary); }
-.promo-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: middle; margin-right: 2px; }
+.promo-dot { display: inline-block; flex: 0 0 8px; width: 8px; height: 8px; min-width: 8px; border-radius: 50%; vertical-align: middle; margin-right: 2px; }
 .promo-dot.active { background: var(--success); }
 .promo-dot.planned { background: var(--warning); }
 .promo-dot.ended { background: #ccc; }
@@ -630,6 +630,8 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .promo-cal-grid .day.has-promo.planned { background: #fef3c7; font-weight: 600; }
 .promo-cal-grid .day.has-promo.ended { background: #f1f3f5; }
 .promo-cal-legend { display: flex; gap: .75rem; font-size: .72rem; color: var(--muted); align-items: center; line-height: 1; }
+.promo-cal-legend > span { display: inline-flex; align-items: center; gap: 5px; }
+.promo-cal-legend > span > span { flex: 0 0 8px; width: 8px; height: 8px; min-width: 8px; border-radius: 50%; }
 .promo-cal-legend span { display: inline-flex; align-items: center; gap: 5px; height: 14px; }
 
 /* ======== ADD RULE DROPDOWN ======== */
