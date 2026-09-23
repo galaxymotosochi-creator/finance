@@ -324,7 +324,7 @@ export default function Timesheet() {
       ) : (
         <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
           {/* КАЛЕНДАРЬ */}
-          <div className="promo-calendar-wrap" style={{background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'14px',padding:'14px 16px',marginBottom:'10px',boxShadow:'0 8px 20px -14px rgba(29,120,252,.35)'}}>
+          <div className="promo-calendar-wrap">
             <div className="promo-cal-header">
               <button className="promo-cal-nav" onClick={prevMonth}>‹</button>
               <div className="promo-cal-month">{MONTHS[month]} {year}</div>

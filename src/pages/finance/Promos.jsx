@@ -217,7 +217,7 @@ export default function Promos() {
         </div>
       </div>
 
-      <div className="promo-calendar-wrap" style={{background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'14px',boxShadow:'0 8px 20px -14px rgba(29,120,252,.35)'}}>
+      <div className="promo-calendar-wrap">
         <div className="promo-cal-header">
           <button className="promo-cal-nav" onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}}>‹</button>
           <div className="promo-cal-month">{months[m]} {y}</div>
