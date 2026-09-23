@@ -596,11 +596,11 @@ export default function Stock() {
       </div>
       )}
 
-      <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow"
-        actions={<>
-          <button className="btn btn-ghost" onClick={cancelCorrection}>Нет</button>
-          <button type="button" className="btn btn-dark" onClick={confirmCorrection}>Да, откорректировать</button>
-        </>}>
+      <Modal open={showConfirm} onClose={()=>setShowConfirm(false)} title="Начальные остатки уже внесены" subtitle="Вы уже вносили начальные остатки. Хотите их откорректировать?" width="narrow">
+        <div style={{display:'flex',justifyContent:'flex-end',gap:'.5rem'}}>
+          <button type="button" className="sk-dd-btn" onClick={confirmCorrection} style={{padding:'11px 22px'}}>Да, откорректировать</button>
+          <button type="button" className="sk-dd-btn" onClick={cancelCorrection} style={{padding:'11px 22px'}}>Нет</button>
+        </div>
       </Modal>
 
       <Modal open={showInitModal} onClose={()=>setShowInitModal(false)} title="Введите начальные остатки" subtitle="Сколько товара уже есть на складе на старте (без оформления поставок) — вносится один раз" width="wide">
