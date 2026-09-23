@@ -54,6 +54,29 @@ const setInitialStock = (data) => {
   localStorage.setItem(INITIAL_KEY, JSON.stringify(data));
 };
 
+// Столбцы таблицы «Остатки» — 1-в-1 как фильтр «Столбцы» в «Товарах и услугах»
+const STOCK_COLUMNS = [
+  { id:'name', label:'Товар', always: true },
+  { id:'sku', label:'Артикул', def:true },
+  { id:'barcode', label:'Штрихкод', def:true },
+  { id:'category', label:'Категория', def:true },
+  { id:'qty', label:'Остаток', def:true },
+  { id:'min_qty', label:'Мин. остаток', def:true },
+  { id:'cost', label:'Закуп', def:true },
+  { id:'price', label:'Продажа', def:true },
+  { id:'markup', label:'Наценка', def:true },
+  { id:'sum', label:'Сумма', def:true },
+];
+const STOCK_COL_ORDER = ['name','sku','barcode','category','qty','min_qty','cost','price','markup','sum'];
+const STOCK_COL_LABELS = { name:'Товар', sku:'Артикул', barcode:'Штрихкод', category:'Категория', qty:'Остаток', min_qty:'Мин. остаток', cost:'Закуп', price:'Продажа', markup:'Наценка', sum:'Сумма' };
+const getStockCols = () => {
+  const def = new Set(STOCK_COLUMNS.filter(c => c.def).map(c => c.id));
+  const saved = localStorage.getItem('stockCols');
+  if (saved) { const set = new Set(JSON.parse(saved)); def.forEach(id => set.add(id)); return set; }
+  return def;
+};
+const setStockCols = (set) => localStorage.setItem('stockCols', JSON.stringify([...set]));
+
 export default function Stock() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
@@ -77,6 +100,10 @@ export default function Stock() {
   const [productsFromDB, setProductsFromDB] = useState([]);
   const [selectedCats, setSelectedCats] = useState(null);
   const [catOpen, setCatOpen] = useState(false);
+  const [colsOpen, setColsOpen] = useState(false);
+  const [priceModal, setPriceModal] = useState(null); // { id, name }
+  const [priceInput, setPriceInput] = useState('');
+  const [activeCols, setActiveColsState] = useState(getStockCols);
   // Подсказка горизонтального скролла таблицы (как в «Товарах» и «Чеках»)
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
@@ -147,7 +174,7 @@ export default function Stock() {
   }, [toast]);
 
   useEffect(() => {
-    const handler = (e) => { if (!e.target.closest('.stock-filter-links') && !e.target.closest('div[style*="position:absolute"]')) setCatOpen(false); };
+    const handler = (e) => { if (!e.target.closest('.stock-filter-links') && !e.target.closest('div[style*="position:absolute"]')) { setCatOpen(false); setColsOpen(false); } };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, []);
@@ -209,6 +236,13 @@ export default function Stock() {
   ];
 
   // Выгрузка текущего списка (с учетом фильтров) в CSV — открывается в Excel
+  const toggleStockCol = (id) => {
+    const next = new Set(activeCols);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setActiveColsState(next);
+    setStockCols(next);
+  };
+
   const exportStock = () => {
     const esc = (s) => { const v = String(s == null ? '' : s); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const head = ['Товар', 'Артикул', 'Штрихкод', 'Категория', 'Остаток', 'Мин. остаток', 'Закуп', 'Продажа', 'Наценка', 'Сумма'];
@@ -236,16 +270,21 @@ export default function Stock() {
     setToast('Файл «остатки.csv» выгружен');
   };
 
-  const editPrice = async (id) => {
-    const val = prompt('Новая цена продажи:');
-    if (val === null || val === '') return;
-    const price = parseFloat(val);
-    if (isNaN(price) || price < 0) return alert('Некорректная цена');
-    // Раньше цена менялась только в localStorage и пропадала после перезагрузки — теперь сохраняем в БД
-    const { error } = await supabase.from('products').update({ price }).eq('id', id);
-    if (error) return alert('Ошибка сохранения цены: ' + error.message);
-    setProductsState(prev => prev.map(x => x.id === id ? { ...x, price } : x));
-    setProductsFromDB(prev => prev.map(x => x.id === id ? { ...x, price } : x));
+  const editPrice = (id) => {
+    const p = products.find(x => x.id === id);
+    setPriceModal({ id, name: p ? p.name : '' });
+    setPriceInput(String((p && p.price) || ''));
+  };
+
+  const savePrice = async () => {
+    if (!priceModal) return;
+    const price = parseFloat(priceInput);
+    if (isNaN(price) || price < 0) { setToast('Некорректная цена'); return; }
+    const { error } = await supabase.from('products').update({ price }).eq('id', priceModal.id);
+    if (error) { setToast('Ошибка сохранения цены: ' + error.message); return; }
+    setProductsState(prev => prev.map(x => x.id === priceModal.id ? { ...x, price } : x));
+    setProductsFromDB(prev => prev.map(x => x.id === priceModal.id ? { ...x, price } : x));
+    setPriceModal(null);
     setToast('Цена обновлена');
   };
 
@@ -366,7 +405,6 @@ export default function Stock() {
           <button className="sk-dd-btn" onClick={openInitialStock}>Начальные остатки</button>
         </div>
       </div>
-      <div className="nav-sep" style={{margin:'.25rem 0',width:'100%'}} />
       <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
         onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
           <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
@@ -379,7 +417,7 @@ export default function Stock() {
           {/* Фильтр по наличию — пилюля с выпадающим списком, как «Тип» в «Товарах и услугах» */}
           <div className="sk-dd-wrap">
             <button type="button" className={'f-pill'+(stStatus !== 'all' ? ' on' : '')}
-              onClick={e=>{e.stopPropagation();setStOpen(!stOpen);setCatOpen(false)}}>
+              onClick={e=>{e.stopPropagation();setStOpen(!stOpen);setCatOpen(false);setColsOpen(false)}}>
               {({all:'Все', in:'В наличии', low:'Заканчиваются', out:'Закончились'})[stStatus]} <span className="car-tri">▾</span>
             </button>
             {stOpen && (
@@ -402,7 +440,7 @@ export default function Stock() {
 
           {/* Категории — пилюля с меню, точно как в «Товарах и услугах» */}
           <div className="sk-dd-wrap">
-            <button type="button" className={'f-pill'+(catOpen?' on':'')} onClick={e=>{e.stopPropagation();setCatOpen(!catOpen);setStOpen(false)}}>Категории <span className="car-tri">▾</span></button>
+            <button type="button" className={'f-pill'+(catOpen?' on':'')} onClick={e=>{e.stopPropagation();setCatOpen(!catOpen);setStOpen(false);setColsOpen(false)}}>Категории <span className="car-tri">▾</span></button>
             {catOpen && (
               <div className="f-menu" style={{minWidth:'220px'}}>
                 <div className="cat-dd-search">
@@ -431,6 +469,28 @@ export default function Stock() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+
+          {/* Столбцы — пилюля с меню, как в «Товарах и услугах» */}
+          <div className="sk-dd-wrap">
+            <button type="button" className={'f-pill'+(colsOpen?' on':'')}
+              onClick={e=>{e.stopPropagation();setColsOpen(!colsOpen);setStOpen(false);setCatOpen(false)}}>Столбцы <span className="car-tri">▾</span></button>
+            {colsOpen && (
+              <div className="f-menu" style={{minWidth:'220px'}}>
+                <div className="cols-list">
+                  {STOCK_COLUMNS.filter(c=>!c.always).map(function(col) {
+                    const act = activeCols.has(col.id);
+                    return (
+                      <div key={col.id} onClick={() => toggleStockCol(col.id)}
+                        style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:act?'#0d4ea8':'#5b6472',fontWeight:act?700:500,background:act?'#E6F0FF':'transparent'}}>
+                        <span style={{width:'8px',height:'8px',borderRadius:'50%',background:act?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                        {col.label}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -467,22 +527,18 @@ export default function Stock() {
         <table className="sk-table ***" style={{minWidth:'900px'}}>
           <thead id="stockColHeaders">
             <tr>
-              <th style={{minWidth:'200px',textAlign:'left'}}>Товар</th>
-              <th style={{textAlign:'left'}}>Артикул</th>
-              <th style={{textAlign:'left'}}>Штрихкод</th>
-              <th style={{textAlign:'left'}}>Категория</th>
-              <th style={{textAlign:'left'}}>Остаток</th>
-              <th style={{textAlign:'left'}}>Мин. остаток</th>
-              <th style={{textAlign:'left'}}>Закуп</th>
-              <th style={{textAlign:'left'}}>Продажа</th>
-              <th style={{textAlign:'left'}}>Наценка</th>
-              <th style={{textAlign:'left'}}>Сумма</th>
+              {STOCK_COL_ORDER.map(col => {
+                if (col === 'name' || activeCols.has(col)) {
+                  return <th key={col} style={col==='name'?{minWidth:'200px',textAlign:'left'}:{textAlign:'left'}}>{STOCK_COL_LABELS[col]}</th>;
+                }
+                return null;
+              })}
             </tr>
           </thead>
           <tbody id="stockTableBody">
             {items.length === 0 ? (
               <tr>
-                <td colSpan="10">
+                <td colSpan={STOCK_COL_ORDER.filter(c=>c==='name'||activeCols.has(c)).length}>
                   <div className="empty-products">
                     <div className="big-icon">📦</div>
                     <p>Склад пока пуст</p>
@@ -508,29 +564,29 @@ export default function Stock() {
                   <td style={{textAlign:'left',whiteSpace:'nowrap',fontSize:'.78rem',color:'#222'}}>
                     <span>{p.name}</span>
                   </td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222',fontFamily:'monospace'}}>{p.sku || '—'}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{p.barcode || '—'}</td>
-                  <td style={{textAlign:'left',whiteSpace:'nowrap',fontSize:'.78rem',color:'#222'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{qty}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
+                  {activeCols.has('sku') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222',fontFamily:'monospace'}}>{p.sku || '—'}</td>}
+                  {activeCols.has('barcode') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{p.barcode || '—'}</td>}
+                  {activeCols.has('category') && <td style={{textAlign:'left',whiteSpace:'nowrap',fontSize:'.78rem',color:'#222'}}><span className="prod-cat">{CAT_LABELS[p.cat] || p.cat || '—'}</span></td>}
+                  {activeCols.has('qty') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{qty} шт</td>}
+                  {activeCols.has('min_qty') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     {p.min_qty > 0 ? (
                       <span style={{color: qty >= p.min_qty ? '#16a34a' : '#dc2626',fontWeight:500}}>
                         {qty + ' / ' + p.min_qty + ' шт'}
                       </span>
                     ) : '—'}
-                  </td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{(costPrice * qty).toLocaleString()}</td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
+                  </td>}
+                  {activeCols.has('cost') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{(costPrice * qty).toLocaleString()} ₽</td>}
+                  {activeCols.has('price') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     <span className="editable-price"
                       style={{cursor:'pointer',color:'#222',borderBottom:'1px dashed #999',paddingBottom:'1px'}}
-                      onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()}</span>
-                  </td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
+                      onClick={() => editPrice(p.id)}>{retailPrice.toLocaleString()} ₽</span>
+                  </td>}
+                  {activeCols.has('markup') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>
                     <span className={`markup-badge${markup >= 0 ? '' : ' neg'}`}>
-                      {markup >= 0 ? '+' : ''}{markup.toLocaleString()}{markupPct ? ` (${markupPct}%)` : ''}
+                      {markup >= 0 ? '+' : ''}{markup.toLocaleString()} ₽
                     </span>
-                  </td>
-                  <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{sumValue.toLocaleString()}</td>
+                  </td>}
+                  {activeCols.has('sum') && <td style={{textAlign:'left',fontSize:'.78rem',color:'#222'}}>{sumValue.toLocaleString()} ₽</td>}
                 </tr>
               );
             })}
@@ -586,6 +642,21 @@ export default function Stock() {
             <div className="modal-actions" style={{marginTop:'.5rem',borderTop:'none',paddingTop:0}}>
               <button type="button" className="sk-dd-btn" onClick={saveInitialStock}>Сохранить</button>
             </div>
+      </Modal>
+
+      {/* Модалка изменения цены продажи — в стиле сайта */}
+      <Modal open={!!priceModal} onClose={() => setPriceModal(null)} title="Цена продажи" subtitle={priceModal ? priceModal.name : ''} width="narrow">
+        <div style={{ marginBottom: '.9rem' }}>
+          <label style={{ display: 'block', fontSize: '.78rem', color: 'var(--sk-muted)', marginBottom: '.35rem' }}>Новая цена, ₽</label>
+          <input type="number" min="0" step="0.01" value={priceInput} autoFocus
+            onChange={e => setPriceInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') savePrice(); }}
+            style={{ width: '100%', border: '1.5px solid rgba(29,120,252,.2)', borderRadius: '12px', padding: '.6rem .8rem', fontSize: '.9rem', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem' }}>
+          <button type="button" className="btn btn-outline" onClick={() => setPriceModal(null)}>Отмена</button>
+          <button type="button" className="btn btn-dark" onClick={savePrice}>Сохранить</button>
+        </div>
       </Modal>
     </>
   );
