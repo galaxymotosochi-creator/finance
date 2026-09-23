@@ -405,7 +405,7 @@ export default function Stock() {
           <button className="sk-dd-btn" onClick={openInitialStock}>Начальные остатки</button>
         </div>
       </div>
-      <div style={{display:'flex',alignItems:'center',gap:'4px',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',border:'1px solid '+(searchFocus?'#111':'#e2e2e6'),borderRadius:'999px',padding:'5px 6px 5px 14px',background:'#fff',boxShadow:searchFocus?'0 2px 10px rgba(0,0,0,.12)':'0 1px 3px rgba(0,0,0,.05)',transition:'border-color .15s, box-shadow .15s'}}
+      <div className="sk-search" style={{display:'flex',marginBottom:'.5rem',width:'100%',flexWrap:'nowrap',padding:'5px 6px 5px 14px'}}
         onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}>
           <span style={{display:'flex',color:searchFocus?'#111':'#999',transition:'color .15s',flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
