@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -189,6 +190,25 @@ export default function Promos() {
         <div className="grow" style={{minWidth:0}}>
           <div style={{display:'flex',alignItems:'center'}}>
             <h1>Акции</h1>
+            <SectionHelp
+              title="Раздел «Акции»"
+              intro="Акции — это временные спецпредложения со скидкой: сезонные распродажи, праздничные предложения, скидки на категорию или конкретные товары."
+              faq={[
+                { q: 'Как создать акцию?', a: (
+                  <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите название, размер скидки, сроки и на что она распространяется.</div>
+                ) },
+                { q: 'Что означает цвет в календаре?', a: (
+                  <ul>
+                    <li style={{marginBottom:'.4rem'}}><b>Зелёный</b> — акция активна.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Жёлтый</b> — акция запланирована.</li>
+                    <li><b>Серый</b> — акция завершена.</li>
+                  </ul>
+                ) },
+                { q: 'Как изменить или удалить акцию?', a: (
+                  <div>Нажмите <b>«⋯»</b> в строке акции — там <b>Редактировать</b> и <b>Удалить</b>.</div>
+                ) },
+              ]}
+            />
           </div>
           <div className="sub" style={{maxWidth:'280px'}}>Управление специальными предложениями и скидками</div>
         </div>
@@ -197,7 +217,7 @@ export default function Promos() {
         </div>
       </div>
 
-      <div className="promo-calendar-wrap">
+      <div className="promo-calendar-wrap" style={{background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'14px',boxShadow:'0 8px 20px -14px rgba(29,120,252,.35)'}}>
         <div className="promo-cal-header">
           <button className="promo-cal-nav" onClick={()=>{var d=new Date(cal);d.setMonth(d.getMonth()-1);setCal(d)}}>‹</button>
           <div className="promo-cal-month">{months[m]} {y}</div>
@@ -224,17 +244,14 @@ export default function Promos() {
         </div>
       </div>
 
-      <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.5rem'}}>Все акции</div>
-
-      {promos.length === 0 && <div className="empty-products"><div className="big-icon">🎉</div><p>У вас пока нет акций</p></div>}
+      {promos.length === 0 && <div className="sk-card" style={{padding:'2rem 1rem',textAlign:'center'}}><div className="sk-empty"><p>Акций пока нет</p><p>Создайте первое специальное предложение для клиентов</p></div></div>}
 
       {promos.map(p => {
         const s = status(p);
         const sc = s === 'active' ? '#16a34a' : s === 'planned' ? '#92400e' : '#9ca3af';
         const sb = s === 'active' ? '#dcfce7' : s === 'planned' ? '#fef3c7' : '#f1f3f5';
         return (
-          <div key={p.id} onClick={() => { setDetail(detail === p.id ? null : p.id); if (detail !== p.id) { setStats(null); loadStats(p); } }} style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',border:'1px solid var(--border)',borderRadius:'.75rem',marginBottom:'.5rem',cursor:'pointer',gap:'.75rem'}}>
-            <div style={{fontSize:'2rem'}}>🔥</div>
+          <div key={p.id} onClick={() => { setDetail(detail === p.id ? null : p.id); if (detail !== p.id) { setStats(null); loadStats(p); } }} style={{display:'flex',alignItems:'center',padding:'.65rem .75rem',background:'#fff',border:'1px solid rgba(29,120,252,.14)',borderRadius:'14px',boxShadow:'0 8px 20px -14px rgba(29,120,252,.35)',marginBottom:'.5rem',cursor:'pointer',gap:'.75rem'}}>
             <div style={{flex:1}}>
               <div style={{fontWeight:600,fontSize:'.85rem'}}>{p.name}</div>
               <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{fmtDate(p.start_date)} — {fmtDate(p.end_date)}</div>
@@ -382,16 +399,6 @@ export default function Promos() {
                   {targetProducts.length > 0 && <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>Выбрано: {targetProducts.length}</div>}
                 </div>
               )}
-              <div style={{marginBottom:'.75rem'}}>
-                <div style={{fontSize:'.7rem',color:'var(--muted)',textTransform:'uppercase',fontWeight:600,marginBottom:'.35rem'}}>Предпросмотр карточки</div>
-                <div style={{display:'flex',alignItems:'center',gap:'.75rem',background:'#f8f9fa',borderRadius:'.75rem',padding:'.75rem'}}>
-                  <div style={{fontSize:'2rem'}}>🔥</div>
-                  <div>
-                    <div style={{fontWeight:600,fontSize:'.85rem'}}>{name || 'Новая акция'}</div>
-                    <div style={{fontSize:'.75rem',color:'var(--muted)'}}>Скидка {discount || 0}%</div>
-                  </div>
-                </div>
-              </div>
               <div className="modal-actions">
                 <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
