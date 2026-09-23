@@ -514,7 +514,7 @@ export default function Timesheet() {
       <Modal open={showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="Статусы сотрудников и события дня" width="wide">
 
             <div style={{border:'1px solid var(--border)',borderRadius:'12px',overflow:'hidden',marginBottom:'.65rem'}}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',background:'#f8f9fa',borderBottom:'1px solid var(--border)'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.5rem .65rem',borderBottom:'1px solid var(--border)'}}>
                 <span style={{fontSize:'.82rem',fontWeight:600}}>Статусы сотрудников</span>
                 <span style={{fontSize:'.6rem',color:'var(--muted)'}}>▼</span>
               </div>
@@ -595,7 +595,7 @@ export default function Timesheet() {
               const td = totalDeducts();
               if (tb === 0 && td === 0) return null;
               return (
-                <div style={{display:'flex',justifyContent:'space-between',padding:'.65rem .75rem',background:'#f8f9fa',borderRadius:'10px',fontSize:'.85rem',marginBottom:'.75rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',padding:'.65rem .75rem',background:'linear-gradient(135deg, #ffdd2d, #fff9db)',borderRadius:'10px',fontSize:'.85rem',fontWeight:700,marginBottom:'.75rem'}}>
                   <span>Бонусов: <b style={{color:'#16a34a'}}>{tb.toLocaleString()} {cur}</b></span>
                   <span>Штрафов: <b style={{color:'#dc2626'}}>{td.toLocaleString()} {cur}</b></span>
                 </div>
