@@ -237,7 +237,7 @@ export default function Promos() {
             return <div key={i} className={cls} onClick={() => c.promos.length && setDetail(c.promos[0].id)}>{c.day}</div>;
           })}
         </div>
-        <div className="promo-cal-legend">
+        <div className="promo-cal-legend" style={{borderTop:'1px solid #f0f3f8',paddingTop:'10px',marginTop:'10px'}}>
           <span><span className="promo-dot active"></span> Активна</span>
           <span><span className="promo-dot planned"></span> Планируется</span>
           <span><span className="promo-dot ended"></span> Завершена</span>
