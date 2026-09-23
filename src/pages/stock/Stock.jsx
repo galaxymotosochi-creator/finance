@@ -647,15 +647,15 @@ export default function Stock() {
       {/* Модалка изменения цены продажи — в стиле сайта */}
       <Modal open={!!priceModal} onClose={() => setPriceModal(null)} title="Цена продажи" subtitle={priceModal ? priceModal.name : ''} width="narrow">
         <div style={{ marginBottom: '.9rem' }}>
-          <label style={{ display: 'block', fontSize: '.78rem', color: 'var(--sk-muted)', marginBottom: '.35rem' }}>Новая цена, ₽</label>
+          <label style={{ display: 'block', fontSize: '.78rem', color: 'var(--sk-muted)', marginBottom: '.35rem' }}>Новая цена</label>
           <input type="number" min="0" step="0.01" value={priceInput} autoFocus
             onChange={e => setPriceInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') savePrice(); }}
             style={{ width: '100%', border: '1.5px solid rgba(29,120,252,.2)', borderRadius: '12px', padding: '.6rem .8rem', fontSize: '.9rem', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem' }}>
-          <button type="button" className="btn btn-outline" onClick={() => setPriceModal(null)}>Отмена</button>
-          <button type="button" className="btn btn-dark" onClick={savePrice}>Сохранить</button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button type="button" className="sk-dd-btn" onClick={savePrice}
+            style={{ padding: '.6rem 2.2rem', fontSize: '.85rem' }}>Сохранить</button>
         </div>
       </Modal>
     </>
