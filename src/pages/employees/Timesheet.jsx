@@ -536,25 +536,29 @@ export default function Timesheet() {
                 <span style={{fontSize:'.82rem',fontWeight:700,color:'#16a34a'}}>Бонусы</span>
               </div>
               <div style={{padding:'.6rem .75rem'}}>
+                <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',margin:'0 -.2rem',padding:'0 .2rem'}}>
+                <div style={{minWidth:'520px'}}>
                 {bonusRows.map((row, idx) => {
                   const isLast = idx === bonusRows.length - 1;
                   const hasValue = row.empId && row.amount;
                   return (
                     <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
-                      <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
+                      <select style={{width:'140px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
                         borderStyle:isLast&&!row.empId?'dashed':'solid'}}
                         value={row.empId} onChange={e=>updateBonusRow(idx,'empId',e.target.value)}>
                         <option value="">Сотрудник</option>
                         {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
                       <input type="number" value={row.amount} onChange={e=>updateBonusRow(idx,'amount',e.target.value)} placeholder="Сумма"
-                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                        style={{width:'90px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateBonusRow(idx,'comment',e.target.value)} placeholder="За что"
-                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()} {cur}</span>}
+                        style={{width:'190px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      {hasValue && <span style={{color:'#16a34a',fontWeight:600,fontSize:'.82rem',minWidth:'60px',flexShrink:0,textAlign:'right',whiteSpace:'nowrap'}}>+{Number(row.amount).toLocaleString()} {cur}</span>}
                     </div>
                   );
                 })}
+                </div>
+                </div>
                 <div style={{fontSize:'.68rem',color:'var(--muted)',marginTop:'2px'}}>Выберите сотрудника — появится новая строка</div>
               </div>
             </div>
@@ -564,25 +568,29 @@ export default function Timesheet() {
                 <span style={{fontSize:'.82rem',fontWeight:700,color:'#dc2626'}}>Штрафы</span>
               </div>
               <div style={{padding:'.6rem .75rem'}}>
+                <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',margin:'0 -.2rem',padding:'0 .2rem'}}>
+                <div style={{minWidth:'520px'}}>
                 {deductRows.map((row, idx) => {
                   const isLast = idx === deductRows.length - 1;
                   const hasValue = row.empId && row.amount;
                   return (
                     <div key={idx} style={{display:'flex',gap:'.35rem',marginBottom:'.35rem',alignItems:'center',opacity: isLast && !row.empId ? .65 : 1}}>
-                      <select style={{flex:'1 1 130px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
+                      <select style={{width:'140px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
                         borderStyle:isLast&&!row.empId?'dashed':'solid'}}
                         value={row.empId} onChange={e=>updateDeductRow(idx,'empId',e.target.value)}>
                         <option value="">Сотрудник</option>
                         {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
                       <input type="number" value={row.amount} onChange={e=>updateDeductRow(idx,'amount',e.target.value)} placeholder="Сумма"
-                        style={{width:'90px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                        style={{width:'90px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
                       <input type="text" value={row.comment} onChange={e=>updateDeductRow(idx,'comment',e.target.value)} placeholder="За что"
-                        style={{flex:'1 1 80px',padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
-                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()} {cur}</span>}
+                        style={{width:'190px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',borderStyle:isLast&&!row.empId?'dashed':'solid'}} />
+                      {hasValue && <span style={{color:'#dc2626',fontWeight:600,fontSize:'.82rem',minWidth:'60px',flexShrink:0,textAlign:'right',whiteSpace:'nowrap'}}>-{Number(row.amount).toLocaleString()} {cur}</span>}
                     </div>
                   );
                 })}
+                </div>
+                </div>
                 <div style={{fontSize:'.68rem',color:'var(--muted)',marginTop:'2px'}}>Выберите сотрудника — появится новая строка</div>
               </div>
             </div>
