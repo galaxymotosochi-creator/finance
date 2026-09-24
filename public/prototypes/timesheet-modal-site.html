@@ -27,7 +27,7 @@
   /* ===== ОКНО МОДАЛКИ — 1-в-1 как .modal-box сайта ===== */
   .box{
     background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
-    box-shadow:var(--shadow-lg);padding:1.5rem;max-width:560px;margin:0 auto;
+    box-shadow:var(--shadow-lg);padding:1.5rem;max-width:720px;margin:0 auto;
   }
   .box .modal-title{font-size:1.125rem;font-weight:700;color:var(--body-color);margin:0 0 .15rem 0}
   .box .modal-sub{font-size:.8125rem;color:#666;font-weight:400;margin-bottom:1.2rem}
@@ -47,9 +47,9 @@
   .row:last-child{border-bottom:none}
 
   /* сетки — одинаковый шаг у всех строк */
-  .row.s1{grid-template-columns:1fr 150px}
-  .row.s2{grid-template-columns:1fr 92px 1fr 74px}
-  .name{font-size:.875rem;font-weight:500;color:var(--body-color)}
+  .row.s1{grid-template-columns:1fr 300px}
+  .row.s2{grid-template-columns:1fr 1fr 1fr}
+  .name{font-size:.875rem;font-weight:500;color:var(--body-color);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
   /* ===== ВСЕ поля одного размера, один шрифт, одна рамка ===== */
   select,.inp{
@@ -83,7 +83,7 @@
 
   /* ===== ПРЕВЬЮ ВНЕ МОДАЛКИ (обёртка страницы) ===== */
   .stage{background:#e9eff8;border-radius:22px;padding:26px 18px;max-width:840px;margin:0 auto}
-  .stage .lbl{max-width:560px;margin:0 auto 10px;font-size:11px;font-weight:700;
+  .stage .lbl{max-width:720px;margin:0 auto 10px;font-size:11px;font-weight:700;
     text-transform:uppercase;letter-spacing:.05em;color:var(--sk-muted)}
 </style>
 </head>
@@ -123,13 +123,11 @@
         <select><option>Ильнур</option><option>Денис</option><option>Юлия Валерьевна</option></select>
         <input class="inp" type="number" value="3000" placeholder="Сумма">
         <input class="inp" type="text" value="За смену" placeholder="За что">
-        <span class="sum" style="color:var(--green)">+3 000 ₽</span>
       </div>
       <div class="row s2" style="opacity:.55">
         <select><option value="">Сотрудник</option></select>
         <input class="inp" type="number" placeholder="Сумма">
         <input class="inp" type="text" placeholder="За что">
-        <span class="sum"></span>
       </div>
     </div>
 
@@ -140,7 +138,6 @@
         <select><option>Денис</option><option>Ильнур</option><option>Юлия Валерьевна</option></select>
         <input class="inp" type="number" value="500" placeholder="Сумма">
         <input class="inp" type="text" value="Опоздание" placeholder="За что">
-        <span class="sum" style="color:var(--red)">−500 ₽</span>
       </div>
     </div>
 
@@ -173,7 +170,6 @@
         <select><option value="">Сотрудник</option></select>
         <input class="inp" type="number" placeholder="Сумма">
         <input class="inp" type="text" placeholder="За что">
-        <span class="sum"></span>
       </div>
     </div>
 
@@ -183,7 +179,6 @@
         <select><option value="">Сотрудник</option></select>
         <input class="inp" type="number" placeholder="Сумма">
         <input class="inp" type="text" placeholder="За что">
-        <span class="sum"></span>
       </div>
     </div>
 
