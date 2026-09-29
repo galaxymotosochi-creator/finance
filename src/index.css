@@ -863,7 +863,7 @@ input:focus, select:focus, textarea:focus {
   .sk-ring-block{flex-direction:column;align-items:flex-start;gap:14px}
   .sk-ring{align-self:center}
   .sk-ring .in .t{font-size:9.5px}
-  .sk-legend{width:100%;min-width:0}
+  .sk-legend{width:100%}
   .sk-leg .nm{font-size:12px}
   .sk-leg .amt{min-width:86px;font-size:12.5px}
 }
