@@ -450,7 +450,7 @@ export default function Accounts() {
             }).join(', ');
             return (
               <div className="sk-ring-block">
-                <div className="tx-ring-row" style={{display:'flex',gap:'22px',flexWrap:'wrap',alignItems:'center',margin:'0 auto 16px',maxWidth:'1180px',width:'100%',boxSizing:'border-box'}}>
+                <div className="sk-ring" style={{background:'conic-gradient('+stops+')'}}>
                   {vals.map((v,i) => {
                     const prev = vals.slice(0,i).reduce((x,y)=>x+y,0);
                     const midPct = (prev + v/2)/sum;
