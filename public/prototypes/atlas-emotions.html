@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Атлас — эмоции</title>
+<style>
+  :root{--yellow:#ffdd2d;--blue:#1d78fc;--blue-d:#0d4ea8;--blue-soft:#E6F0FF;--ink:#111;--muted:#8b93a3;--soft:#f4f7fc;--line:rgba(29,120,252,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 18px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef3fb;color:var(--ink)}
+  h1{font-size:20px;margin:0 0 4px;text-align:center}
+  .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:22px}
+  .panel{max-width:900px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 24px 52px -26px rgba(11,18,32,.42);display:flex;gap:30px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .stage{position:relative;width:270px;height:300px;display:flex;align-items:center;justify-content:center;flex:none}
+  .ctrl{flex:1;min-width:280px}
+  .ctrl h2{font-size:16px;margin:0 0 4px}
+  .state{font-size:12.5px;color:var(--muted);margin-bottom:16px;min-height:34px;line-height:1.45}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  .ebtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 15px;font-size:12.5px;font-weight:700;color:#42506a;cursor:pointer;font-family:inherit;transition:all .15s}
+  .ebtn:hover{background:var(--blue-soft);border-color:#c9deff}
+  .ebtn.on{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border-color:transparent;box-shadow:0 10px 20px -10px rgba(29,120,252,.9)}
+
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes blink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+  @keyframes fastblink{0%,78%,100%{transform:scaleY(1)}84%{transform:scaleY(.1)}88%{transform:scaleY(1)}92%{transform:scaleY(.15)}}
+  @keyframes glow{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.85;filter:brightness(1.4)}}
+  @keyframes ringpulse{0%{transform:scale(.72);opacity:.65}100%{transform:scale(1.4);opacity:0}}
+  @keyframes sweep{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}
+  @keyframes wobble{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+  @keyframes hop{0%,100%{transform:translateY(0)}30%{transform:translateY(-13px)}55%{transform:translateY(0)}}
+  @keyframes lean{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(3deg)}}
+
+  .shadow{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.3),transparent 70%);filter:blur(2px);transition:all .3s}
+  .halo{position:absolute;width:200px;height:200px;border-radius:50%;border:2px solid rgba(29,120,252,.25);animation:ringpulse 3.4s ease-out infinite}
+  .halo.d2{animation-delay:1.7s}
+  .halo.joy{border-color:rgba(255,221,45,.6)}
+  .halo.sad{border-color:rgba(140,150,170,.3);animation-duration:5.5s}
+  .halo.think{border-color:rgba(29,120,252,.5);animation-duration:1.9s}
+
+  .botpos{position:relative;animation:float 4s ease-in-out infinite}
+  .botpos.think{animation:wobble 1s ease-in-out infinite}
+  .botpos.joy{animation:hop 1.15s ease-in-out infinite}
+  .botpos.sad{animation:float 7s ease-in-out infinite}
+  .botpos.listen{animation:lean 2s ease-in-out infinite}
+
+  .bot{position:relative}
+  .head{width:132px;height:112px;border-radius:38px;position:relative;
+    background:linear-gradient(160deg,#ffffff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);
+    border:2px solid #a9bad4;
+    box-shadow:0 20px 34px -18px rgba(11,18,32,.55), inset 0 -10px 22px rgba(120,145,185,.35), inset 0 8px 16px rgba(255,255,255,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:filter .3s}
+  .sad .head{filter:saturate(.6) brightness(.94)}
+  .joy .head{filter:brightness(1.06)}
+  .visor{width:86px;height:44px;border-radius:16px;background:linear-gradient(165deg,#0b1a33,#0d4ea8 60%,#1d78fc);
+    box-shadow:inset 0 4px 10px rgba(0,0,0,.6),0 0 24px rgba(29,120,252,.65);display:flex;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden;transition:all .3s}
+  .visor:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.45) 0%,transparent 45%)}
+  .eye{width:15px;height:15px;border-radius:50%;background:#bff0ff;box-shadow:0 0 14px #9ff0ff;animation:blink 4.4s infinite;transition:all .3s}
+  .eye:nth-child(2){animation-delay:.1s}
+  /* эмоции — глаза */
+  .think .eye{width:20px;height:7px;border-radius:4px;animation:fastblink 1.3s infinite}
+  .joy .eye{width:19px;height:11px;border-radius:11px 11px 2px 2px;background:#d8f6ff;box-shadow:0 0 18px #9ff0ff}
+  .sad .eye{width:15px;height:15px;transform:translateY(3px);background:#8fb6d8;box-shadow:0 0 8px #7fa8cc}
+  .listen .eye{width:18px;height:18px;background:#d8f6ff;box-shadow:0 0 20px #9ff0ff}
+  .mouth{width:40px;height:6px;border-radius:6px;background:linear-gradient(90deg,#cdd9ea,#8899b3);box-shadow:inset 0 1px 2px rgba(0,0,0,.25);transition:all .3s}
+  .joy .mouth{width:34px;height:14px;border-radius:0 0 20px 20px;background:#3a4a63}
+  .sad .mouth{width:34px;height:12px;border-radius:20px 20px 0 0;background:#8fa0b8}
+  .think .mouth{width:22px;height:5px;border-radius:3px}
+  .listen .mouth{width:30px;height:10px;border-radius:8px;background:#5b6b85}
+  .ear{position:absolute;top:34px;width:12px;height:34px;border-radius:7px;background:linear-gradient(180deg,#dbe4f2,#aebfd8);border:1px solid #a3b4cf;transition:all .3s}
+  .ear.l{left:-13px}.ear.r{right:-13px}
+  .sad .ear{transform:translateY(3px)}
+  .ant{position:absolute;top:-24px;left:50%;transform:translateX(-50%);width:3px;height:22px;background:linear-gradient(#c3cee0,#8fa3c2);transition:all .3s}
+  .ant:after{content:"";position:absolute;top:-11px;left:-6px;width:15px;height:15px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff6c4,var(--yellow));box-shadow:0 0 18px rgba(255,221,45,.95);animation:glow 1.8s infinite;transition:all .3s}
+  .think .ant:after{animation-duration:.7s}
+  .joy .ant:after{background:radial-gradient(circle at 35% 30%,#d4ffdc,#22c55e);box-shadow:0 0 22px rgba(34,197,94,.95)}
+  .sad .ant:after{background:radial-gradient(circle at 35% 30%,#d8dde6,#8c97a8);box-shadow:0 0 8px rgba(140,151,168,.6);opacity:.6}
+  .torso{width:104px;height:56px;border-radius:24px;margin-top:8px;position:relative;
+    background:linear-gradient(160deg,#f6f9ff,#d5e0f1 60%,#bccce4);border:2px solid #aab9d3;
+    box-shadow:inset 0 -8px 16px rgba(120,145,185,.35),inset 0 6px 12px rgba(255,255,255,.85);transition:all .3s}
+  .torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#ffe98a,var(--yellow));box-shadow:0 0 16px rgba(255,221,45,.9);transition:all .3s}
+  .think .torso:after{animation:glow .8s infinite}
+  .joy .torso:after{width:30px;height:30px;background:radial-gradient(circle at 35% 30%,#d4ffdc,#22c55e);box-shadow:0 0 24px rgba(34,197,94,.95)}
+  .sad .torso:after{background:radial-gradient(circle at 35% 30%,#e2e6ee,#98a2b3);box-shadow:0 0 8px rgba(152,162,179,.6)}
+  .arm{position:absolute;top:14px;width:16px;height:44px;border-radius:9px;background:linear-gradient(180deg,#e6ecf7,#c0cde2);border:2px solid #aab9d3;transition:all .3s}
+  .arm.l{left:-24px;transform:rotate(8deg)}.arm.r{right:-24px;transform:rotate(-8deg)}
+  .joy .arm.l{transform:rotate(28deg)}.joy .arm.r{transform:rotate(-28deg)}
+  .gloss{position:absolute;inset:0;overflow:hidden;border-radius:40px;pointer-events:none}
+  .gloss:after{content:"";position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:sweep 4.5s ease-in-out infinite}
+  .zzz{position:absolute;top:-30px;right:-18px;font-size:13px;font-weight:800;color:var(--blue);opacity:0;transition:opacity .3s}
+  .think .zzz{opacity:1;animation:float 1.2s ease-in-out infinite}
+</style>
+</head>
+<body>
+  <h1>Атлас — эмоции</h1>
+  <div class="sub">Образ 1 (бело-синий глянцевый) · нажмите состояния, чтобы увидеть реакцию</div>
+
+  <div class="panel">
+    <div class="stage">
+      <div class="halo" id="h1"></div><div class="halo d2" id="h2"></div>
+      <div class="shadow" id="sh"></div>
+      <div class="botpos" id="pos">
+        <div class="bot" id="bot">
+          <div class="ant"></div>
+          <div class="ear l"></div><div class="ear r"></div>
+          <div class="head">
+            <div class="visor"><span class="eye"></span><span class="eye"></span></div>
+            <div class="mouth"></div>
+          </div>
+          <div style="position:relative;display:flex;justify-content:center">
+            <div class="arm l"></div><div class="torso"></div><div class="arm r"></div>
+          </div>
+          <div class="gloss"></div>
+          <div class="zzz">⋯</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <h2>Атлас · AI помощник</h2>
+      <div class="state" id="st">Спокойный: дышит, парит, медленно мигает. Антенна пульсирует мягко.</div>
+      <div class="btns">
+        <button class="ebtn on" data-s="calm">Спокойный</button>
+        <button class="ebtn" data-s="think">Думает</button>
+        <button class="ebtn" data-s="joy">Радуется</button>
+        <button class="ebtn" data-s="sad">Грустит</button>
+        <button class="ebtn" data-s="listen">Слушает</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var texts = {
+    calm:   'Спокойный: дышит, парит, медленно мигает. Антенна пульсирует мягко.',
+    think:  'Думает: глаза сужаются в полоски, частое мигание, корпус покачивается, антенна мигает быстро.',
+    joy:    'Радуется: глаза-дуги (улыбка глазами), подпрыгивает, подсветка зелёная, руки в стороны, ореол жёлтый.',
+    sad:    'Грустит: глаза опущены и тусклые, «рот» изгибается вниз, антенна гаснет, корпус проседает.',
+    listen: 'Слушает: глаза расширены, корпус наклоняется вперёд — живой интерес к тому, что вы печатаете.'
+  };
+  var cls = {calm:'', think:'think', joy:'joy', sad:'sad', listen:'listen'};
+  var bot = document.getElementById('bot');
+  var pos = document.getElementById('pos');
+  var h1 = document.getElementById('h1'), h2 = document.getElementById('h2');
+
+  document.querySelectorAll('.ebtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var s = b.dataset.s;
+      document.querySelectorAll('.ebtn').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      bot.className = 'bot'; pos.className = 'botpos';
+      h1.className = 'halo'; h2.className = 'halo d2';
+      if (cls[s]) { bot.classList.add(cls[s]); pos.classList.add(cls[s]); }
+      if (s === 'joy') { h1.classList.add('joy'); h2.classList.add('joy'); }
+      if (s === 'sad') { h1.classList.add('sad'); h2.classList.add('sad'); }
+      if (s === 'think') { h1.classList.add('think'); }
+      document.getElementById('st').textContent = texts[s];
+    });
+  });
+</script>
+</body>
+</html>

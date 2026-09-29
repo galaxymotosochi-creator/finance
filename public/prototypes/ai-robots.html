@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Робот — 3 образа (объёмные)</title>
+<style>
+  :root{
+    --yellow:#ffdd2d; --blue:#1d78fc; --blue-d:#0d4ea8; --blue-soft:#E6F0FF;
+    --ink:#111; --muted:#8b93a3; --soft:#f4f7fc; --line:rgba(29,120,252,.14);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 18px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef3fb;color:var(--ink)}
+  h1{font-size:20px;margin:0 0 4px;text-align:center}
+  .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:28px}
+  .row{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;max-width:1180px;margin:0 auto}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;width:340px;box-shadow:0 22px 48px -24px rgba(11,18,32,.4);display:flex;flex-direction:column;align-items:center;gap:14px}
+  .card h2{font-size:15px;margin:0}
+  .card .desc{font-size:12px;color:var(--muted);text-align:center;line-height:1.5;margin:0}
+  .btn{border:none;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;padding:9px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 10px 20px -10px rgba(29,120,252,.9)}
+
+  /* ===== ОБЩАЯ АНИМАЦИЯ ===== */
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+  @keyframes blink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+  @keyframes glow{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.85;filter:brightness(1.35)}}
+  @keyframes ringpulse{0%{transform:scale(.7);opacity:.65}100%{transform:scale(1.35);opacity:0}}
+  @keyframes sweep{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}
+  .stage{position:relative;width:250px;height:270px;display:flex;align-items:center;justify-content:center}
+  .botwrap{position:relative;animation:float 4s ease-in-out infinite}
+
+  /* блик-обход */
+  .gloss{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+  .gloss:after{content:"";position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:sweep 4.5s ease-in-out infinite}
+
+  /* ================= ОБРАЗ 1: бело-синий глянцевый ================= */
+  .r1 .head{width:132px;height:112px;border-radius:38px;position:relative;
+    background:linear-gradient(160deg,#ffffff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);
+    border:2px solid #a9bad4;
+    box-shadow:0 20px 34px -18px rgba(11,18,32,.55), inset 0 -10px 22px rgba(120,145,185,.35), inset 0 8px 16px rgba(255,255,255,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  .r1 .visor{width:86px;height:44px;border-radius:16px;background:linear-gradient(165deg,#0b1a33,#0d4ea8 60%,#1d78fc);
+    box-shadow:inset 0 4px 10px rgba(0,0,0,.6), 0 0 24px rgba(29,120,252,.65);display:flex;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden}
+  .r1 .visor:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.45) 0%,transparent 45%)}
+  .r1 .eye{width:15px;height:15px;border-radius:50%;background:#bff0ff;box-shadow:0 0 14px #9ff0ff;animation:blink 4.4s infinite}
+  .r1 .eye:nth-child(2){animation-delay:.1s}
+  .r1 .mouth{width:40px;height:6px;border-radius:6px;background:linear-gradient(90deg,#cdd9ea,#8899b3);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+  .r1 .ear{position:absolute;top:34px;width:12px;height:34px;border-radius:7px;background:linear-gradient(180deg,#dbe4f2,#aebfd8);border:1px solid #a3b4cf}
+  .r1 .ear.l{left:-13px}.r1 .ear.r{right:-13px}
+  .r1 .ant{position:absolute;top:-24px;left:50%;transform:translateX(-50%);width:3px;height:22px;background:linear-gradient(#c3cee0,#8fa3c2)}
+  .r1 .ant:after{content:"";position:absolute;top:-11px;left:-6px;width:15px;height:15px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff6c4,var(--yellow));box-shadow:0 0 18px rgba(255,221,45,.95);animation:glow 1.8s infinite}
+  .r1 .torso{width:104px;height:56px;border-radius:24px;margin-top:8px;position:relative;
+    background:linear-gradient(160deg,#f6f9ff,#d5e0f1 60%,#bccce4);border:2px solid #aab9d3;
+    box-shadow:inset 0 -8px 16px rgba(120,145,185,.35), inset 0 6px 12px rgba(255,255,255,.85)}
+  .r1 .torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#ffe98a,var(--yellow));box-shadow:0 0 16px rgba(255,221,45,.9)}
+  .r1 .arm{position:absolute;top:14px;width:16px;height:44px;border-radius:9px;background:linear-gradient(180deg,#e6ecf7,#c0cde2);border:2px solid #aab9d3}
+  .r1 .arm.l{left:-24px;transform:rotate(8deg)}.r1 .arm.r{right:-24px;transform:rotate(-8deg)}
+
+  /* ================= ОБРАЗ 2: жёлто-тёплый дружелюбный ================= */
+  .r2 .head{width:136px;height:126px;border-radius:46px;position:relative;
+    background:radial-gradient(circle at 34% 26%,#fffbe0 0%,#fff2a8 32%,#ffdd2d 68%,#f0c400 100%);
+    border:2px solid #e8bd00;
+    box-shadow:0 22px 38px -18px rgba(180,140,0,.6), inset 0 -12px 24px rgba(200,160,0,.35), inset 0 10px 18px rgba(255,255,255,.85);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .r2 .eyes{display:flex;gap:26px}
+  .r2 .eye{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4b5566,#111);box-shadow:inset 0 -2px 4px rgba(255,255,255,.25);animation:blink 5s infinite}
+  .r2 .eye:nth-child(2){animation-delay:.12s}
+  .r2 .smile{width:44px;height:22px;border:5px solid #111;border-top:none;border-radius:0 0 44px 44px;box-shadow:0 3px 0 rgba(0,0,0,.06)}
+  .r2 .cheek{position:absolute;bottom:26px;width:20px;height:11px;border-radius:50%;background:rgba(229,62,62,.32);filter:blur(1px)}
+  .r2 .cheek.l{left:16px}.r2 .cheek.r{right:16px}
+  .r2 .ant{position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:3px;height:20px;background:#e0b800}
+  .r2 .ant:after{content:"";position:absolute;top:-12px;left:-7px;width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#cdeaff,var(--blue));box-shadow:0 0 18px rgba(29,120,252,.9);animation:glow 1.9s infinite}
+  .r2 .torso{width:110px;height:58px;border-radius:26px;margin-top:8px;position:relative;
+    background:linear-gradient(160deg,#fff6c9,#ffe27a 55%,#f4c92a);border:2px solid #e8bd00;
+    box-shadow:inset 0 -8px 16px rgba(200,160,0,.35), inset 0 6px 12px rgba(255,255,255,.85)}
+  .r2 .torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e6f1ff,var(--blue));box-shadow:0 0 18px rgba(29,120,252,.85)}
+  .r2 .arm{position:absolute;top:16px;width:17px;height:46px;border-radius:10px;background:linear-gradient(180deg,#ffe9a0,#f2c62c);border:2px solid #e0b800}
+  .r2 .arm.l{left:-25px;transform:rotate(10deg)}.r2 .arm.r{right:-25px;transform:rotate(-10deg)}
+
+  /* ================= ОБРАЗ 3: тёмный техно с подсветкой ================= */
+  .r3 .head{width:134px;height:116px;border-radius:26px;position:relative;
+    background:linear-gradient(160deg,#2a3purple 0%,#1b2a45 0%,#12203a 55%,#0b1626 100%);
+    border:2px solid #2d4570;
+    box-shadow:0 24px 40px -18px rgba(0,0,0,.75), inset 0 0 28px rgba(29,120,252,.35), inset 0 8px 14px rgba(120,180,255,.14);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px}
+  .r3 .head:before{content:"";position:absolute;inset:10px;border-radius:16px;pointer-events:none;
+    background-image:linear-gradient(rgba(120,190,255,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(120,190,255,.16) 1px,transparent 1px);background-size:11px 11px}
+  .r3 .eyes{display:flex;gap:24px;position:relative;z-index:2}
+  .r3 .eye{width:30px;height:9px;border-radius:6px;background:linear-gradient(90deg,#5ff0ff,#9ff0ff);box-shadow:0 0 20px #6ff0ff,0 0 40px rgba(111,240,255,.5);animation:glow 1.6s infinite}
+  .r3 .eye:nth-child(2){animation-delay:.25s}
+  .r3 .mouth{width:46px;height:4px;border-radius:4px;background:rgba(159,240,255,.6);box-shadow:0 0 12px rgba(111,240,255,.45);position:relative;z-index:2}
+  .r3 .ant{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:3px;height:18px;background:#3a5480}
+  .r3 .ant:after{content:"";position:absolute;top:-11px;left:-6px;width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff9f9f,#e53e3e);box-shadow:0 0 16px rgba(229,62,62,.95);animation:glow 1.4s infinite}
+  .r3 .torso{width:106px;height:56px;border-radius:18px;margin-top:8px;position:relative;
+    background:linear-gradient(160deg,#20304f,#101d33);border:2px solid #2d4570;
+    box-shadow:inset 0 0 22px rgba(29,120,252,.4)}
+  .r3 .torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#7ef7ff,#1d78fc);box-shadow:0 0 20px rgba(111,240,255,.95)}
+  .r3 .arm{position:absolute;top:14px;width:16px;height:44px;border-radius:8px;background:linear-gradient(180deg,#27395c,#152340);border:2px solid #2d4570}
+  .r3 .arm.l{left:-24px;transform:rotate(8deg)}.r3 .arm.r{right:-24px;transform:rotate(-8deg)}
+
+  /* тень под роботом */
+  .shadow{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:120px;height:20px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(11,18,32,.28),transparent 70%);filter:blur(2px)}
+  /* ореол */
+  .halo{position:absolute;width:190px;height:190px;border-radius:50%;border:2px solid rgba(29,120,252,.25);animation:ringpulse 3.4s ease-out infinite}
+  .halo.d2{animation-delay:1.7s}
+</style>
+</head>
+<body>
+  <h1>Робот — 3 образа</h1>
+  <div class="sub">Объёмные, с градиентами, бликами и глубиной. Анимация: левитация, дыхание, мигание, пульс подсветки</div>
+
+  <div class="row">
+
+    <!-- ОБРАЗ 1 -->
+    <div class="card">
+      <div class="stage">
+        <div class="halo"></div><div class="halo d2"></div>
+        <div class="shadow"></div>
+        <div class="botwrap" style="animation:breathe 3.6s ease-in-out infinite">
+          <div class="r1" style="position:relative">
+            <div class="ant"></div>
+            <div class="ear l"></div><div class="ear r"></div>
+            <div class="head">
+              <div class="visor"><span class="eye"></span><span class="eye"></span></div>
+              <div class="mouth"></div>
+            </div>
+            <div style="position:relative;display:flex;justify-content:center">
+              <div class="arm l"></div>
+              <div class="torso"></div>
+              <div class="arm r"></div>
+            </div>
+            <div class="gloss" style="border-radius:40px"></div>
+          </div>
+        </div>
+      </div>
+      <h2>1 · Бело-синий глянцевый</h2>
+      <p class="desc">Чистый, технологичный, «премиальный». Стеклянный визор с подсветкой глаз, жёлтый пульс на груди. В тон сайту.</p>
+      <button class="btn">Взять этот образ</button>
+    </div>
+
+    <!-- ОБРАЗ 2 -->
+    <div class="card">
+      <div class="stage">
+        <div class="halo" style="border-color:rgba(255,221,45,.35)"></div>
+        <div class="shadow"></div>
+        <div class="botwrap" style="animation:breathe 3.9s ease-in-out infinite">
+          <div class="r2" style="position:relative">
+            <div class="ant"></div>
+            <div class="head">
+              <div class="eyes"><span class="eye"></span><span class="eye"></span></div>
+              <div class="smile"></div>
+              <span class="cheek l"></span><span class="cheek r"></span>
+            </div>
+            <div style="position:relative;display:flex;justify-content:center">
+              <div class="arm l"></div>
+              <div class="torso"></div>
+              <div class="arm r"></div>
+            </div>
+            <div class="gloss" style="border-radius:48px"></div>
+          </div>
+        </div>
+      </div>
+      <h2>2 · Жёлтый дружелюбный</h2>
+      <p class="desc">Тёплый и живой: улыбка, румянец, жёлтый корпус в цвет акцента сайта. Самый «свой», не пугает.</p>
+      <button class="btn">Взять этот образ</button>
+    </div>
+
+    <!-- ОБРАЗ 3 -->
+    <div class="card">
+      <div class="stage">
+        <div class="halo" style="border-color:rgba(111,240,255,.35)"></div>
+        <div class="shadow"></div>
+        <div class="botwrap" style="animation:breathe 3.3s ease-in-out infinite">
+          <div class="r3" style="position:relative">
+            <div class="ant"></div>
+            <div class="head">
+              <div class="eyes"><span class="eye"></span><span class="eye"></span></div>
+              <div class="mouth"></div>
+            </div>
+            <div style="position:relative;display:flex;justify-content:center">
+              <div class="arm l"></div>
+              <div class="torso"></div>
+              <div class="arm r"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2>3 · Тёмный техно</h2>
+      <p class="desc">Футуризм: тёмный корпус, неоновая подсветка, сетка на корпусе. Выглядит дорого и «умно».</p>
+      <button class="btn">Взять этот образ</button>
+    </div>
+
+  </div>
+</body>
+</html>

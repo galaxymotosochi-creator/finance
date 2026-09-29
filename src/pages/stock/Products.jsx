@@ -637,15 +637,20 @@ export default function Products() {
   // Filter products
   let filtered = [...products];
   const q = search.toLowerCase().trim();
-  if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
+  const qWords = q ? q.split(/\s+/).filter(Boolean) : [];
+  if (qWords.length) filtered = filtered.filter(p => {
+    const hay = (p.name + ' ' + (p.sku || '') + ' ' + (p.barcode || '')).toLowerCase();
+    return qWords.every(w => hay.includes(w));
+  });
   if (selectedCats.size > 0) filtered = filtered.filter(p => selectedCats.has(CAT_LABELS[p.cat] || p.cat || ''));
   if (typeFilterSet.size > 0) filtered = filtered.filter(p => typeFilterSet.has(p.type));
-  // Сортировка: сначала совпадения по названию, потом по артикулу; скрытые — всегда в конце
-  filtered = filtered.sort((a, b) => {
+  // Сортировка: совпадения по началу названия выше, скрытые — всегда в конце
+  if (q) filtered = filtered.sort((a, b) => {
     const rank = (p) => {
-      const nameHit = q && p.name.toLowerCase().includes(q) ? 0 : 1;
+      const n = p.name.toLowerCase();
+      const startsHit = n.startsWith(q) ? 0 : 1;
       const hiddenRank = p.hidden ? 2 : 0;
-      return nameHit + hiddenRank;
+      return startsHit + hiddenRank;
     };
     return rank(a) - rank(b);
   });
@@ -880,7 +885,7 @@ export default function Products() {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={2 + activeCols.size}>
-                  <div className="sk-empty">Каталог пуст — добавьте первый товар или услугу</div>
+                  <div className="sk-empty">{q ? 'Ничего не найдено по запросу' : 'Каталог пуст — добавьте первый товар или услугу'}</div>
                 </td>
               </tr>
             ) : filtered.map(p => (

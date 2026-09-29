@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Круг — варианты процентов</title>
+<style>
+  :root{--ink:#111;--muted:#8b93a3;--soft:#f4f7fc;--line:rgba(29,120,252,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f7f9fc;color:var(--ink)}
+  h1{font-size:19px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+  .wrap{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;flex:1;min-width:330px;max-width:470px}
+  .card h2{font-size:14px;margin:0 0 2px}
+  .card .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#e8f0ff;color:#0d4ea8;margin-bottom:12px}
+  .card .note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+  .ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+  .ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;
+    box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
+  .ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;
+    background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 48%),linear-gradient(158deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,0) 44%,rgba(0,0,0,.26) 100%)}
+  .ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;
+    box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
+  .ring .in{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .ring .in .t{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  .ring .in .v{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-top:3px;color:#111;white-space:nowrap}
+  .pct{position:absolute;z-index:4;font-size:10px;font-weight:800;background:#fff;border-radius:100px;padding:1px 5px;
+    box-shadow:0 4px 10px rgba(11,18,32,.3),0 1px 2px rgba(11,18,32,.2);transform:translate(-50%,-50%);color:#fff}
+  .legend{flex:1;min-width:180px}
+  .grp-h{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;margin:0 0 8px}
+  .grp-h .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .grp-h .amt{margin-left:auto;font-weight:800}
+  .leg{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 0}
+  .leg .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .leg .nm{color:#33405a}
+  .leg .pctv{margin-left:auto;font-weight:700}
+  .leg .amt2{min-width:78px;text-align:right;font-weight:600;color:#111}
+  .bar{height:4px;border-radius:99px;background:#eef2f9;margin:2px 0 6px}
+  .bar i{display:block;height:100%;border-radius:99px}
+</style>
+</head>
+<body>
+  <h1>Круг расходов — варианты подписи процентов</h1>
+  <div class="sub">Данные: Выплата прибыли 100 000 ₽ · Зарплата 20 600 ₽ · Оплата поставок 6 000 ₽ · Без категории 2 000 ₽ (всего 128 600 ₽)</div>
+
+  <div class="wrap">
+
+    <!-- ВАРИАНТ A: сейчас -->
+    <div class="card">
+      <span class="tag">СЕЙЧАС</span>
+      <h2>Проценты от своей группы</h2>
+      <div class="ring-block">
+        <div class="ring" style="background:conic-gradient(#F45B69 0% 77.76%,#7A5AF8 77.76% 93.78%,#0d4ea8 93.78% 98.45%,#61C454 98.45% 100%)">
+          <span class="pct" style="left:calc(50% + 55px);top:calc(50% + 20px);background:#F45B69">78%</span>
+          <span class="pct" style="left:calc(50% + -45px);top:calc(50% - 35px);background:#7A5AF8">16%</span>
+          <div class="in"><div class="t">РАСХОДЫ</div><div class="v">−128 600 ₽</div></div>
+        </div>
+        <div class="legend">
+          <div class="grp-h"><span class="dot" style="background:#ffcf2e"></span>Расходы<span class="amt">−128 600 ₽</span></div>
+          <div class="leg"><span class="dot" style="background:#F45B69"></span><span class="nm">Выплата прибыли</span><span class="pctv">78%</span><span class="amt2">−100 000 ₽</span></div>
+          <div class="bar"><i style="width:78%;background:#F45B69"></i></div>
+          <div class="leg"><span class="dot" style="background:#7A5AF8"></span><span class="nm">Зарплата</span><span class="pctv">16%</span><span class="amt2">−20 600 ₽</span></div>
+          <div class="bar"><i style="width:16%;background:#7A5AF8"></i></div>
+          <div class="leg"><span class="dot" style="background:#0d4ea8"></span><span class="nm">Оплата поставок</span><span class="pctv">5%</span><span class="amt2">−6 000 ₽</span></div>
+          <div class="bar"><i style="width:5%;background:#0d4ea8"></i></div>
+          <div class="leg"><span class="dot" style="background:#61C454"></span><span class="nm">Без категории</span><span class="pctv">2%</span><span class="amt2">−2 000 ₽</span></div>
+          <div class="bar"><i style="width:2%;background:#61C454"></i></div>
+        </div>
+      </div>
+      <div class="note">Проценты считаются внутри группы. Когда в круге ТОЛЬКО расходы — это совпадает со всем кругом, всё честно. Проблема появится в смешанном виде (доходы + расходы) — тогда 78% будет означать «78% от расходов», а не от всего круга.</div>
+    </div>
+
+    <!-- ВАРИАНТ B: от всего круга -->
+    <div class="card">
+      <span class="tag">ВАРИАНТ 3</span>
+      <h2>Проценты от всего круга</h2>
+      <div class="ring-block">
+        <div class="ring" style="background:conic-gradient(#F45B69 0% 77.76%,#7A5AF8 77.76% 93.78%,#0d4ea8 93.78% 98.45%,#61C454 98.45% 100%)">
+          <span class="pct" style="left:calc(50% + 55px);top:calc(50% + 20px);background:#F45B69">78%</span>
+          <span class="pct" style="left:calc(50% + -45px);top:calc(50% - 35px);background:#7A5AF8">16%</span>
+          <div class="in"><div class="t">РАСХОДЫ</div><div class="v">−128 600 ₽</div></div>
+        </div>
+        <div class="legend">
+          <div class="grp-h"><span class="dot" style="background:#ffcf2e"></span>Расходы<span class="amt">−128 600 ₽</span></div>
+          <div class="leg"><span class="dot" style="background:#F45B69"></span><span class="nm">Выплата прибыли</span><span class="pctv">78%</span><span class="amt2">−100 000 ₽</span></div>
+          <div class="bar"><i style="width:78%;background:#F45B69"></i></div>
+          <div class="leg"><span class="dot" style="background:#7A5AF8"></span><span class="nm">Зарплата</span><span class="pctv">16%</span><span class="amt2">−20 600 ₽</span></div>
+          <div class="bar"><i style="width:16%;background:#7A5AF8"></i></div>
+          <div class="leg"><span class="dot" style="background:#0d4ea8"></span><span class="nm">Оплата поставок</span><span class="pctv">5%</span><span class="amt2">−6 000 ₽</span></div>
+          <div class="bar"><i style="width:5%;background:#0d4ea8"></i></div>
+          <div class="leg"><span class="dot" style="background:#61C454"></span><span class="nm">Без категории</span><span class="pctv">2%</span><span class="amt2">−2 000 ₽</span></div>
+          <div class="bar"><i style="width:2%;background:#61C454"></i></div>
+        </div>
+      </div>
+      <div class="note">Если в круге одна группа — цифры не меняются. Но когда появятся доходы, проценты расходов будут считаться от суммы доходов+расходов, то есть уменьшатся вдвое (например, 39% вместо 78%). Зато сумма всех сегментов круга = 100%.</div>
+    </div>
+
+    <!-- ВАРИАНТ C: смешанный пример -->
+    <div class="card">
+      <span class="tag">СМЕШАННЫЙ ПРИМЕР</span>
+      <h2>Доходы + Расходы: 2 подхода</h2>
+      <div class="ring-block">
+        <div class="ring" style="background:conic-gradient(#1F75FF 0% 50%,#F45B69 50% 88.9%,#7A5AF8 88.9% 100%)">
+          <span class="pct" style="left:calc(50% + -50px);top:calc(50% - 30px);background:#1F75FF">100%</span>
+          <span class="pct" style="left:calc(50% + 50px);top:calc(50% + 25px);background:#F45B69">78%</span>
+          <div class="in"><div class="t">ПРИБЫЛЬ</div><div class="v">+71 400 ₽</div></div>
+        </div>
+        <div class="legend">
+          <div class="grp-h"><span class="dot" style="background:#1F75FF"></span>Доходы<span class="amt">+200 000 ₽</span></div>
+          <div class="leg"><span class="dot" style="background:#1F75FF"></span><span class="nm">Доход от продаж</span><span class="pctv">50%</span><span class="amt2">+200 000 ₽</span></div>
+          <div class="bar"><i style="width:100%;background:#1F75FF"></i></div>
+          <div class="grp-h" style="margin-top:10px"><span class="dot" style="background:#ffcf2e"></span>Расходы<span class="amt">−128 600 ₽</span></div>
+          <div class="leg"><span class="dot" style="background:#F45B69"></span><span class="nm">Выплата прибыли</span><span class="pctv">39%</span><span class="amt2">−100 000 ₽</span></div>
+          <div class="bar"><i style="width:39%;background:#F45B69"></i></div>
+          <div class="leg"><span class="dot" style="background:#7A5AF8"></span><span class="nm">Зарплата</span><span class="pctv">8%</span><span class="amt2">−20 600 ₽</span></div>
+          <div class="bar"><i style="width:8%;background:#7A5AF8"></i></div>
+        </div>
+      </div>
+      <div class="note"><b>Слева — «от всего круга»:</b> доход 100% группы = 50% круга, расход 78% группы = 39% круга. Сумма = 100%.<br><b>Сейчас:</b> в легенде стояло бы «100%» и «78%» — то есть 178% на одном круге.</div>
+    </div>
+
+  </div>
+</body>
+</html>

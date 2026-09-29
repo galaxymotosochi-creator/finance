@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI раздел — 5 вариантов с роботом</title>
+<style>
+  :root{
+    --yellow:#ffdd2d; --yellow-d:#f5d100; --yellow-l:#fff8d6;
+    --blue:#1d78fc; --blue-d:#1567d8; --blue-deep:#0d4ea8; --blue-soft:#E6F0FF;
+    --ink:#111; --muted:#8b93a3; --soft:#f4f7fc; --line:rgba(29,120,252,.14);
+    --green:#16a34a; --red:#e53e3e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 18px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef3fb;color:var(--ink)}
+  h1.title{font-size:20px;margin:0 0 4px;text-align:center}
+  .subtitle{text-align:center;color:var(--muted);font-size:13px;margin-bottom:30px}
+  .case{max-width:1080px;margin:0 auto 34px}
+  .case > .cap{display:flex;align-items:center;gap:10px;margin:0 0 10px 4px}
+  .cap .num{width:26px;height:26px;border-radius:8px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  .cap .nm{font-size:14px;font-weight:800}
+  .cap .ds{font-size:12px;color:var(--muted)}
+  .screen{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 20px 44px -22px rgba(11,18,32,.35)}
+  .topbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:#fbfcff}
+  .dot3{width:9px;height:9px;border-radius:50%}
+  .topbar .t{margin-left:8px;font-size:12px;font-weight:700;color:#5b6472}
+  .dot3.r{background:#ff6058}.dot3.y{background:#ffbd2e}.dot3.g{background:#28c840}
+
+  /* общие элементы */
+  .qbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:600;color:#42506a;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .qbtn:hover{background:var(--blue-soft);border-color:#c9deff}
+  .bubble{border-radius:14px;padding:10px 13px;font-size:12.5px;line-height:1.5;max-width:78%}
+  .bubble.bot{background:var(--soft);color:#243043;border-top-left-radius:5px}
+  .bubble.me{background:var(--blue);color:#fff;margin-left:auto;border-top-right-radius:5px}
+  .inputrow{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 16px;background:#fff}
+  .inputrow input{border:none;outline:none;flex:1;font-size:12.5px;font-family:inherit;background:none}
+  .send{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--blue),var(--blue-deep));color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+
+  /* ===== роботы ===== */
+  .bot{position:relative;flex:none}
+  .bot .head{position:relative}
+  .bot .eyes{display:flex;gap:8px}
+  .bot .eye{width:11px;height:11px;border-radius:50%;background:#0b1220;animation:blink 4.2s infinite}
+  .bot .eye:nth-child(2){animation-delay:.12s}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+  .bot .mouth{height:3px;border-radius:3px;background:#0b1220;margin:0 auto}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+  .bot.anim{animation:bob 3.1s ease-in-out infinite}
+  .bot .ant{position:absolute;left:50%;top:-16px;transform:translateX(-50%);width:2px;height:14px;background:#9fb3d6}
+  .bot .ant:after{content:"";position:absolute;top:-7px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--yellow);box-shadow:0 0 10px rgba(255,221,45,.9);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.82)}}
+
+  /* 1 — металлический */
+  .bot-metal .head{width:76px;height:64px;border-radius:16px;background:linear-gradient(150deg,#e9eef7,#c3cee0);border:2px solid #aab8ce;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  .bot-metal .eye{width:14px;height:14px;border-radius:4px;background:#1d78fc;box-shadow:0 0 10px rgba(29,120,252,.75)}
+  .bot-metal .mouth{width:24px;background:#8899b3}
+  .bot-metal .ears{position:absolute;top:22px;left:-9px;right:-9px;display:flex;justify-content:space-between;pointer-events:none}
+  .bot-metal .ears i{width:8px;height:22px;border-radius:4px;background:#b6c2d6;display:block}
+
+  /* 2 — жёлтый дружелюбный */
+  .bot-sun .head{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 34% 28%,#fff3b0,var(--yellow));border:3px solid #f0c800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  .bot-sun .eye{width:13px;height:13px;background:#111}
+  .bot-sun .mouth{width:26px;height:4px;border-radius:0 0 8px 8px;background:#111}
+  .bot-sun .cheek{position:absolute;bottom:20px;width:12px;height:7px;border-radius:50%;background:rgba(229,62,62,.35)}
+  .bot-sun .cheek.l{left:14px}.bot-sun .cheek.r{right:14px}
+
+  /* 3 — синий технарь */
+  .bot-tech .head{width:80px;height:66px;border-radius:12px;background:linear-gradient(160deg,#1d78fc,#0d4ea8);border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:inset 0 0 22px rgba(255,255,255,.22)}
+  .bot-tech .eye{width:20px;height:6px;border-radius:3px;background:#9ff0ff;box-shadow:0 0 12px #9ff0ff}
+  .bot-tech .mouth{width:30px;height:2px;background:rgba(255,255,255,.55)}
+  .bot-tech .grid{position:absolute;inset:0;border-radius:12px;background-image:linear-gradient(rgba(255,255,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.10) 1px,transparent 1px);background-size:10px 10px;pointer-events:none}
+
+  /* 4 — мини-робот в шапке */
+  .bot-mini .head{width:46px;height:40px;border-radius:11px;background:#fff;border:2px solid var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 6px 14px -6px rgba(29,120,252,.6)}
+  .bot-mini .eye{width:8px;height:8px;background:var(--blue)}
+  .bot-mini .mouth{width:14px;height:2px;background:var(--blue)}
+  .bot-mini .ant{top:-11px;height:9px}
+
+  /* 5 — большой робот-собеседник */
+  .bot-big .head{width:104px;height:88px;border-radius:22px;background:linear-gradient(150deg,#ffffff,#dfe8f8);border:3px solid #b9c8e2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 18px 34px -16px rgba(11,18,32,.4)}
+  .bot-big .eye{width:18px;height:18px;border-radius:6px;background:#0b1220}
+  .bot-big .eye.lit{background:#1d78fc;box-shadow:0 0 14px rgba(29,120,252,.85)}
+  .bot-big .mouth{width:34px;height:4px;background:#8899b3}
+  .bot-big .body{width:74px;height:34px;border-radius:14px;background:linear-gradient(150deg,#eef3fb,#c9d6ea);border:3px solid #b9c8e2;margin-top:6px}
+
+  /* статус-плашка */
+  .status{display:inline-flex;align-items:center;gap:7px;background:var(--blue-soft);color:var(--blue-deep);border-radius:999px;padding:5px 12px;font-size:11.5px;font-weight:700}
+  .status .live{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.8s infinite}
+
+  /* типографика внутри экрана */
+  .pad{padding:18px}
+  .h-sec{font-size:15px;font-weight:800;margin:0}
+  .h-sub{font-size:12px;color:var(--muted);margin:3px 0 0}
+</style>
+</head>
+<body>
+  <h1 class="title">Раздел AI — 5 вариантов с роботом</h1>
+  <div class="subtitle">Стиль сайта: жёлтый #ffdd2d · синий #1d78fc · мягкие плашки и скругления</div>
+
+  <!-- ВАРИАНТ 1 -->
+  <div class="case">
+    <div class="cap"><span class="num">1</span><span class="nm">Классика</span><span class="ds">— робот слева как собеседник, чат справа</span></div>
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+      <div class="pad" style="display:flex;gap:20px;align-items:flex-start">
+        <div style="width:190px;flex:none;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 8px;background:var(--soft);border-radius:16px">
+          <div class="bot bot-metal anim" style="height:78px;display:flex;align-items:flex-end">
+            <div class="ant"></div>
+            <div class="head"><div class="ears"><i></i><i></i></div><div class="eyes"><span class="eye"></span><span class="eye"></span></div><div class="mouth" style="width:24px"></div></div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:13.5px;font-weight:800">Бот Atlas</div>
+            <div class="status" style="margin-top:6px"><span class="live"></span>Готов помочь</div>
+          </div>
+          <button class="qbtn" style="width:100%">Дневной отчёт</button>
+          <button class="qbtn" style="width:100%">Топ товаров</button>
+          <button class="qbtn" style="width:100%">Остатки</button>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+          <div class="bubble bot">Привет! Я помогу с отчётами, остатками и деньгами. Что посмотреть?</div>
+          <div class="bubble me">Сколько выручки сегодня?</div>
+          <div class="bubble bot"><b>13 300 ₽</b> — 18 чеков, средний чек 739 ₽. Расходы 129 600 ₽, по кассе минус.</div>
+          <div class="inputrow" style="margin-top:4px"><input placeholder="Спросите что-нибудь…"><button class="send">➤</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВАРИАНТ 2 -->
+  <div class="case">
+    <div class="cap"><span class="num">2</span><span class="nm">Центр</span><span class="ds">— жёлтый робот-солнце по центру, чат под ним</span></div>
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+      <div class="pad" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div class="bot bot-sun anim" style="height:92px;display:flex;align-items:flex-end;margin-top:8px">
+          <div class="head">
+            <div class="eyes"><span class="eye"></span><span class="eye"></span></div>
+            <div class="mouth"></div>
+            <span class="cheek l"></span><span class="cheek r"></span>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <div class="h-sec" style="font-size:17px">Привет, я Сол!</div>
+          <div class="h-sub">Ваш помощник по бизнесу. Спросите что угодно</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:4px 0 6px">
+          <button class="qbtn">📊 Дневной отчёт</button>
+          <button class="qbtn">🔥 Топ товаров</button>
+          <button class="qbtn">💰 Остатки</button>
+          <button class="qbtn">🔮 Прогноз</button>
+        </div>
+        <div style="width:100%;max-width:620px;display:flex;flex-direction:column;gap:10px">
+          <div class="bubble bot" style="max-width:100%">Чем помочь сегодня?</div>
+          <div class="bubble me" style="max-width:100%">Покажи топ товаров за месяц</div>
+          <div class="bubble bot" style="max-width:100%">1. Скутер X9 — 84 шт · 2. Шлем Pro — 61 шт · 3. Масло 5W40 — 58 шт</div>
+          <div class="inputrow"><input placeholder="Напишите сообщение…"><button class="send">➤</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВАРИАНТ 3 -->
+  <div class="case">
+    <div class="cap"><span class="num">3</span><span class="nm">Панель</span><span class="ds">— синий робот-технарь в правой панели, чат на всю ширину</span></div>
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+      <div class="pad" style="display:flex;gap:18px;align-items:stretch;min-height:330px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <button class="qbtn">Дневной отчёт</button><button class="qbtn">Нулевые остатки</button><button class="qbtn">Excel</button>
+          </div>
+          <div class="bubble bot">Загрузите фото накладной — распознаю позиции и цены.</div>
+          <div class="bubble me">Проверь кассу</div>
+          <div class="bubble bot">Касса: <b>44 500 ₽</b>. Прогноз на конец месяца — 47 227 ₽.</div>
+          <div class="inputrow" style="margin-top:auto"><input placeholder="Сообщение…"><button class="send">➤</button></div>
+        </div>
+        <div style="width:210px;flex:none;background:linear-gradient(170deg,#1d78fc,#0d4ea8);border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff">
+          <div class="bot bot-tech anim" style="height:72px;display:flex;align-items:flex-end;margin-top:6px"><div class="head"><div class="grid"></div><div class="eyes"><span class="eye"></span><span class="eye"></span></div><div class="mouth"></div></div></div>
+          <div style="text-align:center"><div style="font-size:13.5px;font-weight:800">НЕО</div><div style="font-size:11px;opacity:.85">Аналитик</div></div>
+          <div style="background:rgba(255,255,255,.16);border-radius:12px;padding:10px;font-size:11.5px;line-height:1.5">Я слежу за цифрами и предупрежу о проблемах</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВАРИАНТ 4 -->
+  <div class="case">
+    <div class="cap"><span class="num">4</span><span class="nm">Минимал</span><span class="ds">— маленький робот в шапке, максимум места чату</span></div>
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+      <div class="pad">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+          <div class="bot bot-mini anim" style="height:44px;display:flex;align-items:flex-end"><div class="ant"></div><div class="head"><div class="eyes"><span class="eye"></span><span class="eye"></span></div><div class="mouth"></div></div></div>
+          <div style="flex:1">
+            <div class="h-sec">AI помощник</div>
+            <div class="h-sub">Спросите, загрузите фото, получите отчёт</div>
+          </div>
+          <div class="status"><span class="live"></span>Онлайн</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="qbtn">📊 Отчёт дня</button><button class="qbtn">📈 Неделя</button><button class="qbtn">🏆 Топ</button><button class="qbtn">📦 Остатки</button><button class="qbtn">🔮 Прогноз</button><button class="qbtn">📥 Excel</button>
+        </div>
+        <div style="background:var(--soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:200px">
+          <div class="bubble bot">Добрый день! Что считаем?</div>
+          <div class="bubble me">Должники</div>
+          <div class="bubble bot">3 клиента: Иванов −2 400 ₽ · Петров −1 100 ₽ · Сидорова −800 ₽</div>
+          <div class="inputrow" style="margin-top:auto"><input placeholder="Сообщение…"><button class="send">➤</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВАРИАНТ 5 -->
+  <div class="case">
+    <div class="cap"><span class="num">5</span><span class="nm">Большой робот</span><span class="ds">— крупный робот-собеседник слева, чат в «стекле»</span></div>
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+      <div class="pad" style="display:flex;gap:22px;align-items:flex-start">
+        <div style="width:230px;flex:none;display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 12px;background:linear-gradient(175deg,#fff,var(--blue-soft));border-radius:18px;border:1px solid var(--line)">
+          <div class="bot bot-big anim" style="display:flex;flex-direction:column;align-items:center">
+            <div class="head"><div class="eyes"><span class="eye lit"></span><span class="eye lit"></span></div><div class="mouth"></div></div>
+            <div class="body"></div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:15px;font-weight:800">Роби</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Ваш деловой помощник</div>
+          </div>
+          <button class="qbtn" style="width:100%">Начать отчёт</button>
+          <div class="status"><span class="live"></span>Слушаю вас</div>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+          <div class="bubble bot">Готов к работе! Могу посчитать, найти, предупредить.</div>
+          <div class="bubble me">Что по прибыли за месяц?</div>
+          <div class="bubble bot">Прибыль +71 400 ₽ за сентябрь. Маржа 34%. Расходы выше обычного на 12% — в основном выплата прибыли.</div>
+          <div class="inputrow"><input placeholder="Ваш вопрос…"><button class="send">➤</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

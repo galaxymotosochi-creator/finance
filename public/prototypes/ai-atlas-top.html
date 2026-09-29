@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI раздел — Атлас сверху (как ChatGPT)</title>
+<style>
+  :root{--yellow:#ffdd2d;--blue:#1d78fc;--blue-d:#0d4ea8;--blue-soft:#E6F0FF;--ink:#111;--muted:#8b93a3;--soft:#f7f9fc;--line:rgba(29,120,252,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 18px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef3fb;color:var(--ink)}
+  h1{font-size:20px;margin:0 0 4px;text-align:center}
+  .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px}
+  .wrap{max-width:820px;margin:0 auto}
+  .screen{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 26px 56px -28px rgba(11,18,32,.45);display:flex;flex-direction:column;height:720px}
+  .topbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:#fbfcff;flex:none}
+  .dot3{width:9px;height:9px;border-radius:50%}
+  .dot3.r{background:#ff6058}.dot3.y{background:#ffbd2e}.dot3.g{background:#28c840}
+  .topbar .t{margin-left:8px;font-size:12px;font-weight:700;color:#5b6472}
+
+  /* верхняя зона с роботом */
+  .hero{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 20px 16px;background:linear-gradient(180deg,#f4f8ff 0%,#fff 100%);border-bottom:1px solid var(--line)}
+  .hero h2{font-size:19px;margin:14px 0 3px;font-weight:800}
+  .hero p{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;color:#42506a;cursor:pointer;font-family:inherit;transition:all .15s}
+  .chip:hover{background:var(--blue-soft);border-color:#c9deff;transform:translateY(-1px)}
+
+  /* чат */
+  .chat{flex:1;min-height:0;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+  .msg{display:flex;gap:10px;max-width:88%}
+  .msg.me{align-self:flex-end;flex-direction:row-reverse}
+  .av{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  .av.bot{background:linear-gradient(135deg,#1d78fc,#0d4ea8);color:#fff}
+  .av.me{background:#e8ecf4;color:#5b6472}
+  .bub{padding:11px 14px;border-radius:16px;font-size:13px;line-height:1.55}
+  .msg.bot .bub{background:var(--soft);color:#1f2b3d;border-top-left-radius:5px}
+  .msg.me .bub{background:linear-gradient(135deg,#1d78fc,#0d4ea8);color:#fff;border-top-right-radius:5px}
+  .bub b{font-weight:800}
+  .card-mini{margin-top:9px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px}
+  .card-mini .row{display:flex;justify-content:space-between;padding:3px 0}
+  .card-mini .row span:last-child{font-weight:800}
+
+  /* ввод */
+  .composer{flex:none;padding:14px 22px 18px;border-top:1px solid var(--line);background:#fff}
+  .inputrow{display:flex;gap:9px;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:7px 7px 7px 18px;background:#fff;transition:border-color .15s,box-shadow .15s}
+  .inputrow:focus-within{border-color:#1d78fc;box-shadow:0 2px 14px rgba(29,120,252,.18)}
+  .inputrow input{border:none;outline:none;flex:1;font-size:13px;font-family:inherit;background:none}
+  .clip{width:30px;height:30px;border-radius:50%;border:none;background:var(--soft);color:#5b6472;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;font-size:14px}
+  .send{width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#1d78fc,#0d4ea8);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;box-shadow:0 8px 18px -8px rgba(29,120,252,.95)}
+  .hint{text-align:center;font-size:11px;color:var(--muted);margin-top:9px}
+
+  /* ==== робот ==== */
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+  @keyframes blink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+  @keyframes glow{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.85;filter:brightness(1.4)}}
+  @keyframes ringpulse{0%{transform:scale(.72);opacity:.6}100%{transform:scale(1.4);opacity:0}}
+  @keyframes sweep{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}
+  .botstage{position:relative;width:170px;height:150px;display:flex;align-items:center;justify-content:center}
+  .halo{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid rgba(29,120,252,.22);animation:ringpulse 3.4s ease-out infinite}
+  .halo.d2{animation-delay:1.7s}
+  .botpos{position:relative;animation:float 4s ease-in-out infinite}
+  .botinner{animation:breathe 3.6s ease-in-out infinite;position:relative}
+  .head{width:96px;height:80px;border-radius:28px;position:relative;
+    background:linear-gradient(160deg,#fff 0%,#eef3fb 42%,#d3dfef 72%,#b9c8e2 100%);border:2px solid #a9bad4;
+    box-shadow:0 14px 24px -14px rgba(11,18,32,.5),inset 0 -8px 16px rgba(120,145,185,.32),inset 0 6px 12px rgba(255,255,255,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+  .visor{width:62px;height:32px;border-radius:12px;background:linear-gradient(165deg,#0b1a33,#0d4ea8 60%,#1d78fc);
+    box-shadow:inset 0 3px 8px rgba(0,0,0,.6),0 0 18px rgba(29,120,252,.6);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden}
+  .visor:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.45) 0%,transparent 45%)}
+  .eye{width:11px;height:11px;border-radius:50%;background:#bff0ff;box-shadow:0 0 11px #9ff0ff;animation:blink 4.4s infinite}
+  .eye:nth-child(2){animation-delay:.1s}
+  .mouth{width:28px;height:5px;border-radius:5px;background:linear-gradient(90deg,#cdd9ea,#8899b3)}
+  .ear{position:absolute;top:24px;width:9px;height:24px;border-radius:6px;background:linear-gradient(180deg,#dbe4f2,#aebfd8);border:1px solid #a3b4cf}
+  .ear.l{left:-10px}.ear.r{right:-10px}
+  .ant{position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:2.5px;height:16px;background:linear-gradient(#c3cee0,#8fa3c2)}
+  .ant:after{content:"";position:absolute;top:-9px;left:-5px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c4,var(--yellow));box-shadow:0 0 14px rgba(255,221,45,.95);animation:glow 1.8s infinite}
+  .torso{width:74px;height:40px;border-radius:18px;margin-top:6px;position:relative;
+    background:linear-gradient(160deg,#f6f9ff,#d5e0f1 60%,#bccce4);border:2px solid #aab9d3;
+    box-shadow:inset 0 -6px 12px rgba(120,145,185,.32),inset 0 5px 10px rgba(255,255,255,.85)}
+  .torso:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe98a,var(--yellow));box-shadow:0 0 13px rgba(255,221,45,.9)}
+  .arm{position:absolute;top:10px;width:12px;height:32px;border-radius:7px;background:linear-gradient(180deg,#e6ecf7,#c0cde2);border:2px solid #aab9d3}
+  .arm.l{left:-18px;transform:rotate(8deg)}.arm.r{right:-18px;transform:rotate(-8deg)}
+  .gloss{position:absolute;inset:0;overflow:hidden;border-radius:30px;pointer-events:none}
+  .gloss:after{content:"";position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);animation:sweep 4.5s ease-in-out infinite}
+  .shadow{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:90px;height:16px;border-radius:50%;background:radial-gradient(ellipse,rgba(11,18,32,.25),transparent 70%);filter:blur(2px)}
+
+  .status{display:inline-flex;align-items:center;gap:7px;background:var(--blue-soft);color:var(--blue-d);border-radius:999px;padding:5px 12px;font-size:11.5px;font-weight:700;margin-top:2px}
+  .live{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 8px #16a34a;animation:glow 1.8s infinite}
+</style>
+</head>
+<body>
+  <h1>AI раздел — Атлас сверху</h1>
+  <div class="sub">Как в ChatGPT: робот по центру в шапке, чат под ним, ввод внизу</div>
+
+  <div class="wrap">
+    <div class="screen">
+      <div class="topbar"><i class="dot3 r"></i><i class="dot3 y"></i><i class="dot3 g"></i><span class="t">AI помощник</span></div>
+
+      <!-- Робот сверху -->
+      <div class="hero">
+        <div class="botstage">
+          <div class="halo"></div><div class="halo d2"></div>
+          <div class="shadow"></div>
+          <div class="botpos"><div class="botinner">
+            <div class="ant"></div>
+            <div class="ear l"></div><div class="ear r"></div>
+            <div class="head">
+              <div class="visor"><span class="eye"></span><span class="eye"></span></div>
+              <div class="mouth"></div>
+            </div>
+            <div style="position:relative;display:flex;justify-content:center">
+              <div class="arm l"></div><div class="torso"></div><div class="arm r"></div>
+            </div>
+            <div class="gloss"></div>
+          </div></div>
+        </div>
+        <h2>Привет! Я Атлас</h2>
+        <p>Ваш помощник по бизнесу. Задайте мне вопрос!</p>
+        <div class="status"><span class="live"></span>Онлайн</div>
+      </div>
+
+      <!-- Чат -->
+      <div class="chat">
+        <div class="msg bot"><div class="av bot">A</div><div class="bub">Здравствуйте! Я помогу с отчётами, остатками и деньгами. Что посмотреть?</div></div>
+        <div class="msg me"><div class="av me">Ю</div><div class="bub">Сколько выручки сегодня?</div></div>
+        <div class="msg bot"><div class="av bot">A</div><div class="bub">
+          Выручка за сегодня — <b>13 300 ₽</b> (18 чеков, средний чек 739 ₽).
+          <div class="card-mini">
+            <div class="row"><span>Доходы</span><span style="color:#16a34a">+13 300 ₽</span></div>
+            <div class="row"><span>Расходы</span><span style="color:#e53e3e">−129 600 ₽</span></div>
+            <div class="row" style="border-top:1px solid var(--line);margin-top:4px;padding-top:6px"><span>Убыток</span><span style="color:#e53e3e">−116 300 ₽</span></div>
+          </div>
+        </div></div>
+        <div class="msg me"><div class="av me">Ю</div><div class="bub">Почему такой большой расход?</div></div>
+        <div class="msg bot"><div class="av bot">A</div><div class="bub">Основное — <b>выплата прибыли 100 000 ₽</b>. Это изъятие владельца, оно не влияет на прибыль бизнеса. Остальное: зарплата 20 600 ₽, поставки 6 000 ₽.</div></div>
+      </div>
+
+      <!-- Ввод -->
+      <div class="composer">
+        <div class="inputrow">
+          <input placeholder="Спросите Атласа или загрузите фото накладной…">
+          <button class="clip">📎</button>
+          <button class="send">➤</button>
+        </div>
+        <div class="hint">Атлас может ошибаться — проверяйте важные цифры</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
