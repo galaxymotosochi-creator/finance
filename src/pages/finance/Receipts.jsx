@@ -7,6 +7,7 @@ import { getCurrencySymbol } from '../../lib/currency';
 import { tzToday, tzOffsetDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
 import SectionHelp from '../../components/SectionHelp';
+import { genId } from '../../lib/id';
 
 
 const STATUS_LABELS = {
@@ -414,11 +415,11 @@ export default function Receipts() {
             const pid = Object.keys(productTypes).find(pp => productNames[pp] === ci.name && productTypes[pp] !== 'service');
             if (pid != null) {
               const q = Math.round((Number(ci.qty) || 0) * row.qty / ((Number(item.quantity) || 1)));
-              if (q > 0) woInserts.push({ id: Date.now() + woInserts.length, user_id: user.id, product_id: parseInt(pid), quantity: -q, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
+              if (q > 0) woInserts.push({ id: genId(), user_id: user.id, product_id: parseInt(pid), quantity: -q, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
             }
           });
         } else if (row.product_id != null && productTypes[row.product_id] !== 'service') {
-          woInserts.push({ id: Date.now() + woInserts.length, user_id: user.id, product_id: parseInt(row.product_id), quantity: -row.qty, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
+          woInserts.push({ id: genId(), user_id: user.id, product_id: parseInt(row.product_id), quantity: -row.qty, cost: 0, reason: 'Возврат по чеку № ' + r.receipt_number, date: tzToday() });
         }
       });
       if (woInserts.length > 0) await supabase.from('writeoffs').insert(woInserts);

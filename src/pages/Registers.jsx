@@ -7,6 +7,7 @@ import QuaggaInit from 'quagga';
 import { getCurrencySymbol } from '../lib/currency';
 import { tzToday } from '../lib/dates';
 import CenterSpinner from '../components/CenterSpinner';
+import { genId } from '../lib/id';
 
 
 export default function Registers({ fullscreen }) {
@@ -712,7 +713,7 @@ export default function Registers({ fullscreen }) {
         // Вставляем отдельную строку для каждого товара
         var woInserts = Object.keys(woProducts).map(function(prodId, i){
           return {
-            id: Date.now() + i,
+            id: genId(),
             user_id: user.id,
             product_id: parseInt(prodId),
             quantity: woProducts[prodId],
@@ -735,7 +736,7 @@ export default function Registers({ fullscreen }) {
     if (!addName.trim()) return setToast('⚠️ Введите название');
     const price = parseFloat(addPrice) || 0;
     const { error } = await supabase.from('products').insert({
-      id: Date.now(), name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
+      id: genId(), name: addName.trim(), cat: addCat, price, unit: addUnit || 'шт',
       type: addType, sku: addSku.trim(), barcode: addBarcode.trim(),
       weight: parseFloat(addWeight) || 0, weight_unit: addWeightUnit,
       description: addDesc, user_id: user.id, hidden: false,

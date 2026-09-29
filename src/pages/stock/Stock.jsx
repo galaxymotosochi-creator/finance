@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import { genId } from '../../lib/id';
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
 const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]');
@@ -144,7 +145,7 @@ export default function Stock() {
       setSuppliesCache(supplies);
       const initial = initRes.data || getInitialStock();
       if (!initRes.data && initial && initial.done) {
-        const { error } = await supabase.from('initial_stocks').insert({ id: Date.now(), user_id: user.id, items: initial.items || {}, costs: initial.costs || {}, done: initial.done });
+        const { error } = await supabase.from('initial_stocks').insert({ id: genId(), user_id: user.id, items: initial.items || {}, costs: initial.costs || {}, done: initial.done });
         if (!error) localStorage.removeItem(INITIAL_KEY);
       }
       setInitialCache(initial);

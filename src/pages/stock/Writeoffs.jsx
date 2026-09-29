@@ -7,6 +7,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 
 const REASONS = ['Списание','Брак','Потеря','Порча','Окончание срока','Инвентаризация','Прочее'];
@@ -155,7 +156,7 @@ export default function Writeoffs() {
       if (res.error) return alert('Ошибка: ' + res.error.message);
       queued = res.queued;
     } else {
-      const res = await supabase.from('writeoffs').insert({ id: Date.now(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
+      const res = await supabase.from('writeoffs').insert({ id: genId(), user_id: user.id, product_id: prodId, quantity: qty, cost, reason: fReason, date: fDate });
       if (res.error) return alert('Ошибка: ' + res.error.message);
       queued = res.queued;
     }

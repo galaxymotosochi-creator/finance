@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { genId } from '../lib/id';
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState([]);
@@ -22,7 +23,7 @@ export function useTransactions() {
     const { error, queued } = await supabase.from('transactions').insert(tx);
     if (error) throw error;
     // Офлайн: запись ушла в очередь — показываем сразу с пометкой «ждет синхронизации»
-    if (queued) setTransactions(prev => [{ ...tx, id: Date.now(), pending: true }, ...(prev || [])]);
+    if (queued) setTransactions(prev => [{ ...tx, id: genId(), pending: true }, ...(prev || [])]);
     else await fetch();
   };
 

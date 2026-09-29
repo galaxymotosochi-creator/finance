@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrencySymbol } from '../lib/currency';
 import { tzToday } from '../lib/dates';
+import { genId } from '../lib/id';
 
 
 export default function QuickSale({ onClose }) {
@@ -319,7 +320,7 @@ export default function QuickSale({ onClose }) {
       });
       var woInserts = Object.keys(woProducts).map(function(prodId, i){
         return {
-          id: Date.now() + i,
+          id: genId(),
           user_id: user.id,
           product_id: parseInt(prodId),
           quantity: woProducts[prodId],

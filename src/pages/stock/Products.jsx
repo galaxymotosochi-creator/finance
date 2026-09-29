@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode } from '../../lib/barcodeScanner';
+import { genId } from '../../lib/id';
 
 
 const CAT_LABELS = { material:'Материалы', tool:'Инструменты', equipment:'Оборудование', other:'Прочее' };
@@ -386,7 +387,7 @@ export default function Products() {
         const { error } = await supabase.from('products').update(productData).eq('id', editId);
         if (error) { alert(error.message); return; }
       } else {
-        const { data: insData, error } = await supabase.from('products').insert({ ...productData, id: Date.now() });
+        const { data: insData, error } = await supabase.from('products').insert({ ...productData, id: genId() });
         if (error) { alert(error.message); return; }
         // Офлайн: запрос ушел в очередь Service Worker — товар уже добавил хук
         // useOptimisticSync (с пометкой «ждет синхронизации»); не делаем load() — кеш перезатрет его
@@ -447,7 +448,7 @@ export default function Products() {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
     if (!data) return showToast('Ошибка копирования');
     const { error, queued } = await supabase.from('products').insert({
-      id: Date.now(), name: data.name, type: data.type, cat: data.cat,
+      id: genId(), name: data.name, type: data.type, cat: data.cat,
       price: data.price, unit: data.unit, sku: data.sku,
       barcode: data.barcode, weight: data.weight, weight_unit: data.weight_unit,
       description: data.description, free_price: data.free_price || false, user_id: user.id, hidden: false,
@@ -617,7 +618,7 @@ export default function Products() {
             const min_qty = parseInt(row[headers.find(h => (colMap[h]||'')==='min_qty')]) || 0;
 
             const { error } = await supabase.from('products').insert({
-              id: Date.now() + added, user_id: user.id,
+              id: genId(), user_id: user.id,
               name, type, cat: cat || null, price, unit: unit || 'шт',
               sku: sku || null, barcode: barcode || genBarcode(),
               weight, weight_unit: 'кг', description, min_qty, hidden: false

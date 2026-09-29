@@ -8,6 +8,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 
 
@@ -261,7 +262,7 @@ const load = async () => {
       queued = res.queued;
     } else {
       obj.paid = 0;
-      const res = await supabase.from('supplies').insert({ ...obj, id: Date.now() });
+      const res = await supabase.from('supplies').insert({ ...obj, id: genId() });
       if (res.error) return showToast('Ошибка: ' + res.error.message);
       queued = res.queued;
     }
@@ -307,7 +308,7 @@ const load = async () => {
   const copy = async (id) => {
     const s = supplies.find(x => x.id === id);
     if (!s) return;
-    const { error, queued } = await supabase.from('supplies').insert({ ...s, id: Date.now(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
+    const { error, queued } = await supabase.from('supplies').insert({ ...s, id: genId(), invoice: (s.invoice||'') + ' (копия)', created_at: new Date().toISOString() });
     if (error) return showToast('Ошибка: ' + error.message);
     if (!queued) await load(); showToast('📋 Поставка скопирована');
   };

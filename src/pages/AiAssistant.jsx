@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { getReport, getWeeklyReport, getTopProducts, getZeroStock, getForecast, downloadExcel } from '../lib/aiActions';
 import { getCurrencySymbol } from '../lib/currency';
 import Atlas from '../components/Atlas';
+import { genId } from '../lib/id';
 
 
 // ===== ДЕЙСТВИЯ AI (из AiChat.jsx) =====
@@ -26,14 +27,14 @@ const ACTION_MAP = {
   },
   ADD_PRODUCT: async (p, user) => {
     const { error } = await supabase.from('products').insert({
-      id: Date.now(), user_id: user.id, name: p.name, price: parseFloat(p.price),
+      id: genId(), user_id: user.id, name: p.name, price: parseFloat(p.price),
       type: p.type || 'product', unit: p.unit || 'шт', hidden: false,
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
   },
   ADD_CATEGORY: async (p, user) => {
     const { error } = await supabase.from('stock_categories').insert({
-      id: Date.now(), user_id: user.id, name: p.name, type: p.type || 'product',
+      id: genId(), user_id: user.id, name: p.name, type: p.type || 'product',
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
   },
@@ -136,7 +137,7 @@ export default function AiAssistant() {
     if (!user) return;
     try {
       await supabase.from('ai_messages').insert({
-        id: Date.now() + Math.floor(Math.random() * 1000),
+        id: genId(),
         user_id: user.id,
         role,
         text: text || '',

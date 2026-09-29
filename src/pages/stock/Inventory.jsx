@@ -8,6 +8,7 @@ import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import { scanBarcode, beep } from '../../lib/barcodeScanner';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 
 
@@ -170,7 +171,7 @@ export default function Inventory() {
     });
     const totalBefore = items.reduce((s, it) => s + it.expected * it.cost, 0);
     const doc = {
-      id: Date.now(), number: num, date: new Date().toISOString().split('T')[0],
+      id: genId(), number: num, date: new Date().toISOString().split('T')[0],
       responsible: '', status: 'draft', items,
       totals: { totalBefore, totalAfter: totalBefore, shortage: 0, surplus: 0, result: 0 }
     };

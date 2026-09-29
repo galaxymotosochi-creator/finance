@@ -6,6 +6,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { fmtDate } from '../../lib/dates';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 
 export default function SupplyNew() {
@@ -109,7 +110,7 @@ export default function SupplyNew() {
     setSaving(true);
     const supplier = supCustom.trim() || supName || '—';
     const obj = {
-      id: Date.now(),
+      id: genId(),
       user_id: user.id,
       supplier_name: supplier,
       // supplier_id — чтобы защита удаления поставщика и статистика работали (раньше был только supplier_name)

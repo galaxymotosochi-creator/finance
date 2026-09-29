@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrencySymbol } from '../lib/currency';
+import { genId } from '../lib/id';
 
 
 const ACTION_MAP = {
@@ -23,14 +24,14 @@ const ACTION_MAP = {
   },
   ADD_PRODUCT: async (p, user) => {
     const { error } = await supabase.from('products').insert({
-      id: Date.now(), user_id: user.id, name: p.name, price: parseFloat(p.price),
+      id: genId(), user_id: user.id, name: p.name, price: parseFloat(p.price),
       type: p.type || 'product', unit: p.unit || 'шт', hidden: false,
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
   },
   ADD_CATEGORY: async (p, user) => {
     const { error } = await supabase.from('stock_categories').insert({
-      id: Date.now(), user_id: user.id, name: p.name, type: p.type || 'product',
+      id: genId(), user_id: user.id, name: p.name, type: p.type || 'product',
     });
     return error ? `❌ Ошибка: ${error.message}` : null;
   },

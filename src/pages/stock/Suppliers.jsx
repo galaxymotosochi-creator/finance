@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 
 const CONTACT_LABELS = {
@@ -131,7 +132,7 @@ export default function Suppliers() {
       if (res.error) return alert(res.error.message);
       queued = res.queued;
     } else {
-      const res = await supabase.from('suppliers').insert({ ...obj, id: Date.now(), user_id: user.id });
+      const res = await supabase.from('suppliers').insert({ ...obj, id: genId(), user_id: user.id });
       if (res.error) return alert(res.error.message);
       queued = res.queued;
     }

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 const TARGET_LABELS = {
   revenue: { label: 'Выручка', icon: '💰', unit: '₽', color: '#16a34a' },
@@ -146,7 +147,7 @@ export default function Plans() {
         if (p.id) {
           ops.push(supabase.from('plans').update(payload).eq('id', p.id));
         } else {
-          ops.push(supabase.from('plans').insert({ ...payload, id: Date.now() + Math.floor(Math.random() * 99999) }));
+          ops.push(supabase.from('plans').insert({ ...payload, id: genId() }));
         }
       }
       const results = await Promise.all(ops);

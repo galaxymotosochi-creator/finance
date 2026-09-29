@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
 import { fmtDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 // «Формирование поставки» — рабочая страница заказа товаров
 // Собирается из аналитики (что заказать): позиции, поставщик, какая закупка (ссылка/цена), количество
@@ -313,7 +314,7 @@ export default function OrderForm() {
         const total = items.reduce((s, it) => s + it.qty * it.cost, 0);
         const supObj = suppliersList.find(x => x.name === g.name);
         const { error } = await supabase.from('supplies').insert({
-          id: Date.now() + created,
+          id: genId(),
           user_id: user.id,
           supplier_name: g.name,
           supplier_id: supObj ? supObj.id : null,

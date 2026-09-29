@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import CenterSpinner from '../../components/CenterSpinner';
+import { genId } from '../../lib/id';
 
 export default function Categories() {
   const { user } = useAuth();
@@ -107,7 +108,7 @@ export default function Categories() {
       queued = res.queued;
     } else {
       const res = await supabase.from('stock_categories').insert({
-        id: Date.now(),
+        id: genId(),
         user_id: user.id,
         name: fName.trim(),
         type: fType
