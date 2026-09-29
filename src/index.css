@@ -345,7 +345,7 @@ body {
 #clientColHeaders th:first-child,
 #stockColHeaders th:first-child { text-align: left; padding-left: 0; }
 
-#productTableBody td:first-child { text-align: left; padding-left: 0; }
+.product-table-body td:first-child { text-align: left; padding-left: 0; }
 #dirTableBody td:first-child { text-align: left; padding-left: 0; }
 #catTableBody td:first-child { padding-left: 0; }
 #clientTableBody td:first-child { text-align: left; padding-left: 0; }

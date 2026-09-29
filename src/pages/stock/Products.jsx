@@ -881,7 +881,7 @@ export default function Products() {
               <th style={{width:'140px'}}></th>
             </tr>
           </thead>
-          <tbody id="productTableBody">
+          <tbody className="product-table-body">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={2 + activeCols.size}>
