@@ -844,7 +844,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Круг «Структура денег» на странице Счета */
-.sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:0 auto 16px;max-width:1180px;padding:0 1.5rem}
+.sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:0 auto 16px;max-width:1180px}
 .sk-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
 .sk-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
 .sk-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
