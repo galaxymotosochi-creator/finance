@@ -1749,6 +1749,6 @@ input:focus, select:focus, textarea:focus {
 /* Счета: круг и легенда — базовые пропорции (как до правок), блок по центру контейнера */
 /* Счета: круг с информацией — отступы справа и слева, как у раздела «Панель управления» */
 
-/* Модалка расхода: рамки полей — скругление как у кнопок Тип операции (10px) */
+/* Модалка расхода: рамки полей — как у кнопок Тип операции (10px, тонкая светлая рамка) */
 .exp-rounded input,
-.exp-rounded .cat-sel-wrap > button { border-radius: 10px !important; }
+.exp-rounded .cat-sel-wrap > button { border-radius: 10px !important; border: 1px solid #e8e8ec !important; }
