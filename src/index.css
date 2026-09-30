@@ -1774,7 +1774,7 @@ input:focus, select:focus, textarea:focus {
 .modal-box input[type="date"]::-webkit-calendar-picker-indicator {
   display: none !important; -webkit-appearance: none; opacity: 0; width: 0; height: 0;
 }
-.modal-box .form-group input[type="date"] { padding-right: 30px; -webkit-appearance: none; appearance: none; }
+.modal-box .form-group input[type="date"] { padding: .5rem 30px .5rem .65rem; -webkit-appearance: none; appearance: none; }
 .modal-box .form-group:has(input[type="date"]) { position: relative; }
 .modal-box .form-group:has(input[type="date"])::after {
   content: "▾"; position: absolute; right: 10px; top: 30px;
@@ -1783,6 +1783,6 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Модалки: поле Дата — выравнивание текста как у «Выберите категорию» */
-.modal-box .form-group input[type="date"] { padding-left: .65rem; text-align: left; -webkit-appearance: none; appearance: none; }
+.modal-box .form-group input[type="date"] { text-align: left; }
 .modal-box input[type="date"]::-webkit-datetime-edit { padding: 0; color: #222; }
 .modal-box input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
