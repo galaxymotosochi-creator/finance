@@ -1756,3 +1756,11 @@ input:focus, select:focus, textarea:focus {
 /* Модалка расхода: при фокусе — простая чёрная обводка, без серой тени */
 .exp-rounded input:focus,
 .exp-rounded .cat-sel-wrap > button:focus { border: 1px solid #111 !important; box-shadow: none !important; }
+
+/* Модалка расхода: шрифт полей = как у счетов (.84rem/600/#0b1220) */
+.exp-rounded input,
+.exp-rounded .cat-sel-wrap > button { font-size: .84rem !important; font-weight: 600 !important; color: #0b1220 !important; }
+
+/* Модалка расхода: Комментарий — совсем без рамки */
+.exp-noframe input { border: none !important; box-shadow: none !important; background: transparent !important; padding-left: 0 !important; }
+.exp-noframe input:focus { border: none !important; box-shadow: none !important; }
