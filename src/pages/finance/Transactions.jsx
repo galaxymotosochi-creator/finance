@@ -1027,9 +1027,9 @@ export default function Transactions() {
                 <label>Тип операции</label>
                 <div style={{display:'flex',gap:'.4rem'}}>
                   <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.84rem',fontWeight:600,border:'1px solid #e8e8ec',background:'#fff',color:'#0b1220',transition:'all .12s'}}>+ Доход</button>
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.82rem',fontWeight:400,border:'1px solid #e8e8ec',background:'#fff',color:'#0b1220',transition:'all .12s'}}>+ Доход</button>
                   <button type="button" onClick={function(){setExpCategory('')}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.84rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>− Расход</button>
+                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.82rem',fontWeight:400,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>− Расход</button>
                 </div>
               </div>
               )}
@@ -1045,11 +1045,11 @@ export default function Transactions() {
               </div>
               <div className="form-group exp-rounded">
                 <label>Сумма </label>
-                <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
+                <input type="number" placeholder="Введите сумму" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
               </div>
-              <div className="form-group exp-rounded exp-noframe">
+              <div className="form-group exp-rounded">
                 <label>Комментарий</label>
-                <input type="text" placeholder="Например: аренда за сентябрь, запчасти на скутер" value={expName} onChange={function(e){setExpName(e.target.value)}} />
+                <input type="text" value={expName} onChange={function(e){setExpName(e.target.value)}} />
               </div>
           <div className="form-group">
             <label>{txKind === 'expense' ? 'С какого счета списать' : 'На какой счет зачислить'}</label>
