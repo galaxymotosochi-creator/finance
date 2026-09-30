@@ -1752,3 +1752,7 @@ input:focus, select:focus, textarea:focus {
 /* Модалка расхода: рамки полей — как у кнопок Тип операции (10px, тонкая светлая рамка) */
 .exp-rounded input,
 .exp-rounded .cat-sel-wrap > button { border-radius: 10px !important; border: 1px solid #e8e8ec !important; }
+
+/* Модалка расхода: при фокусе — простая чёрная обводка, без серой тени */
+.exp-rounded input:focus,
+.exp-rounded .cat-sel-wrap > button:focus { border: 1px solid #111 !important; box-shadow: none !important; }
