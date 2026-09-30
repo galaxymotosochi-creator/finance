@@ -1759,7 +1759,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Модалка расхода: шрифт полей = как у счёта ВТБ (.82rem/400/#0b1220) */
 .exp-rounded input,
-.exp-rounded .cat-sel-wrap > button { font-size: .82rem !important; font-weight: 400 !important; color: #0b1220 !important; }
+.exp-rounded .cat-sel-wrap > button { font-size: .875rem !important; font-weight: 500 !important; color: #222 !important; }
 
 /* Модалка расхода: отступ от заголовка до «Тип операции» */
 .modal-box .modal-title + form, .modal-box .modal-title + div { margin-top: 1rem !important; }
