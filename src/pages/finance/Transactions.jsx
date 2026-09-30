@@ -1033,7 +1033,7 @@ export default function Transactions() {
                 </div>
               </div>
               )}
-              <div className="form-row">
+              <div className="form-row exp-rounded">
                 <div className="form-group">
                   <label>Дата</label>
                   <input type="date" value={expDate} onChange={function(e){setExpDate(e.target.value)}} />
@@ -1043,11 +1043,11 @@ export default function Transactions() {
                   <CategorySelect cats={expenseCats} value={expCategory} onChange={setExpCategory} />
                 </div>
               </div>
-              <div className="form-group">
+              <div className="form-group exp-rounded">
                 <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={expAmount} onChange={function(e){setExpAmount(e.target.value)}} required />
               </div>
-              <div className="form-group">
+              <div className="form-group exp-rounded">
                 <label>Комментарий</label>
                 <input type="text" placeholder="Например: аренда за сентябрь, запчасти на скутер" value={expName} onChange={function(e){setExpName(e.target.value)}} />
               </div>
