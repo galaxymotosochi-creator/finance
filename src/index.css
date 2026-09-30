@@ -1775,11 +1775,11 @@ input:focus, select:focus, textarea:focus {
   display: none !important; -webkit-appearance: none; opacity: 0; width: 0; height: 0;
 }
 .modal-box .form-group input[type="date"] { padding: .5rem 30px .5rem .65rem; -webkit-appearance: none; appearance: none; }
-.modal-box .form-group:has(input[type="date"]) { position: relative; }
-.modal-box .form-group:has(input[type="date"])::after {
-  content: "▾"; position: absolute; right: 10px; top: 30px;
-  font-size: 19px; font-weight: 800; line-height: 1; color: #1F75FF;
-  pointer-events: none; animation: cartripulse 1.6s ease-in-out infinite;
+/* Стрелка в поле Дата — тот же span.car-tri, что и в Категории */
+.modal-box .form-group.date-field { position: relative; }
+.modal-box .form-group.date-field .date-tri {
+  position: absolute; right: 10px; top: 31px; line-height: 1;
+  pointer-events: none; transform: none;
 }
 
 /* Модалки: поле Дата — выравнивание текста как у «Выберите категорию» */

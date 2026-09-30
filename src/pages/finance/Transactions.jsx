@@ -961,9 +961,10 @@ export default function Transactions() {
               </div>
               )}
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group date-field">
                   <label>Дата</label>
                   <input type="date" value={incDate} onChange={function(e){setIncDate(e.target.value)}} />
+                  <span className="car-tri date-tri">▾</span>
                 </div>
                 <div className="form-group">
                   <label>Категория</label>
@@ -1034,9 +1035,10 @@ export default function Transactions() {
               </div>
               )}
               <div className="form-row exp-rounded">
-                <div className="form-group">
+                <div className="form-group date-field">
                   <label>Дата</label>
                   <input type="date" value={expDate} onChange={function(e){setExpDate(e.target.value)}} />
+                  <span className="car-tri date-tri">▾</span>
                 </div>
                 <div className="form-group">
                   <label>Категория</label>
