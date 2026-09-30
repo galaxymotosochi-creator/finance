@@ -1772,12 +1772,12 @@ input:focus, select:focus, textarea:focus {
 
 /* Модалки: поле Дата — свой синий пульсирующий треугольник вместо браузерной чёрной стрелки */
 .modal-box input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0; cursor: pointer; position: absolute; right: 0; top: 0; width: 34px; height: 100%; margin: 0;
+  display: none !important; -webkit-appearance: none; opacity: 0; width: 0; height: 0;
 }
-.modal-box .form-group input[type="date"] { position: relative; padding-right: 30px; }
+.modal-box .form-group input[type="date"] { padding-right: 30px; -webkit-appearance: none; appearance: none; }
 .modal-box .form-group:has(input[type="date"]) { position: relative; }
 .modal-box .form-group:has(input[type="date"])::after {
-  content: "▾"; position: absolute; right: 10px; top: 32px;
+  content: "▾"; position: absolute; right: 10px; top: 30px;
   font-size: 19px; font-weight: 800; line-height: 1; color: #1F75FF;
   pointer-events: none; animation: cartripulse 1.6s ease-in-out infinite;
 }
