@@ -1769,3 +1769,15 @@ input:focus, select:focus, textarea:focus {
 
 /* Отступ от заголовка модалки до первой строки */
 .modal-box .modal-title + form, .modal-box .modal-title + div { margin-top: 1rem !important; }
+
+/* Модалки: поле Дата — свой синий пульсирующий треугольник вместо браузерной чёрной стрелки */
+.modal-box input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0; cursor: pointer; position: absolute; right: 0; top: 0; width: 34px; height: 100%; margin: 0;
+}
+.modal-box .form-group input[type="date"] { position: relative; padding-right: 30px; }
+.modal-box .form-group:has(input[type="date"]) { position: relative; }
+.modal-box .form-group:has(input[type="date"])::after {
+  content: "▾"; position: absolute; right: 10px; top: 32px;
+  font-size: 19px; font-weight: 800; line-height: 1; color: #1F75FF;
+  pointer-events: none; animation: cartripulse 1.6s ease-in-out infinite;
+}
