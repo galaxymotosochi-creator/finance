@@ -1131,7 +1131,7 @@ function CategorySelect({ cats, value, onChange, placeholder }) {
   return (
     <div className="cat-sel-wrap" style={{position:'relative'}}>
       <button type="button" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
-        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .65rem',border:'1.5px solid ' + (open ? '#111' : 'rgba(0,0,0,.26)'),borderRadius:'var(--radius-md)',background:'var(--body-bg)',fontFamily:'var(--font)',fontSize:'.875rem',color:sel ? '#333' : '#8a93a2',cursor:'pointer',textAlign:'left',boxSizing:'border-box',minHeight:'38px',outline:'none',boxShadow:open ? '0 0 0 3px rgba(17,17,17,.07)' : 'none',transition:'border-color .15s, box-shadow .15s'}}>
+        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .65rem',border:'1.5px solid ' + (open ? '#111' : 'rgba(0,0,0,.26)'),borderRadius:'var(--radius-md)',background:'var(--body-bg)',fontFamily:'var(--font)',fontSize:'.875rem',fontWeight:500,color:sel ? '#222' : '#8a93a2',cursor:'pointer',textAlign:'left',boxSizing:'border-box',minHeight:'38px',outline:'none',boxShadow:open ? '0 0 0 3px rgba(17,17,17,.07)' : 'none',transition:'border-color .15s, box-shadow .15s'}}>
         <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{sel ? sel.name : (placeholder || 'Выберите категорию')}</span>
         <span className="car-tri" style={{transform:open?'rotate(180deg)':'none'}}>▾</span>
       </button>
@@ -1142,7 +1142,7 @@ function CategorySelect({ cats, value, onChange, placeholder }) {
             const on = String(c.id) === String(value);
             return (
               <button key={c.id} type="button" onClick={() => { onChange(on ? '' : c.id); setOpen(false); }}
-                style={{display:'flex',alignItems:'center',gap:'.5rem',width:'100%',padding:'.45rem .55rem',borderRadius:'.5rem',border:'none',background:on?'#E6F0FF':'none',fontFamily:'inherit',fontSize:'.8125rem',fontWeight:on?600:400,color:'#333',cursor:'pointer',textAlign:'left'}}>
+                style={{display:'flex',alignItems:'center',gap:'.5rem',width:'100%',padding:'.45rem .55rem',borderRadius:'.5rem',border:'none',background:on?'#E6F0FF':'none',fontFamily:'inherit',fontSize:'.875rem',fontWeight:500,color:'#222',cursor:'pointer',textAlign:'left'}}>
                 <span style={{width:'8px',height:'8px',borderRadius:'50%',background:on?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
                 {c.name}
               </button>

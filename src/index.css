@@ -1763,3 +1763,6 @@ input:focus, select:focus, textarea:focus {
 
 /* Модалка расхода: отступ от заголовка до «Тип операции» */
 .modal-box .modal-title + form, .modal-box .modal-title + div { margin-top: 1rem !important; }
+
+/* Модалка расхода: подсказка (placeholder) — тем же шрифтом, что и текст .875rem/500/#222 */
+.exp-rounded input::placeholder { font-size: .875rem !important; font-weight: 500 !important; color: #222 !important; opacity: 1 !important; }
