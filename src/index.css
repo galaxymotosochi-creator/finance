@@ -1781,3 +1781,8 @@ input:focus, select:focus, textarea:focus {
   font-size: 19px; font-weight: 800; line-height: 1; color: #1F75FF;
   pointer-events: none; animation: cartripulse 1.6s ease-in-out infinite;
 }
+
+/* Модалки: поле Дата — выравнивание текста как у «Выберите категорию» */
+.modal-box .form-group input[type="date"] { padding-left: .65rem; text-align: left; -webkit-appearance: none; appearance: none; }
+.modal-box input[type="date"]::-webkit-datetime-edit { padding: 0; color: #222; }
+.modal-box input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
