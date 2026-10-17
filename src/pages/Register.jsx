@@ -45,9 +45,9 @@ export default function Register() {
             Проверьте почту <strong>{email}</strong> и перейдите по ссылке в письме, чтобы подтвердить аккаунт.
           </p>
           {adminPin && (
-            <div style={{background:'#fef9c3',border:'1px solid #fde047',borderRadius:'12px',padding:'12px 14px',marginBottom:14,textAlign:'left'}}>
-              <div style={{fontSize:'.78rem',fontWeight:700,marginBottom:4}}>Ваш пин руководителя</div>
-              <div style={{fontSize:'1.4rem',fontWeight:800,letterSpacing:4,marginBottom:6}}>{adminPin}</div>
+            <div style={{background:'#E6F0FF',border:'1px solid rgba(31,117,255,.35)',borderRadius:'12px',padding:'12px 14px',marginBottom:14,textAlign:'left'}}>
+              <div style={{fontSize:'.78rem',fontWeight:700,marginBottom:4,color:'#0d4ea8'}}>Ваш пин руководителя</div>
+              <div style={{fontSize:'1.4rem',fontWeight:800,letterSpacing:4,marginBottom:6,color:'#0d4ea8'}}>{adminPin}</div>
               <div style={{fontSize:'.72rem',color:'rgba(0,0,0,.6)',lineHeight:1.4}}>Он нужен для входа в кассу и подтверждения скидок ниже минимальной цены. Сменить можно в разделе «Сотрудники». Запишите его.</div>
             </div>
           )}

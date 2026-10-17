@@ -131,16 +131,16 @@ export default function Landing() {
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1280,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#000"}}>AtlasPos</span>
+        <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#fff"}}>AtlasPos</span>
         <div style={{display:"flex",gap:10}}>
-          <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid #000",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Войти</button>
+          <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid #000",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff"}}>Войти</button>
         </div>
       </header>
 
       {/* ===== HERO С ПРЕВЬЮ ДАШБОРДА ===== */}
       <section style={{maxWidth:1280,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:mobile?'1fr':'repeat(auto-fit, minmax(320px, 1fr))',gap:mobile?24:32,alignItems:"center"}}>
         <div>
-          <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#000",fontSize:13,fontWeight:700,color:"#ffdd2d",marginBottom:20}}>
+          <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#E6F0FF",fontSize:13,fontWeight:700,color:"#0d4ea8",marginBottom:20}}>
             Первая программа с AI аналитикой
           </div>
           <h1 style={{fontSize:"clamp(31px,5vw,47px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
@@ -150,7 +150,7 @@ export default function Landing() {
             Умный учет для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
           </p>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-            <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
+            <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
           </div>
         </div>
         <div>
@@ -174,7 +174,7 @@ export default function Landing() {
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Расходы</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 {cur}</div>
                 </div>
-                <div style={{background:"#ffdd2d",borderRadius:10,padding:10}}>
+                <div style={{background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",borderRadius:10,padding:10}}>
                   <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Итого</div>
                   <div style={{fontSize:14,fontWeight:800}}>+161 000 {cur}</div>
                 </div>
@@ -203,7 +203,7 @@ export default function Landing() {
           {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
         ].map((f,i)=>(
           <div key={i} style={{display:"flex",gap:16,padding:20,border:"1px solid rgba(0,0,0,.08)",borderRadius:14,alignItems:"flex-start",transition:"all .15s"}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor="#1F75FF";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
             onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
             <div style={{fontSize:36,fontWeight:800,color:"rgba(0,0,0,.06)",lineHeight:1,flexShrink:0,minWidth:50}}>{f.num}</div>
             <div style={{display:"flex",flexDirection:"column",justifyContent:"center",flex:1}}>
@@ -224,7 +224,7 @@ export default function Landing() {
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
               <MiniStat label="Доходы" value="+284 000 ₽" color="#16a34a" />
               <MiniStat label="Расходы" value="−123 000 ₽" color="#dc2626" />
-              <MiniStat label="Итого" value="+161 000 ₽" color="#000" bg="#ffdd2d" />
+              <MiniStat label="Итого" value="+161 000 ₽" color="#fff" bg="#1F75FF" />
             </div>
             <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
             {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
@@ -312,17 +312,17 @@ export default function Landing() {
             </div>
           </div>
           {/* Карточка 3 — AtlasPos */}
-          <div style={{border:"2px solid #ffdd2d",borderRadius:16,padding:"24px 28px 28px",background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
-            <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",marginBottom:12}}>Рекомендуем</div>
+          <div style={{border:"2px solid #1F75FF",borderRadius:16,padding:"24px 28px 28px",background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:10,fontWeight:700,color:"#fff",marginBottom:12}}>Рекомендуем</div>
             <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа AtlasPos</h3>
             <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
               <CompareItem type="good" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
               <CompareItem type="good" text="Все в одной вкладке: живая касса, складской учет, база клиентов и финансы команды работают в единой связке." />
               <CompareItem type="good" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
             </div>
-            <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000",transition:"all .15s"}}
-              onMouseEnter={e=>e.currentTarget.style.background="#f5d100"}
-              onMouseLeave={e=>e.currentTarget.style.background="#ffdd2d"}>Попробовать бесплатно</button>
+            <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff",transition:"all .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#0d4ea8"}
+              onMouseLeave={e=>e.currentTarget.style.background="linear-gradient(135deg,#1F75FF,#0d4ea8)"}>Попробовать бесплатно</button>
           </div>
         </div>
       </section>
@@ -348,7 +348,7 @@ export default function Landing() {
             },
           ].map((t,i)=>(
             <div key={i} style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,transition:"all .2s",textAlign:"center"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor="#ffdd2d";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.06)"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="#1F75FF";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.06)"}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
               <div style={{width:52,height:52,borderRadius:14,background:"#fff8d6",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}} dangerouslySetInnerHTML={{__html:t.svg}} />
               <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>{t.title}</div>
@@ -444,12 +444,12 @@ export default function Landing() {
             const periodText = period === '1y' ? 'год' : period === '6m' ? '6 мес' : period === '3m' ? '3 мес' : 'мес';
             return (
             <div key={i} style={{
-              border: t.popular ? "1.5px solid #ffdd2d" : "1.5px solid rgba(0,0,0,.08)",
+              border: t.popular ? "1.5px solid #1F75FF" : "1.5px solid rgba(0,0,0,.08)",
               borderRadius:20,padding:"24px 14px",background:"#fff",
               position:"relative",boxShadow:t.popular?"0 8px 24px rgba(0,0,0,.08)":"none",
               display:"flex",flexDirection:"column",
             }}>
-              {t.popular && <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",padding:"3px 14px",borderRadius:100,background:"#ffdd2d",fontSize:10,fontWeight:700,color:"#000",whiteSpace:"nowrap"}}>Популярный</div>}
+              {t.popular && <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",padding:"3px 14px",borderRadius:100,background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:10,fontWeight:700,color:"#fff",whiteSpace:"nowrap"}}>Популярный</div>}
               <div style={{fontSize:15,fontWeight:700,marginBottom:2}}>{t.name}</div>
               <div style={{marginBottom:2}}>
                 {period === '1m' ? (
@@ -481,11 +481,11 @@ export default function Landing() {
               </div>
               <button onClick={()=>n('/register')} style={{
                 width:"100%",padding:"9px",borderRadius:100,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit",
-                background:t.popular?"#ffdd2d":"rgba(0,0,0,.06)",color:t.popular?"#000":"#111",
+                background:t.popular?"linear-gradient(135deg,#1F75FF,#0d4ea8)":"rgba(0,0,0,.06)",color:t.popular?"#fff":"#111",
                 transition:"all .15s",
               }}
-                onMouseEnter={e=>{if(t.popular)e.currentTarget.style.background="#f5d100"}}
-                onMouseLeave={e=>{if(t.popular)e.currentTarget.style.background="#ffdd2d"}}>{t.btn}</button>
+                onMouseEnter={e=>{if(t.popular)e.currentTarget.style.background="#0d4ea8"}}
+                onMouseLeave={e=>{if(t.popular)e.currentTarget.style.background="linear-gradient(135deg,#1F75FF,#0d4ea8)"}}>{t.btn}</button>
             </div>
           )})}
         </div>
@@ -496,7 +496,7 @@ export default function Landing() {
           <p style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:24,maxWidth:400,margin:"0 auto 24px"}}>
             Зарегистрируйтесь за 1 минуту и начните<br/>управлять финансами вашего бизнеса.
           </p>
-          <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"#ffdd2d",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#000"}}>Создать аккаунт</button>
+          <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff"}}>Создать аккаунт</button>
         </div>
       </section>
 
