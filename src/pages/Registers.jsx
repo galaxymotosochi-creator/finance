@@ -1085,9 +1085,9 @@ if (loading) return <CenterSpinner />;
             var found=products.find(function(p){return p.barcode===bc;});
             if(found){addToCart(found);setToast('Найден: '+found.name)}else setToast('Товар со штрихкодом '+bc+' не найден');
           })}} title="Сканировать штрихкод"
-            style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',border:'1px solid #ffe98a',boxShadow:'0 1px 5px rgba(255,205,0,.35)',cursor:'pointer',fontFamily:'inherit',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor'><rect x='3' y='4.5' width='1.5' height='15'/><rect x='5.3' y='4.5' width='2.6' height='15'/><rect x='8.6' y='4.5' width='1.2' height='15'/><rect x='10.4' y='4.5' width='3' height='15'/><rect x='14' y='4.5' width='1.4' height='15'/><rect x='16' y='4.5' width='2.4' height='15'/><rect x='19' y='4.5' width='1.6' height='15'/></svg></button>
-          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} title="Настройки смены" style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',border:'1px solid #ffe98a',boxShadow:'0 1px 5px rgba(255,205,0,.35)',cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0,userSelect:'none'}}><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3.2'/><path d='M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z'/></svg></span>
-          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#ffdd2d,#fff9db)',color:'#111',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
+            style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',border:'1px solid #8fb8ff',boxShadow:'0 1px 5px rgba(31,117,255,.35)',cursor:'pointer',fontFamily:'inherit',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor'><rect x='3' y='4.5' width='1.5' height='15'/><rect x='5.3' y='4.5' width='2.6' height='15'/><rect x='8.6' y='4.5' width='1.2' height='15'/><rect x='10.4' y='4.5' width='3' height='15'/><rect x='14' y='4.5' width='1.4' height='15'/><rect x='16' y='4.5' width='2.4' height='15'/><rect x='19' y='4.5' width='1.6' height='15'/></svg></button>
+          <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} title="Настройки смены" style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',border:'1px solid #8fb8ff',boxShadow:'0 1px 5px rgba(31,117,255,.35)',cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0,userSelect:'none'}}><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3.2'/><path d='M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z'/></svg></span>
+          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
@@ -1100,14 +1100,14 @@ if (loading) return <CenterSpinner />;
           <button onClick={() => setCatFilter('all')} style={{
             padding:'7px 16px', borderRadius:'100px', border:'none', fontSize:'.78rem',
             fontWeight: catFilter === 'all' ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-            background: catFilter === 'all' ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+            background: catFilter === 'all' ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#e8e8ed',
             color: catFilter === 'all' ? '#111' : '#666', fontFamily:'inherit',
           }}>Все</button>
           {categories.map(c => (
             <button key={c.id} onClick={() => setCatFilter(c.name)} style={{
               padding:'7px 16px', borderRadius:'100px', border:'none', fontSize:'.78rem',
               fontWeight: catFilter === c.name ? 600 : 500, cursor:'pointer', whiteSpace:'nowrap',
-              background: catFilter === c.name ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#e8e8ed',
+              background: catFilter === c.name ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#e8e8ed',
               color: catFilter === c.name ? '#111' : '#666', fontFamily:'inherit',
             }}>{c.name}</button>
           ))}
@@ -1123,7 +1123,7 @@ if (loading) return <CenterSpinner />;
             return (
             <div key={p.id} onClick={function(){if(!oos)addToCart(p)}}
               style={{background: oos ? '#fafafa' : '#fff', borderRadius:'16px', padding:'12px 12px 10px', cursor: oos ? 'default' : 'pointer', transition:'all .15s', display:'flex', flexDirection:'column', border:'1px solid ' + (oos ? '#f0f0f0' : '#eee'), boxShadow:'0 1px 4px rgba(0,0,0,.04)', height:'100%', opacity: oos ? .55 : 1}}
-              onMouseEnter={e => { if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 6px 16px rgba(0,0,0,.08)'; e.currentTarget.style.borderColor='#ffdd2d';}} }
+              onMouseEnter={e => { if(!oos){e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 6px 16px rgba(0,0,0,.08)'; e.currentTarget.style.borderColor='#1F75FF';}} }
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 1px 3px rgba(0,0,0,.03)'; e.currentTarget.style.borderColor= oos ? '#f0f0f0' : '#eee'; } }>
               <div style={{fontSize:'20px',lineHeight:1}}>{p.type === 'service' ? '🔧' : '📦'}</div>
               <div style={{fontSize:'13px',fontWeight:600,color: oos ? '#999' : '#222',lineHeight:1.3,margin:'6px 0 2px',minHeight:'34px'}}>{p.name}</div>
@@ -1395,10 +1395,10 @@ if (loading) return <CenterSpinner />;
                 )}
                 <button onClick={function(){setPayAmount(String(Math.round(finalTotal)));setShowPay(true)}} disabled={!cart.length} style={{
                   flex:1, padding:'13px', borderRadius:'8px', border:'none',
-                  background: cart.length ? 'linear-gradient(135deg,#ffdd2d,#fff9db)' : '#ddd',
+                  background: cart.length ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#ddd',
                   color: cart.length ? '#111' : '#fff', fontSize:'.80rem', fontWeight:700,
                   cursor: cart.length ? 'pointer' : 'default', fontFamily:'inherit',
-                  boxShadow: cart.length ? '0 2px 10px rgba(255,205,0,.35)' : 'none',
+                  boxShadow: cart.length ? '0 2px 10px rgba(31,117,255,.35)' : 'none',
                 }}>Продажа</button>
               </div>
             )}
@@ -1674,7 +1674,7 @@ if (loading) return <CenterSpinner />;
               </div>
               
               <button type="button" onClick={processPay} disabled={!selectedClient}
-                style={{padding:"13px 28px",border:"none",borderRadius:"8px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background: selectedClient ? "linear-gradient(135deg,#ffdd2d,#fff9db)" : "#ddd",color: selectedClient ? "#111" : "#fff",alignSelf:"flex-end",marginTop:"auto",boxShadow: selectedClient ? "0 2px 10px rgba(255,205,0,.35)" : "none",opacity:1}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
+                style={{padding:"13px 28px",border:"none",borderRadius:"8px",fontSize:".80rem",fontWeight:700,cursor: selectedClient ? "pointer" : "not-allowed",fontFamily:"inherit",background: selectedClient ? "linear-gradient(135deg,#1F75FF,#0d4ea8)" : "#ddd",color: selectedClient ? "#111" : "#fff",alignSelf:"flex-end",marginTop:"auto",boxShadow: selectedClient ? "0 2px 10px rgba(31,117,255,.35)" : "none",opacity:1}}>{payUnpaid ? 'Сохранить' : 'Оплатить'}</button>
             </div>
           </div>
         </div>
