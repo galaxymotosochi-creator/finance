@@ -224,16 +224,16 @@ body {
   color: var(--body-color);
 }
 .login-card input:focus {
-  border-color: #111; box-shadow: 0 0 0 3px rgba(17,17,17,.08);
+  border-color: #1F75FF; box-shadow: 0 0 0 3px rgba(31,117,255,.12);
 }
 .login-card button {
   width: 100%; padding: .7rem; font-size: .9rem; font-weight: 600;
   border: none; border-radius: var(--radius-pill);
-  background: var(--primary); color: var(--primary-text);
+  background: linear-gradient(135deg,#1F75FF,#0d4ea8); color: #fff;
   cursor: pointer; font-family: var(--font);
   transition: all var(--transition); margin-top: .35rem;
 }
-.login-card button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.login-card button:hover { background: linear-gradient(135deg,#3d8bff,#0a3f8f); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(31,117,255,.6); }
 .login-card button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .login-card .error { color: var(--danger); font-size: .8rem; text-align: center; margin: 0 0 .6rem; }
 
