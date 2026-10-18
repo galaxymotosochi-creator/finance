@@ -396,7 +396,7 @@ export default function Landing() {
       <section style={{maxWidth:1180,margin:mobile?"56px auto":"88px auto",padding:"0 24px"}}>
         <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h2 style={{fontSize:mobile?11.5:12.5,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Порядок в учёте с первых минут</h2>
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Порядок в учёте с первых минут</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:20,lineHeight:1.5}}>Четыре причины автоматизировать учёт в AtlasPos</p>
@@ -405,8 +405,12 @@ export default function Landing() {
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
-        <p style={{fontSize:14,color:"rgba(0,0,0,.54)",textAlign:"center",maxWidth:560,margin:"0 auto 36px"}}>Реальные скриншоты интерфейса — все работает так, как вы видите</p>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Реальные скриншоты интерфейса — все работает так, как вы видите</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch"}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
@@ -479,8 +483,12 @@ export default function Landing() {
 
       {/* ===== КОНТРАСТ СИСТЕМ ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:40}}>Сравните, как работают привычные методы и наша умная платформа</p>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Сравните, как работают привычные методы и наша умная платформа</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:20,alignItems:"start"}}>
           {/* Карточка 1 — ERP */}
           <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
@@ -516,8 +524,12 @@ export default function Landing() {
         </div>
       </section>
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
-        <h2 style={{fontSize:26,fontWeight:700,marginBottom:8,letterSpacing:"-.02em"}}>Для какого бизнеса создана платформа?</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",marginBottom:36,maxWidth:560,margin:"0 auto 36px"}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Для какого бизнеса создана платформа?</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:16}}>
           {[
             {
@@ -586,8 +598,12 @@ export default function Landing() {
 
       {/* ===== FAQ ===== */}
       <section style={{maxWidth:700,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Остались вопросы? Отвечаем</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Все, что нужно знать о старте, безопасности и возможностях платформы AtlasPos</p>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Остались вопросы? Отвечаем</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Все, что нужно знать о старте, безопасности и возможностях платформы AtlasPos</p>
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {[ 
             {q:"Сколько стоит AtlasPos?",a:"Мы гибко подходим к ценообразованию в зависимости от масштаба вашей компании. Есть прозрачные тарифы для небольших команд и крупных сетей, а начать можно абсолютно бесплатно."},
@@ -603,8 +619,12 @@ export default function Landing() {
 
       {/* ===== ТАРИФЫ ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Тарифы</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:24}}>Прозрачные цены для бизнеса любого масштаба</p>
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Тарифы</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Прозрачные цены для бизнеса любого масштаба</p>
 
         <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:32}}>
           {["1m","3m","6m","1y"].map((key) => (
