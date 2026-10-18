@@ -277,7 +277,7 @@ export default function Landing() {
     }, []);
 
     return (
-      <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?360:height,borderRadius:14,border:'1px solid rgba(0,16,36,.08)',background:'#fff',overflow:'hidden',containerType:'size'}}>
+      <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?360:height,background:'transparent',overflow:'hidden',containerType:'size'}}>
         <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'radial-gradient(ellipse 70% 50% at 50% 18%, rgba(31,117,255,.07), transparent 70%)'}} />
         <div ref={bandRef} className="tgh-band" aria-hidden="true"
           style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
