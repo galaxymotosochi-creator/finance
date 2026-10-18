@@ -143,7 +143,7 @@ export default function Landing() {
     React.useEffect(() => {
       const SLICES = 12, CAMERA = 1.6, MAX_WIDTH = 80;
       const SPEED = 4, TILE_HEIGHT = 52, ASPECT = 1919 / 896;
-      const GAP = 2, AXIS = 50, CURVE = 62, FADE = 12;
+      const GAP = 6, AXIS = 50, CURVE = 80, FADE = 12;
       const IMAGES = [
         '/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg'
       ];
@@ -221,15 +221,6 @@ export default function Landing() {
           tile.style.transformStyle = 'preserve-3d';
           tile.style.animation = `${orbitName} ${duration}s linear ${-t * SPEED}s infinite`;
 
-          const onIter = e => {
-            const lap = Math.round(e.elapsedTime / duration);
-            const nextImg = (lap * columns + first) % IMAGES.length;
-            if (tile.dataset.img !== String(nextImg)) {
-              tile.dataset.img = String(nextImg);
-              const src = IMAGES[nextImg];
-              tile.querySelectorAll('img').forEach(el => el.src = src);
-            }
-          };
           tile.addEventListener('animationiteration', onIter);
           listeners.push([tile, onIter]);
 
@@ -239,7 +230,6 @@ export default function Landing() {
             sl.style.top = '0';
             sl.style.overflow = 'hidden';
             sl.style.background = '#fff';
-            sl.style.boxShadow = 'inset 0 0 0 2px #000';
 
             sl.style.left = u((ASPECT - share) / 2);
             sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
@@ -248,17 +238,13 @@ export default function Landing() {
             if (k === 0) sl.style.borderRadius = '10px 0 0 10px';
             if (k === SLICES - 1) sl.style.borderRadius = '0 10px 10px 0';
 
-            const im = document.createElement('img');
-            im.src = img;
-            im.alt = '';
-            im.draggable = false;
+            const im = document.createElement('div');
             im.style.position = 'absolute';
             im.style.top = '0';
-            im.style.maxWidth = 'none';
-            im.style.objectFit = 'cover';
             im.style.left = u(-k * share);
             im.style.width = u(ASPECT);
             im.style.height = u(1);
+            im.style.background = '#000';
             sl.appendChild(im);
             tile.appendChild(sl);
           }
