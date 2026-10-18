@@ -183,8 +183,8 @@ export default function Landing() {
         let st = document.getElementById('tgh-style');
         if (!st) { st = document.createElement('style'); st.id = 'tgh-style'; document.head.appendChild(st); }
         st.textContent = css +
-          `.tgh-tile{position:absolute;transform-style:preserve-3d;will-change:transform;border-radius:6px;` +
-          `box-shadow:0 0 0 1px rgba(120,130,145,.18), 0 8px 24px -8px rgba(16,40,90,.32), 0 20px 44px -18px rgba(16,40,90,.24), 0 -6px 18px -10px rgba(16,40,90,.14)}` +
+          `.tgh-tile{position:absolute;transform-style:preserve-3d;will-change:transform;border-radius:10px;` +
+          `box-shadow:0 6px 16px -6px rgba(16,40,90,.22), 0 18px 40px -16px rgba(16,40,90,.26), 0 -8px 22px -14px rgba(16,40,90,.16)}` +
           `.tgh-band{opacity:0;transition:opacity .5s}` +
           `.tgh-band.on{opacity:1}` +
           `@media(prefers-reduced-motion:reduce){.tgh-tile{animation-play-state:paused}}`;
@@ -233,20 +233,13 @@ export default function Landing() {
             sl.style.top = '0';
             sl.style.overflow = 'hidden';
             sl.style.background = '#fff';
-            const edge = 'rgba(120,130,145,.55)';
-            if (k === 0) {
-              sl.style.boxShadow = `inset 1px 0 0 ${edge}, inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
-            } else if (k === SLICES - 1) {
-              sl.style.boxShadow = `inset -1px 0 0 ${edge}, inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
-            } else {
-              sl.style.boxShadow = `inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
-            }
+
             sl.style.left = u((ASPECT - share) / 2);
             sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
             sl.style.height = u(1);
             sl.style.transform = turn((ASPECT/2 - (k + 0.5) * share) * unit);
-            if (k === 0) sl.style.borderRadius = '6px 0 0 6px';
-            if (k === SLICES - 1) sl.style.borderRadius = '0 6px 6px 0';
+            if (k === 0) sl.style.borderRadius = '10px 0 0 10px';
+            if (k === SLICES - 1) sl.style.borderRadius = '0 10px 10px 0';
 
             const im = document.createElement('img');
             im.src = img;

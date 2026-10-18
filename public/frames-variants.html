@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — 5 вариантов рамок</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif}
+
+  .vwrap{padding:34px 16px 46px;border-bottom:1px solid #eef0f3}
+  .vwrap:last-child{border-bottom:none}
+  .vtitle{max-width:1280px;margin:0 auto 4px;display:flex;align-items:baseline;gap:12px;padding:0 8px}
+  .vnum{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:13px;font-weight:800;flex:none}
+  .vname{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .vdesc{font-size:12.5px;color:rgba(0,0,0,.45);margin-left:auto;text-align:right}
+  @media(max-width:640px){.vdesc{display:none}}
+
+  .band{position:relative;width:100%;height:340px;overflow:hidden;container-type:size;margin-top:6px}
+  .bandglow{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 40%, rgba(31,117,255,.07), transparent 72%)}
+
+  @media(max-width:640px){.band{height:250px}}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+/* ══════ ОБЩИЕ КОНСТАНТЫ (как на сайте) ══════ */
+const SLICES = 12, CAMERA = 1.6, MAX_WIDTH = 80;
+const SPEED = 4, TILE_HEIGHT = 42, ASPECT = 1919 / 896;
+const GAP = 6, AXIS = 38, CURVE = 80, FADE = 12;
+const IMG = '/screen1.jpg';
+
+function arc(bend){ return (CAMERA - 1 + Math.cos(bend)) / (2 * CAMERA * Math.sin(bend)); }
+
+function measure(width, height, tile, aspect, gap, bend){
+  const h = Math.min((tile / 100) * height, ((MAX_WIDTH / 100) * width) / aspect);
+  const radius = width * arc(bend);
+  if(!(h > 0) || !(radius > 0)) return {columns:2, sweep:0, unit:0, limit:0};
+  const deg = rad => rad * 180 / Math.PI;
+  const unit = deg(h / radius);
+  const pitch = (aspect + gap / 100) * unit;
+  const limit = deg(bend) + (aspect * unit) / 2;
+  const columns = Math.min(60, Math.max(2, Math.ceil((2 * limit) / pitch)));
+  const round = n => +n.toFixed(4);
+  const sweep = round((columns * pitch) / 2);
+  return {columns, sweep, unit: round(unit), limit: round(Math.min(sweep, limit))};
+}
+
+/* ══════ 5 ВАРИАНТОВ ══════ */
+const VARIANTS = [
+  {
+    n:1,
+    name:'Тонкий контур + мягкая тень',
+    desc:'минимализм, почти как Apple',
+    tileShadow:'0 0 0 1px rgba(0,0,0,.07), 0 10px 30px -12px rgba(16,40,90,.30)',
+    edgeColor:'rgba(0,0,0,.10)',
+    edgeInside:true,
+    radius:8
+  },
+  {
+    n:2,
+    name:'Без рамки, только глубина',
+    desc:'тень со всех сторон, контура нет',
+    tileShadow:'0 6px 16px -6px rgba(16,40,90,.22), 0 18px 40px -16px rgba(16,40,90,.26), 0 -8px 22px -14px rgba(16,40,90,.16)',
+    edgeColor:null,
+    edgeInside:true,
+    radius:10
+  },
+  {
+    n:3,
+    name:'Светлая обводка 1px',
+    desc:'чёткая серая линия, лёгкая тень',
+    tileShadow:'0 0 0 1px rgba(120,130,145,.55), 0 8px 22px -10px rgba(16,40,90,.18)',
+    edgeColor:'rgba(120,130,145,.60)',
+    edgeInside:true,
+    radius:6
+  },
+  {
+    n:4,
+    name:'Двойная рамка',
+    desc:'светлый контур + внутренняя линия',
+    tileShadow:'0 0 0 1px rgba(120,130,145,.42), 0 12px 30px -14px rgba(16,40,90,.26)',
+    edgeColor:'rgba(120,130,145,.48)',
+    edgeInside:true,
+    radius:4,
+    innerLine:true
+  },
+  {
+    n:5,
+    name:'Синий акцент',
+    desc:'фирменное свечение AtlasPos',
+    tileShadow:'0 0 0 1px rgba(31,117,255,.28), 0 10px 28px -12px rgba(31,117,255,.36), 0 2px 8px -3px rgba(16,40,90,.16)',
+    edgeColor:'rgba(31,117,255,.40)',
+    edgeInside:true,
+    radius:8
+  }
+];
+
+/* ══════ ПОСТРОЕНИЕ ══════ */
+function buildVariant(v){
+  const wrap = document.createElement('div');
+  wrap.className = 'vwrap';
+  wrap.innerHTML =
+    `<div class="vtitle"><span class="vnum">${v.n}</span><span class="vname">${v.name}</span>` +
+    `<span class="vdesc">${v.desc}</span></div>` +
+    `<div class="band"><div class="bandglow"></div><div class="orbit"></div></div>`;
+
+  document.getElementById('root').appendChild(wrap);
+  const box = wrap.querySelector('.band');
+  const band = wrap.querySelector('.orbit');
+
+  const width = box.clientWidth, height = box.clientHeight;
+  if(!width || !height) return;
+
+  const bend = CURVE * Math.PI / 180;
+  const {columns, sweep, unit, limit} = measure(width, height, TILE_HEIGHT, ASPECT, GAP, bend);
+
+  const r = 100 * arc(bend);
+  const radius = r.toFixed(3) + 'cqw';
+  const turn = d => `translateZ(${radius}) rotateY(${(+d).toFixed(4)}deg) translateZ(-${radius})`;
+  const hide = +(((sweep - limit) / (2 * sweep || 1)) * 100).toFixed(4);
+  const orbitName = 'orbit' + v.n;
+
+  const css =
+    `@keyframes ${orbitName}{from{transform:${turn(-sweep)}}to{transform:${turn(sweep)}}` +
+    `0%,${hide}%,${100-hide}%,100%{visibility:hidden}` +
+    `${hide+0.001}%,${100-hide-0.001}%{visibility:visible}}`;
+  let st = document.getElementById('vstyle');
+  if(!st){ st = document.createElement('style'); st.id = 'vstyle'; document.head.appendChild(st); }
+  st.textContent += css;
+
+  const share = ASPECT / SLICES;
+  const duration = columns * SPEED;
+  const mask = `linear-gradient(90deg,transparent,#000 ${FADE}%,#000 ${100-FADE}%,transparent)`;
+  const u = n => `calc(${(+n).toFixed(4)} * min(${TILE_HEIGHT}cqh, ${(MAX_WIDTH/ASPECT).toFixed(4)}cqw))`;
+
+  band.style.position = 'absolute';
+  band.style.inset = '0';
+  band.style.transformStyle = 'preserve-3d';
+  band.style.perspective = (r * CAMERA).toFixed(3) + 'cqw';
+  band.style.perspectiveOrigin = `50% ${AXIS}%`;
+  band.style.maskImage = mask;
+  band.style.webkitMaskImage = mask;
+
+  for(let t = 0; t < columns; t++){
+    const first = columns - 1 - t;
+    const tile = document.createElement('div');
+    tile.style.position = 'absolute';
+    tile.style.transformStyle = 'preserve-3d';
+    tile.style.willChange = 'transform';
+    tile.style.borderRadius = v.radius + 'px';
+    tile.style.boxShadow = v.tileShadow;
+    tile.style.left = `calc(50% - ${u(ASPECT/2)})`;
+    tile.style.top  = `calc(${AXIS}% - ${u(0.5)})`;
+    tile.style.width = u(ASPECT);
+    tile.style.height = u(1);
+    tile.style.animation = `${orbitName} ${duration}s linear ${-t * SPEED}s infinite`;
+
+    for(let k = 0; k < SLICES; k++){
+      const sl = document.createElement('div');
+      sl.style.position = 'absolute';
+      sl.style.top = '0';
+      sl.style.overflow = 'hidden';
+      sl.style.background = '#fff';
+      sl.style.left = u((ASPECT - share) / 2);
+      sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
+      sl.style.height = u(1);
+      sl.style.transform = turn((ASPECT/2 - (k + 0.5) * share) * unit);
+      if(k === 0) sl.style.borderRadius = v.radius + 'px 0 0 ' + v.radius + 'px';
+      if(k === SLICES - 1) sl.style.borderRadius = '0 ' + v.radius + 'px ' + v.radius + 'px 0';
+
+      // обводка по граням
+      if(v.edgeColor){
+        const c = v.edgeColor;
+        if(k === 0) sl.style.boxShadow = `inset 1px 0 0 ${c}, inset 0 1px 0 ${c}, inset 0 -1px 0 ${c}`;
+        else if(k === SLICES - 1) sl.style.boxShadow = `inset -1px 0 0 ${c}, inset 0 1px 0 ${c}, inset 0 -1px 0 ${c}`;
+        else if(v.innerLine) sl.style.boxShadow = `inset 0 1px 0 ${c}, inset 0 -1px 0 ${c}`;
+        else sl.style.boxShadow = `inset 0 1px 0 ${c}, inset 0 -1px 0 ${c}`;
+      }
+
+      const im = document.createElement('img');
+      im.src = IMG;
+      im.alt = '';
+      im.draggable = false;
+      im.style.position = 'absolute';
+      im.style.top = '0';
+      im.style.maxWidth = 'none';
+      im.style.objectFit = 'cover';
+      im.style.left = u(-k * share);
+      im.style.width = u(ASPECT);
+      im.style.height = u(1);
+      sl.appendChild(im);
+      tile.appendChild(sl);
+    }
+    band.appendChild(tile);
+  }
+}
+
+VARIANTS.forEach(buildVariant);
+
+let rt;
+window.addEventListener('resize', ()=>{
+  clearTimeout(rt);
+  rt = setTimeout(()=>{
+    document.getElementById('root').innerHTML = '';
+    const st = document.getElementById('vstyle');
+    if(st) st.textContent = '';
+    VARIANTS.forEach(buildVariant);
+  }, 260);
+});
+</script>
+</body>
+</html>
