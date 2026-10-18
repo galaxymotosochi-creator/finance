@@ -143,7 +143,7 @@ export default function Landing() {
     React.useEffect(() => {
       const SLICES = 12, CAMERA = 1.6, MAX_WIDTH = 80;
       const SPEED = 4, TILE_HEIGHT = 52, ASPECT = 1919 / 896;
-      const GAP = 2, AXIS = 50, CURVE = 80, FADE = 12;
+      const GAP = 2, AXIS = 50, CURVE = 62, FADE = 12;
       const IMAGES = [
         '/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg'
       ];
