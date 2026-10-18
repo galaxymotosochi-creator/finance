@@ -10,6 +10,12 @@ export default function Landing() {
   const { user } = useAuth();
   useEffect(() => { if (user) n('/dashboard', { replace: true }); }, [user, n]);
 
+  // Отключаем авто-восстановление прокрутки браузером на главной
+  useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname);
+  }, []);
+
   const [mobile, setMobile] = useState(window.innerWidth < 700);
   useEffect(() => {
     const h = () => setMobile(window.innerWidth < 700);
