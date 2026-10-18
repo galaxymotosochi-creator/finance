@@ -298,17 +298,19 @@ export default function Landing() {
       </header>
 
       {/* ===== ЗАГОЛОВОК ===== */}
-      <section style={{maxWidth:900,margin:"0 auto",padding:mobile?"28px 20px 6px":"44px 24px 10px",textAlign:"center"}}>
-        <h1 style={{fontSize:mobile?27:46,fontWeight:800,letterSpacing:"-.035em",lineHeight:1.08,color:"#111"}}>
-          Учёт бизнеса без{' '}
-          <span style={{background:'linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent'}}>рутины</span>
-        </h1>
-        <p style={{marginTop:mobile?12:16,fontSize:mobile?13:15,lineHeight:1.6,color:'rgba(0,0,0,.55)',maxWidth:680,marginLeft:'auto',marginRight:'auto'}}>
-          Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
-        </p>
-        <button onClick={()=>n('/register')} style={{marginTop:mobile?18:24,padding:"13px 34px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",color:"#fff",fontSize:mobile?14:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 10px 26px -10px rgba(31,117,255,.75)"}}>
-          Начать бесплатно
-        </button>
+      <section style={{maxWidth:1180,margin:"0 auto",padding:mobile?"28px 20px 6px":"52px 24px 10px"}}>
+        <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.05fr .95fr",gap:mobile?22:56,alignItems:"center"}}>
+          <h1 style={{fontSize:mobile?30:56,fontWeight:800,letterSpacing:"-.035em",lineHeight:1.04,color:"#111"}}>
+            <span style={{display:"block"}}>Учёт бизнеса</span>
+            <span style={{display:"block",color:"rgba(0,0,0,.22)"}}>без</span>
+            <span style={{display:"block",background:"linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8)",WebkitBackgroundClip:"text",backgroundClip:"text",color:"transparent"}}>рутины.</span>
+          </h1>
+          <div style={{maxWidth:520,display:"flex",alignItems:"center"}}>
+            <p style={{fontSize:mobile?13:15,lineHeight:1.62,color:"rgba(0,0,0,.55)"}}>
+              Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ===== ИЗОГНУТАЯ ЛЕНТА СО СКРИНАМИ ===== */}
