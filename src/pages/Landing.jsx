@@ -281,7 +281,7 @@ export default function Landing() {
         <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'radial-gradient(ellipse 70% 50% at 50% 18%, rgba(31,117,255,.07), transparent 70%)'}} />
         <div ref={bandRef} className="tgh-band" aria-hidden="true"
           style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
-        <div style={{position:'relative',zIndex:10,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'space-between',padding:mobile?'24px 0':'40px 0',textAlign:'center',pointerEvents:'none'}}>
+        <div style={{position:'relative',zIndex:10,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:mobile?'24px 0':'40px 0',textAlign:'center',pointerEvents:'none'}}>
           <div style={{padding:'0 24px'}}>
             <h2 style={{fontSize:mobile?24:40,fontWeight:800,letterSpacing:'-.035em',lineHeight:1.1,color:'#111'}}>
               Так выглядит{' '}
@@ -289,9 +289,6 @@ export default function Landing() {
               изнутри
             </h2>
           </div>
-          <p style={{maxWidth:420,padding:'0 24px',fontSize:mobile?12:13.5,lineHeight:1.6,color:'rgba(0,0,0,.48)'}}>
-            Экраны изгибаются с одного края, выравниваются в центре и растворяются с другого.
-          </p>
         </div>
       </div>
     );
