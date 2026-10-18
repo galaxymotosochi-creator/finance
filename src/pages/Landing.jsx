@@ -304,7 +304,7 @@ export default function Landing() {
 
       {/* ===== ЗАГОЛОВОК ===== */}
       <section style={{maxWidth:1180,margin:"0 auto",padding:mobile?"28px 20px 6px":"52px 24px 10px"}}>
-        <div style={{textAlign:"center",marginBottom:mobile?20:26}}>
+        <div style={{textAlign:"left",marginBottom:mobile?20:26}}>
           <span style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#E6F0FF",fontSize:mobile?11.5:13,fontWeight:700,color:"#0d4ea8"}}>
             Первая программа с AI аналитикой
           </span>
