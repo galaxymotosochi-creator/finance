@@ -282,12 +282,17 @@ export default function Landing() {
         <div ref={bandRef} className="tgh-band" aria-hidden="true"
           style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
         <div style={{position:'relative',zIndex:10,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:mobile?'24px 0':'40px 0',textAlign:'center',pointerEvents:'none'}}>
-          <div style={{padding:'0 24px'}}>
-            <h2 style={{fontSize:mobile?24:40,fontWeight:800,letterSpacing:'-.035em',lineHeight:1.1,color:'#111'}}>
-              Так выглядит{' '}
-              <span style={{background:'linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent'}}>AtlasPos</span>{' '}
-              изнутри
+          <div style={{padding:'0 24px',maxWidth:860}}>
+            <h2 style={{fontSize:mobile?26:44,fontWeight:800,letterSpacing:'-.035em',lineHeight:1.08,color:'#111'}}>
+              Учёт бизнеса без{' '}
+              <span style={{background:'linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent'}}>рутины</span>
             </h2>
+            <p style={{marginTop:mobile?12:16,fontSize:mobile?13:15,lineHeight:1.6,color:'rgba(0,0,0,.55)',maxWidth:680,marginLeft:'auto',marginRight:'auto'}}>
+              Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
+            </p>
+            <button onClick={()=>n('/register')} style={{marginTop:mobile?18:24,padding:'13px 34px',borderRadius:100,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',fontSize:mobile?14:15,fontWeight:700,cursor:'pointer',fontFamily:'inherit',boxShadow:'0 10px 26px -10px rgba(31,117,255,.75)'}}>
+              Начать бесплатно
+            </button>
           </div>
         </div>
       </div>
