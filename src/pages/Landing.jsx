@@ -135,7 +135,7 @@ export default function Landing() {
 
 
   /* ══ Изогнутая лента со скринами (порт tilted-grid-hero) ══ */
-  const ScreenBand = ({height = 520}) => {
+  const ScreenBand = ({height = 330}) => {
     const boxRef = React.useRef(null);
     const bandRef = React.useRef(null);
     const [ready, setReady] = React.useState(false);
@@ -190,7 +190,7 @@ export default function Landing() {
         if (!st) { st = document.createElement('style'); st.id = 'tgh-style'; document.head.appendChild(st); }
         st.textContent = css +
           `.tgh-tile{position:absolute;transform-style:preserve-3d;will-change:transform;border-radius:10px;` +
-          `box-shadow:0 6px 16px -6px rgba(16,40,90,.22), 0 18px 40px -16px rgba(16,40,90,.26), 0 -8px 22px -14px rgba(16,40,90,.16)}` +
+          `box-shadow:0 6px 16px -6px rgba(16,40,90,.22), 0 18px 40px -16px rgba(16,40,90,.26)}` +
           `.tgh-band{opacity:0;transition:opacity .5s}` +
           `.tgh-band.on{opacity:1}` +
           `@media(prefers-reduced-motion:reduce){.tgh-tile{animation-play-state:paused}}`;
@@ -264,7 +264,7 @@ export default function Landing() {
     }, []);
 
     return (
-      <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?360:height,background:'transparent',overflow:'hidden',containerType:'size'}}>
+      <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?230:height,background:'transparent',overflow:'hidden',containerType:'size'}}>
         <div ref={bandRef} className="tgh-band" aria-hidden="true"
           style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
       </div>
@@ -382,7 +382,7 @@ export default function Landing() {
       </section>
 
       {/* ===== ИЗОГНУТАЯ ЛЕНТА СО СКРИНАМИ ===== */}
-      <section style={{maxWidth:1280,margin:"0 auto",padding:mobile?"16px 16px 0":"24px 24px 0"}}>
+      <section style={{width:"100%",padding:0}}>
         <ScreenBand />
       </section>
 
