@@ -399,11 +399,7 @@ export default function Landing() {
           <h2 style={{fontSize:mobile?11.5:12.5,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"rgba(0,0,0,.45)",whiteSpace:"nowrap",textAlign:"center"}}>Порядок в учёте с первых минут</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?12:20}}>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h3 style={{fontSize:mobile?11.5:12.5,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"rgba(0,0,0,.45)",whiteSpace:"nowrap",textAlign:"center"}}>Четыре причины автоматизировать учёт в AtlasPos</h3>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-        </div>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:20,lineHeight:1.5}}>Четыре причины автоматизировать учёт в AtlasPos</p>
         <WhyStack />
       </section>
 
