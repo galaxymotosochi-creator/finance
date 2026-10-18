@@ -233,7 +233,14 @@ export default function Landing() {
             sl.style.top = '0';
             sl.style.overflow = 'hidden';
             sl.style.background = '#fff';
-            sl.style.boxShadow = 'inset 0 0 0 1px rgba(120,130,145,.45)';
+            const edge = 'rgba(120,130,145,.55)';
+            if (k === 0) {
+              sl.style.boxShadow = `inset 1px 0 0 ${edge}, inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
+            } else if (k === SLICES - 1) {
+              sl.style.boxShadow = `inset -1px 0 0 ${edge}, inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
+            } else {
+              sl.style.boxShadow = `inset 0 1px 0 ${edge}, inset 0 -1px 0 ${edge}`;
+            }
             sl.style.left = u((ASPECT - share) / 2);
             sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
             sl.style.height = u(1);
