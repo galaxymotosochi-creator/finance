@@ -285,7 +285,7 @@ export default function Landing() {
 
     // Автолистание — раз в 1 секунду
     React.useEffect(() => {
-      const id = setInterval(() => setActive(a => (a + 1) % n), 1000);
+      const id = setInterval(() => setActive(a => (a + 1) % n), 3000);
       return () => clearInterval(id);
     }, [n]);
 
