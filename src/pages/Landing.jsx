@@ -299,6 +299,11 @@ export default function Landing() {
 
       {/* ===== ЗАГОЛОВОК ===== */}
       <section style={{maxWidth:1180,margin:"0 auto",padding:mobile?"28px 20px 6px":"52px 24px 10px"}}>
+        <div style={{textAlign:"center",marginBottom:mobile?20:26}}>
+          <span style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#E6F0FF",fontSize:mobile?11.5:13,fontWeight:700,color:"#0d4ea8"}}>
+            Первая программа с AI аналитикой
+          </span>
+        </div>
         <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.05fr .95fr",gap:mobile?22:56,alignItems:"center"}}>
           <h1 style={{fontSize:mobile?30:56,fontWeight:800,letterSpacing:"-.035em",lineHeight:1.04,color:"#111"}}>
             <span style={{display:"block"}}>Учёт бизнеса</span>
@@ -310,6 +315,15 @@ export default function Landing() {
               Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
             </p>
           </div>
+        </div>
+        <div style={{textAlign:"center",marginTop:mobile?24:36}}>
+          <button onClick={()=>n('/register')} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:10,padding:"15px 38px",borderRadius:100,border:"1px solid rgba(16,40,90,.12)",background:"#fff",color:"#111",fontSize:mobile?14:15,fontWeight:700,fontFamily:"inherit",letterSpacing:"-.01em",cursor:"pointer",boxShadow:"0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)",transition:"transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .22s"}}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 5px 0 -1px #e6eaf1, 0 10px 18px -8px rgba(16,40,90,.26)";}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)";}}
+            onMouseDown={e=>{e.currentTarget.style.transform="translateY(1px)";e.currentTarget.style.boxShadow="0 2px 0 -1px #e6eaf1, 0 4px 8px -5px rgba(16,40,90,.2)";}}
+            onMouseUp={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 5px 0 -1px #e6eaf1, 0 10px 18px -8px rgba(16,40,90,.26)";}}>
+            Попробовать бесплатно
+          </button>
         </div>
       </section>
 
