@@ -394,12 +394,16 @@ export default function Landing() {
 
       {/* ===== ЧЕТЫРЕ ПРИЧИНЫ (веер карточек) ===== */}
       <section style={{maxWidth:1180,margin:mobile?"56px auto":"88px auto",padding:"0 24px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
           <h2 style={{fontSize:mobile?11.5:12.5,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"rgba(0,0,0,.45)",whiteSpace:"nowrap",textAlign:"center"}}>Порядок в учёте с первых минут</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
-        <p style={{fontSize:mobile?20:26,fontWeight:800,color:"#111",textAlign:"center",letterSpacing:"-.03em",marginBottom:mobile?10:16,lineHeight:1.15}}>Четыре причины автоматизировать учёт в AtlasPos</p>
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?12:20}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h3 style={{fontSize:mobile?11.5:12.5,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"rgba(0,0,0,.45)",whiteSpace:"nowrap",textAlign:"center"}}>Четыре причины автоматизировать учёт в AtlasPos</h3>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
         <WhyStack />
       </section>
 
