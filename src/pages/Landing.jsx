@@ -182,7 +182,12 @@ export default function Landing() {
 
         let st = document.getElementById('tgh-style');
         if (!st) { st = document.createElement('style'); st.id = 'tgh-style'; document.head.appendChild(st); }
-        st.textContent = css;
+        st.textContent = css +
+          `.tgh-tile{position:absolute;transform-style:preserve-3d;will-change:transform;border-radius:6px;` +
+          `box-shadow:0 14px 34px -12px rgba(16,40,90,.30), 0 4px 12px -4px rgba(16,40,90,.16)}` +
+          `.tgh-band{opacity:0;transition:opacity .5s}` +
+          `.tgh-band.on{opacity:1}` +
+          `@media(prefers-reduced-motion:reduce){.tgh-tile{animation-play-state:paused}}`;
 
         const share = ASPECT / SLICES;
         const duration = columns * SPEED;
