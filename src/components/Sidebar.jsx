@@ -110,21 +110,23 @@ export default function Sidebar() {
     <>
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
         <div className="sidebar-inner">
-          <div className="sidebar-user">
-<div className="sidebar-toggle"
+          <div className="sidebar-brand">
+            <div className="brand-mark">A</div>
+            {!collapsed && (
+              <div className="brand-text">
+                <div className="brand-name">AtlasPos</div>
+                <div className="brand-sub">Учёт для бизнеса</div>
+              </div>
+            )}
+            <button type="button" className="sidebar-toggle"
               onClick={() => {
                 if (window.innerWidth <= 768) { setMobileOpen(!mobileOpen); }
                 else { setCollapsed(!collapsed); }
-              }}
-            >
+              }}>
               {collapsed || mobileOpen ? '☰' : '✕'}
-            </div>
-            {!collapsed && (
-              <div className="sidebar-user-info">
-                <div className="sidebar-user-email">AtlasPos</div>
-              </div>
-            )}
+            </button>
           </div>
+          {!collapsed && <p className="nav-section-title">Разделы</p>}
           <nav className="sidebar-nav">
             {menu.filter(function(item){
               if (!employeeData) return true;
