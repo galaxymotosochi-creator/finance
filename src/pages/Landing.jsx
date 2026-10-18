@@ -239,6 +239,8 @@ export default function Landing() {
             sl.style.top = '0';
             sl.style.overflow = 'hidden';
             sl.style.background = '#fff';
+            sl.style.outline = '1px solid #000';
+            sl.style.outlineOffset = '-1px';
 
             sl.style.left = u((ASPECT - share) / 2);
             sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
