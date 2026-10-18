@@ -152,7 +152,7 @@ export default function Sidebar() {
                       onClick={() => { if (item.path) { setExpanded(item.label); navigate(item.path); } else { toggleGroup(item.label); } }}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                       {!collapsed && item.label}
-                      {!collapsed && <span className="arrow">&#9662;</span>}
+                      {!collapsed && <span className="arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>}
                     </button>
                     <div className={`nav-children-acc${open ? ' open' : ''}`}>
                       {item.children.filter(function(child){

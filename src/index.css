@@ -148,8 +148,8 @@ body {
 .nav-parent .ic { width: 18px; height: 18px; flex-shrink: 0; opacity: 1; color: #9ca3af; display: inline-flex; align-items: center; justify-content: center; margin-right: .1rem; }
 
 /* Стрелка раздела — крупная фирменная, как «▾» в Доходах и расходах (Все) */
-.nav-parent .arrow { margin-left: auto; font-size: 15px; font-weight: 700; line-height: 1; color: #9ca3af; display: inline-block; opacity: 1; transition: transform .22s; }
-.nav-parent:hover .arrow { opacity: 1; }
+.nav-parent .arrow { margin-left: auto; color: #9ca3af; display: inline-flex; align-items: center; flex-shrink: 0; transition: transform .22s; }
+.nav-parent:hover .arrow { color: #6b7280; }
 .nav-parent.open .arrow { transform: rotate(180deg); }
 /* Активный раздел: на синем фоне стрелка белая, продолжает мигать */
 
