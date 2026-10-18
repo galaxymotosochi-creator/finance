@@ -283,6 +283,12 @@ export default function Landing() {
     const n = ITEMS.length;
     const [active, setActive] = React.useState(0);
 
+    // Автолистание — раз в 1 секунду
+    React.useEffect(() => {
+      const id = setInterval(() => setActive(a => (a + 1) % n), 1000);
+      return () => clearInterval(id);
+    }, [n]);
+
     const tx = (i) => {
       let d = i - active;
       if (d > n/2) d -= n;
@@ -391,7 +397,6 @@ export default function Landing() {
         <h2 style={{fontSize:mobile?22:28,fontWeight:800,textAlign:"center",marginBottom:8,letterSpacing:"-.03em"}}>Порядок в учёте с первых минут</h2>
         <p style={{fontSize:mobile?13:14.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?8:14}}>Четыре причины автоматизировать учёт в AtlasPos</p>
         <WhyStack />
-        <p style={{textAlign:"center",fontSize:12,color:"rgba(0,0,0,.38)",marginTop:-6}}>Клик по карточке — поставить её в центр</p>
       </section>
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
