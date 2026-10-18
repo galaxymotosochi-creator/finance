@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — варианты изгиба (чёрный фон)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif}
+  .vwrap{padding:18px 0 10px;border-bottom:1px solid #eef0f3}
+  .vwrap:last-child{border-bottom:none}
+  .vtitle{max-width:1280px;margin:0 auto 2px;display:flex;align-items:baseline;gap:10px;padding:0 20px}
+  .vnum{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12px;font-weight:800;flex:none}
+  .vname{font-size:14px;font-weight:700}
+  .vdesc{font-size:12px;color:rgba(0,0,0,.42);margin-left:auto}
+  .band{position:relative;width:100%;height:330px;overflow:hidden;container-type:size}
+  @media(max-width:640px){.band{height:230px}.vdesc{display:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const SLICES = 12, CAMERA = 1.6, MAX_WIDTH = 80;
+const SPEED = 4, TILE_HEIGHT = 52, ASPECT = 1919 / 896;
+const GAP = 6, AXIS = 50, FADE = 12;
+const IMG = '#000';
+
+function arc(b){ return (CAMERA - 1 + Math.cos(b)) / (2 * CAMERA * Math.sin(b)); }
+function measure(w, h, tile, aspect, gap, bend){
+  const hh = Math.min((tile/100)*h, ((MAX_WIDTH/100)*w)/aspect);
+  const radius = w * arc(bend);
+  if(!(hh>0)||!(radius>0)) return {columns:2,sweep:0,unit:0,limit:0};
+  const deg = r => r*180/Math.PI;
+  const unit = deg(hh/radius);
+  const pitch = (aspect + gap/100)*unit;
+  const limit = deg(bend) + (aspect*unit)/2;
+  const columns = Math.min(60, Math.max(2, Math.ceil((2*limit)/pitch)));
+  const round = n => +n.toFixed(4);
+  const sweep = round((columns*pitch)/2);
+  return {columns, sweep, unit: round(unit), limit: round(Math.min(sweep, limit))};
+}
+
+const VARIANTS = [
+  {n:1, curve:80, name:'80° — текущий'},
+  {n:2, curve:62, name:'62° — мягче'},
+  {n:3, curve:48, name:'48° — заметно мягче'},
+  {n:4, curve:34, name:'34° — лёгкая дуга'},
+  {n:5, curve:20, name:'20° — почти прямо'},
+  {n:6, curve:0,  name:'0° — прямая лента'},
+];
+
+function buildVariant(v){
+  const wrap = document.createElement('div');
+  wrap.className = 'vwrap';
+  wrap.innerHTML = `<div class="vtitle"><span class="vnum">${v.n}</span><span class="vname">${v.name}</span>` +
+    `<span class="vdesc">CURVE = ${v.curve}°</span></div><div class="band"><div class="orbit"></div></div>`;
+  document.getElementById('root').appendChild(wrap);
+
+  const box = wrap.querySelector('.band');
+  const band = wrap.querySelector('.orbit');
+  const width = box.clientWidth, height = box.clientHeight;
+  if(!width || !height) return;
+
+  const bend = Math.max(0.001, v.curve) * Math.PI / 180;
+  const {columns, sweep, unit, limit} = measure(width, height, TILE_HEIGHT, ASPECT, GAP, bend);
+
+  const r = 100 * arc(bend);
+  const radius = r.toFixed(3) + 'cqw';
+  const turn = d => `translateZ(${radius}) rotateY(${(+d).toFixed(4)}deg) translateZ(-${radius})`;
+  const hide = +(((sweep - limit) / (2*sweep || 1)) * 100).toFixed(4);
+  const orbitName = 'orbit' + v.n;
+
+  let st = document.getElementById('vstyle');
+  if(!st){ st = document.createElement('style'); st.id='vstyle'; document.head.appendChild(st); }
+  st.textContent += `@keyframes ${orbitName}{from{transform:${turn(-sweep)}}to{transform:${turn(sweep)}}` +
+    `0%,${hide}%,${100-hide}%,100%{visibility:hidden}` +
+    `${hide+0.001}%,${100-hide-0.001}%{visibility:visible}}`;
+
+  const share = ASPECT / SLICES;
+  const duration = columns * SPEED;
+  const mask = `linear-gradient(90deg,transparent,#000 ${FADE}%,#000 ${100-FADE}%,transparent)`;
+  const u = n => `calc(${(+n).toFixed(4)} * min(${TILE_HEIGHT}cqh, ${(MAX_WIDTH/ASPECT).toFixed(4)}cqw))`;
+
+  band.style.position='absolute'; band.style.inset='0';
+  band.style.transformStyle='preserve-3d';
+  band.style.perspective = (r*CAMERA).toFixed(3) + 'cqw';
+  band.style.perspectiveOrigin = `50% ${AXIS}%`;
+  band.style.maskImage = mask; band.style.webkitMaskImage = mask;
+
+  for(let t=0;t<columns;t++){
+    const tile = document.createElement('div');
+    tile.style.position='absolute';
+    tile.style.transformStyle='preserve-3d';
+    tile.style.willChange='transform';
+    tile.style.borderRadius='10px';
+    tile.style.boxShadow='0 6px 16px -6px rgba(16,40,90,.22), 0 18px 40px -16px rgba(16,40,90,.26)';
+    tile.style.left = `calc(50% - ${u(ASPECT/2)})`;
+    tile.style.top  = `calc(${AXIS}% - ${u(0.5)})`;
+    tile.style.width = u(ASPECT); tile.style.height = u(1);
+    tile.style.animation = `${orbitName} ${duration}s linear ${-t*SPEED}s infinite`;
+
+    for(let k=0;k<SLICES;k++){
+      const sl = document.createElement('div');
+      sl.style.position='absolute'; sl.style.top='0'; sl.style.overflow='hidden';
+      sl.style.background='#000';
+      sl.style.left = u((ASPECT-share)/2);
+      sl.style.width = (k===SLICES-1) ? u(share) : `calc(${u(share)} + 1px)`;
+      sl.style.height = u(1);
+      sl.style.transform = turn((ASPECT/2-(k+0.5)*share)*unit);
+      if(k===0) sl.style.borderRadius='10px 0 0 10px';
+      if(k===SLICES-1) sl.style.borderRadius='0 10px 10px 0';
+      const im = document.createElement('div');
+      im.style.position='absolute'; im.style.top='0';
+      im.style.left = u(-k*share);
+      im.style.width = u(ASPECT); im.style.height = u(1);
+      im.style.background = IMG;
+      sl.appendChild(im);
+      tile.appendChild(sl);
+    }
+    band.appendChild(tile);
+  }
+}
+
+VARIANTS.forEach(buildVariant);
+let rt;
+window.addEventListener('resize', ()=>{
+  clearTimeout(rt);
+  rt = setTimeout(()=>{
+    document.getElementById('root').innerHTML='';
+    const st=document.getElementById('vstyle'); if(st) st.textContent='';
+    VARIANTS.forEach(buildVariant);
+  }, 260);
+});
+</script>
+</body>
+</html>
