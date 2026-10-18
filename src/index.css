@@ -144,7 +144,7 @@ body {
   border: none; border-radius: var(--radius-md);
 }
 .nav-parent:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
-.nav-parent.active { background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff; font-weight: 600; }
+.nav-parent.active { background: #f8fafc; color: #111; font-weight: 600; }
 .nav-parent .ic { width: 18px; height: 18px; flex-shrink: 0; opacity: 1; color: #9ca3af; display: inline-flex; align-items: center; justify-content: center; margin-right: .1rem; }
 
 /* Стрелка раздела — крупная фирменная, как «▾» в Доходах и расходах (Все) */
@@ -171,7 +171,7 @@ body {
 .nav-children-acc > .nav-child:last-child { margin-bottom: 2px; }
 
 /* родитель: просто hover-фон, без заливки градиентом */
-.nav-parent.active-parent { background: #f8fafc; color: #111; font-weight: 600; }
+.nav-parent.active-parent { background: transparent; color: #111; font-weight: 600; }
 .nav-parent.active-parent .arrow { color: #9ca3af; opacity: 1; animation: none; }
 .nav-parent.open .arrow { transform: rotate(180deg); }
 
