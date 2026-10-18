@@ -191,7 +191,7 @@ button.nav-parent { width: 100%; text-align: left; font-family: var(--font); }
 
 
 
-.nav-child.active { font-weight: 600; color: #0d4ea8; background: #E6F0FF; }
+.nav-child.active { font-weight: 600; color: #6b7280; background: transparent; }
 .nav-sep { height: 1px; background: #f5f5f5; margin: .2rem .65rem; }
 .nav-footer { margin-top: auto; }
 
