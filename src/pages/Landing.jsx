@@ -483,10 +483,17 @@ export default function Landing() {
 
       {/* ===== КОНТРАСТ СИСТЕМ ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Забудьте о сложных настройках других программ и путанице в Excel</h2>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+                <div style={{marginBottom:mobile?10:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:16}}>
+            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center",margin:0}}>Забудьте о сложных настройках других программ</h2>
+            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:16,marginTop:6}}>
+            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center",margin:0}}>и путанице в Excel</h2>
+            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          </div>
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Сравните, как работают привычные методы и наша умная платформа</p>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:20,alignItems:"start"}}>
