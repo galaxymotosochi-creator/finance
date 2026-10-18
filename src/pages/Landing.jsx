@@ -278,7 +278,6 @@ export default function Landing() {
 
     return (
       <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?360:height,background:'transparent',overflow:'hidden',containerType:'size'}}>
-        <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'radial-gradient(ellipse 70% 50% at 50% 18%, rgba(31,117,255,.07), transparent 70%)'}} />
         <div ref={bandRef} className="tgh-band" aria-hidden="true"
           style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
       </div>
@@ -286,7 +285,11 @@ export default function Landing() {
   };
 
   return (
-    <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
+    <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",position:"relative",background:"#fff"}}>
+      {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
+      <div style={{position:"absolute",top:0,left:0,right:0,height:"1200px",pointerEvents:"none",zIndex:0,
+        background:"radial-gradient(ellipse 80% 55% at 50% 0%, rgba(31,117,255,.13), rgba(31,117,255,.05) 45%, transparent 75%)"}} />
+      <div style={{position:"relative",zIndex:1}}>
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1280,margin:"0 auto"}}>
         <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#111"}}>AtlasPos</span>
@@ -685,6 +688,7 @@ export default function Landing() {
           <a href="/terms" target="_blank" rel="noopener noreferrer" style={{color:"inherit",textDecoration:"underline",cursor:"pointer"}}>Пользовательское соглашение</a>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
