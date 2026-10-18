@@ -1820,3 +1820,40 @@ input:focus, select:focus, textarea:focus {
 .modal-box .form-group input[type="date"] { text-align: left; }
 .modal-box input[type="date"]::-webkit-datetime-edit { padding: 0; color: #222; }
 .modal-box input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+
+/* ── Четыре причины: карточки-трансформеры ── */
+.why-card{
+  position:relative;flex:1 1 0;min-width:0;
+  background:#fff;border:1px solid rgba(16,40,90,.10);border-radius:18px;
+  padding:26px 22px 30px;overflow:hidden;cursor:pointer;
+  transition:flex .45s cubic-bezier(.4,0,.2,1), background .35s, border-color .35s, box-shadow .35s;
+  box-shadow:0 3px 0 -1px #eef1f6, 0 8px 18px -12px rgba(16,40,90,.28);
+}
+.why-card:hover{
+  flex:1.75 1 0;
+  background:linear-gradient(160deg,#F5F9FF,#EAF2FF);
+  border-color:rgba(31,117,255,.28);
+  box-shadow:0 4px 0 -1px #dfe8f5, 0 18px 40px -18px rgba(31,117,255,.5);
+}
+.why-num{
+  font-size:34px;font-weight:800;line-height:1;letter-spacing:-.04em;
+  color:rgba(16,40,90,.10);transition:color .35s, transform .45s cubic-bezier(.4,0,.2,1);
+}
+.why-card:hover .why-num{color:#1F75FF;transform:translateY(-2px)}
+.why-title{
+  margin-top:18px;font-size:17px;font-weight:700;letter-spacing:-.02em;color:#111;
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+.why-desc{
+  margin-top:10px;font-size:13.5px;line-height:1.6;color:rgba(0,0,0,.5);
+  max-height:0;opacity:0;transform:translateY(6px);
+  transition:max-height .45s cubic-bezier(.4,0,.2,1), opacity .3s, transform .45s cubic-bezier(.4,0,.2,1);
+}
+.why-card:hover .why-desc{max-height:260px;opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .why-card:hover{flex:1 1 0}
+  .why-desc{max-height:260px;opacity:1;transform:none}
+  .why-card{background:linear-gradient(160deg,#F9FBFF,#F2F7FF);border-color:rgba(31,117,255,.14)}
+  .why-num{color:rgba(31,117,255,.55)}
+}
