@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — боковое меню (аккордеон, идея из промта)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;margin:0;background:#f6f7f9;color:#111}
+  .side{width:288px;flex:none;background:#fff;border-right:1px solid rgba(0,16,36,.08);
+    height:100vh;position:sticky;top:0;display:flex;flex-direction:column;overflow-y:auto}
+  .side::-webkit-scrollbar{width:6px}
+  .side::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:3px}
+  .acc-body{overflow:hidden;transition:height .26s cubic-bezier(.16,1,.3,1),opacity .2s}
+  .acc-item.open .caret{transform:rotate(180deg)}
+  .caret{transition:transform .22s}
+  .navlink{transition:background .16s,color .16s}
+  .navlink:hover{background:#f4f6f9;color:#111}
+  .navlink.active{background:#E6F0FF;color:#0d4ea8;font-weight:600}
+  .parent-btn{transition:background .16s}
+  .parent-btn:hover{background:#f4f6f9}
+  .parent-btn.active-parent{background:#f8fafc}
+</style>
+</head>
+<body>
+<div class="flex min-h-screen">
+
+  <!-- ══ БОКОВОЕ МЕНЮ ══ -->
+  <aside class="side">
+    <div class="px-4 pt-5 pb-4 flex items-center gap-2.5 border-b border-black/5">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-[15px]"
+           style="background:linear-gradient(135deg,#1F75FF,#0d4ea8)">A</div>
+      <div>
+        <div class="font-extrabold text-[15px] tracking-tight leading-none">AtlasPos</div>
+        <div class="text-[11px] text-gray-400 mt-1">Учёт для бизнеса</div>
+      </div>
+    </div>
+
+    <p class="px-5 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[.12em] text-gray-400">Разделы</p>
+
+    <nav class="px-3 pb-6" id="nav"></nav>
+  </aside>
+
+  <!-- ══ КОНТЕНТ (заглушка) ══ -->
+  <main class="flex-1 p-6">
+    <div class="max-w-xl">
+      <h1 class="text-2xl font-extrabold tracking-tight mb-1">Превью меню</h1>
+      <p class="text-sm text-gray-500 mb-6">Аккордеон как в промте, разделы — наши, AtlasPos.</p>
+      <div class="rounded-2xl bg-white border border-black/8 p-6 shadow-sm">
+        <p class="text-sm text-gray-600 leading-relaxed">Нажмите на «Финансы», «Склад», «Клиенты» или «Команда» — раздел раскроется. Активный пункт подсвечен синим, как в кабинете.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ── наши разделы AtlasPos ── */
+const ICONS = {
+  dashboard:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  ai:'<path d="M12 2l2.4 6.2L21 11l-6.6 2.8L12 20l-2.4-6.2L3 11l6.6-2.8z"/>',
+  kassa:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>',
+  finance:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+  stock:'<rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="19.5" r="1.5"/><circle cx="18.5" cy="19.5" r="1.5"/>',
+  clients:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+  team:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+  reports:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+};
+
+const MENU = [
+  { label:'Панель управления', icon:'dashboard', path:'/dashboard' },
+  { label:'AI помощник',       icon:'ai',        path:'/ai-assistant' },
+  { label:'Касса',             icon:'kassa',     path:'/kassa' },
+  { label:'Финансы', icon:'finance', children:[
+    'Доходы и расходы','Счета','Смены','Чеки','Зарплата','Чистая прибыль','Категории','Планирование'
+  ]},
+  { label:'Склад', icon:'stock', children:[
+    'Товары и услуги','Категории','Аналитика товаров','Остатки','Поставки','Инвентаризация','Списания','Поставщики'
+  ]},
+  { label:'Клиенты', icon:'clients', children:[
+    'База клиентов','Лояльность','Акции'
+  ]},
+  { label:'Команда', icon:'team', children:[
+    'Сотрудники','Табель'
+  ]},
+  { label:'Отчеты',    icon:'reports',  path:'/reports' },
+  { label:'Настройки', icon:'settings', path:'/settings' },
+];
+
+const ACTIVE_CHILD = '';
+
+function iconSvg(key, cls='w-[18px] h-[18px]'){
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]||''}</svg>`;
+}
+
+const nav = document.getElementById('nav');
+
+MENU.forEach(function(item, idx){
+  if(item.children){
+    const hasActive = ACTIVE_CHILD ? item.children.includes(ACTIVE_CHILD) : false;
+    const wrap = document.createElement('div');
+    wrap.className = 'acc-item' + (hasActive ? ' open' : '');
+    wrap.innerHTML = `
+      <button class="parent-btn w-full flex items-center gap-2.5 rounded-lg px-2 py-2 mb-0.5 text-[13.5px] font-medium text-gray-700 ${hasActive?'active-parent':''}">
+        <span class="text-gray-400">${iconSvg(item.icon)}</span>
+        <span class="flex-1 text-left">${item.label}</span>
+        <svg class="caret w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="acc-body" style="height:0">
+        <ul class="ml-[26px] border-l border-black/8 pl-3 py-0.5">
+          ${item.children.map(function(c){
+            const act = ACTIVE_CHILD ? c === ACTIVE_CHILD : false;
+            return `<li><a href="#" class="navlink block rounded-md px-2 py-[7px] text-[13px] my-[1px] ${act?'active':'text-gray-500'}">${c}</a></li>`;
+          }).join('')}
+        </ul>
+      </div>`;
+
+    const btn = wrap.querySelector('.parent-btn');
+    const body = wrap.querySelector('.acc-body');
+    if(hasActive) body.style.height = body.scrollHeight + 'px';
+
+    btn.addEventListener('click', function(){
+      const open = wrap.classList.contains('open');
+      // закрыть другие
+      document.querySelectorAll('.acc-item.open').forEach(function(o){
+        if(o !== wrap){
+          o.classList.remove('open');
+          const b = o.querySelector('.acc-body');
+          b.style.height = b.scrollHeight + 'px';
+          requestAnimationFrame(function(){ b.style.height = '0px'; });
+        }
+      });
+      if(open){
+        body.style.height = body.scrollHeight + 'px';
+        requestAnimationFrame(function(){ body.style.height = '0px'; });
+        wrap.classList.remove('open');
+      } else {
+        wrap.classList.add('open');
+        body.style.height = body.scrollHeight + 'px';
+        body.addEventListener('transitionend', function h(e){
+          if(e.propertyName === 'height' && wrap.classList.contains('open')) body.style.height = 'auto';
+          body.removeEventListener('transitionend', h);
+        });
+      }
+    });
+    nav.appendChild(wrap);
+  } else {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.className = 'navlink flex items-center gap-2.5 rounded-lg px-2 py-2 mb-0.5 text-[13.5px] font-medium ' +
+      (item.path === '/dashboard' ? 'text-gray-700' : 'text-gray-700');
+    a.innerHTML = `<span class="text-gray-400">${iconSvg(item.icon)}</span><span>${item.label}</span>`;
+    nav.appendChild(a);
+  }
+});
+</script>
+</body>
+</html>

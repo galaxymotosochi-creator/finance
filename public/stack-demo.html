@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AtlasPos — стопка карточек</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-x:hidden}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:linear-gradient(180deg,#fff 0%,#fafafa 100%);color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:48px 16px 60px}
+  .h2{font-size:26px;font-weight:700;text-align:center;margin-bottom:8px;letter-spacing:-.02em}
+  .sub{font-size:15px;color:rgba(0,0,0,.54);text-align:center;margin-bottom:28px}
+
+  /* сцена: 4 карточки одна поверх другой, сдвигаются по скроллу */
+  .stage{position:relative;height:400vh}          /* запас прокрутки */
+  .pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .deck{position:relative;width:100%;max-width:860px;height:420px}
+
+  .card{
+    position:absolute;inset:0;
+    display:flex;gap:24px;align-items:center;
+    background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:22px;
+    padding:36px 40px;
+    box-shadow:0 -1px 0 rgba(255,255,255,.95) inset, 0 26px 60px -30px rgba(16,40,90,.45);
+    will-change:transform,opacity;
+    transform-origin:center top;
+  }
+  .card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:22px 22px 0 0;
+    background:linear-gradient(90deg,transparent,#1F75FF,transparent);opacity:.6}
+  .card .num{
+    font-size:56px;font-weight:800;line-height:.9;letter-spacing:-.04em;flex:none;min-width:92px;
+    background:linear-gradient(160deg,#1F75FF,#0d4ea8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .card h3{font-size:21px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+  .card p{font-size:14.5px;line-height:1.6;color:rgba(0,0,0,.56)}
+
+  @media (max-width:640px){
+    .wrap{padding:32px 12px 40px}
+    .deck{height:340px}
+    .card{padding:24px 20px;gap:14px;border-radius:18px;align-items:flex-start;flex-direction:column;justify-content:center}
+    .card .num{font-size:40px;min-width:0}
+    .card h3{font-size:18px}
+    .card p{font-size:13.5px;line-height:1.55}
+    .h2{font-size:21px}
+    .sub{font-size:13.5px;margin-bottom:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="h2">Порядок в учете с первых минут</h2>
+  <p class="sub">Четыре причины автоматизировать учет в AtlasPos</p>
+</div>
+
+<div class="stage" id="stage">
+  <div class="pin">
+    <div class="deck" id="deck">
+      <div class="card" data-i="0"><div class="num">01</div><div>
+        <h3>Простота</h3>
+        <p>Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций.</p>
+      </div></div>
+
+      <div class="card" data-i="1"><div class="num">02</div><div>
+        <h3>Надежность</h3>
+        <p>Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны.</p>
+      </div></div>
+
+      <div class="card" data-i="2"><div class="num">03</div><div>
+        <h3>Выгода</h3>
+        <p>Заменяет кассовый софт, складской учет и CRM-систему. Вы получаете все в одной вкладке и не переплачиваете за разные сервисы.</p>
+      </div></div>
+
+      <div class="card" data-i="3"><div class="num">04</div><div>
+        <h3>Забота и помощь</h3>
+        <p>Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес.</p>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var cards=[].slice.call(document.querySelectorAll('.card'));
+  var N=cards.length;
+  var TOP=14;          // верхняя точка стопки (как в uniqpost)
+  var VIS=64;          // сколько видно от предыдущей карточки — создаёт «стопку»
+
+  function isMobile(){ return innerWidth<=640; }
+
+  function render(){
+    var r=stage.getBoundingClientRect();
+    var total=stage.offsetHeight - innerHeight;       // сколько нужно проскроллить
+    var p=Math.min(1,Math.max(0,(-r.top)/Math.max(1,total)));  // 0..1 прогресс сцены
+
+    // карточка i «приезжает» в свой слот на отрезке [i/(N), (i+1)/N]
+    cards.forEach(function(c,i){
+      if(i===0){ c.style.transform='none'; c.style.opacity=1; c.style.zIndex=4; return; }
+
+      var start=(i-1)/N, end=i/N;
+      var t=Math.min(1,Math.max(0,(p-start)/(end-start)));
+      // easing
+      var e=t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+      if(isMobile()){
+        // мобилка: приезжает снизу и останавливается ступенькой
+        c.style.transform='translateY('+((1-e)*100)+'%) scale('+(1-0.012*i*e)+')';
+        c.style.opacity=String(e);
+      } else {
+        c.style.transform='translateY('+((1-e)*110)+'%)';
+        c.style.opacity=String(e);
+      }
+      c.style.zIndex=String(10+i);
+    });
+
+    // когда все собрались — сдвигаем стопку вверх, чтобы были видны все края
+    var done=Math.max(0,(p-(N-1)/N)*N);   // 0..1
+    if(isMobile()){
+      // на мобилке карточки идут одна под другой в пределах deck (упрощённо)
+    }
+  }
+
+  // По мобильной логике: карточки абсолютные, поэтому переопределим позиционирование
+  function layoutMobile(){
+    if(!isMobile()) { cards.forEach(c=>{c.style.position='absolute';c.style.top='';c.style.left='';c.style.right='';c.style.bottom='';}); return; }
+    // на мобилке используем обычный поток внутри deck для стабильности
+    var deck=document.getElementById('deck');
+    deck.style.height='auto';
+    cards.forEach(function(c,i){
+      c.style.position='relative';
+      c.style.inset='auto';
+      c.style.marginBottom=(i<cards.length-1)?'0px':'0px';
+      c.style.transform='none';
+      c.style.opacity='1';
+      c.style.zIndex=String(10+i);
+    });
+    document.querySelector('.pin').style.height='auto';
+    document.querySelector('.pin').style.position='relative';
+    document.querySelector('.pin').style.overflow='visible';
+    document.querySelector('.pin').style.display='block';
+    document.getElementById('stage').style.height='auto';
+    // схлопываем наездом
+    cards.forEach(function(c,i){
+      if(i>0){ c.style.marginTop='-74px'; c.style.boxShadow='0 -22px 34px -26px rgba(16,40,90,.5)'; }
+    });
+  }
+
+  var raf=null;
+  function onScroll(){ if(raf)return; raf=requestAnimationFrame(function(){raf=null; if(!isMobile()) render();}); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',function(){ layoutMobile(); if(!isMobile()) render(); });
+  layoutMobile(); render();
+})();
+</script>
+</body>
+</html>

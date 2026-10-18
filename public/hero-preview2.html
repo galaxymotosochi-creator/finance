@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — hero по промту</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{overflow-x:hidden}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:#f9fafb;color:#111827;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{text-decoration:none;color:inherit}
+  .container{max-width:1280px;margin:0 auto;padding:0 16px}
+  @media(min-width:640px){.container{padding:0 24px}}
+  @media(min-width:1024px){.container{padding:0 32px}}
+
+  /* ── HEADER ── */
+  header{padding:16px 0}
+  @media(min-width:768px){header{padding:24px 0}}
+  .nav-row{display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .brand-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#1F75FF,#0d4ea8);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px}
+  .brand-name{font-weight:800;font-size:18px;letter-spacing:-.03em}
+
+  .nav-links{display:none}
+  @media(min-width:1024px){
+    .nav-links{display:flex;align-items:center;gap:40px;margin-left:64px}
+    .nav-links a{font-size:16px;font-weight:500;transition:opacity .2s}
+    .nav-links a:hover{opacity:.5}
+  }
+  .nav-actions{display:none}
+  @media(min-width:1024px){
+    .nav-actions{display:flex;align-items:center;gap:40px;margin-left:auto}
+    .nav-actions .signin{font-size:16px;font-weight:500;transition:opacity .2s}
+    .nav-actions .signin:hover{opacity:.5}
+  }
+  .btn-dark{display:inline-flex;align-items:center;justify-content:center;
+    padding:12px 24px;font-size:16px;font-weight:700;color:#fff;background:#111827;
+    border-radius:12px;transition:background .2s,transform .12s}
+  .btn-dark:hover{background:#4b5563}
+  .btn-dark:active{transform:scale(.97)}
+
+  .burger{display:flex;background:none;border:none;color:#111827;cursor:pointer;padding:4px}
+  @media(min-width:1024px){.burger{display:none}}
+
+  .mobile-nav{display:none;padding:8px 4px 28px}
+  .mobile-nav.open{display:block;animation:mnav .28s cubic-bezier(.16,1,.3,1)}
+  @keyframes mnav{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .mobile-nav a{display:flex;align-items:center;padding:12px;font-size:16px;font-weight:500;
+    border-radius:12px;margin-bottom:4px;transition:background .18s}
+  .mobile-nav a:hover{background:#f3f4f6}
+  .mobile-nav .btn-dark{width:100%;margin-top:14px}
+
+  /* ── HERO ── */
+  .hero-sec{padding:48px 0 0;background:#f9fafb}
+  @media(min-width:640px){.hero-sec{padding:64px 0 0}}
+  .hero-inner{max-width:672px;margin:0 auto;text-align:center}
+  .hero-kicker{font-size:18px;color:#4b5563;padding:0 24px}
+  .hero-h1{margin-top:20px;font-size:38px;line-height:1.08;font-weight:700;color:#111827;letter-spacing:-.03em}
+  @media(min-width:640px){.hero-h1{font-size:48px}}
+  @media(min-width:1024px){.hero-h1{font-size:60px}}
+
+  .glowwrap{position:relative;display:inline-flex}
+  .glowwrap .glow{position:absolute;inset:0;filter:blur(14px);opacity:.32;
+    background:linear-gradient(90deg,#44BCFF,#FF44EC,#FF675E);border-radius:8px}
+  .glowwrap .word{position:relative}
+
+  .hero-cta{padding:0 32px;margin-top:36px;display:flex;flex-direction:column;gap:16px}
+  @media(min-width:640px){.hero-cta{flex-direction:row;justify-content:center;padding:0}}
+  .hero-cta a{width:100%;padding:12px 32px;font-size:18px;font-weight:700;border-radius:12px;
+    display:inline-flex;align-items:center;justify-content:center}
+  @media(min-width:640px){.hero-cta a{width:auto}}
+  .btn-ghost2{color:#111827;border:2px solid #9ca3af;transition:all .2s}
+  .btn-ghost2:hover{background:#111827;color:#fff;border-color:#111827}
+  .btn-ghost2 svg{width:20px;height:20px;margin-right:8px}
+
+  .hero-note{margin-top:32px;font-size:16px;color:#6b7280;padding:0 16px}
+
+  /* ── КАРТИНКА ── */
+  .shot-wrap{padding-bottom:48px;background:#fff;position:relative}
+  .shot-bg{position:absolute;inset:0;height:66.666%;background:#f9fafb}
+  .shot-inner{position:relative;margin:0 auto}
+  @media(min-width:1024px){.shot-inner{max-width:1152px;margin:0 auto}}
+  .shot{display:block;width:100%;transform:scale(1.05);transform-origin:center top}
+
+  /* мок-скрин дашборда (вместо внешней картинки) */
+  .mock{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px 18px 0 0;
+    box-shadow:0 40px 80px -50px rgba(16,40,90,.6);overflow:hidden}
+  .mock-bar{display:flex;gap:6px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);background:#fbfbfc}
+  .mock-dot{width:10px;height:10px;border-radius:50%;background:#e5e7eb}
+  .mock-body{padding:20px;display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:640px){.mock-body{grid-template-columns:repeat(3,1fr);padding:28px}}
+  .mock-card{border:1px solid rgba(0,0,0,.07);border-radius:12px;padding:16px}
+  .mock-card .t{font-size:11px;color:rgba(0,0,0,.45);margin-bottom:6px}
+  .mock-card .n{font-size:20px;font-weight:800;color:#0d4ea8;letter-spacing:-.02em}
+  .mock-chart{grid-column:1/-1;height:130px;border-radius:12px;
+    background:linear-gradient(180deg,#eff6ff,#fff);border:1px solid rgba(31,117,255,.15);
+    display:flex;align-items:flex-end;gap:8px;padding:14px}
+  .mock-chart i{flex:1;background:linear-gradient(180deg,#5fa2ff,#1F75FF);border-radius:4px 4px 0 0;display:block}
+
+  .note{max-width:760px;margin:0 auto 40px;font-size:12.5px;line-height:1.65;
+    color:rgba(0,0,0,.42);text-align:center;padding:0 16px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="nav-row">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div class="brand-name">AtlasPos</div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#">Возможности</a>
+        <a href="#">Тарифы</a>
+        <a href="#">Интеграции</a>
+      </div>
+
+      <div class="nav-actions">
+        <a href="#" class="signin">Вход</a>
+        <a href="#" class="btn-dark">Создать аккаунт</a>
+      </div>
+
+      <button class="burger" id="burger" aria-expanded="false">
+        <svg id="ico-open" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg id="ico-close" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+          <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="mobile-nav" id="mnav">
+      <a href="#">Возможности</a>
+      <a href="#">Тарифы</a>
+      <a href="#">Интеграции</a>
+      <a href="#">Вход</a>
+      <a href="#" class="btn-dark">Создать аккаунт</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero-sec">
+  <div class="container">
+    <div class="hero-inner">
+      <h1 class="hero-kicker">Платформа для учёта, которая работает с первой минуты</h1>
+      <p class="hero-h1">
+        Наведите порядок в бизнесе с&nbsp;помощью
+        <span class="glowwrap"><span class="glow"></span><span class="word">автоматизации</span></span>
+      </p>
+
+      <div class="hero-cta">
+        <a href="#" class="btn-dark">Начать бесплатно</a>
+        <a href="#" class="btn-ghost2">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 18 18">
+            <path d="M8.18 13.4261C6.86 14.39 5 13.45 5 11.81V5.44C5 3.8 6.86 2.86 8.18 3.82L12.54 7.01C13.63 7.81 13.63 9.44 12.54 10.24L8.18 13.43Z"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Смотреть демо
+        </a>
+      </div>
+
+      <p class="hero-note">Все функции бесплатно 60 дней. Карта не нужна.</p>
+    </div>
+  </div>
+
+  <div class="shot-wrap">
+    <div class="shot-bg"></div>
+    <div class="shot-inner">
+      <div class="mock shot">
+        <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span></div>
+        <div class="mock-body">
+          <div class="mock-card"><div class="t">Выручка сегодня</div><div class="n">128 400 ₽</div></div>
+          <div class="mock-card"><div class="t">Средний чек</div><div class="n">1 240 ₽</div></div>
+          <div class="mock-card"><div class="t">Прибыль</div><div class="n">41 200 ₽</div></div>
+          <div class="mock-chart">
+            <i style="height:40%"></i><i style="height:62%"></i><i style="height:48%"></i>
+            <i style="height:80%"></i><i style="height:56%"></i><i style="height:94%"></i>
+            <i style="height:70%"></i><i style="height:52%"></i><i style="height:86%"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<p class="note">Превью по промту. В проекте AtlasPos нет Tailwind / shadcn / TypeScript — поэтому
+дизайн воспроизведён на чистом CSS в стиле проекта. Внешнюю картинку из промта заменил мок-скрином,
+чтобы превью было самостоятельным.</p>
+
+<script>
+(function(){
+  var btn=document.getElementById('burger'), nav=document.getElementById('mnav');
+  var op=document.getElementById('ico-open'), cl=document.getElementById('ico-close');
+  btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open);
+    op.style.display=open?'none':'block';
+    cl.style.display=open?'block':'none';
+  });
+})();
+</script>
+</body>
+</html>

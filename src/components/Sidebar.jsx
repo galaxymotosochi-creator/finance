@@ -74,16 +74,14 @@ export default function Sidebar() {
   const [expanded, setExpanded] = React.useState(() => {
     const path = location.pathname;
     const found = menu.find(m => m.children && m.children.some(c => path === c.path));
-    return found ? found.label : 'Финансы';
+    return found ? found.label : null;
   });
 
   // Синхронизация expanded с текущим путем при переходах
   React.useEffect(() => {
     const path = location.pathname;
     const found = menu.find(m => m.children && m.children.some(c => path === c.path));
-    if (found && found.label !== expanded) {
-      setExpanded(found.label);
-    }
+    if (found) setExpanded(found.label);
   }, [location.pathname]);
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -97,6 +95,8 @@ export default function Sidebar() {
   const toggleGroup = (label) => {
     setExpanded((prev) => (prev === label ? null : label));
   };
+
+  const closeMobile = () => { if (window.innerWidth <= 768) setMobileOpen(false); };
 
   const isActive = (path) => {
     var p = location.pathname;
@@ -145,14 +145,14 @@ export default function Sidebar() {
                 const open = expanded === item.label;
                 const anyChildActive = item.children.some((c) => isActive(c.path));
                 return (
-                  <div className="nav-group" key={item.label}>
-                    <a className={`nav-parent${open ? ' open' : ''}${anyChildActive || open ? ' active' : ''}`}
+                  <div className={`nav-group acc-item${open ? ' open' : ''}`} key={item.label}>
+                    <button type="button" className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active-parent' : ''}`}
                       onClick={() => { if (item.path) { setExpanded(item.label); navigate(item.path); } else { toggleGroup(item.label); } }}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                       {!collapsed && item.label}
                       {!collapsed && <span className="arrow">&#9662;</span>}
-                    </a>
-                    <div className={`nav-children${open ? ' open' : ''}`}>
+                    </button>
+                    <div className={`nav-children-acc${open ? ' open' : ''}`}>
                       {item.children.filter(function(child){
                         if (!employeeData) return true;
                         var perms = employeeData.permissions || [];
@@ -166,7 +166,7 @@ export default function Sidebar() {
                       }).map((child) => (
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
-                          onClick={() => navigate(child.path)}>
+                          onClick={() => { navigate(child.path); closeMobile(); }}>
                           <span className="nav-child-dot" />{child.label}</a>
                       ))}
                     </div>
@@ -176,7 +176,7 @@ export default function Sidebar() {
               return (
                 <a key={item.path}
                   className={`nav-parent${isActive(item.path) ? ' active' : ''}`}
-                  onClick={() => item.path === '/kassa' ? window.open('/kassa', '_blank') : navigate(item.path)}>
+                  onClick={() => { if (item.path === '/kassa') window.open('/kassa', '_blank'); else { navigate(item.path); closeMobile(); } }}>
                   <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                   {!collapsed && item.label}
                 </a>
