@@ -184,7 +184,7 @@ export default function Landing() {
         if (!st) { st = document.createElement('style'); st.id = 'tgh-style'; document.head.appendChild(st); }
         st.textContent = css +
           `.tgh-tile{position:absolute;transform-style:preserve-3d;will-change:transform;border-radius:6px;` +
-          `box-shadow:0 14px 34px -12px rgba(16,40,90,.30), 0 4px 12px -4px rgba(16,40,90,.16)}` +
+          `box-shadow:0 0 0 1px rgba(120,130,145,.18), 0 8px 24px -8px rgba(16,40,90,.32), 0 20px 44px -18px rgba(16,40,90,.24), 0 -6px 18px -10px rgba(16,40,90,.14)}` +
           `.tgh-band{opacity:0;transition:opacity .5s}` +
           `.tgh-band.on{opacity:1}` +
           `@media(prefers-reduced-motion:reduce){.tgh-tile{animation-play-state:paused}}`;
@@ -233,8 +233,7 @@ export default function Landing() {
             sl.style.top = '0';
             sl.style.overflow = 'hidden';
             sl.style.background = '#fff';
-            sl.style.outline = '0.5px solid rgba(120,130,145,.35)';
-            sl.style.outlineOffset = '-0.5px';
+            sl.style.boxShadow = 'inset 0 0 0 1px rgba(120,130,145,.45)';
             sl.style.left = u((ASPECT - share) / 2);
             sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
             sl.style.height = u(1);
