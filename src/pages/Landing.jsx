@@ -292,8 +292,13 @@ export default function Landing() {
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 24px",maxWidth:1280,margin:"0 auto"}}>
         <span style={{fontWeight:800,fontSize:18,letterSpacing:"-.03em",color:"#111"}}>AtlasPos</span>
-        <div style={{display:"flex",gap:10}}>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid rgba(0,16,36,.18)",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
+          <button onClick={()=>n('/register')} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",padding:mobile?"8px 16px":"9px 22px",borderRadius:100,border:"1px solid rgba(16,40,90,.12)",background:"#fff",color:"#111",fontSize:mobile?12.5:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",boxShadow:"0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)",transition:"transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .22s"}}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 0 -1px #e6eaf1, 0 9px 16px -8px rgba(16,40,90,.26)";}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)";}}>
+            Попробовать бесплатно
+          </button>
         </div>
       </header>
 
@@ -315,15 +320,6 @@ export default function Landing() {
               Умный учёт для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
             </p>
           </div>
-        </div>
-        <div style={{textAlign:"center",marginTop:mobile?24:36}}>
-          <button onClick={()=>n('/register')} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:10,padding:"15px 38px",borderRadius:100,border:"1px solid rgba(16,40,90,.12)",background:"#fff",color:"#111",fontSize:mobile?14:15,fontWeight:700,fontFamily:"inherit",letterSpacing:"-.01em",cursor:"pointer",boxShadow:"0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)",transition:"transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .22s"}}
-            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 5px 0 -1px #e6eaf1, 0 10px 18px -8px rgba(16,40,90,.26)";}}
-            onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)";}}
-            onMouseDown={e=>{e.currentTarget.style.transform="translateY(1px)";e.currentTarget.style.boxShadow="0 2px 0 -1px #e6eaf1, 0 4px 8px -5px rgba(16,40,90,.2)";}}
-            onMouseUp={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 5px 0 -1px #e6eaf1, 0 10px 18px -8px rgba(16,40,90,.26)";}}>
-            Попробовать бесплатно
-          </button>
         </div>
       </section>
 
