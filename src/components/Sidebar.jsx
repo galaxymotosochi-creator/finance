@@ -77,11 +77,11 @@ export default function Sidebar() {
     return found ? found.label : null;
   });
 
-  // Синхронизация expanded с текущим путем при переходах
+  // Открыт ровно тот раздел, в котором мы находимся; ушли — раздел закрывается
   React.useEffect(() => {
     const path = location.pathname;
     const found = menu.find(m => m.children && m.children.some(c => path === c.path));
-    if (found) setExpanded(found.label);
+    setExpanded(found ? found.label : null);
   }, [location.pathname]);
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -148,7 +148,7 @@ export default function Sidebar() {
                 const anyChildActive = item.children.some((c) => isActive(c.path));
                 return (
                   <div className={`nav-group acc-item${open ? ' open' : ''}`} key={item.label}>
-                    <button type="button" className={`nav-parent${open ? ' open' : ''}${anyChildActive ? ' active-parent' : ''}`}
+                    <button type="button" className={`nav-parent${open ? ' open' : ''}${open ? ' active-parent' : ''}`}
                       onClick={() => { if (item.path) { setExpanded(item.label); navigate(item.path); } else { toggleGroup(item.label); } }}>
                       <span className="ic" dangerouslySetInnerHTML={{ __html: svgIcons[item.icon] }} />
                       {!collapsed && item.label}
