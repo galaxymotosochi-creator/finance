@@ -206,8 +206,6 @@ export default function Landing() {
         band.style.webkitMaskImage = mask;
         band.innerHTML = '';
 
-        const listeners = [];
-
         for (let t = 0; t < columns; t++) {
           const first = columns - 1 - t;
           const img = IMAGES[first % IMAGES.length];
@@ -220,9 +218,6 @@ export default function Landing() {
           tile.style.height = u(1);
           tile.style.transformStyle = 'preserve-3d';
           tile.style.animation = `${orbitName} ${duration}s linear ${-t * SPEED}s infinite`;
-
-          tile.addEventListener('animationiteration', onIter);
-          listeners.push([tile, onIter]);
 
           for (let k = 0; k < SLICES; k++) {
             const sl = document.createElement('div');
@@ -252,7 +247,7 @@ export default function Landing() {
         }
 
         requestAnimationFrame(() => band.classList.add('on'));
-        cleanup = () => listeners.forEach(([el, fn]) => el.removeEventListener('animationiteration', fn));
+        cleanup = null;
       };
 
       build();
