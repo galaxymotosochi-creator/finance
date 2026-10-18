@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — 5 причин (карточки-раскладка)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#fff;color:#111}
+  .stack{display:flex;justify-content:center;perspective:1500px;height:500px;position:relative;width:100%;padding:0 16px}
+  .card{
+    position:absolute;left:50%;top:50%;cursor:pointer;
+    transition:transform .5s cubic-bezier(.4,0,.2,1), opacity .5s cubic-bezier(.4,0,.2,1);
+    will-change:transform,opacity;
+    backface-visibility:hidden;
+    transform-origin:center center;
+    border-radius:20px;border:2px solid rgba(16,40,90,.10);
+    background:#fff;overflow:hidden;
+    width:270px;height:360px;
+    box-shadow:0 20px 50px -30px rgba(16,40,90,.6);
+  }
+  .card:before{content:"";position:absolute;inset:0;border-radius:18px;
+    background:linear-gradient(165deg,#0d4ea8,#1F75FF 60%,#4a92ff);
+    opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:0}
+  .card.center:before{opacity:1}
+  .card .inner{position:relative;z-index:1}
+  .card .num,.card .ttl,.card .dsc{transition:color .35s ease}
+  .card.center .ttl{color:#fff}
+  .card .inner{padding:24px 22px;height:100%;display:flex;flex-direction:column}
+  .num{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.05em;color:rgba(16,40,90,.13)}
+  .card.center .num{color:rgba(255,255,255,.34)}
+  .ttl{margin-top:auto;font-size:19px;font-weight:800;letter-spacing:-.025em}
+  .dsc{margin-top:10px;font-size:12.5px;line-height:1.55;color:rgba(0,0,0,.55)}
+  .card.center .dsc{color:rgba(255,255,255,.88)}
+  .hint{text-align:center;font-size:12px;color:rgba(0,0,0,.4);margin-top:8px}
+  @media(max-width:640px){
+    .stack{height:420px}
+    .card{width:230px;height:300px}
+    .num{font-size:42px}
+    .ttl{font-size:20px}
+    .dsc{font-size:13px}
+  }
+</style>
+</head>
+<body>
+
+<div style="max-width:1180px;margin:0 auto;padding:56px 20px 40px">
+  <h2 style="font-size:clamp(22px,3vw,28px);font-weight:800;text-align:center;letter-spacing:-.03em">Четыре причины автоматизировать учёт</h2>
+  <p style="font-size:14px;color:rgba(0,0,0,.5);text-align:center;margin-top:8px">Карточки раскладываются веером — нажмите на любую</p>
+  <div class="stack" id="stack"></div>
+  <p class="hint">Клик по карточке — поставить её в центр</p>
+</div>
+
+<script>
+const ITEMS = [
+  {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
+  {num:"02",title:"Надежность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
+  {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учет и CRM-систему. Вы получаете все в одной вкладке и не переплачиваете за разные сервисы."},
+  {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
+];
+
+const stack = document.getElementById('stack');
+let active = 0;
+let cards = [];
+
+function cardTransform(i){
+  const n = ITEMS.length;
+  // позиция относительно активной: 0 = центр, далее +/- в стороны
+  let d = i - active;
+  if (d > n/2) d -= n;
+  if (d < -n/2) d += n;
+
+  const abs = Math.abs(d);
+  const dir = Math.sign(d);
+
+  if (abs === 0){
+    return { transform:'translate(-50%,-50%) translateZ(120px) scale(1) rotateY(0deg)', opacity:1, zIndex:100 };
+  }
+  // раскладка веером
+  const x = dir * (150 + (abs-1) * 54);
+  const y = abs * 16;
+  const rotY = dir * -16;
+  const rotZ = dir * 2.2;
+  const scale = Math.max(0.72, 1 - abs * 0.09);
+  return {
+    transform:`translate(-50%,-50%) translateX(${x}px) translateY(${y}px) translateZ(${-abs*70}px) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${scale})`,
+    opacity: Math.max(0.35, 1 - abs*0.16),
+    zIndex: 100 - abs
+  };
+}
+
+function render(){
+  cards.forEach((c,i)=>{
+    const t = cardTransform(i);
+    c.style.transform = t.transform;
+    c.style.opacity = t.opacity;
+    c.style.zIndex = t.zIndex;
+    c.classList.toggle('center', i === active);
+  });
+}
+
+ITEMS.forEach((it,i)=>{
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `<div class="inner"><div class="num">${it.num}</div>
+    <div class="ttl">${it.title}</div><div class="dsc">${it.desc}</div></div>`;
+  el.addEventListener('click', ()=>{ active = i; render(); });
+  stack.appendChild(el);
+  cards.push(el);
+});
+
+render();
+</script>
+</body>
+</html>

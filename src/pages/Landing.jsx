@@ -289,6 +289,72 @@ export default function Landing() {
     );
   };
 
+
+  /* ══ 4 причины: карточки веером (порт stagger) ══ */
+  const WhyStack = () => {
+    const ITEMS = [
+      {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
+      {num:"02",title:"Надежность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
+      {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учет и CRM-систему. Вы получаете все в одной вкладке и не переплачиваете за разные сервисы."},
+      {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
+    ];
+    const n = ITEMS.length;
+    const [active, setActive] = React.useState(0);
+
+    const tx = (i) => {
+      let d = i - active;
+      if (d > n/2) d -= n;
+      if (d < -n/2) d += n;
+      const abs = Math.abs(d), dir = Math.sign(d);
+      if (abs === 0) return {t:'translate(-50%,-50%) translateZ(120px) scale(1)', o:1, z:100};
+      const x = dir * (118 + (abs-1) * 46);
+      const y = abs * 14;
+      const ry = dir * -16, rz = dir * 2.2;
+      const sc = Math.max(0.70, 1 - abs * 0.10);
+      return {
+        t:`translate(-50%,-50%) translateX(${x}px) translateY(${y}px) translateZ(${-abs*70}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`,
+        o: Math.max(0.4, 1 - abs*0.15),
+        z: 100 - abs
+      };
+    };
+
+    return (
+      <div style={{position:'relative',width:'100%',height:mobile?380:470,display:'flex',justifyContent:'center',perspective:1500}}>
+        {ITEMS.map((it,i)=>{
+          const c = tx(i);
+          const isC = i === active;
+          return (
+            <div key={i} onClick={()=>setActive(i)}
+              style={{
+                position:'absolute',left:'50%',top:'50%',cursor:'pointer',
+                width:mobile?230:270,height:mobile?300:360,
+                borderRadius:20,border:'2px solid rgba(16,40,90,.10)',
+                background:'#fff',overflow:'hidden',
+                boxShadow:'0 20px 50px -30px rgba(16,40,90,.6)',
+                transform:c.t,opacity:c.o,zIndex:c.z,
+                transition:'transform .5s cubic-bezier(.4,0,.2,1), opacity .5s cubic-bezier(.4,0,.2,1)',
+                willChange:'transform,opacity',backfaceVisibility:'hidden'
+              }}>
+              <div style={{
+                position:'absolute',inset:0,pointerEvents:'none',
+                background:'linear-gradient(165deg,#0d4ea8,#1F75FF 60%,#4a92ff)',
+                opacity:isC?1:0,transition:'opacity .35s ease'
+              }}/>
+              <div style={{position:'relative',zIndex:1,padding:mobile?'20px 18px':'24px 22px',height:'100%',display:'flex',flexDirection:'column'}}>
+                <div style={{fontSize:mobile?34:40,fontWeight:800,lineHeight:1,letterSpacing:'-.05em',
+                  color:isC?'rgba(255,255,255,.34)':'rgba(16,40,90,.13)',transition:'color .35s ease'}}>{it.num}</div>
+                <div style={{marginTop:'auto',fontSize:mobile?17:19,fontWeight:800,letterSpacing:'-.025em',
+                  color:isC?'#fff':'#111',transition:'color .35s ease'}}>{it.title}</div>
+                <div style={{marginTop:10,fontSize:mobile?12:12.5,lineHeight:1.55,
+                  color:isC?'rgba(255,255,255,.88)':'rgba(0,0,0,.55)',transition:'color .35s ease'}}>{it.desc}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",position:"relative",background:"#fff"}}>
       {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
@@ -338,28 +404,13 @@ export default function Landing() {
         <ScreenBand />
       </section>
 
-      {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
-      <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-        <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учете с первых минут</h2>
-        <p style={{fontSize:15,color:"rgba(0,0,0,.54)",textAlign:"center",marginBottom:36}}>Четыре причины автоматизировать учет в AtlasPos</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:20,alignItems:"stretch"}}>
-        {[
-          {num:"01",title:"Простота",desc:"Интерфейс понятен без обучения с первых секунд. Начните работу сразу, без долгого внедрения и инструкций."},
-          {num:"02",title:"Надежность",desc:"Безопасное облачное хранение данных с автоматическим резервным копированием. Полная защита вашей коммерческой тайны."},
-          {num:"03",title:"Выгода",desc:"Заменяет кассовый софт, складской учет и CRM-систему. Вы получаете все в одной вкладке и не переплачиваете за разные сервисы."},
-          {num:"04",title:"Забота и помощь",desc:"Бесплатно перенесем ваши текущие базы данных и таблицы Excel в систему. Живая поддержка поможет настроить процессы под ваш бизнес."},
-        ].map((f,i)=>(
-          <div key={i} style={{display:"flex",gap:16,padding:20,border:"1px solid rgba(0,0,0,.08)",borderRadius:14,alignItems:"flex-start",transition:"all .15s"}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor="#1F75FF";e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,.04)"}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
-            <div style={{fontSize:36,fontWeight:800,color:"rgba(0,0,0,.06)",lineHeight:1,flexShrink:0,minWidth:50}}>{f.num}</div>
-            <div style={{display:"flex",flexDirection:"column",justifyContent:"center",flex:1}}>
-              <div style={{fontSize:17,fontWeight:700,marginBottom:4}}>{f.title}</div>
-              <div style={{fontSize:14,color:"rgba(0,0,0,.54)",lineHeight:1.5}}>{f.desc}</div>
-            </div>
-          </div>
-        ))}
-      </div></section>
+      {/* ===== ЧЕТЫРЕ ПРИЧИНЫ (веер карточек) ===== */}
+      <section style={{maxWidth:1180,margin:mobile?"56px auto":"88px auto",padding:"0 24px"}}>
+        <h2 style={{fontSize:mobile?22:28,fontWeight:800,textAlign:"center",marginBottom:8,letterSpacing:"-.03em"}}>Порядок в учёте с первых минут</h2>
+        <p style={{fontSize:mobile?13:14.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?8:14}}>Четыре причины автоматизировать учёт в AtlasPos</p>
+        <WhyStack />
+        <p style={{textAlign:"center",fontSize:12,color:"rgba(0,0,0,.38)",marginTop:-6}}>Клик по карточке — поставить её в центр</p>
+      </section>
 
       {/* ===== ПРЕВЬЮ ИНТЕРФЕЙСА (6 возможностей) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
