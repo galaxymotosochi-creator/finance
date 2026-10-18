@@ -338,60 +338,6 @@ export default function Landing() {
         <ScreenBand />
       </section>
 
-      {/* ===== HERO С ПРЕВЬЮ ДАШБОРДА ===== */}
-      <section style={{maxWidth:1280,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:mobile?'1fr':'repeat(auto-fit, minmax(320px, 1fr))',gap:mobile?24:32,alignItems:"center"}}>
-        <div>
-          <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:100,background:"#E6F0FF",fontSize:13,fontWeight:700,color:"#0d4ea8",marginBottom:20}}>
-            Первая программа с AI аналитикой
-          </div>
-          <h1 style={{fontSize:"clamp(31px,5vw,47px)",fontWeight:800,letterSpacing:"-.03em",lineHeight:1.1,marginBottom:16}}>
-            Учет бизнеса без рутины
-          </h1>
-          <p style={{fontSize:15,color:"rgba(0,0,0,.54)",lineHeight:1.55,marginBottom:28}}>
-            Умный учет для современного бизнеса. Объедините кассу, склад, финансы, команду и маркетинг в единый автоматизированный контур. AI-аналитика избавит от таблиц и покажет реальные точки роста вашей прибыли.
-          </p>
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-            <button onClick={()=>n('/register')} style={{padding:"12px 32px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>Начать бесплатно</button>
-          </div>
-        </div>
-        <div>
-          <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:20,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,.06)"}}>
-            <div style={{background:"#000",padding:"8px 14px",display:"flex",gap:6,alignItems:"center"}}>
-              <span style={{width:8,height:8,borderRadius:"50%",background:"#ff6052"}}/>
-              <span style={{width:8,height:8,borderRadius:"50%",background:"#ffbd2e"}}/>
-              <span style={{width:8,height:8,borderRadius:"50%",background:"#28c93f"}}/>
-            </div>
-            <div style={{padding:20,background:"#fff",fontSize:13,lineHeight:1.6}}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}>
-                <span style={{fontWeight:700}}>Панель управления</span>
-                <span style={{color:"rgba(0,0,0,.34)"}}>сегодня</span>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}}>
-                <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Доходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#16a34a"}}>+284 000 {cur}</div>
-                </div>
-                <div style={{background:"#f9f9f9",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Расходы</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#dc2626"}}>−123 000 {cur}</div>
-                </div>
-                <div style={{background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",borderRadius:10,padding:10}}>
-                  <div style={{fontSize:10,color:"rgba(0,0,0,.54)",marginBottom:2}}>Итого</div>
-                  <div style={{fontSize:14,fontWeight:800}}>+161 000 {cur}</div>
-                </div>
-              </div>
-              <div style={{fontSize:11,color:"rgba(0,0,0,.34)",marginBottom:6}}>ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
-              {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
-                <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #f0f0f0"}}>
-                  <span style={{fontWeight:500}}>{r[0]}</span>
-                  <span style={{fontWeight:600,color:r[2]}}>{r[1]}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===== ПОЧЕМУ ВЫБИРАЮТ НАС (из варианта 5) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <h2 style={{fontSize:26,fontWeight:700,textAlign:"center",marginBottom:8,letterSpacing:"-.02em"}}>Порядок в учете с первых минут</h2>
