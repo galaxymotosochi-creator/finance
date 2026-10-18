@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrencySymbol } from '../lib/currency';
@@ -127,6 +127,171 @@ export default function Landing() {
     </div>
   );
 
+
+  /* ══ Изогнутая лента со скринами (порт tilted-grid-hero) ══ */
+  const ScreenBand = ({height = 520}) => {
+    const boxRef = React.useRef(null);
+    const bandRef = React.useRef(null);
+    const [ready, setReady] = React.useState(false);
+
+    React.useEffect(() => {
+      const SLICES = 12, CAMERA = 1.6, MAX_WIDTH = 80;
+      const SPEED = 4, TILE_HEIGHT = 42, ASPECT = 1919 / 896;
+      const GAP = 6, AXIS = 56, CURVE = 80, FADE = 12;
+      const IMAGES = [
+        '/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg','/screen1.jpg'
+      ];
+
+      const arc = b => (CAMERA - 1 + Math.cos(b)) / (2 * CAMERA * Math.sin(b));
+
+      const measure = (width, height, tile, aspect, gap, bend) => {
+        const h = Math.min((tile / 100) * height, ((MAX_WIDTH / 100) * width) / aspect);
+        const radius = width * arc(bend);
+        if (!(h > 0) || !(radius > 0)) return {columns:2, sweep:0, unit:0, limit:0};
+        const deg = rad => rad * 180 / Math.PI;
+        const unit = deg(h / radius);
+        const pitch = (aspect + gap / 100) * unit;
+        const limit = deg(bend) + (aspect * unit) / 2;
+        const columns = Math.min(60, Math.max(2, Math.ceil((2 * limit) / pitch)));
+        const round = n => +n.toFixed(4);
+        const sweep = round((columns * pitch) / 2);
+        return {columns, sweep, unit: round(unit), limit: round(Math.min(sweep, limit))};
+      };
+
+      const box = boxRef.current, band = bandRef.current;
+      if (!box || !band) return;
+
+      let cleanup = null;
+
+      const build = () => {
+        const width = box.clientWidth, height2 = box.clientHeight;
+        if (!width || !height2) return;
+        const bend = Math.min(85, Math.max(5, CURVE)) * Math.PI / 180;
+        const {columns, sweep, unit, limit} = measure(width, height2, TILE_HEIGHT, ASPECT, GAP, bend);
+
+        const r = 100 * arc(bend);
+        const radius = r.toFixed(3) + 'cqw';
+        const turn = d => `translateZ(${radius}) rotateY(${(+d).toFixed(4)}deg) translateZ(-${radius})`;
+        const hide = +(((sweep - limit) / (2 * sweep || 1)) * 100).toFixed(4);
+        const orbitName = 'tgh-orbit';
+
+        const css = `@keyframes ${orbitName}{from{transform:${turn(-sweep)}}to{transform:${turn(sweep)}}` +
+          `0%,${hide}%,${100-hide}%,100%{visibility:hidden}` +
+          `${hide+0.001}%,${100-hide-0.001}%{visibility:visible}}` +
+          `@media(prefers-reduced-motion:reduce){.tgh-tile{animation-play-state:paused}}`;
+
+        let st = document.getElementById('tgh-style');
+        if (!st) { st = document.createElement('style'); st.id = 'tgh-style'; document.head.appendChild(st); }
+        st.textContent = css;
+
+        const share = ASPECT / SLICES;
+        const duration = columns * SPEED;
+        const mask = `linear-gradient(90deg,transparent,#000 ${FADE}%,#000 ${100-FADE}%,transparent)`;
+        const u = n => `calc(${(+n).toFixed(4)} * min(${TILE_HEIGHT}cqh, ${(MAX_WIDTH/ASPECT).toFixed(4)}cqw))`;
+
+        band.style.perspective = (r * CAMERA).toFixed(3) + 'cqw';
+        band.style.perspectiveOrigin = `50% ${AXIS}%`;
+        band.style.maskImage = mask;
+        band.style.webkitMaskImage = mask;
+        band.innerHTML = '';
+
+        const listeners = [];
+
+        for (let t = 0; t < columns; t++) {
+          const first = columns - 1 - t;
+          const img = IMAGES[first % IMAGES.length];
+          const tile = document.createElement('div');
+          tile.className = 'tgh-tile';
+          tile.dataset.img = String(first % IMAGES.length);
+          tile.style.left = `calc(50% - ${u(ASPECT/2)})`;
+          tile.style.top  = `calc(${AXIS}% - ${u(0.5)})`;
+          tile.style.width = u(ASPECT);
+          tile.style.height = u(1);
+          tile.style.transformStyle = 'preserve-3d';
+          tile.style.animation = `${orbitName} ${duration}s linear ${-t * SPEED}s infinite`;
+
+          const onIter = e => {
+            const lap = Math.round(e.elapsedTime / duration);
+            const nextImg = (lap * columns + first) % IMAGES.length;
+            if (tile.dataset.img !== String(nextImg)) {
+              tile.dataset.img = String(nextImg);
+              const src = IMAGES[nextImg];
+              tile.querySelectorAll('img').forEach(el => el.src = src);
+            }
+          };
+          tile.addEventListener('animationiteration', onIter);
+          listeners.push([tile, onIter]);
+
+          for (let k = 0; k < SLICES; k++) {
+            const sl = document.createElement('div');
+            sl.style.position = 'absolute';
+            sl.style.top = '0';
+            sl.style.overflow = 'hidden';
+            sl.style.background = '#fff';
+            sl.style.outline = '0.5px solid rgba(120,130,145,.35)';
+            sl.style.outlineOffset = '-0.5px';
+            sl.style.left = u((ASPECT - share) / 2);
+            sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
+            sl.style.height = u(1);
+            sl.style.transform = turn((ASPECT/2 - (k + 0.5) * share) * unit);
+            if (k === 0) sl.style.borderRadius = '6px 0 0 6px';
+            if (k === SLICES - 1) sl.style.borderRadius = '0 6px 6px 0';
+
+            const im = document.createElement('img');
+            im.src = img;
+            im.alt = '';
+            im.draggable = false;
+            im.style.position = 'absolute';
+            im.style.top = '0';
+            im.style.maxWidth = 'none';
+            im.style.objectFit = 'cover';
+            im.style.left = u(-k * share);
+            im.style.width = u(ASPECT);
+            im.style.height = u(1);
+            sl.appendChild(im);
+            tile.appendChild(sl);
+          }
+          band.appendChild(tile);
+        }
+
+        requestAnimationFrame(() => band.classList.add('on'));
+        cleanup = () => listeners.forEach(([el, fn]) => el.removeEventListener('animationiteration', fn));
+      };
+
+      build();
+      setReady(true);
+
+      let rt;
+      const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { if (cleanup) cleanup(); build(); }, 250); };
+      window.addEventListener('resize', onResize);
+      return () => {
+        window.removeEventListener('resize', onResize);
+        clearTimeout(rt);
+        if (cleanup) cleanup();
+      };
+    }, []);
+
+    return (
+      <div ref={boxRef} style={{position:'relative',width:'100%',height:mobile?360:height,borderRadius:14,border:'1px solid rgba(0,16,36,.08)',background:'#fff',overflow:'hidden',containerType:'size'}}>
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',background:'radial-gradient(ellipse 70% 50% at 50% 18%, rgba(31,117,255,.07), transparent 70%)'}} />
+        <div ref={bandRef} className="tgh-band" aria-hidden="true"
+          style={{position:'absolute',inset:0,pointerEvents:'none',opacity:ready?1:0,transition:'opacity .5s'}} />
+        <div style={{position:'relative',zIndex:10,height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'space-between',padding:mobile?'24px 0':'40px 0',textAlign:'center',pointerEvents:'none'}}>
+          <div style={{padding:'0 24px'}}>
+            <h2 style={{fontSize:mobile?24:40,fontWeight:800,letterSpacing:'-.035em',lineHeight:1.1,color:'#111'}}>
+              Так выглядит{' '}
+              <span style={{background:'linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8)',WebkitBackgroundClip:'text',backgroundClip:'text',color:'transparent'}}>AtlasPos</span>{' '}
+              изнутри
+            </h2>
+          </div>
+          <p style={{maxWidth:420,padding:'0 24px',fontSize:mobile?12:13.5,lineHeight:1.6,color:'rgba(0,0,0,.48)'}}>
+            Экраны изгибаются с одного края, выравниваются в центре и растворяются с другого.
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",background:"linear-gradient(180deg, #fff 0%, #fafafa 100%)"}}>
       {/* ===== ХЕДЕР ===== */}
@@ -136,6 +301,11 @@ export default function Landing() {
           <button onClick={()=>n('/login')} style={{padding:"8px 20px",borderRadius:100,border:"1.5px solid rgba(0,16,36,.18)",background:"transparent",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#111"}}>Войти</button>
         </div>
       </header>
+
+      {/* ===== ИЗОГНУТАЯ ЛЕНТА СО СКРИНАМИ ===== */}
+      <section style={{maxWidth:1280,margin:"0 auto",padding:mobile?"16px 16px 0":"28px 24px 0"}}>
+        <ScreenBand />
+      </section>
 
       {/* ===== HERO С ПРЕВЬЮ ДАШБОРДА ===== */}
       <section style={{maxWidth:1280,margin:"0 auto",padding:"40px 24px",display:"grid",gridTemplateColumns:mobile?'1fr':'repeat(auto-fit, minmax(320px, 1fr))',gap:mobile?24:32,alignItems:"center"}}>

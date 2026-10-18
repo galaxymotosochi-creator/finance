@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — изогнутая лента со скринами</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{max-width:100%;overflow-x:hidden;background:#0a0f1a;color:#fff}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif}
+
+  .hero{position:relative;height:100vh;min-height:640px;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;overflow:hidden}
+  .hero:before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 20%,rgba(31,117,255,.20),transparent 70%)}
+
+  .head{position:relative;z-index:5;text-align:center;padding:0 24px;margin-bottom:8px}
+  .badge{display:inline-flex;padding:6px 16px;border-radius:100px;background:rgba(31,117,255,.14);
+    border:1px solid rgba(31,117,255,.32);color:#8fb8ff;font-size:12.5px;font-weight:700;margin-bottom:16px}
+  .head h1{font-size:clamp(26px,4.6vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1.08}
+  .head h1 span{background:linear-gradient(135deg,#7db4ff,#1F75FF 55%,#0d4ea8);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ── сцена-цилиндр ── */
+  .band{position:relative;width:100%;flex:1;display:flex;align-items:center;justify-content:center;
+    perspective:1400px;perspective-origin:50% 50%;margin-top:10px}
+
+  .orbit{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+
+  .tile{position:absolute;top:50%;left:50%;
+    width:var(--w);height:var(--h);
+    margin-left:calc(var(--w) / -2);margin-top:calc(var(--h) / -2);
+    transform-style:preserve-3d;backface-visibility:hidden;
+    border-radius:14px;overflow:visible;
+    will-change:transform;
+    animation-name:tileMove;animation-timing-function:linear;animation-iteration-count:infinite;
+  }
+  .tile .sl{position:absolute;top:0;height:100%;
+    background-repeat:no-repeat;
+    backface-visibility:hidden;
+  }
+  .tile .frame{border-radius:14px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.95);}
+  .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;
+    background:linear-gradient(0deg,rgba(5,9,18,.94),rgba(5,9,18,0));
+    font-size:12px;font-weight:700;color:#cfe1ff;border-radius:0 0 14px 14px;pointer-events:none}
+
+  /* края растворяются */
+  .mask{position:absolute;inset:0;pointer-events:none;z-index:4}
+  .mask:before,.mask:after{content:"";position:absolute;top:0;bottom:0;width:16%}
+  .mask:before{left:0;background:linear-gradient(90deg,#0a0f1a 5%,rgba(10,15,26,0))}
+  .mask:after{right:0;background:linear-gradient(270deg,#0a0f1a 5%,rgba(10,15,26,0))}
+
+  .note{position:relative;z-index:5;text-align:center;font-size:12px;color:rgba(255,255,255,.32);
+    padding:0 24px 26px}
+
+  @keyframes tileMove{
+    from{transform:rotateY(var(--a0));}
+    to  {transform:rotateY(var(--a1));}
+  }
+
+  @media (max-width:640px){
+    .hero{min-height:560px}
+    .tile .cap{font-size:10.5px;padding:9px 11px}
+    .note{font-size:11px}
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="head">
+    <div class="badge">Живые экраны системы</div>
+    <h1>Так выглядит <span>AtlasPos</span> изнутри</h1>
+  </div>
+
+  <div class="band" id="band">
+    <div class="orbit" id="orbit"></div>
+    <div class="mask"></div>
+  </div>
+
+  <p class="note">Превью изогнутой ленты (как в промте). В бою — актуальные скрины из системы.</p>
+</section>
+
+<script>
+/* ══════ ДАННЫЕ ══════ */
+const SLIDES = [
+  { src:'https://atlaspos.ru/hero-dash.png',   cap:'Касса и аналитика' },
+  { src:'https://atlaspos.ru/shot-landing.jpg',cap:'Главная' },
+  { src:'https://atlaspos.ru/hero-dash.png',   cap:'Склад и остатки' },
+  { src:'https://atlaspos.ru/shot-landing.jpg',cap:'Отчёты' },
+  { src:'https://atlaspos.ru/hero-dash.png',   cap:'Клиенты' },
+];
+
+/* ══════ КОНСТАНТЫ (как в промте) ══════ */
+const SLICES  = 16;      // полос на плитку
+const CAMERA  = 1.6;     // расстояние камеры (в радиусах)
+const MAX_WIDTH = 55;    // макс. ширина плитки, % ширины
+const BEND_DEG = 70;     // изгиб к краям, градусы
+const ASPECT   = 16/10;  // пропорции плитки
+const GAP      = 5;      // зазор между плитками, % высоты
+
+const band  = document.getElementById('band');
+const orbit = document.getElementById('orbit');
+
+let tiles = [];
+let COLUMNS = 12, SWEEP = 0, UNIT = 0, RADIUS = 0, TILE_H = 0, TILE_W = 0;
+let TILE_DURATION = 28;   // секунд на полный оборот
+
+/* ══════ РАСЧЁТ ══════ */
+function arc(bend){ return (CAMERA - 1 + Math.cos(bend)) / (2 * CAMERA * Math.sin(bend)); }
+
+function measure(){
+  const W = band.clientWidth;
+  const H = band.clientHeight;
+  const bend = BEND_DEG * Math.PI / 180;
+
+  // высота плитки: 34% высоты сцены, но не шире MAX_WIDTH
+  let h = Math.min(H * 0.34, (MAX_WIDTH / 100 * W) / ASPECT);
+  const r = W * arc(bend);
+  const deg = rad => rad * 180 / Math.PI;
+  const unit  = deg(h / r);
+  const pitch = (ASPECT + GAP / 100) * unit;
+  const limit = deg(bend) + (ASPECT * unit) / 2;
+  const columns = Math.min(60, Math.max(8, Math.ceil((2 * limit) / pitch)));
+
+  COLUMNS = columns;
+  SWEEP   = (columns * pitch) / 2;
+  UNIT    = unit;
+  RADIUS  = r;
+  TILE_H  = h;
+  TILE_W  = h * ASPECT;
+}
+
+/* ══════ ПОСТРОЕНИЕ ══════ */
+function build(){
+  orbit.innerHTML = '';
+  tiles = [];
+
+  for(let i = 0; i < COLUMNS; i++){
+    const s = SLIDES[i % SLIDES.length];
+    const el = document.createElement('div');
+    el.className = 'tile';
+    el.style.setProperty('--w', TILE_W + 'px');
+    el.style.setProperty('--h', TILE_H + 'px');
+
+    // начальный угол и полный оборот
+    const a0 = -SWEEP + (i * (2 * SWEEP / COLUMNS));
+    el.style.setProperty('--a0', a0 + 'deg');
+    el.style.setProperty('--a1', (a0 + 360) + 'deg');
+    el.style.animationDuration = TILE_DURATION + 's';
+    // задержка = смещение по дуге
+    el.style.animationDelay = (-(i / COLUMNS) * TILE_DURATION) + 's';
+
+    // ── слайсы: каждая полоска — грань цилиндра ──
+    const share = ASPECT / SLICES;             // ширина полоски в «единицах высоты»
+    for(let k = 0; k < SLICES; k++){
+      const sl = document.createElement('div');
+      sl.className = 'sl';
+      sl.style.width  = (TILE_W * share / ASPECT) + 'px';
+      sl.style.height = TILE_H + 'px';
+      sl.style.left   = (k * TILE_W / SLICES) + 'px';
+      // позиция куска картинки
+      sl.style.backgroundImage = `url("${s.src}")`;
+      sl.style.backgroundSize  = TILE_W + 'px ' + TILE_H + 'px';
+      sl.style.backgroundPosition = (-k * TILE_W / SLICES) + 'px 0';
+      // поворот грани вокруг оси цилиндра
+      const ang = (ASPECT / 2 - (k + 0.5) * share) * UNIT;
+      sl.style.transformOrigin = '50% 50%';
+      sl.style.transform = `rotateY(${ang}deg)`;
+      el.appendChild(sl);
+    }
+
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.textContent = s.cap;
+    el.appendChild(cap);
+
+    orbit.appendChild(el);
+    tiles.push(el);
+  }
+
+  // радиус постановки орбиты
+  orbit.style.transform = `translateZ(${-RADIUS}px)`;
+}
+
+/* ══════ СТАРТ ══════ */
+function init(){
+  measure();
+  build();
+}
+
+init();
+
+let rt = null;
+window.addEventListener('resize', () => {
+  clearTimeout(rt);
+  rt = setTimeout(init, 220);
+});
+
+// пауза в неактивной вкладке — не жрём батарею
+document.addEventListener('visibilitychange', () => {
+  tiles.forEach(t => {
+    t.style.animationPlayState = document.hidden ? 'paused' : 'running';
+  });
+});
+</script>
+</body>
+</html>

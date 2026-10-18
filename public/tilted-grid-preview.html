@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — Tilted Grid Hero (точная версия)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif}
+  .hero{position:relative;width:100%;height:640px;border-radius:12px;border:1px solid rgba(0,16,36,.08);
+    background:#fff;overflow:hidden;container-type:size}
+  .hero:before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 18%,rgba(31,117,255,.07),transparent 70%)}
+  @media(max-width:640px){.hero{height:520px;border-radius:0}}
+
+</style>
+</head>
+<body>
+<div class="hero" id="hero">
+  <div class="band" id="band" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="top">
+      <h1>Так выглядит<br><span>AtlasPos</span> изнутри</h1>
+    </div>
+    <p class="bottom">Экраны изгибаются с одного края, выравниваются в центре и растворяются с другого.</p>
+  </div>
+</div>
+
+<style>
+  .band{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s}
+  .band.on{opacity:1}
+  .content{position:relative;z-index:10;pointer-events:none;height:100%;display:flex;flex-direction:column;
+    align-items:center;justify-content:space-between;padding:48px 0;text-align:center}
+  .content .top{padding:0 24px}
+  .content h1{font-size:clamp(26px,4vw,46px);font-weight:800;letter-spacing:-.035em;line-height:1.1}
+  .content h1 span{background:linear-gradient(135deg,#4a92ff,#1F75FF 55%,#0d4ea8);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .content .bottom{max-width:420px;padding:0 24px;font-size:13.5px;line-height:1.6;color:rgba(0,0,0,.48)}
+
+  .tile{position:absolute;transform-style:preserve-3d;will-change:transform;
+    border-radius:6px;
+    box-shadow:0 14px 34px -12px rgba(16,40,90,.30), 0 4px 12px -4px rgba(16,40,90,.16)}
+  .tile>div{position:absolute;top:0;overflow:hidden;background:#fff;outline:0.5px solid rgba(120,130,145,.35);outline-offset:-0.5px}
+  .tile img{position:absolute;top:0;left:0;max-width:none;object-fit:cover;object-position:center;width:100%;height:100%;display:block}
+
+</style>
+
+<script>
+/* ══════ ДАННЫЕ: скрины AtlasPos ══════ */
+const IMAGES = [
+  { src:'https://atlaspos.ru/screen1.jpg', cap:'Касса и аналитика' },
+  { src:'https://atlaspos.ru/screen1.jpg', cap:'Склад и остатки' },
+  { src:'https://atlaspos.ru/screen1.jpg', cap:'Доходы и расходы' },
+  { src:'https://atlaspos.ru/screen1.jpg', cap:'Клиенты и лояльность' },
+  { src:'https://atlaspos.ru/screen1.jpg', cap:'Отчёты и прибыль' },
+];
+
+/* ══════ КОНСТАНТЫ ИЗ ПРОМТА ══════ */
+const SLICES = 12;
+const CAMERA = 1.6;
+const MAX_WIDTH = 80;
+
+const SPEED = 4;          // секунд на одну плитку
+const TILE_HEIGHT = 42;   // % высоты hero
+const ASPECT = 1919 / 896;   // пропорции скрина — без обрезки
+const GAP = 6;            // % высоты плитки
+const AXIS = 56;          // вертикальный центр, %
+const CURVE = 80;         // градусы изгиба
+const FADE = 12;          // ширина затухания, %
+
+function arc(bend){
+  return (CAMERA - 1 + Math.cos(bend)) / (2 * CAMERA * Math.sin(bend));
+}
+
+function measure(width, height, tile, aspect, gap, bend){
+  const h = Math.min((tile / 100) * height, ((MAX_WIDTH / 100) * width) / aspect);
+  const radius = width * arc(bend);
+  if(!(h > 0) || !(radius > 0)) return {columns:2, sweep:0, unit:0, limit:0};
+  const deg = rad => rad * 180 / Math.PI;
+  const unit = deg(h / radius);
+  const pitch = (aspect + gap / 100) * unit;
+  const limit = deg(bend) + (aspect * unit) / 2;
+  const columns = Math.min(60, Math.max(2, Math.ceil((2 * limit) / pitch)));
+  const round = n => +n.toFixed(4);
+  const sweep = round((columns * pitch) / 2);
+  return {columns, sweep, unit: round(unit), limit: round(Math.min(sweep, limit))};
+}
+
+/* ══════ ПОСТРОЕНИЕ ══════ */
+const hero = document.getElementById('hero');
+const band = document.getElementById('band');
+let shown = {};
+
+function build(){
+  const width = hero.clientWidth;
+  const height = hero.clientHeight;
+  const bend = Math.min(85, Math.max(5, CURVE)) * Math.PI / 180;
+  const {columns, sweep, unit, limit} = measure(width, height, TILE_HEIGHT, ASPECT, GAP, bend);
+
+  // радиус в cqw (container query width)
+  const r = 100 * arc(bend);
+  const radius = r.toFixed(3) + 'cqw';
+
+  // turn: выйти на ось, повернуть, вернуться
+  const turn = deg => `translateZ(${radius}) rotateY(${(+deg).toFixed(4)}deg) translateZ(-${radius})`;
+
+  const hide = +(((sweep - limit) / (2 * sweep || 1)) * 100).toFixed(4);
+  const orbitName = 'tgh-orbit';
+
+  // ключевые кадры как в промте
+  const css =
+    `@keyframes ${orbitName}{` +
+      `from{transform:${turn(-sweep)}}to{transform:${turn(sweep)}}` +
+      `0%,${hide}%,${100-hide}%,100%{visibility:hidden}` +
+      `${hide+0.001}%,${100-hide-0.001}%{visibility:visible}}` +
+    `@media(prefers-reduced-motion:reduce){.tile{animation-play-state:paused}}`;
+
+  // подключаем стили
+  let st = document.getElementById('tgh-style');
+  if(!st){ st = document.createElement('style'); st.id='tgh-style'; document.head.appendChild(st); }
+  st.textContent = css;
+
+  const share = ASPECT / SLICES;
+  const duration = columns * SPEED;
+  const mask = `linear-gradient(90deg,transparent,#000 ${FADE}%,#000 ${100-FADE}%,transparent)`;
+
+  // единица измерения u() — как в промте: min(tileHeight cqh, MAX_WIDTH/aspect cqw)
+  const u = n => `calc(${(+n).toFixed(4)} * min(${TILE_HEIGHT}cqh, ${(MAX_WIDTH/ASPECT).toFixed(4)}cqw))`;
+
+  band.style.perspective = (r * CAMERA).toFixed(3) + 'cqw';
+  band.style.perspectiveOrigin = `50% ${AXIS}%`;
+  band.style.maskImage = mask;
+  band.style.webkitMaskImage = mask;
+
+  band.innerHTML = '';
+  shown = {};
+
+  for(let t = 0; t < columns; t++){
+    const first = columns - 1 - t;
+    const img = IMAGES[first % IMAGES.length];
+
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.t = t;
+    tile.dataset.img = String(first);
+    tile.style.left = `calc(50% - ${u(ASPECT/2)})`;
+    tile.style.top  = `calc(${AXIS}% - ${u(0.5)})`;
+    tile.style.width = u(ASPECT);
+    tile.style.height = u(1);
+    tile.style.transformStyle = 'preserve-3d';
+    tile.style.animation = `${orbitName} ${duration}s linear ${-t * SPEED}s infinite`;
+
+    // смена картинки при каждом обороте
+    tile.addEventListener('animationiteration', e => {
+      const lap = Math.round(e.elapsedTime / duration);
+      const nextImg = (lap * columns + first) % IMAGES.length;
+      if(tile.dataset.img !== String(nextImg)){
+        tile.dataset.img = String(nextImg);
+        const im = IMAGES[nextImg];
+        tile.querySelectorAll('img').forEach(el => el.src = im.src);
+      }
+    });
+
+    // 16 слайсов
+    for(let k = 0; k < SLICES; k++){
+      const sl = document.createElement('div');
+      sl.style.left = u((ASPECT - share) / 2);
+      sl.style.width = (k === SLICES - 1) ? u(share) : `calc(${u(share)} + 1px)`;
+      sl.style.height = u(1);
+      sl.style.transform = turn((ASPECT/2 - (k + 0.5) * share) * unit);
+      if(k === 0) sl.style.borderRadius = '6px 0 0 6px';
+      if(k === SLICES - 1) sl.style.borderRadius = '0 6px 6px 0';
+
+      const im = document.createElement('img');
+      im.src = img.src;
+      im.alt = '';
+      im.draggable = false;
+      im.style.left = u(-k * share);
+      im.style.width = u(ASPECT);
+      im.style.height = u(1);
+      sl.appendChild(im);
+
+      tile.appendChild(sl);
+    }
+
+    band.appendChild(tile);
+  }
+
+  requestAnimationFrame(()=> band.classList.add('on'));
+}
+
+build();
+
+let rt;
+window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(build, 250); });
+</script>
+</body>
+</html>
