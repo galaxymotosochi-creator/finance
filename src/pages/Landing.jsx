@@ -627,7 +627,13 @@ const ORBIT_ICONS = {
       <div style={{position:"relative",zIndex:1}}>
       {/* ===== ХЕДЕР ===== */}
       <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:mobile?"12px 16px":"14px 24px",maxWidth:1280,margin:"0 auto"}}>
-        <span style={{fontWeight:800,fontSize:mobile?16:18,letterSpacing:"-.03em",color:"#111",flexShrink:0,lineHeight:1}}>AtlasPos</span>
+        <div style={{display:"flex",alignItems:"center",gap:mobile?7:9,flexShrink:0}}>
+          <div style={{width:mobile?26:30,height:mobile?26:30,borderRadius:mobile?8:9,flexShrink:0,
+            background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",color:"#fff",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontWeight:800,fontSize:mobile?13:15,letterSpacing:"-.02em",lineHeight:1}}>A</div>
+          <span style={{fontWeight:800,fontSize:mobile?16:18,letterSpacing:"-.03em",color:"#111",lineHeight:1}}>AtlasPos</span>
+        </div>
         <div style={{display:"flex",gap:10,alignItems:"center"}}>
           <button onClick={()=>n('/login')} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",padding:mobile?"7px 11px":"9px 22px",borderRadius:100,border:"1px solid rgba(16,40,90,.12)",background:"#fff",color:"#111",fontSize:mobile?11.5:13,whiteSpace:"nowrap",fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)",transition:"transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .22s"}}
             onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 0 -1px #e6eaf1, 0 9px 16px -8px rgba(16,40,90,.26)";}}
