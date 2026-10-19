@@ -528,7 +528,7 @@ const ORBIT_ICONS = {
     const activeItem = activeId ? ORBIT_DATA.find(d => d.id === activeId) : null;
 
     return (
-      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?360:580,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?500:720,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
         <div style={{position:'relative',width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
           {/* кольца */}
           <div style={{position:'absolute',width:(OUTs*2),height:(OUTs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.06)'}} />
