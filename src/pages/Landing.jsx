@@ -558,7 +558,7 @@ const ORBIT_ICONS = {
                   transition: parked ? 'transform .7s cubic-bezier(.4,0,.2,1), opacity .7s' : 'opacity .7s'
                 }}>
                 <div style={{
-                  width:mobile?42:52,height:mobile?42:52,borderRadius:'50%',flex:'none',
+                  width:mobile?34:42,height:mobile?34:42,borderRadius:'50%',flex:'none',
                   display:'flex',alignItems:'center',justifyContent:'center',
                   background: isActive ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#fff',
                   border: '1px solid ' + (isActive ? '#1F75FF' : (isRel ? '#60a5fa' : 'rgba(16,40,90,.14)')),
