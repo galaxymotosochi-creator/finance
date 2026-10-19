@@ -496,7 +496,7 @@ const ORBIT_ICONS = {
       return it ? it.related : [];
     };
 
-    const k = mobile ? 0.5 : 1;
+    const k = mobile ? 0.72 : 1;
     const OUTs = OUT * k, INs = IN * k;
     const offsetOf = (isOut) => isOut
       ? Math.ceil(n / 2)
@@ -528,14 +528,14 @@ const ORBIT_ICONS = {
     const activeItem = activeId ? ORBIT_DATA.find(d => d.id === activeId) : null;
 
     return (
-      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?560:760,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?620:760,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
         <div style={{position:'relative',width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
           {/* кольца */}
           <div style={{position:'absolute',width:(OUTs*2),height:(OUTs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.06)'}} />
           <div style={{position:'absolute',width:(INs*2),height:(INs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.12)'}} />
 
           {/* ядро А */}
-          <div style={{position:'absolute',width:mobile?48:64,height:mobile?48:64,borderRadius:mobile?14:18,
+          <div style={{position:'absolute',width:mobile?52:64,height:mobile?52:64,borderRadius:mobile?15:18,
             background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',
             fontWeight:800,fontSize:mobile?19:26,letterSpacing:'-.02em',zIndex:10,
             boxShadow:'0 10px 28px -10px rgba(31,117,255,.85)'}}>A</div>
@@ -554,11 +554,11 @@ const ORBIT_ICONS = {
                   zIndex: isActive ? 200 : p.z,
                   opacity: isActive ? 1 : p.op,
                   display:'flex',flexDirection:'column',alignItems:'center',gap:6,
-                  width: mobile?70:96, cursor:'pointer',
+                  width: mobile?74:96, cursor:'pointer',
                   transition: parked ? 'transform .7s cubic-bezier(.4,0,.2,1), opacity .7s' : 'opacity .7s'
                 }}>
                 <div style={{
-                  width:mobile?38:52,height:mobile?38:52,borderRadius:'50%',flex:'none',
+                  width:mobile?42:52,height:mobile?42:52,borderRadius:'50%',flex:'none',
                   display:'flex',alignItems:'center',justifyContent:'center',
                   background: isActive ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#fff',
                   border: '1px solid ' + (isActive ? '#1F75FF' : (isRel ? '#60a5fa' : 'rgba(16,40,90,.14)')),
