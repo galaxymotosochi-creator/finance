@@ -683,7 +683,7 @@ const ORBIT_ICONS = {
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
                 <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",maxWidth:mobile?"78%":"none",lineHeight:1.5}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?10:14}}>Все разделы системы — нажмите любой, чтобы узнать, что он умеет</p>
