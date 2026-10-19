@@ -688,74 +688,6 @@ const ORBIT_ICONS = {
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?10:14}}>Все разделы системы — нажмите любой, чтобы узнать, что он умеет</p>
         <OrbitRing />
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch",marginTop:mobile?28:44}}>
-          {/* Панель управления */}
-          <MiniAppWindow title="Панель управления">
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>
-              <MiniStat label="Доходы" value="+284 000 ₽" color="#16a34a" />
-              <MiniStat label="Расходы" value="−123 000 ₽" color="#dc2626" />
-              <MiniStat label="Итого" value="+161 000 ₽" color="#fff" bg="#1F75FF" />
-            </div>
-            <MiniLabel text="ПОСЛЕДНИЕ ОПЕРАЦИИ" />
-            {[["Продажа скутера","+72 000 ₽","#16a34a"],["Запчасти","−8 500 ₽","#dc2626"],["Аренда","+15 000 ₽","#16a34a"]].map((r,i)=>(
-              <MiniRow key={i} label={r[0]} value={r[1]} color={r[2]} />
-            ))}
-          </MiniAppWindow>
-          {/* Склад */}
-          <MiniAppWindow title="Склад и товары">
-            <MiniLabel text="ОСТАТКИ" />
-            {[["Скутер Tank Next","5 шт","#111"],["Масло моторное","12 шт","#111"],["Тормозные колодки","3 шт","#dc2626"],["Аккумулятор","8 шт","#111"]].map((r,i)=>(
-              <MiniRow key={i} label={r[0]} value={r[1]} color={r[2]} />
-            ))}
-          </MiniAppWindow>
-          {/* Клиенты */}
-          <MiniAppWindow title="Клиентская база">
-            <MiniLabel text="ПОСЛЕДНИЕ КЛИЕНТЫ" />
-            {[["Иван Петров","+7 918 123-45-67"],["Анна Смирнова","+7 988 765-43-21"],["Сергей Иванов","+7 962 555-33-22"]].map((r,i)=>(
-              <MiniRow key={i} label={r[0]} value={r[1]} color="rgba(0,0,0,.54)" />
-            ))}
-          </MiniAppWindow>
-          {/* Сотрудники */}
-          <MiniAppWindow title="Сотрудники и зарплата">
-            <MiniLabel text="ТАБЕЛЬ" />
-            {[["Алексей М.","160 ч / 45 000 ₽"],["Мария К.","152 ч / 38 000 ₽"],["Дмитрий С.","168 ч / 52 000 ₽"]].map((r,i)=>(
-              <MiniRow key={i} label={r[0]} value={r[1]} color="rgba(0,0,0,.54)" />
-            ))}
-          </MiniAppWindow>
-          {/* Финансы */}
-          <MiniAppWindow title="Движение денег">
-            <MiniLabel text="ДОХОДЫ / РАСХОДЫ" />
-            <div style={{display:"flex",gap:6,marginBottom:6}}>
-              <div style={{flex:1,background:"#f0fdf4",borderRadius:6,padding:6,textAlign:"center"}}>
-                <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Приход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#16a34a"}}>284K {cur}</div>
-              </div>
-              <div style={{flex:1,background:"#fef2f2",borderRadius:6,padding:6,textAlign:"center"}}>
-                <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Расход</div>
-                <div style={{fontSize:11,fontWeight:700,color:"#dc2626"}}>123K {cur}</div>
-              </div>
-            </div>
-            <MiniLabel text="P&amp;L" />
-            <div style={{fontSize:11,fontWeight:700,color:"#16a34a",textAlign:"center",padding:"4px 0",background:"#f9f9f9",borderRadius:6}}>+161 000 {cur} прибыль</div>
-          </MiniAppWindow>
-          {/* Касса */}
-          <MiniAppWindow title="Кассовые смены">
-            <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-              <span style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Смена #245</span>
-              <span style={{fontSize:9,fontWeight:600,color:"#16a34a"}}>открыта</span>
-            </div>
-            <div style={{display:"flex",gap:6}}>
-              <div style={{flex:1,background:"#f9f9f9",borderRadius:6,padding:6,textAlign:"center"}}>
-                <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Наличные</div>
-                <div style={{fontSize:10,fontWeight:600}}>34 500 {cur}</div>
-              </div>
-              <div style={{flex:1,background:"#f9f9f9",borderRadius:6,padding:6,textAlign:"center"}}>
-                <div style={{fontSize:9,color:"rgba(0,0,0,.54)"}}>Безнал</div>
-                <div style={{fontSize:10,fontWeight:600}}>128 000 {cur}</div>
-              </div>
-            </div>
-          </MiniAppWindow>
-        </div>
       </section>
 
       {/* ===== КОНТРАСТ СИСТЕМ ===== */}
@@ -763,12 +695,12 @@ const ORBIT_ICONS = {
                 <div style={{marginBottom:mobile?10:14}}>
           <div style={{display:"flex",alignItems:"center",gap:16}}>
             <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center",margin:0}}>Забудьте о сложных настройках других программ</h2>
+            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"70%":"none"}}>Забудьте о сложных настройках других программ</h2>
             <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
           </div>
           <div style={{display:"flex",alignItems:"center",gap:16,marginTop:6}}>
             <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center",margin:0}}>и путанице в Excel</h2>
+            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45}}>и путанице в Excel</h2>
             <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
           </div>
         </div>
@@ -810,7 +742,7 @@ const ORBIT_ICONS = {
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
                 <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Для какого бизнеса создана платформа?</h2>
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",lineHeight:1.45,maxWidth:mobile?"70%":"none"}}>Для какого бизнеса создана платформа?</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
