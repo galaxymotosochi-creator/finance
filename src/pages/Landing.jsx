@@ -321,7 +321,7 @@ export default function Landing() {
                 boxShadow:'0 20px 50px -30px rgba(16,40,90,.6)',
                 transform:c.t,opacity:c.o,zIndex:c.z,
                 transition:'transform .5s cubic-bezier(.4,0,.2,1), opacity .5s cubic-bezier(.4,0,.2,1)',
-                willChange:'transform,opacity',backfaceVisibility:'hidden'
+                willChange:'transform,opacity',backfaceVisibility:'hidden',backfaceVisibility:'hidden'
               }}>
               <div style={{
                 position:'absolute',inset:0,pointerEvents:'none',
@@ -456,8 +456,20 @@ const ORBIT_ICONS = {
 
     React.useEffect(() => {
       if (!auto) return;
-      const id = setInterval(() => setAngle(a => (a + 0.3) % 360), 50);
-      return () => clearInterval(id);
+      let raf, last = performance.now(), acc = 0;
+      const SPEED = 6; // градусов в секунду
+      const tick = (now) => {
+        const dt = now - last;
+        last = now;
+        acc += dt;
+        if (acc >= 16) {
+          setAngle(a => (a + SPEED * (acc / 1000)) % 360);
+          acc = 0;
+        }
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
     }, [auto]);
 
     // при остановке — доворачиваем так, чтобы выбранный узел встал наверх
@@ -550,7 +562,7 @@ const ORBIT_ICONS = {
                 onClick={e => { e.stopPropagation(); select(item); }}
                 style={{
                   position:'absolute',left:'50%',top:'50%',
-                  transform:`translate(-50%,-50%) translate(${p.x}px, ${p.y}px)`,
+                  transform:`translate(-50%,-50%) translate3d(${p.x}px, ${p.y}px, 0)`,
                   zIndex: isActive ? 200 : p.z,
                   opacity: isActive ? 1 : p.op,
                   display:'flex',flexDirection:'column',alignItems:'center',gap:6,
