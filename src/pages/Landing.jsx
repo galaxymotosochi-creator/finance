@@ -780,11 +780,6 @@ const ORBIT_ICONS = {
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
         <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"78%":"none"}}>Порядок вместо хаоса в таблицах</h2>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
-          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
           <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"78%":"none"}}>Забудьте о сложных настройках других программ</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
