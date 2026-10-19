@@ -343,6 +343,282 @@ export default function Landing() {
     );
   };
 
+
+  /* ══ Орбита разделов (порт radial-orbital-timeline) ══ */
+const SVG = (p) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ORBIT_ICONS = {
+  kassa: SVG('<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/>'),
+  sales: SVG('<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'),
+  stock: SVG('<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/>'),
+  clients: SVG('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>'),
+  staff: SVG('<circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0114 0"/><circle cx="18" cy="9" r="2.5"/>'),
+  finance: SVG('<path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>'),
+  accounts: SVG('<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/>'),
+  reports: SVG('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 13v4M12 9v8M16 11v6"/>'),
+  ai: SVG('<path d="M12 3l2.2 5.3L20 10l-5.8 1.7L12 17l-2.2-5.3L4 10l5.8-1.7z"/>'),
+  dashboard: SVG('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+  shift: SVG('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  receipt: SVG('<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h3"/>'),
+  salary: SVG('<path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>'),
+  profit: SVG('<path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/>'),
+  plan: SVG('<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>'),
+  chart: SVG('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  boxes: SVG('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
+  supply: SVG('<path d="M3 16V6h11l4 4v6"/><circle cx="8" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M3 16h2M10 18h5"/>'),
+  inventory: SVG('<path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>'),
+  writeoff: SVG('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11l4 4M14 11l-4 4"/>'),
+  suppliers: SVG('<path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/>'),
+  loyalty: SVG('<path d="M20.8 5.6a5 5 0 00-7.1 0L12 7.3l-1.7-1.7a5 5 0 10-7.1 7.1L12 21l8.8-8.3a5 5 0 000-7.1z"/>'),
+  promo: SVG('<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>'),
+  timesheet: SVG('<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4M8 14h3M8 18h5"/>'),
+  settings: SVG('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 007 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.6 1.6 0 002.6 14H2.5a2 2 0 110-4h.1A1.6 1.6 0 004.6 7a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1A1.6 1.6 0 0010 2.6V2.5a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1A1.6 1.6 0 0021.4 10h.1a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>'),
+};
+  const ORBIT_DATA = [
+  { id:1, title:'Панель управления', cat:'Обзор', icon:'dashboard', related:[2,9,22],
+    content:'Главный экран: выручка, расходы, прибыль и последние операции за сегодня.',
+    feats:['Доходы, расходы, итог за день','Последние операции','Быстрые действия','Сводка по всем точкам'] },
+  { id:2, title:'AI помощник', cat:'Обзор', icon:'ai', related:[1,10,22],
+    content:'AI-ассистент отвечает на вопросы по вашим цифрам и находит точки роста простым языком.',
+    feats:['Ответы на вопросы по данным','Автоматические инсайты','Прогноз выручки','Поиск аномалий'] },
+  { id:3, title:'Касса', cat:'Продажи', icon:'kassa', related:[7,12,13],
+    content:'Рабочее место кассира: пробивайте чеки, принимайте оплату и контролируйте смену.',
+    feats:['Открытие и закрытие смены','Наличные, карта, QR','Печать и отправка чеков','Поиск товара по штрихкоду'] },
+  { id:4, title:'Доходы и расходы', cat:'Финансы', icon:'finance', related:[5,9,8],
+    content:'Все денежные потоки по категориям: платежи, операции и сверка по счёту.',
+    feats:['Операции по категориям','Сверка с банком','Планирование платежей','История изменений'] },
+  { id:5, title:'Счета', cat:'Финансы', icon:'accounts', related:[4,9],
+    content:'Несколько касс и счетов одновременно, переводы между ними и контроль остатков.',
+    feats:['Наличные и безналичные счета','Переводы между счетами','Остаток по каждому счёту','История движений'] },
+  { id:6, title:'Смены', cat:'Продажи', icon:'shift', related:[3,7],
+    content:'Открытие и закрытие смен сотрудников, расхождение по кассе и контроль кассиров.',
+    feats:['Открытие и закрытие смены','Сверка наличных в кассе','Кто и когда работал','Расхождения и недостачи'] },
+  { id:7, title:'Чеки', cat:'Продажи', icon:'receipt', related:[3,6],
+    content:'История всех чеков с фильтрами по дате, кассиру и способу оплаты. Возвраты.',
+    feats:['История чеков с детализацией','Возвраты и отмены','Фильтры по кассиру','Выгрузка в Excel'] },
+  { id:8, title:'Зарплата', cat:'Команда', icon:'salary', related:[21,22,4],
+    content:'Оклады, премии и выплаты. Система сама посчитает зарплату по выработке.',
+    feats:['Расчёт зарплаты','Премии и бонусы','История выплат','Связь с табелем'] },
+  { id:9, title:'Чистая прибыль', cat:'Аналитика', icon:'profit', related:[4,22,1],
+    content:'Отчёт о прибыли и убытках: выручка минус все расходы за период.',
+    feats:['P&L за любой период','Динамика по месяцам','Топ категорий расходов','Сравнение периодов'] },
+  { id:10, title:'Планирование', cat:'Аналитика', icon:'plan', related:[9,4,2],
+    content:'Планы по выручке и расходам, контроль выполнения и прогноз на будущее.',
+    feats:['Планы по выручке','Планы по расходам','Факт vs план','Прогноз до конца месяца'] },
+  { id:11, title:'Товары и услуги', cat:'Склад', icon:'stock', related:[12,13,17],
+    content:'Карточки товаров и услуг: цены, себестоимость, штрихкоды и категории.',
+    feats:['Карточки товаров','Цены и себестоимость','Категории и единицы','Штрихкоды'] },
+  { id:12, title:'Аналитика товаров', cat:'Склад', icon:'chart', related:[11,13,9],
+    content:'Что продаётся лучше, где маржа выше и какой товар залёживается.',
+    feats:['Топ продаж','Маржинальность по товару','Медленные позиции','ABC-анализ'] },
+  { id:13, title:'Остатки', cat:'Склад', icon:'boxes', related:[11,14,16],
+    content:'Остатки по складам и точкам в реальном времени, с минимальными порогами.',
+    feats:['Остатки по складам','Минимальные остатки','Перемещения','Отчёты по остаткам'] },
+  { id:14, title:'Поставки', cat:'Склад', icon:'supply', related:[13,17,15],
+    content:'Приём товара от поставщиков: накладные, партии и цены закупки.',
+    feats:['Приёмка товара','Накладные поставщиков','Цены закупки','История поставок'] },
+  { id:15, title:'Инвентаризация', cat:'Склад', icon:'inventory', related:[13,16],
+    content:'Пересчёт товара на складе и автоматическое выравнивание остатков.',
+    feats:['Создание пересчёта','Ввод фактических остатков','Расхождения','Акт инвентаризации'] },
+  { id:16, title:'Списания', cat:'Склад', icon:'writeoff', related:[13,15],
+    content:'Списание брака, порчи и внутренних расходов с фиксацией причины.',
+    feats:['Списание товара','Причины списания','Акты списания','История'] },
+  { id:17, title:'Поставщики', cat:'Склад', icon:'suppliers', related:[14,5],
+    content:'База поставщиков с контактами, условиями и историей закупок.',
+    feats:['Карточка поставщика','Контакты и реквизиты','История закупок','Задолженность'] },
+  { id:18, title:'База клиентов', cat:'Клиенты', icon:'clients', related:[19,20],
+    content:'Карточки клиентов с историей покупок, контактами и сегментами.',
+    feats:['Карточка клиента','История покупок','Поиск по телефону','Сегменты'] },
+  { id:19, title:'Лояльность', cat:'Клиенты', icon:'loyalty', related:[18,20],
+    content:'Бонусные программы, скидки и уровни клиентов.',
+    feats:['Бонусные программы','Скидки по уровню','Начисления и списания бонусов','Отчёты по лояльности'] },
+  { id:20, title:'Акции', cat:'Клиенты', icon:'promo', related:[19,18],
+    content:'Скидочные акции и промокоды с расписанием и контролем условий.',
+    feats:['Создание акций','Промокоды','Расписание действия','Результаты акций'] },
+  { id:21, title:'Сотрудники', cat:'Команда', icon:'staff', related:[22,8],
+    content:'Список сотрудников, должности, доступы и права в системе.',
+    feats:['Карточка сотрудника','Должности','Права доступа','Активность'] },
+  { id:22, title:'Табель', cat:'Команда', icon:'timesheet', related:[21,8],
+    content:'Учёт рабочего времени: часы, явки, отсутствия по каждому сотруднику.',
+    feats:['Отметки прихода/ухода','Часы за период','Отсутствия и отпуска','Связь с зарплатой'] },
+  { id:23, title:'Отчеты', cat:'Аналитика', icon:'reports', related:[9,1,12],
+    content:'Все отчёты системы в одном месте: продажи, склад, финансы, сотрудники.',
+    feats:['Отчёты по продажам','Отчёты по складу','Финансовые отчёты','Выгрузка в Excel'] },
+];
+
+  const OrbitRing = () => {
+    const n = ORBIT_DATA.length;
+    const [angle, setAngle] = React.useState(0);
+    const [auto, setAuto] = React.useState(true);
+    const [activeId, setActiveId] = React.useState(null);
+    const [parked, setParked] = React.useState(false);
+
+    const OUT = 272, IN = 165;
+
+    React.useEffect(() => {
+      if (!auto) return;
+      const id = setInterval(() => setAngle(a => (a + 0.3) % 360), 50);
+      return () => clearInterval(id);
+    }, [auto]);
+
+    // при остановке — доворачиваем так, чтобы выбранный узел встал наверх
+    React.useEffect(() => {
+      if (activeId === null) return;
+      const idx = ORBIT_DATA.findIndex(d => d.id === activeId);
+      if (idx < 0) return;
+      const isOut = idx % 2 === 0;
+      const inRow = isOut ? Math.ceil(n / 2) : Math.floor(n / 2);
+      const rowIdx = Math.floor(idx / 2);
+      const step = 360 / inRow;
+      const offset = isOut ? 0 : step / 2;
+      const target = rowIdx * step + offset;
+      setAngle(((270 - target) % 360 + 360) % 360);
+    }, [activeId, n]);
+
+    const calc = (index) => {
+      const isOut = index % 2 === 0;
+      const radius = isOut ? OUT : IN;
+      const inRow = isOut ? Math.ceil(n / 2) : Math.floor(n / 2);
+      const rowIdx = Math.floor(index / 2);
+      const step = 360 / inRow;
+      const offset = isOut ? 0 : step / 2;
+      const a = ((rowIdx * step + offset + angle) % 360 + 360) % 360;
+      const rad = a * Math.PI / 180;
+      return {
+        x: radius * Math.cos(rad),
+        y: radius * Math.sin(rad),
+        z: Math.round(100 + 50 * Math.cos(rad)),
+        op: Math.max(0.45, Math.min(1, 0.45 + 0.55 * ((1 + Math.sin(rad)) / 2)))
+      };
+    };
+
+    const related = (id) => {
+      const it = ORBIT_DATA.find(d => d.id === id);
+      return it ? it.related : [];
+    };
+
+    const k = mobile ? 0.5 : 1;
+    const OUTs = OUT * k, INs = IN * k;
+    const offsetOf = (isOut) => isOut
+      ? Math.ceil(n / 2)
+      : Math.floor(n / 2);
+
+    const calcS = (index) => {
+      const isOut = index % 2 === 0;
+      const radius = (isOut ? OUTs : INs);
+      const inRow = offsetOf(isOut);
+      const rowIdx = Math.floor(index / 2);
+      const step = 360 / inRow;
+      const off = isOut ? 0 : step / 2;
+      const a = ((rowIdx * step + off + angle) % 360 + 360) % 360;
+      const rad = a * Math.PI / 180;
+      return {
+        x: radius * Math.cos(rad),
+        y: radius * Math.sin(rad),
+        z: Math.round(100 + 50 * Math.cos(rad)),
+        op: Math.max(0.45, Math.min(1, 0.45 + 0.55 * ((1 + Math.sin(rad)) / 2)))
+      };
+    };
+
+    const select = (item) => {
+      if (activeId === item.id) { setActiveId(null); setAuto(true); setParked(false); return; }
+      setActiveId(item.id); setAuto(false); setParked(true);
+    };
+    const reset = () => { setActiveId(null); setAuto(true); setParked(false); };
+
+    const activeItem = activeId ? ORBIT_DATA.find(d => d.id === activeId) : null;
+
+    return (
+      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?560:760,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+        <div style={{position:'relative',width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          {/* кольца */}
+          <div style={{position:'absolute',width:(OUTs*2),height:(OUTs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.06)'}} />
+          <div style={{position:'absolute',width:(INs*2),height:(INs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.12)'}} />
+
+          {/* ядро А */}
+          <div style={{position:'absolute',width:mobile?48:64,height:mobile?48:64,borderRadius:mobile?14:18,
+            background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',
+            fontWeight:800,fontSize:mobile?19:26,letterSpacing:'-.02em',zIndex:10,
+            boxShadow:'0 10px 28px -10px rgba(31,117,255,.85)'}}>A</div>
+
+          {/* узлы */}
+          {ORBIT_DATA.map((item, i) => {
+            const p = calcS(i);
+            const isActive = item.id === activeId;
+            const isRel = activeId !== null && related(activeId).includes(item.id);
+            return (
+              <div key={item.id}
+                onClick={e => { e.stopPropagation(); select(item); }}
+                style={{
+                  position:'absolute',left:'50%',top:'50%',
+                  transform:`translate(-50%,-50%) translate(${p.x}px, ${p.y}px)`,
+                  zIndex: isActive ? 200 : p.z,
+                  opacity: isActive ? 1 : p.op,
+                  display:'flex',flexDirection:'column',alignItems:'center',gap:6,
+                  width: mobile?70:96, cursor:'pointer',
+                  transition: parked ? 'transform .7s cubic-bezier(.4,0,.2,1), opacity .7s' : 'opacity .7s'
+                }}>
+                <div style={{
+                  width:mobile?38:52,height:mobile?38:52,borderRadius:'50%',flex:'none',
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  background: isActive ? 'linear-gradient(135deg,#1F75FF,#0d4ea8)' : '#fff',
+                  border: '1px solid ' + (isActive ? '#1F75FF' : (isRel ? '#60a5fa' : 'rgba(16,40,90,.14)')),
+                  boxShadow: isActive
+                    ? '0 8px 20px -8px rgba(31,117,255,.8)'
+                    : (isRel ? '0 0 0 4px rgba(59,130,246,.14), 0 4px 12px -4px rgba(16,40,90,.22)' : '0 4px 12px -4px rgba(16,40,90,.22), 0 1px 3px -1px rgba(16,40,90,.10)'),
+                  color: isActive ? '#fff' : '#1F75FF',
+                  transition:'background .3s, border-color .3s, box-shadow .3s'
+                }}
+                  dangerouslySetInnerHTML={{__html: ORBIT_ICONS[item.icon]}} />
+                <div style={{
+                  fontSize: mobile?9:10.5, fontWeight: isActive?700:600, lineHeight:1.25,
+                  textAlign:'center', maxWidth: mobile?70:96,
+                  color: isActive ? '#0d4ea8' : 'rgba(0,0,0,.62)',
+                  transition:'color .3s'
+                }}>{item.title}</div>
+              </div>
+            );
+          })}
+
+          {/* карточка раздела */}
+          {activeItem && (
+            <div onClick={e=>e.stopPropagation()}
+              style={{
+                position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',
+                zIndex:300, width: mobile?'min(330px,88vw)':'min(430px,88vw)',
+                maxHeight: mobile?'66vh':'70vh', overflowY:'auto',
+                background:'#fff',border:'1px solid rgba(16,40,90,.12)',borderRadius:18,
+                padding:'22px 22px 24px',
+                boxShadow:'0 30px 90px -30px rgba(16,40,90,.45), 0 8px 24px -12px rgba(16,40,90,.2)'
+              }}>
+              <button onClick={reset} aria-label="Закрыть"
+                style={{position:'absolute',top:12,right:12,width:28,height:28,borderRadius:'50%',border:'none',
+                  background:'rgba(16,40,90,.06)',color:'#111',cursor:'pointer',fontSize:14,lineHeight:1,
+                  display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}}>✕</button>
+              <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:12}}>
+                <div style={{width:38,height:38,borderRadius:11,flex:'none',display:'flex',alignItems:'center',justifyContent:'center',
+                  background:'linear-gradient(135deg,rgba(31,117,255,.14),rgba(13,78,168,.14))',border:'1px solid rgba(31,117,255,.22)',color:'#1F75FF'}}
+                  dangerouslySetInnerHTML={{__html: ORBIT_ICONS[activeItem.icon]}} />
+                <div>
+                  <div style={{fontSize:17,fontWeight:800,letterSpacing:'-.02em',color:'#111'}}>{activeItem.title}</div>
+                  <div style={{fontSize:11,color:'#1F75FF',marginTop:2,textTransform:'uppercase',letterSpacing:'.1em'}}>{activeItem.cat}</div>
+                </div>
+              </div>
+              <div style={{fontSize:13.5,lineHeight:1.62,color:'rgba(0,0,0,.66)'}}>{activeItem.content}</div>
+              <ul style={{listStyle:'none',margin:'14px 0 0',padding:0,display:'flex',flexDirection:'column',gap:8}}>
+                {activeItem.feats.map((f,fi)=>(
+                  <li key={fi} style={{display:'flex',gap:9,fontSize:12.5,lineHeight:1.5,color:'rgba(0,0,0,.62)'}}>
+                    <span style={{width:5,height:5,borderRadius:'50%',background:'#1F75FF',flex:'none',marginTop:7}} />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",position:"relative",background:"#fff"}}>
       {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
@@ -410,8 +686,9 @@ export default function Landing() {
           <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:"nowrap",textAlign:"center"}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
-        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Реальные скриншоты интерфейса — все работает так, как вы видите</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch"}}>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?10:14}}>Все разделы системы — нажмите любой, чтобы узнать, что он умеет</p>
+        <OrbitRing />
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))",gap:14,alignItems:"stretch",marginTop:mobile?28:44}}>
           {/* Панель управления */}
           <MiniAppWindow title="Панель управления">
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:6}}>

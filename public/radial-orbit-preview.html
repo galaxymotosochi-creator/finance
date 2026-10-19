@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — орбита разделов</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+
+  .stage{position:relative;width:100%;height:100vh;min-height:720px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .orbit{position:relative;width:100%;max-width:1000px;height:100%;display:flex;align-items:center;justify-content:center;perspective:1000px}
+
+  .ring{position:absolute;width:290px;height:290px;border-radius:50%;border:1px solid rgba(16,40,90,.12)}
+  .ring2{position:absolute;width:600px;height:600px;border-radius:50%;border:1px solid rgba(16,40,90,.06)}
+
+  /* центр */
+  .core{position:absolute;width:64px;height:64px;border-radius:18px;z-index:10;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:26px;letter-spacing:-.02em;
+    animation:corepulse 3s ease-in-out infinite}
+  @keyframes corepulse{0%,100%{box-shadow:0 0 0 0 rgba(31,117,255,.5)}50%{box-shadow:0 0 0 16px rgba(31,117,255,0)}}
+
+  .core:before,.core:after{content:"";position:absolute;border-radius:18px;border:1px solid rgba(31,117,255,.28);animation:ping 2.4s ease-out infinite}
+  .core:before{width:66px;height:66px}
+  .core:after{width:70px;height:70px;animation-delay:.6s;border-color:rgba(31,117,255,.14)}
+  @keyframes ping{0%{transform:scale(.85);opacity:.7}100%{transform:scale(1.45);opacity:0}}
+
+  /* узел */
+  .node{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;align-items:center;gap:7px;width:96px;
+    cursor:pointer;transition:opacity .7s;will-change:transform,opacity}
+  .orbit.parked .node{transition:transform .7s cubic-bezier(.4,0,.2,1), opacity .7s}
+  .node .bubble{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;
+    background:#fff;border:1px solid rgba(16,40,90,.14);
+    box-shadow:0 4px 12px -4px rgba(16,40,90,.22), 0 1px 3px -1px rgba(16,40,90,.10);
+    transition:all .3s;flex:none}
+  .node .label{font-size:10.5px;font-weight:600;line-height:1.25;text-align:center;color:rgba(0,0,0,.62);
+    max-width:96px;transition:color .3s}
+  .node:hover .bubble{background:#F3F8FF;border-color:rgba(31,117,255,.45)}
+  .node:hover .label{color:#0d4ea8}
+  .node .ico{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#1F75FF}
+  .node.related .bubble{border-color:#60a5fa;box-shadow:0 0 0 4px rgba(59,130,246,.14)}
+  .node.active .bubble{background:linear-gradient(135deg,#1F75FF,#0d4ea8);border-color:#1F75FF;box-shadow:0 8px 20px -8px rgba(31,117,255,.8)}
+  .node.active .ico{color:#fff}
+  .node.active .label{color:#0d4ea8;font-weight:700}
+  .node.pulse .bubble{animation:npulse 1.6s ease-in-out infinite}
+  @keyframes npulse{0%,100%{box-shadow:0 0 0 0 rgba(31,117,255,.45)}50%{box-shadow:0 0 0 10px rgba(31,117,255,0)}}
+
+  /* карточка раздела */
+  .panel{position:absolute;z-index:300;width:min(430px,88vw);max-height:min(560px,76vh);overflow-y:auto;
+    background:#fff;border:1px solid rgba(16,40,90,.12);border-radius:18px;
+    padding:22px 22px 24px;backdrop-filter:blur(18px);box-shadow:0 30px 90px -30px rgba(16,40,90,.45), 0 8px 24px -12px rgba(16,40,90,.2);
+    transform:scale(.94) translateY(8px);opacity:0;pointer-events:none;
+    transition:opacity .3s ease, transform .35s cubic-bezier(.16,1,.3,1)}
+  .panel.open{opacity:1;pointer-events:auto;transform:scale(1) translateY(0)}
+  .phead{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .picon{width:38px;height:38px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,rgba(31,117,255,.14),rgba(13,78,168,.14));border:1px solid rgba(31,117,255,.22);color:#1F75FF}
+  .ptitle{font-size:17px;font-weight:800;letter-spacing:-.02em;color:#111}
+  .pdate{font-size:11px;color:#1F75FF;margin-top:2px;text-transform:uppercase;letter-spacing:.1em}
+  .pclose{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:none;
+    background:rgba(16,40,90,.06);color:#111;cursor:pointer;font-size:14px;line-height:1;
+    display:flex;align-items:center;justify-content:center}
+  .pclose:hover{background:rgba(16,40,90,.12)}
+  .pcontent{font-size:13.5px;line-height:1.62;color:rgba(0,0,0,.66)}
+  .pfeat{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .pfeat li{display:flex;gap:9px;font-size:12.5px;line-height:1.5;color:rgba(0,0,0,.62)}
+  .pfeat li:before{content:"";width:5px;height:5px;border-radius:50%;background:#1F75FF;flex:none;margin-top:7px}
+  .prelated{margin-top:16px;padding-top:14px;border-top:1px solid rgba(16,40,90,.1)}
+  .prelated .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:rgba(0,0,0,.38);margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11.5px;padding:5px 11px;border-radius:100px;background:rgba(31,117,255,.08);
+    border:1px solid rgba(31,117,255,.28);color:#0d4ea8}
+
+  .hint{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:11.5px;color:rgba(255,255,255,.32)}
+
+  @media(max-width:720px){
+    .ring{width:240px;height:240px}
+    .ring2{width:460px;height:460px}
+    .node{width:74px}
+    .node .bubble{width:42px;height:42px}
+    .node .label{font-size:9px;max-width:74px}
+    .panel{width:min(360px,90vw)}
+    .pcontent{font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="orbit" id="orbit">
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <div class="core">A</div>
+  </div>
+  <div class="hint">Клик по разделу — подробнее · клик по пустому месту — продолжить вращение</div>
+</div>
+
+<script>
+/* ══════ РАЗДЕЛЫ ATLASPOS ══════ */
+const SVG = (p) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICONS = {
+  kassa: SVG('<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/>'),
+  sales: SVG('<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'),
+  stock: SVG('<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/>'),
+  clients: SVG('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>'),
+  staff: SVG('<circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0114 0"/><circle cx="18" cy="9" r="2.5"/>'),
+  finance: SVG('<path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>'),
+  accounts: SVG('<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/>'),
+  reports: SVG('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 13v4M12 9v8M16 11v6"/>'),
+  ai: SVG('<path d="M12 3l2.2 5.3L20 10l-5.8 1.7L12 17l-2.2-5.3L4 10l5.8-1.7z"/>'),
+  dashboard: SVG('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+  shift: SVG('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  receipt: SVG('<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h3"/>'),
+  salary: SVG('<path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>'),
+  profit: SVG('<path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/>'),
+  plan: SVG('<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>'),
+  chart: SVG('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  boxes: SVG('<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>'),
+  supply: SVG('<path d="M3 16V6h11l4 4v6"/><circle cx="8" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M3 16h2M10 18h5"/>'),
+  inventory: SVG('<path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>'),
+  writeoff: SVG('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11l4 4M14 11l-4 4"/>'),
+  suppliers: SVG('<path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/>'),
+  loyalty: SVG('<path d="M20.8 5.6a5 5 0 00-7.1 0L12 7.3l-1.7-1.7a5 5 0 10-7.1 7.1L12 21l8.8-8.3a5 5 0 000-7.1z"/>'),
+  promo: SVG('<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>'),
+  timesheet: SVG('<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4M8 14h3M8 18h5"/>'),
+  settings: SVG('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 007 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.6 1.6 0 002.6 14H2.5a2 2 0 110-4h.1A1.6 1.6 0 004.6 7a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1A1.6 1.6 0 0010 2.6V2.5a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1A1.6 1.6 0 0021.4 10h.1a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>'),
+};
+
+const DATA = [
+  { id:1, title:'Панель управления', cat:'Обзор', icon:'dashboard', related:[2,9,22],
+    content:'Главный экран: выручка, расходы, прибыль и последние операции за сегодня.',
+    feats:['Доходы, расходы, итог за день','Последние операции','Быстрые действия','Сводка по всем точкам'] },
+  { id:2, title:'AI помощник', cat:'Обзор', icon:'ai', related:[1,10,22],
+    content:'AI-ассистент отвечает на вопросы по вашим цифрам и находит точки роста простым языком.',
+    feats:['Ответы на вопросы по данным','Автоматические инсайты','Прогноз выручки','Поиск аномалий'] },
+  { id:3, title:'Касса', cat:'Продажи', icon:'kassa', related:[7,12,13],
+    content:'Рабочее место кассира: пробивайте чеки, принимайте оплату и контролируйте смену.',
+    feats:['Открытие и закрытие смены','Наличные, карта, QR','Печать и отправка чеков','Поиск товара по штрихкоду'] },
+  { id:4, title:'Доходы и расходы', cat:'Финансы', icon:'finance', related:[5,9,8],
+    content:'Все денежные потоки по категориям: платежи, операции и сверка по счёту.',
+    feats:['Операции по категориям','Сверка с банком','Планирование платежей','История изменений'] },
+  { id:5, title:'Счета', cat:'Финансы', icon:'accounts', related:[4,9],
+    content:'Несколько касс и счетов одновременно, переводы между ними и контроль остатков.',
+    feats:['Наличные и безналичные счета','Переводы между счетами','Остаток по каждому счёту','История движений'] },
+  { id:6, title:'Смены', cat:'Продажи', icon:'shift', related:[3,7],
+    content:'Открытие и закрытие смен сотрудников, расхождение по кассе и контроль кассиров.',
+    feats:['Открытие и закрытие смены','Сверка наличных в кассе','Кто и когда работал','Расхождения и недостачи'] },
+  { id:7, title:'Чеки', cat:'Продажи', icon:'receipt', related:[3,6],
+    content:'История всех чеков с фильтрами по дате, кассиру и способу оплаты. Возвраты.',
+    feats:['История чеков с детализацией','Возвраты и отмены','Фильтры по кассиру','Выгрузка в Excel'] },
+  { id:8, title:'Зарплата', cat:'Команда', icon:'salary', related:[21,22,4],
+    content:'Оклады, премии и выплаты. Система сама посчитает зарплату по выработке.',
+    feats:['Расчёт зарплаты','Премии и бонусы','История выплат','Связь с табелем'] },
+  { id:9, title:'Чистая прибыль', cat:'Аналитика', icon:'profit', related:[4,22,1],
+    content:'Отчёт о прибыли и убытках: выручка минус все расходы за период.',
+    feats:['P&L за любой период','Динамика по месяцам','Топ категорий расходов','Сравнение периодов'] },
+  { id:10, title:'Планирование', cat:'Аналитика', icon:'plan', related:[9,4,2],
+    content:'Планы по выручке и расходам, контроль выполнения и прогноз на будущее.',
+    feats:['Планы по выручке','Планы по расходам','Факт vs план','Прогноз до конца месяца'] },
+  { id:11, title:'Товары и услуги', cat:'Склад', icon:'stock', related:[12,13,17],
+    content:'Карточки товаров и услуг: цены, себестоимость, штрихкоды и категории.',
+    feats:['Карточки товаров','Цены и себестоимость','Категории и единицы','Штрихкоды'] },
+  { id:12, title:'Аналитика товаров', cat:'Склад', icon:'chart', related:[11,13,9],
+    content:'Что продаётся лучше, где маржа выше и какой товар залёживается.',
+    feats:['Топ продаж','Маржинальность по товару','Медленные позиции','ABC-анализ'] },
+  { id:13, title:'Остатки', cat:'Склад', icon:'boxes', related:[11,14,16],
+    content:'Остатки по складам и точкам в реальном времени, с минимальными порогами.',
+    feats:['Остатки по складам','Минимальные остатки','Перемещения','Отчёты по остаткам'] },
+  { id:14, title:'Поставки', cat:'Склад', icon:'supply', related:[13,17,15],
+    content:'Приём товара от поставщиков: накладные, партии и цены закупки.',
+    feats:['Приёмка товара','Накладные поставщиков','Цены закупки','История поставок'] },
+  { id:15, title:'Инвентаризация', cat:'Склад', icon:'inventory', related:[13,16],
+    content:'Пересчёт товара на складе и автоматическое выравнивание остатков.',
+    feats:['Создание пересчёта','Ввод фактических остатков','Расхождения','Акт инвентаризации'] },
+  { id:16, title:'Списания', cat:'Склад', icon:'writeoff', related:[13,15],
+    content:'Списание брака, порчи и внутренних расходов с фиксацией причины.',
+    feats:['Списание товара','Причины списания','Акты списания','История'] },
+  { id:17, title:'Поставщики', cat:'Склад', icon:'suppliers', related:[14,5],
+    content:'База поставщиков с контактами, условиями и историей закупок.',
+    feats:['Карточка поставщика','Контакты и реквизиты','История закупок','Задолженность'] },
+  { id:18, title:'База клиентов', cat:'Клиенты', icon:'clients', related:[19,20],
+    content:'Карточки клиентов с историей покупок, контактами и сегментами.',
+    feats:['Карточка клиента','История покупок','Поиск по телефону','Сегменты'] },
+  { id:19, title:'Лояльность', cat:'Клиенты', icon:'loyalty', related:[18,20],
+    content:'Бонусные программы, скидки и уровни клиентов.',
+    feats:['Бонусные программы','Скидки по уровню','Начисления и списания бонусов','Отчёты по лояльности'] },
+  { id:20, title:'Акции', cat:'Клиенты', icon:'promo', related:[19,18],
+    content:'Скидочные акции и промокоды с расписанием и контролем условий.',
+    feats:['Создание акций','Промокоды','Расписание действия','Результаты акций'] },
+  { id:21, title:'Сотрудники', cat:'Команда', icon:'staff', related:[22,8],
+    content:'Список сотрудников, должности, доступы и права в системе.',
+    feats:['Карточка сотрудника','Должности','Права доступа','Активность'] },
+  { id:22, title:'Табель', cat:'Команда', icon:'timesheet', related:[21,8],
+    content:'Учёт рабочего времени: часы, явки, отсутствия по каждому сотруднику.',
+    feats:['Отметки прихода/ухода','Часы за период','Отсутствия и отпуска','Связь с зарплатой'] },
+  { id:23, title:'Отчеты', cat:'Аналитика', icon:'reports', related:[9,1,12],
+    content:'Все отчёты системы в одном месте: продажи, склад, финансы, сотрудники.',
+    feats:['Отчёты по продажам','Отчёты по складу','Финансовые отчёты','Выгрузка в Excel'] },
+];
+
+/* ══════ СОСТОЯНИЕ (логика из промта) ══════ */
+const RADIUS_OUT = 272;   // внешний ряд — придвинут к внешнему кольцу
+const RADIUS_IN = 165;    // внутренний ряд — иконки отодвинуты от линии
+let rotationAngle = 0;
+let autoRotate = true;
+let activeNodeId = null;
+let expandedId = null;
+let pulseSet = new Set();
+
+const stage = document.getElementById('stage');
+const orbit = document.getElementById('orbit');
+const nodes = {};
+
+function setParked(on){
+  orbit.classList.toggle('parked', !!on);
+}
+
+function calc(index, total){
+  // чётные — внешний ряд, нечётные — внутренний
+  const isOut = index % 2 === 0;
+  const radius = isOut ? RADIUS_OUT : RADIUS_IN;
+  const inRow = isOut ? Math.ceil(total / 2) : Math.floor(total / 2);
+  const rowIdx = Math.floor(index / 2);
+  const step = 360 / inRow;
+  const offset = isOut ? 0 : step / 2;
+  const angle = ((rowIdx * step + offset + rotationAngle) % 360 + 360) % 360;
+  const rad = angle * Math.PI / 180;
+  const x = radius * Math.cos(rad);
+  const y = radius * Math.sin(rad);
+  return {
+    x, y, angle,
+    z: Math.round(100 + 50 * Math.cos(rad)),
+    op: Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(rad)) / 2)))
+  };
+}
+
+function related(id){
+  const it = DATA.find(d => d.id === id);
+  return it ? it.related : [];
+}
+
+function render(){
+  if (autoRotate) rotationAngle = (rotationAngle + 0.3) % 360;
+  DATA.forEach((item, i) => {
+    const el = nodes[item.id];
+    if (!el) return;
+    const p = calc(i, DATA.length);
+    const isActive = item.id === activeNodeId;
+    el.style.transform = `translate(-50%,-50%) translate(${p.x}px, ${p.y}px)`;
+    el.style.zIndex = isActive ? 200 : p.z;
+    el.style.opacity = p.op;
+    el.classList.toggle('active', isActive);
+    el.classList.toggle('related', !!activeNodeId && related(activeNodeId).includes(item.id));
+    el.classList.toggle('pulse', pulseSet.has(item.id));
+  });
+  requestAnimationFrame(render);
+}
+
+/* ══════ ПАНЕЛЬ ══════ */
+let panel = null;
+function openPanel(item){
+  closePanel(true);
+  panel = document.createElement('div');
+  panel.className = 'panel';
+  const rel = related(item.id).map(id => DATA.find(d => d.id === id)).filter(Boolean);
+  panel.innerHTML = `
+    <button class="pclose" aria-label="Закрыть">✕</button>
+    <div class="phead">
+      <div class="picon">${ICONS[item.icon]}</div>
+      <div><div class="ptitle">${item.title}</div><div class="pdate">${item.cat}</div></div>
+    </div>
+    <div class="pcontent">${item.content}</div>
+    <ul class="pfeat">${item.feats.map(f=>`<li>${f}</li>`).join('')}</ul>
+    ${rel.length ? `<div class="prelated"><div class="lbl">Связанные разделы</div>
+      <div class="chips">${rel.map(r=>`<span class="chip">${r.title}</span>`).join('')}</div></div>` : ''}
+  `;
+  panel.style.left = '50%';
+  panel.style.top = '50%';
+  panel.style.transform = 'scale(.94) translateY(8px)';
+  panel.style.marginLeft = '-' + 0 + 'px';
+  orbit.appendChild(panel);
+  // центрирование
+  const place = () => {
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    panel.style.marginLeft = (-w/2) + 'px';
+    panel.style.marginTop = (-h/2) + 'px';
+  };
+  place();
+  requestAnimationFrame(()=>{ place(); panel.classList.add('open'); });
+  panel.querySelector('.pclose').onclick = (e)=>{ e.stopPropagation(); deselect(); };
+}
+
+function closePanel(keep){
+  if (panel){ panel.remove(); panel = null; }
+}
+
+function deselect(){
+  expandedId = null; activeNodeId = null; pulseSet = new Set();
+  setParked(false);
+  autoRotate = true; closePanel();
+}
+
+function select(item){
+  if (expandedId === item.id){ deselect(); return; }
+  expandedId = item.id;
+  activeNodeId = item.id;
+  autoRotate = false;
+  pulseSet = new Set(related(item.id));
+  // узел поднимается в верхнюю точку кольца (270°), радиус не меняется
+  const idx = DATA.findIndex(d => d.id === item.id);
+  const target = (idx / DATA.length) * 360;
+  rotationAngle = ((270 - target) % 360 + 360) % 360;
+  setParked(true);
+  openPanel(item);
+}
+
+/* ══════ ПОСТРОЕНИЕ ══════ */
+DATA.forEach(item => {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.innerHTML = `<div class="bubble"><span class="ico">${ICONS[item.icon]}</span></div><div class="label">${item.title}</div>`;
+  el.addEventListener('click', e => { e.stopPropagation(); select(item); });
+  orbit.appendChild(el);
+  nodes[item.id] = el;
+});
+
+stage.addEventListener('click', e => {
+  if (e.target === stage || e.target === orbit ||
+      e.target.classList.contains('ring') || e.target.classList.contains('ring2') ||
+      e.target.classList.contains('core') || e.target.tagName === 'I'){
+    deselect();
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') deselect(); });
+
+render();
+
+/* адаптив: радиус меньше на мобилке */
+function resize(){
+  const r = window.innerWidth < 720 ? 230 : 320;
+  DATA.forEach((item,i)=>{
+    // пересчёт делаем через RADIUS-переменную в calc
+  });
+}
+window.addEventListener('resize', resize);
+</script>
+</body>
+</html>
