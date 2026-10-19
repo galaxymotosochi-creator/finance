@@ -570,7 +570,7 @@ const ORBIT_ICONS = {
                 }}
                   dangerouslySetInnerHTML={{__html: ORBIT_ICONS[item.icon]}} />
                 <div style={{
-                  fontSize: mobile?9:10.5, fontWeight: isActive?700:600, lineHeight:1.25,
+                  fontSize: mobile?10.5:12, fontWeight: isActive?700:600, lineHeight:1.3,
                   textAlign:'center', maxWidth: mobile?70:96,
                   color: isActive ? '#0d4ea8' : 'rgba(0,0,0,.62)',
                   transition:'color .3s'
