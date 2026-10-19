@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — сравнение: AtlasPos vs сторонние программы</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px}
+  .head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  .head .line{flex:1;height:1px;background:rgba(16,40,90,.14)}
+  .head h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#111;white-space:nowrap}
+  .sub{font-size:15.5px;color:rgba(0,0,0,.5);text-align:center;margin-bottom:28px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .col{border-radius:18px;overflow:hidden;border:1px solid rgba(16,40,90,.10);background:#fff}
+  .col.good{background:#fff;border-color:rgba(16,185,129,.28);box-shadow:0 20px 50px -34px rgba(5,150,105,.5)}
+  .col.bad{background:#fbfbfc}
+
+  .chead{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid rgba(16,40,90,.08)}
+  .col.good .chead{background:rgba(16,185,129,.07);border-bottom-color:rgba(16,185,129,.2)}
+  .col.bad .chead{background:rgba(220,38,38,.045);border-bottom-color:rgba(220,38,38,.14)}
+  .cico{width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .col.good .cico{background:rgba(16,185,129,.12);color:#059669}
+  .col.bad .cico{background:rgba(220,38,38,.1);color:#dc2626}
+  .cttl{font-size:15px;font-weight:800;letter-spacing:-.02em}
+  .col.good .cttl{color:#065f46}
+  .col .csub{font-size:11.5px;margin-top:2px}
+  .col.good .csub{color:rgba(0,0,0,.45)}
+  .col.bad .csub{color:rgba(0,0,0,.45)}
+  .pill{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+    padding:4px 10px;border-radius:100px;background:rgba(16,185,129,.14);color:#059669;white-space:nowrap}
+
+  ul{list-style:none;padding:8px 0}
+  .col.good ul{padding:14px 16px 18px}
+  .col.bad ul{padding:12px 16px 16px}
+  li{display:flex;gap:10px;padding:8px 0;font-size:13.2px;line-height:1.5}
+  .col.good li{color:rgba(0,0,0,.68)}
+  .col.bad li{color:rgba(0,0,0,.66)}
+  li b{font-weight:700}
+  .col.good li b{color:#111}
+  .col.bad li b{color:#111}
+  .mark{width:18px;height:18px;border-radius:50%;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:800}
+  .col.good .mark{background:rgba(16,185,129,.14);color:#059669}
+  .col.bad .mark{background:rgba(220,38,38,.12);color:#dc2626}
+  li+li{border-top:1px solid rgba(16,40,90,.06)}
+  .col.good li+li{border-top-color:rgba(16,40,90,.06)}
+
+  .foot{padding:0 16px 18px}
+  .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:100px;
+    border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14px;font-weight:800;
+    font-family:inherit;cursor:pointer;
+    box-shadow:0 10px 26px -12px rgba(5,150,105,.7);transition:transform .18s, box-shadow .2s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px -12px rgba(5,150,105,.8)}
+  .note{text-align:center;font-size:11.5px;color:rgba(0,0,0,.42);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><span class="line"></span><h2>Забудьте о сложных настройках других программ</h2><span class="line"></span></div>
+  <p class="sub">Сравните, как работают привычные методы и наша умная платформа</p>
+
+  <div class="grid">
+
+    <!-- ЛЕВО: AtlasPos -->
+    <div class="col good">
+      <div class="chead">
+        <div class="cico">✓</div>
+        <div>
+          <div class="cttl">AtlasPos</div>
+          <div class="csub">умная платформа для учёта</div>
+        </div>
+        <span class="pill">Рекомендуем</span>
+      </div>
+      <ul>
+        <li><span class="mark">✓</span><span><b>Старт за 15 минут.</b> Регистрация и первые продажи — без обучения персонала и без программиста.</span></li>
+        <li><span class="mark">✓</span><span><b>Всё в одной вкладке.</b> Касса, склад, клиенты, счета и финансы работают в единой связке.</span></li>
+        <li><span class="mark">✓</span><span><b>Чистый интерфейс.</b> Никаких скрытых меню и вкладок — сотрудник не запутается в первый день.</span></li>
+        <li><span class="mark">✓</span><span><b>Касса бьётся со складом.</b> Продажа сразу списывает остаток, расхождений не бывает.</span></li>
+        <li><span class="mark">✓</span><span><b>Автоматический P&L.</b> Отчёт о прибыли собирается сам — видите чистую прибыль, а не выручку.</span></li>
+        <li><span class="mark">✓</span><span><b>AI-аналитика.</b> Подсказывает точки роста и предупреждает о рисках простым языком.</span></li>
+        <li><span class="mark">✓</span><span><b>Зарплаты считаются сами.</b> Табель, выработка и премии — без Excel и калькулятора.</span></li>
+        <li><span class="mark">✓</span><span><b>Перенос данных бесплатно.</b> Загрузим ваши таблицы Excel и текущие базы.</span></li>
+        <li><span class="mark">✓</span><span><b>Облако без серверов.</b> Работает с телефона, планшета и компьютера.</span></li>
+        <li><span class="mark">✓</span><span><b>Автоматические резервные копии.</b> Данные не пропадут при сбое техники.</span></li>
+        <li><span class="mark">✓</span><span><b>Без платы за обновления.</b> Все улучшения входят в тариф.</span></li>
+        <li><span class="mark">✓</span><span><b>Живая поддержка.</b> Помогает настроить процессы под ваш бизнес.</span></li>
+      </ul>
+      <div class="foot">
+        <button class="btn">Попробовать бесплатно</button>
+        <div class="note">Без карты · без установки · доступ сразу</div>
+      </div>
+    </div>
+
+    <!-- ПРАВО: 1С + Excel -->
+    <div class="col bad">
+      <div class="chead">
+        <div class="cico">✕</div>
+        <div>
+          <div class="cttl">Сторонние программы и Excel</div>
+          <div class="csub">1С и аналоги / таблицы и блокноты</div>
+        </div>
+      </div>
+      <ul>
+        <li><span class="mark">✕</span><span><b>Внедрение неделями.</b> Нужны обучение персонала и платный программист для любой настройки.</span></li>
+        <li><span class="mark">✕</span><span><b>Перегруженный интерфейс.</b> Сотни скрытых меню, вкладок и кнопок — сотрудники путаются.</span></li>
+        <li><span class="mark">✕</span><span><b>Дорогие лицензии.</b> Плюс привязка к серверам и постоянная плата за мелкие обновления.</span></li>
+        <li><span class="mark">✕</span><span><b>Хаос в данных.</b> Формулы ломаются от случайного клика.</span></li>
+        <li><span class="mark">✕</span><span><b>Касса не бьётся со складом.</b> Остатки в таблице расходятся с реальными.</span></li>
+        <li><span class="mark">✕</span><span><b>Человеческий фактор.</b> Продажи вносят не вовремя, путают позиции, теряют чеки.</span></li>
+        <li><span class="mark">✕</span><span><b>Нулевая аналитика.</b> Чистую прибыль за месяц не видно.</span></li>
+        <li><span class="mark">✕</span><span><b>Кассовые разрывы.</b> О нехватке денег узнаёте по факту.</span></li>
+        <li><span class="mark">✕</span><span><b>Файлы разбросаны.</b> Копии на компьютерах, флешках и в чатах.</span></li>
+        <li><span class="mark">✕</span><span><b>Нет защиты данных.</b> Один сбой диска — и вся база потеряна.</span></li>
+        <li><span class="mark">✕</span><span><b>Нет поддержки.</b> Разбираться приходится самому или платить консультанту.</span></li>
+        <li><span class="mark">✕</span><span><b>Зарплаты вручную.</b> Табель в одной таблице, расчёт в другой, ошибки — в третьей.</span></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

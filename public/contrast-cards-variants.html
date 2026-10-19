@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — 7 вариантов карточек «Контраст систем»</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1280px;margin:0 auto;padding:28px 20px}
+  .vhead{display:flex;align-items:center;gap:12px;margin:34px 0 14px}
+  .vnum{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12px;font-weight:800}
+  .vname{font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .vtag{margin-left:auto;font-size:11.5px;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.12em}
+  .sep{flex:1;height:1px;background:rgba(16,40,90,.12)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:stretch}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .h-ttl{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+  .h-sub{font-size:13px;color:rgba(0,0,0,.5);margin-bottom:14px}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;background:#E6F0FF;
+    color:#0d4ea8;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+  .item{display:flex;gap:10px;font-size:13px;line-height:1.55;color:rgba(0,0,0,.62)}
+  .item b{color:#111;font-weight:700}
+
+  /* ───── 1. ВЫЕЗД СНИЗУ ───── */
+  .v1 .card{position:relative;border-radius:18px;padding:24px;background:#fafbfc;border:1px solid rgba(0,0,0,.07);
+    overflow:hidden;transition:transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s, border-color .45s}
+  .v1 .card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(16,40,90,.04));
+    opacity:0;transition:opacity .45s}
+  .v1 .card:hover{transform:translateY(-6px);box-shadow:0 24px 48px -28px rgba(16,40,90,.5);border-color:rgba(31,117,255,.3)}
+  .v1 .card:hover::after{opacity:1}
+  .v1 .card.dark{background:#f7f8fa}
+  .v1 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border-color:transparent;
+    box-shadow:0 24px 60px -30px rgba(31,117,255,.9)}
+  .v1 .card.good .item{color:rgba(255,255,255,.88)}
+  .v1 .card.good .item b{color:#fff}
+  .v1 .card.good .badge{background:rgba(255,255,255,.2);color:#fff}
+  .v1 .card .reveal{max-height:0;opacity:0;overflow:hidden;transition:max-height .5s cubic-bezier(.16,1,.3,1),opacity .4s, margin .5s}
+  .v1 .card:hover .reveal{max-height:320px;opacity:1;margin-top:14px}
+
+  /* ───── 2. 3D ПОВОРОТ ───── */
+  .v2 .grid{perspective:1400px}
+  .v2 .card{border-radius:18px;padding:24px;background:#fff;border:1px solid rgba(0,0,0,.08);
+    transition:transform .55s cubic-bezier(.16,1,.3,1), box-shadow .55s;transform-style:preserve-3d}
+  .v2 .card:hover{transform:rotateY(-7deg) rotateX(3deg) translateZ(24px) scale(1.02);
+    box-shadow:-24px 28px 60px -30px rgba(16,40,90,.55);border-color:rgba(31,117,255,.25)}
+  .v2 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none}
+  .v2 .card.good .item{color:rgba(255,255,255,.88)}
+  .v2 .card.good .item b{color:#fff}
+  .v2 .card.good:hover{box-shadow:-28px 34px 70px -30px rgba(31,117,255,.75)}
+  .v2 .card .num{font-size:44px;font-weight:800;line-height:1;color:rgba(16,40,90,.08);margin-bottom:10px}
+  .v2 .card.good .num{color:rgba(255,255,255,.25)}
+
+  /* ───── 3. НАЛОЖЕНИЕ / СТОПКА ───── */
+  .v3 .stackwrap{position:relative;padding:0 0 0 14px}
+  .v3 .card{border-radius:18px;padding:24px;background:#fff;border:1px solid rgba(0,0,0,.08);
+    transition:transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s, margin .45s;position:relative}
+  .v3 .card+.card{margin-top:-14px}
+  .v3 .card:hover{transform:translateX(-10px) rotate(-1deg);box-shadow:0 26px 50px -30px rgba(16,40,90,.55);z-index:5}
+  .v3 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none;margin-top:8px;
+    box-shadow:0 22px 50px -28px rgba(31,117,255,.8)}
+  .v3 .card.good .item{color:rgba(255,255,255,.88)}
+  .v3 .card.good .item b{color:#fff}
+  .v3 .card .stripe{position:absolute;left:0;top:20px;bottom:20px;width:3px;border-radius:3px;background:rgba(0,0,0,.07)}
+  .v3 .card.good .stripe{background:rgba(255,255,255,.5)}
+
+  /* ───── 4. РАСКРЫТИЕ ПО ГОРИЗОНТАЛИ ───── */
+  .v4 .row{display:flex;gap:14px;align-items:stretch}
+  @media(max-width:860px){.v4 .row{flex-direction:column}}
+  .v4 .card{flex:1 1 0;min-width:0;border-radius:18px;padding:22px;background:#fafbfc;border:1px solid rgba(0,0,0,.07);
+    transition:flex-grow .5s cubic-bezier(.16,1,.3,1), background .4s, box-shadow .4s;overflow:hidden}
+  .v4 .card:hover{flex-grow:1.55;background:#fff;box-shadow:0 22px 50px -30px rgba(16,40,90,.5);border-color:rgba(31,117,255,.28)}
+  .v4 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none;flex-grow:1.15;
+    box-shadow:0 24px 56px -30px rgba(31,117,255,.85)}
+  .v4 .card.good .item{color:rgba(255,255,255,.88)}
+  .v4 .card.good .item b{color:#fff}
+  .v4 .card .items{max-height:0;opacity:0;overflow:hidden;transition:max-height .5s,opacity .4s}
+  .v4 .card:hover .items,.v4 .card.good .items{max-height:400px;opacity:1}
+
+  /* ───── 5. СВЕЧЕНИЕ ПО КУРСОРУ ───── */
+  .v5 .card{position:relative;border-radius:20px;padding:24px;background:#fff;border:1px solid rgba(0,0,0,.08);
+    overflow:hidden;transition:border-color .35s, box-shadow .35s}
+  .v5 .card::before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(31,117,255,.16),transparent 70%);
+    left:var(--mx,50%);top:var(--my,50%);transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+  .v5 .card:hover::before{opacity:1}
+  .v5 .card:hover{border-color:rgba(31,117,255,.4);box-shadow:0 20px 44px -28px rgba(16,40,90,.5)}
+  .v5 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none}
+  .v5 .card.good::before{background:radial-gradient(circle,rgba(255,255,255,.28),transparent 70%)}
+  .v5 .card.good .item{color:rgba(255,255,255,.88)}
+  .v5 .card.good .item b{color:#fff}
+
+  /* ───── 6. ПРУЖИНА / ИКОНКА ВЫЕЗЖАЕТ ───── */
+  .v6 .card{border-radius:18px;padding:24px;background:#fafbfc;border:1px solid rgba(0,0,0,.07);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), background .3s, border-color .3s}
+  .v6 .card:hover{transform:scale(1.025);background:#fff;border-color:rgba(31,117,255,.35);
+    box-shadow:0 22px 48px -28px rgba(16,40,90,.5)}
+  .v6 .card .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:rgba(16,40,90,.06);font-size:19px;margin-bottom:12px;
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1), background .3s}
+  .v6 .card:hover .ic{transform:translateY(-4px) rotate(-8deg) scale(1.1);background:#E6F0FF}
+  .v6 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none;
+    box-shadow:0 24px 56px -30px rgba(31,117,255,.85)}
+  .v6 .card.good .ic{background:rgba(255,255,255,.2)}
+  .v6 .card.good .item{color:rgba(255,255,255,.88)}
+  .v6 .card.good .item b{color:#fff}
+  .v6 .card .items{display:flex;flex-direction:column;gap:10px}
+
+  /* ───── 7. ЛЕНТА-ЛЕЙБЛ (аккордеон) ───── */
+  .v7 .row{display:flex;gap:12px;align-items:stretch;min-height:380px}
+  @media(max-width:860px){.v7 .row{flex-direction:column;min-height:0}}
+  .v7 .card{flex:1 1 0;min-width:0;border-radius:18px;padding:22px;background:#f6f8fb;border:1px solid rgba(0,0,0,.06);
+    transition:flex-grow .55s cubic-bezier(.16,1,.3,1), background .4s, box-shadow .4s;
+    display:flex;flex-direction:column;overflow:hidden}
+  .v7 .card:hover{flex-grow:2.2;background:#fff;box-shadow:0 26px 56px -32px rgba(16,40,90,.55)}
+  .v7 .card.good{background:linear-gradient(160deg,#0d4ea8,#1F75FF);color:#fff;border:none;flex-grow:1.35;
+    box-shadow:0 26px 60px -30px rgba(31,117,255,.85)}
+  .v7 .card.good .item{color:rgba(255,255,255,.88)}
+  .v7 .card.good .item b{color:#fff}
+  .v7 .card .ttl{font-size:17px;font-weight:800;letter-spacing:-.02em}
+  .v7 .card .mini{font-size:12px;color:rgba(0,0,0,.45);margin-top:4px}
+  .v7 .card.good .mini{color:rgba(255,255,255,.7)}
+  .v7 .card .items{max-height:0;opacity:0;overflow:hidden;transition:max-height .55s cubic-bezier(.16,1,.3,1),opacity .4s,margin .5s}
+  .v7 .card:hover .items,.v7 .card.good .items{max-height:420px;opacity:1;margin-top:16px}
+  .v7 .btn{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;padding:10px 20px;border-radius:100px;
+    border:none;background:#fff;color:#0d4ea8;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 1 -->
+<div class="vhead"><span class="vnum">1</span><span class="vname">Выезд снизу</span><span class="sep"></span><span class="vtag">подъём + раскрытие</span></div>
+<div class="v1"><div class="grid">
+  <div class="card">
+    <div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="item"><b>Сложное внедрение:</b>&nbsp;требуются недели обучения персонала и платные услуги программистов для любой настройки.</div>
+    <div class="reveal">
+      <div class="item" style="margin-top:10px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники.</div>
+      <div class="item" style="margin-top:10px"><b>Высокая стоимость:</b>&nbsp;дорогие лицензии, привязка к серверам и постоянная плата за каждое мелкое обновление.</div>
+    </div>
+  </div>
+  <div class="card dark">
+    <div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются от случайного клика, а текущая касса не бьётся с реальными остатками.</div>
+    <div class="reveal">
+      <div class="item" style="margin-top:10px"><b>Человеческий фактор:</b>&nbsp;сотрудники забывают вносить продажи, путают позиции товара или теряют чеки.</div>
+      <div class="item" style="margin-top:10px"><b>Нулевая аналитика:</b>&nbsp;вы не видите чистую прибыль за месяц и постоянно ловите кассовые разрывы.</div>
+    </div>
+  </div>
+  <div class="card good">
+    <span class="badge">Рекомендуем</span>
+    <div class="h-ttl">Умная платформа AtlasPos</div><div class="h-sub" style="color:rgba(255,255,255,.75)">всё в одном окне</div>
+    <div class="item"><b>Старт за 15 минут:</b>&nbsp;интуитивно понятный интерфейс, работать можно сразу.</div>
+    <div class="reveal">
+      <div class="item" style="margin-top:10px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты и финансы работают в единой связке.</div>
+      <div class="item" style="margin-top:10px"><b>Автоматический AI-анализ:</b>&nbsp;P&L, зарплаты, прибыль и предупреждения о рисках.</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- 2 -->
+<div class="vhead"><span class="vnum">2</span><span class="vname">3D-поворот</span><span class="sep"></span><span class="vtag">объём + наклон</span></div>
+<div class="v2"><div class="grid">
+  <div class="card"><div class="num">01</div>
+    <div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения и платные услуги программистов.</div>
+    <div class="item" style="margin-top:8px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню и кнопок.</div>
+    <div class="item" style="margin-top:8px"><b>Высокая стоимость:</b>&nbsp;лицензии, серверы и плата за обновления.</div>
+  </div>
+  <div class="card"><div class="num">02</div>
+    <div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются, касса не бьётся со складом.</div>
+    <div class="item" style="margin-top:8px"><b>Человеческий фактор:</b>&nbsp;продажи вносят не вовремя, чеки теряются.</div>
+    <div class="item" style="margin-top:8px"><b>Нулевая аналитика:</b>&nbsp;чистой прибыли не видно, кассовые разрывы.</div>
+  </div>
+  <div class="card good"><div class="num">03</div>
+    <div class="h-ttl">Умная платформа AtlasPos</div><div class="h-sub" style="color:rgba(255,255,255,.75)">рекомендуем</div>
+    <div class="item"><b>Старт за 15 минут:</b>&nbsp;чистый интерфейс без инструкций.</div>
+    <div class="item" style="margin-top:8px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты, финансы.</div>
+    <div class="item" style="margin-top:8px"><b>Автоматический AI-анализ:</b>&nbsp;P&L, зарплаты, риски.</div>
+  </div>
+</div></div>
+
+<!-- 3 -->
+<div class="vhead"><span class="vnum">3</span><span class="vname">Стопка / наложение</span><span class="sep"></span><span class="vtag">карточки сдвигаются</span></div>
+<div class="v3"><div class="stackwrap">
+  <div class="card"><span class="stripe"></span>
+    <div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения, платные программисты для любой настройки.</div>
+    <div class="item" style="margin-top:8px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню, вкладок и кнопок.</div>
+    <div class="item" style="margin-top:8px"><b>Высокая стоимость:</b>&nbsp;лицензии, серверы, плата за каждое обновление.</div>
+  </div>
+  <div class="card"><span class="stripe"></span>
+    <div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются от случайного клика, остатки расходятся.</div>
+    <div class="item" style="margin-top:8px"><b>Человеческий фактор:</b>&nbsp;продажи вносят не вовремя, чеки теряются.</div>
+    <div class="item" style="margin-top:8px"><b>Нулевая аналитика:</b>&nbsp;чистой прибыли нет, кассовые разрывы.</div>
+  </div>
+  <div class="card good"><span class="stripe"></span>
+    <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">Рекомендуем</span>
+    <div class="h-ttl">Умная платформа AtlasPos</div>
+    <div class="item" style="margin-top:8px"><b>Старт за 15 минут:</b>&nbsp;интерфейс понятен сразу.</div>
+    <div class="item" style="margin-top:8px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты, финансы.</div>
+    <div class="item" style="margin-top:8px"><b>Автоматический AI-анализ:</b>&nbsp;P&L, зарплаты, риски.</div>
+  </div>
+</div></div>
+
+<!-- 4 -->
+<div class="vhead"><span class="vnum">4</span><span class="vname">Горизонтальное раскрытие</span><span class="sep"></span><span class="vtag">аккордеон</span></div>
+<div class="v4"><div class="row">
+  <div class="card"><div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="items"><div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения и платные программисты.</div>
+    <div class="item" style="margin-top:8px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню.</div>
+    <div class="item" style="margin-top:8px"><b>Высокая стоимость:</b>&nbsp;лицензии и плата за обновления.</div></div>
+  </div>
+  <div class="card"><div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="items"><div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются, остатки расходятся.</div>
+    <div class="item" style="margin-top:8px"><b>Человеческий фактор:</b>&nbsp;чеки теряются.</div>
+    <div class="item" style="margin-top:8px"><b>Нулевая аналитика:</b>&nbsp;прибыли не видно.</div></div>
+  </div>
+  <div class="card good"><span class="badge" style="background:rgba(255,255,255,.2);color:#fff">Рекомендуем</span>
+    <div class="h-ttl">Умная платформа AtlasPos</div>
+    <div class="items"><div class="item"><b>Старт за 15 минут:</b>&nbsp;без инструкций.</div>
+    <div class="item" style="margin-top:8px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты, финансы.</div>
+    <div class="item" style="margin-top:8px"><b>Автоматический AI-анализ:</b>&nbsp;P&L и риски.</div></div>
+  </div>
+</div></div>
+
+<!-- 5 -->
+<div class="vhead"><span class="vnum">5</span><span class="vname">Свечение по курсору</span><span class="sep"></span><span class="vtag">интерактив</span></div>
+<div class="v5"><div class="grid">
+  <div class="card" onmousemove="mv(event,this)">
+    <div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения и платные программисты.</div>
+    <div class="item" style="margin-top:8px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню и кнопок.</div>
+    <div class="item" style="margin-top:8px"><b>Высокая стоимость:</b>&nbsp;лицензии, серверы, обновления.</div>
+  </div>
+  <div class="card" onmousemove="mv(event,this)">
+    <div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются, остатки расходятся.</div>
+    <div class="item" style="margin-top:8px"><b>Человеческий фактор:</b>&nbsp;чеки теряются.</div>
+    <div class="item" style="margin-top:8px"><b>Нулевая аналитика:</b>&nbsp;прибыли не видно.</div>
+  </div>
+  <div class="card good" onmousemove="mv(event,this)">
+    <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">Рекомендуем</span>
+    <div class="h-ttl">Умная платформа AtlasPos</div>
+    <div class="item" style="margin-top:8px"><b>Старт за 15 минут:</b>&nbsp;интерфейс понятен сразу.</div>
+    <div class="item" style="margin-top:8px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты, финансы.</div>
+    <div class="item" style="margin-top:8px"><b>Автоматический AI-анализ:</b>&nbsp;P&L, зарплаты, риски.</div>
+  </div>
+</div></div>
+
+<!-- 6 -->
+<div class="vhead"><span class="vnum">6</span><span class="vname">Пружина + иконка</span><span class="sep"></span><span class="vtag">bounce-эффект</span></div>
+<div class="v6"><div class="grid">
+  <div class="card"><div class="ic">🧱</div>
+    <div class="h-ttl">Тяжёлые программы</div><div class="h-sub">1С и аналоги</div>
+    <div class="items"><div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения и платные программисты.</div>
+    <div class="item"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню.</div>
+    <div class="item"><b>Высокая стоимость:</b>&nbsp;лицензии и обновления.</div></div>
+  </div>
+  <div class="card"><div class="ic">📊</div>
+    <div class="h-ttl">Таблицы и блокноты</div><div class="h-sub">Excel / Sheets</div>
+    <div class="items"><div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются, остатки расходятся.</div>
+    <div class="item"><b>Человеческий фактор:</b>&nbsp;чеки теряются.</div>
+    <div class="item"><b>Нулевая аналитика:</b>&nbsp;прибыли не видно.</div></div>
+  </div>
+  <div class="card good"><div class="ic">✨</div>
+    <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">Рекомендуем</span>
+    <div class="h-ttl">Умная платформа AtlasPos</div>
+    <div class="items"><div class="item"><b>Старт за 15 минут:</b>&nbsp;без инструкций.</div>
+    <div class="item"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты, финансы.</div>
+    <div class="item"><b>Автоматический AI-анализ:</b>&nbsp;P&L и риски.</div></div>
+  </div>
+</div></div>
+
+<!-- 7 -->
+<div class="vhead"><span class="vnum">7</span><span class="vname">Лента-аккордеон</span><span class="sep"></span><span class="vtag">вертикальные полосы</span></div>
+<div class="v7"><div class="row">
+  <div class="card">
+    <div class="ttl">Тяжёлые программы</div><div class="mini">1С и аналоги</div>
+    <div class="items"><div class="item"><b>Сложное внедрение:</b>&nbsp;недели обучения и платные программисты для любой настройки.</div>
+    <div class="item" style="margin-top:10px"><b>Перегруженный интерфейс:</b>&nbsp;сотни скрытых меню, вкладок и кнопок.</div>
+    <div class="item" style="margin-top:10px"><b>Высокая стоимость:</b>&nbsp;дорогие лицензии, серверы и плата за обновления.</div></div>
+  </div>
+  <div class="card">
+    <div class="ttl">Таблицы и блокноты</div><div class="mini">Excel / Sheets</div>
+    <div class="items"><div class="item"><b>Хаос в данных:</b>&nbsp;формулы ломаются от случайного клика, касса не бьётся со складом.</div>
+    <div class="item" style="margin-top:10px"><b>Человеческий фактор:</b>&nbsp;продажи вносят не вовремя, чеки теряются.</div>
+    <div class="item" style="margin-top:10px"><b>Нулевая аналитика:</b>&nbsp;чистой прибыли не видно, кассовые разрывы.</div></div>
+  </div>
+  <div class="card good">
+    <div class="ttl">Умная платформа AtlasPos</div><div class="mini">рекомендуем</div>
+    <div class="items"><div class="item"><b>Старт за 15 минут:</b>&nbsp;интуитивно понятный интерфейс без инструкций.</div>
+    <div class="item" style="margin-top:10px"><b>Всё в одной вкладке:</b>&nbsp;касса, склад, клиенты и финансы в единой связке.</div>
+    <div class="item" style="margin-top:10px"><b>Автоматический AI-анализ:</b>&nbsp;P&L, зарплаты, прибыль и предупреждения о рисках.</div>
+    <button class="btn">Попробовать бесплатно</button></div>
+  </div>
+</div></div>
+
+</div>
+<script>
+function mv(e, el){
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+  el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}
+</script>
+</body>
+</html>

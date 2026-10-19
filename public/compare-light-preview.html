@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — сравнение (лёгкий стиль)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:34px 20px 40px}
+
+  .intro{text-align:center;margin-bottom:30px}
+  .intro h2{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
+  .intro h2 span{background:linear-gradient(135deg,#1F75FF,#0d4ea8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .intro p{margin-top:8px;font-size:14px;color:rgba(0,0,0,.46)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+  @media(max-width:780px){.cols{grid-template-columns:1fr;gap:26px}}
+
+  .col{border-radius:20px;padding:22px 20px;display:flex;flex-direction:column}
+  .col.pro{background:linear-gradient(170deg,#F7FBFF,#EAF2FF);border:1px solid rgba(31,117,255,.22);box-shadow:0 18px 44px -32px rgba(31,117,255,.7)}
+  .col.con{background:#fff;border:1px solid rgba(16,40,90,.10)}
+
+  .ctop{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+  .cdot{width:8px;height:8px;border-radius:50%;flex:none}
+  .pro .cdot{background:#1F75FF}
+  .con .cdot{background:rgba(16,40,90,.25)}
+  .cttl{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+  .pro .cttl{color:#0d4ea8}
+  .con .cttl{color:rgba(0,0,0,.42)}
+
+  ul{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+  li{display:flex;gap:9px;font-size:13.4px;line-height:1.5;padding:8px 0;align-items:flex-start;min-height:36px}
+  .pro li{color:rgba(0,0,0,.74)}
+  .con li{color:rgba(0,0,0,.55)}
+  .m{width:16px;height:16px;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center}
+  .m svg{width:13px;height:13px;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;fill:none}
+  .pro .m svg{stroke:#1F75FF}
+  .con .m svg{stroke:rgba(16,40,90,.35)}
+  li b{font-weight:700;color:#111}
+
+  .cta{margin-top:18px}
+  .btn{width:100%;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
+    font-size:13.5px;font-weight:700;background:#059669;color:#fff;transition:background .2s}
+  .btn:hover{background:#047857}
+
+  .note{margin-top:9px;font-size:11px;color:rgba(0,0,0,.4);text-align:center}
+
+  /* VS разделитель */
+  @media(min-width:781px){
+    .cols{position:relative}
+    .cols::after{content:"VS";position:absolute;left:50%;top:26px;transform:translateX(-50%);
+      width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid rgba(31,117,255,.28);
+      display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;
+      color:#1F75FF;letter-spacing:.05em;z-index:2;box-shadow:0 6px 16px -8px rgba(31,117,255,.6)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h2>Порядок вместо <span>хаоса в таблицах</span></h2>
+    <p>Что вы получаете с AtlasPos — и с чем сталкиваетесь без него</p>
+  </div>
+
+  <div class="cols">
+    <div class="col pro">
+      <div class="ctop"><span class="cdot"></span><span class="cttl">AtlasPos</span></div>
+      <ul>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Старт <b>за 15 минут</b> — без обучения и программиста</span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Касса, склад, клиенты и финансы — <b>в одной вкладке</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Продажа сразу списывает остаток — <b>без расхождений</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Чистая прибыль</b> считается автоматически</span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>AI подсказывает <b>точки роста и риски</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Зарплаты и табель — <b>без Excel</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Перенос данных и <b>обновления бесплатно</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span>Облако: телефон, планшет, компьютер + <b>резервные копии</b></span></li>
+      </ul>
+    </div>
+
+    <div class="col con">
+      <div class="ctop"><span class="cdot"></span><span class="cttl">1С и Excel</span></div>
+      <ul>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Внедрение <b>неделями</b>, платный программист для настройки</span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Сотни скрытых меню — <b>сотрудники путаются</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Касса и склад <b>не связаны</b>, остатки расходятся</span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Формулы ломаются от <b>случайного клика</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Чистой прибыли не видно — <b>кассовые разрывы</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Продажи вносят вручную — <b>чеки теряются</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Дорогие лицензии и <b>плата за обновления</b></span></li>
+        <li><span class="m"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Файлы на компьютерах и флешках — <b>один сбой и всё</b></span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

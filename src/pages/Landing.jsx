@@ -619,6 +619,86 @@ const ORBIT_ICONS = {
     );
   };
 
+
+  /* ══ Сравнение: AtlasPos vs 1С/Excel (лёгкий стиль сайта) ══ */
+  const ComparePro = () => {
+    const pros = [
+      <>Старт <b>за 15 минут</b> — без обучения и программиста</>,
+      <>Касса, склад, клиенты и финансы — <b>в одной вкладке</b></>,
+      <>Продажа сразу списывает остаток — <b>без расхождений</b></>,
+      <><b>Чистая прибыль</b> считается автоматически</>,
+      <>AI подсказывает <b>точки роста и риски</b></>,
+      <>Зарплаты и табель — <b>без Excel</b></>,
+      <>Перенос данных и <b>обновления бесплатно</b></>,
+      <>Облако: телефон, планшет, компьютер + <b>резервные копии</b></>,
+    ];
+    const cons = [
+      <>Внедрение <b>неделями</b>, платный программист для настройки</>,
+      <>Сотни скрытых меню — <b>сотрудники путаются</b></>,
+      <>Касса и склад <b>не связаны</b>, остатки расходятся</>,
+      <>Формулы ломаются от <b>случайного клика</b></>,
+      <>Чистой прибыли не видно — <b>кассовые разрывы</b></>,
+      <>Продажи вносят вручную — <b>чеки теряются</b></>,
+      <>Дорогие лицензии и <b>плата за обновления</b></>,
+      <>Файлы на компьютерах и флешках — <b>один сбой и всё</b></>,
+    ];
+    const Check = () => (
+      <span style={{width:16,height:16,flex:"none",marginTop:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1F75FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </span>
+    );
+    const Cross = () => (
+      <span style={{width:16,height:16,flex:"none",marginTop:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(16,40,90,.35)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </span>
+    );
+
+    return (
+      <div style={{position:"relative"}}>
+      {!mobile && (
+        <div style={{position:"absolute",left:"50%",top:24,transform:"translateX(-50%)",width:34,height:34,borderRadius:"50%",
+          background:"#fff",border:"1px solid rgba(31,117,255,.28)",display:"flex",alignItems:"center",justifyContent:"center",
+          fontSize:10.5,fontWeight:800,color:"#1F75FF",letterSpacing:".05em",zIndex:2,boxShadow:"0 6px 16px -8px rgba(31,117,255,.6)"}}>VS</div>
+      )}
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:mobile?26:16,alignItems:"stretch"}}>
+        {/* AtlasPos */}
+        <div style={{borderRadius:20,padding:"22px 20px",display:"flex",flexDirection:"column",
+          background:"linear-gradient(170deg,#F7FBFF,#EAF2FF)",border:"1px solid rgba(31,117,255,.22)",
+          boxShadow:"0 18px 44px -32px rgba(31,117,255,.7)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:16}}>
+            <span style={{width:8,height:8,borderRadius:"50%",background:"#1F75FF",flex:"none"}} />
+            <span style={{fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".13em",color:"#0d4ea8"}}>AtlasPos</span>
+          </div>
+          <ul style={{listStyle:"none",margin:0,padding:0,flex:1,display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+            {pros.map((t,i)=>(
+              <li key={i} style={{display:"flex",gap:9,fontSize:13.4,lineHeight:1.5,padding:"8px 0",alignItems:"flex-start",
+                minHeight:36,color:"rgba(0,0,0,.74)"}}>
+                <Check /><span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* 1С и Excel */}
+        <div style={{borderRadius:20,padding:"22px 20px",display:"flex",flexDirection:"column",
+          background:"#fff",border:"1px solid rgba(16,40,90,.10)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:16}}>
+            <span style={{width:8,height:8,borderRadius:"50%",background:"rgba(16,40,90,.25)",flex:"none"}} />
+            <span style={{fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".13em",color:"rgba(0,0,0,.42)"}}>1С и Excel</span>
+          </div>
+          <ul style={{listStyle:"none",margin:0,padding:0,flex:1,display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+            {cons.map((t,i)=>(
+              <li key={i} style={{display:"flex",gap:9,fontSize:13.4,lineHeight:1.5,padding:"8px 0",alignItems:"flex-start",
+                minHeight:36,color:"rgba(0,0,0,.55)"}}>
+                <Cross /><span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",maxWidth:"100vw",overflowX:"clip",position:"relative",background:"#fff",margin:0}}>
       {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
@@ -696,50 +776,21 @@ const ORBIT_ICONS = {
         <OrbitRing />
       </section>
 
-      {/* ===== КОНТРАСТ СИСТЕМ ===== */}
+      {/* ===== КОНТРАСТ СИСТЕМ (AtlasPos vs 1С/Excel) ===== */}
       <section style={{maxWidth:1280,margin:"80px auto",padding:"0 24px"}}>
-                <div style={{marginBottom:mobile?10:14}}>
-          <div style={{display:"flex",alignItems:"center",gap:16}}>
-            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-            <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"70%":"none"}}>Забудьте о сложных настройках других программ</h2>
-            <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
-          </div>
-
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"78%":"none"}}>Порядок вместо хаоса в таблицах</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
+          <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",margin:0,lineHeight:1.45,maxWidth:mobile?"78%":"none"}}>Забудьте о сложных настройках других программ</h2>
+          <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>Сравните, как работают привычные методы и наша умная платформа</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))",gap:20,alignItems:"start"}}>
-          {/* Карточка 1 — ERP */}
-          <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
-            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Тяжелые программы<br/>(1С и аналоги)</h3>
-            <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <CompareItem type="bad" text="Сложное внедрение: требуются недели обучения персонала и платные услуги программистов для любой настройки." />
-              <CompareItem type="bad" text="Перегруженный интерфейс: сотни скрытых меню, вкладок и кнопок, в которых постоянно путаются сотрудники." />
-              <CompareItem type="bad" text="Высокая стоимость: дорогие лицензии, привязка к серверам и постоянная плата за каждое мелкое обновление." />
-            </div>
-          </div>
-          {/* Карточка 2 — Excel */}
-          <div style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,background:"#fafafa"}}>
-            <h3 style={{fontSize:16,fontWeight:700,marginBottom:16,color:"#555"}}>Таблицы и блокноты<br/>(Excel / Sheets)</h3>
-            <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <CompareItem type="bad" text="Хаос в данных: формулы постоянно ломаются от случайного клика, а текущая касса не бьется с реальными остатками на складе." />
-              <CompareItem type="bad" text="Человеческий фактор: сотрудники регулярно забывают вовремя вносить продажи, путают позиции товара или теряют чеки." />
-              <CompareItem type="bad" text="Нулевая аналитика: вы не видите чистую, очищенную от расходов прибыль за месяц и постоянно ловите кассовые разрывы." />
-            </div>
-          </div>
-          {/* Карточка 3 — AtlasPos */}
-          <div style={{border:"2px solid #1F75FF",borderRadius:16,padding:"24px 28px 28px",background:"#fff",boxShadow:"0 8px 24px rgba(0,0,0,.08)",position:"relative",top:-4}}>
-            <div style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 10px",borderRadius:100,background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:10,fontWeight:700,color:"#fff",marginBottom:12}}>Рекомендуем</div>
-            <h3 style={{fontSize:17,fontWeight:800,marginBottom:16}}>Умная платформа AtlasPos</h3>
-            <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
-              <CompareItem type="good" text="Старт за 15 минут: интуитивно понятный и чистый интерфейс, в котором можно работать сразу без долгих инструкций." />
-              <CompareItem type="good" text="Все в одной вкладке: живая касса, складской учет, база клиентов и финансы команды работают в единой связке." />
-              <CompareItem type="good" text="Автоматический AI-анализ: система сама собирает P&L, рассчитывает зарплаты, видит прибыль и предупреждает о рисках." />
-            </div>
-            <button onClick={()=>n('/register')} style={{width:"100%",padding:"10px",borderRadius:100,border:"none",background:"linear-gradient(135deg,#1F75FF,#0d4ea8)",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",color:"#fff",transition:"all .15s"}}
-              onMouseEnter={e=>e.currentTarget.style.background="#0d4ea8"}
-              onMouseLeave={e=>e.currentTarget.style.background="linear-gradient(135deg,#1F75FF,#0d4ea8)"}>Попробовать бесплатно</button>
-          </div>
-        </div>
+
+        <ComparePro />
       </section>
       <section style={{maxWidth:900,margin:"80px auto",padding:"0 24px",textAlign:"center"}}>
                 <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:mobile?10:14}}>
