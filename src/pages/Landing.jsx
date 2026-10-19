@@ -528,7 +528,7 @@ const ORBIT_ICONS = {
     const activeItem = activeId ? ORBIT_DATA.find(d => d.id === activeId) : null;
 
     return (
-      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?620:760,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+      <div onClick={reset} style={{position:'relative',width:'100%',height:mobile?360:580,display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
         <div style={{position:'relative',width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
           {/* кольца */}
           <div style={{position:'absolute',width:(OUTs*2),height:(OUTs*2),borderRadius:'50%',border:'1px solid rgba(16,40,90,.06)'}} />
@@ -686,7 +686,7 @@ const ORBIT_ICONS = {
           <h2 style={{fontSize:mobile?13:15,fontWeight:700,textTransform:"uppercase",letterSpacing:".16em",color:"#111",whiteSpace:mobile?"normal":"nowrap",textAlign:"center",maxWidth:mobile?"78%":"none",lineHeight:1.5}}>Внутри AtlasPos: от кассы до чистой прибыли</h2>
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
-        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?10:14}}>Все разделы системы — нажмите любой, чтобы узнать, что он умеет</p>
+        <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:20}}>Все разделы системы — нажмите любой, чтобы узнать, что он умеет</p>
         <OrbitRing />
       </section>
 
