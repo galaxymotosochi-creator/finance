@@ -620,7 +620,7 @@ const ORBIT_ICONS = {
   };
 
   return (
-    <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",overflowX:"hidden",position:"relative",background:"#fff"}}>
+    <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",maxWidth:"100vw",overflowX:"clip",position:"relative",background:"#fff",margin:0}}>
       {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
       <div style={{position:"absolute",top:0,left:0,right:0,height:"1200px",pointerEvents:"none",zIndex:0,
         background:"radial-gradient(ellipse 80% 55% at 50% 0%, rgba(31,117,255,.13), rgba(31,117,255,.05) 45%, transparent 75%)"}} />
@@ -634,7 +634,7 @@ const ORBIT_ICONS = {
             fontWeight:800,fontSize:mobile?13:15,letterSpacing:"-.02em",lineHeight:1}}>A</div>
           <span style={{fontWeight:800,fontSize:mobile?16:18,letterSpacing:"-.03em",color:"#111",lineHeight:1}}>AtlasPos</span>
         </div>
-        <div style={{display:"flex",gap:6,alignItems:"center",marginLeft:"auto",marginRight:mobile?0:56}}>
+        <div style={{display:"flex",gap:6,alignItems:"center",marginLeft:"auto",marginRight:mobile?0:56,minWidth:0}}>
           <button onClick={()=>n('/login')} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",padding:mobile?"7px 11px":"9px 22px",borderRadius:100,border:"1px solid rgba(16,40,90,.12)",background:"#fff",color:"#111",fontSize:mobile?11.5:13,whiteSpace:"nowrap",fontWeight:700,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)",transition:"transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .22s"}}
             onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 0 -1px #e6eaf1, 0 9px 16px -8px rgba(16,40,90,.26)";}}
             onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 3px 0 -1px #e6eaf1, 0 6px 12px -6px rgba(16,40,90,.22)";}}>
