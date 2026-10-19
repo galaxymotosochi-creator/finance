@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — кому подходит</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{padding:38px 0 44px}
+  .intro{max-width:720px;margin:0 auto 28px;padding:0 20px;text-align:center}
+  .intro h2{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
+  .intro h2 span{background:linear-gradient(135deg,#1F75FF,#0d4ea8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .intro p{margin-top:9px;font-size:14px;color:rgba(0,0,0,.48);line-height:1.55}
+
+  .mrow{display:flex;gap:14px;overflow:hidden;padding:7px 0;
+    mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+  .track{display:flex;gap:14px;flex:none;animation:scroll 42s linear infinite}
+  .mrow.rev .track{animation-direction:reverse;animation-duration:50s}
+  .mrow:hover .track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  .chip{flex:none;display:flex;align-items:center;gap:10px;padding:11px 17px 11px 12px;border-radius:14px;
+    background:#fff;border:1px solid rgba(16,40,90,.10);white-space:nowrap;
+    box-shadow:0 6px 16px -12px rgba(16,40,90,.35);transition:border-color .25s, transform .25s}
+  .chip:hover{border-color:rgba(31,117,255,.4);transform:translateY(-2px)}
+  .chip.hero{background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border-color:rgba(31,117,255,.28)}
+  .em{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:16px;background:#F3F8FF}
+  .chip.hero .em{background:rgba(31,117,255,.12)}
+  .nm{font-size:13px;font-weight:700;letter-spacing:-.01em;color:#111}
+  .sb{font-size:11px;color:rgba(0,0,0,.42);margin-top:1px}
+
+  .foot{max-width:720px;margin:26px auto 0;padding:0 20px;text-align:center;font-size:12.5px;color:rgba(0,0,0,.42)}
+  .foot b{color:#0d4ea8}
+
+  @media(max-width:640px){
+    .intro h2{font-size:21px}
+    .chip{padding:10px 14px;border-radius:12px}
+    .em{width:30px;height:30px;font-size:14px;border-radius:9px}
+    .nm{font-size:12px}
+    .sb{font-size:10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h2>Кому подходит <span>AtlasPos</span></h2>
+    <p>От небольшой кофейни до сети магазинов — платформа подстраивается под ваш масштаб и отрасль</p>
+  </div>
+
+  <div class="mrow"><div class="track" id="row1"></div></div>
+  <div class="mrow rev"><div class="track" id="row2"></div></div>
+</div>
+<p class="foot">Не нашли свою сферу? <b>Настроим под ваш бизнес</b> — перенос данных бесплатно</p>
+
+<script>
+const ITEMS = [
+  {e:'🛒',n:'Магазины',s:'продукты, одежда'},
+  {e:'☕',n:'Кофейни',s:'напитки, десерты'},
+  {e:'🍽️',n:'Рестораны и кафе',s:'зал, кухня, доставка'},
+  {e:'🍕',n:'Пиццерии',s:'доставка и самовывоз'},
+  {e:'🍣',n:'Суши-бары',s:'роллы, наборы'},
+  {e:'🥐',n:'Пекарни',s:'выпечка, кондитерские'},
+  {e:'🍦',n:'Мороженое',s:'точки, фудкорты'},
+  {e:'🛠️',n:'Автосервисы',s:'запчасти, работы'},
+  {e:'🏍️',n:'Мотомагазины',s:'техника, запчасти'},
+  {e:'🚿',n:'Автомойки',s:'услуги, абонементы'},
+  {e:'💇',n:'Салоны красоты',s:'услуги, мастера'},
+  {e:'💅',n:'Ногтевые студии',s:'записи, расходники'},
+  {e:'💪',n:'Фитнес-клубы',s:'абонементы, тренеры'},
+  {e:'🧘',n:'Студии йоги',s:'группы, занятия'},
+  {e:'🐾',n:'Зоомагазины',s:'корма, аксессуары'},
+  {e:'🌸',n:'Цветочные',s:'букеты, композиции'},
+  {e:'📱',n:'Электроника',s:'гаджеты, аксессуары'},
+  {e:'💻',n:'Компьютерные магазины',s:'техника, ремонт'},
+  {e:'👗',n:'Бутики',s:'одежда, обувь'},
+  {e:'👶',n:'Детские товары',s:'игрушки, одежда'},
+  {e:'🏠',n:'Стройматериалы',s:'товары, склад'},
+  {e:'🪑',n:'Мебельные салоны',s:'каталог, заказы'},
+  {e:'🔧',n:'Хозтовары',s:'инструмент, расходники'},
+  {e:'📚',n:'Книжные',s:'книги, канцелярия'},
+  {e:'🎮',n:'Компьютерные клубы',s:'часы, бары'},
+  {e:'🎳',n:'Развлечения',s:'боулинг, квесты'},
+  {e:'🚚',n:'Доставка',s:'заказы, курьеры'},
+  {e:'🧾',n:'Оптовая торговля',s:'партии, контрагенты'},
+  {e:'🔨',n:'Ремонт техники',s:'заявки, запчасти'},
+  {e:'👟',n:'Спорттовары',s:'инвентарь, одежда'},
+  {e:'🎨',n:'Творческие мастерские',s:'материалы, услуги'},
+  {e:'🚗',n:'Автосалоны',s:'авто, доп.услуги'},
+  {e:'🛞',n:'Шиномонтаж',s:'услуги, сезонность'},
+  {e:'🍺',n:'Бары и пабы',s:'напитки, кухня'},
+  {e:'🎂',n:'Кондитерские',s:'торты на заказ'},
+  {e:'🥗',n:'Столовые',s:'комплексные обеды'},
+  {e:'🧴',n:'Косметика',s:'уход, парфюм'},
+  {e:'🏗️',n:'Строительные бригады',s:'сметы, материалы'},
+  {e:'⚡',n:'Электротовары',s:'кабель, оборудование'}
+];
+
+function makeChip(it, hero){
+  const d = document.createElement('div');
+  d.className = 'chip' + (hero ? ' hero' : '');
+  d.innerHTML = `<span class="em">${it.e}</span><div class="nm">${it.n}</div>`;
+  return d;
+}
+
+const mid = Math.ceil(ITEMS.length / 2);
+const rows = [ITEMS.slice(0, mid), ITEMS.slice(mid)];
+rows.forEach((arr, ri) => {
+  const track = document.getElementById('row' + (ri + 1));
+  // дублируем для бесшовной прокрутки
+  [...arr, ...arr].forEach((it, i) => track.appendChild(makeChip(it, i % 7 === 0)));
+});
+</script>
+</body>
+</html>

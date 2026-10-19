@@ -711,6 +711,93 @@ const ORBIT_ICONS = {
     );
   };
 
+  /* ══ Кому подходит: бегущие ленты сфер ══ */
+  const SECTOR_ITEMS = [
+      {e:'🛒',n:'Магазины'},
+      {e:'☕',n:'Кофейни'},
+      {e:'🍽️',n:'Рестораны и кафе'},
+      {e:'🍕',n:'Пиццерии'},
+      {e:'🍣',n:'Суши-бары'},
+      {e:'🥐',n:'Пекарни'},
+      {e:'🍦',n:'Мороженое'},
+      {e:'🛠️',n:'Автосервисы'},
+      {e:'🏍️',n:'Мотомагазины'},
+      {e:'🚿',n:'Автомойки'},
+      {e:'💇',n:'Салоны красоты'},
+      {e:'💅',n:'Ногтевые студии'},
+      {e:'💪',n:'Фитнес-клубы'},
+      {e:'🧘',n:'Студии йоги'},
+      {e:'🐾',n:'Зоомагазины'},
+      {e:'🌸',n:'Цветочные'},
+      {e:'📱',n:'Электроника'},
+      {e:'💻',n:'Компьютерные магазины'},
+      {e:'👗',n:'Бутики'},
+      {e:'👶',n:'Детские товары'},
+      {e:'🏠',n:'Стройматериалы'},
+      {e:'🪑',n:'Мебельные салоны'},
+      {e:'🔧',n:'Хозтовары'},
+      {e:'📚',n:'Книжные'},
+      {e:'🎮',n:'Компьютерные клубы'},
+      {e:'🎳',n:'Развлечения'},
+      {e:'🚚',n:'Доставка'},
+      {e:'🧾',n:'Оптовая торговля'},
+      {e:'🔨',n:'Ремонт техники'},
+      {e:'👟',n:'Спорттовары'},
+      {e:'🎨',n:'Творческие мастерские'},
+      {e:'🚗',n:'Автосалоны'},
+      {e:'🛞',n:'Шиномонтаж'},
+      {e:'🍺',n:'Бары и пабы'},
+      {e:'🎂',n:'Кондитерские'},
+      {e:'🥗',n:'Столовые'},
+      {e:'🧴',n:'Косметика'},
+      {e:'🏗️',n:'Строительные бригады'},
+      {e:'⚡',n:'Электротовары'}
+  ];
+
+  const SectorChip = ({item, hero}) => (
+    <div style={{flex:"none",display:"flex",alignItems:"center",gap:10,padding:"11px 17px 11px 12px",borderRadius:14,
+      background:hero?"linear-gradient(135deg,#F7FBFF,#EAF2FF)":"#fff",
+      border:"1px solid " + (hero?"rgba(31,117,255,.28)":"rgba(16,40,90,.10)"),
+      whiteSpace:"nowrap",boxShadow:"0 6px 16px -12px rgba(16,40,90,.35)"}}>
+      <span style={{width:mobile?30:34,height:mobile?30:34,borderRadius:mobile?9:10,flex:"none",display:"flex",
+        alignItems:"center",justifyContent:"center",fontSize:mobile?14:16,
+        background:hero?"rgba(31,117,255,.12)":"#F3F8FF"}}>{item.e}</span>
+      <span style={{fontSize:mobile?12:13,fontWeight:700,letterSpacing:"-.01em",color:"#111"}}>{item.n}</span>
+    </div>
+  );
+
+  const MarqueeSectors = () => {
+    const half = Math.ceil(SECTOR_ITEMS.length / 2);
+    const row1 = SECTOR_ITEMS.slice(0, half);
+    const row2 = SECTOR_ITEMS.slice(half);
+    const mask = "linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)";
+    const rowStyle = (rev) => ({
+      display:"flex", gap:14, overflow:"hidden", padding:"7px 0",
+      maskImage:mask, WebkitMaskImage:mask
+    });
+    const trackStyle = (dur, rev) => ({
+      display:"flex", gap:14, flex:"none",
+      animation:`secscroll ${dur}s linear infinite`,
+      animationDirection: rev ? "reverse" : "normal"
+    });
+    return (
+      <div className="sectors-marquee" style={{marginTop:mobile?18:24}}>
+        <style>{`@keyframes secscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+          .sectors-marquee:hover [style*="secscroll"]{animation-play-state:paused}`}</style>
+        <div style={rowStyle(false)}>
+          <div style={trackStyle(42,false)}>
+            {[...row1, ...row1].map((it,i)=><SectorChip key={"a"+i} item={it} hero={i%7===0} />)}
+          </div>
+        </div>
+        <div style={rowStyle(true)}>
+          <div style={trackStyle(50,true)}>
+            {[...row2, ...row2].map((it,i)=><SectorChip key={"b"+i} item={it} hero={i%7===0} />)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="landing-page" style={{fontFamily:"Inter,sans-serif",color:"#111",minHeight:"100vh",display:"block",width:"100%",maxWidth:"100vw",overflowX:"clip",position:"relative",background:"#fff",margin:0}}>
       {/* ===== ФОНОВОЕ СВЕЧЕНИЕ ОТ САМОГО ВЕРХА ===== */}
@@ -806,33 +893,10 @@ const ORBIT_ICONS = {
           <span style={{flex:1,height:1,background:"rgba(16,40,90,.14)"}} />
         </div>
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:16}}>
-          {[
-            {
-              svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
-              title:"Товарный бизнес и ритейл",
-              desc:"Умный учет остатков на складе, контроль поставщиков, инвентаризация и автоматический расчет маржинальности товаров."
-            },
-            {
-              svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-              title:"Услуги, сервис и аренда",
-              desc:"Контроль кассовых смен, ведение клиентской базы (CRM), учет загрузки мастеров и прозрачный расчет сдельной зарплаты команды."
-            },
-            {
-              svg: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
-              title:"Смешанный и проектный бизнес",
-              desc:"Идеально, если вы одновременно продаете товары, оказываете услуги и сдаете оборудование в прокат. Система объединит все направления в один P&L отчет."
-            },
-          ].map((t,i)=>(
-            <div key={i} style={{border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,transition:"all .2s",textAlign:"center"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor="#1F75FF";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.06)"}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(0,0,0,.08)";e.currentTarget.style.boxShadow="none"}}>
-              <div style={{width:52,height:52,borderRadius:14,background:"#fff8d6",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}} dangerouslySetInnerHTML={{__html:t.svg}} />
-              <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>{t.title}</div>
-              <div style={{fontSize:13,color:"rgba(0,0,0,.54)",lineHeight:1.45}}>{t.desc}</div>
-            </div>
-          ))}
-        </div>
+        <MarqueeSectors />
+        <p style={{fontSize:mobile?12.5:13,color:"rgba(0,0,0,.42)",textAlign:"center",marginTop:mobile?20:26}}>
+          Не нашли свою сферу? <b style={{color:"#0d4ea8",fontWeight:700}}>Настроим под ваш бизнес</b> — перенос данных бесплатно
+        </p>
       </section>
 
       {/* ===== AI-ПОМОЩНИК ===== */}
