@@ -78,18 +78,26 @@ export default function ShowcaseFilters({ form, setForm, products }) {
       <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
         style={{ width:'100%', padding:'9px 14px', border:'1px solid #e5e7eb', borderRadius:10,
           fontSize:'0.85rem', outline:'none', boxSizing:'border-box', marginBottom:8 }} />
-      <div style={{ maxHeight:240, overflowY:'auto', display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:2 }}>
+      <div style={{ maxHeight:280, overflowY:'auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
         {visible.slice(0, 300).map(p => {
           const on = !hidden.includes(String(p.id));
           return (
-            <label key={p.id} style={chk} onClick={() => setForm({ ...form, hidden_products: toggle(hidden, String(p.id)) })}>
-              <span style={{ width:16, height:16, borderRadius:5, border:'1.5px solid ' + (on ? '#111' : '#d1d5db'),
-                background: on ? '#111' : '#fff', display:'flex', alignItems:'center', justifyContent:'center',
-                color:'#fff', fontSize:'0.65rem', fontWeight:800, flexShrink:0 }}>{on ? '✓' : ''}</span>
-              <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</span>
-            </label>
+            <div key={p.id} onClick={() => setForm({ ...form, hidden_products: toggle(hidden, String(p.id)) })}
+              style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:11,
+                cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
+                background: on ? 'rgba(31,117,255,.04)' : '#fff' }}>
+              <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
+                border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
+                background: on ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
+                justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
+                {on ? '✓' : ''}
+              </div>
+              <span style={{ fontSize:'0.87rem', fontWeight:600, color:'#111',
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</span>
+            </div>
           );
         })}
+        {!visible.length && <div style={{ fontSize:'0.82rem', color:'#9ca3af', padding:'6px 2px' }}>Ничего не найдено</div>}
       </div>
     </div>
   );
