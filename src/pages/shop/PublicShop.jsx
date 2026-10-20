@@ -48,8 +48,6 @@ export default function PublicShop() {
     setSending(false);
   };
 
-  const { shop, products } = data;
-
   if (sent) return (
     <div style={{ fontFamily:'Inter,sans-serif', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
       <div style={{ textAlign:'center', maxWidth:420 }}>
@@ -66,6 +64,7 @@ export default function PublicShop() {
   if (error) return <div style={{ padding:60, textAlign:'center', fontFamily:'Inter,sans-serif', color:'#6b7280' }}>{error}</div>;
   if (!data) return <div style={{ padding:60, textAlign:'center', fontFamily:'Inter,sans-serif', color:'#9ca3af' }}>Загружаю…</div>;
 
+  const { shop, products } = data;
   const count = Object.values(cart).reduce((a, b) => a + b, 0);
   const total = Object.entries(cart).reduce((s, [id, q]) => {
     const p = products.find(x => String(x.id) === String(id));
