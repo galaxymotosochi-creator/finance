@@ -52,16 +52,23 @@ export default function ShowcaseFilters({ form, setForm, products }) {
       </div>
 
       <div style={{ fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:8 }}>2. Категории</div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))', gap:4, marginBottom:18 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:18 }}>
         {allCats.map(c => {
           const on = cats.length === 0 || cats.includes(c);
           return (
-            <label key={c} style={chk} onClick={() => setForm({ ...form, show_cats: toggle(cats, c) })}>
-              <span style={{ width:16, height:16, borderRadius:5, border:'1.5px solid ' + (on ? '#111' : '#d1d5db'),
-                background: on ? '#111' : '#fff', display:'flex', alignItems:'center', justifyContent:'center',
-                color:'#fff', fontSize:'0.65rem', fontWeight:800, flexShrink:0 }}>{on ? '✓' : ''}</span>
-              {c}
-            </label>
+            <div key={c} onClick={() => setForm({ ...form, show_cats: toggle(cats, c) })}
+              style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:11,
+                cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
+                background: on ? 'rgba(31,117,255,.04)' : '#fff' }}>
+              <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
+                border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
+                background: on ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
+                justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
+                {on ? '✓' : ''}
+              </div>
+              <span style={{ fontSize:'0.87rem', fontWeight:600, color:'#111',
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c}</span>
+            </div>
           );
         })}
         {!allCats.length && <div style={{ fontSize:'0.82rem', color:'#9ca3af' }}>Категорий пока нет</div>}
