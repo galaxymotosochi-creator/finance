@@ -37,7 +37,7 @@ export default function MySite() {
     if (!user) return;
     if (!slug) { setToast('Укажите адрес витрины'); return; }
     setSaving(true);
-    const payload = { ...form, slug, updated_at: new Date().toISOString() };
+    const payload = { ...form, slug, user_id: user.id, updated_at: new Date().toISOString() };
     let err = null;
     if (shop && shop.id) {
       const r = await supabase.from('shops').update(payload).eq('id', shop.id);
