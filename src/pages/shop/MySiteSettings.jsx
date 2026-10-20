@@ -62,10 +62,10 @@ export default function MySiteSettings({ shop, slug, setShop, setSlug, onSave, s
           const on = form[x.k] === undefined ? x.def : !!form[x.k];
           return (
             <div key={x.k} onClick={() => setForm({ ...form, [x.k]: !on })}
-              style={{ display:'flex', alignItems:'flex-start', gap:11, padding:'10px 12px', borderRadius:11,
+              style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:11,
                 cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
                 background: on ? 'rgba(31,117,255,.04)' : '#fff', marginBottom:8 }}>
-              <div style={{ width:18, height:18, borderRadius:5, marginTop:1, flexShrink:0,
+              <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
                 border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
                 background: on ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
                 justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
