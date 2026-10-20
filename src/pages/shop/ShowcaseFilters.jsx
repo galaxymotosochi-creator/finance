@@ -43,7 +43,7 @@ export default function ShowcaseFilters({ form, setForm, products }) {
                 {on ? '✓' : ''}
               </div>
               <div>
-                <div style={{ fontSize:'0.9rem', fontWeight:600, color:'#111' }}>{x.t}</div>
+                <div style={{ fontSize:'0.87rem', fontWeight:600, color:'#111' }}>{x.t}</div>
                 <div style={{ fontSize:'0.78rem', color:'#9ca3af', marginTop:2 }}>{x.d}</div>
               </div>
             </div>
@@ -66,7 +66,7 @@ export default function ShowcaseFilters({ form, setForm, products }) {
                 justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
                 {on ? '✓' : ''}
               </div>
-              <span style={{ fontSize:'0.9rem', fontWeight:600, color:'#111',
+              <span style={{ fontSize:'0.87rem', fontWeight:600, color:'#111',
                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c}</span>
             </div>
           );
