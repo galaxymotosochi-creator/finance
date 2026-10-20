@@ -933,7 +933,7 @@ const ORBIT_ICONS = {
         <p style={{fontSize:mobile?14:15.5,color:"rgba(0,0,0,.5)",textAlign:"center",marginBottom:mobile?14:24}}>AtlasPos адаптируется под ваши задачи, вне зависимости от масштаба и направления компании</p>
         <MarqueeSectors />
         <p style={{fontSize:mobile?12.5:13,color:"rgba(0,0,0,.42)",textAlign:"center",marginTop:mobile?20:26}}>
-          Не нашли свою сферу? <b style={{color:"#0d4ea8",fontWeight:700}}>Настроим под ваш бизнес</b> — перенос данных бесплатно
+          Не нашли свою сферу? <b style={{color:"#0d4ea8",fontWeight:700}}>Настроим под ваш бизнес</b>
         </p>
       </section>
 
