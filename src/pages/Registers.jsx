@@ -663,6 +663,17 @@ export default function Registers({ fullscreen }) {
       if (itemsErr) showToast('Не удалось сохранить товары чека: ' + itemsErr.message, 'error');
     }
 
+    // Заявка с витрины: чек пробит → заявка «Выполнена», резерв снят
+    try {
+      var siteOrderId = localStorage.getItem('kassa_order_id');
+      if (siteOrderId && !newReceipt.queued) {
+        await supabase.from('shop_orders').update({ status:'done', receipt_id:String(receiptId) }).eq('id', siteOrderId);
+        await supabase.from('shop_reserves').delete().eq('order_id', String(siteOrderId));
+        localStorage.removeItem('kassa_order_id');
+        localStorage.removeItem('kassa_order_num');
+      }
+    } catch (e) { console.error('site order close failed', e); }
+
     // Долг клиента (отрицательное число = должен)
     if (selectedClient) {
       const client = clients.find(c => c.id === selectedClient);
