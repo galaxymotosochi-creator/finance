@@ -53,6 +53,18 @@ export default function MySite() {
 
   const changeStatus = async (o, status) => {
     await supabase.from('shop_orders').update({ status }).eq('id', o.id);
+    if (status === 'confirmed') {
+      // Резервируем товар из заявки, чтобы его не продали в кассе
+      const its = await supabase.from('shop_order_items').select('*').eq('order_id', o.id);
+      for (const it of (its.data || [])) {
+        await supabase.from('shop_reserves').insert([{
+          user_id: user.id, order_id: String(o.id), product_id: String(it.product_id), quantity: it.quantity
+        }]);
+      }
+    }
+    if (status === 'canceled') {
+      await supabase.from('shop_reserves').delete().eq('order_id', String(o.id));
+    }
     load();
   };
 
