@@ -796,9 +796,9 @@ const ORBIT_ICONS = {
   };
 
   const SectorChip = ({item, hero}) => (
-    <div style={{flex:"none",display:"flex",alignItems:"baseline",gap:3,background:"none",border:"none",
+    <div style={{flex:"none",display:"flex",alignItems:"baseline",gap:0,background:"none",border:"none",
       whiteSpace:"nowrap"}}>
-      <span style={{fontSize:mobile?12:15,fontWeight:800,color:"#1F75FF",letterSpacing:"-.05em",lineHeight:1}}>{item.n.charAt(0).toUpperCase()}</span>
+      <span style={{fontSize:mobile?12:15,fontWeight:800,color:"#1F75FF",letterSpacing:"-.06em",lineHeight:1,marginRight:mobile?-1:-0.5}}>{item.n.charAt(0).toUpperCase()}</span>
       <span style={{fontSize:mobile?12:13.5,fontWeight:600,color:"#111",letterSpacing:"-.02em",lineHeight:1}}>{item.n.slice(1)}</span>
       <span style={{width:5,height:5,borderRadius:"50%",background:"rgba(31,117,255,.35)",alignSelf:"center",marginLeft:16}} />
     </div>
