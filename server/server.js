@@ -395,7 +395,7 @@ app.get('/api/auth/me', auth, async (req, res) => {
 const ALLOWED_TABLES = ['products','categories','accounts','transactions','receipts','receipt_items',
   'shifts','supplies','writeoffs','inventory','suppliers','employees','positions','position_templates',
   'timesheet','timesheet_entries','clients','loyalty','loyalties','loyalty_programs','promos','subscriptions',
-  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts','trash'];
+  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts','trash','shops','shop_orders','shop_order_items'];
 
 // --- Схема БД: кеш колонок и типов (чтобы корректно приводить типы фильтров) ---
 const tableColumnsCache = new Map();
@@ -761,6 +761,9 @@ app.post('/api/trash/:id/restore', auth, async (req, res) => {
 
 // ===== TELEGRAM =====
 // Вебхук от Telegram (входящие сообщения)
+// ===== ПУБЛИЧНАЯ ВИТРИНА «МОЙ САЙТ» (публичные роуты, без авторизации) =====
+app.use('/api', require('./routes/shop')(pool));
+
 app.post('/api/telegram/webhook', async (req, res) => {
   try {
     const result = handleMessage(req.body);

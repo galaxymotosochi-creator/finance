@@ -39,6 +39,8 @@ const OrderForm = lazy(() => import('./pages/stock/OrderForm'));
 const Subscription = lazy(() => import('./pages/Subscription'));
 const AiAssistant = lazy(() => import('./pages/AiAssistant'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
+const MySite = lazy(() => import('./pages/shop/MySite'));
+const PublicShop = lazy(() => import('./pages/shop/PublicShop'));
 const TrashPage = lazy(() => import('./pages/Trash'));
 const Clients = lazy(() => import('./pages/clients/Clients'));
 const Loyalty = lazy(() => import('./pages/clients/Loyalty'));
@@ -69,6 +71,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/s/:slug" element={<PublicShop />} />
       <Route path="/" element={<Landing />} />
       <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
       <Route path="/ai-assistant" element={<ProtectedRoute><AppLayout><AiAssistant /></AppLayout></ProtectedRoute>} />
@@ -111,6 +114,7 @@ function AppRoutes() {
       <Route path="/employees/timesheet" element={<ProtectedRoute><AppLayout><Timesheet /></AppLayout></ProtectedRoute>} />
       <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
       <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
+      <Route path="/my-site" element={<ProtectedRoute><AppLayout><MySite /></AppLayout></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/trash" element={<ProtectedRoute><AppLayout><TrashPage /></AppLayout></ProtectedRoute>} />
       <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />

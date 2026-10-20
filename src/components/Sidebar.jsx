@@ -18,6 +18,7 @@ const menu = [
   { label: 'Панель управления', path: '/dashboard', icon: 'dashboard' },
   { label: 'AI помощник', path: '/ai-assistant', icon: 'ai' },
   { label: 'Касса', path: '/kassa', icon: 'registers' },
+  { label: 'Мой сайт', path: '/my-site', icon: 'reports' },
   {
     label: 'Финансы', icon: 'finance', children: [
       { label: 'Доходы и расходы', path: '/finance/transactions' },
