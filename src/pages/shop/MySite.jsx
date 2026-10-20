@@ -38,6 +38,9 @@ export default function MySite() {
     if (!slug) { setToast('Укажите адрес витрины'); return; }
     setSaving(true);
     const payload = { ...form, slug, user_id: user.id, updated_at: new Date().toISOString() };
+    // Режимы витрины: корзина — для товаров, запись — для услуг
+    if (payload.use_cart === undefined) payload.use_cart = true;
+    if (payload.use_booking === undefined) payload.use_booking = false;
     let err = null;
     if (shop && shop.id) {
       const r = await supabase.from('shops').update(payload).eq('id', shop.id);

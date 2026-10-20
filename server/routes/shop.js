@@ -19,7 +19,10 @@ module.exports = function (pool) {
       );
       res.json({ shop: { id: shop.id, slug: shop.slug, name: shop.name, tagline: shop.tagline,
         about: shop.about, logo_url: shop.logo_url, cover_url: shop.cover_url, phone: shop.phone,
-        address: shop.address, work_hours: shop.work_hours }, products: pr.rows });
+        address: shop.address, work_hours: shop.work_hours,
+        use_cart: shop.use_cart !== false, use_booking: shop.use_booking === true,
+        show_types: shop.show_types || [], show_cats: shop.show_cats || [],
+        hidden_products: shop.hidden_products || [] }, products: pr.rows });
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 

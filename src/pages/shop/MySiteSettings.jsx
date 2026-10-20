@@ -53,6 +53,33 @@ export default function MySiteSettings({ shop, slug, setShop, setSlug, onSave, s
         </div>
       </div>
 
+      <div style={{ marginTop:20, paddingTop:18, borderTop:'1px solid #f0f0f0' }}>
+        <div style={{ fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:10 }}>Режимы витрины</div>
+        {[
+          { k:'use_cart', t:'Использовать корзину', d:'Для товаров — клиент оформляет заказ', def:true },
+          { k:'use_booking', t:'Использовать календарь записей', d:'Для услуг — клиент записывается на время', def:false },
+        ].map(x => {
+          const on = form[x.k] === undefined ? x.def : !!form[x.k];
+          return (
+            <div key={x.k} onClick={() => setForm({ ...form, [x.k]: !on })}
+              style={{ display:'flex', alignItems:'flex-start', gap:11, padding:'10px 12px', borderRadius:11,
+                cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
+                background: on ? 'rgba(31,117,255,.04)' : '#fff', marginBottom:8 }}>
+              <div style={{ width:18, height:18, borderRadius:5, marginTop:1, flexShrink:0,
+                border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
+                background: on ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
+                justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
+                {on ? '✓' : ''}
+              </div>
+              <div>
+                <div style={{ fontSize:'0.87rem', fontWeight:600, color:'#111' }}>{x.t}</div>
+                <div style={{ fontSize:'0.78rem', color:'#9ca3af', marginTop:2 }}>{x.d}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       <button className="btn btn-dark" onClick={() => onSave({ ...form })} disabled={saving}
         style={{ marginTop:18, opacity: saving ? .6 : 1 }}>
         {saving ? 'Сохраняю…' : 'Сохранить'}
