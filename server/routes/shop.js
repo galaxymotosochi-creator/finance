@@ -13,7 +13,7 @@ module.exports = function (pool) {
       const shop = rows[0];
       if (!shop) return res.status(404).json({ error: 'Магазин не найден' });
       const pr = await pool.query(
-        `SELECT id, name, price, description, photo_url, type FROM products
+        `SELECT id, name, price, description, photo_url, type, cat FROM products
          WHERE user_id = $1 AND COALESCE(hidden,false) = false ORDER BY name LIMIT 500`,
         [shop.user_id]
       );

@@ -14,6 +14,8 @@ export default function PublicShop() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(null);
   const [formErr, setFormErr] = useState(null);
+  const [cat, setCat] = useState('all');
+  const [q, setQ] = useState('');
 
   useEffect(() => {
     fetch('/api/public/shop/' + slug)
@@ -75,6 +77,16 @@ export default function PublicShop() {
     return s + (p ? Number(p.price || 0) * q : 0);
   }, 0);
 
+  const CAT_EMPTY = 'Прочее';
+  const allCats = Array.from(new Set(products.map(p => (p.cat || '').trim() || CAT_EMPTY)));
+  const cats = ['all', ...allCats];
+  const filtered = products.filter(p => {
+    const pcat = (p.cat || '').trim() || CAT_EMPTY;
+    if (cat !== 'all' && pcat !== cat) return false;
+    if (q.trim() && !String(p.name).toLowerCase().includes(q.trim().toLowerCase())) return false;
+    return true;
+  });
+
   return (
     <div style={{ fontFamily:'Inter,sans-serif', color:'#111', minHeight:'100vh', background:'#fff' }}>
       <header style={{ borderBottom:'1px solid #f0f0f0', padding:'18px 20px' }}>
@@ -97,8 +109,26 @@ export default function PublicShop() {
       )}
 
       <main style={{ maxWidth:1000, margin:'0 auto', padding:'20px' }}>
+        <div style={{ display:'flex', gap:10, marginBottom:16, flexWrap:'wrap', alignItems:'center' }}>
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
+            style={{ flex:'1 1 220px', padding:'10px 16px', border:'1px solid #e5e7eb', borderRadius:22,
+              fontSize:'0.88rem', outline:'none', minWidth:180 }} />
+        </div>
+        <div style={{ display:'flex', gap:8, marginBottom:18, flexWrap:'wrap' }}>
+          {cats.map(c => (
+            <button key={c} onClick={() => setCat(c)}
+              style={{ padding:'8px 16px', borderRadius:22, cursor:'pointer', fontSize:'0.84rem',
+                fontWeight: cat === c ? 700 : 500,
+                background: cat === c ? '#111' : '#fff',
+                color: cat === c ? '#fff' : '#4b5563',
+                border: cat === c ? '1px solid #111' : '1px solid #e5e7eb',
+                transition:'.2s' }}>
+              {c === 'all' ? 'Все' : c}
+            </button>
+          ))}
+        </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:14 }}>
-          {products.map(p => (
+          {filtered.map(p => (
             <div key={p.id} style={{ border:'1px solid #eee', borderRadius:14, overflow:'hidden', display:'flex', flexDirection:'column' }}>
               <div style={{ height:150, background:'#f7f7f8', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
                 {p.photo_url ? <img src={p.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:'2rem', opacity:.25 }}>🖼️</span>}
