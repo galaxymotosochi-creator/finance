@@ -25,17 +25,28 @@ export default function ShowcaseFilters({ form, setForm, products }) {
       </div>
 
       <div style={{ fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:8 }}>1. Тип</div>
-      <div style={{ display:'flex', gap:8, marginBottom:18, flexWrap:'wrap' }}>
-        {[{k:'product',t:'Товары'},{k:'service',t:'Услуги'}].map(x => {
+      <div style={{ display:'grid', gap:8, marginBottom:18 }}>
+        {[
+          { k:'product', t:'Товары', d:'Показывать товары в каталоге с корзиной' },
+          { k:'service', t:'Услуги', d:'Показывать услуги — для записи на время' },
+        ].map(x => {
           const on = types.length === 0 || types.includes(x.k);
           return (
-            <button key={x.k} onClick={() => setForm({ ...form, show_types: toggle(types, x.k) })}
-              style={{ padding:'8px 16px', borderRadius:22, cursor:'pointer', fontSize:'0.84rem',
-                fontWeight: on ? 700 : 500,
-                background: on ? '#111' : '#fff', color: on ? '#fff' : '#6b7280',
-                border: on ? '1px solid #111' : '1px solid #e5e7eb' }}>
-              {on ? '✓ ' : ''}{x.t}
-            </button>
+            <div key={x.k} onClick={() => setForm({ ...form, show_types: toggle(types, x.k) })}
+              style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:11,
+                cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
+                background: on ? 'rgba(31,117,255,.04)' : '#fff' }}>
+              <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
+                border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
+                background: on ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
+                justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
+                {on ? '✓' : ''}
+              </div>
+              <div>
+                <div style={{ fontSize:'0.87rem', fontWeight:600, color:'#111' }}>{x.t}</div>
+                <div style={{ fontSize:'0.78rem', color:'#9ca3af', marginTop:2 }}>{x.d}</div>
+              </div>
+            </div>
           );
         })}
       </div>
