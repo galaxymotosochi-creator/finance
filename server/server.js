@@ -587,7 +587,9 @@ app.post('/api/:table', auth, async (req, res) => {
       // user_id — владелец бизнеса (для сотрудника резолвится)
       if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.dataUserId; }
       // timesheet_entries: id — serial (integer), Date.now() не влезает — не подставляем, пусть БД сама
-      if (!keys.includes('id') && table !== 'timesheet_entries') { keys.unshift('id'); body.id = Date.now() + results.length; }
+      // Таблицы с UUID и своим DEFAULT — id генерирует БД (Date.now() ломает uuid)
+      const UUID_TABLES = ['shops','shop_orders','shop_order_items'];
+      if (!keys.includes('id') && table !== 'timesheet_entries' && !UUID_TABLES.includes(table)) { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }
       // Кассовые смены: opened_at по умолчанию — иначе дата открытия NULL и раздел «Смены» показывает 01.01.1970
