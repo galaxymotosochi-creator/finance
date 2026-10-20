@@ -51,7 +51,11 @@ export default function PublicShop() {
   if (sent) return (
     <div style={{ fontFamily:'Inter,sans-serif', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
       <div style={{ textAlign:'center', maxWidth:420 }}>
-        <div style={{ fontSize:'2.6rem', marginBottom:12 }}>✅</div>
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#111"
+          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+          style={{ marginBottom:16 }}>
+          <path d="M4 12.5l5.5 5.5L20 7.5" />
+        </svg>
         <div style={{ fontSize:'1.3rem', fontWeight:800, marginBottom:8 }}>Заявка №{sent.order_number} принята</div>
         <div style={{ color:'#6b7280', fontSize:'0.9rem', lineHeight:1.6 }}>
           Магазин свяжется с вами по указанному телефону. Сумма заказа: <b>{fmt(sent.total)} ₽</b>
