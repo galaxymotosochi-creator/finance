@@ -47,7 +47,7 @@ export default function MySite() {
       err = r.error;
     }
     setSaving(false);
-    if (err) { setToast('Ошибка: адрес возможно занят'); return; }
+    if (err) { setToast('Ошибка: ' + (err.message || 'неизвестно')); return; }
     setToast('Сохранено'); load();
   };
 
