@@ -796,18 +796,11 @@ const ORBIT_ICONS = {
   };
 
   const SectorChip = ({item, hero}) => (
-    <div style={{flex:"none",display:"flex",alignItems:"center",gap:10,padding:"10px 16px 10px 11px",borderRadius:14,
-      background:hero?"linear-gradient(135deg,#F7FBFF,#EAF2FF)":"#fff",
-      border:"1px solid " + (hero?"rgba(31,117,255,.28)":"rgba(16,40,90,.10)"),
-      whiteSpace:"nowrap",boxShadow:"0 6px 16px -12px rgba(16,40,90,.35)"}}>
-      <span style={{width:mobile?28:32,height:mobile?28:32,borderRadius:mobile?8:9,flex:"none",display:"flex",
-        alignItems:"center",justifyContent:"center",
-        background:hero?"rgba(31,117,255,.10)":"#F3F8FF"}}>
-        <svg width={mobile?14:16} height={mobile?14:16} viewBox="0 0 24 24" fill="none"
-          stroke={hero?"#1F75FF":"#3E6EA8"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
-          dangerouslySetInnerHTML={{__html: SECTOR_SVG[item.i] || SECTOR_SVG.box}} />
-      </span>
-      <span style={{fontSize:mobile?12:13,fontWeight:700,letterSpacing:"-.01em",color:"#111"}}>{item.n}</span>
+    <div style={{flex:"none",display:"flex",alignItems:"baseline",gap:3,background:"none",border:"none",
+      whiteSpace:"nowrap"}}>
+      <span style={{fontSize:mobile?12:15,fontWeight:800,color:"#1F75FF",letterSpacing:"-.05em",lineHeight:1}}>{item.n.charAt(0).toUpperCase()}</span>
+      <span style={{fontSize:mobile?12:13.5,fontWeight:600,color:"#111",letterSpacing:"-.02em",lineHeight:1}}>{item.n.slice(1)}</span>
+      <span style={{width:5,height:5,borderRadius:"50%",background:"rgba(31,117,255,.35)",alignSelf:"center",marginLeft:16}} />
     </div>
   );
 

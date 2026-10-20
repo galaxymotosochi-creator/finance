@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — 5 необычных плашек</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{padding:26px 20px 50px;max-width:1200px;margin:0 auto}
+  .vhead{display:flex;align-items:center;gap:12px;margin:32px 0 14px}
+  .vnum{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12px;font-weight:800}
+  .vname{font-size:14px;font-weight:700}
+  .vtag{margin-left:auto;font-size:11px;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.12em}
+  .sep{flex:1;height:1px;background:rgba(16,40,90,.12)}
+
+  .row{display:flex;gap:14px;overflow-x:auto;padding:14px 2px;scrollbar-width:none;align-items:center}
+  .row::-webkit-scrollbar{display:none}
+
+  /* ── 1. ПОЛЯРОИД / КАРТОЧКА С ПОВОРОТОМ ── */
+  .p1{flex:none;width:132px;height:132px;border-radius:18px;background:#fff;border:1.5px solid rgba(31,117,255,.22);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 10px 26px -18px rgba(16,40,90,.6);transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s;
+    position:relative;overflow:hidden}
+  .p1::before{content:"";position:absolute;inset:-40% -40% auto auto;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(circle,rgba(31,117,255,.14),transparent 70%)}
+  .p1:hover{transform:rotate(-4deg) translateY(-6px) scale(1.04);box-shadow:0 22px 40px -20px rgba(31,117,255,.55)}
+  .p1 .ico{width:44px;height:44px;border-radius:14px;background:linear-gradient(140deg,#EAF2FF,#F7FBFF);
+    display:flex;align-items:center;justify-content:center;border:1px solid rgba(31,117,255,.16)}
+  .p1 .ico svg{width:22px;height:22px;fill:none;stroke:#1F75FF;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .p1 .nm{font-size:12.5px;font-weight:800;text-align:center;line-height:1.2;padding:0 8px}
+  .p1 .dot{position:absolute;bottom:9px;width:4px;height:4px;border-radius:50%;background:rgba(31,117,255,.35)}
+
+  /* ── 2. ГРАДИЕНТНАЯ С ВОЛНОЙ ── */
+  .p2{flex:none;padding:13px 20px 13px 13px;border-radius:16px;display:flex;align-items:center;gap:11px;
+    background:linear-gradient(135deg,#0d4ea8,#1F75FF 55%,#4a92ff);color:#fff;position:relative;overflow:hidden;
+    box-shadow:0 12px 28px -18px rgba(31,117,255,.9);transition:transform .3s}
+  .p2:hover{transform:scale(1.05)}
+  .p2::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 20% 120%,rgba(255,255,255,.28),transparent 55%)}
+  .p2 .ic{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex:none}
+  .p2 .ic svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .p2 .nm{font-size:12.5px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
+
+  /* ── 3. КОНТУРНАЯ С ПУНКТИРОМ ── */
+  .p3{flex:none;padding:2px;border-radius:16px;position:relative;
+    background:linear-gradient(135deg,rgba(31,117,255,.30),rgba(31,117,255,.06))}
+  .p3 .inner{display:flex;align-items:center;gap:10px;padding:10px 16px 10px 11px;border-radius:14px;background:#fff}
+  .p3 .ic{width:28px;height:28px;border-radius:50%;border:1.5px dashed rgba(31,117,255,.45);
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .p3 .ic svg{width:14px;height:14px;fill:none;stroke:#1F75FF;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .p3 .nm{font-size:12.5px;font-weight:700;white-space:nowrap}
+  .p3:hover .ic{border-style:solid;border-color:#1F75FF;transition:.25s}
+
+  /* ── 4. СТЕКЛО / БЛЮР ── */
+  .p4{flex:none;padding:11px 18px 11px 11px;border-radius:16px;display:flex;align-items:center;gap:10px;
+    background:linear-gradient(135deg,rgba(247,251,255,.9),rgba(234,242,255,.75));
+    backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 8px 22px -14px rgba(16,40,90,.45), inset 0 1px 0 rgba(255,255,255,.9);
+    position:relative;overflow:hidden}
+  .p4::before{content:"";position:absolute;top:-50%;left:-30%;width:70%;height:200%;transform:rotate(20deg);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+    animation:shine 4.5s ease-in-out infinite}
+  @keyframes shine{0%,70%{left:-60%}100%{left:120%}}
+  .p4 .ic{width:30px;height:30px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;
+    box-shadow:0 3px 8px -4px rgba(16,40,90,.35)}
+  .p4 .ic svg{width:16px;height:16px;fill:none;stroke:#1F75FF;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .p4 .nm{font-size:12.5px;font-weight:700;white-space:nowrap;position:relative;z-index:1}
+
+  /* ── 5. РАЗРЕЗ / ТЕНЬ С ПОДСВЕТКОЙ ── */
+  .p5{flex:none;padding:12px 20px 12px 13px;border-radius:16px;display:flex;align-items:center;gap:11px;
+    background:#fff;border:1px solid rgba(16,40,90,.09);white-space:nowrap;position:relative;
+    transition:box-shadow .3s, transform .3s}
+  .p5::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,#1F75FF,transparent);opacity:0;transition:opacity .3s}
+  .p5:hover{transform:translateY(-3px);box-shadow:0 16px 30px -20px rgba(31,117,255,.8)}
+  .p5:hover::after{opacity:1}
+  .p5 .ic{width:32px;height:32px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#1F75FF,#0d4ea8);box-shadow:0 6px 14px -8px rgba(31,117,255,.9)}
+  .p5 .ic svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .p5 .nm{font-size:12.5px;font-weight:700}
+
+  @media(max-width:640px){.wrap{padding:18px 12px 34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="vhead"><span class="vnum">1</span><span class="vname">Карточка-плитка с поворотом</span><span class="sep"></span><span class="vtag">hover: наклон</span></div>
+  <div class="row" id="r1"></div>
+
+  <div class="vhead"><span class="vnum">2</span><span class="vname">Синий градиент</span><span class="sep"></span><span class="vtag">цвет сайта</span></div>
+  <div class="row" id="r2"></div>
+
+  <div class="vhead"><span class="vnum">3</span><span class="vname">Градиентная обводка + пунктир</span><span class="sep"></span><span class="vtag">тонко и дорого</span></div>
+  <div class="row" id="r3"></div>
+
+  <div class="vhead"><span class="vnum">4</span><span class="vname">Стекло с бликом</span><span class="sep"></span><span class="vtag">блик бежит по плашке</span></div>
+  <div class="row" id="r4"></div>
+
+  <div class="vhead"><span class="vnum">5</span><span class="vname">Объёмная иконка + подсветка снизу</span><span class="sep"></span><span class="vtag">подъём при hover</span></div>
+  <div class="row" id="r5"></div>
+
+</div>
+<script>
+const SVG = {
+  shop:'<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/>',
+  cup:'<path d="M4 8h13v5a6.5 6.5 0 01-13 0z"/><path d="M17 9h2a2.5 2.5 0 010 5h-2"/><path d="M3 21h16"/>',
+  dish:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+  pizza:'<path d="M12 3l9 17H3z"/><circle cx="12" cy="13" r="1"/><circle cx="9" cy="16" r="1"/><circle cx="15" cy="16" r="1"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 105 5L11 20a3 3 0 01-4-4z"/>',
+  moto:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l-2-6H8l3-4h3"/>',
+  scissors:'<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 8l12 10M20 6L8 16"/>',
+  phone:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
+  truck:'<path d="M3 7h11v10H3z"/><path d="M14 10h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  paw:'<circle cx="7" cy="9" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="17" cy="9" r="2"/><path d="M12 11c3 0 5 2 5 4.5S14.5 20 12 20s-5-2-5-4.5S9 11 12 11z"/>',
+};
+const ITEMS = [
+  {i:'shop',n:'Магазины'},{i:'cup',n:'Кофейни'},{i:'dish',n:'Рестораны'},{i:'pizza',n:'Пиццерии'},
+  {i:'wrench',n:'Автосервисы'},{i:'moto',n:'Мотосервисы'},{i:'scissors',n:'Салоны красоты'},
+  {i:'phone',n:'Электроника'},{i:'truck',n:'Доставка'},{i:'paw',n:'Зоомагазины'},
+];
+const svg = k => `<svg viewBox="0 0 24 24">${SVG[k]||SVG.shop}</svg>`;
+
+function put(id, wrap){
+  const row = document.getElementById(id);
+  ITEMS.forEach(it => {
+    const d = document.createElement('div');
+    d.innerHTML = wrap(it);
+    row.appendChild(d.firstElementChild);
+  });
+}
+
+put('r1', it => `<div class="p1"><span class="ico">${svg(it.i)}</span><span class="nm">${it.n}</span><span class="dot"></span></div>`);
+put('r2', it => `<div class="p2"><span class="ic">${svg(it.i)}</span><span class="nm">${it.n}</span></div>`);
+put('r3', it => `<div class="p3"><div class="inner"><span class="ic">${svg(it.i)}</span><span class="nm">${it.n}</span></div></div>`);
+put('r4', it => `<div class="p4"><span class="ic">${svg(it.i)}</span><span class="nm">${it.n}</span></div>`);
+put('r5', it => `<div class="p5"><span class="ic">${svg(it.i)}</span><span class="nm">${it.n}</span></div>`);
+</script>
+</body>
+</html>

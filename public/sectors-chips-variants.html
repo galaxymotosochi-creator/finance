@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — 5 вариантов плашек в ленте</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{padding:26px 20px 40px;max-width:1200px;margin:0 auto}
+  .vhead{display:flex;align-items:center;gap:12px;margin:30px 0 12px}
+  .vnum{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12px;font-weight:800}
+  .vname{font-size:14px;font-weight:700}
+  .vtag{margin-left:auto;font-size:11px;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.12em}
+  .sep{flex:1;height:1px;background:rgba(16,40,90,.12)}
+
+  .row{display:flex;gap:12px;overflow-x:auto;padding:8px 2px;scrollbar-width:none}
+  .row::-webkit-scrollbar{display:none}
+
+  /* общее */
+  .ic{width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:#F3F8FF}
+  .ic svg{width:16px;height:16px;fill:none;stroke:#3E6EA8;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .hero .ic{background:rgba(31,117,255,.10)}
+  .hero .ic svg{stroke:#1F75FF}
+  .n{font-weight:700;color:#111;letter-spacing:-.01em;font-size:13px}
+
+  /* ── 1. иконка + название + «что ведём» ── */
+  .v1{flex:none;display:flex;align-items:center;gap:10px;padding:11px 16px 11px 11px;border-radius:14px;
+    background:#fff;border:1px solid rgba(16,40,90,.10);box-shadow:0 6px 16px -12px rgba(16,40,90,.35);white-space:nowrap}
+  .v1.hero{background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border-color:rgba(31,117,255,.28)}
+  .v1 .sub{font-size:10.5px;color:rgba(0,0,0,.42);margin-top:2px}
+
+  /* ── 2. бейдж «касса», «касса + склад» ── */
+  .v2{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 10px;border-radius:14px;
+    background:#fff;border:1px solid rgba(16,40,90,.10);white-space:nowrap}
+  .v2.hero{background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border-color:rgba(31,117,255,.28)}
+  .v2 .tg{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;padding:2px 7px;border-radius:5px;
+    background:rgba(31,117,255,.10);color:#1F75FF;margin-top:3px;display:inline-block}
+
+  /* ── 3. число + название ── */
+  .v3{flex:none;display:flex;align-items:center;gap:12px;padding:10px 18px 10px 12px;border-radius:14px;
+    background:#fff;border:1px solid rgba(16,40,90,.10)}
+  .v3.hero{background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border-color:rgba(31,117,255,.28)}
+  .v3 .num{font-size:19px;font-weight:800;color:#1F75FF;line-height:1;letter-spacing:-.04em;min-width:26px}
+  .v3 .cap{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(0,0,0,.38);margin-top:3px}
+
+  /* ── 4. вертикальная иконка + название + разделитель + уточнение ── */
+  .v4{flex:none;display:flex;align-items:center;gap:0;padding:0;border-radius:14px;overflow:hidden;
+    background:#fff;border:1px solid rgba(16,40,90,.10)}
+  .v4.hero{border-color:rgba(31,117,255,.28)}
+  .v4 .left{display:flex;align-items:center;justify-content:center;width:44px;align-self:stretch;
+    background:#F3F8FF}
+  .v4.hero .left{background:rgba(31,117,255,.10)}
+  .v4 .body{padding:10px 15px}
+  .v4 .sub{font-size:10px;color:rgba(0,0,0,.4);margin-top:2px;white-space:nowrap}
+
+  /* ── 5. таблетка: название + хвост-тег ── */
+  .v5{flex:none;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 11px;border-radius:100px;
+    background:#fff;border:1px solid rgba(16,40,90,.12);white-space:nowrap}
+  .v5.hero{background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border-color:rgba(31,117,255,.3)}
+  .v5 .ic{width:26px;height:26px;border-radius:50%}
+  .v5 .tail{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:4px 9px;border-radius:100px;
+    background:#F3F8FF;color:#3E6EA8}
+  .v5.hero .tail{background:rgba(31,117,255,.12);color:#1F75FF}
+
+  @media(max-width:640px){.wrap{padding:18px 12px 30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="vhead"><span class="vnum">1</span><span class="vname">Иконка + название + что ведём</span><span class="sep"></span><span class="vtag">пояснение мелким</span></div>
+  <div class="row" id="r1"></div>
+
+  <div class="vhead"><span class="vnum">2</span><span class="vname">Бейдж модуля</span><span class="sep"></span><span class="vtag">касса / склад / услуги</span></div>
+  <div class="row" id="r2"></div>
+
+  <div class="vhead"><span class="vnum">3</span><span class="vname">Цифра + название</span><span class="sep"></span><span class="vtag">сколько настроек под сферу</span></div>
+  <div class="row" id="r3"></div>
+
+  <div class="vhead"><span class="vnum">4</span><span class="vname">Вертикальная плашка</span><span class="sep"></span><span class="vtag">иконка сбоку на всю высоту</span></div>
+  <div class="row" id="r4"></div>
+
+  <div class="vhead"><span class="vnum">5</span><span class="vname">Пилюля с хвостом-тегом</span><span class="sep"></span><span class="vtag">самое компактное</span></div>
+  <div class="row" id="r5"></div>
+
+</div>
+<script>
+const SVG = {
+  shop:'<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/>',
+  cup:'<path d="M4 8h13v5a6.5 6.5 0 01-13 0z"/><path d="M17 9h2a2.5 2.5 0 010 5h-2"/><path d="M3 21h16"/>',
+  dish:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+  pizza:'<path d="M12 3l9 17H3z"/><circle cx="12" cy="13" r="1"/><circle cx="9" cy="16" r="1"/><circle cx="15" cy="16" r="1"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 105 5L11 20a3 3 0 01-4-4z"/>',
+  moto:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l-2-6H8l3-4h3"/>',
+  scissors:'<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 8l12 10M20 6L8 16"/>',
+  phone:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
+  shirt:'<path d="M8 3l4 3 4-3 5 3-2 4-2-1v11H7V9L5 10 3 6z"/>',
+  car:'<path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
+  flower:'<circle cx="12" cy="10" r="2.5"/><path d="M12 15v6"/>',
+  book:'<path d="M4 4h7a3 3 0 013 3v13a2.5 2.5 0 00-2.5-2.5H4z"/>',
+  paw:'<circle cx="7" cy="9" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="17" cy="9" r="2"/><path d="M12 11c3 0 5 2 5 4.5S14.5 20 12 20s-5-2-5-4.5S9 11 12 11z"/>',
+  truck:'<path d="M3 7h11v10H3z"/><path d="M14 10h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+};
+
+const ITEMS = [
+  {i:'shop',  n:'Магазины',        sub:'касса, остатки, поставки',      tg:'Касса + склад', num:'15 мин'},
+  {i:'cup',   n:'Кофейни',         sub:'чеки, смены, расходники',       tg:'Касса + склад', num:'15 мин'},
+  {i:'dish',  n:'Рестораны и кафе',sub:'зал, кухня, доставка',          tg:'Касса + склад', num:'20 мин'},
+  {i:'wrench',n:'Автосервисы',     sub:'запчасти, работы, зарплата',    tg:'Касса + услуги', num:'20 мин'},
+  {i:'moto',  n:'Мотосервисы',     sub:'ремонт, запчасти, мастера',     tg:'Касса + услуги', num:'20 мин'},
+  {i:'scissors',n:'Салоны красоты',sub:'услуги, мастера, бонусы',       tg:'Касса + клиенты', num:'15 мин'},
+  {i:'phone', n:'Электроника',     sub:'товары, гарантия, склад',       tg:'Касса + склад', num:'15 мин'},
+  {i:'truck', n:'Доставка',        sub:'заказы, курьеры, оплаты',       tg:'Касса + заказы', num:'25 мин'},
+];
+
+function svg(k){ return `<svg viewBox="0 0 24 24">${SVG[k]||SVG.shop}</svg>`; }
+
+function put(id, html){
+  const row = document.getElementById(id);
+  ITEMS.forEach((it, k) => {
+    const d = document.createElement('div');
+    d.className = 'v' + id.slice(1) + (k % 3 === 0 ? ' hero' : '');
+    d.innerHTML = html(it);
+    row.appendChild(d);
+  });
+}
+
+// 1
+put('r1', it => `<span class="ic">${svg(it.i)}</span><div><div class="n">${it.n}</div><div class="sub">${it.sub}</div></div>`);
+// 2
+put('r2', it => `<span class="ic">${svg(it.i)}</span><div><div class="n">${it.n}</div><span class="tg">${it.tg}</span></div>`);
+// 3
+put('r3', it => `<span class="ic">${svg(it.i)}</span><div><div class="num">${it.num}</div><div class="n" style="margin-top:2px">${it.n}</div></div>`);
+// 4
+put('r4', it => `<div class="left">${svg(it.i)}</div><div class="body"><div class="n">${it.n}</div><div class="sub">${it.sub}</div></div>`);
+// 5
+put('r5', it => `<span class="ic">${svg(it.i)}</span><span class="n">${it.n}</span><span class="tail">${it.tg.split(' + ')[1]||'учёт'}</span>`);
+</script>
+</body>
+</html>

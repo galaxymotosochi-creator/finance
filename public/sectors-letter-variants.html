@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AtlasPos — плашки с заглавной буквой</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#fff;color:#111;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{padding:28px 20px 50px;max-width:1200px;margin:0 auto}
+  .vhead{display:flex;align-items:center;gap:12px;margin:34px 0 14px}
+  .vnum{width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;font-size:12px;font-weight:800}
+  .vname{font-size:14px;font-weight:700}
+  .vtag{margin-left:auto;font-size:11px;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.12em}
+  .sep{flex:1;height:1px;background:rgba(16,40,90,.12)}
+  .row{display:flex;gap:12px;overflow-x:auto;padding:12px 2px;scrollbar-width:none;align-items:center}
+  .row::-webkit-scrollbar{display:none}
+  .row.fade{-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+
+  /* ── 1. БУКВА В КРУГЕ ── */
+  .b1{flex:none;display:flex;align-items:center;gap:10px;padding:9px 17px 9px 9px;border-radius:100px;
+    background:#fff;border:1px solid rgba(16,40,90,.10);white-space:nowrap;
+    box-shadow:0 6px 16px -13px rgba(16,40,90,.5);transition:transform .3s, box-shadow .3s}
+  .b1:hover{transform:translateY(-3px);box-shadow:0 14px 26px -16px rgba(31,117,255,.7)}
+  .b1 .L{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:800;color:#fff;background:linear-gradient(140deg,#1F75FF,#0d4ea8);
+    box-shadow:0 5px 12px -6px rgba(31,117,255,.8)}
+  .b1 .T{font-size:13px;font-weight:600;color:rgba(0,0,0,.72)}
+
+  /* ── 2. БУКВА ПРОЗРАЧНАЯ КРУПНАЯ ── */
+  .b2{flex:none;display:flex;align-items:center;padding:10px 18px 10px 10px;border-radius:14px;overflow:hidden;
+    background:linear-gradient(135deg,#F7FBFF,#EAF2FF);border:1px solid rgba(31,117,255,.20);white-space:nowrap}
+  .b2 .G{font-size:30px;font-weight:800;line-height:1;color:rgba(31,117,255,.22);letter-spacing:-.05em;margin-right:8px}
+  .b2 .T{font-size:13px;font-weight:700;color:#111}
+
+  /* ── 3. БУКВА С ПОДЧЁРКИВАНИЕМ ── */
+  .b3{flex:none;padding:11px 18px;border-radius:12px;background:#fff;border:1px solid rgba(16,40,90,.10);
+    font-size:13.5px;font-weight:600;color:#111;white-space:nowrap;transition:.25s}
+  .b3:hover{background:#F7FBFF;border-color:rgba(31,117,255,.35)}
+  .b3 .U{color:#1F75FF;font-weight:800;border-bottom:2px solid #1F75FF;padding-bottom:1px}
+
+  /* ── 4. ЛЕНТА-СТРОКА (бегущая внутри) ── */
+  .b4{flex:none;display:flex;align-items:baseline;gap:0;padding:0;background:none;border:none;white-space:nowrap}
+  .b4 .L{font-size:26px;font-weight:800;color:#1F75FF;letter-spacing:-.05em;margin-right:2px;line-height:1}
+  .b4 .R{font-size:15px;font-weight:700;color:#111;letter-spacing:-.02em}
+  .b4 .D{width:5px;height:5px;border-radius:50%;background:rgba(31,117,255,.35);margin-left:16px;align-self:center}
+
+  /* ── 5. БУКВА КАК КАПЛЯ / БЕЙДЖ ── */
+  .b5{flex:none;display:flex;align-items:center;gap:0;border-radius:12px;overflow:hidden;background:#fff;
+    border:1px solid rgba(16,40,90,.10);white-space:nowrap;transition:.25s}
+  .b5:hover{border-color:rgba(31,117,255,.4);box-shadow:0 10px 22px -16px rgba(31,117,255,.8)}
+  .b5 .L{display:flex;align-items:center;justify-content:center;padding:9px 12px;font-size:14px;font-weight:800;
+    color:#fff;background:linear-gradient(140deg,#1F75FF,#0d4ea8)}
+  .b5 .T{padding:9px 15px 9px 12px;font-size:12.5px;font-weight:600;color:rgba(0,0,0,.72)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="vhead"><span class="vnum">1</span><span class="vname">Буква в синем круге</span><span class="sep"></span><span class="vtag">иконка = инициал</span></div>
+  <div class="row" id="r1"></div>
+
+  <div class="vhead"><span class="vnum">2</span><span class="vname">Крупная прозрачная буква</span><span class="sep"></span><span class="vtag">дорого и спокойно</span></div>
+  <div class="row" id="r2"></div>
+
+  <div class="vhead"><span class="vnum">3</span><span class="vname">Буква подчёркнута</span><span class="sep"></span><span class="vtag">минимализм</span></div>
+  <div class="row" id="r3"></div>
+
+  <div class="vhead"><span class="vnum">4</span><span class="vname">Буква + название в разном весе</span><span class="sep"></span><span class="vtag">типографика вместо иконок</span></div>
+  <div class="row" id="r4"></div>
+
+  <div class="vhead"><span class="vnum">5</span><span class="vname">Буква-бейдж слева</span><span class="sep"></span><span class="vtag">как ценник</span></div>
+  <div class="row" id="r5"></div>
+
+</div>
+<script>
+const ITEMS = ['Магазины','Кофейни','Рестораны и кафе','Пиццерии','Суши-бары','Пекарни','Мороженое',
+  'Автосервисы','Мотосервисы','Автомойки','Салоны красоты','Ногтевые студии','Фитнес-клубы','Студии йоги',
+  'Зоомагазины','Цветочные','Электроника','Компьютерные магазины','Бутики','Детские товары','Стройматериалы',
+  'Мебельные салоны','Хозтовары','Книжные','Компьютерные клубы','Развлечения','Доставка','Оптовая торговля',
+  'Ремонт техники','Спорттовары','Творческие мастерские','Автосалоны','Шиномонтаж','Бары и пабы',
+  'Кондитерские','Столовые','Косметика','Строительные бригады','Электротовары'];
+
+const initial = s => s.charAt(0).toUpperCase();
+
+function put(id, wrap){
+  const row = document.getElementById(id);
+  ITEMS.forEach(n => {
+    const d = document.createElement('div');
+    d.innerHTML = wrap(n);
+    row.appendChild(d.firstElementChild);
+  });
+}
+
+put('r1', n => `<div class="b1"><span class="L">${initial(n)}</span><span class="T">${n}</span></div>`);
+put('r2', n => `<div class="b2"><span class="G">${initial(n)}</span><span class="T">${n}</span></div>`);
+put('r3', n => `<div class="b3"><span class="U">${initial(n)}</span>${n.slice(1)}</div>`);
+put('r4', n => `<div class="b4"><span class="L">${initial(n)}</span><span class="R">${n.slice(1)}</span><span class="D"></span></div>`);
+put('r5', n => `<div class="b5"><span class="L">${initial(n)}</span><span class="T">${n}</span></div>`);
+</script>
+</body>
+</html>
