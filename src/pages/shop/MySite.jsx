@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import MySiteSettings from './MySiteSettings';
+import ShowcaseFilters from './ShowcaseFilters';
 import MySiteOrders from './MySiteOrders';
 
 const TABS = [
@@ -18,6 +19,7 @@ export default function MySite() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
@@ -29,6 +31,8 @@ export default function MySite() {
     else { setShop({}); setSlug(''); }
     const o = await supabase.from('shop_orders').select('*').eq('user_id', user.id).order('created_at', { ascending:false }).limit(100);
     setOrders(o.data || []);
+    const pr = await supabase.from('products').select('id, name, cat, type').eq('user_id', user.id).limit(500);
+    setProducts(pr.data || []);
     setLoading(false);
   };
   useEffect(() => { load(); }, [user?.id]);
@@ -117,7 +121,17 @@ export default function MySite() {
         ))}
       </div>
 
-      {tab === 'settings' && <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />}
+      {tab === 'settings' && (
+        <>
+          <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />
+          <ShowcaseFilters form={shop || {}} setForm={setShop} products={products} />
+          <div style={{ marginTop:12 }}>
+            <button className="btn btn-dark" onClick={() => save(shop || {})} disabled={saving}>
+              {saving ? 'Сохраняю…' : 'Сохранить фильтры'}
+            </button>
+          </div>
+        </>
+      )}
       {tab === 'orders' && <MySiteOrders orders={orders} loading={loading} onChangeStatus={changeStatus} onMakeReceipt={makeReceipt} />}
 
       {toast && (

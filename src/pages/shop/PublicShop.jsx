@@ -78,9 +78,27 @@ export default function PublicShop() {
   }, 0);
 
   const CAT_EMPTY = 'Прочее';
-  const allCats = Array.from(new Set(products.map(p => (p.cat || '').trim() || CAT_EMPTY)));
+  // Фильтры из настроек витрины
+  const hiddenIds = (shop.hidden_products || []).map(String);
+  const showCats = shop.show_cats || [];
+  const showTypes = shop.show_types || [];
+
+  const visibleProducts = products.filter(p => {
+    if (hiddenIds.includes(String(p.id))) return false;
+    const pcat = (p.cat || '').trim() || CAT_EMPTY;
+    if (showCats.length > 0 && !showCats.includes(pcat)) return false;
+    if (showTypes.length > 0) {
+      const t = p.type === 'service' ? 'service' : 'product';
+      if (!showTypes.includes(t)) return false;
+    } else if (p.type === 'service') {
+      return false; // по умолчанию на витрине только товары
+    }
+    return true;
+  });
+
+  const allCats = Array.from(new Set(visibleProducts.map(p => (p.cat || '').trim() || CAT_EMPTY)));
   const cats = ['all', ...allCats];
-  const filtered = products.filter(p => {
+  const filtered = visibleProducts.filter(p => {
     const pcat = (p.cat || '').trim() || CAT_EMPTY;
     if (cat !== 'all' && pcat !== cat) return false;
     if (q.trim() && !String(p.name).toLowerCase().includes(q.trim().toLowerCase())) return false;
