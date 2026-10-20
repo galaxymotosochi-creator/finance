@@ -54,7 +54,7 @@ export default function PublicShop() {
         <div style={{ fontSize:'2.6rem', marginBottom:12 }}>✅</div>
         <div style={{ fontSize:'1.3rem', fontWeight:800, marginBottom:8 }}>Заявка №{sent.order_number} принята</div>
         <div style={{ color:'#6b7280', fontSize:'0.9rem', lineHeight:1.6 }}>
-          {shop.name} свяжется с вами по указанному телефону. Сумма заказа: <b>{fmt(sent.total)} ₽</b>
+          Магазин свяжется с вами по указанному телефону. Сумма заказа: <b>{fmt(sent.total)} ₽</b>
         </div>
         <button onClick={() => { setSent(null); }} style={{ marginTop:20, padding:'10px 22px', borderRadius:20, border:'1px solid #e5e7eb', background:'#fff', cursor:'pointer', fontWeight:600 }}>Вернуться в магазин</button>
       </div>
