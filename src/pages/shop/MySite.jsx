@@ -68,8 +68,24 @@ export default function MySite() {
     load();
   };
 
-  const makeReceipt = (o) => {
-    setToast('Чек по заявке №' + o.order_number + ' — следующим шагом');
+  const makeReceipt = async (o) => {
+    const its = await supabase.from('shop_order_items').select('*').eq('order_id', o.id);
+    const items = (its.data || []).map(it => ({
+      id: it.product_id,
+      name: it.product_name,
+      price: Number(it.price) || 0,
+      qty: Number(it.quantity) || 1,
+      final_price: Number(it.price) || 0,
+      type: 'product',
+    }));
+    if (!items.length) { setToast('В заявке нет товаров'); return; }
+    try {
+      localStorage.setItem('kassa_cart', JSON.stringify(items));
+      localStorage.setItem('kassa_order_id', String(o.id));
+      localStorage.setItem('kassa_order_num', String(o.order_number));
+    } catch (e) {}
+    setToast('Заявка №' + o.order_number + ' передана в кассу');
+    setTimeout(() => { window.location.href = '/kassa'; }, 600);
   };
 
   return (
