@@ -27,7 +27,11 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         const rows = (st.data || []).filter(function(r){ return String(r.ingredient_id) === String(x.id); });
         const qty = rows.reduce(function(a,r){ return a + (Number(r.qty)||0); }, 0);
         const sum = rows.reduce(function(a,r){ return a + (Number(r.total_sum)||0); }, 0);
-        return { ...x, price: x.is_water ? 0 : (qty > 0 ? sum / qty : 0), loss: Number(x.loss_cleaning) || 0 };
+        const basePrice = qty > 0 ? sum / qty : 0;
+        const u = String(x.unit || '').toLowerCase();
+        // цена за единицу ингредиента → цена за грамм/мл (тех. карта ведёт нетто в г/мл)
+        const toGram = u === 'кг' ? 0.001 : u === 'л' ? 0.001 : 1;
+        return { ...x, price: x.is_water ? 0 : basePrice * toGram, loss: Number(x.loss_cleaning) || 0 };
       });
       setProducts(withPrice);
       const ct = await supabase.from('stock_categories').select('*').eq('user_id', user.id);
