@@ -1,8 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SectionHelp from '../../components/SectionHelp';
+import IngredientForm from './IngredientForm';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
+import { getCurrencySymbol } from '../../lib/currency';
 
 export default function Ingredients() {
+  const { user } = useAuth();
+  const cur = getCurrencySymbol();
   const [q, setQ] = useState('');
+  const [rows, setRows] = useState([]);
+  const [stock, setStock] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
+
+  const load = async () => {
+    if (!user) return;
+    const [i, st, w] = await Promise.all([
+      supabase.from('ingredients').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('ingredient_stock').select('*').eq('user_id', user.id),
+      supabase.from('warehouses').select('*').eq('user_id', user.id).order('name'),
+    ]);
+    setRows(i.data || []); setStock(st.data || []); setWarehouses(w.data || []);
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, [user?.id]);
+
+  const stockOf = (id) => stock.filter(s => String(s.ingredient_id) === String(id))
+    .reduce((acc, s) => ({ qty: acc.qty + (Number(s.qty) || 0), sum: acc.sum + (Number(s.total_sum) || 0) }),
+      { qty:0, sum:0 });
+  const avgPrice = (id) => { const s = stockOf(id); return s.qty > 0 ? s.sum / s.qty : 0; };
+
+  const save = async (f) => {
+    const payload = {
+      user_id: user.id, name: f.name, unit: f.unit || 'кг', barcode: f.barcode || '',
+      loss_cleaning: Number(f.loss_cleaning) || 0, loss_boil: Number(f.loss_boil) || 0,
+      loss_fry: Number(f.loss_fry) || 0, loss_stew: Number(f.loss_stew) || 0,
+      loss_bake: Number(f.loss_bake) || 0, updated_at: new Date().toISOString(),
+    };
+    const ins = await supabase.from('ingredients').insert(payload).select('id').single();
+    const ingId = ins.data?.id;
+    const qty = Number(f.qty) || 0;
+    const price = Number(f.price) || 0;
+    const wid = f.warehouse_id || warehouses[0]?.id;
+    if (ingId && qty > 0 && wid) {
+      await supabase.from('ingredient_stock').insert({
+        user_id: user.id, ingredient_id: ingId, warehouse_id: wid,
+        qty, total_sum: qty * price,
+      });
+    }
+    setFormOpen(false);
+    load();
+  };
+
+  const list = rows.filter(r => !q.trim() || String(r.name).toLowerCase().includes(q.trim().toLowerCase()));
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:0, overflow:'hidden' }}>
@@ -32,7 +84,7 @@ export default function Ingredients() {
             <div className="sub">Сырьё для приготовления блюд</div>
           </div>
           <div className="page-actions">
-            <button className="sk-dd-btn">Добавить ингредиент</button>
+            <button className="sk-dd-btn" onClick={() => setFormOpen(true)}>Добавить ингредиент</button>
           </div>
         </div>
 
@@ -59,22 +111,43 @@ export default function Ingredients() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td colSpan={6}>
-                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
-                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Ингредиентов пока нет</p>
-                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
-                      Раздел подготовлен под ингредиенты: единицы измерения (г, кг, мл, л), цена закупки
-                      и процент отходов для расчёта брутто и нетто.<br /><br />
-                      Логику добавления и состав полей обсудим отдельно.
+              {loading ? (
+                <tr><td colSpan={6} style={{ padding:28, textAlign:'center', color:'#9ca3af' }}>Загружаю…</td></tr>
+              ) : !list.length ? (
+                <tr>
+                  <td colSpan={6}>
+                    <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                      <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Ингредиентов пока нет</p>
+                      <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                        Нажмите «Добавить ингредиент» — укажите название, единицу измерения и проценты потерь.
+                        В блоке «Складской учёт» можно сразу внести купленное количество и цену.
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              ) : list.map(r => {
+                const st = stockOf(r.id);
+                const avg = avgPrice(r.id);
+                const totalLoss = [r.loss_cleaning, r.loss_boil, r.loss_fry, r.loss_stew, r.loss_bake]
+                  .map(Number).filter(n => n > 0);
+                return (
+                  <tr key={r.id}>
+                    <td style={{ fontWeight:600 }}>{r.name}</td>
+                    <td style={{ color:'#6b7280' }}>{r.category || '—'}</td>
+                    <td>{r.unit}</td>
+                    <td>{st.qty ? Number(st.qty).toFixed(2) : '0'}</td>
+                    <td>{avg ? Math.round(avg).toLocaleString('ru-RU') + ' ' + cur : '—'}</td>
+                    <td style={{ color:'#6b7280' }}>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
+
+      <IngredientForm open={formOpen} warehouses={warehouses}
+        onClose={() => setFormOpen(false)} onSave={save} />
     </div>
   );
 }
