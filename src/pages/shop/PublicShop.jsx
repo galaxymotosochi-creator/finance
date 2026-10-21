@@ -72,7 +72,7 @@ export default function PublicShop() {
   );
 
   if (error) return <div style={{ padding:60, textAlign:'center', fontFamily:'Inter,sans-serif', color:'#6b7280' }}>{error}</div>;
-  if (!data) return <div style={{ padding:60, textAlign:'center', fontFamily:'Inter,sans-serif', color:'#9ca3af' }}>Загружаю…</div>;
+  if (!data) return <div style={{ minHeight:'100vh', background:'#fff' }} />;
 
   const { shop, products } = data;
   const count = Object.values(cart).reduce((a, b) => a + b, 0);
