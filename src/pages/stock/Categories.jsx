@@ -9,6 +9,9 @@ import { genId } from '../../lib/id';
 
 export default function Categories() {
   const { user } = useAuth();
+  const businessType = (function(){
+    try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
+  })();
   const [cats, setCats] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -231,8 +234,17 @@ export default function Categories() {
           <div className="form-group">
             <label>Вид</label>
             <select value={fType} onChange={e => setFType(e.target.value)}>
-              <option value="product">Товар</option>
-              <option value="service">Услуга</option>
+              {businessType === 'food' ? (
+                <>
+                  <option value="dish">Блюдо / тех. карта</option>
+                  <option value="ingredient">Ингредиент</option>
+                </>
+              ) : (
+                <>
+                  <option value="product">Товар</option>
+                  <option value="service">Услуга</option>
+                </>
+              )}
             </select>
           </div>
           <div className="modal-actions">

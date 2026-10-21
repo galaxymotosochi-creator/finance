@@ -11,6 +11,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
+  const [cats, setCats] = useState([]);
   const [f, setF] = useState(initial || {
     name:'', category:'', price:'', output_weight:'', output_unit:'г',
     photo_url:'', description:'', is_weight:false, price_per_kg:''
@@ -29,6 +30,8 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         return { ...x, price: qty > 0 ? sum / qty : 0, loss: Number(x.loss_cleaning) || 0 };
       });
       setProducts(withPrice);
+      const ct = await supabase.from('stock_categories').select('*').eq('user_id', user.id);
+      setCats((ct.data || []).filter(function(c){ return c.type === 'dish'; }));
       if (initial?.id) {
         const it = await supabase.from('tech_card_items').select('*').eq('tech_card_id', initial.id);
         setItems(it.data || []);
