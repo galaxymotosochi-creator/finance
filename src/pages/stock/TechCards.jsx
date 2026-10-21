@@ -129,8 +129,11 @@ export default function TechCards() {
         <div className="empty-products">
           <div className="big-icon">📋</div>
           <p>Тех. карт пока нет</p>
-          <div style={{ maxWidth:'420px', margin:'0 auto', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
-            Нажмите «Добавить тех. карту» — укажите название, цену продажи и состав.
+          <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
+            <b>Как добавить блюдо:</b><br />
+            • Нажмите «Добавить тех. карту»<br />
+            • Укажите название, цену продажи и выход порции<br />
+            • Добавьте состав — ингредиенты с граммовками<br />
             Себестоимость и наценка посчитаются сами.
           </div>
         </div>
@@ -140,12 +143,12 @@ export default function TechCards() {
           <table className="sk-table stock-table" style={{ minWidth:'760px' }}>
             <thead>
               <tr>
-                <th style={{ minWidth:'200px', textAlign:'left' }}>Название</th>
-                <th style={{ textAlign:'left' }}>Категория</th>
-                <th style={{ textAlign:'left' }}>Выход</th>
-                <th style={{ textAlign:'left' }}>Себестоимость</th>
-                <th style={{ textAlign:'left' }}>Цена</th>
-                <th style={{ textAlign:'left' }}>Наценка</th>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Выход</th>
+                <th>Себестоимость</th>
+                <th>Цена</th>
+                <th>Наценка</th>
               </tr>
             </thead>
             <tbody>
@@ -155,15 +158,12 @@ export default function TechCards() {
                 const markup = cost > 0 ? Math.round(((price - cost) / cost) * 100) : 0;
                 return (
                   <tr key={c.id} style={{ borderTop:'1px solid #f5f5f5' }}>
-                    <td style={{ padding:'12px 16px', fontSize:'.86rem', fontWeight:600 }}>{c.name}</td>
-                    <td style={{ padding:'12px 16px', fontSize:'.82rem', color:'#6b7280' }}>{c.category || '—'}</td>
-                    <td style={{ padding:'12px 16px', fontSize:'.82rem', textAlign:'right', color:'#6b7280' }}>
-                      {Number(c.output_weight) ? Number(c.output_weight) + ' ' + (c.output_unit || 'г') : '—'}
-                    </td>
-                    <td style={{ padding:'12px 16px', fontSize:'.82rem', textAlign:'right', color:'#6b7280' }}>{fmt(cost)} {cur}</td>
-                    <td style={{ padding:'12px 16px', fontSize:'.86rem', textAlign:'right', fontWeight:700 }}>{fmt(price)} {cur}</td>
-                    <td style={{ padding:'12px 16px', fontSize:'.82rem', textAlign:'right',
-                      color: cost > 0 ? (markup >= 0 ? '#16a34a' : '#dc2626') : '#9ca3af', fontWeight:600 }}>
+                    <td style={{ fontWeight:600 }}>{c.name}</td>
+                    <td style={{ color:'#6b7280' }}>{c.category || '—'}</td>
+                    <td>{Number(c.output_weight) ? Number(c.output_weight) + ' ' + (c.output_unit || 'г') : '—'}</td>
+                    <td style={{ color:'#6b7280' }}>{fmt(cost)} {cur}</td>
+                    <td style={{ fontWeight:700 }}>{fmt(price)} {cur}</td>
+                    <td style={{ color: cost > 0 ? (markup >= 0 ? '#16a34a' : '#dc2626') : '#9ca3af', fontWeight:600 }}>
                       {cost > 0 ? markup + '%' : '—'}
                     </td>
                   </tr>
