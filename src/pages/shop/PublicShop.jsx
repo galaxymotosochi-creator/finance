@@ -163,7 +163,9 @@ export default function PublicShop() {
             <div key={p.id} style={{ border:'1px solid #eee', borderRadius:14, overflow:'hidden', display:'flex',
               flexDirection:'column', height:'100%' }}>
               <div style={{ height:150, background:'#f7f7f8', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-                {p.photo_url ? <img src={p.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:'2rem', opacity:.25 }}>🖼️</span>}
+                {p.photo_url ? <img src={'/api/thumb?file=' + encodeURIComponent(String(p.photo_url).split('/').pop())}
+                  alt="" loading="lazy" decoding="async"
+                  style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:'2rem', opacity:.25 }}>🖼️</span>}
               </div>
               <div style={{ padding:'12px 14px', flex:1, display:'flex', flexDirection:'column', gap:6 }}>
                 <div style={{ fontWeight:600, fontSize:'0.84rem', lineHeight:1.3, height:'2.6em',
