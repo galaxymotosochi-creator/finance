@@ -77,7 +77,7 @@ export default function TechCards() {
   };
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:0 }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:0, overflow:'hidden' }}>
       <div style={{ flexShrink:0 }}>
         <div className="sk-bar">
           <div className="grow">
@@ -126,7 +126,9 @@ export default function TechCards() {
       {loading ? (
         <div style={{ padding:40, textAlign:'center', color:'#9ca3af' }}>Загружаю…</div>
       ) : !list.length ? (
-        <table className="sk-table stock-table" style={{ minWidth:'760px' }}>
+        <div className="sk-tablewrap" style={{ flex:1, minHeight:0 }}>
+          <div className="sk-card" style={{ position:'relative', flex:1, overflowX:'auto', overflowY:'auto', WebkitOverflowScrolling:'touch', minHeight:0 }}>
+        <table className="sk-table sk-techcards">
           <thead>
             <tr>
               <th>Название</th>
@@ -155,10 +157,12 @@ export default function TechCards() {
             </tr>
           </tbody>
         </table>
+        </div>
+        </div>
       ) : (
-        <div className="stock-table-wrap" style={{ flex:1, minHeight:0 }}>
-        <div className="sk-card" style={{ position:'relative', flex:1, overflowY:'auto', overflowX:'auto', minHeight:0 }}>
-          <table className="sk-table stock-table" style={{ minWidth:'760px' }}>
+        <div className="sk-tablewrap" style={{ flex:1, minHeight:0 }}>
+        <div className="sk-card" style={{ position:'relative', flex:1, overflowY:'auto', overflowX:'auto', WebkitOverflowScrolling:'touch', minHeight:0 }}>
+          <table className="sk-table sk-techcards">
             <thead>
               <tr>
                 <th>Название</th>
