@@ -132,9 +132,20 @@ export default function Sidebar() {
       .then(function(d){ if (d && d.user && d.user.business_type) { setBusinessTypeState(d.user.business_type); try { localStorage.setItem('atlaspos_business_type', d.user.business_type); } catch(e){} } })
       .catch(function(){});
   }, []);
+  useLocalEffect(function(){
+    var onType = function(e){ if (e && e.detail) setBusinessTypeState(e.detail); };
+    window.addEventListener('atlaspos-business-type', onType);
+    window.addEventListener('storage', onType);
+    return function(){
+      window.removeEventListener('atlaspos-business-type', onType);
+      window.removeEventListener('storage', onType);
+    };
+  }, []);
+
   const setBusinessType = function(t){
     setBusinessTypeState(t);
     try { localStorage.setItem('atlaspos_business_type', t); } catch(e){}
+    try { window.dispatchEvent(new CustomEvent('atlaspos-business-type', { detail: t })); } catch(e){}
     fetch('/api/business-type', { method:'PUT',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + ((function(){ try { return JSON.parse(localStorage.getItem('atlaspos_session')||'{}').access_token || ''; } catch(e){ return ''; } })()) },
       body: JSON.stringify({ business_type: t }) }).catch(function(){});
