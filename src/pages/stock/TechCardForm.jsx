@@ -22,7 +22,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
     if (!open || !user) return;
     (async () => {
       const pr = await supabase.from('ingredients').select('*').eq('user_id', user.id).limit(1000);
-      const st = await supabase.from('ingredient_stock').select('*').eq('user_id', user.id);
+      const st = await supabase.from('ingredient_stock').select('*');
       const withPrice = (pr.data || []).map(function(x){
         const rows = (st.data || []).filter(function(r){ return String(r.ingredient_id) === String(x.id); });
         const qty = rows.reduce(function(a,r){ return a + (Number(r.qty)||0); }, 0);
@@ -61,7 +61,12 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
     updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0,
       waste_percent: waste, brutto });
   };
-  const costOf = (r) => (Number(r.brutto || r.netto) || 0) * (Number(r.price_per_unit) || 0);
+  const priceOf = (r) => {
+    const ing = products.find(x => String(x.id) === String(r.product_id));
+    const p = ing ? Number(ing.price) || 0 : Number(r.price_per_unit) || 0;
+    return p;
+  };
+  const costOf = (r) => (Number(r.brutto || r.netto) || 0) * priceOf(r);
   const totalCost = items.reduce((s, r) => s + costOf(r), 0);
   const totalNetto = items.reduce((s, r) => s + (Number(r.netto) || 0), 0);
   const [outManual, setOutManual] = useState(false);
