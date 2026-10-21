@@ -120,6 +120,7 @@ export default function PublicShop() {
             {shop.tagline && <div style={{ fontSize:'0.84rem', color:'#9ca3af', marginTop:2 }}>{shop.tagline}</div>}
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:14, fontSize:'0.82rem', color:'#6b7280', flexWrap:'wrap' }}>
+            {shop.address && <span>{shop.address}</span>}
             {shop.phone && <span>{shop.phone}</span>}
             {shop.work_hours && <span>{shop.work_hours}</span>}
             {shop.use_booking && (
@@ -139,7 +140,8 @@ export default function PublicShop() {
         </div>
       )}
 
-      <main style={{ width:'100%', maxWidth:'100%', margin:'0 auto', padding:'20px' }}>
+      <main style={{ width:'100%', maxWidth:'100%', margin:'0 auto',
+        padding:'20px', paddingBottom: count > 0 ? 96 : 40 }}>
         <div style={{ display:'flex', gap:10, marginBottom:16, flexWrap:'wrap', alignItems:'center' }}>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
             style={{ flex:'1 1 220px', padding:'10px 16px', border:'1px solid #e5e7eb', borderRadius:22,
