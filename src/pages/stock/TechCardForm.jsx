@@ -41,7 +41,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   const totalNetto = items.reduce((s, r) => s + (Number(r.netto) || 0), 0);
 
   return (
-    <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width="wide" customWidth={860}>
+    <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width={860} className="tc-modal">
       <div style={{ display:'grid', gap:14 }}>
         <div>
           <label style={lbl}>Название *</label>

@@ -1857,3 +1857,10 @@ input:focus, select:focus, textarea:focus {
   .why-card{background:linear-gradient(160deg,#F9FBFF,#F2F7FF);border-color:rgba(31,117,255,.14)}
   .why-num{color:rgba(31,117,255,.55)}
 }
+
+/* Тех. карты: модалка не прижимается к краям экрана */
+.modal-box.tc-modal { max-height: 82vh; }
+.modal-box.tc-modal .modal-body { overflow-y: auto; }
+@media (max-width: 768px) {
+  .modal-box.tc-modal { max-height: 86vh; }
+}
