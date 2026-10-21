@@ -14,6 +14,7 @@ export default function Ingredients() {
   const [warehouses, setWarehouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
 
   const load = async () => {
     if (!user) return;
@@ -32,6 +33,18 @@ export default function Ingredients() {
       { qty:0, sum:0 });
   const avgPrice = (id) => { const s = stockOf(id); return s.qty > 0 ? s.sum / s.qty : 0; };
 
+  const openEdit = (r) => {
+    setEditing(r);
+    setFormOpen(true);
+  };
+
+  const remove = async (r) => {
+    if (!confirm('Удалить ингредиент «' + r.name + '»?')) return;
+    await supabase.from('ingredient_stock').delete().eq('ingredient_id', r.id);
+    await supabase.from('ingredients').delete().eq('id', r.id);
+    await load();
+  };
+
   const save = async (f) => {
     const payload = {
       user_id: user.id, name: f.name, unit: f.unit || 'кг', barcode: f.barcode || '',
@@ -39,8 +52,13 @@ export default function Ingredients() {
       loss_fry: Number(f.loss_fry) || 0, loss_stew: Number(f.loss_stew) || 0,
       loss_bake: Number(f.loss_bake) || 0, is_water: !!f.is_water, updated_at: new Date().toISOString(),
     };
-    const ins = await supabase.from('ingredients').insert(payload).select('id').single();
-    const ingId = ins.data?.id;
+    let ingId = editing?.id;
+    if (editing?.id) {
+      await supabase.from('ingredients').update(payload).eq('id', editing.id);
+    } else {
+      const ins = await supabase.from('ingredients').insert(payload).select('id').single();
+      ingId = ins.data?.id;
+    }
     const qty = Number(f.qty) || 0;
     const price = Number(f.price) || 0;
     const wid = f.warehouse_id || warehouses[0]?.id;
@@ -51,6 +69,7 @@ export default function Ingredients() {
       });
     }
     setFormOpen(false);
+    setEditing(null);
     setLoading(true);
     await load();
   };
@@ -85,7 +104,7 @@ export default function Ingredients() {
             <div className="sub">Сырьё для приготовления блюд</div>
           </div>
           <div className="page-actions">
-            <button className="sk-dd-btn" onClick={() => setFormOpen(true)}>Добавить ингредиент</button>
+            <button className="sk-dd-btn" onClick={() => { setEditing(null); setFormOpen(true); }}>Добавить ингредиент</button>
           </div>
         </div>
 
@@ -109,14 +128,15 @@ export default function Ingredients() {
                 <th>Остаток</th>
                 <th>Цена закупки</th>
                 <th>Отходы, %</th>
+                <th style={{ width:'48px' }}></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ padding:28, textAlign:'center', color:'#9ca3af' }}>Загружаю…</td></tr>
+                <tr><td colSpan={7} style={{ padding:28, textAlign:'center', color:'#9ca3af' }}>Загружаю…</td></tr>
               ) : !list.length ? (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
                       <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Ингредиентов пока нет</p>
                       <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
@@ -142,6 +162,29 @@ export default function Ingredients() {
                     <td>{st.qty ? Number(st.qty).toFixed(2) : '0'}</td>
                     <td>{avg ? Math.round(avg).toLocaleString('ru-RU') + ' ' + cur : '—'}</td>
                     <td style={{ color:'#6b7280' }}>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
+                    <td>
+                      <div className="prod-more-wrap">
+                        <button className="prod-more-btn" onClick={(e) => {
+                          const btn = e.currentTarget;
+                          const dd = btn.nextElementSibling;
+                          const isOpen = dd.classList.contains('open');
+                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.cssText = ''; });
+                          if (isOpen) return;
+                          dd.classList.add('open');
+                          dd.style.position = 'fixed';
+                          dd.style.right = (window.innerWidth - btn.getBoundingClientRect().right) + 'px';
+                          const below = btn.getBoundingClientRect().bottom + 6;
+                          const menuH = dd.offsetHeight || 84;
+                          dd.style.top = (below + menuH > window.innerHeight - 8)
+                            ? (btn.getBoundingClientRect().top - menuH - 4) + 'px'
+                            : below + 'px';
+                        }}>⋯</button>
+                        <div className="prod-dropdown">
+                          <button onClick={() => openEdit(r)}>Редактировать</button>
+                          <button onClick={() => remove(r)} style={{ color:'#dc3545' }}>Удалить</button>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -150,8 +193,8 @@ export default function Ingredients() {
         </div>
       </div>
 
-      <IngredientForm open={formOpen} warehouses={warehouses}
-        onClose={() => setFormOpen(false)} onSave={save} />
+      <IngredientForm open={formOpen} warehouses={warehouses} initial={editing}
+        onClose={() => { setFormOpen(false); setEditing(null); }} onSave={save} />
     </div>
   );
 }
