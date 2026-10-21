@@ -147,7 +147,7 @@ export default function MySite() {
       {tab === 'settings' && (
         <>
           <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />
-          <BookingSettings form={shop || {}} setForm={setShop} />
+          <BookingSettings form={shop || {}} setForm={setShop} onSave={() => save(shop || {})} saving={saving} />
           <ShowcaseFilters form={shop || {}} setForm={setShop} products={products} />
           <div className="modal-actions" style={{ marginTop:12 }}>
             <button type="button" className="sk-dd-btn" onClick={() => save(shop || {})} disabled={saving}

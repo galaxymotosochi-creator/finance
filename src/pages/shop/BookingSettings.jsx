@@ -2,7 +2,7 @@ const DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 const inp = { padding:'8px 10px', border:'1px solid #e5e7eb', borderRadius:9, fontSize:'0.82rem',
   outline:'none', boxSizing:'border-box', fontFamily:'inherit', width:96 };
 
-export default function BookingSettings({ form, setForm }) {
+export default function BookingSettings({ form, setForm, onSave, saving }) {
   const sched = form.booking_schedule || {};
   const setDay = (d, patch) => {
     const cur = sched[d] || { open:'09:00', close:'18:00', off:false };
@@ -67,6 +67,13 @@ export default function BookingSettings({ form, setForm }) {
         <span style={{ color:'#9ca3af', fontSize:'0.8rem' }}>—</span>
         <input type="time" value={form.booking_break_end || ''} onChange={e => setForm({ ...form, booking_break_end: e.target.value })} style={inp} />
         <span style={{ fontSize:'0.76rem', color:'#9ca3af', marginLeft:6 }}>оставьте пустым, если перерыва нет</span>
+      </div>
+
+      <div className="modal-actions" style={{ marginTop:18 }}>
+        <button type="button" className="sk-dd-btn" onClick={onSave} disabled={saving}
+          style={{ opacity: saving ? .6 : 1 }}>
+          {saving ? 'Сохраняю…' : 'Сохранить'}
+        </button>
       </div>
     </div>
   );
