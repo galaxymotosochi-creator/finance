@@ -28,6 +28,18 @@ export default function Ingredients() {
   };
   useEffect(() => { load(); }, [user?.id]);
 
+  useEffect(() => {
+    const close = (e) => {
+      if (!e.target.closest('.prod-more-wrap') && !e.target.closest('.prod-dropdown')) {
+        document.querySelectorAll('.prod-dropdown.open').forEach(d => {
+          d.classList.remove('open'); d.classList.remove('up'); d.style.cssText = '';
+        });
+      }
+    };
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
+
   const stockOf = (id) => stock.filter(s => String(s.ingredient_id) === String(id))
     .reduce((acc, s) => ({ qty: acc.qty + (Number(s.qty) || 0), sum: acc.sum + (Number(s.total_sum) || 0) }),
       { qty:0, sum:0 });
@@ -163,21 +175,14 @@ export default function Ingredients() {
                     <td>{avg ? Math.round(avg).toLocaleString('ru-RU') + ' ' + cur : '—'}</td>
                     <td style={{ color:'#6b7280' }}>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
                     <td>
-                      <div className="prod-more-wrap">
-                        <button className="prod-more-btn" onClick={(e) => {
-                          const btn = e.currentTarget;
-                          const dd = btn.nextElementSibling;
-                          const isOpen = dd.classList.contains('open');
-                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.cssText = ''; });
-                          if (isOpen) return;
-                          dd.classList.add('open');
-                          dd.style.position = 'fixed';
-                          dd.style.right = (window.innerWidth - btn.getBoundingClientRect().right) + 'px';
-                          const below = btn.getBoundingClientRect().bottom + 6;
-                          const menuH = dd.offsetHeight || 84;
-                          dd.style.top = (below + menuH > window.innerHeight - 8)
-                            ? (btn.getBoundingClientRect().top - menuH - 4) + 'px'
-                            : below + 'px';
+                      <div style={{ display:'inline-block', position:'relative' }} className="prod-more-wrap">
+                        <button className="sk-more" onClick={(e) => {
+                          e.stopPropagation();
+                          const dd = e.currentTarget.nextElementSibling;
+                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+                          dd.classList.toggle('open');
+                          var _r = dd.getBoundingClientRect();
+                          if (_r.bottom > window.innerHeight) dd.classList.add('up'); else dd.classList.remove('up');
                         }}>⋯</button>
                         <div className="prod-dropdown">
                           <button onClick={() => openEdit(r)}>Редактировать</button>

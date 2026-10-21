@@ -5,7 +5,7 @@ const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', bor
   fontSize:'.875rem', color:'#333', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
 const lbl = { display:'block', fontSize:'.8125rem', fontWeight:600, color:'#333', marginBottom:6 };
 
-export default function IngredientForm({ open, warehouses, onClose, onSave }) {
+export default function IngredientForm({ open, warehouses, initial, onClose, onSave }) {
   const [f, setF] = useState({
     name:'', unit:'кг', barcode:'',
     loss_cleaning:'', loss_boil:'', loss_fry:'', loss_stew:'', loss_bake:'',
@@ -14,11 +14,26 @@ export default function IngredientForm({ open, warehouses, onClose, onSave }) {
   const empty = {
     name:'', unit:'кг', barcode:'',
     loss_cleaning:'', loss_boil:'', loss_fry:'', loss_stew:'', loss_bake:'',
-    qty:'', price:'', warehouse_id:''
+    qty:'', price:'', warehouse_id:'', is_water:false
   };
   useEffect(() => {
-    if (open) setF(empty);
-  }, [open]);
+    if (!open) return;
+    if (initial && initial.id) {
+      setF({
+        name: initial.name || '',
+        unit: initial.unit || 'кг',
+        barcode: initial.barcode || '',
+        loss_cleaning: initial.loss_cleaning != null ? String(Number(initial.loss_cleaning) || '') : '',
+        loss_boil: initial.loss_boil != null ? String(Number(initial.loss_boil) || '') : '',
+        loss_fry: initial.loss_fry != null ? String(Number(initial.loss_fry) || '') : '',
+        loss_stew: initial.loss_stew != null ? String(Number(initial.loss_stew) || '') : '',
+        loss_bake: initial.loss_bake != null ? String(Number(initial.loss_bake) || '') : '',
+        qty: '', price: '', warehouse_id: '', is_water: !!initial.is_water
+      });
+    } else {
+      setF(empty);
+    }
+  }, [open, initial?.id]);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const losses = [
     ['loss_cleaning','% потерь при очистке'],
@@ -29,7 +44,7 @@ export default function IngredientForm({ open, warehouses, onClose, onSave }) {
   ];
 
   return (
-    <Modal open={open} onClose={onClose} title="Добавить ингредиент" width={680} className="tc-modal">
+    <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать ингредиент' : 'Добавить ингредиент'} width={680} className="tc-modal">
       <div style={{ display:'grid', gap:14 }}>
         <div>
           <label style={lbl}>Название</label>
