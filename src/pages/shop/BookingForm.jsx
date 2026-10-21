@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 const inp = { width:'100%', padding:'11px 14px', border:'1px solid #e5e7eb', borderRadius:10,
   fontSize:'0.9rem', boxSizing:'border-box', outline:'none', marginBottom:10, fontFamily:'inherit' };
 
-export default function BookingForm({ slug, services, onClose, onDone }) {
-  const [service, setService] = useState(services[0] || null);
+export default function BookingForm({ slug, services, preset, onClose, onDone }) {
+  const [service, setService] = useState(preset || services[0] || null);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [slots, setSlots] = useState([]);
   const [slot, setSlot] = useState(null);

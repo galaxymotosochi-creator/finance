@@ -19,6 +19,7 @@ export default function PublicShop() {
   const [q, setQ] = useState('');
   const [bookOpen, setBookOpen] = useState(false);
   const [bookDone, setBookDone] = useState(null);
+  const [bookService, setBookService] = useState(null);
 
   useEffect(() => {
     fetch('/api/public/shop/' + slug)
@@ -168,7 +169,13 @@ export default function PublicShop() {
                 {p.description && <div style={{ fontSize:'0.78rem', color:'#9ca3af', lineHeight:1.4 }}>{p.description.slice(0, 80)}</div>}
                 <div style={{ marginTop:'auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                   <div style={{ fontWeight:800, fontSize:'1rem' }}>{fmt(p.price)} ₽</div>
-                  {cart[p.id] ? (
+                  {p.type === 'service' ? (
+                    <button onClick={() => { setBookService(p); setBookOpen(true); }}
+                      style={{ padding:'7px 14px', borderRadius:20, border:'none', background:'#111',
+                        color:'#fff', fontSize:'0.8rem', fontWeight:600, cursor:'pointer' }}>
+                      Записаться
+                    </button>
+                  ) : cart[p.id] ? (
                     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                       <button onClick={() => dec(p)} style={{ width:26, height:26, borderRadius:8, border:'1px solid #e5e7eb', background:'#fff', cursor:'pointer', fontSize:'0.9rem' }}>−</button>
                       <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{cart[p.id]}</span>
@@ -196,7 +203,7 @@ export default function PublicShop() {
       )}
 
       {bookOpen && (
-        <BookingForm slug={slug} services={services} onClose={() => setBookOpen(false)}
+        <BookingForm slug={slug} services={services} preset={bookService} onClose={() => { setBookOpen(false); setBookService(null); }}
           onDone={(j) => { setBookOpen(false); setBookDone(j); }} />
       )}
 
