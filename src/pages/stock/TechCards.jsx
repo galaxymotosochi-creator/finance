@@ -34,7 +34,7 @@ export default function TechCards() {
 
   const list = cards.filter(c => !q.trim() || String(c.name).toLowerCase().includes(q.trim().toLowerCase()));
 
-  const saveCard = async (f) => {
+  const saveCard = async (f, items) => {
     const payload = {
       user_id: user.id,
       name: f.name,
@@ -48,11 +48,32 @@ export default function TechCards() {
       price_per_kg: Number(f.price_per_kg) || 0,
       updated_at: new Date().toISOString(),
     };
-    if (f.id) await supabase.from('tech_cards').update(payload).eq('id', f.id);
-    else await supabase.from('tech_cards').insert(payload);
+    let cardId = f.id;
+    if (f.id) {
+      await supabase.from('tech_cards').update(payload).eq('id', f.id);
+    } else {
+      const ins = await supabase.from('tech_cards').insert(payload).select('id').single();
+      cardId = ins.data?.id;
+    }
+    if (cardId) {
+      await supabase.from('tech_card_items').delete().eq('tech_card_id', cardId);
+      const rows = (items || []).filter(r => r.product_id || r.name).map(r => ({
+        user_id: user.id,
+        tech_card_id: cardId,
+        product_id: r.product_id ? String(r.product_id) : null,
+        name: r.name || '',
+        netto: Number(r.netto) || 0,
+        waste_percent: Number(r.waste_percent) || 0,
+        price_per_unit: Number(r.price_per_unit) || 0,
+        unit: r.unit || 'г',
+      }));
+      if (rows.length) await supabase.from('tech_card_items').insert(rows);
+    }
     setFormOpen(false); setEditing(null);
     const c = await supabase.from('tech_cards').select('*').eq('user_id', user.id).order('name');
+    const i = await supabase.from('tech_card_items').select('*').eq('user_id', user.id);
     setCards(c.data || []);
+    setItems(i.data || []);
   };
 
   return (

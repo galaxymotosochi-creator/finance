@@ -1,19 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', borderRadius:10,
   fontSize:'.88rem', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
 const lbl = { display:'block', fontSize:'.76rem', fontWeight:600, color:'#6b7280', marginBottom:6 };
 
 export default function TechCardForm({ open, initial, categories, onClose, onSave }) {
+  const { user } = useAuth();
+  const [items, setItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [f, setF] = useState(initial || {
     name:'', category:'', price:'', output_weight:'', output_unit:'г',
     photo_url:'', description:'', is_weight:false, price_per_kg:''
   });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
+  useEffect(() => {
+    if (!open || !user) return;
+    (async () => {
+      const pr = await supabase.from('products').select('id, name, price, cat, type, unit').eq('user_id', user.id).limit(1000);
+      setProducts(pr.data || []);
+      if (initial?.id) {
+        const it = await supabase.from('tech_card_items').select('*').eq('tech_card_id', initial.id);
+        setItems(it.data || []);
+      } else setItems([]);
+    })();
+  }, [open, user?.id, initial?.id]);
+
+  const addRow = () => setItems([...items, { name:'', product_id:'', netto:'', price_per_unit:'', unit:'г', waste_percent:'' }]);
+  const updRow = (i, patch) => setItems(items.map((r, idx) => idx === i ? { ...r, ...patch } : r));
+  const delRow = (i) => setItems(items.filter((_, idx) => idx !== i));
+  const pickProduct = (i, pid) => {
+    const p = products.find(x => String(x.id) === String(pid));
+    updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0 });
+  };
+  const costOf = (r) => (Number(r.netto) || 0) * (Number(r.price_per_unit) || 0);
+  const totalCost = items.reduce((s, r) => s + costOf(r), 0);
+  const totalNetto = items.reduce((s, r) => s + (Number(r.netto) || 0), 0);
+
   return (
-    <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width="medium">
+    <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width="wide" customWidth={860}>
       <div style={{ display:'grid', gap:14 }}>
         <div>
           <label style={lbl}>Название *</label>
@@ -82,9 +110,68 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         </div>
       </div>
 
+      <div style={{ marginTop:20, paddingTop:16, borderTop:'1px solid #f0f0f0' }}>
+        <div style={{ fontSize:'.9rem', fontWeight:700, marginBottom:4 }}>Состав</div>
+        <div style={{ fontSize:'.76rem', color:'#9ca3af', marginBottom:12 }}>
+          Ингредиенты и полуфабрикаты, из которых состоит тех. карта
+        </div>
+
+        {items.length > 0 && (
+          <div style={{ display:'grid', gap:6, marginBottom:10 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 80px 80px 100px 28px', gap:6,
+              fontSize:'.7rem', color:'#9ca3af', fontWeight:600, padding:'0 2px' }}>
+              <div>Продукт</div><div>Брутто</div><div>Нетто</div><div>Себестоимость</div><div></div>
+            </div>
+            {items.map((r, i) => (
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 80px 80px 100px 28px', gap:6, alignItems:'center' }}>
+                <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
+                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }}>
+                  <option value="">— выберите —</option>
+                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+                <input value={r.brutto} onChange={e => {
+                    const b = e.target.value;
+                    const waste = Number(r.waste_percent) || 0;
+                    const netto = b === '' ? '' : (Number(b) * (1 - waste / 100)).toFixed(2);
+                    updRow(i, { brutto: b, netto });
+                  }}
+                  inputMode="decimal" placeholder="0"
+                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
+                <input value={r.netto} onChange={e => {
+                    const n = e.target.value;
+                    const waste = Number(r.waste_percent) || 0;
+                    const brutto = n === '' ? '' : (Number(n) / (1 - waste / 100)).toFixed(2);
+                    updRow(i, { netto: n, brutto });
+                  }}
+                  inputMode="decimal" placeholder="0"
+                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
+                <div style={{ fontSize:'.8rem', color:'#6b7280', textAlign:'right', paddingRight:4 }}>
+                  {Math.round(costOf(r)).toLocaleString('ru-RU')} ₽
+                </div>
+                <button onClick={() => delRow(i)}
+                  style={{ border:'none', background:'transparent', cursor:'pointer', color:'#dc2626', fontSize:'1rem' }}>×</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button onClick={addRow}
+          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px',
+            borderRadius:20, border:'1px dashed #d1d5db', background:'#fff', cursor:'pointer',
+            fontSize:'.8rem', fontWeight:600, color:'#4b5563' }}>
+          + Добавить ингредиент
+        </button>
+
+        <div style={{ display:'flex', justifyContent:'space-between', marginTop:12, paddingTop:10,
+          borderTop:'1px solid #f5f5f5', fontSize:'.82rem' }}>
+          <span style={{ color:'#6b7280' }}>Выход: <b style={{ color:'#111' }}>{Math.round(totalNetto)} г</b></span>
+          <span style={{ color:'#6b7280' }}>Итого: <b style={{ color:'#111' }}>{Math.round(totalCost).toLocaleString('ru-RU')} ₽</b></span>
+        </div>
+      </div>
+
       <div className="modal-actions">
         <button className="btn btn-outline" onClick={onClose}>Отмена</button>
-        <button className="sk-dd-btn" onClick={() => onSave(f)}>Сохранить</button>
+        <button className="sk-dd-btn" onClick={() => onSave(f, items)}>Сохранить</button>
       </div>
     </Modal>
   );
