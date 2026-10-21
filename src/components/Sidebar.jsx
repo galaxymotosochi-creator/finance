@@ -38,7 +38,7 @@ const menu = [
     label: 'Меню', icon: 'menu', onlyFood: true, children: [
       { label: 'Тех. карты', path: '/stock/techcards' },
       { label: 'Полуфабрикаты', path: '/stock/semifinished', soon: true },
-      { label: 'Ингредиенты', path: '/stock/products' },
+      { label: 'Ингредиенты', path: '/stock/ingredients' },
       { label: 'Категории блюд и тех.карт', path: '/stock/categories' },
       { label: 'Категории ингредиентов', path: '/stock/ing-categories', soon: true },
       { label: 'Цеха', path: '/stock/workshops', soon: true },
@@ -46,8 +46,8 @@ const menu = [
   },
   {
     label: 'Склад', icon: 'stock', children: [
-      { label: 'Товары и услуги', path: '/stock/products', hideForFood: true },
-      { label: 'Аналитика товаров', path: '/stock/turnover', hideForFood: true },
+      { label: 'Товары и услуги', path: '/stock/products' },
+      { label: 'Аналитика товаров', path: '/stock/turnover' },
       { label: 'Остатки', path: '/stock/stock' },
       { label: 'Поставки', path: '/stock/supplies' },
       { label: 'Переработки', path: '/stock/processing', onlyFood: true, soon: true },

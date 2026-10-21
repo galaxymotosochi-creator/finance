@@ -123,11 +123,8 @@ const DdCheck = () => (
 export default function Products() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
-  const businessType = (function(){
-    try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
-  })();
-  const isFood = businessType === 'food';
-  const pageTitle = isFood ? 'Ингредиенты' : 'Товары и услуги';
+  const pageTitle = 'Товары и услуги';
+  const isFood = false;
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
