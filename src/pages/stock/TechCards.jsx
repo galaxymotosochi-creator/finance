@@ -126,17 +126,35 @@ export default function TechCards() {
       {loading ? (
         <div style={{ padding:40, textAlign:'center', color:'#9ca3af' }}>Загружаю…</div>
       ) : !list.length ? (
-        <div className="empty-products">
-          <div className="big-icon">📋</div>
-          <p>Тех. карт пока нет</p>
-          <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
-            <b>Как добавить блюдо:</b><br />
-            • Нажмите «Добавить тех. карту»<br />
-            • Укажите название, цену продажи и выход порции<br />
-            • Добавьте состав — ингредиенты с граммовками<br />
-            Себестоимость и наценка посчитаются сами.
-          </div>
-        </div>
+        <table className="sk-table stock-table" style={{ minWidth:'760px' }}>
+          <thead>
+            <tr>
+              <th>Название</th>
+              <th>Категория</th>
+              <th>Выход</th>
+              <th>Себестоимость</th>
+              <th>Цена</th>
+              <th>Наценка</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <div className="empty-products">
+                  <div className="big-icon">📋</div>
+                  <p>Тех. карт пока нет</p>
+                  <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
+                    <b>Как добавить блюдо:</b><br />
+                    • Нажмите «Добавить тех. карту»<br />
+                    • Укажите название, цену продажи и выход порции<br />
+                    • Добавьте состав — ингредиенты с граммовками<br />
+                    Себестоимость и наценка посчитаются сами.
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       ) : (
         <div className="stock-table-wrap" style={{ flex:1, minHeight:0 }}>
         <div className="sk-card" style={{ position:'relative', flex:1, overflowY:'auto', overflowX:'auto', minHeight:0 }}>
