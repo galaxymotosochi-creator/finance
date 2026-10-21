@@ -93,7 +93,7 @@ export default function ShowcaseFilters({ form, setForm, products }) {
                 justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
                 {on ? '✓' : ''}
               </div>
-              <span style={{ fontSize:'0.76rem', fontWeight:600, color:'#111', minWidth:0,
+              <span style={{ fontSize:'0.78rem', fontWeight:600, color:'#111', minWidth:0,
                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</span>
             </div>
           );
