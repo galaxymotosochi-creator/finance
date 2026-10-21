@@ -69,7 +69,7 @@ export default function TechCards() {
             <button className="sk-dd-btn">Добавить тех. карту</button>
           </div>
         </div>
-        <div className="sk-search" style={{ display:'flex', marginBottom:'.5rem', width:'100%', flexWrap:'nowrap', padding:'5px 6px 5px 14px' }}>
+        <div className="sk-search" style={{ display:'flex', marginBottom:'.5rem', width:'100%', flexWrap:'nowrap' }}>
           <span style={{ display:'flex', color:'#999', flexShrink:0 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </span>
