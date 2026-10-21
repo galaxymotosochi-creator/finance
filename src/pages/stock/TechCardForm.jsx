@@ -20,8 +20,15 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   useEffect(() => {
     if (!open || !user) return;
     (async () => {
-      const pr = await supabase.from('products').select('id, name, price, cat, type, unit').eq('user_id', user.id).limit(1000);
-      setProducts(pr.data || []);
+      const pr = await supabase.from('ingredients').select('*').eq('user_id', user.id).limit(1000);
+      const st = await supabase.from('ingredient_stock').select('*').eq('user_id', user.id);
+      const withPrice = (pr.data || []).map(function(x){
+        const rows = (st.data || []).filter(function(r){ return String(r.ingredient_id) === String(x.id); });
+        const qty = rows.reduce(function(a,r){ return a + (Number(r.qty)||0); }, 0);
+        const sum = rows.reduce(function(a,r){ return a + (Number(r.total_sum)||0); }, 0);
+        return { ...x, price: qty > 0 ? sum / qty : 0, loss: Number(x.loss_cleaning) || 0 };
+      });
+      setProducts(withPrice);
       if (initial?.id) {
         const it = await supabase.from('tech_card_items').select('*').eq('tech_card_id', initial.id);
         setItems(it.data || []);
@@ -34,9 +41,14 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   const delRow = (i) => setItems(items.filter((_, idx) => idx !== i));
   const pickProduct = (i, pid) => {
     const p = products.find(x => String(x.id) === String(pid));
-    updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0 });
+    const row = items[i] || {};
+    const waste = Number(p?.loss) || 0;
+    const netto = Number(row.netto) || 0;
+    const brutto = netto > 0 ? (netto / (1 - waste / 100)).toFixed(2) : '';
+    updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0,
+      waste_percent: waste, brutto });
   };
-  const costOf = (r) => (Number(r.netto) || 0) * (Number(r.price_per_unit) || 0);
+  const costOf = (r) => (Number(r.brutto || r.netto) || 0) * (Number(r.price_per_unit) || 0);
   const totalCost = items.reduce((s, r) => s + costOf(r), 0);
   const totalNetto = items.reduce((s, r) => s + (Number(r.netto) || 0), 0);
 
@@ -121,7 +133,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           <div style={{ display:'grid', gap:6, marginBottom:10 }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8,
               fontSize:'.8125rem', color:'#333', fontWeight:600, padding:'0 2px' }}>
-              <div>Продукт</div><div>Брутто</div><div>Нетто</div><div>Себестоимость</div><div></div>
+              <div>Ингредиент</div><div>Брутто</div><div>Нетто</div><div>Себестоимость</div><div></div>
             </div>
             {items.map((r, i) => (
               <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8, alignItems:'center' }}>
@@ -133,7 +145,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                 <input value={r.brutto} onChange={e => {
                     const b = e.target.value;
                     const waste = Number(r.waste_percent) || 0;
-                    const netto = b === '' ? '' : (Number(b) * (1 - waste / 100)).toFixed(2);
+                    const netto = b === '' ? '' : (Number(b) * (1 - (Number(r.waste_percent)||0) / 100)).toFixed(2);
                     updRow(i, { brutto: b, netto });
                   }}
                   inputMode="decimal" placeholder="0"
@@ -141,7 +153,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                 <input value={r.netto} onChange={e => {
                     const n = e.target.value;
                     const waste = Number(r.waste_percent) || 0;
-                    const brutto = n === '' ? '' : (Number(n) / (1 - waste / 100)).toFixed(2);
+                    const brutto = n === '' || waste >= 100 ? (n === '' ? '' : n) : (Number(n) / (1 - waste / 100)).toFixed(2);
                     updRow(i, { netto: n, brutto });
                   }}
                   inputMode="decimal" placeholder="0"
