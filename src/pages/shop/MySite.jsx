@@ -101,12 +101,16 @@ export default function MySite() {
         <div>
           <h1 style={{ margin:0, fontSize:'1.4rem', fontWeight:800, letterSpacing:'-.02em' }}>Мой сайт</h1>
           <div style={{ fontSize:'0.84rem', color:'#9ca3af', marginTop:4 }}>
-            {slug ? <>Витрина: <b style={{ color:'#1F75FF' }}>atlaspos.ru/s/{slug}</b></> : 'Витрина ещё не создана'}
+            {slug ? <>Витрина:{' '}
+              <a href={'/s/' + slug} target="_blank" rel="noopener noreferrer"
+                style={{ color:'#1F75FF', fontWeight:700, textDecoration:'none' }}
+                onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+                atlaspos.ru/s/{slug}
+              </a>
+            </> : 'Витрина ещё не создана'}
           </div>
         </div>
-        {slug && (
-          <button className="btn btn-outline" onClick={() => window.open('/s/' + slug, '_blank')}>Открыть витрину</button>
-        )}
       </div>
 
       <div style={{ display:'flex', gap:6, marginBottom:16, borderBottom:'1px solid #eee' }}>
