@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import BookingForm from './BookingForm';
 
 const CART_KEY = (slug) => 'atlaspos_cart_' + slug;
 const fmt = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(Number(n) || 0));
@@ -16,6 +17,8 @@ export default function PublicShop() {
   const [formErr, setFormErr] = useState(null);
   const [cat, setCat] = useState('all');
   const [q, setQ] = useState('');
+  const [bookOpen, setBookOpen] = useState(false);
+  const [bookDone, setBookDone] = useState(null);
 
   useEffect(() => {
     fetch('/api/public/shop/' + slug)
@@ -79,6 +82,7 @@ export default function PublicShop() {
 
   const CAT_EMPTY = 'Прочее';
   // Фильтры из настроек витрины
+  const services = products.filter(p => p.type === 'service');
   const hiddenIds = (shop.hidden_products || []).map(String);
   const showCats = shop.show_cats || [];
   const showTypes = shop.show_types || [];
@@ -113,9 +117,16 @@ export default function PublicShop() {
             <div style={{ fontSize:'1.25rem', fontWeight:800, letterSpacing:'-.02em' }}>{shop.name || 'Магазин'}</div>
             {shop.tagline && <div style={{ fontSize:'0.84rem', color:'#9ca3af', marginTop:2 }}>{shop.tagline}</div>}
           </div>
-          <div style={{ display:'flex', gap:16, fontSize:'0.82rem', color:'#6b7280' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:14, fontSize:'0.82rem', color:'#6b7280', flexWrap:'wrap' }}>
             {shop.phone && <span>{shop.phone}</span>}
             {shop.work_hours && <span>{shop.work_hours}</span>}
+            {shop.use_booking && (
+              <button onClick={() => setBookOpen(true)}
+                style={{ padding:'9px 18px', borderRadius:20, border:'none', background:'#111',
+                  color:'#fff', fontWeight:700, fontSize:'0.82rem', cursor:'pointer' }}>
+                Записаться
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -179,6 +190,28 @@ export default function PublicShop() {
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div style={{ fontWeight:800 }}>{fmt(total)} ₽</div>
             <button onClick={() => setOpen(true)} style={{ padding:'9px 20px', borderRadius:20, border:'none', background:'#fff', color:'#111', fontWeight:700, fontSize:'0.84rem', cursor:'pointer' }}>Оформить заказ</button>
+          </div>
+        </div>
+      )}
+
+      {bookOpen && (
+        <BookingForm slug={slug} services={services} onClose={() => setBookOpen(false)}
+          onDone={(j) => { setBookOpen(false); setBookDone(j); }} />
+      )}
+
+      {bookDone && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.45)', display:'flex', alignItems:'center', justifyContent:'center', padding:16, zIndex:110 }}>
+          <div style={{ background:'#fff', borderRadius:18, padding:28, width:'100%', maxWidth:400, textAlign:'center' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.2"
+              strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom:14 }}>
+              <path d="M4 12.5l5.5 5.5L20 7.5" />
+            </svg>
+            <div style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:8 }}>Вы записаны</div>
+            <div style={{ color:'#6b7280', fontSize:'0.88rem', lineHeight:1.6 }}>
+              {String(bookDone.date).split('-').reverse().join('.')} в {bookDone.start}<br />
+              Магазин свяжется с вами для подтверждения
+            </div>
+            <button className="btn btn-dark" style={{ marginTop:18 }} onClick={() => setBookDone(null)}>Хорошо</button>
           </div>
         </div>
       )}

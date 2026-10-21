@@ -75,5 +75,59 @@ module.exports = function (pool) {
     } finally { client.release(); }
   });
 
+
+  // Публично: свободные слоты на дату
+  router.get('/public/shop/:slug/slots', async (req, res) => {
+    try {
+      const { date } = req.query;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) return res.status(400).json({ error: 'Укажите дату' });
+      const { rows } = await pool.query('SELECT * FROM shops WHERE slug = $1 AND is_active = true', [req.params.slug]);
+      const shop = rows[0];
+      if (!shop) return res.status(404).json({ error: 'Магазин не найден' });
+      const open = shop.booking_open || '09:00';
+      const close = shop.booking_close || '20:00';
+      const step = Number(shop.booking_step) || 60;
+      const toMin = (t) => { const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); };
+      const toStr = (n) => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+      const busy = await pool.query(
+        "SELECT start_time FROM shop_bookings WHERE user_id = $1 AND booking_date = $2 AND status <> 'canceled'",
+        [shop.user_id, date]
+      );
+      const taken = new Set(busy.rows.map(r => String(r.start_time).slice(0, 5)));
+      const slots = [];
+      for (let t = toMin(open); t + step <= toMin(close); t += step) {
+        const st = toStr(t);
+        if (!taken.has(st)) slots.push({ start: st, end: toStr(t + step) });
+      }
+      res.json({ slots, date, step });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Публично: создать запись
+  router.post('/public/shop/:slug/booking', async (req, res) => {
+    try {
+      const { name, phone, comment, date, start, service_id, service_name, price, end } = req.body || {};
+      if (!name || !phone) return res.status(400).json({ error: 'Укажите имя и телефон' });
+      if (!date || !start) return res.status(400).json({ error: 'Выберите дату и время' });
+      const { rows } = await pool.query('SELECT * FROM shops WHERE slug = $1 AND is_active = true', [req.params.slug]);
+      const shop = rows[0];
+      if (!shop) return res.status(404).json({ error: 'Магазин не найден' });
+      const dup = await pool.query(
+        "SELECT 1 FROM shop_bookings WHERE user_id = $1 AND booking_date = $2 AND start_time = $3 AND status <> 'canceled'",
+        [shop.user_id, date, start]
+      );
+      if (dup.rows.length) return res.status(409).json({ error: 'Это время уже занято' });
+      const o = await pool.query(
+        `INSERT INTO shop_bookings (user_id, booking_date, start_time, end_time, customer_name,
+          customer_phone, comment, service_name, service_id, price, status, source)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'new','showcase') RETURNING id`,
+        [shop.user_id, date, start, end || start, String(name).slice(0,120), String(phone).slice(0,40),
+         String(comment || '').slice(0,1000), String(service_name || '').slice(0,200),
+         service_id ? String(service_id) : null, Number(price) || 0]
+      );
+      res.json({ ok: true, id: o.rows[0].id, date, start });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
   return router;
 };

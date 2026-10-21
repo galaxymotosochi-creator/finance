@@ -4,9 +4,11 @@ import { useAuth } from '../../hooks/useAuth';
 import MySiteSettings from './MySiteSettings';
 import ShowcaseFilters from './ShowcaseFilters';
 import MySiteOrders from './MySiteOrders';
+import ShopBookings from './ShopBookings';
 
 const TABS = [
   { id:'orders', label:'Заявки' },
+  { id:'bookings', label:'Записи' },
   { id:'settings', label:'Настройки витрины' },
 ];
 
@@ -20,6 +22,7 @@ export default function MySite() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [products, setProducts] = useState([]);
+  const [bookings, setBookings] = useState([]);
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
@@ -33,6 +36,9 @@ export default function MySite() {
     setOrders(o.data || []);
     const pr = await supabase.from('products').select('id, name, cat, type').eq('user_id', user.id).limit(500);
     setProducts(pr.data || []);
+    const bk = await supabase.from('shop_bookings').select('*').eq('user_id', user.id)
+      .order('booking_date', { ascending:false }).limit(500);
+    setBookings(bk.data || []);
     setLoading(false);
   };
   useEffect(() => { load(); }, [user?.id]);
@@ -72,6 +78,11 @@ export default function MySite() {
     if (status === 'canceled') {
       await supabase.from('shop_reserves').delete().eq('order_id', String(o.id));
     }
+    load();
+  };
+
+  const changeBooking = async (b, status) => {
+    await supabase.from('shop_bookings').update({ status, updated_at: new Date().toISOString() }).eq('id', b.id);
     load();
   };
 
@@ -137,6 +148,7 @@ export default function MySite() {
           </div>
         </>
       )}
+      {tab === 'bookings' && <ShopBookings bookings={bookings} loading={loading} onStatus={changeBooking} />}
       {tab === 'orders' && <MySiteOrders orders={orders} loading={loading} onChangeStatus={changeStatus} onMakeReceipt={makeReceipt} />}
 
       {toast && (
