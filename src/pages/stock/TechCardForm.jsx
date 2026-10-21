@@ -48,17 +48,18 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           <input style={inp} value={f.name} onChange={set('name')} placeholder="Например, Борщ украинский" />
         </div>
 
-        <div>
-          <label style={lbl}>Категория</label>
-          <input style={inp} value={f.category} onChange={set('category')} placeholder="Супы, салаты, напитки" list="tc-cats" />
-          <datalist id="tc-cats">
-            {(categories || []).map(c => <option key={c} value={c} />)}
-          </datalist>
-        </div>
-
-        <div>
-          <label style={lbl}>Цена продажи</label>
-          <input style={inp} value={f.price} onChange={set('price')} placeholder="0" inputMode="decimal" />
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div>
+            <label style={lbl}>Категория</label>
+            <input style={inp} value={f.category} onChange={set('category')} placeholder="Супы, салаты" list="tc-cats" />
+            <datalist id="tc-cats">
+              {(categories || []).map(c => <option key={c} value={c} />)}
+            </datalist>
+          </div>
+          <div>
+            <label style={lbl}>Цена продажи</label>
+            <input style={inp} value={f.price} onChange={set('price')} placeholder="0" inputMode="decimal" />
+          </div>
         </div>
 
         <div style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px',
