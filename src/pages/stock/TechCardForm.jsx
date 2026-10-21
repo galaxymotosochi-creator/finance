@@ -33,7 +33,12 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         const toGram = u === 'кг' ? 0.001 : u === 'л' ? 0.001 : 1;
         return { ...x, price: x.is_water ? 0 : basePrice * toGram, loss: Number(x.loss_cleaning) || 0 };
       });
-      setProducts(withPrice);
+      const sf = await supabase.from('semifinished').select('*').eq('user_id', user.id);
+      const sfList = (sf.data || []).map(function(x){
+        return { ...x, id: 'sf_' + x.id, sf_id: x.id, is_sf: true,
+                 price: Number(x.price_per_unit) || 0, loss: 0 };
+      });
+      setProducts(withPrice.concat(sfList));
       const ct = await supabase.from('stock_categories').select('*').eq('user_id', user.id);
       setCats((ct.data || []).filter(function(c){ return c.type === 'dish'; }));
       if (initial?.id) {
@@ -55,16 +60,21 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   const pickProduct = (i, pid) => {
     const p = products.find(x => String(x.id) === String(pid));
     const row = items[i] || {};
+    if (p && p.is_sf) {
+      const netto = Number(row.netto) || 0;
+      updRow(i, { product_id: p.sf_id, name: p.name, price_per_unit: p.price,
+        waste_percent: 0, brutto: netto > 0 ? String(netto) : '', is_sf: true });
+      return;
+    }
     const waste = Number(p?.loss) || 0;
     const netto = Number(row.netto) || 0;
     const brutto = netto > 0 ? (netto / (1 - waste / 100)).toFixed(2) : '';
     updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0,
-      waste_percent: waste, brutto });
+      waste_percent: waste, brutto, is_sf: false });
   };
   const priceOf = (r) => {
-    const ing = products.find(x => String(x.id) === String(r.product_id));
-    const p = ing ? Number(ing.price) || 0 : Number(r.price_per_unit) || 0;
-    return p;
+    const ing = products.find(x => String(x.id) === String(r.product_id) || String(x.sf_id) === String(r.product_id));
+    return ing ? (Number(ing.price) || 0) : (Number(r.price_per_unit) || 0);
   };
   const costOf = (r) => (Number(r.brutto || r.netto) || 0) * priceOf(r);
   const totalCost = items.reduce((s, r) => s + costOf(r), 0);
@@ -168,7 +178,16 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                 <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
                   style={{ ...inp, padding:'8px 10px' }}>
                   <option value="">— выберите —</option>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  {products.filter(p => !p.is_sf).length > 0 && (
+                    <optgroup label="Ингредиенты">
+                      {products.filter(p => !p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </optgroup>
+                  )}
+                  {products.filter(p => p.is_sf).length > 0 && (
+                    <optgroup label="Полуфабрикаты">
+                      {products.filter(p => p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </optgroup>
+                  )}
                 </select>
                 <input value={r.brutto} onChange={e => {
                     const b = e.target.value;
