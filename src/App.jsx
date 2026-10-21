@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const Login = lazy(() => import('./pages/Login'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Register = lazy(() => import('./pages/Register'));
+const TechCards = lazy(() => import('./pages/stock/TechCards'));
 const Variant1 = lazy(() => import('./pages/Variant1'));
 const Variant2 = lazy(() => import('./pages/Variant2'));
 const Variant3 = lazy(() => import('./pages/Variant3'));
