@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import MySiteSettings from './MySiteSettings';
 import ShowcaseFilters from './ShowcaseFilters';
+import BookingSettings from './BookingSettings';
 import MySiteOrders from './MySiteOrders';
 import ShopBookings from './ShopBookings';
 
@@ -146,6 +147,7 @@ export default function MySite() {
       {tab === 'settings' && (
         <>
           <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />
+          <BookingSettings form={shop || {}} setForm={setShop} />
           <ShowcaseFilters form={shop || {}} setForm={setShop} products={products} />
           <div className="modal-actions" style={{ marginTop:12 }}>
             <button type="button" className="sk-dd-btn" onClick={() => save(shop || {})} disabled={saving}
