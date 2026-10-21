@@ -172,12 +172,12 @@ export default function PublicShop() {
                   overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
                   {p.description || ''}
                 </div>
-                <div style={{ marginTop:'auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                  <div style={{ fontWeight:800, fontSize:'1rem' }}>{fmt(p.price)} ₽</div>
+                <div style={{ marginTop:'auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:6, flexWrap:'nowrap' }}>
+                  <div style={{ fontWeight:800, fontSize:'0.92rem', whiteSpace:'nowrap', flexShrink:0 }}>{fmt(p.price)} ₽</div>
                   {p.type === 'service' ? (
                     <button onClick={() => { setBookService(p); setBookOpen(true); }}
-                      style={{ padding:'7px 14px', borderRadius:20, border:'none', background:'#111',
-                        color:'#fff', fontSize:'0.8rem', fontWeight:600, cursor:'pointer' }}>
+                      style={{ padding:'6px 11px', borderRadius:20, border:'none', background:'#111',
+                        color:'#fff', fontSize:'0.74rem', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
                       Записаться
                     </button>
                   ) : cart[p.id] ? (
@@ -187,7 +187,7 @@ export default function PublicShop() {
                       <button onClick={() => add(p)} style={{ width:26, height:26, borderRadius:8, border:'none', background:'#111', color:'#fff', cursor:'pointer', fontSize:'0.9rem' }}>+</button>
                     </div>
                   ) : (
-                    <button onClick={() => add(p)} style={{ padding:'7px 14px', borderRadius:20, border:'none', background:'#111', color:'#fff', fontSize:'0.8rem', fontWeight:600, cursor:'pointer' }}>В корзину</button>
+                    <button onClick={() => add(p)} style={{ padding:'6px 11px', borderRadius:20, border:'none', background:'#111', color:'#fff', fontSize:'0.74rem', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>В корзину</button>
                   )}
                 </div>
               </div>
