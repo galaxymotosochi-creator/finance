@@ -4,8 +4,8 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
 const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', borderRadius:10,
-  fontSize:'.88rem', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
-const lbl = { display:'block', fontSize:'.76rem', fontWeight:600, color:'#6b7280', marginBottom:6 };
+  fontSize:'.875rem', color:'#333', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
+const lbl = { display:'block', fontSize:'.8125rem', fontWeight:600, color:'#333', marginBottom:6 };
 
 export default function TechCardForm({ open, initial, categories, onClose, onSave }) {
   const { user } = useAuth();
@@ -119,13 +119,13 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         {items.length > 0 && (
           <div style={{ display:'grid', gap:6, marginBottom:10 }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8,
-              fontSize:'.7rem', color:'#9ca3af', fontWeight:600, padding:'0 2px' }}>
+              fontSize:'.8125rem', color:'#333', fontWeight:600, padding:'0 2px' }}>
               <div>Продукт</div><div>Брутто</div><div>Нетто</div><div>Себестоимость</div><div></div>
             </div>
             {items.map((r, i) => (
               <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8, alignItems:'center' }}>
                 <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }}>
+                  style={{ ...inp, padding:'8px 10px' }}>
                   <option value="">— выберите —</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
@@ -136,7 +136,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                     updRow(i, { brutto: b, netto });
                   }}
                   inputMode="decimal" placeholder="0"
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
+                  style={{ ...inp, padding:'8px 10px' }} />
                 <input value={r.netto} onChange={e => {
                     const n = e.target.value;
                     const waste = Number(r.waste_percent) || 0;
@@ -144,8 +144,8 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                     updRow(i, { netto: n, brutto });
                   }}
                   inputMode="decimal" placeholder="0"
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
-                <div style={{ fontSize:'.8rem', color:'#6b7280', textAlign:'right', paddingRight:4 }}>
+                  style={{ ...inp, padding:'8px 10px' }} />
+                <div style={{ fontSize:'.875rem', color:'#333', textAlign:'right', paddingRight:4 }}>
                   {Math.round(costOf(r)).toLocaleString('ru-RU')} ₽
                 </div>
                 <button onClick={() => delRow(i)}
