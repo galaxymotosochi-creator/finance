@@ -66,10 +66,10 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div>
             <label style={lbl}>Категория</label>
-            <input style={inp} value={f.category} onChange={set('category')} placeholder="Супы, салаты" list="tc-cats" />
-            <datalist id="tc-cats">
-              {(categories || []).map(c => <option key={c} value={c} />)}
-            </datalist>
+            <select style={inp} value={f.category} onChange={set('category')}>
+              <option value="">— выберите —</option>
+              {cats.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+            </select>
           </div>
           <div>
             <label style={lbl}>Цена продажи</label>
