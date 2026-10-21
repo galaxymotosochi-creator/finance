@@ -33,7 +33,7 @@ export default function ShowcaseFilters({ form, setForm, products }) {
           const on = types.length === 0 || types.includes(x.k);
           return (
             <div key={x.k} onClick={() => setForm({ ...form, show_types: toggle(types, x.k) })}
-              style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:11,
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 9px', borderRadius:10, minWidth:0,
                 cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : '#eee'),
                 background: on ? 'rgba(31,117,255,.04)' : '#fff' }}>
               <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
@@ -78,7 +78,8 @@ export default function ShowcaseFilters({ form, setForm, products }) {
       <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
         style={{ width:'100%', padding:'9px 14px', border:'1px solid #e5e7eb', borderRadius:10,
           fontSize:'0.85rem', outline:'none', boxSizing:'border-box', marginBottom:8 }} />
-      <div style={{ maxHeight:280, overflowY:'auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+      <div style={{ maxHeight:280, overflowY:'auto', overflowX:'hidden', display:'grid',
+        gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))', gap:6 }}>
         {visible.slice(0, 300).map(p => {
           const on = !hidden.includes(String(p.id));
           return (
@@ -92,7 +93,7 @@ export default function ShowcaseFilters({ form, setForm, products }) {
                 justifyContent:'center', color:'#fff', fontSize:'0.7rem', fontWeight:800 }}>
                 {on ? '✓' : ''}
               </div>
-              <span style={{ fontSize:'0.78rem', fontWeight:600, color:'#111',
+              <span style={{ fontSize:'0.76rem', fontWeight:600, color:'#111', minWidth:0,
                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</span>
             </div>
           );
