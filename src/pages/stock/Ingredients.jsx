@@ -37,7 +37,7 @@ export default function Ingredients() {
       user_id: user.id, name: f.name, unit: f.unit || 'кг', barcode: f.barcode || '',
       loss_cleaning: Number(f.loss_cleaning) || 0, loss_boil: Number(f.loss_boil) || 0,
       loss_fry: Number(f.loss_fry) || 0, loss_stew: Number(f.loss_stew) || 0,
-      loss_bake: Number(f.loss_bake) || 0, updated_at: new Date().toISOString(),
+      loss_bake: Number(f.loss_bake) || 0, is_water: !!f.is_water, updated_at: new Date().toISOString(),
     };
     const ins = await supabase.from('ingredients').insert(payload).select('id').single();
     const ingId = ins.data?.id;

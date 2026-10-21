@@ -53,6 +53,22 @@ export default function IngredientForm({ open, warehouses, onClose, onSave }) {
           </div>
         </div>
 
+        <div style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px',
+          borderRadius:11, border:'1px solid ' + (f.is_water ? 'rgba(31,117,255,.35)' : '#eee'),
+          background: f.is_water ? 'rgba(31,117,255,.04)' : '#fff', cursor:'pointer' }}
+          onClick={() => setF({ ...f, is_water: !f.is_water })}>
+          <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
+            border:'1.5px solid ' + (f.is_water ? '#1F75FF' : '#d1d5db'),
+            background: f.is_water ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
+            justifyContent:'center', color:'#fff', fontSize:'.7rem', fontWeight:800 }}>
+            {f.is_water ? '✓' : ''}
+          </div>
+          <div>
+            <div style={{ fontSize:'.82rem', fontWeight:600 }}>Вода</div>
+            <div style={{ fontSize:'.74rem', color:'#9ca3af', marginTop:2 }}>Идёт в выход блюда, но не в себестоимость</div>
+          </div>
+        </div>
+
         <div>
           <div style={{ fontSize:'.8125rem', fontWeight:600, color:'#333', marginBottom:8 }}>Потери при обработке</div>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
