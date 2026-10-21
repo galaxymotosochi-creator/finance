@@ -409,7 +409,7 @@ app.get('/api/auth/me', auth, async (req, res) => {
 const ALLOWED_TABLES = ['products','categories','accounts','transactions','receipts','receipt_items',
   'shifts','supplies','writeoffs','inventory','suppliers','employees','positions','position_templates',
   'timesheet','timesheet_entries','clients','loyalty','loyalties','loyalty_programs','promos','subscriptions',
-  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts','trash','shops','shop_orders','shop_order_items','shop_reserves','shop_bookings','tech_cards','tech_card_items','ingredients','ingredient_stock','warehouses'];
+  'user_profiles','users','salary','stock_categories','plans','deductions','bonuses','combo_items','initial_stocks','employee_debts','trash','shops','shop_orders','shop_order_items','shop_reserves','shop_bookings','tech_cards','tech_card_items','ingredients','ingredient_stock','warehouses','semifinished','semifinished_items'];
 
 // --- Схема БД: кеш колонок и типов (чтобы корректно приводить типы фильтров) ---
 const tableColumnsCache = new Map();
@@ -602,7 +602,7 @@ app.post('/api/:table', auth, async (req, res) => {
       if (cols.has('user_id')) { if (!keys.includes('user_id')) keys.push('user_id'); body.user_id = req.dataUserId; }
       // timesheet_entries: id — serial (integer), Date.now() не влезает — не подставляем, пусть БД сама
       // Таблицы с UUID и своим DEFAULT — id генерирует БД (Date.now() ломает uuid)
-      const UUID_TABLES = ['shops','shop_orders','shop_order_items','tech_cards','tech_card_items','ingredients','ingredient_stock','warehouses'];
+      const UUID_TABLES = ['shops','shop_orders','shop_order_items','tech_cards','tech_card_items','ingredients','ingredient_stock','warehouses','semifinished','semifinished_items'];
       if (!keys.includes('id') && table !== 'timesheet_entries' && !UUID_TABLES.includes(table)) { keys.unshift('id'); body.id = Date.now() + results.length; }
       // created_at по умолчанию — иначе записи без даты теряются из отчётов/сортировок
       if (!keys.includes('created_at') && cols.has('created_at')) { keys.push('created_at'); body.created_at = new Date().toISOString(); }

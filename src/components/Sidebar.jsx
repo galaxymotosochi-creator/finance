@@ -37,7 +37,7 @@ const menu = [
   {
     label: 'Меню', icon: 'menu', onlyFood: true, children: [
       { label: 'Тех. карты', path: '/stock/techcards' },
-      { label: 'Полуфабрикаты', path: '/stock/semifinished', soon: true },
+      { label: 'Полуфабрикаты', path: '/stock/semifinished' },
       { label: 'Ингредиенты', path: '/stock/ingredients' },
       { label: 'Категории блюд и тех.карт', path: '/stock/categories' },
       { label: 'Категории ингредиентов', path: '/stock/ing-categories' },

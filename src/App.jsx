@@ -12,6 +12,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Register = lazy(() => import('./pages/Register'));
 const TechCards = lazy(() => import('./pages/stock/TechCards'));
+const Semifinished = lazy(() => import('./pages/stock/Semifinished'));
 const Ingredients = lazy(() => import('./pages/stock/Ingredients'));
 const Variant1 = lazy(() => import('./pages/Variant1'));
 const Variant2 = lazy(() => import('./pages/Variant2'));
@@ -101,6 +102,7 @@ function AppRoutes() {
 
       <Route path="/stock/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/techcards" element={<ProtectedRoute><AppLayout><TechCards /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/semifinished" element={<ProtectedRoute><AppLayout><Semifinished /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/ingredients" element={<ProtectedRoute><AppLayout><Ingredients /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/ing-categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
