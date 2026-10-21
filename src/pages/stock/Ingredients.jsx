@@ -19,7 +19,7 @@ export default function Ingredients() {
     if (!user) return;
     const [i, st, w] = await Promise.all([
       supabase.from('ingredients').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('ingredient_stock').select('*').eq('user_id', user.id),
+      supabase.from('ingredient_stock').select('*'),
       supabase.from('warehouses').select('*').eq('user_id', user.id).order('name'),
     ]);
     setRows(i.data || []); setStock(st.data || []); setWarehouses(w.data || []);
@@ -51,7 +51,8 @@ export default function Ingredients() {
       });
     }
     setFormOpen(false);
-    load();
+    setLoading(true);
+    await load();
   };
 
   const list = rows.filter(r => !q.trim() || String(r.name).toLowerCase().includes(q.trim().toLowerCase()));

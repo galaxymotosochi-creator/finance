@@ -54,6 +54,13 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   const costOf = (r) => (Number(r.brutto || r.netto) || 0) * (Number(r.price_per_unit) || 0);
   const totalCost = items.reduce((s, r) => s + costOf(r), 0);
   const totalNetto = items.reduce((s, r) => s + (Number(r.netto) || 0), 0);
+  const [outManual, setOutManual] = useState(false);
+  useEffect(() => {
+    if (!outManual && items.length) {
+      const sum = items.reduce((a, r) => a + (Number(r.netto) || 0), 0);
+      if (sum > 0) setF(function(prev){ return { ...prev, output_weight: String(Math.round(sum)) }; });
+    }
+  }, [items]);
 
   return (
     <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width={680} className="tc-modal">
@@ -103,7 +110,10 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div>
             <label style={lbl}>Выход порции</label>
-            <input style={inp} value={f.output_weight} onChange={set('output_weight')} placeholder="300" inputMode="decimal" />
+            <input style={inp} value={f.output_weight} onChange={e => { setOutManual(true); set('output_weight')(e); }} placeholder="300" inputMode="decimal" />
+            <div style={{ fontSize:'.7rem', color:'#9ca3af', marginTop:4 }}>
+              {outManual ? 'Введено вручную' : 'Считается из состава'}
+            </div>
           </div>
           <div>
             <label style={lbl}>Ед.</label>
