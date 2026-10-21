@@ -85,7 +85,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           </div>
         )}
 
-        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:10 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div>
             <label style={lbl}>Выход порции</label>
             <input style={inp} value={f.output_weight} onChange={set('output_weight')} placeholder="300" inputMode="decimal" />
