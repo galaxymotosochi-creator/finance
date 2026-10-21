@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
 import SectionHelp from '../../components/SectionHelp';
+import TechCardForm from './TechCardForm';
 
 const fmt = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(Number(n) || 0));
 
@@ -13,6 +14,8 @@ export default function TechCards() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -30,6 +33,27 @@ export default function TechCards() {
     .reduce((s, i) => s + (Number(i.netto) || 0) * (Number(i.price_per_unit) || 0), 0);
 
   const list = cards.filter(c => !q.trim() || String(c.name).toLowerCase().includes(q.trim().toLowerCase()));
+
+  const saveCard = async (f) => {
+    const payload = {
+      user_id: user.id,
+      name: f.name,
+      category: f.category || '',
+      price: Number(f.price) || 0,
+      output_weight: Number(f.output_weight) || 0,
+      output_unit: f.output_unit || 'г',
+      photo_url: f.photo_url || '',
+      description: f.description || '',
+      is_weight: !!f.is_weight,
+      price_per_kg: Number(f.price_per_kg) || 0,
+      updated_at: new Date().toISOString(),
+    };
+    if (f.id) await supabase.from('tech_cards').update(payload).eq('id', f.id);
+    else await supabase.from('tech_cards').insert(payload);
+    setFormOpen(false); setEditing(null);
+    const c = await supabase.from('tech_cards').select('*').eq('user_id', user.id).order('name');
+    setCards(c.data || []);
+  };
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:0 }}>
@@ -66,7 +90,7 @@ export default function TechCards() {
             <div className="sub">Блюда с составом и себестоимостью</div>
           </div>
           <div className="page-actions">
-            <button className="sk-dd-btn">Добавить тех. карту</button>
+            <button className="sk-dd-btn" onClick={() => { setEditing(null); setFormOpen(true); }}>Добавить тех. карту</button>
           </div>
         </div>
         <div className="sk-search" style={{ display:'flex', marginBottom:'.5rem', width:'100%', flexWrap:'nowrap' }}>
@@ -129,6 +153,11 @@ export default function TechCards() {
         </div>
         </div>
       )}
+
+      <TechCardForm open={formOpen} initial={editing}
+        categories={Array.from(new Set(cards.map(c => c.category).filter(Boolean)))}
+        onClose={() => { setFormOpen(false); setEditing(null); }}
+        onSave={saveCard} />
     </div>
   );
 }
