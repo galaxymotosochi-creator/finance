@@ -55,6 +55,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
   }, [open, user?.id, initial?.id]);
 
   const addRow = () => setItems([...items, { name:'', product_id:'', netto:'', price_per_unit:'', unit:'г', waste_percent:'' }]);
+  const addSfRow = () => setItems([...items, { name:'', product_id:'', netto:'', price_per_unit:'', unit:'г', waste_percent:'', sfMode:true }]);
   const updRow = (i, patch) => setItems(items.map((r, idx) => idx === i ? { ...r, ...patch } : r));
   const delRow = (i) => setItems(items.filter((_, idx) => idx !== i));
   const pickProduct = (i, pid) => {
@@ -213,12 +214,20 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           </div>
         )}
 
-        <button onClick={addRow}
-          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px',
-            borderRadius:20, border:'1px dashed #d1d5db', background:'#fff', cursor:'pointer',
-            fontSize:'.8rem', fontWeight:600, color:'#4b5563' }}>
-          + Добавить ингредиент
-        </button>
+        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+          <button onClick={addRow}
+            style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px',
+              borderRadius:20, border:'1px dashed #d1d5db', background:'#fff', cursor:'pointer',
+              fontSize:'.8rem', fontWeight:600, color:'#4b5563' }}>
+            + Добавить ингредиент
+          </button>
+          <button onClick={addSfRow}
+            style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px',
+              borderRadius:20, border:'1px dashed #d1d5db', background:'#fff', cursor:'pointer',
+              fontSize:'.8rem', fontWeight:600, color:'#4b5563' }}>
+            + Добавить полуфабрикат
+          </button>
+        </div>
 
         <div style={{ display:'flex', justifyContent:'space-between', marginTop:12, paddingTop:10,
           borderTop:'1px solid #f5f5f5', fontSize:'.82rem' }}>
