@@ -123,6 +123,11 @@ const DdCheck = () => (
 export default function Products() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
+  const businessType = (function(){
+    try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
+  })();
+  const isFood = businessType === 'food';
+  const pageTitle = isFood ? 'Ингредиенты' : 'Товары и услуги';
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
@@ -709,10 +714,10 @@ export default function Products() {
         <div className="sk-bar">
         <div className="grow">
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h1>Товары и услуги</h1>
+            <h1>{pageTitle}</h1>
             <SectionHelp
-              title="Раздел «Товары и услуги»"
-              intro="Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость."
+              title={isFood ? 'Раздел «Ингредиенты»' : 'Раздел «Товары и услуги»'}
+              intro={isFood ? 'Продукты и сырьё, из которых готовятся блюда: мука, мясо, масло, специи. Здесь задаются единицы измерения, цены закупки и остатки на складе.' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.'}
               blocks={[
                 { title: 'Типы позиций', items: [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
