@@ -113,25 +113,32 @@ export default function PublicShop() {
   return (
     <div style={{ fontFamily:'Inter,sans-serif', color:'#111', minHeight:'100vh', background:'#fff',
       flex:'1 1 auto', width:'100%', minWidth:0, alignSelf:'stretch' }}>
-      <header style={{ borderBottom:'1px solid #f0f0f0', padding:'18px 20px' }}>
-        <div style={{ width:'100%', maxWidth:'100%', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
-          <div>
-            <div style={{ fontSize:'1.25rem', fontWeight:800, letterSpacing:'-.02em' }}>{shop.name || 'Магазин'}</div>
-            {shop.tagline && <div style={{ fontSize:'0.84rem', color:'#9ca3af', marginTop:2 }}>{shop.tagline}</div>}
+      <header style={{ borderBottom:'1px solid #f0f0f0', padding:'14px 16px' }}>
+        <div style={{ width:'100%', maxWidth:'100%', margin:'0 auto', display:'flex',
+          alignItems:'center', justifyContent:'space-between', gap:10 }}>
+          <div style={{ minWidth:0 }}>
+            <div style={{ fontSize:'1.15rem', fontWeight:800, letterSpacing:'-.02em',
+              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{shop.name || 'Магазин'}</div>
+            {shop.tagline && <div style={{ fontSize:'0.78rem', color:'#9ca3af', marginTop:1,
+              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{shop.tagline}</div>}
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:14, fontSize:'0.82rem', color:'#6b7280', flexWrap:'wrap' }}>
+          {shop.use_booking && (
+            <button onClick={() => setBookOpen(true)}
+              style={{ padding:'8px 15px', borderRadius:20, border:'none', background:'#111',
+                color:'#fff', fontWeight:700, fontSize:'0.78rem', cursor:'pointer',
+                whiteSpace:'nowrap', flexShrink:0 }}>
+              Записаться
+            </button>
+          )}
+        </div>
+        {(shop.address || shop.phone || shop.work_hours) && (
+          <div style={{ width:'100%', margin:'8px auto 0', display:'flex', flexWrap:'wrap',
+            gap:'2px 12px', fontSize:'0.76rem', color:'#6b7280', lineHeight:1.5 }}>
             {shop.address && <span>{shop.address}</span>}
             {shop.phone && <span>{shop.phone}</span>}
             {shop.work_hours && <span>{shop.work_hours}</span>}
-            {shop.use_booking && (
-              <button onClick={() => setBookOpen(true)}
-                style={{ padding:'9px 18px', borderRadius:20, border:'none', background:'#111',
-                  color:'#fff', fontWeight:700, fontSize:'0.82rem', cursor:'pointer' }}>
-                Записаться
-              </button>
-            )}
           </div>
-        </div>
+        )}
       </header>
 
       {shop.about && (
