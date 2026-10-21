@@ -123,8 +123,11 @@ const DdCheck = () => (
 export default function Products() {
   const cur = getCurrencySymbol();
   const { user } = useAuth();
-  const pageTitle = 'Товары и услуги';
-  const isFood = false;
+  const businessType = (function(){
+    try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
+  })();
+  const isFood = businessType === 'food';
+  const pageTitle = isFood ? 'Товары' : 'Товары и услуги';
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
@@ -713,8 +716,8 @@ export default function Products() {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>{pageTitle}</h1>
             <SectionHelp
-              title={isFood ? 'Раздел «Ингредиенты»' : 'Раздел «Товары и услуги»'}
-              intro={isFood ? 'Продукты и сырьё, из которых готовятся блюда: мука, мясо, масло, специи. Здесь задаются единицы измерения, цены закупки и остатки на складе.' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.'}
+              title={isFood ? 'Раздел «Товары»' : 'Раздел «Товары и услуги»'}
+              intro={isFood ? 'Готовые товары для продажи: напитки, снеки, упаковка и прочее. Ингредиенты, из которых готовятся блюда, ведутся в разделе «Меню → Ингредиенты».' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.'}
               blocks={[
                 { title: 'Типы позиций', items: [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
@@ -777,7 +780,7 @@ export default function Products() {
             {typeOpen && (
               <div className="f-menu">
                 <div className="f-list">
-                {[{v:null,l:'Все'},{v:'product',l:'Товары'},{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}].map(function(t) {
+                {[{v:null,l:'Все'},{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}].map(function(t) {
                   const checked = (t.v === null && typeFilterSet.size === 0) || typeFilterSet.has(t.v);
                   return (
                     <div key={String(t.v)} onClick={() => pickType(t.v)}
@@ -969,7 +972,7 @@ export default function Products() {
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
               </div>
               <div className="form-row">
-                <div className="form-group">
+                {!isFood && <div className="form-group">
                   <label>Тип</label>
                   <select value={fType} onChange={e => {
                     const t = e.target.value;
@@ -982,7 +985,7 @@ export default function Products() {
                     <option value="service">Услуга</option>
                     <option value="combo">Комбо</option>
                   </select>
-                </div>
+                </div>}
                 <div className="form-group">
                   <label>Категория</label>
                   <select value={fCat} onChange={e => setFCat(e.target.value)}>
