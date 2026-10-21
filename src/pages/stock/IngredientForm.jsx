@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
 
 const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', borderRadius:10,
@@ -11,6 +11,14 @@ export default function IngredientForm({ open, warehouses, onClose, onSave }) {
     loss_cleaning:'', loss_boil:'', loss_fry:'', loss_stew:'', loss_bake:'',
     qty:'', price:'', warehouse_id:''
   });
+  const empty = {
+    name:'', unit:'кг', barcode:'',
+    loss_cleaning:'', loss_boil:'', loss_fry:'', loss_stew:'', loss_bake:'',
+    qty:'', price:'', warehouse_id:''
+  };
+  useEffect(() => {
+    if (open) setF(empty);
+  }, [open]);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const losses = [
     ['loss_cleaning','% потерь при очистке'],
