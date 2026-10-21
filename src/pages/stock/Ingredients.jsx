@@ -12,18 +12,21 @@ export default function Ingredients() {
   const [rows, setRows] = useState([]);
   const [stock, setStock] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
+  const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
   const load = async () => {
     if (!user) return;
-    const [i, st, w] = await Promise.all([
+    const [i, st, w, ct] = await Promise.all([
       supabase.from('ingredients').select('*').eq('user_id', user.id).order('name'),
       supabase.from('ingredient_stock').select('*'),
       supabase.from('warehouses').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('stock_categories').select('*').eq('user_id', user.id),
     ]);
     setRows(i.data || []); setStock(st.data || []); setWarehouses(w.data || []);
+    setCats((ct.data || []).filter(function(c){ return c.type === 'ingredient'; }));
     setLoading(false);
   };
   useEffect(() => { load(); }, [user?.id]);
@@ -198,7 +201,7 @@ export default function Ingredients() {
         </div>
       </div>
 
-      <IngredientForm open={formOpen} warehouses={warehouses} initial={editing}
+      <IngredientForm open={formOpen} warehouses={warehouses} categories={cats} initial={editing}
         onClose={() => { setFormOpen(false); setEditing(null); }} onSave={save} />
     </div>
   );

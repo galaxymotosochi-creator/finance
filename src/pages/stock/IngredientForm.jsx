@@ -5,7 +5,7 @@ const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', bor
   fontSize:'.875rem', color:'#333', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
 const lbl = { display:'block', fontSize:'.8125rem', fontWeight:600, color:'#333', marginBottom:6 };
 
-export default function IngredientForm({ open, warehouses, initial, onClose, onSave }) {
+export default function IngredientForm({ open, warehouses, categories, initial, onClose, onSave }) {
   const [f, setF] = useState({
     name:'', unit:'кг', barcode:'',
     loss_cleaning:'', loss_boil:'', loss_fry:'', loss_stew:'', loss_bake:'',
@@ -21,6 +21,7 @@ export default function IngredientForm({ open, warehouses, initial, onClose, onS
     if (initial && initial.id) {
       setF({
         name: initial.name || '',
+        category: initial.category || '',
         unit: initial.unit || 'кг',
         barcode: initial.barcode || '',
         loss_cleaning: initial.loss_cleaning != null ? String(Number(initial.loss_cleaning) || '') : '',
@@ -46,9 +47,18 @@ export default function IngredientForm({ open, warehouses, initial, onClose, onS
   return (
     <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать ингредиент' : 'Добавить ингредиент'} width={680} className="tc-modal">
       <div style={{ display:'grid', gap:14 }}>
-        <div>
-          <label style={lbl}>Название</label>
-          <input style={inp} value={f.name} onChange={set('name')} placeholder="Например, Картофель" />
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div>
+            <label style={lbl}>Название</label>
+            <input style={inp} value={f.name} onChange={set('name')} placeholder="Например, Картофель" />
+          </div>
+          <div>
+            <label style={lbl}>Категория</label>
+            <select style={inp} value={f.category} onChange={set('category')}>
+              <option value="">— выберите —</option>
+              {(categories || []).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+            </select>
+          </div>
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
@@ -65,22 +75,6 @@ export default function IngredientForm({ open, warehouses, initial, onClose, onS
           <div>
             <label style={lbl}>Штрихкод</label>
             <input style={inp} value={f.barcode} onChange={set('barcode')} placeholder="Необязательно" />
-          </div>
-        </div>
-
-        <div style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px',
-          borderRadius:11, border:'1px solid ' + (f.is_water ? 'rgba(31,117,255,.35)' : '#eee'),
-          background: f.is_water ? 'rgba(31,117,255,.04)' : '#fff', cursor:'pointer' }}
-          onClick={() => setF({ ...f, is_water: !f.is_water })}>
-          <div style={{ width:18, height:18, borderRadius:5, flexShrink:0,
-            border:'1.5px solid ' + (f.is_water ? '#1F75FF' : '#d1d5db'),
-            background: f.is_water ? '#1F75FF' : '#fff', display:'flex', alignItems:'center',
-            justifyContent:'center', color:'#fff', fontSize:'.7rem', fontWeight:800 }}>
-            {f.is_water ? '✓' : ''}
-          </div>
-          <div>
-            <div style={{ fontSize:'.82rem', fontWeight:600 }}>Вода</div>
-            <div style={{ fontSize:'.74rem', color:'#9ca3af', marginTop:2 }}>Идёт в выход блюда, но не в себестоимость</div>
           </div>
         </div>
 
