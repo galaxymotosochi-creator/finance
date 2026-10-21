@@ -103,6 +103,7 @@ function AppRoutes() {
       <Route path="/stock/techcards" element={<ProtectedRoute><AppLayout><TechCards /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/ingredients" element={<ProtectedRoute><AppLayout><Ingredients /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/ing-categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/supplies" element={<ProtectedRoute><AppLayout><Supplies /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/supply/new" element={<ProtectedRoute><AppLayout><SupplyNew /></AppLayout></ProtectedRoute>} />

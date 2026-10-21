@@ -12,6 +12,9 @@ export default function Categories() {
   const businessType = (function(){
     try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
   })();
+  const scope = (function(){
+    try { return location.pathname.indexOf('ing-categories') >= 0 ? 'ingredient' : 'dish'; } catch(e){ return 'dish'; }
+  })();
   const [cats, setCats] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -48,7 +51,7 @@ export default function Categories() {
     try {
       const { data, error } = await supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at');
       if (error) throw error;
-      if (data) setCats(data);
+      if (data) setCats(businessType === 'food' ? data.filter(function(c){ return c.type === scope; }) : data);
     } catch (e) {
       setToast('⚠️ Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'));
     }
@@ -90,7 +93,7 @@ export default function Categories() {
   const openAdd = () => {
     setEditId(null);
     setFName('');
-    setFType(businessType === 'food' ? 'dish' : 'product');
+    setFType(businessType === 'food' ? scope : 'product');
     setShowModal(true);
   };
 
@@ -138,7 +141,7 @@ export default function Categories() {
       <div className="sk-bar">
         <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Категории</h1>
+            <h1>{businessType === 'food' ? (scope === 'ingredient' ? 'Категории ингредиентов' : 'Категории блюд и тех.карт') : 'Категории'}</h1>
             <SectionHelp
               title="Раздел «Категории»"
               intro="Категории — группы, по которым распределяются товары и услуги. По ним удобно фильтровать каталог, остатки и кассу."
@@ -240,10 +243,9 @@ export default function Categories() {
             <label>Вид</label>
             <select value={fType} onChange={e => setFType(e.target.value)}>
               {businessType === 'food' ? (
-                <>
-                  <option value="dish">Блюдо / тех. карта</option>
-                  <option value="ingredient">Ингредиент</option>
-                </>
+                scope === 'ingredient'
+                  ? <option value="ingredient">Ингредиент</option>
+                  : <option value="dish">Блюдо / тех. карта</option>
               ) : (
                 <>
                   <option value="product">Товар</option>
