@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { getCurrencySymbol } from '../../lib/currency';
+import SectionHelp from '../../components/SectionHelp';
 
 const fmt = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(Number(n) || 0));
 
@@ -31,39 +32,75 @@ export default function TechCards() {
   const list = cards.filter(c => !q.trim() || String(c.name).toLowerCase().includes(q.trim().toLowerCase()));
 
   return (
-    <div style={{ padding:'0 0 40px' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap', marginBottom:16 }}>
-        <div>
-          <h1 style={{ margin:0, fontSize:'1.5rem', fontWeight:800, letterSpacing:'-.02em' }}>Тех. карты</h1>
-          <div style={{ fontSize:'.82rem', color:'#9ca3af', marginTop:4 }}>
-            Блюда с составом и себестоимостью
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', minHeight:0 }}>
+      <div style={{ flexShrink:0 }}>
+        <div className="sk-bar">
+          <div className="grow">
+            <div style={{ display:'flex', alignItems:'center' }}>
+              <h1>Тех. карты</h1>
+              <SectionHelp
+                title="Раздел «Тех. карты»"
+                intro="Технологические карты блюд: состав, граммовки и себестоимость. Тех. карта — это и есть блюдо: создали карту — оно продаётся в кассе."
+                blocks={[
+                  { title: 'Как создать блюдо', items: [
+                    <>Нажмите «Добавить тех. карту» — откроется форма.</>,
+                    <>Укажите <b>название</b>, <b>категорию</b>, <b>цену продажи</b> и <b>выход порции</b> (вес или объём).</>,
+                    <>Добавьте <b>состав</b>: ингредиенты и количество нетто в граммах.</>,
+                  ]},
+                  { title: 'Себестоимость и наценка', items: [
+                    <><b>Себестоимость</b> считается сама: сумма (нетто × цена за грамм) по всем ингредиентам.</>,
+                    <><b>Цена продажи</b> задаётся вручную — это то, за сколько продаёте.</>,
+                    <><b>Наценка</b> считается сама: разница между ценой и себестоимостью в процентах.</>,
+                  ]},
+                  { title: 'Столбцы таблицы', items: [
+                    <><b>Название</b> — название блюда.</>,
+                    <><b>Категория</b> — группа меню: супы, салаты, напитки.</>,
+                    <><b>Выход</b> — вес или объём одной порции.</>,
+                    <><b>Себестоимость</b> — во сколько обходится порция.</>,
+                    <><b>Цена</b> — цена продажи.</>,
+                    <><b>Наценка</b> — прибыль в процентах от себестоимости.</>,
+                  ]},
+                ]}
+              />
+            </div>
+            <div className="sub">Блюда с составом и себестоимостью</div>
+          </div>
+          <div className="page-actions">
+            <button className="sk-dd-btn">Добавить тех. карту</button>
           </div>
         </div>
-        <button className="sk-dd-btn">Добавить тех. карту</button>
+        <div className="sk-search" style={{ display:'flex', marginBottom:'.5rem', width:'100%', flexWrap:'nowrap', padding:'5px 6px 5px 14px' }}>
+          <span style={{ display:'flex', color:'#999', flexShrink:0 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
+          <input type="text" placeholder="Поиск…" value={q} onChange={e => setQ(e.target.value)} autoComplete="off"
+            style={{ border:'none', outline:'none', flex:'1 1 60px', minWidth:0, width:'100%', fontSize:'.78rem', fontFamily:'var(--font)', background:'none', padding:0 }} />
+        </div>
       </div>
-
-      <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
-        style={{ width:'100%', maxWidth:360, padding:'10px 16px', border:'1px solid #e5e7eb',
-          borderRadius:22, fontSize:'.88rem', outline:'none', marginBottom:16, boxSizing:'border-box' }} />
 
       {loading ? (
         <div style={{ padding:40, textAlign:'center', color:'#9ca3af' }}>Загружаю…</div>
       ) : !list.length ? (
-        <div style={{ background:'#fff', border:'1px solid #eee', borderRadius:14, padding:40,
-          textAlign:'center', color:'#9ca3af', fontSize:'.88rem' }}>
-          Тех. карт пока нет. Нажмите «Добавить тех. карту».
+        <div className="empty-products">
+          <div className="big-icon">📋</div>
+          <p>Тех. карт пока нет</p>
+          <div style={{ maxWidth:'420px', margin:'0 auto', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
+            Нажмите «Добавить тех. карту» — укажите название, цену продажи и состав.
+            Себестоимость и наценка посчитаются сами.
+          </div>
         </div>
       ) : (
-        <div style={{ background:'#fff', border:'1px solid #eee', borderRadius:14, overflow:'hidden' }}>
-          <table className="sk-table" style={{ width:'100%', borderCollapse:'collapse' }}>
+        <div className="stock-table-wrap" style={{ flex:1, minHeight:0 }}>
+        <div className="sk-card" style={{ position:'relative', flex:1, overflowY:'auto', overflowX:'auto', minHeight:0 }}>
+          <table className="sk-table stock-table" style={{ minWidth:'760px' }}>
             <thead>
               <tr>
-                <th style={{ textAlign:'left', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Название</th>
-                <th style={{ textAlign:'left', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Категория</th>
-                <th style={{ textAlign:'right', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Выход</th>
-                <th style={{ textAlign:'right', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Себестоимость</th>
-                <th style={{ textAlign:'right', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Цена</th>
-                <th style={{ textAlign:'right', padding:'12px 16px', fontSize:'.74rem', color:'#6b7280', fontWeight:600 }}>Наценка</th>
+                <th style={{ minWidth:'200px', textAlign:'left' }}>Название</th>
+                <th style={{ textAlign:'left' }}>Категория</th>
+                <th style={{ textAlign:'left' }}>Выход</th>
+                <th style={{ textAlign:'left' }}>Себестоимость</th>
+                <th style={{ textAlign:'left' }}>Цена</th>
+                <th style={{ textAlign:'left' }}>Наценка</th>
               </tr>
             </thead>
             <tbody>
@@ -89,6 +126,7 @@ export default function TechCards() {
               })}
             </tbody>
           </table>
+        </div>
         </div>
       )}
     </div>
