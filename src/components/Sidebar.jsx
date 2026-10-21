@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useState as useLocalState, useEffect as useLocalEffect } from 'react';
 
 const svgIcons = {
   dashboard: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
@@ -34,7 +35,8 @@ const menu = [
   },
   {
     label: 'Склад', icon: 'stock', children: [
-      { label: 'Товары и услуги', path: '/stock/products' },
+      { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Ингредиенты' },
+      { label: 'Блюда', path: '/stock/dishes', onlyFood: true },
       { label: 'Категории', path: '/stock/categories' },
       { label: 'Аналитика товаров', path: '/stock/turnover' },
       { label: 'Остатки', path: '/stock/stock' },
@@ -108,6 +110,22 @@ export default function Sidebar() {
     return p === cleanPath;
   };
 
+  const [businessType, setBusinessTypeState] = useLocalState('retail');
+  useLocalEffect(function(){
+    try { var v = localStorage.getItem('atlaspos_business_type'); if (v) setBusinessTypeState(v); } catch(e){}
+    fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + ((function(){ try { return JSON.parse(localStorage.getItem('atlaspos_session')||'{}').access_token || ''; } catch(e){ return ''; } })()) } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ if (d && d.user && d.user.business_type) { setBusinessTypeState(d.user.business_type); try { localStorage.setItem('atlaspos_business_type', d.user.business_type); } catch(e){} } })
+      .catch(function(){});
+  }, []);
+  const setBusinessType = function(t){
+    setBusinessTypeState(t);
+    try { localStorage.setItem('atlaspos_business_type', t); } catch(e){}
+    fetch('/api/business-type', { method:'PUT',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + ((function(){ try { return JSON.parse(localStorage.getItem('atlaspos_session')||'{}').access_token || ''; } catch(e){ return ''; } })()) },
+      body: JSON.stringify({ business_type: t }) }).catch(function(){});
+  };
+
   return (
     <>
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' open' : ''}`} id="mainSidebar">
@@ -158,6 +176,7 @@ export default function Sidebar() {
                     </button>
                     <div className={`nav-children-acc${open ? ' open' : ''}`}>
                       {item.children.filter(function(child){
+                if (child.onlyFood && businessType !== 'food') return false;
                         if (!employeeData) return true;
                         var perms = employeeData.permissions || [];
                         if (!perms || perms.length === 0) return true;
@@ -171,7 +190,7 @@ export default function Sidebar() {
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
                           onClick={() => { navigate(child.path); closeMobile(); }}>
-                          <span className="nav-child-dot" />{child.label}</a>
+                          <span className="nav-child-dot" />{(businessType === 'food' && child.foodLabel) ? child.foodLabel : child.label}</a>
                       ))}
                     </div>
                   </div>
@@ -187,6 +206,35 @@ export default function Sidebar() {
               );
             })}
           </nav>
+          {!collapsed && (
+            <div style={{ marginTop:'auto', padding:'10px 10px 4px' }}>
+              <div style={{ fontSize:'.62rem', color:'#9ca3af', fontWeight:600,
+                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:6, paddingLeft:2 }}>
+                Тип бизнеса
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+                {[['retail','Товарный бизнес'],['services','Услуги'],['food','Общепит']].map(function(o){
+                  var on = businessType === o[0];
+                  return (
+                    <button key={o[0]} type="button"
+                      onClick={function(){ setBusinessType(o[0]); }}
+                      style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 9px',
+                        borderRadius:9, cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : 'transparent'),
+                        background: on ? 'rgba(31,117,255,.07)' : 'transparent',
+                        fontSize:'.76rem', fontWeight: on ? 700 : 500,
+                        color: on ? '#1F75FF' : '#5b6472', fontFamily:'inherit', textAlign:'left' }}>
+                      <span style={{ width:14, height:14, borderRadius:4, flexShrink:0,
+                        border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
+                        background: on ? '#1F75FF' : '#fff', display:'flex',
+                        alignItems:'center', justifyContent:'center', color:'#fff',
+                        fontSize:'.6rem', fontWeight:800 }}>{on ? '✓' : ''}</span>
+                      {o[1]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </aside>
       {mobileOpen && (

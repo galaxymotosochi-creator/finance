@@ -186,7 +186,8 @@ app.post('/api/auth/login', rateLimitAuth({ max: 8, windowMs: 5 * 60 * 1000, lab
     const valid = await bcrypt.compare(password, rows[0].password_hash);
     if (!valid) return res.status(400).json({ error: 'Неверный email или пароль' });
     const token = jwt.sign({ user_id: rows[0].id, role: 'atlaspos' }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: rows[0].id, email: rows[0].email, name: rows[0].name } });
+    res.json({ token, user: { id: rows[0].id, email: rows[0].email, name: rows[0].name,
+      business_type: rows[0].business_type || 'retail' } });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -376,6 +377,18 @@ app.post('/api/ai/chat', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.put('/api/business-type', auth, async (req, res) => {
+  try {
+    const { business_type } = req.body || {};
+    if (!['retail', 'services', 'food'].includes(business_type)) {
+      return res.status(400).json({ error: 'Неверный тип бизнеса' });
+    }
+    const ownerId = req.dataUserId || req.user.id;
+    await pool.query('UPDATE users SET business_type = $1 WHERE id = $2', [business_type, ownerId]);
+    res.json({ ok: true, business_type });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/auth/me', auth, async (req, res) => {
   let employeePerms = null;
   if (req.user.employee_id) {
@@ -385,7 +398,8 @@ app.get('/api/auth/me', auth, async (req, res) => {
     } catch (e) { console.error('Failed to load employee permissions:', e.message); }
   }
   res.json({
-    user: { id: req.user.id, email: req.user.email, name: req.user.name, employee_id: req.user.employee_id },
+    user: { id: req.user.id, email: req.user.email, name: req.user.name,
+      employee_id: req.user.employee_id, business_type: req.user.business_type || 'retail' },
     permissions: employeePerms,
   });
 });
