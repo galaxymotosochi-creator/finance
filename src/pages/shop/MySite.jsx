@@ -125,8 +125,8 @@ export default function MySite() {
         <>
           <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />
           <ShowcaseFilters form={shop || {}} setForm={setShop} products={products} />
-          <div style={{ marginTop:12, display:'flex', justifyContent:'flex-end' }}>
-            <button className="btn btn-outline" onClick={() => save(shop || {})} disabled={saving}
+          <div className="modal-actions" style={{ marginTop:12 }}>
+            <button type="button" className="sk-dd-btn" onClick={() => save(shop || {})} disabled={saving}
               style={{ opacity: saving ? .6 : 1 }}>
               {saving ? 'Сохраняю…' : 'Сохранить фильтры'}
             </button>
