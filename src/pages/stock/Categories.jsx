@@ -51,7 +51,9 @@ export default function Categories() {
     try {
       const { data, error } = await supabase.from('stock_categories').select('*').eq('user_id', user.id).order('created_at');
       if (error) throw error;
-      if (data) setCats(businessType === 'food' ? data.filter(function(c){ return c.type === scope; }) : data);
+      if (data) setCats(businessType === 'food'
+        ? data.filter(function(c){ return c.scope === 'food' && c.type === scope; })
+        : data.filter(function(c){ return c.scope !== 'food'; }));
     } catch (e) {
       setToast('⚠️ Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'));
     }
@@ -76,6 +78,7 @@ export default function Categories() {
     if (oldList.length > 0) {
       oldList.forEach(async (c) => {
         await supabase.from('stock_categories').upsert({
+          scope: businessType === 'food' ? 'food' : 'retail',
           id: c.id,
           user_id: user.id,
           name: c.name,
@@ -109,7 +112,7 @@ export default function Categories() {
     if (!fName.trim()) return alert('Введите название');
     let queued = false;
     if (editId) {
-      const res = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType }).eq('id', editId);
+      const res = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType, scope: businessType === 'food' ? 'food' : 'retail' }).eq('id', editId);
       if (res.error) return alert(res.error.message);
       queued = res.queued;
     } else {
@@ -117,7 +120,8 @@ export default function Categories() {
         id: genId(),
         user_id: user.id,
         name: fName.trim(),
-        type: fType
+        type: fType,
+        scope: businessType === 'food' ? 'food' : 'retail'
       });
       if (res.error) return alert(res.error.message);
       queued = res.queued;
