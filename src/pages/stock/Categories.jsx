@@ -206,7 +206,7 @@ export default function Categories() {
             ) : cats.map(c => (
               <tr key={c.id}>
                 <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
-                <td style={{textAlign:'left'}}>{c.type === 'dish' ? 'Блюдо / тех. карта' : c.type === 'ingredient' ? 'Ингредиент' : c.type === 'service' ? 'Услуга' : 'Товар'}</td>
+                <td style={{textAlign:'left'}}>{businessType === 'food' ? (scope === 'ingredient' ? 'Ингредиент' : 'Блюдо / тех. карта') : (c.type === 'service' ? 'Услуга' : 'Товар')}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="sk-more" onClick={(e) => {
