@@ -110,7 +110,8 @@ export default function PublicShop() {
   });
 
   return (
-    <div style={{ fontFamily:'Inter,sans-serif', color:'#111', minHeight:'100vh', background:'#fff' }}>
+    <div style={{ fontFamily:'Inter,sans-serif', color:'#111', minHeight:'100vh', background:'#fff',
+      flex:'1 1 auto', width:'100%', minWidth:0, alignSelf:'stretch' }}>
       <header style={{ borderBottom:'1px solid #f0f0f0', padding:'18px 20px' }}>
         <div style={{ width:'100%', maxWidth:'100%', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
           <div>

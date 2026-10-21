@@ -26,9 +26,9 @@ export default function MySite() {
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
 
-  const load = async () => {
+  const load = async (silent) => {
     if (!user) return;
-    setLoading(true);
+    if (!silent) setLoading(true);
     const s = await supabase.from('shops').select('*').eq('user_id', user.id).maybeSingle();
     if (s.data) { setShop(s.data); setSlug(s.data.slug); }
     else { setShop({}); setSlug(''); }
@@ -42,6 +42,13 @@ export default function MySite() {
     setLoading(false);
   };
   useEffect(() => { load(); }, [user?.id]);
+
+  // Автообновление: новые заявки и записи появляются без перезагрузки страницы
+  useEffect(() => {
+    if (!user?.id) return;
+    const t = setInterval(() => { if (!document.hidden) load(true); }, 30000);
+    return () => clearInterval(t);
+  }, [user?.id]);
 
   const save = async (form) => {
     if (!user) return;
