@@ -148,13 +148,8 @@ export default function MySite() {
         <>
           <MySiteSettings shop={shop} slug={slug} setShop={setShop} setSlug={setSlug} onSave={save} saving={saving} />
           <BookingSettings form={shop || {}} setForm={setShop} onSave={() => save(shop || {})} saving={saving} />
-          <ShowcaseFilters form={shop || {}} setForm={setShop} products={products} />
-          <div className="modal-actions" style={{ marginTop:12 }}>
-            <button type="button" className="sk-dd-btn" onClick={() => save(shop || {})} disabled={saving}
-              style={{ opacity: saving ? .6 : 1 }}>
-              {saving ? 'Сохраняю…' : 'Сохранить фильтры'}
-            </button>
-          </div>
+          <ShowcaseFilters form={shop || {}} setForm={setShop} products={products}
+            onSave={() => save(shop || {})} saving={saving} />
         </>
       )}
       {tab === 'bookings' && <ShopBookings bookings={bookings} loading={loading} onStatus={changeBooking} />}

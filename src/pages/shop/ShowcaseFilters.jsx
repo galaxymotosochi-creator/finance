@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const chk = { display:'flex', alignItems:'center', gap:9, padding:'8px 10px', borderRadius:9,
   cursor:'pointer', fontSize:'0.85rem', userSelect:'none' };
 
-export default function ShowcaseFilters({ form, setForm, products }) {
+export default function ShowcaseFilters({ form, setForm, products, onSave, saving }) {
   const [q, setQ] = useState('');
   const types = form.show_types || [];
   const cats = form.show_cats || [];
@@ -99,6 +99,13 @@ export default function ShowcaseFilters({ form, setForm, products }) {
           );
         })}
         {!visible.length && <div style={{ fontSize:'0.82rem', color:'#9ca3af', padding:'6px 2px' }}>Ничего не найдено</div>}
+      </div>
+
+      <div className="modal-actions" style={{ marginTop:18 }}>
+        <button type="button" className="sk-dd-btn" onClick={onSave} disabled={saving}
+          style={{ opacity: saving ? .6 : 1 }}>
+          {saving ? 'Сохраняю…' : 'Сохранить'}
+        </button>
       </div>
     </div>
   );

@@ -84,11 +84,20 @@ module.exports = function (pool) {
       const { rows } = await pool.query('SELECT * FROM shops WHERE slug = $1 AND is_active = true', [req.params.slug]);
       const shop = rows[0];
       if (!shop) return res.status(404).json({ error: 'Магазин не найден' });
-      const open = shop.booking_open || '09:00';
-      const close = shop.booking_close || '20:00';
       const step = Number(shop.booking_step) || 60;
       const toMin = (t) => { const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); };
       const toStr = (n) => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+      // График по дням недели: 0=Пн ... 6=Вс (в базе ключи Пн..Вс)
+      const DAY_KEYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+      const dObj = new Date(String(date) + 'T12:00:00');
+      const dow = (dObj.getDay() + 6) % 7;
+      const sched = shop.booking_schedule || {};
+      const dayCfg = sched[DAY_KEYS[dow]];
+      if (dayCfg && dayCfg.off) return res.json({ slots: [], date, step, closed: true });
+      const open = (dayCfg && dayCfg.open) || shop.booking_open || '09:00';
+      const close = (dayCfg && dayCfg.close) || shop.booking_close || '20:00';
+      const brkS = shop.booking_break_start || '';
+      const brkE = shop.booking_break_end || '';
       const busy = await pool.query(
         "SELECT start_time FROM shop_bookings WHERE user_id = $1 AND booking_date = $2 AND status <> 'canceled'",
         [shop.user_id, date]
@@ -97,6 +106,7 @@ module.exports = function (pool) {
       const slots = [];
       for (let t = toMin(open); t + step <= toMin(close); t += step) {
         const st = toStr(t);
+        if (brkS && brkE && t < toMin(brkE) && (t + step) > toMin(brkS)) continue; // слот пересекает перерыв
         if (!taken.has(st)) slots.push({ start: st, end: toStr(t + step) });
       }
       res.json({ slots, date, step });
