@@ -112,7 +112,7 @@ export default function PublicShop() {
   return (
     <div style={{ fontFamily:'Inter,sans-serif', color:'#111', minHeight:'100vh', background:'#fff' }}>
       <header style={{ borderBottom:'1px solid #f0f0f0', padding:'18px 20px' }}>
-        <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+        <div style={{ width:'100%', maxWidth:'100%', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
           <div>
             <div style={{ fontSize:'1.25rem', fontWeight:800, letterSpacing:'-.02em' }}>{shop.name || 'Магазин'}</div>
             {shop.tagline && <div style={{ fontSize:'0.84rem', color:'#9ca3af', marginTop:2 }}>{shop.tagline}</div>}
@@ -132,12 +132,12 @@ export default function PublicShop() {
       </header>
 
       {shop.about && (
-        <div style={{ maxWidth:1200, margin:'0 auto', padding:'20px 20px 0', color:'#6b7280', fontSize:'0.9rem', lineHeight:1.6 }}>
+        <div style={{ width:'100%', maxWidth:'100%', margin:'0 auto', padding:'20px 20px 0', color:'#6b7280', fontSize:'0.9rem', lineHeight:1.6 }}>
           {shop.about}
         </div>
       )}
 
-      <main style={{ maxWidth:1200, margin:'0 auto', padding:'20px' }}>
+      <main style={{ width:'100%', maxWidth:'100%', margin:'0 auto', padding:'20px' }}>
         <div style={{ display:'flex', gap:10, marginBottom:16, flexWrap:'wrap', alignItems:'center' }}>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по названию"
             style={{ flex:'1 1 220px', padding:'10px 16px', border:'1px solid #e5e7eb', borderRadius:22,
@@ -156,7 +156,7 @@ export default function PublicShop() {
             </button>
           ))}
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))', gap:14 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))', gap:14 }}>
           {filtered.map(p => (
             <div key={p.id} style={{ border:'1px solid #eee', borderRadius:14, overflow:'hidden', display:'flex', flexDirection:'column' }}>
               <div style={{ height:150, background:'#f7f7f8', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
