@@ -64,14 +64,14 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
     if (p && p.is_sf) {
       const netto = Number(row.netto) || 0;
       updRow(i, { product_id: p.sf_id, name: p.name, price_per_unit: p.price,
-        waste_percent: 0, brutto: netto > 0 ? String(netto) : '', is_sf: true });
+        waste_percent: 0, brutto: netto > 0 ? String(netto) : '', is_sf: true, sfMode: true });
       return;
     }
     const waste = Number(p?.loss) || 0;
     const netto = Number(row.netto) || 0;
     const brutto = netto > 0 ? (netto / (1 - waste / 100)).toFixed(2) : '';
     updRow(i, { product_id: pid, name: p?.name || '', price_per_unit: p?.price || 0,
-      waste_percent: waste, brutto, is_sf: false });
+      waste_percent: waste, brutto, is_sf: false, sfMode: false });
   };
   const priceOf = (r) => {
     const ing = products.find(x => String(x.id) === String(r.product_id) || String(x.sf_id) === String(r.product_id));
@@ -176,18 +176,19 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
             </div>
             {items.map((r, i) => (
               <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8, alignItems:'center' }}>
-                <div style={{ display:'grid', gap:6 }}>
-                  <select value={r.is_sf ? '' : (r.product_id || '')} onChange={e => pickProduct(i, e.target.value)}
+                {r.sfMode ? (
+                  <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
+                    style={{ ...inp, padding:'8px 10px' }}>
+                    <option value="">Полуфабрикат — выберите</option>
+                    {products.filter(p => p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                ) : (
+                  <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
                     style={{ ...inp, padding:'8px 10px' }}>
                     <option value="">Ингредиент — выберите</option>
                     {products.filter(p => !p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
-                  <select value={r.is_sf ? (r.product_id || '') : ''} onChange={e => pickProduct(i, e.target.value)}
-                    style={{ ...inp, padding:'8px 10px', color: r.is_sf ? '#333' : '#9ca3af' }}>
-                    <option value="">Полуфабрикат — выберите</option>
-                    {products.filter(p => p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
-                </div>
+                )}
                 <input value={r.brutto} onChange={e => {
                     const b = e.target.value;
                     const waste = Number(r.waste_percent) || 0;
