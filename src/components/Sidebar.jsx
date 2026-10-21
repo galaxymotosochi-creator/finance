@@ -46,7 +46,7 @@ const menu = [
   },
   {
     label: 'Склад', icon: 'stock', children: [
-      { label: 'Товары', path: '/stock/products', labelNotFood: 'Товары и услуги' },
+      { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары' },
       { label: 'Аналитика товаров', path: '/stock/turnover' },
       { label: 'Остатки', path: '/stock/stock' },
       { label: 'Поставки', path: '/stock/supplies' },
@@ -217,7 +217,7 @@ export default function Sidebar() {
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
                           onClick={() => { navigate(child.path); closeMobile(); }}>
-                          <span className="nav-child-dot" />{(businessType === 'food' && child.labelNotFood) ? child.labelNotFood : child.label}{child.soon && <span style={{ marginLeft:6, fontSize:'.58rem', color:'#c3cad6' }}>скоро</span>}</a>
+                          <span className="nav-child-dot" />{(businessType === 'food' && child.foodLabel) ? child.foodLabel : child.label}{child.soon && <span style={{ marginLeft:6, fontSize:'.58rem', color:'#c3cad6' }}>скоро</span>}</a>
                       ))}
                     </div>
                   </div>
