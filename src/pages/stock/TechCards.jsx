@@ -142,10 +142,9 @@ export default function TechCards() {
           <tbody>
             <tr>
               <td colSpan={6}>
-                <div className="empty-products">
-                  <div className="big-icon">📋</div>
-                  <p>Тех. карт пока нет</p>
-                  <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6, marginTop:'.5rem' }}>
+                <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                  <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Тех. карт пока нет</p>
+                  <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                     <b>Как добавить блюдо:</b><br />
                     • Нажмите «Добавить тех. карту»<br />
                     • Укажите название, цену продажи и выход порции<br />
