@@ -38,7 +38,13 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
       setCats((ct.data || []).filter(function(c){ return c.type === 'dish'; }));
       if (initial?.id) {
         const it = await supabase.from('tech_card_items').select('*').eq('tech_card_id', initial.id);
-        setItems(it.data || []);
+        // цену берём актуальную из ингредиента, а не сохранённую (старые записи с нулём)
+        const fixed = (it.data || []).map(function(r){
+          const ing = withPrice.find(function(x){ return String(x.id) === String(r.product_id); });
+          return { ...r, price_per_unit: ing ? ing.price : (Number(r.price_per_unit) || 0),
+                   waste_percent: ing ? ing.loss : (Number(r.waste_percent) || 0) };
+        });
+        setItems(fixed);
       } else setItems([]);
     })();
   }, [open, user?.id, initial?.id]);
