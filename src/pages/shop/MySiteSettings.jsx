@@ -80,10 +80,12 @@ export default function MySiteSettings({ shop, slug, setShop, setSlug, onSave, s
         })}
       </div>
 
-      <button className="btn btn-dark" onClick={() => onSave({ ...form })} disabled={saving}
-        style={{ marginTop:18, opacity: saving ? .6 : 1 }}>
-        {saving ? 'Сохраняю…' : 'Сохранить'}
-      </button>
+      <div className="modal-actions" style={{ marginTop:18 }}>
+        <button type="button" className="sk-dd-btn" onClick={() => onSave({ ...form })} disabled={saving}
+          style={{ opacity: saving ? .6 : 1 }}>
+          {saving ? 'Сохраняю…' : 'Сохранить'}
+        </button>
+      </div>
     </div>
   );
 }
