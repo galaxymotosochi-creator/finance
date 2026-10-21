@@ -3,9 +3,7 @@ import Modal from '../../components/Modal';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 
-const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', borderRadius:10,
-  fontSize:'.88rem', outline:'none', boxSizing:'border-box', fontFamily:'inherit', background:'#fff' };
-const lbl = { display:'block', fontSize:'.76rem', fontWeight:600, color:'#6b7280', marginBottom:6 };
+const inp = { width:'100%' };
 
 export default function TechCardForm({ open, initial, categories, onClose, onSave }) {
   const { user } = useAuth();
@@ -42,23 +40,37 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
 
   return (
     <Modal open={open} onClose={onClose} title={initial?.id ? 'Редактировать тех. карту' : 'Добавить тех. карту'} width="wide" customWidth={860}>
-      <div style={{ display:'grid', gap:14 }}>
-        <div>
-          <label style={lbl}>Название *</label>
-          <input style={inp} value={f.name} onChange={set('name')} placeholder="Например, Борщ украинский" />
+      <div>
+        <div className="form-group">
+          <label>Название</label>
+          <input type="text" value={f.name} onChange={set('name')} placeholder="Например, Борщ украинский" required />
         </div>
 
-        <div>
-          <label style={lbl}>Категория</label>
-          <input style={inp} value={f.category} onChange={set('category')} placeholder="Супы, салаты, напитки" list="tc-cats" />
+        <div className="form-group">
+          <label>Категория</label>
+          <input type="text" value={f.category} onChange={set('category')} placeholder="Супы, салаты, напитки" list="tc-cats" />
           <datalist id="tc-cats">
             {(categories || []).map(c => <option key={c} value={c} />)}
           </datalist>
         </div>
 
-        <div>
-          <label style={lbl}>Цена продажи</label>
-          <input style={inp} value={f.price} onChange={set('price')} placeholder="0" inputMode="decimal" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Цена продажи</label>
+            <input type="text" value={f.price} onChange={set('price')} placeholder="0" inputMode="decimal" />
+          </div>
+          <div className="form-group">
+            <label>Выход порции</label>
+            <input type="text" value={f.output_weight} onChange={set('output_weight')} placeholder="300" inputMode="decimal" />
+          </div>
+          <div className="form-group" style={{ flex:'0 0 110px' }}>
+            <label>Ед.</label>
+            <select value={f.output_unit} onChange={set('output_unit')}>
+              <option value="г">г</option>
+              <option value="мл">мл</option>
+              <option value="шт">шт</option>
+            </select>
+          </div>
         </div>
 
         <div style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px',
@@ -78,35 +90,20 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
         </div>
 
         {f.is_weight && (
-          <div>
-            <label style={lbl}>Цена за кг</label>
-            <input style={inp} value={f.price_per_kg} onChange={set('price_per_kg')} placeholder="0" inputMode="decimal" />
+          <div className="form-group">
+            <label>Цена за кг</label>
+            <input type="text" value={f.price_per_kg} onChange={set('price_per_kg')} placeholder="0" inputMode="decimal" />
           </div>
         )}
 
-        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:10 }}>
-          <div>
-            <label style={lbl}>Выход порции</label>
-            <input style={inp} value={f.output_weight} onChange={set('output_weight')} placeholder="300" inputMode="decimal" />
-          </div>
-          <div>
-            <label style={lbl}>Ед.</label>
-            <select style={inp} value={f.output_unit} onChange={set('output_unit')}>
-              <option value="г">г</option>
-              <option value="мл">мл</option>
-              <option value="шт">шт</option>
-            </select>
-          </div>
+        <div className="form-group">
+          <label>Обложка (ссылка на фото)</label>
+          <input type="text" value={f.photo_url} onChange={set('photo_url')} placeholder="/uploads/..." />
         </div>
 
-        <div>
-          <label style={lbl}>Обложка (ссылка на фото)</label>
-          <input style={inp} value={f.photo_url} onChange={set('photo_url')} placeholder="/uploads/..." />
-        </div>
-
-        <div>
-          <label style={lbl}>Описание</label>
-          <textarea style={{ ...inp, minHeight:70, resize:'vertical' }} value={f.description} onChange={set('description')} />
+        <div className="form-group">
+          <label>Описание</label>
+          <textarea value={f.description} onChange={set('description')} style={{ minHeight:70, resize:'vertical' }} />
         </div>
       </div>
 
@@ -125,7 +122,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
             {items.map((r, i) => (
               <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 80px 80px 100px 28px', gap:6, alignItems:'center' }}>
                 <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }}>
+                >
                   <option value="">— выберите —</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
@@ -135,17 +132,15 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                     const netto = b === '' ? '' : (Number(b) * (1 - waste / 100)).toFixed(2);
                     updRow(i, { brutto: b, netto });
                   }}
-                  inputMode="decimal" placeholder="0"
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
+                  inputMode="decimal" placeholder="0" />
                 <input value={r.netto} onChange={e => {
                     const n = e.target.value;
                     const waste = Number(r.waste_percent) || 0;
                     const brutto = n === '' ? '' : (Number(n) / (1 - waste / 100)).toFixed(2);
                     updRow(i, { netto: n, brutto });
                   }}
-                  inputMode="decimal" placeholder="0"
-                  style={{ ...inp, padding:'8px 10px', fontSize:'.8rem' }} />
-                <div style={{ fontSize:'.8rem', color:'#6b7280', textAlign:'right', paddingRight:4 }}>
+                  inputMode="decimal" placeholder="0" />
+                <div style={{ fontSize:'.8125rem', color:'#6b7280', textAlign:'right', paddingRight:4 }}>
                   {Math.round(costOf(r)).toLocaleString('ru-RU')} ₽
                 </div>
                 <button onClick={() => delRow(i)}
