@@ -980,7 +980,6 @@ export default function Products() {
                   <select value={fType} onChange={e => {
                     const t = e.target.value;
                     setFType(t);
-                    // При смене типа сбрасываем категорию, если она не подходит
                     const need = t === 'service' ? 'service' : 'product';
                     if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === need))) setFCat('');
                   }}>
@@ -996,6 +995,17 @@ export default function Products() {
                     {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (fType === 'service' ? 'service' : 'product')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
+                {isFood && <div className="form-group">
+                  <label>Тип</label>
+                  <select value={fType} onChange={e => {
+                    const t = e.target.value;
+                    setFType(t);
+                    if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === 'product'))) setFCat('');
+                  }}>
+                    <option value="product">Товар</option>
+                    <option value="combo">Комбо</option>
+                  </select>
+                </div>}
               </div>
               <div className="form-row">
                 <div className="form-group">
