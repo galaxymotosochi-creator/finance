@@ -98,6 +98,7 @@ function AppRoutes() {
       <Route path="/clients/loyalty" element={<ProtectedRoute><AppLayout><Loyalty /></AppLayout></ProtectedRoute>} />
 
       <Route path="/stock/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
+      <Route path="/stock/techcards" element={<ProtectedRoute><AppLayout><TechCards /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
       <Route path="/stock/supplies" element={<ProtectedRoute><AppLayout><Supplies /></AppLayout></ProtectedRoute>} />
