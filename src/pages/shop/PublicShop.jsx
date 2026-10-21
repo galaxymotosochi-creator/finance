@@ -160,13 +160,18 @@ export default function PublicShop() {
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))', gap:14 }}>
           {filtered.map(p => (
-            <div key={p.id} style={{ border:'1px solid #eee', borderRadius:14, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+            <div key={p.id} style={{ border:'1px solid #eee', borderRadius:14, overflow:'hidden', display:'flex',
+              flexDirection:'column', height:'100%' }}>
               <div style={{ height:150, background:'#f7f7f8', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
                 {p.photo_url ? <img src={p.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{ fontSize:'2rem', opacity:.25 }}>🖼️</span>}
               </div>
               <div style={{ padding:'12px 14px', flex:1, display:'flex', flexDirection:'column', gap:6 }}>
-                <div style={{ fontWeight:600, fontSize:'0.9rem', lineHeight:1.35 }}>{p.name}</div>
-                {p.description && <div style={{ fontSize:'0.78rem', color:'#9ca3af', lineHeight:1.4 }}>{p.description.slice(0, 80)}</div>}
+                <div style={{ fontWeight:600, fontSize:'0.84rem', lineHeight:1.3, height:'2.6em',
+                  overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{p.name}</div>
+                <div style={{ fontSize:'0.74rem', color:'#9ca3af', lineHeight:1.35, height:'2.7em',
+                  overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                  {p.description || ''}
+                </div>
                 <div style={{ marginTop:'auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                   <div style={{ fontWeight:800, fontSize:'1rem' }}>{fmt(p.price)} ₽</div>
                   {p.type === 'service' ? (
