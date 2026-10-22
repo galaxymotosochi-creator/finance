@@ -966,14 +966,9 @@ export default function Transactions() {
               }
             }}>
               {!editingId && (
-              <div className="form-group">
-                <label>Тип операции</label>
-                <div style={{display:'flex',gap:'.4rem'}}>
-                  <button type="button" onClick={function(){setIncCategory('')}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>+ Доход</button>
-                  <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:'1.5px solid #e8e8ec',background:'#fff',color:'#888',transition:'all .12s'}}>− Расход</button>
-                </div>
+              <div className="v2-seg">
+                <button type="button" className="on" onClick={function(){setIncCategory('')}}>+ Доход</button>
+                <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}>− Расход</button>
               </div>
               )}
               <div className="form-row">
