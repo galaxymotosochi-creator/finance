@@ -420,7 +420,7 @@ export default function Accounts() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
           <div className="sk-dd-wrap">
-            <button type="button" className="cat-add-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия <span className="car">▾</span></button>
+            <button type="button" className="cat-add-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия</button>
             <div className="sk-dd-menu">
               {[
                 { onClick: openAdd, label:'Добавить счет' },
