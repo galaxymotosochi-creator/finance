@@ -943,15 +943,15 @@ export default function Accounts() {
             setToast('Выплата прибыли: ' + amt.toLocaleString() + ' ' + cur);
           } catch(err) { alert('Ошибка: ' + err.message); }
         }}>
-          <div style={{background:'#F6F9FF',border:'1px solid #dbe6fb',borderRadius:'12px',padding:'.7rem .85rem',marginBottom:'.85rem'}}>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#33405a',padding:'.15rem 0'}}>
-              <span>Заработано за месяц</span><b style={{color:'#0d4ea8'}}>{profitEarnedMonth.toLocaleString()} {cur}</b>
+          <div style={{background:'#fff',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'10px',padding:'8px 10px',marginBottom:'14px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#555',padding:'.15rem 0'}}>
+              <span>Заработано за месяц</span><b style={{color:'#111'}}>{profitEarnedMonth.toLocaleString()} {cur}</b>
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#33405a',padding:'.15rem 0'}}>
-              <span>Уже выплачено</span><b style={{color:'#c0392b'}}>{profitPaidMonth.toLocaleString()} {cur}</b>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#555',padding:'.15rem 0'}}>
+              <span>Уже выплачено</span><b style={{color:'#111'}}>{profitPaidMonth.toLocaleString()} {cur}</b>
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.9rem',fontWeight:700,borderTop:'1px dashed #c9d9f5',marginTop:'.35rem',paddingTop:'.45rem'}}>
-              <span>Доступно к выплате</span><b style={{color:'#0d4ea8'}}>{Math.max(0, profitEarnedMonth - profitPaidMonth).toLocaleString()} {cur}</b>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.9rem',fontWeight:700,borderTop:'1px solid #e8e8ec',marginTop:'.35rem',paddingTop:'.45rem'}}>
+              <span>Доступно к выплате</span><b style={{color:'#111'}}>{Math.max(0, profitEarnedMonth - profitPaidMonth).toLocaleString()} {cur}</b>
             </div>
           </div>
           <div className="v2-card">
