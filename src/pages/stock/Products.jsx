@@ -851,25 +851,13 @@ export default function Products() {
               </div>
             )}
           </div>
-          <div className="sk-dd-wrap">
-            <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setColsOpen(!colsOpen);setTypeOpen(false);setCatOpen(false);setExportOpen(false)}}>Столбцы <span className="car-tri">▾</span></button>
-            {colsOpen && (
-              <div className="f-menu" style={{minWidth:'230px'}}>
-                <div className="cols-list">
-                {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
-                  const active = activeCols.has(col.id);
-                  return (
-                    <div key={col.id} onClick={() => toggleCol(col.id)}
-                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:active?'#0d4ea8':'#5b6472',fontWeight:active?700:500,background:active?'#E6F0FF':'transparent'}}>
-                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:active?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
-                      {col.label}
-                    </div>
-                  );
-                })}
-              </div></div>
-            )}</div>
-          <button type="button" className={'f-pill'+(showTrash?' on':'')}
-            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}>Корзина</button>
+          <button type="button" title="Корзина" aria-label="Корзина"
+            onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}
+            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:showTrash?'linear-gradient(135deg,#0d4ea8,#1F75FF)':'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s'}}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)'}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='none'}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+          </button>
           <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} type="button" title="Скачать" aria-label="Скачать"
             style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'skpulse 2s ease-in-out infinite'}}
             onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.animationPlayState='paused'}}
