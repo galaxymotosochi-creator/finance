@@ -128,8 +128,6 @@ export default function Products() {
   })();
   const isFood = businessType === 'food';
   const isServices = businessType === 'services';
-  // В режиме «только услуги» любая позиция — услуга: тип фиксирован, поле выбора скрыто
-  useEffect(function(){ if (isServices && fType !== 'service') setFType('service'); }, [isServices, fType]);
   const pageTitle = isFood ? 'Товары' : (isServices ? 'Услуги' : 'Товары и услуги');
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
@@ -181,6 +179,8 @@ export default function Products() {
   const [fSku, setFSku] = useState('');
   const [fBarcode, setFBarcode] = useState('');
   const [fType, setFType] = useState('product');
+  // В режиме «только услуги» любая позиция — услуга: тип фиксирован, поле выбора скрыто
+  useEffect(function(){ if (isServices && fType !== 'service') setFType('service'); }, [isServices, fType]);
   const [fFreePrice, setFFreePrice] = useState(false);
   const [fWeight, setFWeight] = useState('0');
   const [fWeightUnit, setFWeightUnit] = useState('кг');
