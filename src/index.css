@@ -1969,7 +1969,7 @@ input:focus, select:focus, textarea:focus {
 
 /* v2: состав комбо как в превью */
 .v2-combo { background:#fff; border:1.5px dashed rgba(0,0,0,.26); border-radius:12px; padding:10px; margin-bottom:10px; }
-.v2-combo .cb-t { font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#9aa3b2; margin-bottom:8px; }
+.v2-combo .cb-t { font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:#333; margin-bottom:4px; display:block; }
 .v2-combo .cb-search { width:100%; border:1.5px solid rgba(0,0,0,.26); border-radius:10px; padding:7px 10px; font-family:var(--font); font-size:13px; outline:none; margin-bottom:8px; color:#333; background:#fff; box-sizing:border-box; }
 .v2-combo .cb-search:focus { border-color:#1F75FF; }
 .v2-combo .cb-item { display:flex; align-items:center; gap:8px; padding:6px; border-radius:8px; font-size:13px; cursor:pointer; }
