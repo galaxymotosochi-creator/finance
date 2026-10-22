@@ -178,15 +178,13 @@ export default function TechCards() {
                 const price = Number(c.price) || 0;
                 const markup = cost > 0 ? Math.round(((price - cost) / cost) * 100) : 0;
                 return (
-                  <tr key={c.id} style={{ borderTop:'1px solid #f5f5f5' }}>
-                    <td style={{ fontWeight:600 }}>{c.name}</td>
-                    <td style={{ color:'#6b7280' }}>{c.category || '—'}</td>
+                  <tr key={c.id}>
+                    <td>{c.name}</td>
+                    <td>{c.category || '—'}</td>
                     <td>{Number(c.output_weight) ? Number(c.output_weight) + ' ' + (c.output_unit || 'г') : '—'}</td>
-                    <td style={{ color:'#6b7280' }}>{fmt(cost)} {cur}</td>
-                    <td style={{ fontWeight:700 }}>{fmt(price)} {cur}</td>
-                    <td style={{ color: cost > 0 ? (markup >= 0 ? '#16a34a' : '#dc2626') : '#9ca3af', fontWeight:600 }}>
-                      {cost > 0 ? markup + '%' : '—'}
-                    </td>
+                    <td>{fmt(cost)} {cur}</td>
+                    <td>{fmt(price)} {cur}</td>
+                    <td>{cost > 0 ? markup + '%' : '—'}</td>
                   </tr>
                 );
               })}
