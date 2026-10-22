@@ -607,7 +607,7 @@ export default function Transactions() {
         </div>
         <div style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
           <button type="button" title="Скачать" aria-label="Скачать"
-            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'skpulse 2s ease-in-out infinite'}}
+            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'none'}}
             onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.animationPlayState='paused'}}
             onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.animationPlayState='running'}}
             onClick={e=>{e.stopPropagation();setShowDownload(!showDownload);setShowPeriod(false)}}>
