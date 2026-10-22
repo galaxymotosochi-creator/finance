@@ -162,10 +162,10 @@ export default function Semifinished() {
                 const cnt = items.filter(i => String(i.semifinished_id) === String(r.id)).length;
                 return (
                   <tr key={r.id}>
-                    <td style={{ fontWeight:600 }}>{r.name}</td>
+                    <td>{r.name}</td>
                     <td>{Number(r.output_weight) ? Number(r.output_weight) + ' ' + (r.output_unit || 'г') : '—'}</td>
                     <td>{Math.round(costOf(r.id)).toLocaleString('ru-RU') + ' ' + cur}</td>
-                    <td style={{ color:'#6b7280' }}>{cnt}</td>
+                    <td>{cnt}</td>
                     <td>
                       <div style={{ display:'inline-block', position:'relative' }} className="prod-more-wrap">
                         <button className="sk-more" onClick={(e) => {

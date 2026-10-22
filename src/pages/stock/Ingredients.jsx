@@ -182,12 +182,12 @@ export default function Ingredients() {
                   .map(Number).filter(n => n > 0);
                 return (
                   <tr key={r.id}>
-                    <td style={{ fontWeight:600 }}>{r.name}</td>
-                    <td style={{ color:'#6b7280' }}>{r.category || '—'}</td>
+                    <td>{r.name}</td>
+                    <td>{r.category || '—'}</td>
                     <td>{r.unit}</td>
-                    <td style={{ whiteSpace:'nowrap' }}>{fmtQty(st.qty, r.unit)}</td>
+                    <td>{fmtQty(st.qty, r.unit)}</td>
                     <td>{avg ? Math.round(avg).toLocaleString('ru-RU') + ' ' + cur : '—'}</td>
-                    <td style={{ color:'#6b7280' }}>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
+                    <td>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
                     <td>
                       <div style={{ display:'inline-block', position:'relative' }} className="prod-more-wrap">
                         <button className="sk-more" onClick={(e) => {
