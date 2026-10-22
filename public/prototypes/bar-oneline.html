@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Плашка раздела — в одну линию, 5 вариантов</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f6f9; color: #0b1220; padding: 32px 20px 70px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1.page { font-size: 23px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #6b7688; margin-bottom: 30px; line-height: 1.6; }
+
+  .item { margin-bottom: 30px; }
+  .cap {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: #8b95a5; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .num { display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 6px; background: #0b1220; color: #fff;
+    font-size: 11px; font-weight: 800; }
+  .hint { font-size: 12px; color: #6b7688; margin-top: 9px; line-height: 1.55; }
+
+  /* ===== одна линия ===== */
+  .row1 {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 12px; background: #fff;
+  }
+  .ttl { font-size: 20px; font-weight: 800; letter-spacing: -.02em; line-height: 1; white-space: nowrap; }
+
+  .q {
+    width: 20px; height: 20px; border-radius: 50%; border: none; flex-shrink: 0;
+    font-size: 11px; font-weight: 800; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  .search {
+    display: flex; align-items: center; gap: 8px; flex: 1; min-width: 120px; max-width: 340px;
+    padding: 8px 12px; border-radius: 9px; border: 1px solid #e5e9f0; background: #fafbfd;
+    font-size: 13px; color: #9aa4b4;
+  }
+  .search svg { flex-shrink: 0; }
+  .filters {
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+    padding: 8px 13px; border-radius: 9px; border: 1px solid #e5e9f0; background: #fff;
+    font-size: 12.5px; font-weight: 600; color: #5b6472; cursor: pointer; white-space: nowrap;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; margin-left: auto;
+    padding: 9px 16px; border-radius: 9px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1;
+    background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff;
+    box-shadow: 0 10px 22px -14px rgba(29,120,252,.9);
+  }
+  .plus { font-size: 15px; font-weight: 700; margin-top: -1px; }
+
+  /* ===== 1. Poster-стиль: плоская линия, без рамки ===== */
+  .v1 { background: transparent; padding: 6px 0 12px; border-bottom: 1px solid #e5e9f0; border-radius: 0; }
+  .v1 .q { background: #eef3fb; color: #1F75FF; }
+  .v1 .btn { border-radius: 8px; }
+
+  /* ===== 2. Белая карточка ===== */
+  .v2 { background: #fff; border: 1px solid #e8ecf2; box-shadow: 0 12px 30px -26px rgba(15,25,45,.55); }
+  .v2 .q { background: #1F75FF; color: #fff; }
+
+  /* ===== 3. Мягкая серая полоса ===== */
+  .v3 { background: #fff; border: 1px solid #eef1f6; box-shadow: none; border-radius: 14px; }
+  .v3 .ttl { font-size: 18px; }
+  .v3 .search { background: #f4f6fa; border-color: transparent; }
+  .v3 .q { background: #0b1220; color: #fff; }
+
+  /* ===== 4. Голубая плашка (компактная, в одну строку) ===== */
+  .v4 { background: linear-gradient(135deg, rgba(31,117,255,.07), rgba(31,117,255,.03));
+    border: 1px solid rgba(31,117,255,.18); }
+  .v4 .ttl { color: #0d4ea8; }
+  .v4 .q { background: #1F75FF; color: #fff; }
+  .v4 .search { background: #fff; }
+
+  /* ===== 5. Тёмная капсула ===== */
+  .v5 { background: linear-gradient(135deg, #141c2b, #1c2941); border: 1px solid rgba(100,165,255,.25);
+    box-shadow: 0 18px 40px -26px rgba(9,16,32,.9); border-radius: 14px; }
+  .v5 .ttl { color: #fff; }
+  .v5 .q { background: rgba(100,165,255,.16); color: #93c1ff; }
+  .v5 .search { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); color: #8b98ad; }
+  .v5 .filters { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); color: #c3cddd; }
+  .v5 .btn { background: linear-gradient(135deg, #2f8bff, #0d5fd8);
+    box-shadow: 0 0 0 1px rgba(120,180,255,.3), 0 12px 26px -14px rgba(47,139,255,.95); }
+
+  @media (max-width: 760px) {
+    .row1 { flex-wrap: wrap; }
+    .search { order: 5; flex-basis: 100%; max-width: none; }
+    .btn { margin-left: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page">Всё в одну линию — как в Poster</h1>
+  <div class="page-sub">Слева название раздела и «?», затем поиск, фильтры, справа кнопка «Добавить». Пять оформлений одной и той же строки.</div>
+
+  <!-- 1 -->
+  <div class="item">
+    <div class="cap"><span class="num">1</span> Poster-стиль: чистая линия, без рамки</div>
+    <div class="row1 v1">
+      <span class="ttl">Категории услуг</span>
+      <button class="q">?</button>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa4b4" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Поиск по названию
+      </div>
+      <button class="filters">Фильтры ⌄</button>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Ни фона, ни рамки — только тонкая линия под строкой. Максимально близко к Poster: контент главнее оформления.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="item">
+    <div class="cap"><span class="num">2</span> Белая карточка с тенью</div>
+    <div class="row1 v2">
+      <span class="ttl">Категории услуг</span>
+      <button class="q">?</button>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa4b4" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Поиск по названию
+      </div>
+      <button class="filters">Фильтры ⌄</button>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Строка живёт в белой карточке с мягкой тенью — визуально отделена от таблицы, но остаётся одной линией.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="item">
+    <div class="cap"><span class="num">3</span> Спокойная, поиск в сером поле</div>
+    <div class="row1 v3">
+      <span class="ttl">Категории услуг</span>
+      <button class="q">?</button>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa4b4" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Поиск по названию
+      </div>
+      <button class="filters">Фильтры ⌄</button>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Заголовок чуть меньше, поиск утоплен в серое поле — тихо и аккуратно, как в CRM.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="item">
+    <div class="cap"><span class="num">4</span> Голубая плашка в одну строку</div>
+    <div class="row1 v4">
+      <span class="ttl">Категории услуг</span>
+      <button class="q">?</button>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa4b4" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Поиск по названию
+      </div>
+      <button class="filters">Фильтры ⌄</button>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Фирменный синий, но компактно: подсветка вместо тяжёлой плашки, поиск на белом.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="item">
+    <div class="cap"><span class="num">5</span> Тёмная капсула</div>
+    <div class="row1 v5">
+      <span class="ttl">Категории услуг</span>
+      <button class="q">?</button>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b98ad" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Поиск по названию
+      </div>
+      <button class="filters">Фильтры ⌄</button>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Тёмный графит + светящаяся кнопка. Самая «премиальная» из пяти, но требует поддержки в остальных разделах.</div>
+  </div>
+
+</div>
+</body>
+</html>
