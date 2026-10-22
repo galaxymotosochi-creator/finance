@@ -845,7 +845,7 @@ export default function Accounts() {
       </Modal>
 
       {/* Инкассация */}
-      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="Личные средства — не считаются доходом и не влияют на прибыль" width="medium">
+      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={async function(e){
           e.preventDefault();
           const amt = parseFloat(ownerAmt);
@@ -882,16 +882,17 @@ export default function Accounts() {
             setToast((isDeposit ? 'Взнос' : 'Вывод') + ' своих денег: ' + amt.toLocaleString() + ' ' + cur);
           } catch(err) { alert('Ошибка: ' + err.message); }
         }}>
+          <div className="v2-card">
           <div className="form-group">
             <label>Операция</label>
-            <div style={{display:'flex',gap:'.5rem'}}>
-              <button type="button" onClick={()=>setOwnerMode('deposit')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='deposit'?'none':'1.5px solid #e8e8ec',background:ownerMode==='deposit'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='deposit'?'#fff':'#888',transition:'all .12s'}}>Взнос (доложить)</button>
-              <button type="button" onClick={()=>setOwnerMode('withdraw')} style={{flex:1,padding:'.6rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.8125rem',fontWeight:600,border:ownerMode==='withdraw'?'none':'1.5px solid #e8e8ec',background:ownerMode==='withdraw'?'linear-gradient(135deg,#1F75FF,#0d4ea8)':'#fff',color:ownerMode==='withdraw'?'#fff':'#888',transition:'all .12s'}}>Вывод (забрать)</button>
+            <div className="v2-seg">
+              <button type="button" className={ownerMode === 'deposit' ? 'on' : ''} onClick={()=>setOwnerMode('deposit')}>Взнос (доложить)</button>
+              <button type="button" className={ownerMode === 'withdraw' ? 'on' : ''} onClick={()=>setOwnerMode('withdraw')}>Вывод (забрать)</button>
             </div>
           </div>
           <div className="form-group">
             <label>Счет</label>
-            <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
+            <AcctPick accounts={accounts} value={ownerAcct} onChange={setOwnerAcct} cur={cur} balOf={balOfId} placeholder="— выберите —" />
           </div>
           <div className="form-group">
             <label>Сумма</label>
@@ -901,8 +902,10 @@ export default function Accounts() {
             <label>Комментарий</label>
             <input type="text" value={ownerDesc} onChange={e=>setOwnerDesc(e.target.value)} placeholder="Например: аренда за сентябрь" />
           </div>
+          </div>
           <div className="modal-actions">
-            <button type="submit" className="sk-dd-btn">Сохранить</button>
+            <button type="button" className="v2-ghost" onClick={()=>setShowOwner(false)}>Отмена</button>
+            <button type="submit" className="cat-add-btn">Сохранить</button>
           </div>
         </form>
       </Modal>
