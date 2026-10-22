@@ -101,8 +101,12 @@ const refreshCostMap = async (userId) => {
 const setTrash = (list) => localStorage.setItem('trash88', JSON.stringify(list));
 // Легкая миниатюра для списков (сервер ресайзит до 120px — вместо тяжелых оригиналов)
 const thumbUrl = (u) => u ? '/api/thumb?file=' + encodeURIComponent(String(u).split('/').pop()) : u;
-const getCols = () => {
-  const def = new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
+// Набор столбцов для аккаунта «Услуги»: без себестоимости и наценки
+const SERVICE_DEFAULT_COLS = ['category', 'type', 'price', 'min_price', 'sku', 'unit'];
+const getCols = (isServices) => {
+  const def = isServices
+    ? new Set(['name', ...SERVICE_DEFAULT_COLS])
+    : new Set(ALL_COLUMNS.filter(c => c.def).map(c => c.id));
   const saved = localStorage.getItem('productsCols');
   if (saved) {
     try { return new Set(JSON.parse(saved)); } catch (e) { return def; }
@@ -134,7 +138,7 @@ export default function Products() {
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
-  const [activeCols, setActiveColsState] = useState(getCols);
+  const [activeCols, setActiveColsState] = useState(() => getCols(businessType === 'services'));
   // Подсказка скролла таблицы (как в Чеках и Счетах)
   const [tblPos, setTblPos] = useState({ left: false, right: false });
   const tblElRef = useRef(null);
