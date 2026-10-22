@@ -845,7 +845,7 @@ export default function Accounts() {
       </Modal>
 
       {/* Инкассация */}
-      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Собственные средства предпринимателя" subtitle="" width="medium" className="modal-v2 cat-modal">
+      <Modal open={showOwner} onClose={()=>setShowOwner(false)} title="Взнос / вывод своих денег" subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={async function(e){
           e.preventDefault();
           const amt = parseFloat(ownerAmt);
