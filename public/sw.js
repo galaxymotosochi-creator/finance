@@ -3,7 +3,7 @@
 // 2) Мутации (POST/PATCH/DELETE) без сети уходят в очередь (IndexedDB)
 // 3) При появлении сети очередь синхронизируется автоматически
 
-const CACHE = 'atlaspos-v11';
+const CACHE = 'atlaspos-v12';
 // ВАЖНО: index.html ('/') НЕ кэшируем на install — иначе после деплоя отдаётся старая сборка
 // и ломается ленивая загрузка чанков («Failed to fetch dynamically imported module»)
 const STATIC = ['/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
