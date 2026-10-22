@@ -943,7 +943,7 @@ export default function Accounts() {
             setToast('Выплата прибыли: ' + amt.toLocaleString() + ' ' + cur);
           } catch(err) { alert('Ошибка: ' + err.message); }
         }}>
-          <div style={{background:'#fff',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'10px',padding:'8px 10px',marginBottom:'14px'}}>
+          <div style={{background:'#f8f9fb',border:'1px solid rgba(0,16,36,.12)',borderRadius:'12px',padding:'10px 12px',marginBottom:'10px'}}>
             <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'#555',padding:'.15rem 0'}}>
               <span>Заработано за месяц</span><b style={{color:'#111'}}>{profitEarnedMonth.toLocaleString()} {cur}</b>
             </div>
