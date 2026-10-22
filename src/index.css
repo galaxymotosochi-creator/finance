@@ -812,7 +812,7 @@ input:focus, select:focus, textarea:focus {
 .sk-tile.sk-gold .sk-v{color:#fff}
 
 /* Карточка-обертка таблицы */
-.sk-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:var(--sk-radius);overflow:hidden}
+.sk-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:11px;overflow:hidden}
 .main .content .sk-card.cat-table{border-radius:11px !important}
 
 /* Таблица */
