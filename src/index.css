@@ -1883,3 +1883,7 @@ input:focus, select:focus, textarea:focus {
 .v2-card .form-group input,
 .v2-card .form-group select,
 .v2-card .form-group textarea { background: #fff; }
+
+.v2-fold-head { width: 100%; display: block; background: none; border: none; padding: 2px 0 0;
+  font-family: var(--font); font-size: .78rem; font-weight: 700; color: #6b7688;
+  letter-spacing: .02em; cursor: default; text-align: left; }

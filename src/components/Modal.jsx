@@ -38,9 +38,19 @@ export default function Modal({ open, onClose, title, subtitle, children, action
   return (
     <div className="modal-overlay active" onClick={(e) => { if (e.target.className === 'modal-overlay active') onClose(); }}>
       <div className={`modal-box ${widthClass}${className ? ' ' + className : ''}`} style={customWidth ? { maxWidth: customWidth + 'px' } : {}}>
-        <button className="modal-close" onClick={onClose} type="button">&times;</button>
-        {!hideHead && title && <h1 className="modal-title">{title}</h1>}
-        {!hideHead && subtitle && <p className="modal-sub">{subtitle}</p>}
+        {String(className || '').indexOf('modal-v2') >= 0 ? (
+          <div className="v2-head">
+            <button className="modal-close" onClick={onClose} type="button">&times;</button>
+            {!hideHead && title && <h1>{title}</h1>}
+            {!hideHead && subtitle && <p>{subtitle}</p>}
+          </div>
+        ) : (
+          <>
+            <button className="modal-close" onClick={onClose} type="button">&times;</button>
+            {!hideHead && title && <h1 className="modal-title">{title}</h1>}
+            {!hideHead && subtitle && <p className="modal-sub">{subtitle}</p>}
+          </>
+        )}
         <div className="modal-body">
           {children}
         </div>

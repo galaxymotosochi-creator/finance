@@ -1061,11 +1061,8 @@ export default function Products() {
               )}
           </div>
           <div className="v2-card v2-card-fold">
-              <button type="button" className="v2-fold-head" onClick={function(){ setExtraOpen(!extraOpen); }}>
-                <span>Дополнительно</span>
-                <span className={"v2-chev" + (extraOpen ? " open" : "")}>▾</span>
-              </button>
-              {extraOpen && <div className="form-row" style={{marginTop:".5rem"}}>
+              <div className="v2-fold-head">Дополнительно</div>
+              <div className="form-row" style={{marginTop:".35rem"}}>
                 <div className="form-group">
                   <label>Артикул</label>
                   <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
