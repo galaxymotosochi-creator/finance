@@ -53,7 +53,7 @@ export default function Categories() {
       if (error) throw error;
       if (data) setCats(businessType === 'food'
         ? data.filter(function(c){ return c.scope === 'food' && c.type === scope; })
-        : data.filter(function(c){ return c.scope !== 'food'; }));
+        : data.filter(function(c){ return c.scope !== 'food' && (scope === 'ingredient' ? !c.type || c.type === 'ingredient' : (!c.type || c.type === 'product' || c.type === 'service')); }));
     } catch (e) {
       setToast('⚠️ Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'));
     }

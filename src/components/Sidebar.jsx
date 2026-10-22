@@ -45,13 +45,15 @@ const menu = [
     ],
   },
   {
-    label: 'Услуги', icon: 'stock', onlyServices: true, children: [
+    label: 'Услуги', icon: 'menu', onlyServices: true, children: [
       { label: 'Каталог услуг', path: '/stock/products' },
+      { label: 'Категории услуг', path: '/stock/categories' },
     ],
   },
   {
     label: 'Склад', icon: 'stock', hideForServices: true, children: [
       { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары', servicesLabel: 'Услуги' },
+      { label: 'Категории', path: '/stock/categories' },
       { label: 'Аналитика товаров', path: '/stock/turnover', hideForServices: true },
       { label: 'Остатки', path: '/stock/stock', hideForServices: true },
       { label: 'Поставки', path: '/stock/supplies', hideForServices: true },
