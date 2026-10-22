@@ -10,7 +10,7 @@ import SectionHelp from '../../components/SectionHelp';
 const dirTypeLabels = {
   income: 'Доход',
   expense: 'Расход',
-  supply_expense: 'Расход поставки',
+  supply_expense: 'Расход',
 };
 
 export default function Categories() {
@@ -144,10 +144,11 @@ export default function Categories() {
   return (
     <>
       {toast && <div className="toast toast-warning"><span style={{display:'inline-flex',alignItems:'center',gap:'.35rem'}}>{toast}<button onClick={()=>setToast(null)} style={{background:'none',border:'none',color:'#fff',fontSize:'1.1rem',cursor:'pointer',padding:'0 0 0 .35rem',lineHeight:1}}>&times;</button></span></div>}
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Финансовые категории</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Финансовые категории</h1>
             <SectionHelp
               title="Раздел «Финансовые категории»"
               intro="Справочник статей доходов и расходов бизнеса. Категории выбираются при вводе расходов, доходов и поставок."
@@ -155,11 +156,10 @@ export default function Categories() {
                 { q: 'Что это за раздел и зачем он нужен?', a: (
                   <div>Это <b>справочник статей</b>, по которым вы учитываете деньги. Один раз заводите категории — потом выбираете их при вводе расходов, доходов и в поставках. Благодаря этому видно, <i>куда</i> уходят деньги и <i>откуда</i> приходят.</div>
                 ) },
-                { q: 'Чем отличаются три типа категорий?', a: (
+                { q: 'Какие бывают типы категорий?', a: (
                   <ul>
                     <li style={{marginBottom:'.4rem'}}><b>Доход</b> — поступления: выручка от продаж, проценты банка, доп. услуги и прочее.</li>
-                    <li style={{marginBottom:'.4rem'}}><b>Расходы бизнеса (операционные)</b> — жизнь компании: аренда, зарплата, реклама, интернет. В себестоимость товара не входят.</li>
-                    <li><b>Расходы поставки (себестоимость)</b> — довески к товару: доставка ТК, сборка, упаковка, пошлина. Увеличивают себестоимость товара.</li>
+                    <li><b>Расход</b> — траты бизнеса: аренда, зарплата, реклама, интернет, расходники.</li>
                   </ul>
                 ) },
                 { q: 'Как добавить категорию?', a: (
@@ -174,10 +174,11 @@ export default function Categories() {
               ]}
             />
           </div>
-          <div className="sub">Структура доходов и расходов бизнеса</div>
+          </div>
+          <span className="cat-sub">Структура доходов и расходов бизнеса</span>
         </div>
-        <div className="sk-bar-acts">
-          <button type="button" className="sk-dd-btn" onClick={function () { openModal(null); }}>Добавить</button>
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
+          <button type="button" className="cat-add-btn" onClick={function () { openModal(null); }}>Добавить</button>
         </div>
       </div>
 
@@ -239,14 +240,13 @@ export default function Categories() {
         <form onSubmit={save}>
           <div className="form-group">
             <label>Название</label>
-            <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : dirType === 'supply_expense' ? 'Например: ТК (доставка), упаковка товара' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
+            <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
           </div>
           <div className="form-group">
             <label>Тип категории</label>
             <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
               <option value="income">Доход</option>
               <option value="expense">Расход</option>
-              <option value="supply_expense">Расход поставки</option>
             </select>
           </div>
           <div className="modal-actions">
