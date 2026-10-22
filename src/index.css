@@ -1825,8 +1825,14 @@ input:focus, select:focus, textarea:focus {
 .modal-box .form-group input::placeholder,
 .modal-box .form-group textarea::placeholder { font-size: .875rem !important; font-weight: 400 !important; color: rgba(0,0,0,.38) !important; opacity: 1 !important; }
 /* Заглушка «— выберите —» в селектах: бледная, как подсказка */
-.modal-box .form-group select:has(option:checked[value=""]) { color: rgba(0,0,0,.38) !important; }
-.sel-ph { color: rgba(0,0,0,.38); }
+/* Заглушка в селекте — ВСЕГДА приглушённая, пока не выбрано значение.
+   Работает и в .v2-card (модалки услуг), и в обычных модалках. */
+.modal-box .form-group select:has(option:checked[value=""]),
+.modal-box .v2-card .form-group select:has(option:checked[value=""]) {
+  color: rgba(0,0,0,.38) !important;
+  font-weight: 400 !important;
+}
+.sel-ph { color: rgba(0,0,0,.38) !important; font-weight: 400; }
 
 .modal-box .v2-card .form-group input::placeholder,
 .modal-box .v2-card .form-group textarea::placeholder { color: rgba(0,0,0,.38) !important; font-weight: 400 !important; }
