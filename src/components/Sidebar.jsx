@@ -245,35 +245,6 @@ export default function Sidebar() {
               );
             })}
           </nav>
-          {!collapsed && (
-            <div style={{ marginTop:'auto', padding:'10px 10px 4px' }}>
-              <div style={{ fontSize:'.62rem', color:'#9ca3af', fontWeight:600,
-                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:6, paddingLeft:2 }}>
-                Тип бизнеса
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
-                {[['retail','Товарный бизнес'],['mixed','Товары и услуги'],['services','Услуги'],['food','Общепит']].map(function(o){
-                  var on = businessType === o[0];
-                  return (
-                    <button key={o[0]} type="button"
-                      onClick={function(){ setBusinessType(o[0]); }}
-                      style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 9px',
-                        borderRadius:9, cursor:'pointer', border:'1px solid ' + (on ? 'rgba(31,117,255,.35)' : 'transparent'),
-                        background: on ? 'rgba(31,117,255,.07)' : 'transparent',
-                        fontSize:'.76rem', fontWeight: on ? 700 : 500,
-                        color: on ? '#1F75FF' : '#5b6472', fontFamily:'inherit', textAlign:'left' }}>
-                      <span style={{ width:14, height:14, borderRadius:4, flexShrink:0,
-                        border:'1.5px solid ' + (on ? '#1F75FF' : '#d1d5db'),
-                        background: on ? '#1F75FF' : '#fff', display:'flex',
-                        alignItems:'center', justifyContent:'center', color:'#fff',
-                        fontSize:'.6rem', fontWeight:800 }}>{on ? '✓' : ''}</span>
-                      {o[1]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </aside>
       {mobileOpen && (
