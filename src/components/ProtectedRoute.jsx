@@ -63,6 +63,12 @@ export default function ProtectedRoute({ children, skipSubscription }) {
     return <Navigate to="/login" replace />;
   }
 
+  // Неподтверждённая почта — в кабинет не пускаем.
+  // Показываем экран «подтвердите email» вместо любого раздела.
+  if (user.email_verified === false) {
+    return <Navigate to="/login?unverified=1" replace />;
+  }
+
   // Проверка прав доступа к разделу
   const requiredPerm = getRequiredPerm(location.pathname);
   if (requiredPerm && employeeData && !hasPermission(requiredPerm)) {
