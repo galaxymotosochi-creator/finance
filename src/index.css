@@ -813,6 +813,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Карточка-обертка таблицы */
 .sk-card{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:var(--sk-radius);overflow:hidden}
+.main .content .sk-card.cat-table{border-radius:11px !important}
 
 /* Таблица */
 .sk-table{width:100%;border-collapse:separate;border-spacing:0;min-width:860px}
@@ -1262,7 +1263,7 @@ input:focus, select:focus, textarea:focus {
   justify-content:center;color:#fff;font-size:.7rem;font-weight:800}
 
 /* Заголовок раздела без плашки (Категории) */
-.cat-title,.content h1.cat-title{font-family:var(--font);font-size:16px;font-weight:600;letter-spacing:0;
+.cat-title,.content h1.cat-title{font-family:var(--font);font-size:18px;font-weight:600;letter-spacing:0;
   line-height:1.2;margin:0;color:#0b1220}
 /* Кнопка «Добавить» в строке заголовка */
 .cat-add-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;
