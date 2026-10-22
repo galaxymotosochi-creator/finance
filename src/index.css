@@ -1923,3 +1923,40 @@ input:focus, select:focus, textarea:focus {
 .v2-fold-head { width: 100%; display: block; background: none; border: none; padding: 2px 0 0;
   font-family: var(--font); font-size: .78rem; font-weight: 700; color: #6b7688;
   letter-spacing: .02em; cursor: default; text-align: left; }
+
+/* v2: состав комбо как в превью */
+.v2-combo { background:#fff; border:1.5px dashed rgba(0,0,0,.26); border-radius:12px; padding:10px; margin-bottom:10px; }
+.v2-combo .cb-t { font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#9aa3b2; margin-bottom:8px; }
+.v2-combo .cb-search { width:100%; border:1.5px solid rgba(0,0,0,.26); border-radius:10px; padding:7px 10px; font-family:var(--font); font-size:13px; outline:none; margin-bottom:8px; color:#333; background:#fff; box-sizing:border-box; }
+.v2-combo .cb-search:focus { border-color:#1F75FF; }
+.v2-combo .cb-item { display:flex; align-items:center; gap:8px; padding:6px; border-radius:8px; font-size:13px; cursor:pointer; }
+.v2-combo .cb-item:hover { background:#F2F6FF; }
+.v2-combo .cb-item.picked { background:#EAF2FF; }
+.v2-combo .cb-item .nm { flex:1; }
+.v2-combo .cb-item .pr { color:#8b95a5; font-size:12px; }
+.v2-combo .cb-item .plus { width:20px; height:20px; border-radius:50%; background:linear-gradient(135deg,#1F75FF,#0d4ea8); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1; }
+.v2-combo .cb-list { max-height:180px; overflow-y:auto; margin-bottom:8px; }
+.v2-combo .cb-chosen { border-top:1px solid rgba(0,16,36,.12); padding-top:8px; margin-top:6px; }
+.v2-combo .cb-row { display:flex; align-items:center; gap:6px; font-size:13px; padding:4px 0; }
+.v2-combo .cb-row .nm { flex:1; }
+.v2-combo .cb-row .qty { min-width:16px; text-align:center; font-weight:700; }
+.v2-combo .cb-row .sum { width:64px; text-align:right; font-weight:600; }
+.v2-combo .cb-q { width:22px; height:22px; border:1.5px solid rgba(0,0,0,.26); border-radius:6px; background:#fff; cursor:pointer; font-size:12px; line-height:1; color:#333; }
+.v2-combo .cb-q:hover { border-color:#1F75FF; color:#1F75FF; }
+.v2-combo .cb-empty { font-size:12px; color:#9aa3b2; padding:4px 0; }
+.v2-combo .cb-total { display:flex; justify-content:space-between; font-size:13px; font-weight:700; border-top:1px solid rgba(0,16,36,.12); margin-top:6px; padding-top:6px; }
+
+/* v2: тумблер свободной цены */
+.v2-tg { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:rgba(0,0,0,.54); margin-bottom:12px; cursor:pointer; }
+.v2-tg .sw { position:relative; width:34px; height:20px; flex-shrink:0; }
+.v2-tg .sw i { position:absolute; inset:0; background:#ccc; border-radius:20px; transition:background .2s; }
+.v2-tg .sw i:after { content:''; position:absolute; width:16px; height:16px; background:#fff; border-radius:50%; top:2px; left:2px; transition:transform .2s; }
+.v2-tg.on .sw i { background:#1F75FF; }
+.v2-tg.on .sw i:after { transform:translateX(14px); }
+
+/* v2: кнопки */
+.v2-dark { background:linear-gradient(135deg,#1F75FF,#0d4ea8); color:#fff; border:none; border-radius:100px; padding:9px 18px; font-family:var(--font); font-size:13px; font-weight:600; cursor:pointer; }
+.v2-ghost { background:transparent; border:none; color:rgba(0,0,0,.54); border-radius:100px; padding:9px 14px; font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer; }
+
+/* v2: модалка с отступами сверху и снизу */
+.modal-overlay.active { padding: 24px 16px; }

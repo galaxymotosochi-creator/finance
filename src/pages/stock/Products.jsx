@@ -951,232 +951,220 @@ export default function Products() {
       {/* Модалка товара */}
       <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : (isServices ? 'Добавить услугу' : 'Добавить позицию')} subtitle={isServices ? '' : 'Заполните информацию о товаре или услуге'} width="wide" className="modal-v2">
         <form onSubmit={save}>
+
           {isServices && !isFood && (
             <div className="v2-seg">
-              <button type="button" className={fType !== 'combo' ? 'on' : ''} onClick={() => setFType('service')}>Услуга</button>
-              <button type="button" className={fType === 'combo' ? 'on' : ''} onClick={() => setFType('combo')}>Комбо</button>
+              <button type="button" className={fType !== 'combo' ? 'on' : ''} onClick={() => { setFType('service'); if (!fName || /Комплекс:/.test(fName)) setFName('Стрижка женская'); }}>Услуга</button>
+              <button type="button" className={fType === 'combo' ? 'on' : ''} onClick={() => { setFType('combo'); if (!fName || /Стрижка женская/.test(fName)) setFName('Комплекс: стрижка + укладка'); }}>Комбо</button>
             </div>
           )}
+
+          {/* Название + категория */}
           <div className="v2-card">
-              {/* Фото товара/услуги */}
-              <div className="form-group">
-                <label>Фото</label>
-                <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
-                  {fPhoto ? (
-                    <img src={fPhoto} alt="" style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'10px',border:'1px solid var(--border)',flexShrink:0}} />
-                  ) : uploading ? (
-                    /* Полоска загрузки — прямо в квадратике */
-                    <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',background:'#fafafa',flexShrink:0}}>
-                      <div style={{width:'70%',height:'4px',background:'#eee',borderRadius:'2px',overflow:'hidden',position:'relative'}}>
-                        <div style={{position:'absolute',top:0,left:0,height:'100%',width:'40%',background:'#111',borderRadius:'2px',animation:'loadbar 1s ease-in-out infinite'}} />
+            <div className="form-group">
+              <label>Название</label>
+              <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder={isServices ? 'Например: стрижка женская' : 'Например: кофе или доставка заказа'} />
+            </div>
+            <div className="form-group" style={{marginBottom:'8px'}}>
+              <label>Категория</label>
+              <select value={fCat} onChange={e => setFCat(e.target.value)}>
+                <option value="">— выберите —</option>
+                {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (isFood ? 'product' : 'service')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+              </select>
+            </div>
+            {isFood && (
+              <div className="form-group" style={{marginBottom:'8px'}}>
+                <label>Тип</label>
+                <select value={fType} onChange={e => setFType(e.target.value)}>
+                  <option value="product">Товар</option>
+                  <option value="combo">Комбо</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Состав комбо */}
+          {fType === 'combo' && (
+            <div className="v2-combo">
+              <div className="cb-t">Состав комбо</div>
+              <input className="cb-search" type="text" value={fComboSearch} onChange={e => setFComboSearch(e.target.value)} placeholder="Поиск услуг…" />
+              {fComboSearch.length > 0 && (
+                <div className="cb-list">
+                  {products.filter(function(p){return p.type !== 'combo' && p.id !== editId && (!isServices || p.type === 'service') && p.name.toLowerCase().includes(fComboSearch.toLowerCase())}).map(function(p) {
+                    var inCombo = fComboItems.find(function(i){return i.id === p.id});
+                    return (
+                      <div key={p.id} className={'cb-item' + (inCombo ? ' picked' : '')} onClick={function() {
+                        if (inCombo) { setFComboItems(fComboItems.filter(function(i){return i.id !== p.id})); }
+                        else { setFComboItems([...fComboItems, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }]); }
+                      }}>
+                        <span className="nm">{p.name}</span>
+                        <span className="pr">{Number(p.price || 0).toLocaleString('ru-RU')} {cur}</span>
+                        <span className="plus">+</span>
                       </div>
-                    </div>
-                  ) : (
-                    <div style={{width:'64px',height:'64px',borderRadius:'10px',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:'.68rem',textAlign:'center',flexShrink:0}}>без фото</div>
-                  )}
-                  <label style={{cursor: uploading ? 'default' : 'pointer',padding:'.35rem .8rem',border:'1.5px solid var(--border)',borderRadius:'100px',fontSize:'.75rem',fontWeight:600,color: uploading ? '#999' : '#555',fontFamily:'inherit',margin:0}}>
-                    {fPhoto ? 'Заменить' : 'Загрузить'}
-                    <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
-                  </label>
-                  {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
-                </div>
-              </div>
-          </div>
-          <div className="v2-card">
-              <div className="form-group">
-                <label>Название</label>
-                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder={isServices ? 'Например: стрижка женская' : 'Например: кофе или доставка заказа'} />
-              </div>
-              <div className="form-row">
-                {!isFood && !isServices && <div className="form-group">
-                  <label>Тип</label>
-                  <select value={fType} onChange={e => {
-                    const t = e.target.value;
-                    setFType(t);
-                    const need = t === 'service' ? 'service' : 'product';
-                    if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === need))) setFCat('');
-                  }}>
-                    {isServices ? (<>
-                      <option value="service">Услуга</option>
-                      <option value="combo">Комбо</option>
-                    </>) : (<>
-                      <option value="product">Товар</option>
-                      <option value="service">Услуга</option>
-                      <option value="combo">Комбо</option>
-                    </>)}
-                  </select>
-                </div>}
-                <div className="form-group">
-                  <label>Категория</label>
-                  <select value={fCat} onChange={e => setFCat(e.target.value)}>
-                    <option value="">— выберите —</option>
-                    {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (fType === 'service' ? 'service' : 'product')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                  </select>
-                </div>
-                {isFood && <div className="form-group">
-                  <label>Тип</label>
-                  <select value={fType} onChange={e => {
-                    const t = e.target.value;
-                    setFType(t);
-                    if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === 'product'))) setFCat('');
-                  }}>
-                    <option value="product">Товар</option>
-                    <option value="combo">Комбо</option>
-                  </select>
-                </div>}
-              </div>
-          </div>
-          <div className="v2-card">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>{fType === 'combo' ? 'Цена комбо' : 'Цена'}</label>
-                  <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
-                </div>
-                <div className="form-group">
-                  <label>Минимальная цена</label>
-                  <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0" />
-                </div>
-                {fType !== 'service' && <div className="form-group">
-                  <label>Мин. остаток</label>
-                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
-                </div>}
-              </div>
-              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.78rem',fontWeight:600,color:'#333',marginBottom:'.6rem',cursor:'pointer'}}>
-                <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
-                  <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
-                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#1F75FF':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
-                    <span style={{position:'absolute',content:'',height:'16px',width:'16px',left:'2px',bottom:'2px',background:'#fff',borderRadius:'50%',transition:'transform .2s',transform:fFreePrice?'translateX(14px)':'translateX(0)'}}></span>
-                  </span>
-                </span>
-                Продавать по свободной цене
-              </label>}
-              {fType === 'service' && (() => { try { const pw = JSON.parse(localStorage.getItem('settings_piecework') || '{}'); return pw.enabled === true && pw.mode === 'auto'; } catch(e){ return false; } })() && (
-                <div className="form-group">
-                  <label>Сдельная оплата мастеру</label>
-                  <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-                    <select value={fRewardKind} onChange={e => { setFRewardKind(e.target.value); if (!e.target.value) setFRewardValue(''); }} style={{ width: 'auto', minWidth: '140px' }}>
-                      <option value="">— не задана —</option>
-                      <option value="rub">Сумма </option>
-                      <option value="pct">Процент (%)</option>
-                    </select>
-                    {fRewardKind && <input type="number" min="0" step="0.01" value={fRewardValue} onChange={e => setFRewardValue(e.target.value)} placeholder={fRewardKind === 'pct' ? '30' : '500'} style={{ width: '110px' }} autoFocus={false} />}
-                    {fRewardKind === 'pct' && <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>от цены услуги</span>}
-                  </div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem' }}>Сумма автоматически подставится мастеру в чеке (ее можно изменить)</div>
+                    );
+                  })}
                 </div>
               )}
-          </div>
-          <div className="v2-card v2-card-fold">
-              <div className="v2-fold-head">Дополнительно</div>
-              <div className="form-row" style={{marginTop:".35rem"}}>
-                <div className="form-group">
-                  <label>Артикул</label>
-                  <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
+              {fComboItems.length === 0 && <div className="cb-empty">Добавьте услуги в комбо</div>}
+              {fComboItems.length > 0 && (
+                <div className="cb-chosen">
+                  {fComboItems.map(function(item, idx) {
+                    return (
+                      <div key={item.id} className="cb-row">
+                        <span className="nm">{item.name}</span>
+                        <button type="button" className="cb-q" onClick={function() {
+                          var next = [...fComboItems];
+                          if (next[idx].qty > 1) { next[idx].qty--; setFComboItems(next); }
+                        }}>−</button>
+                        <span className="qty">{item.qty}</span>
+                        <button type="button" className="cb-q" onClick={function() {
+                          var next = [...fComboItems];
+                          next[idx].qty++; setFComboItems(next);
+                        }}>+</button>
+                        <span className="sum">{(item.price * item.qty).toLocaleString('ru-RU')} {cur}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-                {fType !== 'service' && <div className="form-group">
+              )}
+              <div className="cb-total">
+                <span>Итого</span>
+                <span>{fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString('ru-RU')} {cur}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Цена */}
+          <div className="v2-card">
+            <div className="form-row">
+              <div className="form-group">
+                <label>{fType === 'combo' ? 'Цена комбо, ₽' : 'Цена, ₽'}</label>
+                <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
+              </div>
+              <div className="form-group">
+                <label>Мин. цена, ₽</label>
+                <input type="number" min="0" step="0.01" value={fMinPrice} onChange={function(e){setFMinPrice(e.target.value)}} placeholder="0" />
+              </div>
+              {fType === 'product' && (
+                <div className="form-group">
+                  <label>Мин. остаток</label>
+                  <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
+                </div>
+              )}
+            </div>
+            {fType !== 'combo' && (
+              <label className={'v2-tg' + (fFreePrice ? ' on' : '')}>
+                <span className="sw"><i></i></span>
+                <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{display:'none'}} />
+                Свободная цена
+              </label>
+            )}
+            {fType === 'service' && (() => { try { const pw = JSON.parse(localStorage.getItem('settings_piecework') || '{}'); return pw.enabled === true && pw.mode === 'auto'; } catch(e){ return false; } })() && (
+              <div className="form-group">
+                <label>Сдельная оплата мастеру</label>
+                <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+                  <select value={fRewardKind} onChange={e => { setFRewardKind(e.target.value); if (!e.target.value) setFRewardValue(''); }} style={{ width: 'auto', minWidth: '140px' }}>
+                    <option value="">— не задана —</option>
+                    <option value="rub">Сумма</option>
+                    <option value="pct">Процент (%)</option>
+                  </select>
+                  {fRewardKind && <input type="number" min="0" step="0.01" value={fRewardValue} onChange={e => setFRewardValue(e.target.value)} placeholder={fRewardKind === 'pct' ? '30' : '500'} style={{ width: '110px' }} />}
+                  {fRewardKind === 'pct' && <span style={{ fontSize: '.75rem', color: '#8b95a5' }}>от цены услуги</span>}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Дополнительно */}
+          <div className="v2-card">
+            <div className="cb-t" style={{marginBottom:'8px'}}>Дополнительно</div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Артикул</label>
+                <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
+              </div>
+              <div className="form-group">
+                <label>Ед. измерения</label>
+                <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
+                  <option value="">— выберите —</option>
+                  {(isServices ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+              </div>
+            </div>
+            {fType !== 'service' && (
+              <div className="form-row">
+                <div className="form-group">
                   <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
                     Штрихкод
                     <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#222',background:'#eee',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => setFBarcode(genBarcode())}>Сгенерировать</span>
                     <span style={{display:'inline-block',padding:'.1rem .45rem',borderRadius:'100px',fontSize:'.65rem',color:'#fff',background:'#111',cursor:'pointer',fontFamily:'inherit',lineHeight:1.5}} onClick={() => scanBarcode(code => { setFBarcode(code); showToast('Штрихкод распознан: ' + code); })}>Распознать</span>
                   </label>
                   <input type="text" value={fBarcode} onChange={e => setFBarcode(e.target.value)} placeholder="4600000000000" />
-                </div>}
-                {fType === 'service' && <div className="form-group">
-                  <label>Ед. измерения</label>
-                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
-                    <option value="">— выберите —</option>
-                    {SERVICE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                  </select>
-                </div>}
-              </div>}
-              {fType !== 'service' && <div className="form-row">
-                <div className="form-group">
-                  <label>Ед. измерения</label>
-                  <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
-                    <option value="">— выберите —</option>
-                    {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                  </select>
                 </div>
-                {fType !== 'combo' && <div className="form-group">
-                  <label>Вес</label>
-                  <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
-                </div>}
-                {fType !== 'combo' && <div className="form-group">
-                  <label>Ед. веса</label>
-                  <select value={fWeightUnit} onChange={e => setFWeightUnit(e.target.value)}>
-                    <option value="г">г</option>
-                    <option value="кг">кг</option>
-                    <option value="т">т</option>
-                  </select>
-                </div>}
-              </div>}
-              {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
-                <label>Состав комбо</label>
-                <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
-                  <div style={{display:'flex',gap:'.35rem',marginBottom:'.35rem'}}>
-                    <input type="text" value={fComboSearch} onChange={function(e){setFComboSearch(e.target.value)}}
-                      placeholder={isServices ? 'Поиск услуг...' : 'Поиск товаров/услуг...'}
-                      style={{flex:1,padding:'.4rem .5rem',fontSize:'.78rem',border:'1px solid var(--border)',borderRadius:'.4rem',outline:'none',fontFamily:'var(--font)',background:'var(--body-bg)'}} />
+                {fType !== 'combo' && (
+                  <div className="form-group">
+                    <label>Вес</label>
+                    <input type="number" min="0" step="0.01" value={fWeight} onChange={e => setFWeight(e.target.value)} />
                   </div>
-                  {fComboSearch.length > 0 && <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'.35rem',border:'1px solid var(--border)',borderRadius:'.35rem',padding:'.2rem'}}>
-                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && (!isServices || p.type === 'service') && p.name.toLowerCase().includes(fComboSearch.toLowerCase())}).map(function(p) {
-                      var inCombo = fComboItems.find(function(i){return i.id === p.id});
-                      return (
-                        <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.25rem .35rem',borderRadius:'.3rem',cursor:'pointer',background:inCombo?'#f0f0f0':'transparent'}}
-                          onClick={function() {
-                            if (inCombo) { setFComboItems(fComboItems.filter(function(i){return i.id !== p.id})); }
-                            else { setFComboItems([...fComboItems, { id: p.id, name: p.name, price: p.price || 0, qty: 1 }]); }
-                          }}>
-                          <span style={{fontSize:'.75rem',flex:1}}>{p.name}</span>
-                          <span style={{fontSize:'.7rem',color:'#888'}}>{p.type === 'service' ? 'Услуга' : 'Товар'} - {(p.price||0).toLocaleString()} {cur}</span>
-                          {inCombo && <span style={{fontSize:'.7rem',marginLeft:'.25rem',color:'var(--primary)',fontWeight:700}}>+</span>}
-                        </div>
-                      );
-                    })}
-                  </div>}
-                  {fComboItems.length > 0 && <div style={{borderTop:'1px solid var(--border)',paddingTop:'.35rem'}}>
-                    <div style={{fontSize:'.72rem',fontWeight:600,color:'#555',marginBottom:'.25rem'}}>B составе:</div>
-                    {fComboItems.map(function(item, idx) {
-                      return (
-                        <div key={item.id} style={{display:'flex',alignItems:'center',padding:'.25rem .35rem',fontSize:'.78rem'}}>
-                          <span style={{flex:1}}>{item.name}</span>
-                          <div style={{display:'flex',alignItems:'center',gap:'.15rem',marginLeft:'.35rem'}}>
-                            <button type="button" onClick={function() {
-                              var next = [...fComboItems];
-                              if (next[idx].qty > 1) { next[idx].qty--; setFComboItems(next); }
-                            }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>-</button>
-                            <span style={{minWidth:'20px',textAlign:'center',fontWeight:600}}>{item.qty}</span>
-                            <button type="button" onClick={function() {
-                              var next = [...fComboItems];
-                              next[idx].qty++; setFComboItems(next);
-                            }} style={{width:'20px',height:'20px',border:'1px solid var(--border)',borderRadius:'4px',background:'none',cursor:'pointer',fontSize:'.7rem',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>+</button>
-                          </div>
-                          <span style={{width:'75px',textAlign:'right',fontWeight:600}}>{(item.price * item.qty).toLocaleString()} {cur}</span>
-                          <button type="button" onClick={function() { setFComboItems(fComboItems.filter(function(_, i) { return i !== idx; })) }} style={{background:'none',border:'none',cursor:'pointer',color:'#dc2626',fontSize:'.8rem',marginLeft:'.25rem',lineHeight:1,padding:'.1rem'}}>x</button>
-                        </div>
-                      );
-                    })}
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid var(--border)',paddingTop:'.35rem',marginTop:'.25rem',fontSize:'.78rem'}}>
-                      <span style={{fontWeight:600}}>Итого:</span>
-                      <span style={{fontWeight:700}}>{fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0).toLocaleString()} {cur}</span>
-                    </div>
-                  </div>}
-                </div>
-              </div>}
-          </div>
-          <div className="v2-card" style={{paddingBottom:'12px'}}>
-              <div className="form-group" style={{marginBottom:0}}>
-                <label>Описание</label>
-                <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
-              </div>
-          </div>
-              <div className="modal-actions">
-                {editId && fHidden && (
-                  <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
                 )}
-                <button type="submit" className="sk-dd-btn" disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
+                {fType !== 'combo' && (
+                  <div className="form-group">
+                    <label>Ед. веса</label>
+                    <select value={fWeightUnit} onChange={e => setFWeightUnit(e.target.value)}>
+                      <option value="г">г</option>
+                      <option value="кг">кг</option>
+                      <option value="т">т</option>
+                    </select>
+                  </div>
+                )}
               </div>
-            </form>
+            )}
+          </div>
+
+          {/* Фото — внизу, как в превью */}
+          <div className="v2-card">
+            <div className="form-group" style={{marginBottom:'8px'}}>
+              <label>Фото</label>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                {fPhoto ? (
+                  <img src={fPhoto} alt="" style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'12px',border:'1px solid rgba(0,16,36,.12)',flexShrink:0}} />
+                ) : uploading ? (
+                  <div style={{width:'64px',height:'64px',borderRadius:'12px',border:'1.5px dashed rgba(0,0,0,.26)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',background:'#fff',flexShrink:0}}>
+                    <div style={{width:'70%',height:'4px',background:'#eee',borderRadius:'2px',overflow:'hidden',position:'relative'}}>
+                      <div style={{position:'absolute',top:0,left:0,height:'100%',width:'40%',background:'#1F75FF',borderRadius:'2px',animation:'loadbar 1s ease-in-out infinite'}} />
+                    </div>
+                  </div>
+                ) : (
+                  <label style={{width:'64px',height:'64px',borderRadius:'12px',border:'1.5px dashed rgba(0,0,0,.26)',display:'flex',alignItems:'center',justifyContent:'center',color:'#aab3c0',fontSize:'20px',cursor:'pointer',flexShrink:0,margin:0}}>
+                    +
+                    <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
+                  </label>
+                )}
+                <label style={{cursor: uploading ? 'default' : 'pointer',padding:'6px 14px',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'100px',fontSize:'12px',fontWeight:600,color: uploading ? '#999' : '#555',background:'#fff',fontFamily:'inherit',margin:0}}>
+                  {fPhoto ? 'Заменить фото' : 'Загрузить фото'}
+                  <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
+                </label>
+                {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'11.5px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
+              </div>
+            </div>
+          </div>
+
+          {/* Описание */}
+          <div className="v2-card" style={{paddingBottom:'12px'}}>
+            <div className="form-group" style={{marginBottom:0}}>
+              <label>Описание</label>
+              <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
+            </div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="v2-ghost" onClick={() => { cleanupFreshPhoto(); setShowModal(false); }}>Отмена</button>
+            {editId && fHidden && (
+              <button type="button" className="v2-ghost" onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить</button>
+            )}
+            <button type="submit" className="v2-dark" disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
+          </div>
+        </form>
       </Modal>
 
       {/* Модалка подтверждения удаления */}
