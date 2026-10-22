@@ -863,7 +863,7 @@ input:focus, select:focus, textarea:focus {
 .sk-chip:active{transform:scale(.98)}
 
 /* Панель-строка (вариант 2) для страницы Счета */
-.sk-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--sk-soft);border-radius:16px;padding:16px 20px;margin-bottom:18px}
+.sk-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--sk-soft);border-radius:14px;padding:10px 16px;margin-bottom:14px;width:fit-content;max-width:100%}
 .sk-bar .grow{flex:1;min-width:220px}
 .sk-bar h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
 .sk-bar .sub{font-size:13px;color:var(--sk-muted);margin-top:3px}
@@ -936,7 +936,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Раскрывающаяся кнопка «Действия» на странице Счета */
 .sk-dd-wrap{position:relative}
-.sk-dd-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:11px 18px;font-size:12.5px;font-weight:700;line-height:1;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;box-shadow:0 12px 26px -12px rgba(29,120,252,.8);transition:transform .15s;animation:skpulse 2s ease-in-out infinite}
+.sk-dd-btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:9999px;padding:7px 14px;font-size:12px;font-weight:700;line-height:1;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;box-shadow:0 10px 22px -14px rgba(29,120,252,.8);transition:transform .15s;animation:skpulse 2s ease-in-out infinite}
 .sk-dd-btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px -12px rgba(29,120,252,.9);animation-play-state:paused}
 .sk-dd-btn:active{transform:scale(.98)}
 .sk-dd-btn .car{font-size:9px;transition:transform .2s}
