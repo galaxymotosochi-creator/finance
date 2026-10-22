@@ -215,7 +215,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           </div>
         )}
 
-        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:8, alignItems:'flex-start' }}>
           <button onClick={addRow}
             style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px',
               borderRadius:20, border:'1px dashed #d1d5db', background:'#fff', cursor:'pointer',
