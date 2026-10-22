@@ -180,7 +180,7 @@ export default function Products() {
   const [fBarcode, setFBarcode] = useState('');
   const [fType, setFType] = useState('product');
   // В режиме «только услуги» любая позиция — услуга: тип фиксирован, поле выбора скрыто
-  useEffect(function(){ if (isServices && fType !== 'service') setFType('service'); }, [isServices, fType]);
+  useEffect(function(){ if (isServices && fType !== 'service' && fType !== 'combo') setFType('service'); }, [isServices, fType]);
   const [fFreePrice, setFFreePrice] = useState(false);
   const [fWeight, setFWeight] = useState('0');
   const [fWeightUnit, setFWeightUnit] = useState('кг');
@@ -786,7 +786,7 @@ export default function Products() {
             {typeOpen && (
               <div className="f-menu">
                 <div className="f-list">
-                {[{v:null,l:'Все'},...(isServices?[{v:'service',l:'Услуги'}]:[{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}])].map(function(t) {
+                {[{v:null,l:'Все'},...(isServices?[{v:'service',l:'Услуги'},{v:'combo',l:'Пакеты'}]:[{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}])].map(function(t) {
                   const checked = (t.v === null && typeFilterSet.size === 0) || typeFilterSet.has(t.v);
                   return (
                     <div key={String(t.v)} onClick={() => pickType(t.v)}
@@ -978,7 +978,7 @@ export default function Products() {
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
               </div>
               <div className="form-row">
-                {!isFood && !isServices && <div className="form-group">
+                {!isFood && <div className="form-group">
                   <label>Тип</label>
                   <select value={fType} onChange={e => {
                     const t = e.target.value;
@@ -986,9 +986,14 @@ export default function Products() {
                     const need = t === 'service' ? 'service' : 'product';
                     if (fCat && !(catsLoaded ? cats : []).some(c => c.name === fCat && (!c.type || c.type === need))) setFCat('');
                   }}>
-                    <option value="product">Товар</option>
-                    <option value="service">Услуга</option>
-                    <option value="combo">Комбо</option>
+                    {isServices ? (<>
+                      <option value="service">Услуга</option>
+                      <option value="combo">Пакет (комбо услуг)</option>
+                    </>) : (<>
+                      <option value="product">Товар</option>
+                      <option value="service">Услуга</option>
+                      <option value="combo">Комбо</option>
+                    </>)}
                   </select>
                 </div>}
                 <div className="form-group">
@@ -1091,15 +1096,15 @@ export default function Products() {
                 </div>}
               </div>}
               {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
-                <label>Состав комбо</label>
+                <label>{isServices ? 'Состав пакета' : 'Состав комбо'}</label>
                 <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
                   <div style={{display:'flex',gap:'.35rem',marginBottom:'.35rem'}}>
                     <input type="text" value={fComboSearch} onChange={function(e){setFComboSearch(e.target.value)}}
-                      placeholder="Поиск товаров/услуг..."
+                      placeholder={isServices ? 'Поиск услуг...' : 'Поиск товаров/услуг...'}
                       style={{flex:1,padding:'.4rem .5rem',fontSize:'.78rem',border:'1px solid var(--border)',borderRadius:'.4rem',outline:'none',fontFamily:'var(--font)',background:'var(--body-bg)'}} />
                   </div>
                   {fComboSearch.length > 0 && <div style={{maxHeight:'160px',overflowY:'auto',marginBottom:'.35rem',border:'1px solid var(--border)',borderRadius:'.35rem',padding:'.2rem'}}>
-                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && p.name.toLowerCase().includes(fComboSearch.toLowerCase())}).map(function(p) {
+                    {products.filter(function(p){return p.type !== 'combo' && (p.id !== editId) && (!isServices || p.type === 'service') && p.name.toLowerCase().includes(fComboSearch.toLowerCase())}).map(function(p) {
                       var inCombo = fComboItems.find(function(i){return i.id === p.id});
                       return (
                         <div key={p.id} style={{display:'flex',alignItems:'center',gap:'.35rem',padding:'.25rem .35rem',borderRadius:'.3rem',cursor:'pointer',background:inCombo?'#f0f0f0':'transparent'}}
