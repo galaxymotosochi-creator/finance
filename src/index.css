@@ -141,7 +141,7 @@ body {
   font-size: .78rem; font-weight: 500; color: var(--sidebar-text);
   cursor: pointer; transition: all var(--transition); text-decoration: none;
   user-select: none; background: transparent;
-  border: none; border-radius: var(--radius-md);
+  border: none; border-radius: 11px;
 }
 .nav-parent:hover { background: #f5f5f5; color: var(--sidebar-text-hover); }
 .nav-parent.active { background: #f8fafc; color: #111; font-weight: 600; }
@@ -183,7 +183,7 @@ button.nav-parent { width: 100%; text-align: left; font-family: var(--font); }
   margin: 1px 0;
   font-size: .815rem; color: #6b7280;
   cursor: pointer; transition: background .16s, color .16s; text-decoration: none;
-  border-radius: var(--radius-sm);
+  border-radius: 11px;
 }
 .nav-child:hover { background: #f4f6f9; color: #111; }
 /* Кружок слева у подраздела: серый по умолчанию, синий пульсирующий — если активен */
