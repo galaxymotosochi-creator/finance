@@ -54,7 +54,7 @@ const menu = [
   {
     label: 'Склад', icon: 'stock', hideForServices: true, children: [
       { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары', servicesLabel: 'Услуги' },
-      { label: 'Категории', path: '/stock/categories' },
+      { label: 'Категории', path: '/stock/categories', hideForServices: true },
       { label: 'Аналитика товаров', path: '/stock/turnover', hideForServices: true },
       { label: 'Остатки', path: '/stock/stock', hideForServices: true },
       { label: 'Поставки', path: '/stock/supplies', hideForServices: true },
@@ -103,12 +103,22 @@ export default function Sidebar() {
     return found ? found.label : null;
   });
 
-  // Открыт ровно тот раздел, в котором мы находимся; ушли — раздел закрывается
+  // Открыт ровно тот раздел, в котором мы находимся; ушли — раздел закрывается.
+  // Если путь встречается в нескольких разделах (например «Категории услуг» есть и в
+  // «Услугах», и в «Складе») — выбираем первый ВИДИМЫЙ раздел, чтобы меню не прыгало.
   React.useEffect(() => {
     const path = location.pathname;
-    const found = menu.find(m => m.children && m.children.some(c => path === c.path));
+    const isVisible = (m) => {
+      if (!m.children) return false;
+      if (m.onlyFood && businessType !== 'food') return false;
+      if (m.onlyServices && businessType !== 'services') return false;
+      if (m.hideForServices && businessType === 'services') return false;
+      if (m.hideForFood && businessType === 'food') return false;
+      return true;
+    };
+    const found = menu.find(m => isVisible(m) && m.children.some(c => path === c.path));
     setExpanded(found ? found.label : null);
-  }, [location.pathname]);
+  }, [location.pathname, businessType]);
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
