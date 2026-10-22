@@ -11,6 +11,8 @@ export default function Login() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [notVerified, setNotVerified] = useState('');
+  const [resendInfo, setResendInfo] = useState('');
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
@@ -21,16 +23,37 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setNotVerified('');
+    setResendInfo('');
     setLoading(true);
     try {
       await signIn(email, password);
       navigate('/');
     } catch (err) {
-      setError(err.message === 'Invalid login credentials'
-        ? 'Неверный email или пароль'
-        : err.message);
+      if (err.code === 'EMAIL_NOT_VERIFIED') {
+        setNotVerified(err.email || email);
+      } else {
+        setError(err.message === 'Invalid login credentials'
+          ? 'Неверный email или пароль'
+          : err.message);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resendVerify = async () => {
+    setResendInfo('Отправляем…');
+    try {
+      const r = await fetch('/api/auth/resend-verify', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: notVerified || email }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.ok !== false) setResendInfo('Письмо отправлено. Проверьте почту.');
+      else setResendInfo('Не удалось отправить. Попробуйте позже.');
+    } catch (e) {
+      setResendInfo('Ошибка сети. Попробуйте позже.');
     }
   };
 
@@ -125,6 +148,21 @@ export default function Login() {
             />
 
             {error && <p className="error">{error}</p>}
+
+            {notVerified && (
+              <div style={{background:'#EAF2FF',border:'1px solid rgba(31,117,255,.35)',borderRadius:'12px',padding:'12px 14px',marginBottom:12}}>
+                <div style={{fontSize:'.8rem',fontWeight:700,color:'#0d4ea8',marginBottom:5}}>Подтвердите почту</div>
+                <div style={{fontSize:'.76rem',color:'rgba(0,0,0,.62)',lineHeight:1.45,marginBottom:9}}>
+                  Вход откроется после подтверждения адреса <strong>{notVerified}</strong>. Проверьте письмо и нажмите в нём «Подтвердить email».
+                </div>
+                <button type="button" onClick={resendVerify}
+                  style={{width:'100%',border:'none',borderRadius:100,padding:'8px',fontFamily:'var(--font)',
+                    fontSize:'.76rem',fontWeight:700,cursor:'pointer',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff'}}>
+                  Отправить письмо ещё раз
+                </button>
+                {resendInfo && <div style={{fontSize:'.73rem',color:'#0d4ea8',marginTop:7}}>{resendInfo}</div>}
+              </div>
+            )}
 
             <button type="submit" disabled={loading}>
               {loading ? 'Вход...' : 'Войти'}

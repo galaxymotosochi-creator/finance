@@ -218,7 +218,12 @@ const auth = {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) return { data: null, error: new Error(data.error || 'Login failed') };
+      if (!res.ok) {
+        const err = new Error(data.error || 'Login failed');
+        err.code = data.code || '';
+        err.email = data.email || '';
+        return { data: null, error: err };
+      }
       const session = {
         access_token: data.token, token_type: 'bearer',
         user: { id: data.user.id, email: data.user.email, user_metadata: {} },
