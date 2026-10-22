@@ -307,13 +307,20 @@ export default function Transactions() {
     } catch (e) { console.error(e); }
   };
 
-  // Один раз за сессию: гарантируем системные категории («Доход от продаж», «Зарплата»)
+  // Один раз за сессию: гарантируем системные категории («Доход от продаж», «Зарплата»).
+  // Защита от двойного монтирования: общий флаг в localStorage по пользователю.
   const seededRef = useRef(false);
   useEffect(() => {
     if (!user || seededRef.current) return;
+    const flagKey = 'atlaspos_seeded_' + user.id;
+    try { if (localStorage.getItem(flagKey)) { seededRef.current = true; return; } } catch (e) {}
     seededRef.current = true;
     const have = new Set((cats || []).map(c => String(c.name || '').trim()));
-    if (!have.has('Доход от продаж') || !have.has('Зарплата')) seed();
+    if (have.has('Доход от продаж') && have.has('Зарплата')) {
+      try { localStorage.setItem(flagKey, '1'); } catch (e) {}
+      return;
+    }
+    seed().then(function () { try { localStorage.setItem(flagKey, '1'); } catch (e) {} });
   }, [user, cats]);
 
 
