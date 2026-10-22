@@ -729,7 +729,7 @@ export default function Accounts() {
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'.5rem'}}>
                   <label style={{margin:0}}>Новые счета</label>
-                  <button type="button" onClick={()=>setNewAccs([...newAccs, {name:'',amt:'',desc:'',type:'custom'}])}
+                  <button type="button" onClick={()=>setNewAccs([...newAccs, {name:'',amt:'',desc:'',type:''}])}
                     style={{background:'none',border:'none',padding:'.15rem .4rem',margin:0,fontFamily:'inherit',fontSize:'.82rem',color:'var(--secondary)',cursor:'pointer',lineHeight:1,fontWeight:400}}>
                     + Добавить счет
                   </button>
@@ -743,7 +743,8 @@ export default function Accounts() {
                         <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
                       </div>
                       <input placeholder="Комментарий" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
-                      <select value={na.type} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}}>
+                      <select value={na.type || ''} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} required style={{marginTop:'.4rem',width:'100%'}}>
+                        <option value=""><span className="sel-ph">— выберите —</span></option>
                         {ACC_TYPES.filter(t => {
                           if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
                           if (t.type === 'cash_register' && accounts.some(a => a.type === 'cash_register')) return false;
