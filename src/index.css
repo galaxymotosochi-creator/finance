@@ -1252,11 +1252,12 @@ input:focus, select:focus, textarea:focus {
   .sk-bar .sub{font-size:12px}
 }
 /* Кнопка «Добавить» внутри плашки раздела */
-.sk-bar-btn{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border-radius:11px;
+.sk-bar .sk-bar-btn{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;
+  border-radius:11px !important;
   cursor:pointer;border:1px solid rgba(31,117,255,.35);background:rgba(31,117,255,.04);
   font-family:inherit;font-size:.85rem;font-weight:700;color:#111;transition:background .15s,border-color .15s}
-.sk-bar-btn:hover{background:rgba(31,117,255,.09);border-color:rgba(31,117,255,.55)}
-.sk-bar-btn-check{width:18px;height:18px;border-radius:11px;flex-shrink:0;
+.sk-bar .sk-bar-btn:hover{background:rgba(31,117,255,.09);border-color:rgba(31,117,255,.55)}
+.sk-bar .sk-bar-btn-check{width:18px;height:18px;border-radius:11px !important;flex-shrink:0;
   border:1.5px solid #1F75FF;background:#1F75FF;display:flex;align-items:center;
   justify-content:center;color:#fff;font-size:.7rem;font-weight:800}
 
