@@ -236,21 +236,24 @@ export default function Categories() {
       </div>
 
       {/* МОДАЛКА */}
-      <Modal open={showModal} onClose={() => { setShowModal(false); setEditingId(null); }} title={editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'} subtitle="Добавьте или измените категорию доходов/расходов" width="medium">
+      <Modal open={showModal} onClose={() => { setShowModal(false); setEditingId(null); }} title={editingId ? 'Редактировать категорию' : 'Создать финансовую категорию'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
-          <div className="form-group">
-            <label>Название</label>
-            <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка, оплата за доп. услуги' : 'Например: аренда офиса, рекламный бюджет, CRM'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required />
-          </div>
-          <div className="form-group">
-            <label>Тип категории</label>
-            <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-              <option value="income">Доход</option>
-              <option value="expense">Расход</option>
-            </select>
+          <div className="v2-card">
+            <div className="form-group">
+              <label>Название</label>
+              <input type="text" placeholder={dirType === 'income' ? 'Например: проценты от банка' : 'Например: аренда офиса, реклама'} value={dirName} onChange={function (e) { setDirName(e.target.value); }} required autoFocus />
+            </div>
+            <div className="form-group">
+              <label>Тип категории</label>
+              <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
+                <option value="income">Доход</option>
+                <option value="expense">Расход</option>
+              </select>
+            </div>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="sk-dd-btn">Сохранить</button>
+            <button type="button" className="v2-ghost" onClick={() => { setShowModal(false); setEditingId(null); }}>Отмена</button>
+            <button type="submit" className="cat-add-btn">Сохранить</button>
           </div>
         </form>
       </Modal>
