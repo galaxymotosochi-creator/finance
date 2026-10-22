@@ -851,6 +851,25 @@ export default function Products() {
               </div>
             )}
           </div>
+          {!isServices && (
+          <div className="sk-dd-wrap">
+            <button type="button" className="f-pill" onClick={e=>{e.stopPropagation();setColsOpen(!colsOpen);setTypeOpen(false);setCatOpen(false);setExportOpen(false)}}>Столбцы <span className="car-tri">▾</span></button>
+            {colsOpen && (
+              <div className="f-menu" style={{minWidth:'230px'}}>
+                <div className="cols-list">
+                {ALL_COLUMNS.filter(c=>!c.always).map(function(col) {
+                  const active = activeCols.has(col.id);
+                  return (
+                    <div key={col.id} onClick={() => toggleCol(col.id)}
+                      style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:active?'#0d4ea8':'#5b6472',fontWeight:active?700:500,background:active?'#E6F0FF':'transparent'}}>
+                      <span style={{width:'8px',height:'8px',borderRadius:'50%',background:active?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                      {col.label}
+                    </div>
+                  );
+                })}
+              </div></div>
+            )}</div>
+          )}
           <button type="button" title="Корзина" aria-label="Корзина"
             onClick={()=>{setCatOpen(false);setColsOpen(false);setExportOpen(false);setShowTrash(true)}}
             style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:showTrash?'linear-gradient(135deg,#0d4ea8,#1F75FF)':'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s'}}
