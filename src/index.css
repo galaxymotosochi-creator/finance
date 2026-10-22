@@ -1265,6 +1265,9 @@ input:focus, select:focus, textarea:focus {
 /* Заголовок раздела без плашки (Категории) */
 .cat-title,.content h1.cat-title{font-family:var(--font);font-size:18px;font-weight:600;letter-spacing:0;
   line-height:1.2;margin:0;color:#0b1220}
+/* Подпись под заголовком раздела */
+.cat-sub{font-family:var(--font);font-size:12px;font-weight:400;color:#8b95a5;line-height:1.4}
+
 /* Кнопка «Добавить» в строке заголовка */
 .cat-add-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;
   border:1px solid rgba(31,117,255,.35);background:rgba(31,117,255,.04);cursor:pointer;

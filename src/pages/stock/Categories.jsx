@@ -142,9 +142,10 @@ export default function Categories() {
 
   return (
     <>
-      <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'14px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
             <h1 className="cat-title">{businessType === 'food' ? (scope === 'ingredient' ? 'Категории ингредиентов' : 'Категории блюд и тех.карт') : 'Категории'}</h1>
             <SectionHelp
               title="Раздел «Категории»"
@@ -175,6 +176,8 @@ export default function Categories() {
                 ) },
               ]}
             />
+            </div>
+            <span className="cat-sub">Группы для каталога услуг</span>
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
