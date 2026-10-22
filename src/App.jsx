@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from './lib/supabase';
@@ -70,6 +70,21 @@ function FullKassa() {
   );
 }
 
+
+// Пока ленивый чанк страницы грузится — показываем только маленький кружок,
+// каркас (меню, шапка) остаётся на месте. Белого экрана больше нет.
+function PageSuspense() {
+  return (
+    <Suspense fallback={
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'48px 0' }}>
+        <div style={{ width:'26px', height:'26px', border:'3px solid #eee', borderTopColor:'#111', borderRadius:'50%', animation:'spin .8s linear infinite' }} />
+      </div>
+    }>
+      <Outlet />
+    </Suspense>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -90,6 +105,7 @@ function AppRoutes() {
 
       {/* Один каркас на все разделы: меню и шапка не пересоздаются при переходах */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route element={<PageSuspense />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/ai-assistant" element={<AiAssistant />} />
         <Route path="/registers" element={<RegistersPage />} />
@@ -148,6 +164,7 @@ function AppRoutes() {
         <Route path="/reports/monthly" element={<MonthlyReport />} />
         <Route path="/reports/annual" element={<AnnualReport />} />
         <Route path="/reports/:kind" element={<ProductReport />} />
+        </Route>
       </Route>
 
       {/* Подписка — каркас без проверки подписки */}
