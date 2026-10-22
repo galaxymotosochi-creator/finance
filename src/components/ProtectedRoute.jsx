@@ -41,7 +41,7 @@ function getRequiredPerm(pathname) {
 }
 
 export default function ProtectedRoute({ children, skipSubscription }) {
-  const { user, loading: authLoading, employeeData, hasPermission } = useAuth();
+  const { user, profile, loading: authLoading, employeeData, hasPermission } = useAuth();
   const { loading: subLoading, isExpired } = useSubscription();
   const location = useLocation();
 
@@ -65,7 +65,7 @@ export default function ProtectedRoute({ children, skipSubscription }) {
 
   // Неподтверждённая почта — в кабинет не пускаем.
   // Показываем экран «подтвердите email» вместо любого раздела.
-  if (user.email_verified === false) {
+  if (profile && profile.email_verified === false) {
     return <Navigate to="/login?unverified=1" replace />;
   }
 
