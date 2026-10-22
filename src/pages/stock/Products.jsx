@@ -128,6 +128,8 @@ export default function Products() {
   })();
   const isFood = businessType === 'food';
   const isServices = businessType === 'services';
+  // В режиме «только услуги» любая позиция — услуга: тип фиксирован, поле выбора скрыто
+  useEffect(function(){ if (isServices && fType !== 'service') setFType('service'); }, [isServices, fType]);
   const pageTitle = isFood ? 'Товары' : (isServices ? 'Услуги' : 'Товары и услуги');
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
@@ -309,7 +311,7 @@ export default function Products() {
     setEditId(null); setMode('add'); setFHidden(false); setFPhoto(''); setFreshPhotoUrl('');
     setFName(''); setFCat(''); setFPrice(''); setFMinPrice(''); setFUnit(''); setFSku('');
     setFRewardKind(''); setFRewardValue('');
-    setFBarcode(''); setFType('product'); setFWeight('0'); setFWeightUnit('кг');
+    setFBarcode(''); setFType(isServices ? 'service' : 'product'); setFWeight('0'); setFWeightUnit('кг');
     setFMinQty(''); setFDesc(''); setFComboItems([]);
     setFFreePrice(false); // новый товар: свободная цена всегда выключена, включается вручную
     setFComboSearch('');
@@ -761,7 +763,7 @@ export default function Products() {
               ]}
             />
           </div>
-          <div className="sub">Каталог товаров, услуг и комбо</div>
+          <div className="sub">{isServices ? 'Каталог услуг' : (isFood ? 'Товары для продажи' : 'Каталог товаров, услуг и комбо')}</div>
         </div>
         <div className="sk-bar-acts">
           <button className="sk-dd-btn" onClick={openAdd}>Добавить</button>
@@ -976,7 +978,7 @@ export default function Products() {
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
               </div>
               <div className="form-row">
-                {!isFood && <div className="form-group">
+                {!isFood && !isServices && <div className="form-group">
                   <label>Тип</label>
                   <select value={fType} onChange={e => {
                     const t = e.target.value;

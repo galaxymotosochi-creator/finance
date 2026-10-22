@@ -48,6 +48,8 @@ export default function Registers({ fullscreen }) {
   const [addPrice, setAddPrice] = useState('');
   const [addUnit, setAddUnit] = useState('');
   const [addType, setAddType] = useState('product');
+  const businessType = (function(){ try { return localStorage.getItem('atlaspos_business_type') || (user && user.business_type) || 'retail'; } catch(e){ return 'retail'; } })();
+  const isServicesBiz = businessType === 'services';
   const [addSku, setAddSku] = useState('');
   const [addBarcode, setAddBarcode] = useState('');
   const [addWeight, setAddWeight] = useState('0');
@@ -754,7 +756,7 @@ export default function Registers({ fullscreen }) {
     });
     if (error) return setToast('' + error.message);
     setShowAdd(false);
-    setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product');
+    setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType(isServicesBiz ? 'service' : 'product');
     setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc('');
     // Refresh products
     const { data } = await supabase.from('products').select('*').eq('user_id', user.id).order('name');
@@ -1098,7 +1100,7 @@ if (loading) return <CenterSpinner />;
           })}} title="Сканировать штрихкод"
             style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',border:'1px solid #8fb8ff',boxShadow:'0 1px 5px rgba(31,117,255,.35)',cursor:'pointer',fontFamily:'inherit',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor'><rect x='3' y='4.5' width='1.5' height='15'/><rect x='5.3' y='4.5' width='2.6' height='15'/><rect x='8.6' y='4.5' width='1.2' height='15'/><rect x='10.4' y='4.5' width='3' height='15'/><rect x='14' y='4.5' width='1.4' height='15'/><rect x='16' y='4.5' width='2.4' height='15'/><rect x='19' y='4.5' width='1.6' height='15'/></svg></button>
           <span onClick={() => { if (activeShift) setShowActions(true); else setShowOpenShift(true); }} title="Настройки смены" style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',border:'1px solid #8fb8ff',boxShadow:'0 1px 5px rgba(31,117,255,.35)',cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0,userSelect:'none'}}><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3.2'/><path d='M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z'/></svg></span>
-          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType('product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
+          <button onClick={() => { setShowAdd(true); setAddName(''); setAddCat(''); setAddPrice(''); setAddUnit(''); setAddType(isServicesBiz ? 'service' : 'product'); setAddSku(''); setAddBarcode(''); setAddWeight('0'); setAddWeightUnit('кг'); setAddDesc(''); }} style={{padding:'8px 14px',border:'none',borderRadius:'8px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',fontSize:'.80rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',flexShrink:0}}>+ Добавить</button>
         </div>
 
         {/* Две отдельные плашки: каталог слева, чек справа (как в прототипе) */}
@@ -1435,16 +1437,16 @@ if (loading) return <CenterSpinner />;
                   <label>Категория</label>
                   <select value={addCat} onChange={e => setAddCat(e.target.value)}>
                     <option value="">— выберите —</option>
-                    {allCats.filter(c => c.type === 'product').map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                    {allCats.filter(c => isServicesBiz ? (c.type === 'service' || !c.type) : (c.type === 'product' || !c.type)).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
-                <div className="form-group">
+                {!isServicesBiz && <div className="form-group">
                   <label>Тип</label>
                   <select value={addType} onChange={e => setAddType(e.target.value)}>
                     <option value="product">Товар</option>
                     <option value="service">Услуга</option>
                   </select>
-                </div>
+                </div>}
               </div>
               <div className="form-row">
                 <div className="form-group">
