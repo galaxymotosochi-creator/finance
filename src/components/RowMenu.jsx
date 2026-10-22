@@ -75,7 +75,7 @@ export default function RowMenu({ items = [], buttonClassName = 'sk-more' }) {
             style={{
               position: 'fixed', left: pos.left, top: pos.top, zIndex: 9999,
               minWidth: 160, background: '#fff',
-              border: '1px solid rgba(29,120,252,.16)', borderRadius: 11,
+              border: '1px solid rgba(29,120,252,.14)', borderRadius: 11,
               boxShadow: '0 18px 40px -18px rgba(15,25,45,.45)',
               padding: '.25rem 0',
             }}
