@@ -1186,7 +1186,7 @@ export default function Products() {
             {editId && fHidden && (
               <button type="button" className="v2-ghost" onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить</button>
             )}
-            <button type="submit" className="v2-dark" disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
+            <button type="submit" className="cat-add-btn" disabled={saving}>{saving ? 'Сохранение…' : 'Сохранить'}</button>
           </div>
         </form>
       </Modal>
