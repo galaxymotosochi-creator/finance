@@ -708,8 +708,9 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(notInit).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle={sorted.filter(notInit).length ? "Введите балансы счетов. Если на счету ноль — оставьте 0 и нажмите «Сохранить»: это тоже нормально" : "Все начальные остатки уже внесены. Изменить баланс счета можно через «Корректировку»"} width="medium">
+      <Modal open={showInit} onClose={()=>setShowInit(false)} title={sorted.filter(notInit).length ? "Введите первоначальные остатки" : "Начальные остатки"} subtitle="" width="medium" className="modal-v2 cat-modal">
             <form onSubmit={saveInit}>
+              <div className="v2-card">
               {sorted.filter(notInit).map(a => {
                 var m=getTypeMeta(a), ic=m?m.icon:'🏦', lb=m?m.label:a.type;
                 return (
@@ -722,7 +723,7 @@ export default function Accounts() {
                 );
               })}
               {sorted.filter(notInit).length === 0 && (
-                <div style={{padding:'.25rem 0'}}></div>
+                <div style={{padding:'.25rem 0',fontSize:'.8rem',color:'#555'}}>Все начальные остатки внесены. Изменить баланс счёта можно через «Корректировку».</div>
               )}
               {sorted.filter(notInit).length > 0 && (
               <div className="form-group" style={{marginTop:'.75rem',paddingTop:'.75rem',borderTop:'1px solid var(--border)'}}>
@@ -757,13 +758,14 @@ export default function Accounts() {
                 )}
               </div>
               )}
+              </div>
               <div className="modal-actions">
                 {sorted.filter(notInit).length > 0 && (<>
-                  <button type="button" className="btn btn-outline" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
-                  <button type="submit" className="sk-dd-btn">Сохранить</button>
+                  <button type="button" className="v2-ghost" onClick={()=>{setShowInit(false);setNewAccs([])}}>Пропустить</button>
+                  <button type="submit" className="cat-add-btn">Сохранить</button>
                 </>)}
                 {sorted.filter(notInit).length === 0 && (
-                  <button type="button" className="sk-dd-btn sk-pulse-plain" onClick={()=>setShowInit(false)}>Закрыть</button>
+                  <button type="button" className="cat-add-btn" onClick={()=>setShowInit(false)}>Закрыть</button>
                 )}
               </div>
             </form>
