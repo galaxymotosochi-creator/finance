@@ -1077,7 +1077,6 @@ export default function Products() {
 
           {/* Дополнительно */}
           <div className="v2-card">
-            <div className="cb-t" style={{marginBottom:'8px'}}>Дополнительно</div>
             <div className="form-row">
               <div className="form-group">
                 <label>Артикул</label>
