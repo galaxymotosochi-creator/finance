@@ -145,7 +145,7 @@ export default function Categories() {
       <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'14px'}}>
         <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1 style={{fontSize:'17px',fontWeight:400,letterSpacing:0,margin:0,color:'#0b1220'}}>{businessType === 'food' ? (scope === 'ingredient' ? 'Категории ингредиентов' : 'Категории блюд и тех.карт') : 'Категории'}</h1>
+            <h1 className="cat-title">{businessType === 'food' ? (scope === 'ingredient' ? 'Категории ингредиентов' : 'Категории блюд и тех.карт') : 'Категории'}</h1>
             <SectionHelp
               title="Раздел «Категории»"
               intro="Категории — группы, по которым распределяются товары и услуги. По ним удобно фильтровать каталог, остатки и кассу."
@@ -178,8 +178,8 @@ export default function Categories() {
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
-          <button type="button" onClick={openAdd} className="sk-bar-btn">
-            <span className="sk-bar-btn-check">✓</span>
+          <button type="button" onClick={openAdd} className="cat-add-btn">
+            <span className="cat-add-check">✓</span>
             Добавить
           </button>
         </div>

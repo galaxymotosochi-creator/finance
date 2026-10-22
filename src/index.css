@@ -1261,6 +1261,19 @@ input:focus, select:focus, textarea:focus {
   border:1.5px solid #1F75FF;background:#1F75FF;display:flex;align-items:center;
   justify-content:center;color:#fff;font-size:.7rem;font-weight:800}
 
+/* Заголовок раздела без плашки (Категории) */
+.cat-title{font-family:var(--font);font-size:17px;font-weight:400;letter-spacing:-.01em;
+  line-height:1.2;margin:0;color:#0b1220}
+/* Кнопка «Добавить» в строке заголовка */
+.cat-add-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;
+  border:1px solid rgba(31,117,255,.35);background:rgba(31,117,255,.04);cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:600;line-height:1;color:#0d4ea8;
+  transition:background .15s,border-color .15s}
+.cat-add-btn:hover{background:rgba(31,117,255,.1);border-color:rgba(31,117,255,.55)}
+.cat-add-check{width:16px;height:16px;border-radius:11px;flex-shrink:0;
+  background:#1F75FF;color:#fff;font-size:10px;font-weight:800;line-height:1;
+  display:flex;align-items:center;justify-content:center}
+
 /* Компьютер: кнопка тоже справа внутри плашки */
 .sk-bar .sk-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 
