@@ -67,11 +67,14 @@ export default function Onboarding({ onDone }) {
 
   return (
     <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: '#f4f6f9', padding: '32px 18px', fontFamily: 'var(--font)',
+      position: 'fixed', inset: 0, display: 'flex',
+      alignItems: 'center', justifyContent: 'center',
+      background: '#f4f6f9', padding: '32px 18px',
+      fontFamily: 'var(--font)', boxSizing: 'border-box', overflowY: 'auto',
     }}>
       <div style={{
-        width: '100%', maxWidth: '760px', background: '#fff', borderRadius: '20px',
+        width: '100%', maxWidth: '760px', margin: '0 auto',
+        background: '#fff', borderRadius: '20px',
         boxShadow: '0 18px 50px rgba(15,25,45,.10)', overflow: 'hidden',
       }}>
         <div style={{ background: 'linear-gradient(135deg,#1F75FF,#0d4ea8)', padding: '26px 28px' }}>

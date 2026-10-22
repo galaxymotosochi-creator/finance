@@ -27,7 +27,11 @@ export default function AppLayout({ children }) {
   ];
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
-  const needsOnboarding = !!user && !user.employee_id && !user.onboarding_done;
+  // Онбординг — ТОЛЬКО после подтверждения email.
+  // Неподтверждённого пользователя сюда вообще не пускает ProtectedRoute,
+  // но проверяем и здесь на всякий случай.
+  const emailOk = !!user && user.email_verified !== false;
+  const needsOnboarding = !!user && emailOk && !user.employee_id && !user.onboarding_done;
 
   if (needsOnboarding) {
     return (
