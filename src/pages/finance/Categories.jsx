@@ -20,7 +20,7 @@ export default function Categories() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [dirName, setDirName] = useState('');
-  const [dirType, setDirType] = useState('income');
+  const [dirType, setDirType] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   // Подсказка скролла таблицы (как в «Счетах» и «Чекax»)
@@ -83,7 +83,7 @@ export default function Categories() {
     } else {
       setEditingId(null);
       setDirName('');
-      setDirType('income');
+      setDirType('');
     }
     setShowModal(true);
   };
@@ -91,6 +91,7 @@ export default function Categories() {
   const save = async (e) => {
     e.preventDefault();
     if (!dirName.trim()) { setToast('⚠️ Введите название'); return; }
+    if (!dirType) { setToast('⚠️ Выберите тип категории'); return; }
     const editingCat = editingId ? (list || []).find(c => String(c.id) === String(editingId)) : null;
     if (editingCat && editingCat.is_system) { setToast('⚠️ Системную категорию изменить нельзя'); setShowModal(false); setEditingId(null); return; }
     try {
@@ -104,7 +105,7 @@ export default function Categories() {
       setShowModal(false);
       setEditingId(null);
       setDirName('');
-      setDirType('income');
+      setDirType('');
       if (!res.queued) await fetch();
     } catch (err) { setToast('⚠️ ' + err.message); }
   };
@@ -246,6 +247,7 @@ export default function Categories() {
             <div className="form-group">
               <label>Тип категории</label>
               <div className="v2-seg">
+                {!dirType && <span className="sel-ph" style={{fontSize:'12.5px',fontWeight:600,padding:'7px',flex:'0 0 auto'}}>— выберите —</span>}
                 <button type="button" className={dirType === 'income' ? 'on' : ''} onClick={function () { setDirType('income'); }}>Доход</button>
                 <button type="button" className={dirType === 'expense' ? 'on' : ''} onClick={function () { setDirType('expense'); }}>Расход</button>
               </div>
