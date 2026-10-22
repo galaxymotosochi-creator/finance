@@ -637,11 +637,12 @@ export default function Accounts() {
         </>
       )}
 
-      <Modal open={showModal} onClose={()=>{setShowModal(false);setEditingId(null)}} title={editingId?'Редактировать счет':'Добавить счет'} subtitle={editingId?'Измените данные счета':'Настройка нового кошелька, расчетного счета или кассы'} width="medium">
+      <Modal open={showModal} onClose={()=>{setShowModal(false);setEditingId(null)}} title={editingId?'Редактировать счет':'Добавить счет'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
+          <div className="v2-card">
               <div className="form-group">
                 <label>Название</label>
-                <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required />
+                <input type="text" placeholder="Например: расчетный счет (Т-Банк), карта (Сбер)" value={modalName} onChange={e=>setModalName(e.target.value)} required autoFocus />
               </div>
               <div className="form-group">
                 <label>Комментарий</label>
@@ -667,8 +668,10 @@ export default function Accounts() {
                   <input type="number" placeholder="0" min="0" step="0.01" value={modalBalance} onChange={e=>setModalBalance(e.target.value)} />
                 </div>
               )}
+          </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={()=>{setShowModal(false);setEditingId(null)}}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
