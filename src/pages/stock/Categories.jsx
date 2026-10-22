@@ -96,7 +96,7 @@ export default function Categories() {
   const openAdd = () => {
     setEditId(null);
     setFName('');
-    setFType(businessType === 'food' ? scope : 'product');
+    setFType(businessType === 'food' ? scope : (businessType === 'services' ? 'service' : 'product'));
     setShowModal(true);
   };
 
@@ -112,7 +112,7 @@ export default function Categories() {
     if (!fName.trim()) return alert('Введите название');
     let queued = false;
     if (editId) {
-      const res = await supabase.from('stock_categories').update({ name: fName.trim(), type: fType, scope: businessType === 'food' ? 'food' : 'retail' }).eq('id', editId);
+      const res = await supabase.from('stock_categories').update({ name: fName.trim(), type: businessType === 'services' ? 'service' : fType, scope: businessType === 'food' ? 'food' : 'retail' }).eq('id', editId);
       if (res.error) return alert(res.error.message);
       queued = res.queued;
     } else {
@@ -120,7 +120,7 @@ export default function Categories() {
         id: genId(),
         user_id: user.id,
         name: fName.trim(),
-        type: fType,
+        type: businessType === 'services' ? 'service' : fType,
         scope: businessType === 'food' ? 'food' : 'retail'
       });
       if (res.error) return alert(res.error.message);
@@ -193,7 +193,7 @@ export default function Categories() {
           <thead id="catColHeaders">
             <tr>
               <th style={{textAlign:'left'}}>Название</th>
-              <th style={{textAlign:'left'}}>Вид</th>
+              <th style={{textAlign:'left'}}>Тип</th>
               <th className="actions" style={{textAlign:'left',width:'58px'}}></th>
             </tr>
           </thead>
@@ -210,7 +210,7 @@ export default function Categories() {
             ) : cats.map(c => (
               <tr key={c.id}>
                 <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
-                <td style={{textAlign:'left'}}>{businessType === 'food' ? (scope === 'ingredient' ? 'Ингредиент' : 'Блюдо / тех. карта') : (c.type === 'service' ? 'Услуга' : 'Товар')}</td>
+                <td style={{textAlign:'left'}}>{businessType === 'food' ? (scope === 'ingredient' ? 'Ингредиент' : 'Блюдо / тех. карта') : (businessType === 'services' ? 'Услуга' : (c.type === 'service' ? 'Услуга' : 'Товар'))}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="sk-more" onClick={(e) => {
@@ -240,8 +240,9 @@ export default function Categories() {
             <input type="text" value={fName} onChange={e => setFName(e.target.value)}
               placeholder="Например, Электроинструменты" required />
           </div>
+          {businessType !== 'services' && (
           <div className="form-group">
-            <label>Вид</label>
+            <label>Тип</label>
             <select value={fType} onChange={e => setFType(e.target.value)}>
               {businessType === 'food' ? (
                 scope === 'ingredient'
@@ -254,7 +255,7 @@ export default function Categories() {
                 </>
               )}
             </select>
-          </div>
+          </div>)}
           <div className="modal-actions">
             <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
           </div>
