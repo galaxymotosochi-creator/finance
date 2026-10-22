@@ -312,12 +312,11 @@ export default function Clients() {
                       <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:0 }}>Ничего не найдено по запросу</p>
                     ) : (
                       <>
-                        <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Клиентов пока нет</p>
                         <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                           <b>Как добавить клиента:</b><br />
                           • Нажмите «Добавить клиента»<br />
                           • Укажите имя и телефон — этого достаточно для старта<br />
-                          • Остальное (дата рождения, скидка, долг) можно заполнить позже<br />
+                          • Дату рождения, скидку и контактные данные можно добавить позже<br />
                           История покупок начнёт собираться автоматически после первой продажи.
                         </div>
                       </>

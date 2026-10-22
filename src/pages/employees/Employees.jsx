@@ -490,7 +490,6 @@ export default function Employees() {
               <tr>
                 <td colSpan="9">
                   <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
-                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Сотрудников пока нет</p>
                     <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                       <b>Как добавить сотрудника:</b><br />
                       • Нажмите «Добавить сотрудника»<br />

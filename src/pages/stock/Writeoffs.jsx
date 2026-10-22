@@ -307,7 +307,6 @@ export default function Writeoffs() {
               <tr>
                 <td colSpan="6">
                   <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
-                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Списаний пока нет</p>
                     <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                       <b>Как оформить списание:</b><br />
                       • Нажмите «Добавить списание»<br />

@@ -202,11 +202,6 @@ export default function Categories() {
               <tr>
                 <td colSpan="3">
                   <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
-                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>
-                      {businessType === 'food'
-                        ? (scope === 'ingredient' ? 'Категорий ингредиентов пока нет' : 'Категорий блюд пока нет')
-                        : (businessType === 'services' ? 'Категорий услуг пока нет' : 'Категорий пока нет')}
-                    </p>
                     <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                       {businessType === 'food' ? (
                         <>

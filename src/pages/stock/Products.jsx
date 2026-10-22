@@ -902,9 +902,6 @@ export default function Products() {
                     <div className="sk-empty">Ничего не найдено по запросу</div>
                   ) : (
                     <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
-                      <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>
-                        {isFood ? 'Товаров пока нет' : (isServices ? 'Услуг пока нет' : 'Каталог пока пуст')}
-                      </p>
                       <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                         {isServices ? (
                           <>
