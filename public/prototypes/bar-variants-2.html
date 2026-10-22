@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Плашка раздела — вторая партия</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #eef1f6; color: #0b1220; padding: 34px 20px 70px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  h1.page { font-size: 23px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #6b7688; margin-bottom: 30px; }
+
+  .item { margin-bottom: 34px; }
+  .cap {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: #8b95a5; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 6px; background: #0b1220; color: #fff;
+    font-size: 11px; font-weight: 800;
+  }
+  .hint { font-size: 12px; color: #6b7688; margin-top: 9px; }
+
+  .bar { display: flex; align-items: center; padding: 14px 20px; border-radius: 14px; }
+  .ttl { font-size: 21px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .left { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
+
+  .q {
+    width: 21px; height: 21px; border-radius: 50%; border: none; flex-shrink: 0;
+    font-size: 11.5px; font-weight: 800; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform .18s;
+  }
+  .q:hover { transform: scale(1.1); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+    padding: 10px 18px; border-radius: 11px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .plus { font-size: 15px; font-weight: 700; margin-top: -1px; }
+
+  /* ============ 1. Стекло (glassmorphism) ============ */
+  .v1 {
+    position: relative; overflow: hidden;
+    background: linear-gradient(120deg, #dbe9ff 0%, #eef4ff 45%, #e3edff 100%);
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: 0 18px 40px -26px rgba(29,80,180,.5), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  .v1::before {
+    content: ''; position: absolute; width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(31,117,255,.28), transparent 68%);
+    top: -140px; right: 120px; filter: blur(6px);
+  }
+  .v1::after {
+    content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(120,180,255,.35), transparent 70%);
+    bottom: -110px; left: 220px;
+  }
+  .v1 .ttl { color: #0a2540; position: relative; z-index: 1; }
+  .v1 .left, .v1 .btn { position: relative; z-index: 1; }
+  .v1 .q { background: #0a2540; color: #fff; }
+  .v1 .btn { background: #0a2540; color: #fff; box-shadow: 0 14px 28px -16px rgba(10,37,64,.9); }
+
+  /* ============ 2. Тёмная с неоновой подсветкой ============ */
+  .v2 {
+    background: linear-gradient(135deg, #0d1526 0%, #16233d 100%);
+    border: 1px solid rgba(90,160,255,.28);
+    box-shadow: 0 20px 44px -24px rgba(9,16,32,.9), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .v2 .ttl { color: #fff; }
+  .v2 .q { background: rgba(90,160,255,.16); color: #8fc0ff; box-shadow: inset 0 0 0 1px rgba(90,160,255,.4); }
+  .v2 .btn {
+    background: linear-gradient(135deg, #2f8bff, #0d5fd8); color: #fff;
+    box-shadow: 0 0 0 1px rgba(120,180,255,.35), 0 10px 26px -12px rgba(47,139,255,.95);
+  }
+
+  /* ============ 3. Объёмная белая с цветной тенью ============ */
+  .v3 {
+    background: #fff; border: 1px solid #eaeef5;
+    box-shadow: 0 2px 0 #e3e9f3, 0 22px 44px -30px rgba(29,80,180,.45);
+  }
+  .v3 .ttl { color: #101a2c; }
+  .v3 .q { background: #eef4ff; color: #1F75FF; box-shadow: inset 0 0 0 1px #d3e3ff; }
+  .v3 .btn {
+    background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff;
+    box-shadow: 0 3px 0 #0a3d85, 0 14px 26px -14px rgba(29,120,252,.8);
+  }
+  .v3 .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0a3d85; }
+
+  /* ============ 4. Акцентная полоса + крупный счётчик ============ */
+  .v4 {
+    background: #fff; border: 1px solid #e8ecf2; padding-left: 0; overflow: hidden;
+    box-shadow: 0 14px 36px -26px rgba(15,25,45,.4);
+  }
+  .v4 .stripe {
+    width: 6px; align-self: stretch; background: linear-gradient(180deg, #1F75FF, #0d4ea8);
+    border-radius: 0 6px 6px 0; margin-right: 18px; flex-shrink: 0;
+  }
+  .v4 .left { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .v4 .row { display: flex; align-items: center; gap: 8px; }
+  .v4 .meta { font-size: 11.5px; color: #9aa4b4; font-weight: 600; letter-spacing: .01em; }
+  .v4 .q { background: #1F75FF; color: #fff; }
+  .v4 .btn { background: #0b1220; color: #fff; }
+
+  /* ============ 5. Капсульная с градиентной рамкой ============ */
+  .v5wrap {
+    padding: 1.5px; border-radius: 999px;
+    background: linear-gradient(120deg, #1F75FF, #61a9ff, #0d4ea8);
+    box-shadow: 0 16px 38px -22px rgba(29,120,252,.85);
+  }
+  .v5 {
+    background: #fff; border-radius: 999px; padding: 10px 12px 10px 22px;
+  }
+  .v5 .ttl { font-size: 19px; background: linear-gradient(120deg,#0d4ea8,#1F75FF);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .v5 .q { background: #eef4ff; color: #1F75FF; }
+  .v5 .btn { border-radius: 999px; background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff;
+    box-shadow: 0 12px 24px -14px rgba(29,120,252,.9); }
+
+  @media (max-width: 620px) {
+    .bar { flex-wrap: wrap; gap: 12px; padding: 12px 14px; }
+    .ttl { font-size: 17px; }
+    .btn { margin-left: 0 !important; }
+    .v5 { border-radius: 14px; padding: 12px 14px; }
+    .v5wrap { border-radius: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page">Плашка раздела — вторая партия</h1>
+  <div class="page-sub">Смелее: стекло, неон, объём, акцент, градиентная капсула. Скажите номер.</div>
+
+  <!-- 1 -->
+  <div class="item">
+    <div class="cap"><span class="num">1</span> Стекло с мягким свечением</div>
+    <div class="bar v1">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Светлая «стеклянная» плашка, внутри плавают синие блики. Тёмные кнопки дают контраст.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="item">
+    <div class="cap"><span class="num">2</span> Тёмная с неоном</div>
+    <div class="bar v2">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Глубокий графит + светящаяся синяя кнопка. Выглядит премиально и «дорого-технологично».</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="item">
+    <div class="cap"><span class="num">3</span> Объёмная кнопка с подложкой</div>
+    <div class="bar v3">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Белая плашка с цветной тенью, кнопка «нажимается» физически — с 3D-подложкой.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="item">
+    <div class="cap"><span class="num">4</span> Акцентная полоса слева</div>
+    <div class="bar v4">
+      <div class="stripe"></div>
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <div class="row">
+          <span class="meta">Группы для каталога услуг</span>
+          <button class="q">?</button>
+        </div>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Градиентная полоса слева + подпись. Строго, современно, с явным акцентом.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="item">
+    <div class="cap"><span class="num">5</span> Капсула с градиентной рамкой</div>
+    <div class="v5wrap">
+      <div class="bar v5">
+        <div class="left">
+          <span class="ttl">Категории услуг</span>
+          <button class="q">?</button>
+        </div>
+        <button class="btn"><span class="plus">+</span> Добавить</button>
+      </div>
+    </div>
+    <div class="hint">Градиентный контур, градиентный текст заголовка. Легко и нарядно.</div>
+  </div>
+
+</div>
+</body>
+</html>
