@@ -7,6 +7,7 @@ import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
 import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
+import Onboarding from '../pages/Onboarding';
 import { useNavigate } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
@@ -26,6 +27,13 @@ export default function AppLayout({ children }) {
   ];
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
+  const needsOnboarding = !!user && !user.employee_id && !user.onboarding_done;
+
+  if (needsOnboarding) {
+    return (
+      <Onboarding onDone={() => window.location.reload()} />
+    );
+  }
 
   return (
     <>

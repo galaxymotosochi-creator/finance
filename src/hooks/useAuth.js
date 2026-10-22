@@ -6,6 +6,7 @@ export function useAuth() {
   const [user, setUser] = useState(storedSession?.user || null);
   const [loading, setLoading] = useState(!storedSession);
   const [employeeData, setEmployeeData] = useState(null);
+  const [meUser, setMeUser] = useState(null); // актуальный пользователь из /api/auth/me (business_type, onboarding_done)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,6 +25,14 @@ export function useAuth() {
         });
         if (res.ok) {
           const data = await res.json();
+          if (data.user) {
+            setMeUser(data.user);
+            try {
+              const ses = JSON.parse(localStorage.getItem('atlaspos_session') || '{}');
+              ses.user = { ...(ses.user || {}), ...data.user };
+              localStorage.setItem('atlaspos_session', JSON.stringify(ses));
+            } catch(e) {}
+          }
           if (data.permissions && Array.isArray(data.permissions) && data.permissions.length > 0) {
             setEmployeeData({ permissions: data.permissions });
           } else {
@@ -52,6 +61,7 @@ export function useAuth() {
         fetch('/api/auth/me', {
           headers: { 'Authorization': 'Bearer ' + (session?.access_token || '') }
         }).then(r => r.ok ? r.json() : null).then(data => {
+          if (data?.user) setMeUser(data.user);
           if (data?.permissions && Array.isArray(data.permissions) && data.permissions.length > 0) {
             setEmployeeData({ permissions: data.permissions });
           } else {
@@ -89,5 +99,6 @@ export function useAuth() {
     if (error) throw error;
   };
 
-  return { user, loading, employeeData, hasPermission, signIn, signUp, signOut };
+  const mergedUser = meUser ? { ...(user || {}), ...meUser } : user;
+  return { user: mergedUser, loading, employeeData, hasPermission, signIn, signUp, signOut };
 }
