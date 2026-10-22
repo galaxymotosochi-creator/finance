@@ -878,7 +878,7 @@ export default function Products() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
           </button>
           <button onClick={()=>{setCatOpen(false);setColsOpen(false);exportExcel()}} type="button" title="Скачать" aria-label="Скачать"
-            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'skpulse 2s ease-in-out infinite'}}
+            style={{width:'26px',height:'26px',flexShrink:0,border:'none',borderRadius:'100px',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',boxShadow:'0 8px 18px -8px rgba(29,120,252,.8)',transition:'transform .15s',animation:'none'}}
             onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.animationPlayState='paused'}}
             onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.animationPlayState='running'}}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
