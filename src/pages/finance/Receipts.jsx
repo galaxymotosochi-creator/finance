@@ -28,6 +28,7 @@ const STATUS_BG = {
 };
 
 export default function Receipts() {
+  if (typeof window !== 'undefined') window.__dbgRenders = (window.__dbgRenders || 0) + 1;
   const cur = getCurrencySymbol();
   const { user } = useAuth();
   const [receipts, setReceipts] = useState([]);
