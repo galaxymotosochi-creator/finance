@@ -90,7 +90,8 @@ export default function Receipts() {
 
   const load = async () => {
     if (!user) return;
-    setLoading(true);
+    // Не стираем экран, если данные уже есть — иначе моргание при перезагрузке списка
+    if (receipts.length === 0) setLoading(true);
     try {
       const { data } = await supabase
         .from('receipts')
@@ -450,7 +451,21 @@ export default function Receipts() {
   };
 
   if (loading) {
-    return <CenterSpinner />;
+    return (
+      <div>
+        <div className="sk-bar">
+          <div className="grow">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <h1>Чеки</h1>
+            </div>
+            <div className="sub">Все чеки: касса и быстрые продажи</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+          <div style={{ width: '26px', height: '26px', border: '3px solid #eee', borderTopColor: '#111', borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
+        </div>
+      </div>
+    );
   }
 
   return (
