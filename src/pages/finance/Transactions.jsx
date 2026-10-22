@@ -513,7 +513,7 @@ export default function Transactions() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
           <div className="sk-dd-wrap" style={{position:'relative'}}>
-            <button className="cat-add-btn" onClick={function(e){e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(function(w){w.classList.remove('open')});e.currentTarget.parentElement.classList.toggle('open')}}>Добавить <span className="car">▾</span></button>
+            <button className="cat-add-btn" onClick={function(e){e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(function(w){w.classList.remove('open')});e.currentTarget.parentElement.classList.toggle('open')}}>Добавить</button>
             <div className="sk-dd-menu" style={{minWidth:'260px'}}>
               {[{
                 label:'Добавить расход', sub:'Списание средств',
