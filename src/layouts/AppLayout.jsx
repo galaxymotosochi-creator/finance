@@ -7,7 +7,6 @@ import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
 import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
-import Onboarding from '../pages/Onboarding';
 import { useNavigate, Outlet } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
@@ -30,14 +29,6 @@ export default function AppLayout({ children }) {
   // Онбординг — ТОЛЬКО после подтверждения email.
   // Неподтверждённого пользователя сюда вообще не пускает ProtectedRoute,
   // но проверяем и здесь на всякий случай.
-  const emailOk = !!user && user.email_verified !== false;
-  const needsOnboarding = !!user && emailOk && !user.employee_id && !user.onboarding_done;
-
-  if (needsOnboarding) {
-    return (
-      <Onboarding onDone={() => window.location.reload()} />
-    );
-  }
 
   return (
     <>
