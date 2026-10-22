@@ -677,10 +677,11 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="Исправьте остаток на счете" width="medium">
+      <Modal open={showCorrect} onClose={()=>setShowCorrect(false)} title="Корректировка баланса" subtitle="" width="medium" className="modal-v2 cat-modal">
             <form onSubmit={async (e)=>{e.preventDefault();if(!corAmt||parseFloat(corAmt)<=0)return;var amt=parseFloat(corAmt);try{var ac=accounts.find(a=>a.id===corAcct);if(!ac)return;// Защита: баланс не может уйти в минус
               if(corType==='expense'){var cb=getBal(ac);if(amt>cb)return alert('На счете «'+ac.name+'» недостаточно средств (доступно '+Math.round(cb).toLocaleString()+' '+cur+'). Баланс не может уйти в минус — выберите другой счет или сначала пополните этот.');}
               await supabase.from('transactions').insert({user_id:user.id,account_id:ac.id,type:corType,amount:amt,description:corDesc.trim()||'Корректировка баланса',date:new Date().toISOString().split('T')[0]});setShowCorrect(false);await fetchTx();}catch(err){alert(err.message);}}}>
+              <div className="v2-card">
               <div className="form-group">
                 <label>Счет</label>
                 <AcctPick accounts={accounts} value={corAcct} onChange={setCorAcct} cur={cur} balOf={balOfId} />
@@ -702,8 +703,10 @@ export default function Accounts() {
                 <label>Комментарий</label>
                 <input type="text" placeholder="Корректировка баланса" value={corDesc} onChange={e=>setCorDesc(e.target.value)} />
               </div>
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={()=>setShowCorrect(false)}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
