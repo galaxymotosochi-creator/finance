@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const Login = lazy(() => import('./pages/Login'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Register = lazy(() => import('./pages/Register'));
+const Verify = lazy(() => import('./pages/Verify'));
 const TechCards = lazy(() => import('./pages/stock/TechCards'));
 const Semifinished = lazy(() => import('./pages/stock/Semifinished'));
 const Ingredients = lazy(() => import('./pages/stock/Ingredients'));
