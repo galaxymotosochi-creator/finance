@@ -1861,7 +1861,8 @@ input:focus, select:focus, textarea:focus {
 
 /* Модалки: поле Дата — выравнивание текста как у «Выберите категорию» */
 .modal-box .form-group input[type="date"] { text-align: left; }
-.modal-box input[type="date"]::-webkit-datetime-edit { padding: 0; color: #222; }
+.modal-box input[type="date"]::-webkit-datetime-edit { padding: 0; color: rgba(0,0,0,.38); }
+.modal-box .v2-card input[type="date"]::-webkit-datetime-edit { padding: 0; color: rgba(0,0,0,.38); }
 .modal-box input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
 
 /* ── Четыре причины: карточки-трансформеры ── */

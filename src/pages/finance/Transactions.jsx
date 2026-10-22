@@ -965,13 +965,16 @@ export default function Transactions() {
                 await doTx({type:"income",user_id:user.id,description:(incName.trim()||catNameById(incCategory)||'Доход'),amount:parseFloat(incAmount),date:incDate,category_id:incCategory||null});
               }
             }}>
+              <div className="v2-card">
               {!editingId && (
-              <div className="v2-seg">
-                <button type="button" className="on" onClick={function(){setIncCategory('')}}>+ Доход</button>
-                <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}>− Расход</button>
+              <div className="form-group">
+                <label>Операция</label>
+                <div className="v2-seg">
+                  <button type="button" className="on" onClick={function(){setIncCategory('')}}>+ Доход</button>
+                  <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}>− Расход</button>
+                </div>
               </div>
               )}
-              <div className="v2-card">
               <div className="form-row">
                 <div className="form-group date-field">
                   <label>Дата</label>
@@ -1037,13 +1040,16 @@ export default function Transactions() {
                 await doTx({type:"expense",user_id:user.id,description:(expName.trim()||catNameById(expCategory)||'Расход'),amount:parseFloat(expAmount),date:expDate,category_id:expCategory||null});
               }
             }}>
+              <div className="v2-card">
               {!editingId && (
-              <div className="v2-seg">
-                <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}>+ Доход</button>
-                <button type="button" className="on" onClick={function(){setExpCategory('')}}>− Расход</button>
+              <div className="form-group">
+                <label>Операция</label>
+                <div className="v2-seg">
+                  <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}>+ Доход</button>
+                  <button type="button" className="on" onClick={function(){setExpCategory('')}}>− Расход</button>
+                </div>
               </div>
               )}
-              <div className="v2-card">
               <div className="form-row exp-rounded">
                 <div className="form-group date-field">
                   <label>Дата</label>
@@ -1145,8 +1151,8 @@ function CategorySelect({ cats, value, onChange, placeholder }) {
   return (
     <div className="cat-sel-wrap" style={{position:'relative'}}>
       <button type="button" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
-        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .65rem',border:'1.5px solid ' + (open ? '#111' : 'rgba(0,0,0,.26)'),borderRadius:'var(--radius-md)',background:'var(--body-bg)',fontFamily:'var(--font)',fontSize:'.875rem',fontWeight:500,color:sel ? '#222' : '#8a93a2',cursor:'pointer',textAlign:'left',boxSizing:'border-box',minHeight:'38px',outline:'none',boxShadow:open ? '0 0 0 3px rgba(17,17,17,.07)' : 'none',transition:'border-color .15s, box-shadow .15s'}}>
-        <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{sel ? sel.name : (placeholder || 'Выберите категорию')}</span>
+        style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.5rem',width:'100%',padding:'.5rem .65rem',border:'1.5px solid ' + (open ? '#111' : 'rgba(0,0,0,.26)'),borderRadius:'var(--radius-md)',background:'var(--body-bg)',fontFamily:'var(--font)',fontSize:'.875rem',fontWeight:500,color:sel ? '#222' : 'rgba(0,0,0,.38)',cursor:'pointer',textAlign:'left',boxSizing:'border-box',minHeight:'38px',outline:'none',boxShadow:open ? '0 0 0 3px rgba(17,17,17,.07)' : 'none',transition:'border-color .15s, box-shadow .15s'}}>
+        <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{sel ? sel.name : (placeholder || '— выберите —')}</span>
         <span className="car-tri" style={{transform:open?'rotate(180deg)':'none'}}>▾</span>
       </button>
       {open && (
