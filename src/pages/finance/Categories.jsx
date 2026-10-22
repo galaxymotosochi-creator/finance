@@ -8,9 +8,9 @@ import CenterSpinner from '../../components/CenterSpinner';
 import SectionHelp from '../../components/SectionHelp';
 
 const dirTypeLabels = {
-  income: 'Доходы (Внекассовые)',
-  expense: 'Расходы бизнеса (Операционные)',
-  supply_expense: 'Расходы поставки (Себестоимость)',
+  income: 'Доход',
+  expense: 'Расход',
+  supply_expense: 'Расход поставки',
 };
 
 export default function Categories() {
@@ -157,7 +157,7 @@ export default function Categories() {
                 ) },
                 { q: 'Чем отличаются три типа категорий?', a: (
                   <ul>
-                    <li style={{marginBottom:'.4rem'}}><b>Доходы (внекассовые)</b> — деньги не от продаж: проценты банка, доп. услуги, прочие поступления.</li>
+                    <li style={{marginBottom:'.4rem'}}><b>Доход</b> — поступления: выручка от продаж, проценты банка, доп. услуги и прочее.</li>
                     <li style={{marginBottom:'.4rem'}}><b>Расходы бизнеса (операционные)</b> — жизнь компании: аренда, зарплата, реклама, интернет. В себестоимость товара не входят.</li>
                     <li><b>Расходы поставки (себестоимость)</b> — довески к товару: доставка ТК, сборка, упаковка, пошлина. Увеличивают себестоимость товара.</li>
                   </ul>
@@ -244,9 +244,9 @@ export default function Categories() {
           <div className="form-group">
             <label>Тип категории</label>
             <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-              <option value="income">Доходы (Внекассовые)</option>
-              <option value="expense">Расходы бизнеса (Операционные)</option>
-              <option value="supply_expense">Расходы поставки (Себестоимость)</option>
+              <option value="income">Доход</option>
+              <option value="expense">Расход</option>
+              <option value="supply_expense">Расход поставки</option>
             </select>
           </div>
           <div className="modal-actions">
