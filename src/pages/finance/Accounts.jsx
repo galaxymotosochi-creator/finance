@@ -966,7 +966,7 @@ export default function Accounts() {
         </form>
       </Modal>
 
-      <Modal open={showCollection} onClose={()=>setShowCollection(false)} title="Инкассация" subtitle="Изъятие наличных из кассы" width="medium">
+      <Modal open={showCollection} onClose={()=>setShowCollection(false)} title="Инкассация" subtitle="" width="medium" className="modal-v2 cat-modal">
         {(()=>{
         var cashRegAc = accounts.find(a => a.type === 'cash_register');
         var cashRegBal = 0;
@@ -976,12 +976,12 @@ export default function Accounts() {
         }
         var otherAccs = accounts.filter(function(a){return a.id !== cashRegAc?.id;});
         if (!cashRegAc) return (<>
-              <div style={{padding:'1rem 0',fontSize:'.85rem',color:'var(--muted)'}}>Счет «Кассовый ящик» не найден. Обновите страницу — он создастся автоматически.</div>
-              <div className="modal-actions"><button type="button" className="btn btn-outline" onClick={()=>setShowCollection(false)}>Закрыть</button></div>
+              <div style={{padding:'.5rem 0',fontSize:'.85rem',color:'#555'}}>Счет «Кассовый ящик» не найден. Обновите страницу — он создастся автоматически.</div>
+              <div className="modal-actions"><button type="button" className="v2-ghost" onClick={()=>setShowCollection(false)}>Закрыть</button></div>
         </>);
         return (<>
-              <div style={{background:'#f5f5f5',borderRadius:'.5rem',padding:'.5rem .75rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
-                <span style={{color:'var(--muted)'}}>Баланс Кассы:</span>{' '}
+              <div style={{background:'#f8f9fb',border:'1px solid rgba(0,16,36,.12)',borderRadius:'12px',padding:'.6rem .85rem',marginBottom:'.75rem',fontSize:'.82rem'}}>
+                <span style={{color:'rgba(0,0,0,.54)'}}>Баланс Кассы:</span>{' '}
                 <span style={{fontWeight:700}}>{cashRegBal.toLocaleString()} {cur}</span>
               </div>
               <form onSubmit={async function(e){
@@ -1011,16 +1011,19 @@ export default function Accounts() {
                   await fetchTx();
                 } catch(err) {alert(err.message);}
               }}>
+                <div className="v2-card">
                 <div className="form-group">
                   <label>Сумма </label>
                   <input type="number" placeholder="0" min="0" step="0.01" value={colAmt} onChange={function(e){setColAmt(e.target.value)}} required autoFocus />
                 </div>
                 <div className="form-group">
                   <label>Куда зачислить</label>
-                  <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
+                  <AcctPick accounts={otherAccs} value={colTo} onChange={setColTo} cur={cur} balOf={balOfId} placeholder="— выберите —" />
+                </div>
                 </div>
                 <div className="modal-actions">
-                  <button type="submit" className="sk-dd-btn">Инкассировать</button>
+                  <button type="button" className="v2-ghost" onClick={()=>setShowCollection(false)}>Отмена</button>
+                  <button type="submit" className="cat-add-btn">Инкассировать</button>
                 </div>
               </form>
         </>
