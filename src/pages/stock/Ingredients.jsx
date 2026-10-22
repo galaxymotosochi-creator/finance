@@ -47,6 +47,17 @@ export default function Ingredients() {
     .reduce((acc, s) => ({ qty: acc.qty + (Number(s.qty) || 0), sum: acc.sum + (Number(s.total_sum) || 0) }),
       { qty:0, sum:0 });
   const avgPrice = (id) => { const s = stockOf(id); return s.qty > 0 ? s.sum / s.qty : 0; };
+  const fmtQty = (qty, unit) => {
+    const n = Number(qty) || 0;
+    if (!n) return '0 ' + (unit || '');
+    const u = String(unit || '').toLowerCase();
+    if (u === 'кг' || u === 'л') {
+      // целое, если дробная часть не нужна
+      const v = Number.isInteger(n) ? n : Number(n.toFixed(3));
+      return v + ' ' + unit;
+    }
+    return Math.round(n) + ' ' + unit;
+  };
 
   const openEdit = (r) => {
     setEditing(r);
@@ -174,7 +185,7 @@ export default function Ingredients() {
                     <td style={{ fontWeight:600 }}>{r.name}</td>
                     <td style={{ color:'#6b7280' }}>{r.category || '—'}</td>
                     <td>{r.unit}</td>
-                    <td>{st.qty ? Number(st.qty).toFixed(2) : '0'}</td>
+                    <td style={{ whiteSpace:'nowrap' }}>{fmtQty(st.qty, r.unit)}</td>
                     <td>{avg ? Math.round(avg).toLocaleString('ru-RU') + ' ' + cur : '—'}</td>
                     <td style={{ color:'#6b7280' }}>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
                     <td>
