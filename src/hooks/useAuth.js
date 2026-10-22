@@ -69,7 +69,7 @@ export function useAuth() {
           }
         }).catch(() => setEmployeeData(null));
       } else if (event === 'SIGNED_OUT') {
-        setUser(null); setEmployeeData(null);
+        setUser(null); setMeUser(null); setEmployeeData(null);
       }
     });
 
@@ -95,8 +95,16 @@ export function useAuth() {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try { await supabase.auth.signOut(); } catch (e) {}
+    // Чистим всё, что могло остаться от сессии
+    try {
+      localStorage.removeItem('atlaspos_session');
+      localStorage.removeItem('atlaspos_pending_receipts');
+    } catch (e) {}
+    setUser(null);
+    setMeUser(null);
+    setEmployeeData(null);
+    setLoading(false);
   };
 
   const mergedUser = meUser ? { ...(user || {}), ...meUser } : user;
