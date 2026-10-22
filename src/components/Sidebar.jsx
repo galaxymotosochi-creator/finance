@@ -240,7 +240,7 @@ export default function Sidebar() {
                 Тип бизнеса
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
-                {[['retail','Товарный бизнес'],['services','Услуги'],['food','Общепит']].map(function(o){
+                {[['retail','Товарный бизнес'],['mixed','Товары и услуги'],['services','Услуги'],['food','Общепит']].map(function(o){
                   var on = businessType === o[0];
                   return (
                     <button key={o[0]} type="button"
