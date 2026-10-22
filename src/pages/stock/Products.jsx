@@ -794,7 +794,7 @@ export default function Products() {
             {typeOpen && (
               <div className="f-menu">
                 <div className="f-list">
-                {[{v:null,l:'Все'},...(isServices?[{v:'service',l:'Услуги'},{v:'combo',l:'Пакеты'}]:[{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}])].map(function(t) {
+                {[{v:null,l:'Все'},...(isServices?[{v:'service',l:'Услуги'},{v:'combo',l:'Комбо'}]:[{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}])].map(function(t) {
                   const checked = (t.v === null && typeFilterSet.size === 0) || typeFilterSet.has(t.v);
                   return (
                     <div key={String(t.v)} onClick={() => pickType(t.v)}
