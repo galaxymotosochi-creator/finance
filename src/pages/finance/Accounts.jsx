@@ -814,8 +814,9 @@ export default function Accounts() {
         </>)}
       </Modal>
 
-      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="Перемещение средств между счетами" width="medium">
+      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="" width="medium" className="modal-v2 cat-modal">
             <form onSubmit={async (e)=>{e.preventDefault();if(!trFrom||!trTo||trFrom===trTo||!trAmt||parseFloat(trAmt)<=0)return;var amt=parseFloat(trAmt);try{var fromAc=accounts.find(a=>a.id===trFrom);var toAc=accounts.find(a=>a.id===trTo);if(!fromAc||!toAc)return;var fromBal=getBal(fromAc);if(amt>fromBal)return alert('Недостаточно средств на счете «'+fromAc.name+'». Баланс: '+fromBal.toLocaleString()+' ₽');var tid=Date.now();await supabase.from('transactions').insert({user_id:user.id,account_id:fromAc.id,type:'expense',amount:amt,description:'Перевод со счета '+fromAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});await supabase.from('transactions').insert({user_id:user.id,account_id:toAc.id,type:'income',amount:amt,description:'Перевод на счет '+toAc.name,date:new Date().toISOString().split('T')[0],kind:'transfer',transfer_id:tid});setShowTransfer(false);await fetchTx();}catch(err){alert(err.message);}}}>
+              <div className="v2-card">
               <div className="form-group">
                 <label>Откуда</label>
                 <AcctPick accounts={accounts.filter(a=>String(a.id)!==String(trTo))} value={trFrom} onChange={setTrFrom} cur={cur} balOf={balOfId} placeholder="— выберите —" />
@@ -828,8 +829,10 @@ export default function Accounts() {
                 <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={e=>setTrAmt(e.target.value)} required />
               </div>
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={()=>setShowTransfer(false)}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
