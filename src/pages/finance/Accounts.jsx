@@ -837,11 +837,19 @@ export default function Accounts() {
             </form>
       </Modal>
 
-      <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle={pendingDeleteAc ? 'Счет «'+pendingDeleteAc.name+'» будет удален навсегда.' + ((parseFloat(pendingDeleteAc.balance)||0)>0 ? ' На счету '+(parseFloat(pendingDeleteAc.balance)||0).toLocaleString()+' ₽ — они исчезнут из учета.' : '') : ''} width="narrow"
-        actions={<>
-          <button type="button" className="btn btn-outline" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
-          <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmDelete}>Да, удалить</button>
-        </>}>
+      <Modal open={showConfirm} onClose={()=>{setShowConfirm(false);setPendingDeleteAc(null)}} title="Удалить счет?" subtitle="" width="medium" className="modal-v2 cat-modal">
+        <div className="v2-card">
+          <div style={{fontSize:'.85rem',color:'#555',lineHeight:1.5}}>
+            {pendingDeleteAc ? (<>
+              Счет «<b style={{color:'#111'}}>{pendingDeleteAc.name}</b>» будет удален навсегда.
+              {(parseFloat(pendingDeleteAc.balance)||0)>0 && ' На счету '+(parseFloat(pendingDeleteAc.balance)||0).toLocaleString()+' ₽ — они исчезнут из учета.'}
+            </>) : ''}
+          </div>
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="v2-ghost" onClick={()=>{setShowConfirm(false);setPendingDeleteAc(null)}}>Отмена</button>
+          <button type="button" className="cat-add-btn" style={{background:'linear-gradient(135deg,#ef4444,#b91c1c)'}} onClick={confirmDelete}>Да, удалить</button>
+        </div>
       </Modal>
 
       {/* Инкассация */}
