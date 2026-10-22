@@ -45,6 +45,11 @@ const menu = [
     ],
   },
   {
+    label: 'Услуги', icon: 'stock', onlyServices: true, children: [
+      { label: 'Каталог услуг', path: '/stock/products' },
+    ],
+  },
+  {
     label: 'Склад', icon: 'stock', hideForServices: true, children: [
       { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары', servicesLabel: 'Услуги' },
       { label: 'Аналитика товаров', path: '/stock/turnover', hideForServices: true },
@@ -175,6 +180,7 @@ export default function Sidebar() {
           <nav className="sidebar-nav">
             {menu.filter(function(item){
               if (item.onlyFood && businessType !== 'food') return false;
+              if (item.onlyServices && businessType !== 'services') return false;
               if (item.hideForServices && businessType === 'services') return false;
               if (!employeeData) return true;
               var perms = employeeData.permissions || [];
