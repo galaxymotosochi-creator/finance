@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Плашка раздела — 5 вариантов</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f6f9; color: #0b1220; padding: 32px 20px 60px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1.page { font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #6b7688; margin-bottom: 28px; }
+  .item { margin-bottom: 26px; }
+  .cap {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: #9ca3af; margin-bottom: 9px; padding-left: 2px;
+  }
+  .cap b { color: #1F75FF; }
+  .hint { font-size: 12px; color: #6b7688; margin-top: 8px; padding-left: 2px; }
+
+  /* ===== общие токены ===== */
+  .bar { display: flex; align-items: center; padding: 12px 18px; border-radius: 12px; }
+
+  .ttl { font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+
+  .q {
+    width: 22px; height: 22px; border-radius: 50%; border: none; flex-shrink: 0;
+    background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff;
+    font-size: 12px; font-weight: 800; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 14px -6px rgba(29,120,252,.9); margin-left: 8px;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    padding: 9px 16px; border-radius: 11px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1;
+    background: linear-gradient(135deg, #1F75FF, #0d4ea8); color: #fff;
+    box-shadow: 0 10px 22px -12px rgba(29,120,252,.85);
+  }
+  .btn-ghost {
+    background: #fff; color: #1F75FF;
+    box-shadow: inset 0 0 0 1px rgba(31,117,255,.35);
+  }
+  .btn-soft {
+    background: rgba(31,117,255,.09); color: #1F75FF;
+    box-shadow: inset 0 0 0 1px rgba(31,117,255,.22);
+  }
+  .btn .plus { font-size: 15px; font-weight: 700; margin-top: -1px; }
+
+  /* ===== 1. Белая карточка, синяя линия слева ===== */
+  .v1 {
+    background: #fff; border: 1px solid #e8ecf2;
+    border-left: 3px solid #1F75FF;
+    box-shadow: 0 2px 10px -4px rgba(15,25,45,.08);
+  }
+  .v1 .left { display: flex; align-items: center; flex: 1; }
+  .v1 .btn { margin-left: auto; }
+
+  /* ===== 2. Градиентная шапка ===== */
+  .v2 {
+    background: linear-gradient(135deg, #1F75FF, #0d4ea8);
+    box-shadow: 0 14px 32px -18px rgba(29,120,252,.9);
+  }
+  .v2 .ttl { color: #fff; }
+  .v2 .left { display: flex; align-items: center; flex: 1; }
+  .v2 .q {
+    background: rgba(255,255,255,.18); box-shadow: none;
+    border: 1px solid rgba(255,255,255,.35);
+  }
+  .v2 .btn { margin-left: auto; background: #fff; color: #0d4ea8; box-shadow: 0 8px 20px -10px rgba(0,0,0,.4); }
+
+  /* ===== 3. Минимализм: заголовок слева, подпись, кнопка-пилюля ===== */
+  .v3 { background: transparent; border-bottom: 1px solid #e5e9f0; border-radius: 0; padding: 10px 2px 14px; }
+  .v3 .left { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .v3 .ttl { font-size: 21px; }
+  .v3 .sub { font-size: 12px; color: #9ca3af; font-weight: 500; }
+  .v3 .row { display: flex; align-items: center; gap: 8px; }
+  .v3 .q { width: 18px; height: 18px; font-size: 11px; box-shadow: none; background: #eef3fb; color: #1F75FF; }
+  .v3 .btn { margin-left: auto; border-radius: 999px; padding: 9px 18px; }
+
+  /* ===== 4. Голубая мягкая плашка ===== */
+  .v4 {
+    background: rgba(31,117,255,.055);
+    border: 1px solid rgba(31,117,255,.16);
+  }
+  .v4 .left { display: flex; align-items: center; flex: 1; }
+  .v4 .ttl { font-size: 20px; color: #0d4ea8; }
+  .v4 .q { background: #1F75FF; }
+  .v4 .btn { margin-left: auto; }
+
+  /* ===== 5. Двухцветная: тёмная капсула заголовка + кнопка справа ===== */
+  .v5 {
+    background: #fff; border: 1px solid #e8ecf2;
+    box-shadow: 0 2px 10px -4px rgba(15,25,45,.07);
+  }
+  .v5 .left { display: flex; align-items: center; flex: 1; gap: 10px; }
+  .v5 .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #0b1220; color: #fff; border-radius: 999px;
+    padding: 8px 16px 8px 14px;
+  }
+  .v5 .chip .ttl { font-size: 16px; color: #fff; }
+  .v5 .chip .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #4ade80; flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(74,222,128,.18);
+  }
+  .v5 .q { background: #fff; color: #0b1220; box-shadow: inset 0 0 0 1.5px #dfe5ee; font-size: 12px; margin-left: 2px; }
+  .v5 .btn { margin-left: auto; }
+
+  @media (max-width: 620px) {
+    .bar { flex-wrap: wrap; gap: 10px; }
+    .ttl { font-size: 18px; }
+    .btn { margin-left: 0 !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page">Плашка раздела «Категории услуг» — 5 вариантов</h1>
+  <div class="page-sub">Один и тот же набор: название, знак вопроса, кнопка «Добавить». Скажите номер — внедрю на боевой сайт.</div>
+
+  <!-- 1 -->
+  <div class="item">
+    <div class="cap">Вариант <b>1</b> — белая карточка с синей линией слева</div>
+    <div class="bar v1">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Спокойно, дорого, акцент тонкой полосой. Хорошо смотрится над таблицей.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="item">
+    <div class="cap">Вариант <b>2</b> — синяя градиентная шапка</div>
+    <div class="bar v2">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Ярко и заметно — как заголовок бренда. Кнопка белая, читается чётко.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="item">
+    <div class="cap">Вариант <b>3</b> — минимализм без заливки</div>
+    <div class="bar v3">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <div class="row">
+          <span class="sub">Группы для каталога услуг</span>
+          <button class="q">?</button>
+        </div>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Максимально чисто, ничего не отвлекает от таблицы. Лёгкая линия вместо плашки.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="item">
+    <div class="cap">Вариант <b>4</b> — мягкая голубая плашка</div>
+    <div class="bar v4">
+      <div class="left">
+        <span class="ttl">Категории услуг</span>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Свежо и мягко, в фирменном синем, но без «крика». Моя рекомендация для каталога.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="item">
+    <div class="cap">Вариант <b>5</b> — тёмная капсула с индикатором</div>
+    <div class="bar v5">
+      <div class="left">
+        <div class="chip">
+          <span class="dot"></span>
+          <span class="ttl">Категории услуг</span>
+        </div>
+        <button class="q">?</button>
+      </div>
+      <button class="btn"><span class="plus">+</span> Добавить</button>
+    </div>
+    <div class="hint">Современный «дашборд-стиль»: тёмная капсула + зелёная точка активности.</div>
+  </div>
+
+</div>
+</body>
+</html>
