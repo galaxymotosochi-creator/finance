@@ -942,7 +942,7 @@ input:focus, select:focus, textarea:focus {
 .sk-dd-btn:active{transform:scale(.98)}
 .sk-dd-btn .car{font-size:9px;transition:transform .2s}
 .sk-dd-wrap.open .sk-dd-btn .car{transform:rotate(180deg)}
-.sk-dd-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:235px;background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:11px;box-shadow:0 24px 50px -20px rgba(29,120,252,.55);padding:6px;display:none;z-index:60}
+.sk-dd-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:235px;background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:11px;box-shadow:0 8px 24px -14px rgba(15,25,45,.28);padding:6px;display:none;z-index:60}
 .sk-dd-wrap.open .sk-dd-menu{display:block;animation:skpop .16s ease}
 @keyframes skpop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @keyframes skpulse{0%,100%{transform:scale(1);box-shadow:0 8px 18px -12px rgba(29,120,252,.5), 0 0 0 0 rgba(29,120,252,.22)}50%{transform:scale(1.04);box-shadow:0 10px 20px -12px rgba(29,120,252,.6), 0 0 0 5px rgba(29,120,252,0)}}
@@ -1156,7 +1156,7 @@ input:focus, select:focus, textarea:focus {
 .f-pill{display:inline-flex;align-items:center;gap:4px;border:none;border-radius:11px;padding:6px 6px;font-size:.76rem;font-weight:600;line-height:18px;color:#5b6472;background:transparent;cursor:pointer;font-family:inherit;white-space:nowrap;transition:color .15s}
 .f-pill:hover{color:#111}
 .f-pill.on{background:#E6F0FF;color:#0d4ea8;font-weight:700}
-.f-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:#fff;border:1px solid rgba(29,120,252,.16);border-radius:14px;box-shadow:0 24px 50px -20px rgba(29,120,252,.55);padding:8px;z-index:60;animation:skpop .16s ease}
+.f-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:11px;box-shadow:0 8px 24px -14px rgba(15,25,45,.28);padding:8px;z-index:60;animation:skpop .16s ease}
 /* Выпадашка в форме «Начислить зарплату» — открывается под кнопкой слева (как в превью) */
 .sal-dd-wrap{display:inline-block}
 .sal-dd-wrap .f-menu{left:0;right:auto;min-width:210px}
