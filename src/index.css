@@ -1262,8 +1262,8 @@ input:focus, select:focus, textarea:focus {
   justify-content:center;color:#fff;font-size:.7rem;font-weight:800}
 
 /* Заголовок раздела без плашки (Категории) */
-.cat-title{font-family:var(--font);font-size:17px;font-weight:400;letter-spacing:-.01em;
-  line-height:1.2;margin:0;color:#0b1220}
+.cat-title{font-family:var(--font);font-size:15px;font-weight:500;letter-spacing:0;
+  line-height:1.2;margin:0;color:#5b6472}
 /* Кнопка «Добавить» в строке заголовка */
 .cat-add-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;
   border:1px solid rgba(31,117,255,.35);background:rgba(31,117,255,.04);cursor:pointer;
