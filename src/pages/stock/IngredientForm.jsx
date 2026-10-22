@@ -55,7 +55,7 @@ export default function IngredientForm({ open, warehouses, categories, initial, 
           <div>
             <label style={lbl}>Категория</label>
             <select style={inp} value={f.category} onChange={set('category')}>
-              <option value="">— выберите —</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               {(categories || []).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
           </div>
@@ -111,7 +111,7 @@ export default function IngredientForm({ open, warehouses, categories, initial, 
             <div>
               <label style={lbl}>Склад</label>
               <select style={inp} value={f.warehouse_id} onChange={set('warehouse_id')}>
-                <option value="">— выберите —</option>
+                <option value=""><span className="sel-ph">— выберите —</span></option>
                 {(warehouses || []).map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
             </div>

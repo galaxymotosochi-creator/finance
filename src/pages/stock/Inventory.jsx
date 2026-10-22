@@ -569,7 +569,7 @@ export default function Inventory() {
               <span style={{fontSize:'.78rem',color:'#888'}}>Проводит:</span>
               <select value={editing.responsible || ''} onChange={e => setEditing({...editing, responsible: e.target.value})}
                 style={{padding:'.4rem .7rem',fontSize:'.8rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)',outline:'none',background:'#fff',color:'#222',minWidth:'220px'}}>
-                <option value="">— выберите —</option>
+                <option value=""><span className="sel-ph">— выберите —</span></option>
                 {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
               </select>
               <button onClick={() => scanBarcode(handleScan, { continuous: true, lockDelay: 1200 })} title="Сканировать штрихкоды (непрерывно)"

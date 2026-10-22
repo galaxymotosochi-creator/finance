@@ -100,7 +100,7 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
           <div>
             <label style={lbl}>Категория</label>
             <select style={inp} value={f.category} onChange={set('category')}>
-              <option value="">— выберите —</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               {cats.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
           </div>

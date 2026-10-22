@@ -1436,7 +1436,7 @@ if (loading) return <CenterSpinner />;
                 <div className="form-group">
                   <label>Категория</label>
                   <select value={addCat} onChange={e => setAddCat(e.target.value)}>
-                    <option value="">— выберите —</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     {allCats.filter(c => isServicesBiz ? (c.type === 'service' || !c.type) : (c.type === 'product' || !c.type)).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
@@ -1456,7 +1456,7 @@ if (loading) return <CenterSpinner />;
                 <div className="form-group">
                   <label>Ед. измерения</label>
                   <select value={addUnit} onChange={e => setAddUnit(e.target.value)}>
-                    <option value="">— выберите —</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     <option value="шт">шт</option>
                     <option value="кг">кг</option>
                     <option value="л">л</option>

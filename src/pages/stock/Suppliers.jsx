@@ -378,7 +378,7 @@ export default function Suppliers() {
           <div className="form-group">
             <label>Способ заказа</label>
             <select value={fMethod} onChange={e=>{setFMethod(e.target.value);setFOrderLink('')}}>
-              <option value="">— выберите —</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               <option value="link">Ссылка на товар</option>
               <option value="telegram">Telegram</option>
               <option value="whatsapp">WhatsApp</option>

@@ -128,7 +128,7 @@ export default function SemifinishedForm({ open, initial, onClose, onSave }) {
               <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 110px 30px', gap:8, alignItems:'center' }}>
                 <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
                   style={{ ...inp, padding:'8px 10px' }}>
-                  <option value="">— выберите —</option>
+                  <option value=""><span className="sel-ph">— выберите —</span></option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
                 <input value={r.brutto} onChange={e => {

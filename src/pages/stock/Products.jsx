@@ -1005,7 +1005,7 @@ export default function Products() {
             <div className="form-group" style={{marginBottom:'8px'}}>
               <label>Категория</label>
               <select value={fCat} onChange={e => setFCat(e.target.value)}>
-                <option value="">— выберите —</option>
+                <option value=""><span className="sel-ph">— выберите —</span></option>
                 {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (isFood ? 'product' : 'service')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
               </select>
             </div>
@@ -1122,7 +1122,7 @@ export default function Products() {
               <div className="form-group">
                 <label>Ед. измерения</label>
                 <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
-                  <option value="">— выберите —</option>
+                  <option value=""><span className="sel-ph">— выберите —</span></option>
                   {(isServices ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
               </div>

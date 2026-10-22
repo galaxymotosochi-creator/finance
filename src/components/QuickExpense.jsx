@@ -43,7 +43,7 @@ export default function QuickExpense({ onClose }) {
           <div className="form-group">
             <label>Категория</label>
             <select value={catId} onChange={e => setCatId(e.target.value)}>
-              <option value="">— выберите —</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               {cats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>

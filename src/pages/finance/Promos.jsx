@@ -375,7 +375,7 @@ export default function Promos() {
                 <div className="form-group">
                   <label>Выберите категорию</label>
                   <select value={targetCat} onChange={e => setTargetCat(e.target.value)}>
-                    <option value="">— выберите —</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     {categories.filter(c => c.type === (targetType === 'category_products' ? 'product' : 'service')).map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
