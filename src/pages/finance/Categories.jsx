@@ -193,10 +193,9 @@ export default function Categories() {
             {!loading && list.length === 0 && (
               <tr>
                 <td colSpan="3">
-                  <div className="empty-products">
-                    <div className="big-icon">📂</div>
+                  <div className="sk-empty">
                     <p>Список категорий пуст</p>
-                    <p style={{fontSize:'.82rem',color:'var(--muted)',margin:'.5rem 0 0'}}>Создайте первую статью доходов или расходов для финансового учета</p>
+                    <p>Создайте первую статью доходов или расходов</p>
                   </div>
                 </td>
               </tr>
