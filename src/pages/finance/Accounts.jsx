@@ -40,7 +40,7 @@ export default function Accounts() {
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
   const [modalType, setModalType] = useState('');
-  const [modalBalance, setModalBalance] = useState('0');
+  const [modalBalance, setModalBalance] = useState('');
   const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
   const [initAmts, setInitAmts] = useState({});
@@ -274,10 +274,10 @@ export default function Accounts() {
   var isSys = (ac) => systemIds.has(ac?.id);
   var hasAct = (ac) => (transactions||[]).some(t=>t.account_id===ac.id);
 
-  var openAdd = () => { setEditingId(null); setModalName(''); setModalType(''); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
+  var openAdd = () => { setEditingId(null); setModalName(''); setModalType(''); setModalBalance(''); setModalDesc(''); setShowModal(true); };
   var openEdit = (ac) => {
     if (hasAct(ac)) return setToast('⚠️ Нельзя редактировать счет — на нем есть движения');
-    setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setModalDesc(ac.description||''); setShowModal(true);
+    setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance(''); setModalDesc(ac.description||''); setShowModal(true);
   };
 
   var save = async (e) => {
