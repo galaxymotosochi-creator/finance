@@ -943,7 +943,7 @@ export default function Transactions() {
               </div>
             </form>
       </Modal>
-      <Modal open={showIncome} onClose={function(){setShowIncome(false);setEditingId(null)}} title={editingId ? "Редактировать доход" : "Добавить доход"} width="medium">
+      <Modal open={showIncome} onClose={function(){setShowIncome(false);setEditingId(null)}} title={editingId ? "Редактировать доход" : "Добавить доход"} subtitle="" width="medium" className="modal-v2 cat-modal">
 
             <form onSubmit={async function(e){
               e.preventDefault();
@@ -971,6 +971,7 @@ export default function Transactions() {
                 <button type="button" onClick={function(){setTxKind('expense');setShowIncome(false);setExpName(incName);setExpAmount(incAmount);setExpDate(incDate);setExpCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowExpense(true)}}>− Расход</button>
               </div>
               )}
+              <div className="v2-card">
               <div className="form-row">
                 <div className="form-group date-field">
                   <label>Дата</label>
@@ -1007,13 +1008,15 @@ export default function Transactions() {
               })}
             </div>
           </div>
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={function(){setShowIncome(false);setEditingId(null)}}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
 
-      <Modal open={showExpense} onClose={function(){setShowExpense(false);setEditingId(null)}} title={editingId ? "Редактировать расход" : "Добавить расход"} width="medium">
+      <Modal open={showExpense} onClose={function(){setShowExpense(false);setEditingId(null)}} title={editingId ? "Редактировать расход" : "Добавить расход"} subtitle="" width="medium" className="modal-v2 cat-modal">
             <form onSubmit={async function(e){
               e.preventDefault();
               if(!expAmount){alert("Введите сумму");return}
@@ -1035,16 +1038,12 @@ export default function Transactions() {
               }
             }}>
               {!editingId && (
-              <div className="form-group">
-                <label>Тип операции</label>
-                <div style={{display:'flex',gap:'.4rem'}}>
-                  <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.875rem',fontWeight:500,border:'1px solid #e8e8ec',background:'#fff',color:'#222',transition:'all .12s'}}>+ Доход</button>
-                  <button type="button" onClick={function(){setExpCategory('')}}
-                    style={{flex:1,padding:'.55rem .5rem',borderRadius:'10px',cursor:'pointer',fontFamily:'var(--font)',fontSize:'.875rem',fontWeight:500,border:'none',background:'linear-gradient(135deg,#1F75FF,#0d4ea8)',color:'#fff',transition:'all .12s'}}>− Расход</button>
-                </div>
+              <div className="v2-seg">
+                <button type="button" onClick={function(){setTxKind('income');setShowExpense(false);setIncName(expName);setIncAmount(expAmount);setIncDate(expDate);setIncCategory('');setSelectedAcc(accs.length > 0 ? accs[0].id : null);setShowIncome(true)}}>+ Доход</button>
+                <button type="button" className="on" onClick={function(){setExpCategory('')}}>− Расход</button>
               </div>
               )}
+              <div className="v2-card">
               <div className="form-row exp-rounded">
                 <div className="form-group date-field">
                   <label>Дата</label>
@@ -1081,8 +1080,10 @@ export default function Transactions() {
               })}
             </div>
           </div>
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={function(){setShowExpense(false);setEditingId(null)}}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>
