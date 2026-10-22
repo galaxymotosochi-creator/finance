@@ -1101,7 +1101,7 @@ export default function Products() {
                 <label>Сдельная оплата мастеру</label>
                 <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
                   <select value={fRewardKind} onChange={e => { setFRewardKind(e.target.value); if (!e.target.value) setFRewardValue(''); }} style={{ width: 'auto', minWidth: '140px' }}>
-                    <option value="">— не задана —</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     <option value="rub">Сумма</option>
                     <option value="pct">Процент (%)</option>
                   </select>

@@ -689,7 +689,7 @@ const load = async () => {
             </div>
             <div style={{display:'flex',gap:'.3rem',marginTop:'.35rem'}}>
               <select value={fAddProd} onChange={e=>setFAddProd(e.target.value)} style={{flex:1,padding:'.3rem .4rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)'}}>
-                <option value="">— товар —</option>
+                <option value=""><span className="sel-ph">— выберите —</span></option>
                 {products.filter(p=>p.type==='product'||p.type==='combo').map(p=><option key={p.id} value={String(p.id)}>{p.name}</option>)}
               </select>
               <input type="number" value={fAddQty} onChange={e=>setFAddQty(e.target.value)} placeholder="Кол-во" style={{width:'70px',padding:'.3rem .4rem',fontSize:'.78rem',border:'1.5px solid var(--border)',borderRadius:'8px',fontFamily:'var(--font)'}} />
@@ -755,7 +755,7 @@ const load = async () => {
                   <div className="form-group">
                     <label style={{fontSize:'.78rem',color:'#222'}}>Счет списания</label>
                     <select id="payMethod">
-                      <option value="">— выберите счет —</option>
+                      <option value=""><span className="sel-ph">— выберите —</span></option>
                       {payAccounts.map(function(a){var bal=parseFloat(a.balance)||0;payTxList.forEach(function(t){if(t.account_id===a.id)bal+=Number(t.amount||0)*(t.type==='income'?1:-1)});return <option key={a.id} value={a.id}>{a.name} ({bal.toLocaleString()} {cur})</option>})}
                     </select>
                   </div>

@@ -1813,7 +1813,7 @@ if (loading) return <CenterSpinner />;
             <div className="form-group">
               <label>Новый кассир</label>
               <select value={transferEmpId} onChange={e=>setTransferEmpId(e.target.value)} style={{width:'100%',padding:'10px 12px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'.80rem',outline:'none',fontFamily:'inherit',boxSizing:'border-box',background:'#fff'}}>
-                <option value="">— выберите сотрудника —</option>
+                <option value=""><span className="sel-ph">— выберите —</span></option>
                 {employees.map(function(e){return <option key={e.id} value={e.id}>{e.name}</option>})}
               </select>
             </div>

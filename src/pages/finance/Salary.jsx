@@ -961,7 +961,7 @@ export default function Salary() {
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
                 <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input sal-select">
-                  <option value="">Выберите сотрудника</option>
+                  <option value=""><span className="sel-ph">— выберите —</span></option>
                   {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
               </div>

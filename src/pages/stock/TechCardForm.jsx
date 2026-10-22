@@ -179,13 +179,13 @@ export default function TechCardForm({ open, initial, categories, onClose, onSav
                 {r.sfMode ? (
                   <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
                     style={{ ...inp, padding:'8px 10px' }}>
-                    <option value="">Полуфабрикат — выберите</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     {products.filter(p => p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 ) : (
                   <select value={r.product_id || ''} onChange={e => pickProduct(i, e.target.value)}
                     style={{ ...inp, padding:'8px 10px' }}>
-                    <option value="">Ингредиент — выберите</option>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     {products.filter(p => !p.is_sf).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 )}

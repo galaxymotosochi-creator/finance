@@ -219,7 +219,7 @@ export default function SupplyNew() {
               if (e.target.value) setSupCustom('');
             }}
               style={{ flex: 1, padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)', color: supName ? 'inherit' : '#999' }}>
-              <option value="">Выберите поставщика</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               {suppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
               <option value="__new__">+ Новый поставщик</option>
             </select>
@@ -277,7 +277,7 @@ export default function SupplyNew() {
               <div style={{ flex: 2, minWidth: 140 }}>
                 <label style={{ display: 'block', fontSize: '.7rem', fontWeight: 600, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.3px' }}>Счет</label>
                 <select id="payMethod" style={{ width: '100%', padding: '.45rem .55rem', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: '.82rem', fontFamily: 'inherit', outline: 'none', background: 'var(--body-bg)' }}>
-                  <option value="">Выберите счет</option>
+                  <option value=""><span className="sel-ph">— выберите —</span></option>
                   {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Number(a.balance||0).toLocaleString()} {cur}</option>)}
                 </select>
               </div>

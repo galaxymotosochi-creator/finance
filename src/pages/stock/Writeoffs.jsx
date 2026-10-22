@@ -365,7 +365,7 @@ export default function Writeoffs() {
           <div className="form-group">
             <label>Товар</label>
             <select value={fProd} onChange={e=>setFProd(e.target.value)} required>
-              <option value="">— выберите товар —</option>
+              <option value=""><span className="sel-ph">— выберите —</span></option>
               {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           </div>

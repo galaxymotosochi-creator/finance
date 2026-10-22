@@ -541,7 +541,7 @@ export default function Timesheet() {
                       <select style={{width:'140px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
                         borderStyle:isLast&&!row.empId?'dashed':'solid'}}
                         value={row.empId} onChange={e=>updateBonusRow(idx,'empId',e.target.value)}>
-                        <option value="">Сотрудник</option>
+                        <option value=""><span className="sel-ph">— выберите —</span></option>
                         {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
                       <input type="number" value={row.amount} onChange={e=>updateBonusRow(idx,'amount',e.target.value)} placeholder="Сумма"
@@ -573,7 +573,7 @@ export default function Timesheet() {
                       <select style={{width:'140px',flexShrink:0,padding:'.35rem .5rem',fontSize:'.78rem',fontFamily:'var(--font)',border:'1.5px solid var(--border)',borderRadius:'8px',outline:'none',background:'var(--white)',color:'#111',
                         borderStyle:isLast&&!row.empId?'dashed':'solid'}}
                         value={row.empId} onChange={e=>updateDeductRow(idx,'empId',e.target.value)}>
-                        <option value="">Сотрудник</option>
+                        <option value=""><span className="sel-ph">— выберите —</span></option>
                         {employees.map(emp=><option key={emp.id} value={emp.id}>{emp.name}</option>)}
                       </select>
                       <input type="number" value={row.amount} onChange={e=>updateDeductRow(idx,'amount',e.target.value)} placeholder="Сумма"
