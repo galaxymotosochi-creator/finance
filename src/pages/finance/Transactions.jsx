@@ -473,10 +473,11 @@ export default function Transactions() {
    if (loading) return <CenterSpinner />;
    return (
     <div>
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Доходы и расходы</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Доходы и расходы</h1>
             <SectionHelp
               title="Раздел «Доходы и расходы»"
               intro="Все поступления, списания и переводы между счетами."
@@ -507,11 +508,12 @@ export default function Transactions() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>Поступления, списания<br />и переводы между счетами</div>
+          </div>
+          <span className="cat-sub">Поступления, списания и переводы между счетами</span>
         </div>
-        <div className="sk-bar-acts">
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
           <div className="sk-dd-wrap" style={{position:'relative'}}>
-            <button className="sk-dd-btn" onClick={function(e){e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(function(w){w.classList.remove('open')});e.currentTarget.parentElement.classList.toggle('open')}}>Добавить <span className="car">▾</span></button>
+            <button className="cat-add-btn" onClick={function(e){e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(function(w){w.classList.remove('open')});e.currentTarget.parentElement.classList.toggle('open')}}>Добавить <span className="car">▾</span></button>
             <div className="sk-dd-menu" style={{minWidth:'260px'}}>
               {[{
                 label:'Добавить расход', sub:'Списание средств',
