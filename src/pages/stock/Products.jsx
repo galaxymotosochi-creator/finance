@@ -991,8 +991,8 @@ export default function Products() {
 
           {isServices && !isFood && (
             <div className="v2-seg">
-              <button type="button" className={fType !== 'combo' ? 'on' : ''} onClick={() => { setFType('service'); if (!fName || /Комплекс:/.test(fName)) setFName('Стрижка женская'); }}>Услуга</button>
-              <button type="button" className={fType === 'combo' ? 'on' : ''} onClick={() => { setFType('combo'); if (!fName || /Стрижка женская/.test(fName)) setFName('Комплекс: стрижка + укладка'); }}>Комбо</button>
+              <button type="button" className={fType !== 'combo' ? 'on' : ''} onClick={() => setFType('service')}>Услуга</button>
+              <button type="button" className={fType === 'combo' ? 'on' : ''} onClick={() => setFType('combo')}>Комбо</button>
             </div>
           )}
 
@@ -1161,7 +1161,7 @@ export default function Products() {
           <div className="v2-card">
             <div className="form-group" style={{marginBottom:'8px'}}>
               <label>Фото</label>
-              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'8px'}}>
                 {fPhoto ? (
                   <img src={fPhoto} alt="" style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'12px',border:'1px solid rgba(0,16,36,.12)',flexShrink:0}} />
                 ) : uploading ? (
@@ -1176,10 +1176,6 @@ export default function Products() {
                     <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
                   </label>
                 )}
-                <label style={{cursor: uploading ? 'default' : 'pointer',padding:'6px 14px',border:'1.5px solid rgba(0,0,0,.26)',borderRadius:'100px',fontSize:'12px',fontWeight:600,color: uploading ? '#999' : '#555',background:'#fff',fontFamily:'inherit',margin:0}}>
-                  {fPhoto ? 'Заменить фото' : 'Загрузить фото'}
-                  <input type="file" accept="image/*" style={{display:'none'}} disabled={uploading} onChange={e => { const f = e.target.files?.[0]; if (f) uploadPhoto(f); e.target.value = ''; }} />
-                </label>
                 {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'11.5px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
               </div>
             </div>
