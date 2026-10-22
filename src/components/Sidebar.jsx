@@ -107,18 +107,20 @@ export default function Sidebar() {
   // Если путь встречается в нескольких разделах (например «Категории услуг» есть и в
   // «Услугах», и в «Складе») — выбираем первый ВИДИМЫЙ раздел, чтобы меню не прыгало.
   React.useEffect(() => {
-    const path = location.pathname;
-    const isVisible = (m) => {
+    var path = location.pathname;
+    var bt = 'retail';
+    try { bt = localStorage.getItem('atlaspos_business_type') || 'retail'; } catch (e) {}
+    var isVisible = function (m) {
       if (!m.children) return false;
-      if (m.onlyFood && businessType !== 'food') return false;
-      if (m.onlyServices && businessType !== 'services') return false;
-      if (m.hideForServices && businessType === 'services') return false;
-      if (m.hideForFood && businessType === 'food') return false;
+      if (m.onlyFood && bt !== 'food') return false;
+      if (m.onlyServices && bt !== 'services') return false;
+      if (m.hideForServices && bt === 'services') return false;
+      if (m.hideForFood && bt === 'food') return false;
       return true;
     };
-    const found = menu.find(m => isVisible(m) && m.children.some(c => path === c.path));
+    var found = menu.find(function (m) { return isVisible(m) && m.children.some(function (c) { return path === c.path; }); });
     setExpanded(found ? found.label : null);
-  }, [location.pathname, businessType]);
+  }, [location.pathname]);
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
