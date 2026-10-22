@@ -82,7 +82,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
     let alive = true;
-    setLoading(true);
+    // Не стираем экран: пока грузим, показываем прежние данные (если уже есть),
+    // иначе — каркас с кружком. Это убирает моргание при переключении периода.
+    if (!data) setLoading(true);
     (async () => {
       try {
         const dr = getDateRange();
@@ -361,7 +363,30 @@ export default function Dashboard() {
   }, [user, period, customFrom, customTo]);
 
   const d = data;
-  if (loading) return <CenterSpinner />;
+
+  // Первая загрузка: показываем каркас страницы (заголовок + период), а не пустой экран
+  if (loading && !d) {
+    return (
+      <div className="dash">
+        <div className="dash-head">
+          <div>
+            <h1>Панель управления</h1>
+            {headDate ? <div className="dash-date">{headDate}</div> : null}
+          </div>
+          <div className="dash-spacer" />
+          <div className="sk-period-wrap" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+            <button disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', border: 'none', borderRadius: '9999px', padding: '6px 6px', fontSize: '.76rem', fontWeight: 600, lineHeight: '18px', color: '#5b6472', background: 'transparent', cursor: 'default', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+              {periodLabel}
+              <span className="car-tri">▾</span>
+            </button>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+          <div style={{ width: '26px', height: '26px', border: '3px solid #eee', borderTopColor: '#111', borderRadius: '50%', animation: 'spin .8s linear infinite' }} />
+        </div>
+      </div>
+    );
+  }
   if (!d) return <div className="dash-empty">Нет данных</div>;
 
   const profitPct = d.rev > 0 ? Math.round(d.profit / d.rev * 100) : 0;
