@@ -127,7 +127,8 @@ export default function Products() {
     try { return localStorage.getItem('atlaspos_business_type') || user?.business_type || 'retail'; } catch(e){ return 'retail'; }
   })();
   const isFood = businessType === 'food';
-  const pageTitle = isFood ? 'Товары' : 'Товары и услуги';
+  const isServices = businessType === 'services';
+  const pageTitle = isFood ? 'Товары' : (isServices ? 'Услуги' : 'Товары и услуги');
   const [products, setProductsState] = useState([]);
   const [loaded, setLoaded] = useState(false); // список загружен — чтобы «Каталог пуст» не мигал при загрузке
   const [search, setSearch] = useState('');
@@ -716,8 +717,8 @@ export default function Products() {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>{pageTitle}</h1>
             <SectionHelp
-              title={isFood ? 'Раздел «Товары»' : 'Раздел «Товары и услуги»'}
-              intro={isFood ? 'Готовые товары для продажи: напитки, снеки, упаковка и прочее. Ингредиенты, из которых готовятся блюда, ведутся в разделе «Меню → Ингредиенты».' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.'}
+              title={isFood ? 'Раздел «Товары»' : (isServices ? 'Раздел «Услуги»' : 'Раздел «Товары и услуги»')}
+              intro={isFood ? 'Готовые товары для продажи: напитки, снеки, упаковка и прочее. Ингредиенты, из которых готовятся блюда, ведутся в разделе «Меню → Ингредиенты».' : (isServices ? 'Каталог услуг: стрижка, маникюр, консультация, ремонт и прочее. Остатков нет — услуга не лежит на складе, поэтому раздел «Склад» скрыт.' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.')}
               blocks={[
                 { title: 'Типы позиций', items: isFood ? [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
@@ -783,7 +784,7 @@ export default function Products() {
             {typeOpen && (
               <div className="f-menu">
                 <div className="f-list">
-                {[{v:null,l:'Все'},{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}].map(function(t) {
+                {[{v:null,l:'Все'},...(isServices?[{v:'service',l:'Услуги'}]:[{v:'product',l:'Товары'},...(isFood?[]:[{v:'service',l:'Услуги'}]),{v:'combo',l:'Комбо'}])].map(function(t) {
                   const checked = (t.v === null && typeFilterSet.size === 0) || typeFilterSet.has(t.v);
                   return (
                     <div key={String(t.v)} onClick={() => pickType(t.v)}

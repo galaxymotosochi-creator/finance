@@ -45,17 +45,17 @@ const menu = [
     ],
   },
   {
-    label: 'Склад', icon: 'stock', children: [
-      { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары' },
-      { label: 'Аналитика товаров', path: '/stock/turnover' },
-      { label: 'Остатки', path: '/stock/stock' },
-      { label: 'Поставки', path: '/stock/supplies' },
+    label: 'Склад', icon: 'stock', hideForServices: true, children: [
+      { label: 'Товары и услуги', path: '/stock/products', foodLabel: 'Товары', servicesLabel: 'Услуги' },
+      { label: 'Аналитика товаров', path: '/stock/turnover', hideForServices: true },
+      { label: 'Остатки', path: '/stock/stock', hideForServices: true },
+      { label: 'Поставки', path: '/stock/supplies', hideForServices: true },
       { label: 'Переработки', path: '/stock/processing', onlyFood: true, soon: true },
       { label: 'Перемещения', path: '/stock/transfers', onlyFood: true, soon: true },
-      { label: 'Списания', path: '/stock/writeoffs' },
+      { label: 'Списания', path: '/stock/writeoffs', hideForServices: true },
       { label: 'Отчёт по движению', path: '/stock/movement', onlyFood: true, soon: true },
-      { label: 'Инвентаризация', path: '/stock/inventory' },
-      { label: 'Поставщики', path: '/stock/suppliers' },
+      { label: 'Инвентаризация', path: '/stock/inventory', hideForServices: true },
+      { label: 'Поставщики', path: '/stock/suppliers', hideForServices: true },
       { label: 'Склады', path: '/stock/warehouses', onlyFood: true, soon: true },
       { label: 'Фасовки', path: '/stock/packings', onlyFood: true, soon: true },
     ],
@@ -175,6 +175,7 @@ export default function Sidebar() {
           <nav className="sidebar-nav">
             {menu.filter(function(item){
               if (item.onlyFood && businessType !== 'food') return false;
+              if (item.hideForServices && businessType === 'services') return false;
               if (!employeeData) return true;
               var perms = employeeData.permissions || [];
               if (!perms || perms.length === 0) return true;
@@ -203,6 +204,7 @@ export default function Sidebar() {
                     <div className={`nav-children-acc${open ? ' open' : ''}`}>
                       {item.children.filter(function(child){
                 if (child.onlyFood && businessType !== 'food') return false;
+                if (child.hideForServices && businessType === 'services') return false;
                 if (child.hideForFood && businessType === 'food') return false;
                         if (!employeeData) return true;
                         var perms = employeeData.permissions || [];
@@ -217,7 +219,9 @@ export default function Sidebar() {
                         <a key={child.path}
                           className={`nav-child${isActive(child.path) ? ' active' : ''}`}
                           onClick={() => { navigate(child.path); closeMobile(); }}>
-                          <span className="nav-child-dot" />{(businessType === 'food' && child.foodLabel) ? child.foodLabel : child.label}{child.soon && <span style={{ marginLeft:6, fontSize:'.58rem', color:'#c3cad6' }}>скоро</span>}</a>
+                          <span className="nav-child-dot" />{(businessType === 'food' && child.foodLabel) ? child.foodLabel
+                            : (businessType === 'services' && child.servicesLabel) ? child.servicesLabel
+                            : child.label}{child.soon && <span style={{ marginLeft:6, fontSize:'.58rem', color:'#c3cad6' }}>скоро</span>}</a>
                       ))}
                     </div>
                   </div>
