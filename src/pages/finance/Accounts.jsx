@@ -370,10 +370,11 @@ export default function Accounts() {
    return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:'.75rem',padding:'.75rem 1.2rem',fontSize:'.85rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:9999,display:'flex',alignItems:'center',gap:'.5rem'}}>{toast}</div>}
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Счета</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Счета</h1>
             <SectionHelp
               title="Раздел «Счета»"
               intro="Здесь собраны все деньги бизнеса: наличные, кассы, банковские счета и карты."
@@ -414,11 +415,12 @@ export default function Accounts() {
               ]}
             />
           </div>
-          <div className="sub">Управление счетами и учет остатков</div>
+          </div>
+          <span className="cat-sub">Управление счетами и учет остатков</span>
         </div>
-        <div className="sk-bar-acts">
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
           <div className="sk-dd-wrap">
-            <button type="button" className="sk-dd-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия <span className="car">▾</span></button>
+            <button type="button" className="cat-add-btn" onClick={e=>{e.stopPropagation();const w=e.currentTarget.parentElement;w.classList.toggle('open')}}>Действия <span className="car">▾</span></button>
             <div className="sk-dd-menu">
               {[
                 { onClick: openAdd, label:'Добавить счет' },
