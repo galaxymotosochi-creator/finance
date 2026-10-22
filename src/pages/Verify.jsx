@@ -41,7 +41,7 @@ export default function Verify() {
 
   const btn = (label, onClick) => (
     <button type="button" onClick={onClick} style={{
-      width: '100%', border: 'none', borderRadius: '100px', padding: '13px',
+      width: 'auto', display: 'inline-block', border: 'none', borderRadius: '100px', padding: '11px 22px',
       fontFamily: 'inherit', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
       background: 'linear-gradient(135deg,#1F75FF,#0d4ea8)', color: '#fff',
     }}>{label}</button>
@@ -61,7 +61,6 @@ export default function Verify() {
           <>
             {head('Email подтверждён', 'Аккаунт активен', 'linear-gradient(135deg,#1C9A5B,#0d6b3d)')}
             <div style={{ padding: '24px' }}>
-              <div style={{ fontSize: '34px', marginBottom: '10px' }}>✅</div>
               <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: '#42526b', lineHeight: 1.55 }}>
                 Спасибо! Ваш адрес подтверждён. Теперь можно войти в кабинет.
               </p>
