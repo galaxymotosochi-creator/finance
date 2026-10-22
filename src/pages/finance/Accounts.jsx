@@ -39,7 +39,7 @@ export default function Accounts() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [modalName, setModalName] = useState('');
-  const [modalType, setModalType] = useState('custom');
+  const [modalType, setModalType] = useState('');
   const [modalBalance, setModalBalance] = useState('0');
   const [modalDesc, setModalDesc] = useState('');
   const [showInit, setShowInit] = useState(false);
@@ -274,7 +274,7 @@ export default function Accounts() {
   var isSys = (ac) => systemIds.has(ac?.id);
   var hasAct = (ac) => (transactions||[]).some(t=>t.account_id===ac.id);
 
-  var openAdd = () => { setEditingId(null); setModalName(''); setModalType('custom'); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
+  var openAdd = () => { setEditingId(null); setModalName(''); setModalType(''); setModalBalance('0'); setModalDesc(''); setShowModal(true); };
   var openEdit = (ac) => {
     if (hasAct(ac)) return setToast('⚠️ Нельзя редактировать счет — на нем есть движения');
     setEditingId(ac.id); setModalName(ac.name); setModalType(ac.type); setModalBalance('0'); setModalDesc(ac.description||''); setShowModal(true);
@@ -651,7 +651,8 @@ export default function Accounts() {
               {!editingId && (
                 <div className="form-group">
                   <label>Тип счета</label>
-                  <select value={modalType} onChange={e=>setModalType(e.target.value)}>
+                  <select value={modalType} onChange={e=>setModalType(e.target.value)} required>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     {ACC_TYPES.filter(t => {
                       // Нельзя создать второй системный счёт: только один cash и один cash_register
                       if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
