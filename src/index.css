@@ -1992,6 +1992,12 @@ input:focus, select:focus, textarea:focus {
 
 /* v2: кнопки */
 .v2-dark { background:linear-gradient(135deg,#1F75FF,#0d4ea8); color:#fff; border:none; border-radius:100px; padding:9px 18px; font-family:var(--font); font-size:13px; font-weight:600; cursor:pointer; }
+/* Компактная модалка категории в стиле v2 */
+.modal-box.cat-modal{max-width:400px}
+.cat-modal .v2-head{padding:16px 18px 14px}
+.cat-modal .v2-head h1{font-size:17px}
+.cat-modal .modal-body{padding:14px 18px 18px}
+
 .v2-ghost { background:transparent; border:none; color:rgba(0,0,0,.54); border-radius:100px; padding:9px 14px; font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer; }
 
 /* v2: модалка с отступами сверху и снизу */

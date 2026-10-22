@@ -270,31 +270,35 @@ export default function Categories() {
       )}
 
       {/* Модалка */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="Добавьте или измените категорию товаров/услуг" width="medium">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="Добавьте или измените категорию товаров/услуг" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
-          <div className="form-group">
-            <label>Название</label>
-            <input type="text" value={fName} onChange={e => setFName(e.target.value)}
-              placeholder="Например, Электроинструменты" required />
+          <div className="v2-card">
+            <div className="form-group">
+              <label>Название</label>
+              <input type="text" value={fName} onChange={e => setFName(e.target.value)}
+                placeholder="Например, Стрижки" required autoFocus />
+            </div>
+            {businessType !== 'services' && (
+            <div className="form-group">
+              <label>Тип</label>
+              <select value={fType} onChange={e => setFType(e.target.value)}>
+                {businessType === 'food' ? (
+                  scope === 'ingredient'
+                    ? <option value="ingredient">Ингредиент</option>
+                    : <option value="dish">Блюдо / тех. карта</option>
+                ) : (
+                  <>
+                    <option value="product">Товар</option>
+                    <option value="service">Услуга</option>
+                  </>
+                )}
+              </select>
+            </div>
+            )}
           </div>
-          {businessType !== 'services' && (
-          <div className="form-group">
-            <label>Тип</label>
-            <select value={fType} onChange={e => setFType(e.target.value)}>
-              {businessType === 'food' ? (
-                scope === 'ingredient'
-                  ? <option value="ingredient">Ингредиент</option>
-                  : <option value="dish">Блюдо / тех. карта</option>
-              ) : (
-                <>
-                  <option value="product">Товар</option>
-                  <option value="service">Услуга</option>
-                </>
-              )}
-            </select>
-          </div>)}
           <div className="modal-actions">
-            <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
+            <button type="button" className="v2-ghost" onClick={() => setShowModal(false)}>Отмена</button>
+            <button type="submit" className="cat-add-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
           </div>
         </form>
       </Modal>
