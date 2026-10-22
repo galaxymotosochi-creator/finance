@@ -90,41 +90,32 @@ export default function Receipts() {
 
   const load = async () => {
     if (!user) return;
-    // Не стираем экран, если данные уже есть — иначе моргание при перезагрузке списка
+    // Первая загрузка — показываем каркас. Повторная — старый список остаётся на экране.
     if (receipts.length === 0) setLoading(true);
     try {
-      const { data } = await supabase
-        .from('receipts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(PAGE_SIZE);
-      setReceipts(data || []);
-      setHasMore((data || []).length === PAGE_SIZE);
-    } catch (e) {
-      // Таблица может еще не существовать
-      setReceipts([]);
-      setHasMore(false);
-      console.warn('Таблица receipts недоступна. Выполните SQL миграцию в Supabase.');
-    }
-    try {
-      const { data: ac } = await supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id);
-      setAccounts(ac || []);
-      // Транзакции — чтобы проверять остатки на счетах при возврате
-      const { data: txData } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-      setTxs(txData || []);
-    } catch (e) { setAccounts([]); }
-    try {
-      // Сотрудники (продавцы/исполнители) — для деталей чека
-      const { data: emps } = await supabase.from('employees').select('id,name').eq('user_id', user.id);
-      setEmployees(emps || []);
-      // Товары (тип, имя) — чтобы при возврате вернуть на склад только товары (не услуги)
-      const { data: prods } = await supabase.from('products').select('id,name,type').eq('user_id', user.id);
+      // Все запросы параллельно — один рендер вместо трёх волн
+      const [rRes, aRes, tRes, eRes, pRes] = await Promise.all([
+        supabase.from('receipts').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(PAGE_SIZE),
+        supabase.from('accounts').select('id,name,balance,type').eq('user_id', user.id),
+        supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1000),
+        supabase.from('employees').select('id,name').eq('user_id', user.id),
+        supabase.from('products').select('id,name,type').eq('user_id', user.id),
+      ]);
+      const list = rRes.data || [];
+      setReceipts(list);
+      setHasMore(list.length === PAGE_SIZE);
+      setAccounts(aRes.data || []);
+      setTxs(tRes.data || []);
+      setEmployees(eRes.data || []);
       const pt = {}, pn = {};
-      (prods || []).forEach(pp => { pt[pp.id] = pp.type; pn[pp.id] = pp.name; });
+      (pRes.data || []).forEach(pp => { pt[pp.id] = pp.type; pn[pp.id] = pp.name; });
       setProductTypes(pt); setProductNames(pn);
-    } catch (e) {}
-    setLoading(false);
+    } catch (e) {
+      console.warn('Ошибка загрузки чеков:', e && e.message);
+      if (receipts.length === 0) { setReceipts([]); setHasMore(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, [user]);
