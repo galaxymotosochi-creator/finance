@@ -1,6 +1,7 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -21,6 +22,7 @@ export default function Categories() {
   const [fName, setFName] = useState('');
   const [fType, setFType] = useState('product');
   const [toast, setToast] = useState(null);
+  const [menu, setMenu] = useState(null); // { cat, x, y } — меню действий
   const [loading, setLoading] = useState(true);
   // Подсказка скролла таблицы (как в «Счетах» и «Чекax»)
   // Подсказка скролла: показывается ТОЛЬКО когда реально есть что прокрутить
@@ -238,15 +240,10 @@ export default function Categories() {
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                     <button className="sk-more" onClick={(e) => {
-                      e.stopPropagation();
-                      const dd = e.currentTarget.nextElementSibling;
-                      document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                      dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
+                      if (e) e.stopPropagation();
+                      const r = e.currentTarget.getBoundingClientRect();
+                      setMenu({ cat: c, x: r.right, y: r.bottom + 4 });
                     }}>⋯</button>
-                    <div className="prod-dropdown">
-                      <button onClick={() => openEdit(c)}>Редактировать</button>
-                      <button onClick={() => remove(c.id)} style={{color:'#dc3545'}}>Удалить</button>
-                    </div>
                   </div>
                 </td>
               </tr>
@@ -255,6 +252,22 @@ export default function Categories() {
         </table>
         </div>
       </div>
+
+      {menu && createPortal(
+        <>
+          <div onClick={() => setMenu(null)} style={{position:'fixed',inset:0,zIndex:9998}} />
+          <div className="prod-dropdown open" style={{
+            position:'fixed', left: Math.max(8, menu.x - 150), top: menu.y,
+            zIndex:9999, minWidth:'160px', background:'#fff',
+            border:'1px solid rgba(29,120,252,.16)', borderRadius:'11px',
+            boxShadow:'0 18px 40px -18px rgba(15,25,45,.45)', padding:'.25rem 0'
+          }}>
+            <button onClick={() => { setMenu(null); openEdit(menu.cat); }}>Редактировать</button>
+            <button onClick={() => { setMenu(null); remove(menu.cat.id); }} style={{color:'#dc3545'}}>Удалить</button>
+          </div>
+        </>,
+        document.body
+      )}
 
       {/* Модалка */}
       <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="Добавьте или измените категорию товаров/услуг" width="medium">
