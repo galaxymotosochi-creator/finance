@@ -7,10 +7,11 @@ import QuickSupply from '../components/QuickSupply';
 import QuickIncome from '../components/QuickIncome';
 import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
+import Onboarding from '../pages/Onboarding';
 import { useNavigate, Outlet } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const n = useNavigate();
   const [showSale, setShowSale] = useState(false);
   const [showSupply, setShowSupply] = useState(false);
@@ -26,9 +27,14 @@ export default function AppLayout({ children }) {
   ];
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
-  // Онбординг — ТОЛЬКО после подтверждения email.
-  // Неподтверждённого пользователя сюда вообще не пускает ProtectedRoute,
-  // но проверяем и здесь на всякий случай.
+  // Онбординг: показываем, только если профиль загружен, почта подтверждена
+  // и тип ещё не выбран. profile меняется отдельно от user — моргания не будет.
+  const needsOnboarding = !!profile && profile.email_verified !== false
+    && !profile.employee_id && !profile.onboarding_done;
+
+  if (needsOnboarding) {
+    return <Onboarding onDone={() => window.location.reload()} />;
+  }
 
   return (
     <>
