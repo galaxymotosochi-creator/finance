@@ -272,7 +272,20 @@ export default function Loyalty() {
             </thead>
             <tbody>
               {loyFiltered.length === 0 ? (
-                <tr><td colSpan="7"><div className="sk-empty"><p>Программ пока нет</p><p>Создайте первую программу лояльности для клиентов</p></div></td></tr>
+                <tr>
+                  <td colSpan="7">
+                    <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                      <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Программ лояльности пока нет</p>
+                      <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                        <b>Как создать программу лояльности:</b><br />
+                        • Нажмите «Добавить программу»<br />
+                        • Выберите тип — бонусы за покупку или скидка постоянному клиенту<br />
+                        • Укажите процент или сумму начисления<br />
+                        Баллы копятся автоматически после каждой продажи и списываются в кассе.
+                      </div>
+                    </div>
+                  </td>
+                </tr>
               ) : loyFiltered.map(p => {
                 const badge = TYPE_LABELS[p.type] || 'Постоянная';
                 return (

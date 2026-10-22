@@ -487,9 +487,20 @@ export default function Employees() {
           </tr></thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan="9"><div className="sk-empty">
-                    <p>Список сотрудников пуст</p>
-                    <p>Добавьте первого участника команды и настройте его права доступа</p></div></td></tr>
+              <tr>
+                <td colSpan="9">
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Сотрудников пока нет</p>
+                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                      <b>Как добавить сотрудника:</b><br />
+                      • Нажмите «Добавить сотрудника»<br />
+                      • Укажите имя, должность и телефон<br />
+                      • Отметьте, к каким разделам у него будет доступ<br />
+                      Сотрудник сможет войти по приглашению и работать только в разрешённых разделах.
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : filtered.map(emp => {
               const pos = emp.position_name;
               return (

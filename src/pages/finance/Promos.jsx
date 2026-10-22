@@ -244,7 +244,18 @@ export default function Promos() {
         </div>
       </div>
 
-      {promos.length === 0 && <div className="sk-card" style={{padding:'2rem 1rem',textAlign:'center'}}><div className="sk-empty"><p>Акций пока нет</p><p>Создайте первое специальное предложение для клиентов</p></div></div>}
+      {promos.length === 0 && (
+        <div className="sk-card" style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+          <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Акций пока нет</p>
+          <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+            <b>Как создать акцию:</b><br />
+            • Нажмите «Добавить акцию»<br />
+            • Укажите название и размер скидки (процент или сумма)<br />
+            • Выберите период действия и категории, на которые действует скидка<br />
+            Скидка применится в кассе автоматически в указанные даты.
+          </div>
+        </div>
+      )}
 
       {promos.map(p => {
         const s = status(p);

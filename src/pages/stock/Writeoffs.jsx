@@ -304,7 +304,20 @@ export default function Writeoffs() {
           </thead>
           <tbody id="writeoffTableBody">
             {list.length === 0 ? (
-              <tr><td colSpan="6"><div className="sk-empty"><p>Список списаний пуст</p><p>Зафиксируйте первый факт брака, порчи или потери товара</p></div></td></tr>
+              <tr>
+                <td colSpan="6">
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Списаний пока нет</p>
+                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                      <b>Как оформить списание:</b><br />
+                      • Нажмите «Добавить списание»<br />
+                      • Выберите товар и количество<br />
+                      • Укажите причину — брак, порча, потеря или собственные нужды<br />
+                      Остаток на складе уменьшится, а сумма попадёт в расходы.
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : list.filter(w => {
               const nm = String(w.name || products.find(p=>p.id===w.product_id)?.name || '').toLowerCase();
               if (woSearch && !nm.includes(woSearch.toLowerCase())) return false;

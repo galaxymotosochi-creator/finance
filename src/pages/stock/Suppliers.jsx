@@ -278,7 +278,20 @@ export default function Suppliers() {
           </thead>
           <tbody id="supplierTableBody">
             {suppliers.length === 0 ? (
-              <tr><td colSpan="7"><div className="sk-empty"><p>Список поставщиков пуст</p><p>Внесите первого контрагента, чтобы начать работу</p></div></td></tr>
+              <tr>
+                <td colSpan="7">
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Поставщиков пока нет</p>
+                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                      <b>Как добавить поставщика:</b><br />
+                      • Нажмите «Добавить поставщика»<br />
+                      • Укажите название и телефон — этого достаточно для старта<br />
+                      • Остальное (адрес, ИНН, контактное лицо) можно заполнить позже<br />
+                      Выбранный поставщик появится в оформлении поставок.
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : suppliers.filter(s => {
               if (supNames.size > 0 && !supNames.has(s.name || '')) return false;
               if (supSearch) {

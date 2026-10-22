@@ -788,7 +788,16 @@ export default function Transactions() {
           </div>
         </div>
       ) : (
-        <div className="sk-card"><div className="sk-empty">История операций пуста</div></div>
+        <div className="sk-card" style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+          <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Операций пока нет</p>
+          <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+            <b>Откуда берутся операции:</b><br />
+            • Продажи в кассе создают доход автоматически<br />
+            • Поставки, списания и зарплаты создают расход<br />
+            • Свои операции можно добавить кнопками «Доход» и «Расход»<br />
+            Переводы между счетами остатки не меняют.
+          </div>
+        </div>
       )}
       <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" width="medium">
             <form onSubmit={async function(e){

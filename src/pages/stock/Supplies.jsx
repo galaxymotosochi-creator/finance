@@ -535,7 +535,20 @@ const load = async () => {
           </thead>
           <tbody id="supplyTableBody">
             {supplies.length === 0 ? (
-              <tr><td colSpan="11"><div className="sk-empty"><p>Список поставок пуст</p><p>Оформите первое поступление товаров от поставщика</p></div></td></tr>
+              <tr>
+                <td colSpan="11">
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Поставок пока нет</p>
+                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                      <b>Как оформить поставку:</b><br />
+                      • Нажмите «Новая поставка»<br />
+                      • Выберите поставщика, добавьте товары и укажите закупочную цену<br />
+                      • Укажите склад, на который приходит товар<br />
+                      После проведения остатки на складе и себестоимость обновятся.
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : supplies.filter(s => {
               if (supFilter.size > 0 && !supFilter.has(s.supplier_name || '')) return false;
               if (period !== 'all') {
