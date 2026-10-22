@@ -1,5 +1,6 @@
 import Modal from '../../components/Modal';
 import SectionHelp from '../../components/SectionHelp';
+import RowMenu from '../../components/RowMenu';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -362,18 +363,10 @@ export default function Clients() {
                     return <span style={{display:'flex',gap:'4px',alignItems:'center',flexWrap:'wrap'}}>{parts}</span>;
                   })()}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={(e) => {
-                        e.stopPropagation();
-                        const dd = e.currentTarget.nextElementSibling;
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={() => openEdit(c)}>Редактировать</button>
-                        <button onClick={() => remove(c.id)} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
-                    </div>
+                    <RowMenu buttonClassName="act-btn prod-more-btn" items={[
+                      { label: 'Редактировать', onClick: () => openEdit(c) },
+                      { label: 'Удалить', onClick: () => remove(c.id), danger: true },
+                    ]} />
                   </td>
                 </tr>
               );
