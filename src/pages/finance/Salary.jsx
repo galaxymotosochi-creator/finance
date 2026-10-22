@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -934,11 +935,10 @@ export default function Salary() {
                 })()}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                    <button className="sk-more" onClick={e=>{e.stopPropagation();var dd=e.currentTarget.nextElementSibling;document.querySelectorAll('.prod-dropdown.open').forEach(d=>{if(d!==dd)d.classList.remove('open')});dd.classList.toggle('open')}}>⋯</button>
-                    <div className="prod-dropdown">
-                      <button onClick={()=>openEdit(s)}>Редактировать</button>
-                      <button onClick={()=>remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
-                    </div>
+                    <RowMenu items={[
+                      { label: 'Редактировать', onClick: () => openEdit(s) },
+                      { label: 'Удалить', onClick: () => remove(s.id), danger: true },
+                    ]} />
                   </div>
                 </td>
               </tr>

@@ -1,4 +1,5 @@
 import { useAuth } from '../../hooks/useAuth';
+import RowMenu from '../../components/RowMenu';
 import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
 import SectionHelp from '../../components/SectionHelp';
@@ -526,11 +527,10 @@ export default function Accounts() {
                       <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                         {!isSys(a) ? (
                           <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                            <button className="sk-more" onClick={e=>{e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(()=>document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)}),10)}}>⋯</button>
-                            <div className="prod-dropdown">
-                              <button onClick={()=>openEdit(a)}>Редактировать</button>
-                              <button onClick={()=>remove(a)} style={{color:'#dc3545'}}>Удалить</button>
-                            </div>
+                            <RowMenu items={[
+                              { label: 'Редактировать', onClick: () => openEdit(a) },
+                              { label: 'Удалить', onClick: () => remove(a), danger: true },
+                            ]} />
                           </div>
                         ) : null}
                       </td>

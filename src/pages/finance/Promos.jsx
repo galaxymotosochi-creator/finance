@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -269,11 +270,10 @@ export default function Promos() {
             </div>
             <span style={{fontSize:'.7rem',fontWeight:600,color:sc,background:sb,padding:'.2rem .5rem',borderRadius:'20px'}}>{s === 'active' ? 'Активна' : s === 'planned' ? 'Планируется' : 'Завершена'}</span>
             <div className="prod-more-wrap">
-              <button className="sk-more" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
-              <div className="prod-dropdown">
-                <button onClick={function(e){e.stopPropagation();openEdit(p)}}>Редактировать</button>
-                <button onClick={function(e){e.stopPropagation();del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
-              </div>
+              <RowMenu items={[
+                { label: 'Редактировать', onClick: () => openEdit(p) },
+                { label: 'Удалить', onClick: () => del(p.id), danger: true },
+              ]} />
             </div>
           </div>
         );
@@ -327,11 +327,10 @@ export default function Promos() {
               </div>
 
               <div className="prod-more-wrap" style={{position:'absolute',top:'.75rem',right:'3rem'}}>
-                <button className="act-btn prod-more-btn" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.toggle('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up')}}>⋯</button>
-                <div className="prod-dropdown">
-                  <button onClick={function(){setDetail(null);setStats(null);openEdit(p)}}>Редактировать</button>
-                  <button onClick={function(){setDetail(null);setStats(null);del(p.id)}} style={{color:'#dc3545'}}>Удалить</button>
-                </div>
+                <RowMenu buttonClassName="act-btn prod-more-btn" items={[
+                  { label: 'Редактировать', onClick: () => { setDetail(null); setStats(null); openEdit(p); } },
+                  { label: 'Удалить', onClick: () => { setDetail(null); setStats(null); del(p.id); }, danger: true },
+                ]} />
               </div>
         </>
         );

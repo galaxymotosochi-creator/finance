@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
@@ -948,23 +949,14 @@ export default function Products() {
                 })}
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                   <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
-                    <button className="sk-more" onClick={(e) => {
-                      e.stopPropagation();
-                      const dd = e.currentTarget.nextElementSibling;
-                      document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                      dd.classList.toggle('open');
-                      var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
-                    }}>⋯</button>
-                    <div className="prod-dropdown">
-                      <button onClick={() => openEdit(p)}>Редактировать</button>
-                      <button onClick={() => copyP(p.id)}>Копировать</button>
-                      {p.hidden ? (
-                        <button onClick={() => unhide(p.id)}>Восстановить</button>
-                      ) : (
-                        <button onClick={() => hide(p.id)}>Скрыть</button>
-                      )}
-                      <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
-                    </div>
+                    <RowMenu items={[
+                      { label: 'Редактировать', onClick: () => openEdit(p) },
+                      { label: 'Копировать', onClick: () => copyP(p.id) },
+                      p.hidden
+                        ? { label: 'Восстановить', onClick: () => unhide(p.id) }
+                        : { label: 'Скрыть', onClick: () => hide(p.id) },
+                      { label: 'Удалить', onClick: () => remove(p.id), danger: true },
+                    ]} />
                   </div>
                 </td>
               </tr>

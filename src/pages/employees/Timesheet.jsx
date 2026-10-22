@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -489,16 +490,10 @@ export default function Timesheet() {
                     </td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                        <button className="sk-more" onClick={(ev) => {
-                          ev.stopPropagation();
-                          var dd=ev.currentTarget.nextElementSibling;
-                          document.querySelectorAll('.prod-dropdown.open').forEach(function(d){if(d!==dd)d.classList.remove('open');});
-                          dd.classList.toggle('open');var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
-                        }}>⋯</button>
-                        <div className="prod-dropdown">
-                          <button onClick={() => openDayByDateStr(e.date)}>Редактировать</button>
-                          <button onClick={() => deleteEntry(e.id)} style={{color:'#dc3545'}}>Удалить</button>
-                        </div>
+                        <RowMenu items={[
+                          { label: 'Редактировать', onClick: () => openDayByDateStr(e.date) },
+                          { label: 'Удалить', onClick: () => deleteEntry(e.id), danger: true },
+                        ]} />
                       </div>
                     </td>
                   </tr>

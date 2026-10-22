@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import IngredientForm from './IngredientForm';
 import { supabase } from '../../lib/supabase';
@@ -190,18 +191,10 @@ export default function Ingredients() {
                     <td>{totalLoss.length ? totalLoss.join(' / ') + '%' : '—'}</td>
                     <td>
                       <div style={{ display:'inline-block', position:'relative' }} className="prod-more-wrap">
-                        <button className="sk-more" onClick={(e) => {
-                          e.stopPropagation();
-                          const dd = e.currentTarget.nextElementSibling;
-                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                          dd.classList.toggle('open');
-                          var _r = dd.getBoundingClientRect();
-                          if (_r.bottom > window.innerHeight) dd.classList.add('up'); else dd.classList.remove('up');
-                        }}>⋯</button>
-                        <div className="prod-dropdown">
-                          <button onClick={() => openEdit(r)}>Редактировать</button>
-                          <button onClick={() => remove(r)} style={{ color:'#dc3545' }}>Удалить</button>
-                        </div>
+                        <RowMenu items={[
+                          { label: 'Редактировать', onClick: () => openEdit(r) },
+                          { label: 'Удалить', onClick: () => remove(r), danger: true },
+                        ]} />
                       </div>
                     </td>
                   </tr>

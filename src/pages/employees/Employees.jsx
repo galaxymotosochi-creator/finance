@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -522,20 +523,10 @@ export default function Employees() {
                   <td style={{textAlign:'left',color:'#222',letterSpacing:0}}>{emp.pin || '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="sk-more" onClick={(e) => {
-                        e.stopPropagation();
-                        var el = e.currentTarget.nextElementSibling;
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
-                        var willOpen = !el.classList.contains('open');
-                        el.classList.toggle('open');
-                        var _r = el.getBoundingClientRect();
-                        if (_r.bottom > window.innerHeight) el.classList.add('up'); else el.classList.remove('up');
-                        if (willOpen) setTimeout(function(){ document.addEventListener('click', function h(){ el.classList.remove('open'); document.removeEventListener('click', h); }); }, 10);
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={() => openEdit(emp)}>Редактировать</button>
-                        <button onClick={() => remove(emp.id)} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
+                      <RowMenu items={[
+                        { label: 'Редактировать', onClick: () => openEdit(emp) },
+                        { label: 'Удалить', onClick: () => remove(emp.id), danger: true },
+                      ]} />
                     </div>
                   </td>
                 </tr>

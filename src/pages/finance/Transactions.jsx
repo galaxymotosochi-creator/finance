@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import Toast from '../../components/Toast';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -768,17 +769,10 @@ export default function Transactions() {
                   <td style={{textAlign:'left'}}>{userMap[tx.user_id] || '—'}</td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                      <button className="sk-more" onClick={function(e){
-                        e.stopPropagation();
-                        var el = e.currentTarget.nextElementSibling;
-                        el.classList.add('open');
-                        var h = function(){el.classList.remove('open'); document.removeEventListener('click',h)};
-                        setTimeout(function(){document.addEventListener('click',h)}, 10);
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={function(){editTx(tx)}}>Редактировать</button>
-                        <button onClick={async function(){await remove(tx.id);setToast('Транзакция успешно удалена!')}} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
+                      <RowMenu items={[
+                        { label: 'Редактировать', onClick: () => editTx(tx) },
+                        { label: 'Удалить', onClick: async () => { await remove(tx.id); setToast('Транзакция успешно удалена!'); }, danger: true },
+                      ]} />
                     </div>
                   </td>
                 </tr>

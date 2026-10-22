@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -207,11 +208,10 @@ export default function Categories() {
                   <td style={{textAlign:'left'}}>{dirTypeLabels[c.type] || c.type}</td>
                   <td style={{textAlign:'left',width:'58px'}}>
                     <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                      <button className="sk-more" onClick={function(e){e.stopPropagation();var el=e.currentTarget.nextElementSibling;el.classList.add('open');var _r=el.getBoundingClientRect();if(_r.bottom>window.innerHeight)el.classList.add('up');else el.classList.remove('up');setTimeout(function(){document.addEventListener('click',function h(){el.classList.remove('open');document.removeEventListener('click',h)})},10)}}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={function(e){e.stopPropagation();openModal(c)}}>Редактировать</button>
-                        <button onClick={function(e){e.stopPropagation();remove(c.id)}} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
+                      <RowMenu items={[
+                        { label: 'Редактировать', onClick: () => openModal(c) },
+                        { label: 'Удалить', onClick: () => remove(c.id), danger: true },
+                      ]} />
                     </div>
                   </td>
                 </tr>
