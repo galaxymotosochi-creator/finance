@@ -116,7 +116,7 @@ export default function Accounts() {
     }
   }, [toast]);
   const [corAcct, setCorAcct] = useState('cash');
-  const [corType, setCorType] = useState('income');
+  const [corType, setCorType] = useState('');
   const [corAmt, setCorAmt] = useState('');
   const [corDesc, setCorDesc] = useState('');
   // Мьют от гонки при автосоздании системных счетов
@@ -425,7 +425,7 @@ export default function Accounts() {
               {[
                 { onClick: openAdd, label:'Добавить счет' },
                 { onClick: ()=>{setInitAmts({});setNewAccs([]);setShowInit(true)}, label:'Начальные остатки' },
-                { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('income');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
+                { onClick: ()=>{setCorAcct(accounts[0]?.id||'');setCorType('');setCorAmt('');setCorDesc('');setShowCorrect(true)}, label:'Корректировка' },
                 { onClick: ()=>{setColAmt('');setColTo('');setShowCollection(true)}, label:'Инкассация' },
                 { onClick: ()=>{setTrFrom('');setTrTo('');setTrAmt('');setShowTransfer(true)}, label:'Перевод между счетами' },
                 { onClick: ()=>{setOwnerMode('deposit');setOwnerAcct(accounts.length?accounts[0].id:'');setOwnerAmt('');setOwnerDesc('');setShowOwner(true)}, label:'Взнос / вывод своих денег' },
@@ -689,7 +689,8 @@ export default function Accounts() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Тип</label>
-                  <select value={corType} onChange={e=>setCorType(e.target.value)}>
+                  <select value={corType} onChange={e=>setCorType(e.target.value)} required>
+                    <option value=""><span className="sel-ph">— выберите —</span></option>
                     <option value="income">Приход</option>
                     <option value="expense">Расход</option>
                   </select>
