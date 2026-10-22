@@ -91,6 +91,8 @@ export default function Categories() {
   const save = async (e) => {
     e.preventDefault();
     if (!dirName.trim()) { setToast('⚠️ Введите название'); return; }
+    const editingCat = editingId ? (list || []).find(c => String(c.id) === String(editingId)) : null;
+    if (editingCat && editingCat.is_system) { setToast('⚠️ Системную категорию изменить нельзя'); setShowModal(false); setEditingId(null); return; }
     try {
       let res;
       if (editingId) {
@@ -114,6 +116,8 @@ export default function Categories() {
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
+    const delCat = (list || []).find(c => String(c.id) === String(pendingDeleteId));
+    if (delCat && delCat.is_system) { setShowConfirm(false); setPendingDeleteId(null); setToast('⚠️ Системную категорию удалить нельзя'); return; }
     setShowConfirm(false);
     try {
       // Проверяем, используется ли категория в операциях.
@@ -206,12 +210,16 @@ export default function Categories() {
                   <td style={{textAlign:'left'}}><span style={{whiteSpace:'nowrap'}}>{c.name}{c.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</span></td>
                   <td style={{textAlign:'left'}}>{dirTypeLabels[c.type] || c.type}</td>
                   <td style={{textAlign:'left',width:'58px'}}>
-                    <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
-                      <RowMenu items={[
-                        { label: 'Редактировать', onClick: () => openModal(c) },
-                        { label: 'Удалить', onClick: () => remove(c.id), danger: true },
-                      ]} />
-                    </div>
+                    {c.is_system ? (
+                      <span title="Системная категория — изменить нельзя" style={{color:'#b8c0cc',fontSize:'.9rem',cursor:'default'}}>—</span>
+                    ) : (
+                      <div className="prod-more-wrap" style={{display:'inline-block',position:'relative'}}>
+                        <RowMenu items={[
+                          { label: 'Редактировать', onClick: () => openModal(c) },
+                          { label: 'Удалить', onClick: () => remove(c.id), danger: true },
+                        ]} />
+                      </div>
+                    )}
                   </td>
                 </tr>
               );
