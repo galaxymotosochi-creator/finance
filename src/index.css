@@ -863,7 +863,7 @@ input:focus, select:focus, textarea:focus {
 .sk-chip:active{transform:scale(.98)}
 
 /* Панель-строка (вариант 2) для страницы Счета */
-.sk-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--sk-soft);border-radius:14px;padding:10px 16px;margin-bottom:14px;width:fit-content;max-width:100%}
+.sk-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--sk-soft);border-radius:14px;padding:6px 16px;margin-bottom:14px}
 .sk-bar .grow{flex:1;min-width:220px}
 .sk-bar h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
 .sk-bar .sub{font-size:13px;color:var(--sk-muted);margin-top:3px}
