@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
+import DebugWatch from '../../components/DebugWatch';
 import { getCurrencySymbol } from '../../lib/currency';
 import { tzToday, tzOffsetDate } from '../../lib/dates';
 import CenterSpinner from '../../components/CenterSpinner';
@@ -461,6 +462,7 @@ export default function Receipts() {
 
   return (
     <div>
+      {new URLSearchParams(window.location.search).get('debug') === '1' && <DebugWatch name="Чеки" />}
       <div className="sk-bar">
         <div className="grow">
           <div style={{display:'flex',alignItems:'center'}}>
