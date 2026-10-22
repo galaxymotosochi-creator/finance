@@ -270,7 +270,7 @@ export default function Categories() {
       )}
 
       {/* Модалка */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="Добавьте или измените категорию товаров/услуг" width="medium" className="modal-v2 cat-modal">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Редактировать категорию' : 'Добавить категорию'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
           <div className="v2-card">
             <div className="form-group">
