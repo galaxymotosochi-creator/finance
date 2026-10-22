@@ -179,14 +179,8 @@ export default function Categories() {
           <div className="sub">Настройка групп для товаров и услуг</div>
         </div>
         <div className="sk-bar-actions">
-          <button type="button" onClick={openAdd}
-            style={{ display:'inline-flex', alignItems:'center', gap:9, padding:'8px 14px', borderRadius:11,
-              cursor:'pointer', border:'1px solid rgba(31,117,255,.35)', background:'rgba(31,117,255,.04)',
-              fontFamily:'inherit', fontSize:'.85rem', fontWeight:700, color:'#111' }}>
-            <span style={{ width:18, height:18, borderRadius:11, flexShrink:0,
-              border:'1.5px solid #1F75FF', background:'#1F75FF', display:'flex',
-              alignItems:'center', justifyContent:'center', color:'#fff',
-              fontSize:'.7rem', fontWeight:800 }}>✓</span>
+          <button type="button" onClick={openAdd} className="sk-bar-btn">
+            <span className="sk-bar-btn-check">✓</span>
             Добавить
           </button>
         </div>
