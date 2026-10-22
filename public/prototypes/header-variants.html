@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шапка раздела без плашки — 5 вариантов</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #eef1f6; color: #0b1220; padding: 34px 20px 70px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1.page { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #6b7688; margin-bottom: 32px; line-height: 1.6; }
+
+  .item { margin-bottom: 36px; }
+  .cap {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: #8b95a5; margin-bottom: 11px; display: flex; align-items: center; gap: 8px;
+  }
+  .num { display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 6px; background: #0b1220; color: #fff;
+    font-size: 11px; font-weight: 800; }
+  .hint { font-size: 12px; color: #6b7688; margin-top: 10px; line-height: 1.55; }
+
+  /* имитация страницы */
+  .page { background: #f4f6f9; padding: 18px 18px 0; border-radius: 14px; border: 1px solid #e2e7ef; }
+
+  .ttl { font-family: inherit; font-size: 18px; font-weight: 600; letter-spacing: 0;
+    line-height: 1.2; margin: 0; color: #0b1220; }
+  .sub { font-size: 12px; color: #8b95a5; font-weight: 400; line-height: 1.4; }
+  .meta { font-size: 12px; color: #9aa4b4; font-weight: 500; }
+
+  .q {
+    width: 19px; height: 19px; border-radius: 50%; border: none; flex-shrink: 0;
+    font-size: 10.5px; font-weight: 800; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #eef3fb; color: #1F75FF;
+  }
+  .q.solid { background: #1F75FF; color: #fff; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto;
+    padding: 8px 14px; border-radius: 11px; cursor: pointer;
+    border: 1px solid rgba(31,117,255,.35); background: rgba(31,117,255,.04);
+    font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; color: #0d4ea8;
+  }
+  .chk { width: 16px; height: 16px; border-radius: 11px; flex-shrink: 0;
+    background: #1F75FF; color: #fff; font-size: 10px; font-weight: 800; line-height: 1;
+    display: flex; align-items: center; justify-content: center; }
+
+  /* таблица-заглушка */
+  .tbl { background: #fff; border: 1px solid rgba(29,120,252,.14); border-radius: 11px;
+    overflow: hidden; margin-top: 14px; }
+  .tbl .th { display: flex; gap: 16px; padding: 9px 24px; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase; color: #8b95a5;
+    background: #f7f9fc; border-bottom: 1px solid #eef2f8; }
+  .tbl .tr { display: flex; gap: 16px; padding: 11px 24px; font-size: 13px; color: #2b3a52;
+    border-bottom: 1px solid #f2f5fa; }
+  .tbl .tr:last-child { border-bottom: none; }
+  .tbl .c1 { flex: 1; } .tbl .c2 { width: 150px; color: #6b7688; } .tbl .c3 { width: 30px; }
+
+  /* ---------- 1. Подпись + тонкая линия ---------- */
+  .v1 { padding-bottom: 12px; border-bottom: 1px solid #e2e7ef; }
+  .v1 .row { display: flex; align-items: flex-start; gap: 8px; }
+  .v1 .txt { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .v1 .titleline { display: flex; align-items: center; gap: 7px; }
+  .v1 .btn { align-self: center; }
+
+  /* ---------- 2. Горизонтальная линия + счётчик ---------- */
+  .v2 .row { display: flex; align-items: center; gap: 10px; padding-bottom: 13px;
+    border-bottom: 1px solid #e2e7ef; }
+  .v2 .count { display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 6px;
+    background: #eef3fb; color: #1F75FF; font-size: 11.5px; font-weight: 700; }
+
+  /* ---------- 3. Вертикальная линия-акцент ---------- */
+  .v3 .row { display: flex; align-items: center; gap: 12px; padding: 2px 0 2px 14px;
+    border-left: 3px solid #1F75FF; }
+  .v3 .txt { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .v3 .titleline { display: flex; align-items: center; gap: 7px; }
+
+  /* ---------- 4. Заголовок слева, метаданные справа ---------- */
+  .v4 .row { display: flex; align-items: baseline; gap: 10px; padding-bottom: 12px;
+    border-bottom: 1px solid #e2e7ef; }
+  .v4 .dots { flex: 1; border-bottom: 1px dotted #d7dfea; margin-bottom: 4px; }
+  .v4 .btn { align-self: center; margin-left: 0; }
+
+  /* ---------- 5. Хлебные крошки + заголовок + кнопка ---------- */
+  .v5 { padding-bottom: 12px; border-bottom: 1px solid #e2e7ef; }
+  .v5 .crumb { font-size: 11.5px; color: #9aa4b4; margin-bottom: 5px; }
+  .v5 .crumb b { color: #5b6472; font-weight: 600; }
+  .v5 .row { display: flex; align-items: center; gap: 8px; }
+  .v5 .btn { align-self: center; }
+
+  @media (max-width: 640px) {
+    .tbl .c2 { display: none; }
+    .btn { padding: 7px 11px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page">Шапка раздела «Категории» — 5 вариантов без плашки</h1>
+  <div class="page-sub">Заголовок 18px полужирный, знак «?» и кнопка «Добавить». Разное — чем держится шапка: подпись, разделитель, счётчик, акцент.</div>
+
+  <!-- 1 -->
+  <div class="item">
+    <div class="cap"><span class="num">1</span> Подпись + тонкая линия</div>
+    <div class="page">
+      <div class="v1">
+        <div class="row">
+          <div class="txt">
+            <div class="titleline">
+              <span class="ttl">Категории</span>
+              <button class="q">?</button>
+            </div>
+            <span class="sub">Группы для каталога услуг</span>
+          </div>
+          <button class="btn"><span class="chk">✓</span> Добавить</button>
+        </div>
+      </div>
+      <div class="tbl">
+        <div class="th"><span class="c1">Название</span><span class="c2">Тип</span><span class="c3"></span></div>
+        <div class="tr"><span class="c1">Стрижки</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+        <div class="tr"><span class="c1">Маникюр</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+      </div>
+    </div>
+    <div class="hint">Подпись объясняет раздел, линия отделяет от таблицы. Спокойно и законченно.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="item">
+    <div class="cap"><span class="num">2</span> Счётчик записей + линия</div>
+    <div class="page">
+      <div class="v2">
+        <div class="row">
+          <span class="ttl">Категории</span>
+          <span class="count">4</span>
+          <button class="q solid">?</button>
+          <button class="btn"><span class="chk">✓</span> Добавить</button>
+        </div>
+      </div>
+      <div class="tbl">
+        <div class="th"><span class="c1">Название</span><span class="c2">Тип</span><span class="c3"></span></div>
+        <div class="tr"><span class="c1">Стрижки</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+        <div class="tr"><span class="c1">Маникюр</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+      </div>
+    </div>
+    <div class="hint">Счётчик даёт смысл: видно, сколько записей, без скролла вниз. Глазу есть за что зацепиться.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="item">
+    <div class="cap"><span class="num">3</span> Вертикальный акцент слева</div>
+    <div class="page">
+      <div class="v3">
+        <div class="row">
+          <div class="txt">
+            <div class="titleline">
+              <span class="ttl">Категории</span>
+              <button class="q">?</button>
+            </div>
+            <span class="sub">Группы для каталога услуг</span>
+          </div>
+          <button class="btn"><span class="chk">✓</span> Добавить</button>
+        </div>
+      </div>
+      <div class="tbl" style="margin-top:16px">
+        <div class="th"><span class="c1">Название</span><span class="c2">Тип</span><span class="c3"></span></div>
+        <div class="tr"><span class="c1">Стрижки</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+        <div class="tr"><span class="c1">Маникюр</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+      </div>
+    </div>
+    <div class="hint">Синяя полоса слева вместо фона — тот же акцент, но без плашки.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="item">
+    <div class="cap"><span class="num">4</span> Заголовок · точка · тип раздела</div>
+    <div class="page">
+      <div class="v4">
+        <div class="row">
+          <span class="ttl">Категории</span>
+          <button class="q">?</button>
+          <span class="dots"></span>
+          <span class="meta">Услуги</span>
+          <button class="btn"><span class="chk">✓</span> Добавить</button>
+        </div>
+      </div>
+      <div class="tbl">
+        <div class="th"><span class="c1">Название</span><span class="c2">Тип</span><span class="c3"></span></div>
+        <div class="tr"><span class="c1">Стрижки</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+        <div class="tr"><span class="c1">Маникюр</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+      </div>
+    </div>
+    <div class="hint">Пунктир заполняет пустоту между заголовком и кнопкой, справа — тип бизнеса. Плотно и информативно.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="item">
+    <div class="cap"><span class="num">5</span> Хлебные крошки + заголовок</div>
+    <div class="page">
+      <div class="v5">
+        <div class="crumb">Услуги <b>/ Категории</b></div>
+        <div class="row">
+          <span class="ttl">Категории</span>
+          <button class="q">?</button>
+          <button class="btn"><span class="chk">✓</span> Добавить</button>
+        </div>
+      </div>
+      <div class="tbl">
+        <div class="th"><span class="c1">Название</span><span class="c2">Тип</span><span class="c3"></span></div>
+        <div class="tr"><span class="c1">Стрижки</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+        <div class="tr"><span class="c1">Маникюр</span><span class="c2">Услуга</span><span class="c3">⋯</span></div>
+      </div>
+    </div>
+    <div class="hint">Крошки отвечают на вопрос «где я» лучше любого заголовка. Шапка становится навигацией.</div>
+  </div>
+
+</div>
+</body>
+</html>
