@@ -948,8 +948,9 @@ export default function Products() {
       )}
 
       {/* Модалка товара */}
-      <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : 'Добавить позицию'} subtitle="Заполните информацию о товаре или услуге" width="wide">
+      <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : (isServices ? 'Добавить услугу' : 'Добавить позицию')} subtitle={isServices ? '' : 'Заполните информацию о товаре или услуге'} width="wide" className="modal-v2">
         <form onSubmit={save}>
+          <div className="v2-card">
               {/* Фото товара/услуги */}
               <div className="form-group">
                 <label>Фото</label>
@@ -973,9 +974,11 @@ export default function Products() {
                   {fPhoto && !uploading && <button type="button" onClick={() => { if (freshPhotoUrl && freshPhotoUrl === fPhoto) { deleteUploadedFile(freshPhotoUrl); setFreshPhotoUrl(''); } setFPhoto(''); }} style={{background:'none',border:'none',color:'#dc3545',fontSize:'.72rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0}}>Удалить</button>}
                 </div>
               </div>
+          </div>
+          <div className="v2-card">
               <div className="form-group">
                 <label>Название</label>
-                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder="Например: кофе или доставка заказа" />
+                <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder={isServices ? 'Например: стрижка женская' : 'Например: кофе или доставка заказа'} />
               </div>
               <div className="form-row">
                 {!isFood && <div className="form-group">
@@ -988,7 +991,7 @@ export default function Products() {
                   }}>
                     {isServices ? (<>
                       <option value="service">Услуга</option>
-                      <option value="combo">Пакет (комбо услуг)</option>
+                      <option value="combo">Комбо</option>
                     </>) : (<>
                       <option value="product">Товар</option>
                       <option value="service">Услуга</option>
@@ -1015,9 +1018,11 @@ export default function Products() {
                   </select>
                 </div>}
               </div>
+          </div>
+          <div className="v2-card">
               <div className="form-row">
                 <div className="form-group">
-                  <label>Цена{fType === 'combo' ? ' (по умолчанию сумма состава)' : ' продажи'}</label>
+                  <label>{fType === 'combo' ? 'Цена комбо' : 'Цена'}</label>
                   <input type="number" min="0" step="0.01" value={fPrice || (fType === 'combo' ? fComboItems.reduce(function(s,i){return s + i.price * i.qty}, 0) : '')} onChange={function(e){setFPrice(e.target.value)}} placeholder="0" />
                 </div>
                 <div className="form-group">
@@ -1029,10 +1034,10 @@ export default function Products() {
                   <input type="number" min="0" step="1" value={fMinQty} onChange={e => setFMinQty(e.target.value)} placeholder="0" />
                 </div>}
               </div>
-              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.8rem',fontWeight:500,color:'rgba(0,0,0,.54)',marginBottom:'.75rem',cursor:'pointer'}}>
+              {fType !== 'combo' && <label style={{display:'flex',alignItems:'center',gap:'.5rem',fontSize:'.78rem',fontWeight:600,color:'#333',marginBottom:'.6rem',cursor:'pointer'}}>
                 <span style={{position:'relative',display:'inline-block',width:'34px',height:'20px',flexShrink:0}}>
                   <input type="checkbox" checked={fFreePrice} onChange={function(e){setFFreePrice(e.target.checked)}} style={{opacity:0,width:0,height:0,position:'absolute'}} />
-                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#111':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
+                  <span style={{position:'absolute',cursor:'pointer',top:0,left:0,right:0,bottom:0,background:fFreePrice?'#1F75FF':'#ccc',borderRadius:'20px',transition:'background .2s'}}>
                     <span style={{position:'absolute',content:'',height:'16px',width:'16px',left:'2px',bottom:'2px',background:'#fff',borderRadius:'50%',transition:'transform .2s',transform:fFreePrice?'translateX(14px)':'translateX(0)'}}></span>
                   </span>
                 </span>
@@ -1053,6 +1058,8 @@ export default function Products() {
                   <div style={{ fontSize: '.72rem', color: 'var(--muted)', marginTop: '.3rem' }}>Сумма автоматически подставится мастеру в чеке (ее можно изменить)</div>
                 </div>
               )}
+          </div>
+          <div className="v2-card">
               <div className="form-row">
                 <div className="form-group">
                   <label>Артикул</label>
@@ -1096,7 +1103,7 @@ export default function Products() {
                 </div>}
               </div>}
               {fType === 'combo' && <div className="form-group" style={{marginBottom:'.75rem'}}>
-                <label>{isServices ? 'Состав пакета' : 'Состав комбо'}</label>
+                <label>Состав комбо</label>
                 <div style={{border:'1px solid var(--border)',borderRadius:'.6rem',padding:'.5rem',background:'var(--body-bg)'}}>
                   <div style={{display:'flex',gap:'.35rem',marginBottom:'.35rem'}}>
                     <input type="text" value={fComboSearch} onChange={function(e){setFComboSearch(e.target.value)}}
@@ -1148,10 +1155,13 @@ export default function Products() {
                   </div>}
                 </div>
               </div>}
-              <div className="form-group">
+          </div>
+          <div className="v2-card" style={{paddingBottom:'12px'}}>
+              <div className="form-group" style={{marginBottom:0}}>
                 <label>Описание</label>
                 <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
               </div>
+          </div>
               <div className="modal-actions">
                 {editId && fHidden && (
                   <button type="button" className="btn" style={{background:'var(--primary)',color:'#000',marginRight:'.5rem',borderRadius:'100px',fontWeight:'600'}} onClick={() => { unhide(editId); setShowModal(false); }}>Восстановить товар</button>
