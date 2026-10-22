@@ -951,6 +951,12 @@ export default function Products() {
       {/* Модалка товара */}
       <Modal open={showModal} onClose={() => { cleanupFreshPhoto(); setShowModal(false); }} title={editId ? 'Редактировать позицию' : (isServices ? 'Добавить услугу' : 'Добавить позицию')} subtitle={isServices ? '' : 'Заполните информацию о товаре или услуге'} width="wide" className="modal-v2">
         <form onSubmit={save}>
+          {isServices && !isFood && (
+            <div className="v2-seg">
+              <button type="button" className={fType !== 'combo' ? 'on' : ''} onClick={() => setFType('service')}>Услуга</button>
+              <button type="button" className={fType === 'combo' ? 'on' : ''} onClick={() => setFType('combo')}>Комбо</button>
+            </div>
+          )}
           <div className="v2-card">
               {/* Фото товара/услуги */}
               <div className="form-group">
@@ -982,7 +988,7 @@ export default function Products() {
                 <input type="text" value={fName} onChange={e => setFName(e.target.value)} required placeholder={isServices ? 'Например: стрижка женская' : 'Например: кофе или доставка заказа'} />
               </div>
               <div className="form-row">
-                {!isFood && <div className="form-group">
+                {!isFood && !isServices && <div className="form-group">
                   <label>Тип</label>
                   <select value={fType} onChange={e => {
                     const t = e.target.value;
