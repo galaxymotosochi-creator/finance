@@ -74,6 +74,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/verify" element={<Verify />} />
       <Route path="/s/:slug" element={<PublicShop />} />
       <Route path="/" element={<Landing />} />
       <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />

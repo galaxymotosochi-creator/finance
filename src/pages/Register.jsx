@@ -10,10 +10,18 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [adminPin, setAdminPin] = useState(null);
+  const [resent, setResent] = useState(false);
   const { signUp, user } = useAuth();
   const n = useNavigate();
 
   if (user) { n('/dashboard', { replace: true }); return null; }
+
+  const resend = async () => {
+    try {
+      await fetch('/api/auth/resend-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+      setResent(true);
+    } catch(e) {}
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,9 +48,9 @@ export default function Register() {
       <div className="login-wrapper">
         <div className="login-card" style={{textAlign:'center'}}>
           <div style={{fontSize:'2.5rem',marginBottom:'.75rem'}}>📧</div>
-          <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:8,letterSpacing:'-.03em'}}>Письмо отправлено</h1>
+          <h1 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:8,letterSpacing:'-.03em'}}>Проверьте почту</h1>
           <p style={{fontSize:'.85rem',color:'rgba(0,0,0,.54)',lineHeight:1.4,marginBottom:8}}>
-            Проверьте почту <strong>{email}</strong> и перейдите по ссылке в письме, чтобы подтвердить аккаунт.
+            Мы отправили письмо на <strong>{email}</strong>. Нажмите в нём кнопку <strong>«Подтвердить email»</strong> — ссылка действует 48 часов.
           </p>
           {adminPin && (
             <div style={{background:'#E6F0FF',border:'1px solid rgba(31,117,255,.35)',borderRadius:'12px',padding:'12px 14px',marginBottom:14,textAlign:'left'}}>
@@ -54,8 +62,11 @@ export default function Register() {
           <p style={{fontSize:.78,color:'rgba(0,0,0,.34)',marginBottom:20}}>
             Если письмо не пришло — проверьте папку «Спам».
           </p>
-          <button className="btn btn-ghost" style={{width:'100%'}} onClick={() => n('/login')}>
-            Перейти ко входу
+          <button className="btn btn-ghost" style={{width:'100%',marginBottom:8}} onClick={() => n('/dashboard')}>
+            Я подтвердил — перейти в кабинет
+          </button>
+          <button className="btn btn-ghost" style={{width:'100%'}} onClick={resend}>
+            Отправить письмо ещё раз
           </button>
         </div>
       </div>
