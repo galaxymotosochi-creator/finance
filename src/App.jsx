@@ -73,69 +73,87 @@ function FullKassa() {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Публичные страницы — без каркаса */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/s/:slug" element={<PublicShop />} />
       <Route path="/" element={<Landing />} />
-      <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
-      <Route path="/ai-assistant" element={<ProtectedRoute><AppLayout><AiAssistant /></AppLayout></ProtectedRoute>} />
       <Route path="/variant/1" element={<Variant1 />} />
       <Route path="/variant/2" element={<Variant2 />} />
       <Route path="/variant/3" element={<Variant3 />} />
       <Route path="/variant/4" element={<Variant4 />} />
       <Route path="/variant/5" element={<Variant5 />} />
-      <Route path="/registers" element={<ProtectedRoute><AppLayout><RegistersPage /></AppLayout></ProtectedRoute>} />
+
+      {/* Полноэкранная касса — без меню */}
       <Route path="/kassa" element={<ProtectedRoute><FullKassa /></ProtectedRoute>} />
 
-      {/* Finance */}
-      <Route path="/finance/pnl" element={<ProtectedRoute><AppLayout><PnL /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/transactions" element={<ProtectedRoute><AppLayout><Transactions /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/categories" element={<ProtectedRoute><AppLayout><Categories /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/shifts" element={<ProtectedRoute><AppLayout><Shifts /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/receipts" element={<ProtectedRoute><AppLayout><Receipts /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/salary" element={<ProtectedRoute><AppLayout><Salary /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
-      <Route path="/finance/plans" element={<ProtectedRoute><AppLayout><Plans /></AppLayout></ProtectedRoute>} />
+      {/* Один каркас на все разделы: меню и шапка не пересоздаются при переходах */}
+      <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/ai-assistant" element={<AiAssistant />} />
+        <Route path="/registers" element={<RegistersPage />} />
 
-      {/* Clients */}
-      <Route path="/clients/promos" element={<ProtectedRoute><AppLayout><Promos /></AppLayout></ProtectedRoute>} />
-      <Route path="/clients/loyalty" element={<ProtectedRoute><AppLayout><Loyalty /></AppLayout></ProtectedRoute>} />
+        {/* Финансы */}
+        <Route path="/finance/pnl" element={<PnL />} />
+        <Route path="/finance/transactions" element={<Transactions />} />
+        <Route path="/finance/categories" element={<Categories />} />
+        <Route path="/finance/shifts" element={<Shifts />} />
+        <Route path="/finance/receipts" element={<Receipts />} />
+        <Route path="/finance/salary" element={<Salary />} />
+        <Route path="/finance/accounts" element={<Accounts />} />
+        <Route path="/finance/plans" element={<Plans />} />
 
-      <Route path="/stock/products" element={<ProtectedRoute><AppLayout><Products /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/techcards" element={<ProtectedRoute><AppLayout><TechCards /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/semifinished" element={<ProtectedRoute><AppLayout><Semifinished /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/ingredients" element={<ProtectedRoute><AppLayout><Ingredients /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/ing-categories" element={<ProtectedRoute><AppLayout><StockCategories /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/stock" element={<ProtectedRoute><AppLayout><Stock /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/supplies" element={<ProtectedRoute><AppLayout><Supplies /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/supply/new" element={<ProtectedRoute><AppLayout><SupplyNew /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/suppliers" element={<ProtectedRoute><AppLayout><Suppliers /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/writeoffs" element={<ProtectedRoute><AppLayout><Writeoffs /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/inventory" element={<ProtectedRoute><AppLayout><Inventory /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/health" element={<ProtectedRoute><AppLayout><Health /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/order" element={<ProtectedRoute><AppLayout><OrderForm /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/turnover" element={<ProtectedRoute><AppLayout><Health /></AppLayout></ProtectedRoute>} />
-      <Route path="/stock/*" element={<ProtectedRoute><AppLayout><div>Склад</div></AppLayout></ProtectedRoute>} />
-      <Route path="/clients" element={<ProtectedRoute><AppLayout><Clients /></AppLayout></ProtectedRoute>} />
-      <Route path="/clients/*" element={<ProtectedRoute><AppLayout><div>Клиенты</div></AppLayout></ProtectedRoute>} />
-      <Route path="/employees/timesheet" element={<ProtectedRoute><AppLayout><Timesheet /></AppLayout></ProtectedRoute>} />
-      <Route path="/employees" element={<ProtectedRoute><AppLayout><Employees /></AppLayout></ProtectedRoute>} />
-      <Route path="/employees/*" element={<ProtectedRoute><AppLayout><div>Команда</div></AppLayout></ProtectedRoute>} />
-      <Route path="/my-site" element={<ProtectedRoute><AppLayout><MySite /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/trash" element={<ProtectedRoute><AppLayout><TrashPage /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/subscription" element={<ProtectedRoute skipSubscription><AppLayout><Subscription /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsHome /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/sales" element={<ProtectedRoute><AppLayout><SalesReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/:kind" element={<ProtectedRoute><AppLayout><ProductReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/category" element={<ProtectedRoute><AppLayout><CategoryReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/daily" element={<ProtectedRoute><AppLayout><DailyReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/weekly" element={<ProtectedRoute><AppLayout><WeeklyReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/monthly" element={<ProtectedRoute><AppLayout><MonthlyReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/reports/annual" element={<ProtectedRoute><AppLayout><AnnualReport /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings/*" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
+        {/* Клиенты */}
+        <Route path="/clients" element={<Clients />} />
+        <Route path="/clients/promos" element={<Promos />} />
+        <Route path="/clients/loyalty" element={<Loyalty />} />
+        <Route path="/clients/*" element={<div>Клиенты</div>} />
+
+        {/* Склад и услуги */}
+        <Route path="/stock/products" element={<Products />} />
+        <Route path="/stock/techcards" element={<TechCards />} />
+        <Route path="/stock/semifinished" element={<Semifinished />} />
+        <Route path="/stock/ingredients" element={<Ingredients />} />
+        <Route path="/stock/categories" element={<StockCategories />} />
+        <Route path="/stock/ing-categories" element={<StockCategories />} />
+        <Route path="/stock/stock" element={<Stock />} />
+        <Route path="/stock/supplies" element={<Supplies />} />
+        <Route path="/stock/supply/new" element={<SupplyNew />} />
+        <Route path="/stock/suppliers" element={<Suppliers />} />
+        <Route path="/stock/writeoffs" element={<Writeoffs />} />
+        <Route path="/stock/inventory" element={<Inventory />} />
+        <Route path="/stock/health" element={<Health />} />
+        <Route path="/stock/order" element={<OrderForm />} />
+        <Route path="/stock/turnover" element={<Health />} />
+        <Route path="/stock/*" element={<div>Склад</div>} />
+
+        {/* Команда */}
+        <Route path="/employees" element={<Employees />} />
+        <Route path="/employees/timesheet" element={<Timesheet />} />
+        <Route path="/employees/*" element={<div>Команда</div>} />
+
+        {/* Сайт и настройки */}
+        <Route path="/my-site" element={<MySite />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/trash" element={<TrashPage />} />
+        <Route path="/settings/*" element={<SettingsPage />} />
+
+        {/* Отчёты */}
+        <Route path="/reports" element={<ReportsHome />} />
+        <Route path="/reports/sales" element={<SalesReport />} />
+        <Route path="/reports/category" element={<CategoryReport />} />
+        <Route path="/reports/daily" element={<DailyReport />} />
+        <Route path="/reports/weekly" element={<WeeklyReport />} />
+        <Route path="/reports/monthly" element={<MonthlyReport />} />
+        <Route path="/reports/annual" element={<AnnualReport />} />
+        <Route path="/reports/:kind" element={<ProductReport />} />
+      </Route>
+
+      {/* Подписка — каркас без проверки подписки */}
+      <Route element={<ProtectedRoute skipSubscription><AppLayout /></ProtectedRoute>}>
+        <Route path="/settings/subscription" element={<Subscription />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

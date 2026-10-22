@@ -8,7 +8,7 @@ import QuickIncome from '../components/QuickIncome';
 import QuickExpense from '../components/QuickExpense';
 import { useState } from 'react';
 import Onboarding from '../pages/Onboarding';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
   const { user, signOut } = useAuth();
@@ -78,7 +78,7 @@ export default function AppLayout({ children }) {
           <button className="logout-btn" onClick={signOut}>Выйти</button>
         </header>
         <div className="content" style={{paddingBottom:'90px'}}>
-          {children}
+          {children || <Outlet />}
         </div>
       </div>
 
