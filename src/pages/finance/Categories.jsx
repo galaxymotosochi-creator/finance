@@ -197,9 +197,14 @@ export default function Categories() {
             {!loading && list.length === 0 && (
               <tr>
                 <td colSpan="3">
-                  <div className="sk-empty">
-                    <p>Список категорий пуст</p>
-                    <p>Создайте первую статью доходов или расходов</p>
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                      <b>Как добавить категорию:</b><br />
+                      • Нажмите «Добавить» справа вверху<br />
+                      • Укажите название категории<br />
+                      • Выберите тип — доход или расход<br />
+                      Категории нужны для группировки операций в «Доходах и расходах».
+                    </div>
                   </div>
                 </td>
               </tr>
