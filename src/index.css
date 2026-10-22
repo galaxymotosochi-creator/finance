@@ -1869,7 +1869,7 @@ input:focus, select:focus, textarea:focus {
 .modal-overlay { padding: 32px 20px; overflow-y: auto; }
 .modal-box.modal-v2 {
   width: 100%; max-width: 440px; padding: 0; overflow: hidden;
-  border: 1px solid var(--border); border-radius: 16px;
+  border: none; border-radius: 16px;
   box-shadow: 0 12px 40px rgba(0,0,0,.15);
   display: flex; flex-direction: column;
   max-height: calc(100vh - 64px);
@@ -1879,6 +1879,9 @@ input:focus, select:focus, textarea:focus {
 .modal-v2 .v2-head {
   background: linear-gradient(135deg,#1F75FF,#0d4ea8);
   padding: 18px 20px 16px; position: relative; flex: none;
+  border: none; outline: none;
+  border-radius: 16px 16px 0 0;
+  background-clip: padding-box;
 }
 .modal-v2 .v2-head h1 { margin: 0; font-size: 19px; font-weight: 800; color: #fff; }
 .modal-v2 .v2-head p { margin: 2px 0 0; font-size: 12.5px; color: rgba(255,255,255,.82); }
