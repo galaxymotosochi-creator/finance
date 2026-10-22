@@ -844,7 +844,7 @@ export default function Transactions() {
                       <div key={a.id} onClick={function(){setTrFrom(a.id);if(String(a.id)===String(trTo))setTrTo('')}}
                         style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'10px',background:sel?'#E6F0FF':'#fff',border:'1px solid '+(sel?'#1F75FF':'#e8e8ec')}}>
                         <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
-                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:sel ? '#222' : 'rgba(0,0,0,.38)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
                         <span style={{fontSize:'.875rem',fontWeight:500,color:'#222',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
                       </div>
                     );
