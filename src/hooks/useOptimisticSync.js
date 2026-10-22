@@ -78,8 +78,12 @@ export default function useOptimisticSync({ table, setList, onSynced }) {
       }
     };
 
-    const onSync = () => {
-      // Очередь синхронизирована — офлайн-записи теперь на сервере, чистим локальный реестр
+    const onSync = (e) => {
+      // Перезагружаем список ТОЛЬКО если реально что-то синхронизировалось.
+      // Раньше событие приходило на каждый 10-секундный пинг — таблица моргала по кругу.
+      const changed = Number(e && e.detail && e.detail.changed) || 0;
+      const pending = readPending(table);
+      if (changed === 0 && pending.length === 0) return;
       clearPending(table);
       if (onSyncedRef.current) onSyncedRef.current();
     };
