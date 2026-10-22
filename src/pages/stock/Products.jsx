@@ -1148,14 +1148,6 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Описание */}
-          <div className="v2-card" style={{paddingBottom:'12px'}}>
-            <div className="form-group" style={{marginBottom:0}}>
-              <label>Описание</label>
-              <textarea rows="2" value={fDesc} onChange={e => setFDesc(e.target.value)} placeholder="Дополнительная информация..." />
-            </div>
-          </div>
-
           <div className="modal-actions">
             <button type="button" className="v2-ghost" onClick={() => { cleanupFreshPhoto(); setShowModal(false); }}>Отмена</button>
             {editId && fHidden && (
