@@ -64,7 +64,9 @@ export default function Verify() {
               <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: '#42526b', lineHeight: 1.55 }}>
                 Спасибо! Ваш адрес подтверждён. Теперь можно войти в кабинет.
               </p>
-              {btn('Перейти ко входу', () => n('/login'))}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                {btn('Перейти ко входу', () => n('/login'))}
+              </div>
             </div>
           </>
         )}
@@ -76,7 +78,9 @@ export default function Verify() {
               <p style={{ margin: '0 0 20px', fontSize: '13.5px', color: '#42526b', lineHeight: 1.55 }}>
                 Этот email уже был подтверждён ранее. Можно входить.
               </p>
-              {btn('Войти', () => n('/login'))}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                {btn('Войти', () => n('/login'))}
+              </div>
             </div>
           </>
         )}
@@ -91,7 +95,9 @@ export default function Verify() {
               <p style={{ margin: '0 0 20px', fontSize: '12.5px', color: '#8b95a5', lineHeight: 1.5 }}>
                 Запросите новое письмо на странице входа.
               </p>
-              {btn('Ко входу', () => n('/login'))}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                {btn('Ко входу', () => n('/login'))}
+              </div>
             </div>
           </>
         )}
