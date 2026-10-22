@@ -1269,11 +1269,14 @@ input:focus, select:focus, textarea:focus {
 .cat-sub{font-family:var(--font);font-size:12px;font-weight:400;color:#8b95a5;line-height:1.4}
 
 /* Кнопка «Добавить» в строке заголовка */
-.cat-add-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;
-  border:1px solid rgba(31,117,255,.35);background:rgba(31,117,255,.04);cursor:pointer;
-  font-family:var(--font);font-size:13px;font-weight:600;line-height:1;color:#0d4ea8;
-  transition:background .15s,border-color .15s}
-.cat-add-btn:hover{background:rgba(31,117,255,.1);border-color:rgba(31,117,255,.55)}
+.cat-add-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;
+  border-radius:11px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;
+  font-family:var(--font);font-size:13px;font-weight:600;line-height:1;
+  box-shadow:0 10px 22px -14px rgba(29,120,252,.9);
+  transition:transform .15s,box-shadow .15s}
+.cat-add-btn:hover{transform:translateY(-1px);box-shadow:0 14px 26px -14px rgba(29,120,252,.95)}
+.cat-add-btn:active{transform:scale(.98)}
 .cat-add-check{width:16px;height:16px;border-radius:11px;flex-shrink:0;
   background:#1F75FF;color:#fff;font-size:10px;font-weight:800;line-height:1;
   display:flex;align-items:center;justify-content:center}

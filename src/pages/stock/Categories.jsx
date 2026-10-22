@@ -181,10 +181,7 @@ export default function Categories() {
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
-          <button type="button" onClick={openAdd} className="cat-add-btn">
-            <span className="cat-add-check">✓</span>
-            Добавить
-          </button>
+          <button type="button" onClick={openAdd} className="cat-add-btn">Добавить</button>
         </div>
       </div>
 
