@@ -910,7 +910,7 @@ export default function Accounts() {
         </form>
       </Modal>
 
-      <Modal open={showProfit} onClose={()=>setShowProfit(false)} title="Выплата прибыли" subtitle="Вы забираете заработанную прибыль. На саму прибыль это не влияет" width="medium">
+      <Modal open={showProfit} onClose={()=>setShowProfit(false)} title="Выплата прибыли" subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={async function(e){
           e.preventDefault();
           const amt = parseFloat(profitAmt);
@@ -954,9 +954,10 @@ export default function Accounts() {
               <span>Доступно к выплате</span><b style={{color:'#0d4ea8'}}>{Math.max(0, profitEarnedMonth - profitPaidMonth).toLocaleString()} {cur}</b>
             </div>
           </div>
+          <div className="v2-card">
           <div className="form-group">
             <label>Счет</label>
-            <AcctPick accounts={accounts} value={profitAcct} onChange={setProfitAcct} cur={cur} balOf={balOfId} placeholder="— выберите счет —" />
+            <AcctPick accounts={accounts} value={profitAcct} onChange={setProfitAcct} cur={cur} balOf={balOfId} placeholder="— выберите —" />
           </div>
           <div className="form-group">
             <label>Сумма</label>
@@ -966,8 +967,10 @@ export default function Accounts() {
             <label>Комментарий</label>
             <input type="text" value={profitDesc} onChange={e=>setProfitDesc(e.target.value)} placeholder="Например: за сентябрь" />
           </div>
+          </div>
           <div className="modal-actions">
-            <button type="submit" className="sk-dd-btn">Выплатить</button>
+            <button type="button" className="v2-ghost" onClick={()=>setShowProfit(false)}>Отмена</button>
+            <button type="submit" className="cat-add-btn">Выплатить</button>
           </div>
         </form>
       </Modal>
