@@ -1090,7 +1090,7 @@ export default function Products() {
                 </select>
               </div>
             </div>
-            {fType !== 'service' && (
+            {fType !== 'service' && fType !== 'combo' && (
               <div className="form-row">
                 <div className="form-group">
                   <label style={{display:'flex',alignItems:'center',gap:'.35rem'}}>
