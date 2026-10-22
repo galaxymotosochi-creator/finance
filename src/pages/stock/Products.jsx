@@ -191,6 +191,7 @@ export default function Products() {
   const [uploading, setUploading] = useState(false);
   const [freshPhotoUrl, setFreshPhotoUrl] = useState(''); // загружено в этой сессии, еще не сохранено
   const [fComboItems, setFComboItems] = useState([]);
+  const [extraOpen, setExtraOpen] = useState(false);
   const [fComboSearch, setFComboSearch] = useState('');
   const [typeFilterSet, setTypeFilterSet] = useState(new Set());
   const [typeOpen, setTypeOpen] = useState(false);
@@ -1059,8 +1060,12 @@ export default function Products() {
                 </div>
               )}
           </div>
-          <div className="v2-card">
-              <div className="form-row">
+          <div className="v2-card v2-card-fold">
+              <button type="button" className="v2-fold-head" onClick={function(){ setExtraOpen(!extraOpen); }}>
+                <span>Дополнительно</span>
+                <span className={"v2-chev" + (extraOpen ? " open" : "")}>▾</span>
+              </button>
+              {extraOpen && <div className="form-row" style={{marginTop:".5rem"}}>
                 <div className="form-group">
                   <label>Артикул</label>
                   <input type="text" value={fSku} onChange={e => setFSku(e.target.value)} placeholder="ART-001" />
@@ -1080,7 +1085,7 @@ export default function Products() {
                     {SERVICE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>}
-              </div>
+              </div>}
               {fType !== 'service' && <div className="form-row">
                 <div className="form-group">
                   <label>Ед. измерения</label>
