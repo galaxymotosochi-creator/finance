@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -305,22 +306,10 @@ export default function Loyalty() {
                     <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0</td>
                     <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}>0 {cur}</td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                      <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                        <button className="sk-more" onClick={(e) => {
-                          e.stopPropagation();
-                          var el = e.currentTarget.nextElementSibling;
-                          document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
-                          var willOpen = !el.classList.contains('open');
-                          el.classList.toggle('open');
-                          var _r = el.getBoundingClientRect();
-                          if (_r.bottom > window.innerHeight) el.classList.add('up'); else el.classList.remove('up');
-                          if (willOpen) setTimeout(function(){ document.addEventListener('click', function h(){ el.classList.remove('open'); document.removeEventListener('click', h); }); }, 10);
-                        }}>⋯</button>
-                        <div className="prod-dropdown">
-                          <button onClick={() => openEdit(p)}>Редактировать</button>
-                          <button onClick={() => remove(p.id)} style={{color:'#dc3545'}}>Удалить</button>
-                        </div>
-                      </div>
+                      <RowMenu items={[
+                        { label: 'Редактировать', onClick: () => openEdit(p) },
+                        { label: 'Удалить', onClick: () => remove(p.id), danger: true },
+                      ]} />
                     </td>
                   </tr>
                 );

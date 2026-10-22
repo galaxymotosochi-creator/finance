@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -342,22 +343,14 @@ export default function Writeoffs() {
                 <td style={{whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}><span className="prod-cat">{w.reason||'—'}</span></td>
                 <td style={{color:'#222',fontSize:'.78rem'}}>{fmtDate(w.date)}</td>
                 <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                  <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                    <button className="act-btn prod-more-btn" onClick={(e) => {
-                      e.stopPropagation();
-                      const dd = e.currentTarget.nextElementSibling;
-                      document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                      dd.classList.toggle('open');
-                    }}>⋯</button>
-                    <div className="prod-dropdown">
-                      <button onClick={() => {
-                        setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));
-                        setFReason(w.reason||'Списание'); setFDate(w.date||new Date().toISOString().split('T')[0]);
-                        setShow(true);
-                      }}>Редактировать</button>
-                      <button onClick={() => remove(w.id)} style={{color:'#dc3545'}}>Удалить</button>
-                    </div>
-                  </div>
+                  <RowMenu buttonClassName="act-btn prod-more-btn" items={[
+                    { label: 'Редактировать', onClick: () => {
+                      setEditId(w.id); setFProd(String(w.product_id)); setFQty(String(w.quantity));
+                      setFReason(w.reason||'Списание'); setFDate(w.date||new Date().toISOString().split('T')[0]);
+                      setShow(true);
+                    } },
+                    { label: 'Удалить', onClick: () => remove(w.id), danger: true },
+                  ]} />
                 </td>
               </tr>
             ))}

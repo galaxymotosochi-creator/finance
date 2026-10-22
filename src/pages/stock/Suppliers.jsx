@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -344,31 +345,10 @@ export default function Suppliers() {
                   <td style={{textAlign:'left',color:'#222'}}>{supplyCount}</td>
                   <td style={{textAlign:'left',color:'#222'}}><span className="num">{totalSum.toLocaleString()} {cur}</span></td>
                   <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
-                    <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="sk-more" onClick={(e) => {
-                        e.stopPropagation();
-                        const btn = e.currentTarget;
-                        const dd = btn.nextElementSibling;
-                        const isOpen = dd.classList.contains('open');
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { d.classList.remove('open'); d.style.cssText = ''; });
-                        if (isOpen) return;
-                        // Меню показываем position:fixed — иначе его обрезает overflowX у контейнера таблицы
-                        dd.classList.add('open');
-                        dd.style.position = 'fixed';
-                        dd.style.right = (window.innerWidth - btn.getBoundingClientRect().right) + 'px';
-                        const below = btn.getBoundingClientRect().bottom + 6;
-                        const menuH = dd.offsetHeight || 84;
-                        if (below + menuH > window.innerHeight - 8) {
-                          dd.style.top = (btn.getBoundingClientRect().top - menuH - 4) + 'px';
-                        } else {
-                          dd.style.top = below + 'px';
-                        }
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={() => openEdit(s)}>Редактировать</button>
-                        <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
-                    </div>
+                    <RowMenu items={[
+                      { label: 'Редактировать', onClick: () => openEdit(s) },
+                      { label: 'Удалить', onClick: () => remove(s.id), danger: true },
+                    ]} />
                   </td>
                 </tr>
               );

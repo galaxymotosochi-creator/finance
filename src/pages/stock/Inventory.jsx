@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -544,17 +545,9 @@ export default function Inventory() {
                   <td style={{textAlign:'left',color:'#222',fontSize:'.78rem'}}><span className="num">{isDraft ? '—' : (result > 0 ? '+' : '') + result.toLocaleString() + ' ' + cur}</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
                     <span style={{display:'inline-block',padding:'.2rem .6rem',borderRadius:'100px',fontSize:'.78rem',color:'#222',background:'#eee',cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}} onClick={() => continueEdit(inv)}>{isDraft ? 'Продолжить' : 'Открыть'}</span>
-                    <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
-                      <button className="act-btn prod-more-btn" onClick={(e) => {
-                        e.stopPropagation();
-                        const dd = e.currentTarget.nextElementSibling;
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={() => remove(inv.id)} style={{color:'#dc3545'}}>{isDraft ? 'Удалить черновик' : 'Удалить'}</button>
-                      </div>
-                    </div>
+                    <RowMenu buttonClassName="act-btn prod-more-btn" items={[
+                      { label: isDraft ? 'Удалить черновик' : 'Удалить', onClick: () => remove(inv.id), danger: true },
+                    ]} />
                   </td>
                 </tr>
               );

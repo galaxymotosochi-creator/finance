@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -600,20 +601,11 @@ const load = async () => {
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}><span className="num">{Number(total).toLocaleString()}₽</span></td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',fontSize:'.78rem'}}>{(s.paid||0) < total ? (total - (s.paid||0)).toLocaleString() + '₽' : '—'}</td>
                   <td style={{textAlign:'left',whiteSpace:'nowrap'}}>
-                    <div style={{display:'inline-block',position:'relative',zIndex:2}} className="prod-more-wrap">
-                      <button className="sk-more" onClick={(e) => {
-                        e.stopPropagation();
-                        const dd = e.currentTarget.nextElementSibling;
-                        document.querySelectorAll('.prod-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
-                        dd.classList.toggle('open');
-                        var _r=dd.getBoundingClientRect();if(_r.bottom>window.innerHeight)dd.classList.add('up');else dd.classList.remove('up');
-                      }}>⋯</button>
-                      <div className="prod-dropdown">
-                        <button onClick={() => edit(s.id)}>Редактировать</button>
-                        <button onClick={() => copy(s.id)}>Копировать</button>
-                        <button onClick={() => remove(s.id)} style={{color:'#dc3545'}}>Удалить</button>
-                      </div>
-                    </div>
+                    <RowMenu items={[
+                      { label: 'Редактировать', onClick: () => edit(s.id) },
+                      { label: 'Копировать', onClick: () => copy(s.id) },
+                      { label: 'Удалить', onClick: () => remove(s.id), danger: true },
+                    ]} />
                   </td>
                 </tr>
                 {expandedId === s.id && (() => {
