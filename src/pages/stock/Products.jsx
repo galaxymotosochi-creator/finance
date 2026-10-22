@@ -715,10 +715,11 @@ export default function Products() {
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
       <div style={{flexShrink:0}}>
-        <div className="sk-bar">
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h1>{pageTitle}</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{ display: 'flex', alignItems: 'center', gap:'7px' }}>
+            <h1 className="cat-title">{pageTitle}</h1>
             <SectionHelp
               title={isFood ? 'Раздел «Товары»' : (isServices ? 'Раздел «Услуги»' : 'Раздел «Товары и услуги»')}
               intro={isFood ? 'Готовые товары для продажи: напитки, снеки, упаковка и прочее. Ингредиенты, из которых готовятся блюда, ведутся в разделе «Меню → Ингредиенты».' : (isServices ? 'Каталог услуг: стрижка, маникюр, консультация, ремонт и прочее. Остатков нет — услуга не лежит на складе, поэтому раздел «Склад» скрыт.' : 'Каталог всего, что вы продаете: товары, услуги и комбо-наборы. Здесь создаются позиции, задаются цены и отслеживается себестоимость.')}
@@ -764,10 +765,11 @@ export default function Products() {
               ]}
             />
           </div>
-          <div className="sub">{isServices ? 'Каталог услуг' : (isFood ? 'Товары для продажи' : 'Каталог товаров, услуг и комбо')}</div>
+          </div>
+          <span className="cat-sub">{isServices ? 'Каталог услуг' : (isFood ? 'Товары для продажи' : 'Каталог товаров, услуг и комбо')}</span>
         </div>
-        <div className="sk-bar-acts">
-          <button className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
+          <button type="button" className="cat-add-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
 
