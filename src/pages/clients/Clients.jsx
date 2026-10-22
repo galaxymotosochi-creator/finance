@@ -305,7 +305,26 @@ export default function Clients() {
           </thead>
           <tbody id="clientTableBody">
             {filtered.length === 0 ? (
-              <tr><td colSpan="12"><div className="sk-empty"><p>База клиентов пуста</p><p>Добавьте первого клиента, чтобы отслеживать историю покупок</p></div></td></tr>
+              <tr>
+                <td colSpan="12">
+                  <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                    {search.trim() ? (
+                      <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:0 }}>Ничего не найдено по запросу</p>
+                    ) : (
+                      <>
+                        <p style={{ fontSize:'.85rem', fontWeight:600, color:'var(--body-color)', margin:'0 0 .5rem' }}>Клиентов пока нет</p>
+                        <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                          <b>Как добавить клиента:</b><br />
+                          • Нажмите «Добавить клиента»<br />
+                          • Укажите имя и телефон — этого достаточно для старта<br />
+                          • Остальное (дата рождения, скидка, долг) можно заполнить позже<br />
+                          История покупок начнёт собираться автоматически после первой продажи.
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
             ) : filtered.map(c => {
               const st = clientStats[c.id] || { checks: 0, total: 0 };
               const avg = st.checks > 0 ? Math.round(st.total / st.checks) : 0;
