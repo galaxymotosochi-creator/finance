@@ -245,10 +245,10 @@ export default function Categories() {
             </div>
             <div className="form-group">
               <label>Тип категории</label>
-              <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-                <option value="income">Доход</option>
-                <option value="expense">Расход</option>
-              </select>
+              <div className="v2-seg">
+                <button type="button" className={dirType === 'income' ? 'on' : ''} onClick={function () { setDirType('income'); }}>Доход</button>
+                <button type="button" className={dirType === 'expense' ? 'on' : ''} onClick={function () { setDirType('expense'); }}>Расход</button>
+              </div>
             </div>
           </div>
           <div className="modal-actions">
