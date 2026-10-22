@@ -294,22 +294,27 @@ export default function Transactions() {
           { user_id: user.id, name: 'Наличные', type: 'cash' },
         ]);
       }
-      if (cats.length === 0) {
-        await supabase.from('categories').insert([
-          { user_id: user.id, name: 'Продажи', type: 'income' },
-          { user_id: user.id, name: 'Аренда', type: 'expense' },
-          { user_id: user.id, name: 'Коммунальные', type: 'expense' },
-          { user_id: user.id, name: 'Налоги', type: 'expense' },
-          { user_id: user.id, name: 'Зарплата', type: 'expense' },
-          { user_id: user.id, name: 'Прочее', type: 'expense' },
-          { user_id: user.id, name: 'Прочие доходы', type: 'income' },
-        ]);
-      }
+      // Системные категории — якоря для кассы/чеков и выплат зарплаты.
+      // Создаются всегда, если их нет; удалить и переименовать нельзя.
+      const have = new Set((cats || []).map(c => String(c.name || '').trim()));
+      const sys = [];
+      if (!have.has('Доход от продаж')) sys.push({ user_id: user.id, name: 'Доход от продаж', type: 'income', is_system: true });
+      if (!have.has('Зарплата')) sys.push({ user_id: user.id, name: 'Зарплата', type: 'expense', is_system: true });
+      if (sys.length > 0) await supabase.from('categories').insert(sys);
       await refresh();
       refreshAccounts();
       refreshCategories();
     } catch (e) { console.error(e); }
   };
+
+  // Один раз за сессию: гарантируем системные категории («Доход от продаж», «Зарплата»)
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (!user || seededRef.current) return;
+    seededRef.current = true;
+    const have = new Set((cats || []).map(c => String(c.name || '').trim()));
+    if (!have.has('Доход от продаж') || !have.has('Зарплата')) seed();
+  }, [user, cats]);
 
 
   // Сброс всех полей форм операции (доход/расход)
