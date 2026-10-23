@@ -271,7 +271,7 @@ export default function Timesheet() {
           if (hrs != null) payload.day_hours = hrs;
           const r = await supabase.from('timesheet_entries').update(payload).eq('id', entry.id); if (r.queued) anyQueued = true;
         } else if (st !== 'present' || rate != null || hrs != null) {
-          const payload = { user_id: user.id, employee_id: empId, date: showDay, status: st };
+          const payload = { user_id: user.id, employee_id: empId, date: showDay, status: st, filled_by: user.email || '' };
           if (rate != null) payload.day_rate = rate;
           if (hrs != null) payload.day_hours = hrs;
           const r = await supabase.from('timesheet_entries').insert(payload); if (r.queued) anyQueued = true;
@@ -283,7 +283,7 @@ export default function Timesheet() {
       for (const [empId, amount] of Object.entries(bonusByEmp)) {
         const { data: exB } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
         if (exB) { const r = await supabase.from('timesheet_entries').update({ bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }).eq('id', exB.id); if (r.queued) anyQueued = true; }
-        else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', bonus_amount: amount, bonus_comment: bonusComments[empId]||'' }); if (r.queued) anyQueued = true; }
+        else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', bonus_amount: amount, bonus_comment: bonusComments[empId]||'', filled_by: user.email || '' }); if (r.queued) anyQueued = true; }
       }
       const dayEntriesB = entries.filter(e => e.date && e.date.startsWith(showDay));
       for (const e of dayEntriesB) {
@@ -297,7 +297,7 @@ export default function Timesheet() {
       for (const [empId, amount] of Object.entries(deductByEmp)) {
         const { data: exD } = await supabase.from('timesheet_entries').select('id').eq('user_id',user.id).eq('employee_id',empId).eq('date',showDay).maybeSingle();
         if (exD) { const r = await supabase.from('timesheet_entries').update({ deduct_amount: amount, deduct_comment: deductComments[empId]||'' }).eq('id', exD.id); if (r.queued) anyQueued = true; }
-        else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', deduct_amount: amount, deduct_comment: deductComments[empId]||'' }); if (r.queued) anyQueued = true; }
+        else { const r = await supabase.from('timesheet_entries').insert({ user_id: user.id, employee_id: empId, date: showDay, status: localStatuses[empId]||'present', deduct_amount: amount, deduct_comment: deductComments[empId]||'', filled_by: user.email || '' }); if (r.queued) anyQueued = true; }
       }
       const dayEntriesD = entries.filter(e => e.date && e.date.startsWith(showDay));
       for (const e of dayEntriesD) {
@@ -550,16 +550,19 @@ export default function Timesheet() {
             <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
             <table className="sk-table ts-table">
               <thead><tr>
-                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Дата</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap',width:'76px'}}>Дата</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Статус</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Бонус</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Комментарий к бонусу</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Штраф</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Комментарий к штрафу</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Кто заполнил</th>
                 <th style={{width:'70px',textAlign:'left'}}></th>
               </tr></thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
-                  <tr><td colSpan={6}>
+                  <tr><td colSpan={8}>
                     <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
                       <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                         <b>Как заполнить табель:</b><br />
@@ -572,7 +575,7 @@ export default function Timesheet() {
                   </td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',width:'76px'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                       {getEmpName(e.employee_id)}{e.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
                     </td>
@@ -580,9 +583,16 @@ export default function Timesheet() {
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#16a34a'}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
+                    <td style={{textAlign:'left',color:'#5b6472',maxWidth:'200px'}}>
+                      {(e.bonus_amount||0)>0 ? (e.bonus_comment || '—') : '—'}
+                    </td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#dc2626'}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
+                    <td style={{textAlign:'left',color:'#5b6472',maxWidth:'200px'}}>
+                      {(e.deduct_amount||0)>0 ? (e.deduct_comment || '—') : '—'}
+                    </td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#5b6472'}}>{e.filled_by || '—'}</td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                         <RowMenu items={[
