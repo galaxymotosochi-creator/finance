@@ -2240,3 +2240,6 @@ input:focus, select:focus, textarea:focus {
   opacity: 1 !important;
 }
 .modal-box .cat-sel-wrap > button span:first-child { font-weight: 500; }
+
+/* Переключатель внутри плашки не должен давать вторую рамку/фон */
+.modal-box .v2-card .v2-seg{background:transparent !important;border:none !important;padding:0 !important;box-shadow:none !important}
