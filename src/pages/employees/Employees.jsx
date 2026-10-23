@@ -92,7 +92,8 @@ const getProducts = () => JSON.parse(localStorage.getItem('products88') || '[]')
 
 export default function Employees() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [employees, setEmployees] = useState([]);
   const [allCats, setAllCats] = useState([]);
   const [allProds, setAllProds] = useState([]);
@@ -629,9 +630,9 @@ export default function Employees() {
                 {/* По типу */}
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По типу</div>
-                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для всех услуг и для всех товаров</div>
+                  <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>{isServices ? 'Своя ставка для всех услуг' : 'Своя ставка для всех услуг и для всех товаров'}</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    {[['all_services', '🔧', 'Все услуги'], ['all_products', '📦', 'Все товары']].map(([sc, ic, lb]) => {
+                    {(isServices ? [['all_services', '🔧', 'Все услуги']] : [['all_services', '🔧', 'Все услуги'], ['all_products', '📦', 'Все товары']]).map(([sc, ic, lb]) => {
                       const r = typeRule(sc);
                       return (
                         <div key={sc} style={{ flex: 1, minWidth: 0, background: '#fff', border: '1.5px solid ' + (r ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
@@ -655,7 +656,7 @@ export default function Employees() {
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По категориям</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для позиций категории. Заменяет «По типу».</div>
-                  {fBonusRules.filter(r => r.scope === 'service_category' || r.scope === 'product_category').map((rule, ri) => (
+                  {fBonusRules.filter(r => r.scope === 'service_category' || (!isServices && r.scope === 'product_category')).map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>{rule.scope === 'service_category' ? '🔧' : '📦'}</span>
                       <span style={{ flex: 1, fontSize: '.78rem', color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{refName(rule)}</span>
@@ -706,7 +707,7 @@ export default function Employees() {
                 <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>Конкретные позиции</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для одной позиции. Заменяет категории и «По типу».</div>
-                  {fBonusRules.filter(r => r.scope === 'service' || r.scope === 'product').map((rule, ri) => (
+                  {fBonusRules.filter(r => r.scope === 'service' || (!isServices && r.scope === 'product')).map((rule, ri) => (
                     <div key={ri} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', border: '1px solid #eee', borderRadius: '10px', padding: '6px 10px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '13px' }}>{rule.scope === 'service' ? '🔧' : '📦'}</span>
                       <span style={{ flex: 1, fontSize: '.78rem', color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{refName(rule)}</span>
@@ -726,7 +727,7 @@ export default function Employees() {
                         <input type="text" value={itemSearch}
                           onChange={e => { setItemSearch(e.target.value); setItemDrop(true); setItemRef(''); }}
                           onFocus={() => setItemDrop(true)}
-                          placeholder="Поиск товара или услуги…"
+                          placeholder={isServices ? "Поиск услуги…" : "Поиск товара или услуги…"}
                           style={{ width: '100%', border: '1.5px solid var(--border)', borderRadius: '8px', padding: '9px', fontSize: '.8125rem', fontFamily: 'inherit', outline: 'none', background: '#fff' }} />
                         {itemDrop && (
                           <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20, background: '#fff', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 14px rgba(0,0,0,.1)', maxHeight: 340, minHeight: 340, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', marginTop: 2 }}>

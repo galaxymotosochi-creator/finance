@@ -22,7 +22,8 @@ function locStr(dt) {
 
 export default function Dashboard() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('month');
   const [periodLabel, setPeriodLabel] = useState('Этот месяц');
@@ -411,7 +412,7 @@ export default function Dashboard() {
         ...((d.acctList || []).length === 0 ? [{ l: 'Счетов нет', v: '—' }] : []),
       ],
     },
-    {
+    ...(isServices ? [] : [{
       key: 'stock', icon: 'stock', name: 'Склад', desc: 'Товарный запас',
       right: { v: `${(d.stockCost || 0).toLocaleString('ru-RU')} ${cur}`, s: 'по себестоимости' },
       items: [
@@ -420,7 +421,7 @@ export default function Dashboard() {
         { l: 'Себестоимость запаса', v: `${(d.stockCost || 0).toLocaleString('ru-RU')} ${cur}` },
         { l: 'В продаже (розница)', v: `${(d.stockRetail || 0).toLocaleString('ru-RU')} ${cur}` },
       ],
-    },
+    }]),
     {
       key: 'clients', icon: 'clients', name: 'Клиенты', desc: 'База, долги',
       right: { v: String(d.totalClients || 0), s: `долги ${(d.debt || 0).toLocaleString('ru-RU')} ${cur}` },
@@ -443,7 +444,7 @@ export default function Dashboard() {
 
   const alerts = [];
   if ((d.debtors || []).length > 0) alerts.push(`${d.debtors.length} клиентов с общей задолженностью ${(d.debt || 0).toLocaleString('ru-RU')} ${cur}`);
-  if ((d.deficit || []).length > 0) alerts.push(`${d.deficit.length} товаров на исходе — пора закупать`);
+  if (!isServices && (d.deficit || []).length > 0) alerts.push(`${d.deficit.length} товаров на исходе — пора закупать`);
   if (d.cashBal < 0) alerts.push(`Касса в минусе на ${Math.abs(d.cashBal || 0).toLocaleString('ru-RU')} ${cur}`);
 
   return (
@@ -544,11 +545,11 @@ export default function Dashboard() {
           <div className="k-val">{(d.debt || 0).toLocaleString('ru-RU')} {cur}</div>
           <div className="k-sub warn">{(d.debtors || []).length} должников</div>
         </div>
-        <div className="kpi yellow">
+        {!isServices && <div className="kpi yellow">
           <div className="k-lbl">Товарный запас</div>
           <div className="k-val">{(d.stockCost || 0).toLocaleString('ru-RU')} {cur}</div>
           <div className={'k-sub ' + ((d.lowStockCount || 0) > 0 ? 'warn' : 'ok')}>{(d.lowStockCount || 0) > 0 ? `${d.lowStockCount} ${d.lowStockCount === 1 ? 'позиция' : (d.lowStockCount < 5 ? 'позиции' : 'позиций')} пора закупать` : 'все позиции в норме'}</div>
-        </div>
+        </div>}
       </div>
 
       {/* ПОКАЗАТЕЛИ */}

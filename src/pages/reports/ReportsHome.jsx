@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const reports = [
   {
@@ -68,6 +69,9 @@ const reports = [
 
 export default function ReportsHome() {
   const n = useNavigate();
+  const { businessType } = useAuth();
+  const isServices = businessType === 'services';
+  const list = reports.filter(r => !(isServices && r.key === 'products'));
   return (
     <div>
       <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
@@ -79,7 +83,7 @@ export default function ReportsHome() {
       <div className="nav-sep" style={{ margin: '.25rem 0 1rem', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '14px' }}>
-        {reports.map((r) => (
+        {list.map((r) => (
           <div key={r.key}
             onClick={() => n(r.path)}
             onMouseEnter={ev => { ev.currentTarget.style.transform = 'translateY(-2px)'; ev.currentTarget.style.boxShadow = '0 10px 24px rgba(0,0,0,.12)'; }}
