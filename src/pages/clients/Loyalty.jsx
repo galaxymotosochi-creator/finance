@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useRef } from 'react';
@@ -322,19 +323,24 @@ export default function Loyalty() {
       </div>
 
       {/* Модалка */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать программу' : 'Добавить программу'} subtitle="Создание и настройка условий лояльности" width="wide">
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать программу' : 'Добавить программу'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
+          <div className="v2-card">
           <div className="form-group">
             <label>Название</label>
             <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Например: Партнерская программа" required />
           </div>
           <div className="form-group">
             <label>Тип программы</label>
-            <select value={fType} onChange={e=>setFType(e.target.value)}>
-              <option value="accumulative">Накопительная — скидка растет от суммы</option>
-              <option value="bonus">Бонусная — баллы за покупки</option>
-              <option value="birthday">ДР-скидка — автоскидка в день рождения</option>
-            </select>
+            <SmartSelect
+              value={fType}
+              onChange={setFType}
+              options={[
+                { value: 'accumulative', label: 'Накопительная — скидка растёт от суммы' },
+                { value: 'bonus', label: 'Бонусная — баллы за покупки' },
+                { value: 'birthday', label: 'ДР-скидка — автоскидка в день рождения' },
+              ]}
+            />
           </div>
           <div className="form-row">
             <div className="form-group">
@@ -359,8 +365,10 @@ export default function Loyalty() {
               </div>
             </div>
           </div>
+          </div>
           <div className="modal-actions">
-            <button type="submit" className="sk-dd-btn">{editId?'Сохранить':'Создать программу'}</button>
+            <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
+            <button type="submit" className="cat-add-btn">{editId?'Сохранить':'Создать программу'}</button>
           </div>
         </form>
       </Modal>

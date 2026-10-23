@@ -809,7 +809,7 @@ export default function Transactions() {
           </div>
         </div>
       )}
-      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" width="medium">
+      <Modal open={showTransfer} onClose={()=>setShowTransfer(false)} title="Перевод между счетами" subtitle="" width="medium" className="modal-v2 cat-modal">
             <form onSubmit={async function(e){
               e.preventDefault();
               if (!trAmt||parseFloat(trAmt)<=0) {alert('Введите сумму');return;}
@@ -837,6 +837,7 @@ export default function Transactions() {
                 setToast('Перевод успешно выполнен!');
               } catch(err) {alert(err.message);}
             }}>
+              <div className="v2-card">
               <div className="form-group">
                 <label>С какого счета списать</label>
                 <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
@@ -875,8 +876,10 @@ export default function Transactions() {
                 <label>Сумма </label>
                 <input type="number" placeholder="0" min="0" step="0.01" value={trAmt} onChange={function(e){setTrAmt(e.target.value)}} required />
               </div>
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">Сохранить</button>
+                <button type="button" className="v2-ghost" onClick={()=>setShowTransfer(false)}>Отмена</button>
+                <button type="submit" className="cat-add-btn">Сохранить</button>
               </div>
             </form>
       </Modal>

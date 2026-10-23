@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import SectionHelp from '../../components/SectionHelp';
 import RowMenu from '../../components/RowMenu';
 import { useState, useEffect, useRef } from 'react';
@@ -380,8 +381,9 @@ export default function Clients() {
       )}
 
       {/* Модалка */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать клиента' : 'Добавить клиента'} subtitle="Создание карточки нового покупателя" width="medium">
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать клиента' : 'Добавить клиента'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
+              <div className="v2-card">
               <div className="form-group">
                 <label>Имя</label>
                 <input type="text" value={fName} onChange={e=>setFName(e.target.value)} placeholder="Иван Иванов" required />
@@ -402,11 +404,13 @@ export default function Clients() {
               </div>
               <div className="form-group">
                 <label>Программа лояльности</label>
-                <select value={fLoyalty} onChange={e=>setFLoyalty(e.target.value)}>
-                  <option value="auto">Авто (по правилам программ)</option>
-                  {loyaltyPrograms.map(p => <option key={p.id} value={String(p.id)}>{p.name}{p.discount > 0 ? ' — скидка ' + Number(p.discount).toLocaleString() + '%' : ''}</option>)}
-                  <option value="none">Без скидки</option>
-                </select>
+                <SmartSelect
+                  value={fLoyalty}
+                  onChange={setFLoyalty}
+                  options={[{ value: 'auto', label: 'Авто (по правилам программ)' }]
+                    .concat(loyaltyPrograms.map(p => ({ value: String(p.id), label: p.name + (p.discount > 0 ? ' — скидка ' + Number(p.discount).toLocaleString() + '%' : '') })))
+                    .concat([{ value: 'none', label: 'Без скидки' }])}
+                />
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -429,8 +433,10 @@ export default function Clients() {
                   <span style={{color:'#dc2626',fontWeight:700}}>{Math.abs(editClient.debt).toLocaleString()} {cur}</span>
                 </div>
               )()})}
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
+                <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
+                <button type="submit" className="cat-add-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
       </Modal>
