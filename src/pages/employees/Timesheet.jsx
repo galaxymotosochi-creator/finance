@@ -689,7 +689,7 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <button type="button" className="ts-add" onClick={() => setBonusRows([...bonusRows, emptyRow()])}>+ Добавить премию</button>
+                <button type="button" className="ts-add" onClick={() => setBonusRows(r => r.length ? [...r, emptyRow()] : [emptyRow()])}>+ Добавить премию</button>
 
                 <div className="ts-seclab" style={{marginTop:'12px'}}>Штрафы</div>
                 {deductRows.map((row, idx) => (row.empId || row.amount) && (
@@ -710,15 +710,15 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <button type="button" className="ts-add" onClick={() => setDeductRows([...deductRows, emptyRow()])}>+ Добавить штраф</button>
+                <button type="button" className="ts-add" onClick={() => setDeductRows(r => r.length ? [...r, emptyRow()] : [emptyRow()])}>+ Добавить штраф</button>
               </div>
             )}
 
-            {/* Итог дня */}
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',background:'#F6F9FF',border:'1px solid rgba(29,120,252,.16)',borderRadius:'11px',padding:'.6rem .75rem',margin:'12px 0 4px'}}>
+            {/* Итог дня — на шагах 2 и 3, на первом он не нужен */}
+            {dayStep > 1 && (<div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',background:'#F6F9FF',border:'1px solid rgba(29,120,252,.16)',borderRadius:'11px',padding:'.6rem .75rem',margin:'12px 0 4px'}}>
               <span style={{fontSize:'.65rem',textTransform:'uppercase',letterSpacing:'.05em',color:'var(--muted)',fontWeight:800}}>За день</span>
               <span style={{fontSize:'1.05rem',fontWeight:800}}>{dayTotal().toLocaleString()} {cur}</span>
-            </div>
+            </div>)}
 
             <div className="modal-actions">
               {dayStep > 1 && <button type="button" className="v2-ghost" onClick={() => setDayStep(dayStep - 1)}>← Назад</button>}
