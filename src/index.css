@@ -2149,3 +2149,6 @@ input:focus, select:focus, textarea:focus {
 @keyframes tsBlink{0%,100%{opacity:.25}50%{opacity:1}}
 .ts-sel.ts-sel-wide:not(:focus){color:#111}
 .ts-sel.ts-sel-wide.placeholder{color:rgba(0,0,0,.38) !important;font-weight:400 !important}
+
+/* Модалка «Добавить сотрудника» — пошире, чтобы поля помещались */
+.modal-box.modal-v2.emp-modal-wide{max-width:560px}

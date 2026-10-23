@@ -542,7 +542,7 @@ export default function Employees() {
       )}
 
       {/* ============ МОДАЛКА ============ */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="" width="medium" className="modal-v2 cat-modal">
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="" width="medium" className="modal-v2 cat-modal emp-modal-wide">
         <form onSubmit={save}>
 
               {/* ШАГ 1: ДАННЫЕ */}
