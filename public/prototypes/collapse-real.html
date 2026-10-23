@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сворачивание — как на реальной странице</title>
+<style>
+:root{--blue:#1F75FF;--muted:#8b93a3;--line:rgba(29,120,252,.14)}
+*{box-sizing:border-box}
+body{margin:0;padding:22px 16px 70px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6fb;color:#111}
+h1{font-size:19px;font-weight:800;margin:0 0 4px;letter-spacing:-.02em}
+.sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:18px;max-width:1460px;margin:0 auto}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:16px;box-shadow:0 2px 14px rgba(11,18,32,.05)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#0d4ea8;background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:10px}
+.ttl{font-size:14px;font-weight:800;margin:0 0 12px}
+/* ===== реальный контейнер ===== */
+.pnl2-card{border:1px solid rgba(29,120,252,.16);border-radius:16px;padding:14px 14px 12px;background:#fff}
+.tx-mirror{display:flex;align-items:center;gap:0;height:86px;width:100%;margin:0 0 10px;padding:0}
+.tx-mirror .half{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-right:4px;height:100%}
+.tx-mirror .half.r{align-items:flex-start;padding-left:4px;padding-right:0}
+.tx-mirror .b{height:32px;border-radius:8px 2px 2px 8px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:12px;font-weight:800;white-space:nowrap;max-width:100%;overflow:hidden;min-width:0}
+.tx-mirror .half.r .b{border-radius:2px 8px 8px 2px;justify-content:flex-end}
+.tx-mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+.tx-mirror .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
+.tx-mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
+.tx-mirror .sep{opacity:.75}
+.tx-m5{display:flex;gap:0;align-items:stretch;width:100%;margin:14px 0 0}
+.tx-m5 .side{flex:1;min-width:0;padding:0}
+.tx-m5 .divider{width:1px;background:rgba(29,120,252,.14);flex:none;margin:4px 14px}
+.tx-m5 .hd{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;margin-bottom:8px;color:#111}
+.tx-m5 .hd .dot{width:10px;height:10px;border-radius:3px;flex:none}
+.tx-m5 .hd .amt{margin-left:auto;font-variant-numeric:tabular-nums}
+.tx-m5 .cat{margin-bottom:9px}
+.tx-m5 .cat .ct{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:#33405a;margin-bottom:3px}
+.tx-m5 .cat .ct b{font-weight:700;color:#111;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tx-m5 .cat .tr{height:7px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.tx-m5 .cat .tr i{display:block;height:100%;border-radius:99px}
+.tx-m5 .cat .tr i.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+.tx-m5 .cat .tr i.exp{background:linear-gradient(90deg,#20252e,#4a5464)}
+.tx-m5 .cat .pc{font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
+.tx-m5 .tot{font-size:11.5px;border-top:1px dashed rgba(29,120,252,.18);padding-top:7px;margin-top:2px;display:flex;justify-content:space-between;font-weight:700;color:#111}
+/* кнопка «ещё» в стиле сайта */
+.more{display:flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;color:#0d4ea8;background:rgba(31,117,255,.05);border:1px dashed rgba(31,117,255,.3);border-radius:8px;padding:5px;margin-top:7px;cursor:pointer;user-select:none}
+.more:hover{background:rgba(31,117,255,.1)}
+.hide{display:none}
+.note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.16);padding-top:9px}
+/* 2 */
+.car{font-size:8.5px;color:#9aa7bd;transition:transform .2s;cursor:pointer}
+/* 3 */
+.head3{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;margin-bottom:8px;cursor:pointer;user-select:none}
+.head3 .dot{width:10px;height:10px;border-radius:3px;flex:none}
+.head3 .amt{margin-left:auto;font-variant-numeric:tabular-nums}
+.body3.on{display:block}
+.body3{display:none}
+/* 4 */
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cellb{background:#F6F9FF;border-radius:8px;padding:7px 9px;font-size:10.5px;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;gap:6px}
+.cellb .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#33405a;font-weight:600}
+.cellb .v{font-weight:800;color:#111;flex:none}
+@media(max-width:640px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Сворачивание длинного списка — на реальных стилях</h1>
+<div class="sub">Разметка и стили один в один как в «Доходах и расходах». Пример: 9 категорий, показываем 5</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <div class="ttl">Кнопка «Ещё N категорий»</div>
+  <div class="pnl2-card">
+    <div class="tx-mirror">
+      <div class="half"><div class="b inc" style="width:100%"><span>500 ₽</span><span class="sep">&#160;|&#160;</span><span>77%</span></div></div>
+      <div class="center"></div>
+      <div class="half r"><div class="b exp" style="width:23%"><span>23%</span><span class="sep">&#160;|&#160;</span><span>150 ₽</span></div></div>
+    </div>
+    <div class="tx-m5">
+      <div class="side l">
+        <div class="hd"><span class="dot" style="background:#1F75FF"></span><span>Доходы</span><span class="amt">500 ₽</span></div>
+        <div class="cat"><div class="ct"><span>Выручка от продаж</span><b>240 ₽</b></div><div class="tr"><i class="inc" style="width:48%"></i></div><div class="pc">48% от доходов</div></div>
+        <div class="cat"><div class="ct"><span>Услуги</span><b>120 ₽</b></div><div class="tr"><i class="inc" style="width:24%"></i></div><div class="pc">24% от доходов</div></div>
+        <div class="cat"><div class="ct"><span>Доставка</span><b>60 ₽</b></div><div class="tr"><i class="inc" style="width:12%"></i></div><div class="pc">12% от доходов</div></div>
+        <div class="cat"><div class="ct"><span>Консультации</span><b>40 ₽</b></div><div class="tr"><i class="inc" style="width:8%"></i></div><div class="pc">8% от доходов</div></div>
+        <div class="cat"><div class="ct"><span>Аренда оборудования</span><b>25 ₽</b></div><div class="tr"><i class="inc" style="width:5%"></i></div><div class="pc">5% от доходов</div></div>
+        <div class="hide" data-more="1">
+          <div class="cat"><div class="ct"><span>Подарочные карты</span><b>8 ₽</b></div><div class="tr"><i class="inc" style="width:2%"></i></div><div class="pc">2% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Возвраты поставщиков</span><b>5 ₽</b></div><div class="tr"><i class="inc" style="width:1%"></i></div><div class="pc">1% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Прочее</span><b>2 ₽</b></div><div class="tr"><i class="inc" style="width:1%"></i></div><div class="pc">0% от доходов</div></div>
+        </div>
+        <div class="more" data-btn="1">▾ Ещё 3 категории</div>
+        <div class="tot"><span>Итого доходы</span><span>500 ₽</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="side r">
+        <div class="hd"><span class="dot" style="background:#3c4553"></span><span>Расходы</span><span class="amt">150 ₽</span></div>
+        <div class="cat"><div class="ct"><span>Интернет</span><b>150 ₽</b></div><div class="tr"><i class="exp" style="width:100%"></i></div><div class="pc">100% от расходов</div></div>
+        <div class="tot"><span>Итого расходы</span><span>150 ₽</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Порог 5: как только категорий больше — снизу появляется «Ещё N». Итог всегда на месте.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <div class="ttl">Треугольник у заголовка</div>
+  <div class="pnl2-card">
+    <div class="tx-mirror">
+      <div class="half"><div class="b inc" style="width:100%"><span>500 ₽</span><span class="sep">&#160;|&#160;</span><span>77%</span></div></div>
+      <div class="center"></div>
+      <div class="half r"><div class="b exp" style="width:23%"><span>23%</span><span class="sep">&#160;|&#160;</span><span>150 ₽</span></div></div>
+    </div>
+    <div class="tx-m5">
+      <div class="side l">
+        <div class="hd" data-h="2" style="cursor:pointer"><span class="car" data-car="2">▼</span><span class="dot" style="background:#1F75FF"></span><span>Доходы</span><span class="amt">500 ₽</span></div>
+        <div data-body="2">
+          <div class="cat"><div class="ct"><span>Выручка от продаж</span><b>240 ₽</b></div><div class="tr"><i class="inc" style="width:48%"></i></div><div class="pc">48% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Услуги</span><b>120 ₽</b></div><div class="tr"><i class="inc" style="width:24%"></i></div><div class="pc">24% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Доставка</span><b>60 ₽</b></div><div class="tr"><i class="inc" style="width:12%"></i></div><div class="pc">12% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Консультации</span><b>40 ₽</b></div><div class="tr"><i class="inc" style="width:8%"></i></div><div class="pc">8% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Аренда оборудования</span><b>25 ₽</b></div><div class="tr"><i class="inc" style="width:5%"></i></div><div class="pc">5% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Подарочные карты</span><b>8 ₽</b></div><div class="tr"><i class="inc" style="width:2%"></i></div><div class="pc">2% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Возвраты поставщиков</span><b>5 ₽</b></div><div class="tr"><i class="inc" style="width:1%"></i></div><div class="pc">1% от доходов</div></div>
+        </div>
+        <div class="tot"><span>Итого доходы</span><span>500 ₽</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="side r">
+        <div class="hd"><span class="dot" style="background:#3c4553"></span><span>Расходы</span><span class="amt">150 ₽</span></div>
+        <div class="cat"><div class="ct"><span>Интернет</span><b>150 ₽</b></div><div class="tr"><i class="exp" style="width:100%"></i></div><div class="pc">100% от расходов</div></div>
+        <div class="tot"><span>Итого расходы</span><span>150 ₽</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Клик по «Доходы» — свернуть/развернуть весь список. Итог не пропадает.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <div class="ttl">Начало свёрнуто, итог в шапке</div>
+  <div class="pnl2-card">
+    <div class="tx-mirror">
+      <div class="half"><div class="b inc" style="width:100%"><span>500 ₽</span><span class="sep">&#160;|&#160;</span><span>77%</span></div></div>
+      <div class="center"></div>
+      <div class="half r"><div class="b exp" style="width:23%"><span>23%</span><span class="sep">&#160;|&#160;</span><span>150 ₽</span></div></div>
+    </div>
+    <div class="tx-m5">
+      <div class="side l">
+        <div class="head3" data-h="3"><span class="car" data-car="3">▶</span><span class="dot" style="background:#1F75FF"></span><span>Доходы</span><span class="amt">500 ₽</span></div>
+        <div class="body3" data-body="3">
+          <div class="cat"><div class="ct"><span>Выручка от продаж</span><b>240 ₽</b></div><div class="tr"><i class="inc" style="width:48%"></i></div><div class="pc">48% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Услуги</span><b>120 ₽</b></div><div class="tr"><i class="inc" style="width:24%"></i></div><div class="pc">24% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Доставка</span><b>60 ₽</b></div><div class="tr"><i class="inc" style="width:12%"></i></div><div class="pc">12% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Консультации</span><b>40 ₽</b></div><div class="tr"><i class="inc" style="width:8%"></i></div><div class="pc">8% от доходов</div></div>
+          <div class="cat"><div class="ct"><span>Аренда оборудования</span><b>25 ₽</b></div><div class="tr"><i class="inc" style="width:5%"></i></div><div class="pc">5% от доходов</div></div>
+        </div>
+        <div class="tot"><span>Итого доходы</span><span>500 ₽</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="side r">
+        <div class="hd"><span class="dot" style="background:#3c4553"></span><span>Расходы</span><span class="amt">150 ₽</span></div>
+        <div class="cat"><div class="ct"><span>Интернет</span><b>150 ₽</b></div><div class="tr"><i class="exp" style="width:100%"></i></div><div class="pc">100% от расходов</div></div>
+        <div class="tot"><span>Итого расходы</span><span>150 ₽</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Длинный список сразу свёрнут — видно только сумму. Разворачивается треугольником.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <div class="ttl">Плитки вместо строк</div>
+  <div class="pnl2-card">
+    <div class="tx-mirror">
+      <div class="half"><div class="b inc" style="width:100%"><span>500 ₽</span><span class="sep">&#160;|&#160;</span><span>77%</span></div></div>
+      <div class="center"></div>
+      <div class="half r"><div class="b exp" style="width:23%"><span>23%</span><span class="sep">&#160;|&#160;</span><span>150 ₽</span></div></div>
+    </div>
+    <div class="tx-m5">
+      <div class="side l">
+        <div class="hd"><span class="dot" style="background:#1F75FF"></span><span>Доходы</span><span class="amt">500 ₽</span></div>
+        <div class="grid4">
+          <div class="cellb"><span class="n">Выручка</span><span class="v">240 ₽</span></div>
+          <div class="cellb"><span class="n">Услуги</span><span class="v">120 ₽</span></div>
+          <div class="cellb"><span class="n">Доставка</span><span class="v">60 ₽</span></div>
+          <div class="cellb"><span class="n">Консультации</span><span class="v">40 ₽</span></div>
+          <div class="cellb" style="grid-column:1/-1;justify-content:center;color:#0d4ea8;font-weight:700;background:rgba(31,117,255,.05);border:1px dashed rgba(31,117,255,.3);cursor:pointer">▾ Ещё 5 категорий</div>
+        </div>
+        <div class="tot"><span>Итого доходы</span><span>500 ₽</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="side r">
+        <div class="hd"><span class="dot" style="background:#3c4553"></span><span>Расходы</span><span class="amt">150 ₽</span></div>
+        <div class="cat"><div class="ct"><span>Интернет</span><b>150 ₽</b></div><div class="tr"><i class="exp" style="width:100%"></i></div><div class="pc">100% от расходов</div></div>
+        <div class="tot"><span>Итого расходы</span><span>150 ₽</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Компактные плитки без полосок — на мобилке особенно выигрывает.</div>
+</div>
+
+</div>
+<script>
+document.querySelectorAll('.more').forEach(function(b){ b.onclick=function(){ var box=b.parentElement.querySelector('[data-more="1"]'); var on=box.classList.toggle('hide'); b.textContent = on ? '▾ Ещё 3 категории' : '▴ Свернуть'; }; });
+document.querySelectorAll('[data-h]').forEach(function(h){ h.onclick=function(){ var body=h.parentElement.querySelector('[data-body]'); var car=h.querySelector('[data-car]'); var hidden=body.style.display==='none'; body.style.display=hidden?'block':'none'; car.textContent=hidden?'▼':'▶'; }; });
+document.querySelectorAll('.head3').forEach(function(h){ h.onclick=function(){ var body=h.nextElementSibling; var car=h.querySelector('[data-car]'); var open=body.classList.toggle('on'); car.textContent=open?'▼':'▶'; }; });
+document.querySelectorAll('.cellb[style]').forEach(function(c){ if(c.textContent.indexOf('Ещё')>=0){ c.onclick=function(){ var g=c.parentElement; g.querySelectorAll('.cellb').forEach(function(x){ if(x!==c) x.style.display=''; }); c.style.display='none'; }; } });
+</script>
+</body></html>
