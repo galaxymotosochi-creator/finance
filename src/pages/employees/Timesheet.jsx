@@ -547,7 +547,7 @@ export default function Timesheet() {
             <div className="sk-card" style={{position:'relative',overflowX:'auto',WebkitOverflowScrolling:'touch'}} ref={tblElRef} onScroll={onTblScroll}>
             <table className="sk-table ts-table">
               <thead><tr>
-                <th style={{textAlign:'left',whiteSpace:'nowrap',width:'76px'}}>Дата</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Статус</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Бонус</th>
@@ -572,7 +572,7 @@ export default function Timesheet() {
                   </td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
-                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',width:'76px'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222',width:'92px',minWidth:'92px'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                       {getEmpName(e.employee_id)}{e.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
                     </td>
