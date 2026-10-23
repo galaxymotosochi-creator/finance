@@ -954,7 +954,7 @@ export default function Salary() {
 
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
       <Modal open={show} onClose={()=>setShow(false)} width={660} hideHead className="modal-salary">
-        <div className="sal-head">
+        <div className="sal-head sal-head-v2">
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
           <p className="modal-sub">Выберите сотрудника и период</p>
         </div>
@@ -1348,7 +1348,8 @@ export default function Salary() {
 
               {/* Кнопки */}
               <div className="modal-actions">
-                <button type="submit" className="sk-dd-btn">
+                <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
+                <button type="submit" className="cat-add-btn">
                   {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}
                 </button>
               </div>

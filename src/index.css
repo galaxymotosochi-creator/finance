@@ -1366,6 +1366,9 @@ input:focus, select:focus, textarea:focus {
 .ord-sel option{padding:10px 10px;line-height:2.2;font-size:.8rem}
 
 /* ===== Форма «Начислить зарплату» — фирменный стиль (перенос из превью) ===== */
+.sal-head.sal-head-v2{background:linear-gradient(135deg,#1F75FF,#0d4ea8)}
+.sal-head.sal-head-v2 .modal-title{color:#fff}
+.sal-head.sal-head-v2 .modal-sub{color:rgba(255,255,255,.82)}
 .sal-head{background:#E6F0FF;margin:0 0 1.15rem;padding:1.15rem 3rem 1.15rem 1.5rem;
   border-radius:16px 16px 0 0;display:block;box-sizing:border-box;width:auto}
 .sal-head .modal-title{font-size:1.125rem;font-weight:700;margin:0;color:#0b1220;letter-spacing:-.01em}
