@@ -737,7 +737,7 @@ export default function Timesheet() {
               </div>
               {dayStep > 1 && <button type="button" className="v2-ghost" onClick={() => setDayStep(dayStep - 1)}>← Назад</button>}
               {dayStep === 1 && <button type="button" className="v2-ghost" onClick={() => setShowDay(null)}>Отмена</button>}
-              {dayStep < 3 && <button type="button" className="cat-add-btn" onClick={() => setDayStep(dayStep + 1)}>Дальше →</button>}
+              {dayStep < 3 && <button type="button" className="cat-add-btn" onClick={() => setDayStep(dayStep + 1)}>Далее →</button>}
               {dayStep === 3 && (
                 <button type="button" className="cat-add-btn" disabled={saving} onClick={saveDay}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
               )}
