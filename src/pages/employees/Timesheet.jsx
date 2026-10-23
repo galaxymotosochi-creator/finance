@@ -610,21 +610,6 @@ export default function Timesheet() {
       {/* МОДАЛКА ДНЯ */}
       <Modal open={!!showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="" width="wide" className="modal-v2 cat-modal">
 
-            {/* Индикатор шагов — точки, как в «Новом сотруднике» */}
-            <div style={{display:'flex',alignItems:'center',gap:'.45rem',marginBottom:'14px'}}>
-              {[1,2,3].map(function(i){
-                var act = dayStep === i;
-                return (
-                  <span key={i} onClick={function(){ setDayStep(i); }} title={'Шаг ' + i}
-                    style={{cursor:'pointer',width:'11px',height:'11px',borderRadius:'50%',
-                      background: act ? '#1d78fc' : '#bcd8fe',
-                      boxShadow: act ? '0 0 0 3px rgba(29,120,252,.18)' : 'none',
-                      transition:'all .22s', transform: act ? 'scale(1.12)' : 'scale(1)'}}>
-                  </span>
-                );
-              })}
-            </div>
-
             {/* ШАГ 1 — кто работал */}
             {dayStep === 1 && (
               <div>
@@ -737,6 +722,19 @@ export default function Timesheet() {
             </div>)}
 
             <div className="modal-actions">
+              <div style={{display:'flex',alignItems:'center',gap:'.45rem',marginRight:'auto'}}>
+                {[1,2,3].map(function(i){
+                  var act = dayStep === i;
+                  return (
+                    <span key={i} onClick={function(){ setDayStep(i); }} title={'Шаг ' + i}
+                      style={{cursor:'pointer',width:'11px',height:'11px',borderRadius:'50%',
+                        background: act ? '#1d78fc' : '#bcd8fe',
+                        boxShadow: act ? '0 0 0 3px rgba(29,120,252,.18)' : 'none',
+                        transition:'all .22s', transform: act ? 'scale(1.12)' : 'scale(1)'}}>
+                    </span>
+                  );
+                })}
+              </div>
               {dayStep > 1 && <button type="button" className="v2-ghost" onClick={() => setDayStep(dayStep - 1)}>← Назад</button>}
               {dayStep === 1 && <button type="button" className="v2-ghost" onClick={() => setShowDay(null)}>Отмена</button>}
               {dayStep < 3 && <button type="button" className="cat-add-btn" onClick={() => setDayStep(dayStep + 1)}>Дальше →</button>}
