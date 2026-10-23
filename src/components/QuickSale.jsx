@@ -343,13 +343,18 @@ export default function QuickSale({ onClose }) {
   return (
     <div className="modal-overlay active" onClick={e => { if (e.target.className === 'modal-overlay active') onClose(); }}>
       {toast && <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,padding:'1rem 1.5rem',fontSize:'.9rem',color:'#333',boxShadow:'0 .5rem 1.5rem rgba(0,0,0,.12)',zIndex:10000}}>{toast}</div>}
-      <div className="modal-box" style={{maxWidth:'520px',maxHeight:'85vh',display:'flex',flexDirection:'column'}}>
-        <h2 style={{fontSize:'1.15rem',fontWeight:700,marginBottom:'.75rem'}}>Быстрая продажа</h2>
-        <button className="modal-close" onClick={onClose}>&times;</button>
+      <div className="modal-box modal-v2" style={{maxWidth:'520px'}}>
+        <div className="v2-head">
+          <button className="modal-close" onClick={onClose} type="button">&times;</button>
+          <h1>Быстрая продажа</h1>
+          <p>Товары, клиент и оплата в одном окне</p>
+        </div>
+        <div className="modal-body">
 
           {/* Клиент */}
+          <div className="v2-card">
           <div className="form-group"><label>Клиент</label>
-          <div style={{display:'flex',gap:'6px',marginBottom:'12px'}}>
+          <div style={{display:'flex',gap:'6px'}}>
             <div style={{position:'relative',flex:1}}>
               <input type="text" placeholder="Поиск по имени или телефону..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
                 onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setLoyaltyPct(0); setClientDrop(true); }}
@@ -371,6 +376,7 @@ export default function QuickSale({ onClose }) {
           </div>
 
           {/* Товары */}
+          <div className="v2-card">
           <div className="form-group"><label>Товар или услуга</label>
           <input type="text" placeholder="Поиск товара..." value={search} onChange={e => setSearch(e.target.value)}
             style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
@@ -406,11 +412,13 @@ export default function QuickSale({ onClose }) {
               </div>
             </div>
           )}
-        </div>
+          </div>
+          </div>
 
           {/* Способ оплаты */}
-          <div className="form-group" ><label>Способ оплаты</label>
-          <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'10px'}}>
+          <div className="v2-card">
+          <div className="form-group"><label>Способ оплаты</label>
+          <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'2px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
               <button key={a.id} onClick={() => setPayMode(a.id)} style={{
                     flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
@@ -420,18 +428,19 @@ export default function QuickSale({ onClose }) {
                   }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
             ))}
           </div>
-
+          </div>
           </div>
 
           {/* Сумма оплаты */}
           {payMode && !payUnpaid && (
-            <div style={{marginBottom:'10px'}}>
-              <label style={{fontSize:'11px',fontWeight:600,color:'#888',display:'block',marginBottom:'4px'}}>Сумма</label>
-              <input type="number" min="0" step="0.01" placeholder={total.toString()} value={payAmount} onChange={e => setPayAmount(e.target.value)}
-                style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
-              {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
-                <div style={{fontSize:'11px',color:'#92400e',marginTop:'3px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} {cur} — долг</div>
-              )}
+            <div className="v2-card">
+              <div className="form-group">
+                <label>Сумма оплаты</label>
+                <input type="number" min="0" step="0.01" placeholder={total.toString()} value={payAmount} onChange={e => setPayAmount(e.target.value)} />
+                {payAmount && parseFloat(payAmount) > 0 && parseFloat(payAmount) < total && (
+                  <div style={{fontSize:'11px',color:'#92400e',marginTop:'3px'}}>Остаток {(total - parseFloat(payAmount)).toLocaleString()} {cur} — долг</div>
+                )}
+              </div>
             </div>
           )}
 
@@ -469,11 +478,15 @@ export default function QuickSale({ onClose }) {
             </label>
             <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
           </div>
+          </div>
 
-        <div style={{padding:'12px 24px 16px',borderTop:'1px solid #eee',display:'flex',gap:'8px'}}>
-          <button type="button" className="btn btn-outline" onClick={onClose} style={{flex:1}}>Отмена</button>
-          <button type="button" className="btn btn-account-select" onClick={processSale} disabled={!cart.length || !selectedClient}
-            style={{flex:1,opacity: (cart.length && selectedClient) ? 1 : 0.4}}>Продать</button>
+        <div style={{padding:'0 20px 18px'}}>
+          <div className="modal-actions">
+            <button type="button" className="v2-ghost" onClick={onClose}>Отмена</button>
+            <button type="button" className="cat-add-btn" onClick={processSale} disabled={!cart.length || !selectedClient}
+              style={{opacity: (cart.length && selectedClient) ? 1 : 0.4}}>Продать</button>
+          </div>
+        </div>
         </div>
       </div>
     </div>
