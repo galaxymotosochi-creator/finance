@@ -1676,6 +1676,19 @@ input:focus, select:focus, textarea:focus {
 
 /* Доходы и расходы: два круга рядом */
 .tx-rings{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+/* Доходы и расходы: два столбика вместо кругов */
+.tx-bars{display:flex;flex-direction:column;gap:16px;max-width:760px;margin:0 auto}
+.tx-bar-row{display:grid;grid-template-columns:1fr 46px;gap:6px 10px;align-items:center}
+.tx-bar-hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;grid-column:1 / -1}
+.tx-bar-hd .nm{font-size:13px;font-weight:700;color:#111;letter-spacing:.01em}
+.tx-bar-hd .amt{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.tx-bar-hd .amt.inc{color:#0d4ea8}
+.tx-bar-hd .amt.exp{color:#c0392b}
+.tx-bar-track{height:14px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.tx-bar-track i{display:block;height:100%;border-radius:99px;transition:width .3s}
+.tx-bar-track i.inc{background:linear-gradient(90deg,#3a8bff,#0d4ea8)}
+.tx-bar-track i.exp{background:linear-gradient(90deg,#78818f,#242b36)}
+.tx-bar-pc{font-size:12.5px;font-weight:800;color:#5b6472;text-align:right;font-variant-numeric:tabular-nums}
 .tx-ring-col{display:flex;flex-direction:column;align-items:center;gap:8px}
 .tx-ring-r{position:relative}
 .tx-ring-cap{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--sk-muted)}

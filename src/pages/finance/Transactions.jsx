@@ -643,56 +643,23 @@ export default function Transactions() {
 
       {!loading && (
         <div className="tx-card">
-          <div className="tx-rings">
-            {typeFilter !== 'expense' && (
-              <div className="tx-ring-col">
-                <div className="tx-ring-r">
-                  <div className="tx-ring" style={{background: incRingStops ? 'conic-gradient(' + incRingStops + ')' : '#eef4ff'}}>
-                    {incRingSegs.map((s, i) => {
-                      const spanDeg = incomeTotal ? (s.amount / incomeTotal) * 360 : 0;
-                      const beforeDeg = incRingSegs.slice(0, i).reduce((x, y) => x + (incomeTotal ? (y.amount / incomeTotal) * 360 : 0), 0);
-                      const ang = (beforeDeg + spanDeg / 2) - 90;
-                      const rad = ang * Math.PI / 180;
-                      const x = Math.round(Math.cos(rad) * 56);
-                      const y = Math.round(Math.sin(rad) * 56);
-                      const pct = incomeTotal ? Math.round(s.amount / incomeTotal * 100) : 0;
-                      if (pct < 5) return null;
-                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:'#fff'}}>{pct}%</span>;
-                    })}
-                    <div className="in">
-                      <div className="t">Доходы</div>
-                      <div className="v">+{incomeTotal.toLocaleString()} {cur}</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="tx-ring-cap">Доходы</div>
+          <div className="tx-bars">
+            <div className="tx-bar-row">
+              <div className="tx-bar-hd">
+                <span className="nm">Доходы</span>
+                <span className="amt inc">+{incomeTotal.toLocaleString()} {cur}</span>
               </div>
-            )}
-            {typeFilter !== 'income' && (
-              <div className="tx-ring-col">
-                <div className="tx-ring-r">
-                  <div className="tx-ring" style={{background: expRingStops ? 'conic-gradient(' + expRingStops + ')' : '#eef4ff'}}>
-                    {expRingSegs.map((s, i) => {
-                      const spanDeg = expenseTotal ? (s.amount / expenseTotal) * 360 : 0;
-                      const beforeDeg = expRingSegs.slice(0, i).reduce((x, y) => x + (expenseTotal ? (y.amount / expenseTotal) * 360 : 0), 0);
-                      const ang = (beforeDeg + spanDeg / 2) - 90;
-                      const rad = ang * Math.PI / 180;
-                      const x = Math.round(Math.cos(rad) * 56);
-                      const y = Math.round(Math.sin(rad) * 56);
-                      const pct = expenseTotal ? Math.round(s.amount / expenseTotal * 100) : 0;
-                      if (pct < 5) return null;
-                      const light = ['#FCA5A5','#FECACA','#FEDDDD','#FFEFEF','#A7F3C9','#C6F6DC','#E0FBEC'].indexOf(s.color) >= 0;
-                      return <span key={i} className="tx-ring-pct" style={{left:'calc(50% + '+x+'px)', top:'calc(50% + '+y+'px)', background:s.color, color:light?'#7a1710':'#fff'}}>{pct}%</span>;
-                    })}
-                    <div className="in">
-                      <div className="t">Расходы</div>
-                      <div className="v">−{expenseTotal.toLocaleString()} {cur}</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="tx-ring-cap">Расходы</div>
+              <div className="tx-bar-track"><i className="inc" style={{width:(incomeTotal+expenseTotal ? incomeTotal/(incomeTotal+expenseTotal)*100 : 0)+'%'}}></i></div>
+              <div className="tx-bar-pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
+            </div>
+            <div className="tx-bar-row">
+              <div className="tx-bar-hd">
+                <span className="nm">Расходы</span>
+                <span className="amt exp">−{expenseTotal.toLocaleString()} {cur}</span>
               </div>
-            )}
+              <div className="tx-bar-track"><i className="exp" style={{width:(incomeTotal+expenseTotal ? expenseTotal/(incomeTotal+expenseTotal)*100 : 0)+'%'}}></i></div>
+              <div className="tx-bar-pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
+            </div>
           </div>
           <div className="tx-ring-totals">
             <span className="ttl-inc">Доходы <b>+{incomeTotal.toLocaleString()} {cur}</b></span>
@@ -700,13 +667,7 @@ export default function Transactions() {
             <span className={centerVal >= 0 ? 'ttl-prof' : 'ttl-loss'}>{centerVal >= 0 ? 'Прибыль' : 'Убыток'} <b>{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</b></span>
           </div>
           {(incomeCatsList.length + expenseCatsList.length) >= 1 && (
-            <div className="tx-toggle-row">
-              <button type="button" className={'tx-toggle' + (txRingOpen ? ' open' : '')} onClick={() => setTxRingOpen(!txRingOpen)}>
-                <span className="car">▾</span><span>{txRingOpen ? 'Свернуть категории' : 'Раскрыть категории'}</span>
-              </button>
-            </div>
-          )}
-          {txRingOpen && (<div className={'tx-legend-wrap' + (txRingOpen ? '' : ' tx-collapse')}>
+          <div className="tx-legend-wrap">
             {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
               <div className="tx-legend-col">
                 <div className="tx-grp-h">Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
