@@ -780,7 +780,7 @@ export default function Transactions() {
                   <td style={{textAlign:'left'}}>{fmtTime(tx)}</td>
                   <td style={{textAlign:'left'}}>{tx.description || '—'}{tx.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}</td>
                   <td style={{textAlign:'left'}}>{tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toLocaleString()} {cur}</td>
-                  <td style={{textAlign:'left',maxWidth:'220px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} title={tx.comment || ''}>{tx.comment || '—'}</td>
+                  <td style={{textAlign:'left',maxWidth:'220px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} title={tx.comment || tx.description || ''}>{tx.comment || tx.description || '—'}</td>
                   <td style={{textAlign:'left'}}>{(accs.find(a => a.id === tx.account_id)?.name) || tx.account_name || '—'}</td>
                   <td style={{textAlign:'left'}}>{(cats.find(c => c && c.id === tx.category_id)?.name) || '—'}</td>
                   <td style={{textAlign:'left'}}>{userMap[tx.user_id] || '—'}</td>
