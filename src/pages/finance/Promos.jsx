@@ -340,8 +340,9 @@ export default function Promos() {
       })()}
       </Modal>
 
-      <Modal open={show} onClose={function(){setShow(false);setEditId(null)}} title={editId ? 'Редактировать акцию' : 'Добавить акцию'} subtitle="Настройка условий и сроков действия акции" width="wide">
+      <Modal open={show} onClose={function(){setShow(false);setEditId(null)}} title={editId ? 'Редактировать акцию' : 'Добавить акцию'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
+              <div className="v2-card">
               <div className="form-group">
                 <label>Название</label>
                 <input type="text" placeholder="Например: Новогодняя распродажа" value={name} onChange={e=>setName(e.target.value)} required />
@@ -366,13 +367,17 @@ export default function Promos() {
               </div>
               <div className="form-group">
                 <label>Действует на</label>
-                <select value={targetType} onChange={e => setTargetType(e.target.value)}>
-                  <option value="all">На все позиции</option>
-                  <option value="category_products">На категорию товаров</option>
-                  <option value="category_services">На категорию услуг</option>
-                  <option value="specific_products">На конкретные товары</option>
-                  <option value="specific_services">На конкретные услуги</option>
-                </select>
+                <SmartSelect
+                  value={targetType}
+                  onChange={setTargetType}
+                  options={[
+                    { value: 'all', label: 'На все позиции' },
+                    { value: 'category_products', label: 'На категорию товаров' },
+                    { value: 'category_services', label: 'На категорию услуг' },
+                    { value: 'specific_products', label: 'На конкретные товары' },
+                    { value: 'specific_services', label: 'На конкретные услуги' },
+                  ]}
+                />
               </div>
               {(targetType === 'category_products' || targetType === 'category_services') && (
                 <div className="form-group">
@@ -410,8 +415,10 @@ export default function Promos() {
                   {targetProducts.length > 0 && <div style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.15rem'}}>Выбрано: {targetProducts.length}</div>}
                 </div>
               )}
+              </div>
               <div className="modal-actions">
-                <button type="submit" className="btn btn-dark">{editId ? 'Сохранить' : 'Добавить'}</button>
+                <button type="button" className="v2-ghost" onClick={function(){setShow(false);setEditId(null)}}>Отмена</button>
+                <button type="submit" className="cat-add-btn">{editId ? 'Сохранить' : 'Добавить'}</button>
               </div>
             </form>
       </Modal>
