@@ -347,7 +347,6 @@ export default function QuickSale({ onClose }) {
         <div className="v2-head">
           <button className="modal-close" onClick={onClose} type="button">&times;</button>
           <h1>Быстрая продажа</h1>
-          <p>Товары, клиент и оплата в одном окне</p>
         </div>
         <div className="modal-body">
 
@@ -377,8 +376,8 @@ export default function QuickSale({ onClose }) {
 
           {/* Товары */}
           <div className="v2-card">
-          <div className="form-group"><label>Товар или услуга</label>
-          <input type="text" placeholder="Поиск товара..." value={search} onChange={e => setSearch(e.target.value)}
+          <div className="form-group"><label>Услуга</label>
+          <input type="text" placeholder="Поиск услуги..." value={search} onChange={e => setSearch(e.target.value)}
             style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
           
           <div style={{maxHeight:'120px',overflowY:'auto',marginBottom:'8px'}}>
@@ -448,7 +447,7 @@ export default function QuickSale({ onClose }) {
           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
             <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
               <input type="checkbox" checked={paySplit} onChange={e => { setPaySplit(e.target.checked); if (!e.target.checked) setSplitAmts({}); }} style={{opacity:0,width:0,height:0}} />
-              <span style={{position:'absolute',inset:0,background:paySplit?'#000':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+              <span style={{position:'absolute',inset:0,background:paySplit?'#1F75FF':'#ddd',borderRadius:'100px',transition:'.2s'}}>
                 <span style={{position:'absolute',top:'2px',left:paySplit?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
               </span>
             </label>
@@ -472,7 +471,7 @@ export default function QuickSale({ onClose }) {
           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'18px'}}>
             <label style={{position:'relative',display:'inline-block',width:'36px',height:'20px',cursor:'pointer'}}>
               <input type="checkbox" checked={payUnpaid} onChange={e => { setPayUnpaid(e.target.checked); if (e.target.checked) { setPaySplit(false); setSplitAmts({}); }} } style={{opacity:0,width:0,height:0}} />
-              <span style={{position:'absolute',inset:0,background:payUnpaid?'#dc2626':'#ddd',borderRadius:'100px',transition:'.2s'}}>
+              <span style={{position:'absolute',inset:0,background:payUnpaid?'#1F75FF':'#ddd',borderRadius:'100px',transition:'.2s'}}>
                 <span style={{position:'absolute',top:'2px',left:payUnpaid?'18px':'2px',width:'16px',height:'16px',borderRadius:'50%',background:'#fff',transition:'.2s'}}></span>
               </span>
             </label>
