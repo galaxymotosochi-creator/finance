@@ -52,12 +52,12 @@ const ACTION_MAP = {
     if (!clients?.length) return '✅ Нет должников';
     return '⚠️ Должники:\n' + clients.map(c => `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ${cur}`).join('\n');
   },
-  GET_STOCK: async (p, user) => {
+  GET_STOCK: async (p, user, bizType) => {
     const name = (p.product_name||'').toLowerCase().trim();
-    if (!name) return '📦 Укажите название товара';
+    if (!name) return bizType === 'services' ? '📦 Укажите название услуги' : '📦 Укажите название товара';
     const {data:prods} = await supabase.from('products').select('id,name').eq('user_id',user.id).eq('hidden',false);
     const found = (prods||[]).filter(p => p.name.toLowerCase().includes(name));
-    if (found.length === 0) return `❌ Товар «${p.product_name}» не найден`;
+    if (found.length === 0) return bizType === 'services' ? `❌ Услуга «${p.product_name}» не найдена` : `❌ Товар «${p.product_name}» не найден`;
     const [supRes, woRes] = await Promise.all([
       supabase.from('supplies').select('items').eq('user_id',user.id),
       supabase.from('writeoffs').select('items').eq('user_id',user.id),
@@ -97,7 +97,7 @@ const QUICK_BUTTONS = [
 
 export default function AiAssistant() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
   const [messages, setMessages] = useState([{ role: 'assistant', text: '👋 Привет! Я Атлас. Чем могу помочь?', data: null, greeting: true }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -215,7 +215,7 @@ export default function AiAssistant() {
       if (data.action) {
         const fn = ACTION_MAP[data.action];
         if (fn) {
-          const err = await fn(data.params, user);
+          const err = await fn(data.params, user, businessType);
           if (err) reply = err;
         }
       }

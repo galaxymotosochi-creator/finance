@@ -193,12 +193,12 @@ const ACTION_MAP = {
     clients.forEach(c => { text += `- ${c.name}: ${Math.abs(Number(c.debt)).toLocaleString()} ${cur}\n`; });
     return text;
   },
-  GET_STOCK: async (p, user) => {
+  GET_STOCK: async (p, user, bizType) => {
     const name = (p.product_name||'').toLowerCase().trim();
-    if (!name) return '📦 Укажите название товара';
+    if (!name) return bizType === 'services' ? '📦 Укажите название услуги' : '📦 Укажите название товара';
     const {data:prods} = await supabase.from('products').select('id,name').eq('user_id',user.id).eq('hidden',false);
     const found = (prods||[]).filter(p => p.name.toLowerCase().includes(name));
-    if (found.length === 0) return `❌ Товар «${p.product_name}» не найден`;
+    if (found.length === 0) return bizType === 'services' ? `❌ Услуга «${p.product_name}» не найдена` : `❌ Товар «${p.product_name}» не найден`;
     const ids = found.map(p => p.id);
     const {data:supRaw} = await supabase.from('supplies').select('items').eq('user_id',user.id);
     const {data:wo} = await supabase.from('writeoffs').select('items').eq('user_id',user.id);
@@ -459,7 +459,7 @@ const ACTION_MAP = {
 
 export default function AiChat() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'assistant', text: '👋 Привет! Чем могу помочь?\n\n💰 Финансы\n- Добавить расход / доход\n- Баланс счетов / Деньги на счетах\n- Отчет за день / неделю / месяц\n- Кто должен клиентов\n\n📦 Склад и товары\n- Создать товар / категорию\n- Остатки на складе\n\n👥 Сотрудники\n- Статистика табеля\n- Бонусы / Штрафы\n- Сколько дней отработал\n\n📊 Продажи\n- Что продается лучше всего\n- Прибыль / Средний чек\n\nПримеры:\n"добавь расход 5000 на запчасти"\n"сколько денег на счетах?"\n"кто должен?"\n"сколько дней отработала Анна"', isNotification: false },
@@ -538,7 +538,7 @@ export default function AiChat() {
       if (data.action) {
         const fn = ACTION_MAP[data.action];
         if (fn) {
-          const err = await fn(data.params, user);
+          const err = await fn(data.params, user, businessType);
           if (err) reply = err;
         }
       }
