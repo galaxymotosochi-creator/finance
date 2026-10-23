@@ -2018,7 +2018,7 @@ input:focus, select:focus, textarea:focus {
 
 /* сегмент-переключатель Услуга / Комбо */
 .v2-seg {
-  display: flex; gap: 6px; background: #f4f6f9; padding: 4px;
+  display: flex; gap: 6px; background: #fefeff; padding: 4px;
   border-radius: 100px; margin-bottom: 14px;
 }
 .v2-seg button {
