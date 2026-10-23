@@ -610,11 +610,19 @@ export default function Timesheet() {
       {/* МОДАЛКА ДНЯ */}
       <Modal open={!!showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="" width="wide" className="modal-v2 cat-modal">
 
-            {/* Полоски шагов */}
-            <div style={{display:'flex',gap:'5px',marginBottom:'14px'}}>
-              <i style={{flex:1,height:'4px',borderRadius:'99px',background: dayStep>1 ? '#9dc0ff' : (dayStep===1 ? 'linear-gradient(90deg,#0d4ea8,#1F75FF)' : '#e7eefb')}}></i>
-              <i style={{flex:1,height:'4px',borderRadius:'99px',background: dayStep>2 ? '#9dc0ff' : (dayStep===2 ? 'linear-gradient(90deg,#0d4ea8,#1F75FF)' : '#e7eefb')}}></i>
-              <i style={{flex:1,height:'4px',borderRadius:'99px',background: dayStep===3 ? 'linear-gradient(90deg,#0d4ea8,#1F75FF)' : '#e7eefb'}}></i>
+            {/* Индикатор шагов — точки, как в «Новом сотруднике» */}
+            <div style={{display:'flex',alignItems:'center',gap:'.45rem',marginBottom:'14px'}}>
+              {[1,2,3].map(function(i){
+                var act = dayStep === i;
+                return (
+                  <span key={i} onClick={function(){ setDayStep(i); }} title={'Шаг ' + i}
+                    style={{cursor:'pointer',width:'11px',height:'11px',borderRadius:'50%',
+                      background: act ? '#1d78fc' : '#bcd8fe',
+                      boxShadow: act ? '0 0 0 3px rgba(29,120,252,.18)' : 'none',
+                      transition:'all .22s', transform: act ? 'scale(1.12)' : 'scale(1)'}}>
+                  </span>
+                );
+              })}
             </div>
 
             {/* ШАГ 1 — кто работал */}
