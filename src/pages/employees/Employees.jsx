@@ -1,6 +1,6 @@
 import Modal from '../../components/Modal';
 import RowMenu from '../../components/RowMenu';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -8,6 +8,8 @@ import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 import SectionHelp from '../../components/SectionHelp';
 
+
+const SERVICE_ONLY_IDS = ['stock.products','stock.categories'];
 
 const ALL_SECTIONS = [
   { id: 'dashboard', label: 'Панель управления' },
@@ -402,6 +404,17 @@ export default function Employees() {
   const svcCats = allCats.filter(c => c.type === 'service');
   const products = allProds;
 
+  // Для бизнеса «услуги» показываем только разделы услуг, без товаров, склада и инвентаризации
+  const sectionsForBiz = useMemo(() => {
+    if (!isServices) return ALL_SECTIONS;
+    return ALL_SECTIONS.map(sec => {
+      if (!sec.children) return sec;
+      let kids = sec.children;
+      if (sec.id === 'stock') kids = kids.filter(c => SERVICE_ONLY_IDS.includes(c.id));
+      return { ...sec, children: kids };
+    }).filter(sec => !sec.children || sec.children.length > 0);
+  }, [isServices]);
+
   const renderSectionToggle = (section) => {
     const isParentOn = fPermissions.includes(section.id);
     const hasChildren = section.children && section.children.length > 0;
@@ -768,7 +781,7 @@ export default function Employees() {
               <div className="form-group">
                 <label>Доступ к разделам</label>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'.4rem .75rem',marginTop:'.55rem'}}>
-                  {ALL_SECTIONS.map(renderSectionToggle)}
+                  {sectionsForBiz.map(renderSectionToggle)}
                 </div>
               </div>
 
