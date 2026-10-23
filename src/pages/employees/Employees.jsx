@@ -586,7 +586,7 @@ export default function Employees() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Должность</label>
-                  <input type="text" value={fPositionName} onChange={e=>setFPositionName(e.target.value)} placeholder="Например: Администратор" />
+                  <input type="text" value={fPositionName} onChange={e=>setFPositionName(e.target.value)} placeholder="Администратор" />
                 </div>
                 <div className="form-group">
                   <label>Дата приема</label>
