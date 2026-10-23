@@ -2184,9 +2184,10 @@ input:focus, select:focus, textarea:focus {
 
 /* Плашка группы полей */
 .modal-box .v2-card {
-  background: #fefeff !important;
-  border: 1px solid rgba(0,16,36,.07) !important;
-  border-radius: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
 
 /* Поля во всех модалках — единая светлая рамка, чёрная при фокусе */
