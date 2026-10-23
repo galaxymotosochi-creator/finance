@@ -32,7 +32,7 @@ const menu = [
       { label: 'Зарплата', path: '/finance/salary' },
       { label: 'Чистая прибыль', path: '/finance/pnl' },
       { label: 'Категории', path: '/finance/categories' },
-      { label: 'Планирование', path: '/finance/plans' },
+      { label: 'Планирование', path: '/finance/plans', soon: true },
     ],
   },
   {

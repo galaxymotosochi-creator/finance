@@ -170,6 +170,44 @@ export default function Plans() {
 
   if (loading) return <CenterSpinner />;
 
+  // Раздел в разработке — показываем заглушку со замком на всех типах бизнеса
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1>Планирование</h1>
+          <div className="sub">Цели и бюджеты на период</div>
+        </div>
+      </div>
+
+      <div style={{
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        textAlign:'center', padding:'56px 24px', marginTop:'10px',
+        background:'#fff', border:'1px solid rgba(0,0,0,.07)', borderRadius:'18px',
+        boxShadow:'0 2px 12px rgba(11,18,32,.05)', minHeight:'340px'
+      }}>
+        <div style={{
+          width:'74px', height:'74px', borderRadius:'50%',
+          background:'rgba(31,117,255,.08)', display:'grid', placeItems:'center',
+          fontSize:'32px', marginBottom:'18px'
+        }}>🔒</div>
+        <div style={{fontSize:'1.05rem', fontWeight:800, letterSpacing:'-.01em', marginBottom:'8px'}}>
+          Скоро
+        </div>
+        <div style={{fontSize:'.82rem', color:'var(--muted)', maxWidth:'420px', lineHeight:1.6}}>
+          Раздел «Планирование» сейчас в разработке. Здесь появятся цели и бюджеты
+          на месяц, квартал, полгода и год — с автоматическим сравнением план / факт.
+        </div>
+        <div style={{
+          marginTop:'16px', fontSize:'.7rem', fontWeight:700, textTransform:'uppercase',
+          letterSpacing:'.06em', color:'#0d4ea8', background:'rgba(31,117,255,.09)',
+          borderRadius:'99px', padding:'5px 12px'
+        }}>В разработке</div>
+      </div>
+    </div>
+  );
+
+  // eslint-disable-next-line no-unreachable
   return (
     <div>
       <div className="page-header">
