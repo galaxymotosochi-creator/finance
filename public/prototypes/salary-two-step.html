@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Начислить зарплату — превью в 2 шага</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#eef2f8;font-family:Inter,system-ui,sans-serif;
+       display:flex;align-items:center;justify-content:center;padding:28px}
+  /* ---------- модалка: ширина и высота как у «Новый сотрудник» ---------- */
+  .m{width:560px;height:600px;background:#fff;border-radius:16px;overflow:hidden;
+     box-shadow:0 24px 60px -20px rgba(11,18,32,.35);display:flex;flex-direction:column}
+  .head{background:linear-gradient(135deg,#1F75FF,#0d4ea8);padding:18px 20px 16px;position:relative;flex:none}
+  .head h1{margin:0;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em}
+  .head p{margin:3px 0 0;font-size:12.5px;color:rgba(255,255,255,.82)}
+  .x{position:absolute;top:16px;right:16px;width:26px;height:26px;border:none;background:rgba(255,255,255,.16);
+     color:#fff;border-radius:50%;cursor:pointer;font-size:13px;line-height:1}
+  .body{padding:16px 20px 0;overflow-y:auto;flex:1;min-height:0}
+  .lbl{font-size:13px;font-weight:600;color:#333;margin:0 0 4px}
+  .sec{font-size:11.5px;font-weight:600;color:rgba(0,0,0,.54);text-transform:uppercase;
+       letter-spacing:.04em;margin:16px 0 8px}
+  .sec:first-child{margin-top:2px}
+  .row{display:flex;gap:10px}
+  .row>*{flex:1;min-width:0}
+  .fg{margin-bottom:12px}
+  input,.fake{width:100%;height:38px;padding:8px 10px;border:1px solid #e8e8ec;border-radius:10px;
+        font-family:inherit;font-size:14px;color:#222;background:#fff;outline:none}
+  input:focus{border-color:#111}
+  .fake{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}
+  .ph{color:rgba(0,0,0,.38);font-weight:400}
+  .tri{color:#1F75FF;font-size:15px;font-weight:800;animation:tp 1.6s ease-in-out infinite}
+  @keyframes tp{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(3px);opacity:1}}
+  /* переключатель типа */
+  .seg{display:flex;gap:4px;margin-bottom:12px}
+  .seg button{flex:1;border:1px solid #e8e8ec;background:#fff;border-radius:100px;padding:8px 6px;
+              font-family:inherit;font-size:12.5px;font-weight:600;color:#7b8494;cursor:pointer}
+  .seg button.on{background:#E6F0FF;border-color:rgba(31,117,255,.45);color:#0d4ea8}
+  /* галочки */
+  .pick{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8ec;
+        border-radius:10px;margin-bottom:8px;cursor:pointer;background:#fff}
+  .pick.on{background:#F3F8FF;border-color:rgba(31,117,255,.5)}
+  .cb{width:17px;height:17px;flex:none;border-radius:5px;border:2px solid #c3ccd8;display:grid;
+      place-items:center;font-size:11px;font-weight:700;color:#fff}
+  .pick.on .cb{background:#1F75FF;border-color:#1F75FF}
+  .pick .nm{flex:1;font-size:13px;font-weight:600;color:#222}
+  .pick .vl{font-size:13px;font-weight:700;color:#111;white-space:nowrap}
+  .pick .vl.g{color:#8b93a3;font-weight:600}
+  /* итог */
+  .total{display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+         padding:12px 14px;background:#F3F8FF;border-radius:12px}
+  .total .t{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5b6472}
+  .total .v{font-size:20px;font-weight:800;color:#0d4ea8}
+  /* подвал */
+  .foot{flex:none;display:flex;align-items:center;gap:8px;padding:14px 20px 18px;border-top:1px solid #f0f3f8}
+  .dots{display:flex;align-items:center;gap:7px;margin-right:auto}
+  .dot{width:11px;height:11px;border-radius:50%;background:#bcd8fe;cursor:pointer;transition:all .22s}
+  .dot.on{background:#1d78fc;box-shadow:0 0 0 3px rgba(29,120,252,.18);transform:scale(1.12)}
+  .ghost{background:transparent;border:none;color:rgba(0,0,0,.54);border-radius:100px;padding:9px 14px;
+         font-family:inherit;font-size:13px;font-weight:500;cursor:pointer}
+  .ghost:hover{background:#f4f6fa}
+  .prim{background:linear-gradient(135deg,#1F75FF,#0d4ea8);color:#fff;border:none;border-radius:11px;
+        padding:10px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+        box-shadow:0 10px 22px -12px rgba(29,120,252,.95)}
+  .hint{font-size:11.5px;color:#8b93a3;line-height:1.5;margin:-4px 0 10px}
+  .step2{display:none}
+  .m.s2 .step1{display:none}
+  .m.s2 .step2{display:block}
+  .pagehead{position:fixed;top:14px;left:0;right:0;text-align:center;font-size:12px;color:#7b8494}
+</style>
+</head>
+<body>
+<div class="pagehead">Превью · модалка «Начислить зарплату» в 2 шага · 560×600</div>
+
+<div class="m" id="m">
+  <div class="head">
+    <h1>Начислить зарплату</h1>
+    <p id="sub">Шаг 1 из 2 — сотрудник и период</p>
+    <button class="x" onclick="document.getElementById('m').classList.remove('s2');document.getElementById('sub').textContent='Шаг 1 из 2 — сотрудник и период';sync(1)">✕</button>
+  </div>
+
+  <div class="body">
+    <!-- ШАГ 1 -->
+    <div class="step1">
+      <div class="sec">Сотрудник и период</div>
+      <div class="fg">
+        <div class="lbl">Сотрудник</div>
+        <div class="fake"><span class="ph">— выберите —</span><span class="tri">▾</span></div>
+      </div>
+      <div class="row">
+        <div class="fg">
+          <div class="lbl">Начало периода</div>
+          <input type="date" value="2026-10-01">
+        </div>
+        <div class="fg">
+          <div class="lbl">Конец периода</div>
+          <input type="date" value="2026-10-31">
+        </div>
+      </div>
+
+      <div class="sec">Расчёт</div>
+      <div class="seg">
+        <button class="on">Оклад за месяц</button>
+        <button>За смену</button>
+        <button>За сделанное</button>
+      </div>
+      <div class="row">
+        <div class="fg">
+          <div class="lbl">Оклад (мес.)</div>
+          <input type="text" placeholder="0">
+        </div>
+        <div class="fg">
+          <div class="lbl">Отработано</div>
+          <input type="text" value="18 дн. / 31 дн." disabled style="background:#fafbfd;color:#8b93a3">
+        </div>
+      </div>
+      <div class="hint">Отработано берётся из табеля за выбранный период.</div>
+    </div>
+
+    <!-- ШАГ 2 -->
+    <div class="step2">
+      <div class="sec">Включить в начисление</div>
+      <div class="pick on">
+        <span class="cb">✓</span><span class="nm">Бонус от выручки магазина</span><span class="vl">+4 500 ₽</span>
+      </div>
+      <div class="pick on">
+        <span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl">+2 280 ₽</span>
+      </div>
+      <div class="pick">
+        <span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl">+1 100 ₽</span>
+      </div>
+      <div class="pick">
+        <span class="cb"></span><span class="nm">Премии</span><span class="vl g">нет</span>
+      </div>
+
+      <div class="sec">Корректировки</div>
+      <div class="row">
+        <div class="fg">
+          <div class="lbl">Премия, ₽</div>
+          <input type="text" placeholder="0">
+        </div>
+        <div class="fg">
+          <div class="lbl">Вычет, ₽</div>
+          <input type="text" placeholder="0">
+        </div>
+      </div>
+      <div class="fg">
+        <div class="lbl">Комментарий</div>
+        <input type="text" placeholder="Например: за переработки">
+      </div>
+
+      <div class="total"><span class="t">К начислению</span><span class="v">28 880 ₽</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="dots">
+      <span class="dot on" onclick="go(1)"></span>
+      <span class="dot" onclick="go(2)"></span>
+    </div>
+    <button class="ghost step1">Отмена</button>
+    <button class="prim step1" onclick="go(2)">Далее →</button>
+    <button class="ghost step2" onclick="go(1)">← Назад</button>
+    <button class="prim step2">Начислить 28 880 ₽</button>
+  </div>
+</div>
+
+<script>
+  function go(n){
+    var m = document.getElementById('m');
+    m.classList.toggle('s2', n === 2);
+    document.getElementById('sub').textContent = n === 1
+      ? 'Шаг 1 из 2 — сотрудник и период'
+      : 'Шаг 2 из 2 — что включить в начисление';
+    sync(n);
+  }
+  function sync(n){
+    document.querySelectorAll('#m .dot').forEach(function(d,i){ d.classList.toggle('on', i === n-1); });
+  }
+</script>
+</body>
+</html>
