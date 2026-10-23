@@ -2112,7 +2112,7 @@ input:focus, select:focus, textarea:focus {
 .tx-more:hover{background:rgba(31,117,255,.1)}
 
 /* ===== Табель: трёхшаговая модалка дня ===== */
-.ts-pcard{border:1px solid rgba(29,120,252,.16);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:#fff}
+.ts-pcard{background:#fefeff;border:1px solid rgba(0,16,36,.07);border-radius:12px;padding:10px 12px 10px;margin-bottom:10px}
 .ts-pcard-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .ts-av{width:27px;height:27px;border-radius:50%;background:rgba(31,117,255,.1);color:#0d4ea8;display:grid;place-items:center;font-size:.62rem;font-weight:800;flex:none}
 .ts-pname{font-size:.8125rem;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
