@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Табель — трёхшаговый ввод, 4 варианта</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef1f6;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px;max-width:900px;line-height:1.55}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(470px,1fr));gap:20px;max-width:1580px;margin:0 auto;align-items:start}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:16px;box-shadow:0 2px 14px rgba(11,18,32,.06)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15px;font-weight:800;margin:0 0 3px}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--muted);margin-top:13px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:9px}
+.mod{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:16px;overflow:hidden;box-shadow:0 10px 30px -18px rgba(11,18,32,.4)}
+.head{background:linear-gradient(135deg,#1F75FF,#0d4ea8);padding:13px 16px 12px;position:relative}
+.head h1{margin:0;font-size:15.5px;font-weight:800;color:#fff}
+.head p{margin:2px 0 0;font-size:10.5px;color:rgba(255,255,255,.82)}
+.head .x{position:absolute;top:9px;right:10px;color:rgba(255,255,255,.75);font-size:13px}
+.body{padding:13px 16px 15px}
+.seclab{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px;display:flex;align-items:center;gap:6px}
+.seclab .c{background:rgba(31,117,255,.1);color:var(--blue-d);border-radius:99px;padding:1px 6px;font-size:9px}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:99px;background:#eef2f9;color:#5b6472;white-space:nowrap;cursor:pointer}
+.chip.on{background:linear-gradient(135deg,#0d4ea8,#1F75FF);color:#fff}
+.av{width:26px;height:26px;border-radius:50%;background:rgba(31,117,255,.1);color:var(--blue-d);display:grid;place-items:center;font-size:10px;font-weight:800;flex:none}
+.nm{flex:1;font-weight:600;color:#33405a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
+.rowline{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f2f5fa}
+.rowline:last-child{border-bottom:none}
+.st{font-size:9.5px;font-weight:800;border-radius:6px;padding:3px 7px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit}
+.st.p{background:rgba(31,117,255,.1);color:#0d4ea8}
+.st.s{background:rgba(249,115,22,.14);color:#c2410c}
+.st.a{background:rgba(17,17,17,.08);color:#111}
+.st.v{background:rgba(59,130,246,.14);color:#1d4ed8}
+.st.z{background:rgba(139,147,163,.16);color:#5b6472}
+.st.o{background:rgba(13,148,136,.13);color:#0d9488}
+.in{font-family:inherit;font-size:11.5px;color:#111;padding:6px 8px;border:1.5px solid rgba(0,0,0,.14);border-radius:8px;background:#fff;font-variant-numeric:tabular-nums}
+.sumbox{display:flex;justify-content:space-between;align-items:baseline;background:var(--soft);border:1px solid rgba(29,120,252,.16);border-radius:11px;padding:9px 11px;margin:11px 0 9px}
+.sumbox .l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+.sumbox .v{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.acts{display:flex;gap:7px;justify-content:flex-end;align-items:center}
+.ghost{border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:#5b6472;padding:8px 12px;border-radius:99px;cursor:pointer}
+.dark{border:none;background:#111;color:#fff;font-family:inherit;font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;cursor:pointer}
+.stepsA{display:flex;gap:5px;margin-bottom:13px}
+.stepsA i{flex:1;height:4px;border-radius:99px;background:#e7eefb}
+.stepsA i.on{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+.stepsA i.done{background:#9dc0ff}
+/* таблица под календарём */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:11px}
+.tbl th{font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:800;text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+.tbl td{padding:6px 4px;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .rt{text-align:right}
+.tbl tfoot td{font-weight:800;border-top:1px solid rgba(29,120,252,.18);padding-top:8px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;font-size:9.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{width:7px;height:7px;border-radius:2px;display:inline-block}
+</style></head><body>
+<h1>Табель: 3 шага → таблица под календарём</h1>
+<div class="sub">Шаг 1 — кто работал / не вышел / больничный / отпуск за свой счёт / отпуск оплачиваемый. Шаг 2 — ставка за день и часы. Шаг 3 — премии и штрафы. Всё падает в таблицу под календарём.</div>
+<div class="wrap">
+
+<!-- ВАРИАНТ 1 -->
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>Мастер с шагами и общей таблицей</h2>
+  <div class="hint">Три шага внутри модалки, прогресс сверху. После сохранения — таблица под календарём со всеми колонками.</div>
+  <div class="mod">
+    <div class="head"><h1>24 октября 2026 · шаг 2 из 3</h1><p>Ставка и часы за день</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="stepsA"><i class="done"></i><i class="on"></i><i></i></div>
+      <div class="seclab">Явка отмечена <span class="c">2 работали · 1 больничный</span></div>
+      <div class="rowline"><span class="av">Р</span><span class="nm">Руководитель</span><span class="st p">работал</span><input class="in" style="width:74px;text-align:right" value="3 000"><input class="in" style="width:44px;text-align:center" value="8"></div>
+      <div class="rowline"><span class="av">ЕМ</span><span class="nm">Елена мастер</span><span class="st p">работал</span><input class="in" style="width:74px;text-align:right" value="2 500"><input class="in" style="width:44px;text-align:center" value="8"></div>
+      <div class="rowline"><span class="av">ПА</span><span class="nm">Петров А.</span><span class="st s">больничный</span><input class="in" style="width:74px;text-align:right" value="0" disabled><input class="in" style="width:44px;text-align:center" value="—" disabled></div>
+      <div class="sumbox"><span class="l">За день</span><span class="v num">5 500 ₽</span></div>
+      <div class="acts"><button class="ghost">← Назад</button><button class="dark">Дальше: премии →</button></div>
+    </div>
+  </div>
+  <div style="margin-top:14px">
+    <div class="seclab" style="margin-bottom:6px">Таблица под календарём</div>
+    <table class="tbl">
+      <thead><tr><th>Сотрудник</th><th>Статус</th><th class="rt">Ставка</th><th class="rt">Часы</th><th class="rt">Премия</th><th class="rt">Штраф</th><th class="rt">Итого</th></tr></thead>
+      <tbody>
+        <tr><td>Руководитель</td><td><span class="st p">работал</span></td><td class="rt">3 000</td><td class="rt">8</td><td class="rt">—</td><td class="rt">—</td><td class="rt"><b>3 000 ₽</b></td></tr>
+        <tr><td>Елена мастер</td><td><span class="st p">работал</span></td><td class="rt">2 500</td><td class="rt">8</td><td class="rt">500</td><td class="rt">—</td><td class="rt"><b>3 000 ₽</b></td></tr>
+        <tr><td>Петров А.</td><td><span class="st s">больничный</span></td><td class="rt">—</td><td class="rt">—</td><td class="rt">—</td><td class="rt">—</td><td class="rt"><b>0 ₽</b></td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="6">Итого за день</td><td class="rt">6 000 ₽</td></tr></tfoot>
+    </table>
+  </div>
+  <div class="note">Классика: пошаговый ввод, под календарём полная таблица со статусом, ставкой, часами, премией, штрафом и итогом.</div>
+</div>
+
+<!-- ВАРИАНТ 2 -->
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Один экран, три блока</h2>
+  <div class="hint">Без переходов: явка, ставка и премии на одном экране тремя блоками. Быстрее всего для опытного пользователя.</div>
+  <div class="mod">
+    <div class="head"><h1>24 октября 2026</h1><p>Явка · ставка · премии — всё на одном экране</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="seclab">1 · Явка</div>
+      <div class="rowline"><span class="av">Р</span><span class="nm">Руководитель</span><span class="st p">работал</span><span class="st z">не вышел</span></div>
+      <div class="rowline"><span class="av">ЕМ</span><span class="nm">Елена мастер</span><span class="st p">работал</span><span class="st z">не вышел</span></div>
+      <div class="rowline"><span class="av">ПА</span><span class="nm">Петров А.</span><span class="st s">больничный</span><span class="st v">отпуск опл.</span></div>
+      <div class="seclab" style="margin-top:12px">2 · Ставка и часы</div>
+      <div class="rowline"><span class="nm">Руководитель</span><input class="in" style="width:74px;text-align:right" value="3 000"><input class="in" style="width:44px;text-align:center" value="8"><span style="font-size:10.5px;color:#8b93a3">= 3 000 ₽</span></div>
+      <div class="rowline"><span class="nm">Елена мастер</span><input class="in" style="width:74px;text-align:right" value="2 500"><input class="in" style="width:44px;text-align:center" value="8"><span style="font-size:10.5px;color:#8b93a3">= 2 500 ₽</span></div>
+      <div class="seclab" style="margin-top:12px">3 · Премии и штрафы</div>
+      <div class="rowline"><span class="nm">Елена мастер</span><span class="st o">премия</span><input class="in" style="width:66px;text-align:right" value="500"><span style="font-size:10.5px;color:#33405a;flex:1">за качество</span></div>
+      <div class="rowline"><span class="nm">Руководитель</span><span class="st a">штраф</span><input class="in" style="width:66px;text-align:right" value="200"><span style="font-size:10.5px;color:#33405a;flex:1">опоздание</span></div>
+      <div class="sumbox"><span class="l">Итого за день</span><span class="v num">5 800 ₽</span></div>
+      <div class="acts"><button class="ghost">Отмена</button><button class="dark">Сохранить</button></div>
+    </div>
+  </div>
+  <div class="note">Самый быстрый: ничего не прячется за шагами. Минус — экран длиннее, нужна прокрутка при большом штате.</div>
+</div>
+
+<!-- ВАРИАНТ 3 -->
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>Пошагово, но в таблице</h2>
+  <div class="hint">Каждый шаг = одна колонка таблицы. Идёте по колонкам слева направо — как заполняете бумажный табель.</div>
+  <div class="mod">
+    <div class="head"><h1>24 октября 2026</h1><p>Заполняйте по колонкам</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="stepsA"><i class="done"></i><i class="on"></i><i></i></div>
+      <table class="tbl">
+        <thead><tr><th>Сотрудник</th><th>Статус</th><th class="rt">Ставка</th><th class="rt">Часы</th><th class="rt">Бонус</th></tr></thead>
+        <tbody>
+          <tr><td>Руководитель</td><td><span class="st p">работал</span></td><td class="rt"><input class="in" style="width:66px;text-align:right" value="3 000"></td><td class="rt"><input class="in" style="width:40px;text-align:center" value="8"></td><td class="rt"><input class="in" style="width:56px;text-align:right" placeholder="—"></td></tr>
+          <tr><td>Елена мастер</td><td><span class="st p">работал</span></td><td class="rt"><input class="in" style="width:66px;text-align:right" value="2 500"></td><td class="rt"><input class="in" style="width:40px;text-align:center" value="8"></td><td class="rt"><input class="in" style="width:56px;text-align:right" value="500"></td></tr>
+          <tr><td>Петров А.</td><td><span class="st s">больничный</span></td><td class="rt">—</td><td class="rt">—</td><td class="rt"><input class="in" style="width:56px;text-align:right" placeholder="—"></td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="4">Итого за день</td><td class="rt">6 000 ₽</td></tr></tfoot>
+      </table>
+      <div class="legend"><span><i style="background:#1F75FF"></i>работал</span><span><i style="background:#f97316"></i>больничный</span><span><i style="background:#111"></i>прогул</span><span><i style="background:#3b82f6"></i>отпуск опл.</span><span><i style="background:#8b93a3"></i>за свой счёт</span></div>
+      <div class="acts" style="margin-top:11px"><button class="ghost">← Назад</button><button class="dark">Дальше →</button></div>
+    </div>
+  </div>
+  <div class="note">Та же таблица, что и под календарём, только редактируемая. Меньше кликов — всё в одной сетке.</div>
+</div>
+
+<!-- ВАРИАНТ 4 -->
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Карточка сотрудника за день</h2>
+  <div class="hint">Шаг 1 — список сотрудников, отмечаете статус. Нажали на сотрудника — его карточка с шагами 2 и 3.</div>
+  <div class="mod">
+    <div class="head"><h1>24 октября 2026</h1><p>Елена мастер · ставка и начисления</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="stepsA"><i class="done"></i><i class="done"></i><i class="on"></i></div>
+      <div class="seclab">Статус <span class="c">работал</span></div>
+      <div class="rowline"><span class="nm">Ставка за день</span><input class="in" style="width:84px;text-align:right" value="2 500"></div>
+      <div class="rowline"><span class="nm">Отработано часов</span><input class="in" style="width:64px;text-align:center" value="8"></div>
+      <div class="seclab" style="margin-top:12px">Начисления</div>
+      <div class="rowline"><span class="nm">Премия</span><input class="in" style="width:84px;text-align:right" value="500"><input class="in" style="flex:1" value="за качество"></div>
+      <div class="rowline"><span class="nm">Штраф</span><input class="in" style="width:84px;text-align:right" placeholder="—"><input class="in" style="flex:1" placeholder="причина"></div>
+      <div class="sumbox"><span class="l">Елена мастер за день</span><span class="v num">3 000 ₽</span></div>
+      <div class="acts"><button class="ghost">← К списку</button><button class="dark">Готово</button></div>
+    </div>
+  </div>
+  <div class="note">Удобно, когда сотрудник один-два: не нужно листать общий список, всё про человека в одном месте.</div>
+</div>
+
+</div>
+</body></html>

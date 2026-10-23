@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Модалка «Зарплата» — 5 вариантов</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 80px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef1f6;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px;max-width:760px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:20px;max-width:1520px;margin:0 auto;align-items:start}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:16px;box-shadow:0 2px 14px rgba(11,18,32,.06)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15px;font-weight:800;margin:0 0 3px}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--muted);margin-top:13px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:9px}
+
+/* ====== базовая модалка в стиле сайта ====== */
+.mod{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px -16px rgba(11,18,32,.4);border:1px solid rgba(0,0,0,.06)}
+.head{background:linear-gradient(135deg,#1F75FF,#0d4ea8);padding:15px 18px 13px;position:relative}
+.head h1{margin:0;font-size:17px;font-weight:800;color:#fff}
+.head p{margin:2px 0 0;font-size:11.5px;color:rgba(255,255,255,.82)}
+.head .x{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.8);font-size:14px}
+.body{padding:14px 18px 16px}
+.seclab{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px}
+.grp{margin-bottom:13px}
+.row2{display:flex;gap:8px}
+.fld{flex:1;min-width:0}
+.cap{display:block;font-size:11px;color:#5b6472;font-weight:600;margin-bottom:4px}
+.in{width:100%;font-family:inherit;font-size:13px;color:#111;padding:8px 10px;border:1.5px solid rgba(0,0,0,.14);border-radius:10px;background:#fff;font-variant-numeric:tabular-nums}
+.in:disabled{background:#f7f9fc;color:#5b6472}
+.pick{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;margin-bottom:7px;font-size:12px;background:#fff}
+.pick.on{border-color:rgba(31,117,255,.55);background:rgba(31,117,255,.05)}
+.cb{width:16px;height:16px;border-radius:5px;border:2px solid #c3ccd8;flex:none;display:grid;place-items:center;font-size:10px;color:#fff}
+.pick.on .cb{background:var(--blue);border-color:var(--blue)}
+.pick .nm{flex:1;font-weight:600;color:#33405a}
+.pick .vl{font-weight:800;font-variant-numeric:tabular-nums}
+.total{display:flex;justify-content:space-between;align-items:baseline;background:#F6F9FF;border:1px solid rgba(29,120,252,.16);border-radius:12px;padding:10px 12px;margin:14px 0 10px}
+.total .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+.total .v{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.acts{display:flex;gap:8px;justify-content:flex-end}
+.ghost{border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:#5b6472;padding:9px 14px;border-radius:99px;cursor:pointer}
+.dark{border:none;background:#111;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:99px;cursor:pointer}
+
+/* вариант 2 — группы с фоном */
+.v2g{background:#fcfcfe;border:1px solid rgba(0,16,36,.09);border-radius:12px;padding:10px 12px 3px;margin-bottom:10px}
+/* вариант 3 — секции с иконками и разделителями */
+.v3sec{border-top:1px solid rgba(29,120,252,.12);padding-top:11px;margin-top:11px}
+.v3sec:first-child{border-top:none;padding-top:0;margin-top:0}
+.v3h{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:#111;margin-bottom:8px}
+.v3h .ic{width:22px;height:22px;border-radius:7px;background:rgba(31,117,255,.08);display:grid;place-items:center;font-size:11px}
+/* вариант 4 — двухколоночная */
+.v4cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.v4box{border:1px solid rgba(29,120,252,.14);border-radius:12px;padding:11px}
+.v4box .h{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--blue-d);font-weight:800;margin-bottom:8px}
+/* вариант 5 — шаги */
+.v5steps{display:flex;gap:6px;margin-bottom:12px}
+.v5st{flex:1;height:4px;border-radius:99px;background:#e7eefb}
+.v5st.on{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+.v5chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.v5chip{font-size:11px;font-weight:700;padding:6px 11px;border-radius:99px;background:#eef2f9;color:#5b6472}
+.v5chip.on{background:linear-gradient(135deg,#0d4ea8,#1F75FF);color:#fff}
+.v5sum{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.6),#fff 40%);padding-top:8px}
+@media(max-width:640px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Модалка «Начислить зарплату» — 5 вариантов</h1>
+<div class="sub">Шапка синяя как везде, поля и данные те же: сотрудник, период, тип расчёта, оклад, отработано, три галочки начислений, итог и кнопки. Разница — в подаче.</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>Как сейчас (эталон)</h2>
+  <div class="hint">Одна колонка, подписи-разделители, галочки списком. Всё на белом.</div>
+  <div class="mod">
+    <div class="head"><h1>Начислить зарплату</h1><p>Выберите сотрудника и период</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="grp">
+        <div class="seclab">Сотрудник и период</div>
+        <div style="margin-bottom:8px"><input class="in" value="Иванова Мария"></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Начало периода</span><input class="in" value="01.10.2026"></div>
+          <div class="fld"><span class="cap">Конец периода</span><input class="in" value="31.10.2026"></div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="seclab">Расчёт</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px"><span class="v5chip on">Оклад</span><span class="v5chip">За смену</span><span class="v5chip">Сдельно</span></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Оклад (мес.)</span><input class="in num" value="60 000"></div>
+          <div class="fld"><span class="cap">Отработано</span><input class="in" value="22 дн. / 22 дн." disabled></div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="seclab">Включить в начисление</div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Бонус от выручки магазина</span><span class="vl num">+3 200 ₽</span></div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl num">+1 450 ₽</span></div>
+        <div class="pick"><span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl num">+0 ₽</span></div>
+      </div>
+      <div class="total"><span class="l">К начислению</span><span class="v num">64 650 ₽</span></div>
+      <div class="acts"><button class="ghost">Отмена</button><button class="dark">Начислить 64 650 ₽</button></div>
+    </div>
+  </div>
+  <div class="note">Текущий вид. Спокойно и понятно, но длинно: три блока подряд без визуального деления.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Группы на бледной плашке</h2>
+  <div class="hint">Те же поля, но каждая группа — в своей бледно-серой карточке, как в остальных модалках сайта.</div>
+  <div class="mod">
+    <div class="head"><h1>Начислить зарплату</h1><p>Выберите сотрудника и период</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="v2g">
+        <div class="seclab">Сотрудник и период</div>
+        <div style="margin-bottom:9px"><input class="in" value="Иванова Мария"></div>
+        <div class="row2" style="padding-bottom:8px">
+          <div class="fld"><span class="cap">Начало периода</span><input class="in" value="01.10.2026"></div>
+          <div class="fld"><span class="cap">Конец периода</span><input class="in" value="31.10.2026"></div>
+        </div>
+      </div>
+      <div class="v2g">
+        <div class="seclab">Расчёт</div>
+        <div style="display:flex;gap:6px;margin-bottom:9px"><span class="v5chip on">Оклад</span><span class="v5chip">За смену</span><span class="v5chip">Сдельно</span></div>
+        <div class="row2" style="padding-bottom:8px">
+          <div class="fld"><span class="cap">Оклад (мес.)</span><input class="in num" value="60 000"></div>
+          <div class="fld"><span class="cap">Отработано</span><input class="in" value="22 дн. / 22 дн." disabled></div>
+        </div>
+      </div>
+      <div class="v2g">
+        <div class="seclab">Включить в начисление</div>
+        <div style="padding-bottom:8px">
+          <div class="pick on"><span class="cb">✓</span><span class="nm">Бонус от выручки магазина</span><span class="vl num">+3 200 ₽</span></div>
+          <div class="pick on"><span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl num">+1 450 ₽</span></div>
+          <div class="pick" style="margin-bottom:0"><span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl num">+0 ₽</span></div>
+        </div>
+      </div>
+      <div class="total"><span class="l">К начислению</span><span class="v num">64 650 ₽</span></div>
+      <div class="acts"><button class="ghost">Отмена</button><button class="dark">Начислить 64 650 ₽</button></div>
+    </div>
+  </div>
+  <div class="note">Единый язык с остальными модалками сайта. Группы видно, но фон очень лёгкий.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>Секции с иконками</h2>
+  <div class="hint">Группы разделены тонкими линиями и подписаны иконками — без серых плашек, воздушно.</div>
+  <div class="mod">
+    <div class="head"><h1>Начислить зарплату</h1><p>Выберите сотрудника и период</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="v3sec">
+        <div class="v3h"><span class="ic">👤</span>Сотрудник и период</div>
+        <div style="margin-bottom:8px"><input class="in" value="Иванова Мария"></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Начало периода</span><input class="in" value="01.10.2026"></div>
+          <div class="fld"><span class="cap">Конец периода</span><input class="in" value="31.10.2026"></div>
+        </div>
+      </div>
+      <div class="v3sec">
+        <div class="v3h"><span class="ic">🧮</span>Расчёт</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px"><span class="v5chip on">Оклад</span><span class="v5chip">За смену</span><span class="v5chip">Сдельно</span></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Оклад (мес.)</span><input class="in num" value="60 000"></div>
+          <div class="fld"><span class="cap">Отработано</span><input class="in" value="22 дн. / 22 дн." disabled></div>
+        </div>
+      </div>
+      <div class="v3sec">
+        <div class="v3h"><span class="ic">➕</span>Включить в начисление</div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Бонус от выручки магазина</span><span class="vl num">+3 200 ₽</span></div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl num">+1 450 ₽</span></div>
+        <div class="pick" style="margin-bottom:0"><span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl num">+0 ₽</span></div>
+      </div>
+      <div class="total"><span class="l">К начислению</span><span class="v num">64 650 ₽</span></div>
+      <div class="acts"><button class="ghost">Отмена</button><button class="dark">Начислить 64 650 ₽</button></div>
+    </div>
+  </div>
+  <div class="note">Самый «лёгкий» вид: никаких плашек, только линии и иконки. Хорошо читается на телефоне.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Две колонки</h2>
+  <div class="hint">Слева — кто и за какой период, справа — расчёт и начисления. Итог на всю ширину.</div>
+  <div class="mod">
+    <div class="head"><h1>Начислить зарплату</h1><p>Выберите сотрудника и период</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="v4cols" style="margin-bottom:11px">
+        <div class="v4box">
+          <div class="h">Сотрудник</div>
+          <input class="in" value="Иванова Мария" style="margin-bottom:8px">
+          <span class="cap">Начало периода</span><input class="in" value="01.10.2026" style="margin-bottom:8px">
+          <span class="cap">Конец периода</span><input class="in" value="31.10.2026">
+        </div>
+        <div class="v4box">
+          <div class="h">Расчёт</div>
+          <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap"><span class="v5chip on">Оклад</span><span class="v5chip">Смена</span><span class="v5chip">Сделка</span></div>
+          <span class="cap">Оклад (мес.)</span><input class="in num" value="60 000" style="margin-bottom:8px">
+          <span class="cap">Отработано</span><input class="in" value="22 / 22 дн." disabled>
+        </div>
+      </div>
+      <div class="seclab">Включить в начисление</div>
+      <div class="pick on"><span class="cb">✓</span><span class="nm">Бонус от выручки</span><span class="vl num">+3 200 ₽</span></div>
+      <div class="pick on"><span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl num">+1 450 ₽</span></div>
+      <div class="pick"><span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl num">+0 ₽</span></div>
+      <div class="total"><span class="l">К начислению</span><span class="v num">64 650 ₽</span></div>
+      <div class="acts"><button class="ghost">Отмена</button><button class="dark">Начислить 64 650 ₽</button></div>
+    </div>
+  </div>
+  <div class="note">Экономит высоту почти вдвое — на планшете влезает без прокрутки. На телефоне колонки схлопнутся в одну.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 5</div>
+  <h2>Шаги + липкий итог</h2>
+  <div class="hint">Сверху индикатор заполнения шагов, итог прилипает к низу и всегда виден при прокрутке.</div>
+  <div class="mod">
+    <div class="head"><h1>Начислить зарплату</h1><p>Выберите сотрудника и период</p><span class="x">✕</span></div>
+    <div class="body">
+      <div class="v5steps"><i class="v5st on"></i><i class="v5st on"></i><i class="v5st"></i></div>
+      <div class="grp">
+        <div class="seclab">1 · Сотрудник и период</div>
+        <div style="margin-bottom:8px"><input class="in" value="Иванова Мария"></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Начало периода</span><input class="in" value="01.10.2026"></div>
+          <div class="fld"><span class="cap">Конец периода</span><input class="in" value="31.10.2026"></div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="seclab">2 · Расчёт</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px"><span class="v5chip on">Оклад</span><span class="v5chip">За смену</span><span class="v5chip">Сдельно</span></div>
+        <div class="row2">
+          <div class="fld"><span class="cap">Оклад (мес.)</span><input class="in num" value="60 000"></div>
+          <div class="fld"><span class="cap">Отработано</span><input class="in" value="22 дн. / 22 дн." disabled></div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="seclab">3 · Что включить</div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Бонус от выручки магазина</span><span class="vl num">+3 200 ₽</span></div>
+        <div class="pick on"><span class="cb">✓</span><span class="nm">Продажи сотрудника</span><span class="vl num">+1 450 ₽</span></div>
+        <div class="pick" style="margin-bottom:0"><span class="cb"></span><span class="nm">Вознаграждение исполнителю</span><span class="vl num">+0 ₽</span></div>
+      </div>
+      <div class="v5sum">
+        <div class="total" style="margin-bottom:9px"><span class="l">К начислению</span><span class="v num">64 650 ₽</span></div>
+        <div class="acts"><button class="ghost">Отмена</button><button class="dark">Начислить 64 650 ₽</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Итог всегда перед глазами — не нужно мотать вниз, чтобы увидеть сумму. Шаги подсказывают порядок.</div>
+</div>
+
+</div></body></html>
