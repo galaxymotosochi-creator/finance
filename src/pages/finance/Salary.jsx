@@ -960,13 +960,13 @@ export default function Salary() {
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
           <p className="modal-sub">Выберите сотрудника и период</p>
         </div>
-        <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
+        <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'0'}}>
 
               {/* ═══ ШАГ 1 ═══ */}
               {salStep === 1 && (<>
               {/* Сотрудник + период */}
               
-              <div className="form-group" style={{marginBottom:'.75rem'}}>
+              <div className="form-group">
                 <label>Сотрудник</label>
                 <SmartSelect
                   value={fEmpId}
