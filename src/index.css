@@ -1692,6 +1692,11 @@ input:focus, select:focus, textarea:focus {
 .tx-mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
 .tx-mirror .half.r .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
 .tx-mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
+/* Мобильная версия: текст не прячется в узкой плашке */
+@media(max-width:640px){
+  .tx-mirror .b .pc,.tx-mirror .b .sm{flex:none}
+  .tx-mirror .b .sep{flex:none}
+}
 .tx-m5{display:flex;gap:0;align-items:stretch;width:100%;margin:18px 0 0}
 .tx-m5 .side{flex:1;min-width:0;padding:0}
 .tx-m5 .divider{width:1px;background:rgba(29,120,252,.14);flex:none;margin:4px 14px}
