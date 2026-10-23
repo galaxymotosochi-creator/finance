@@ -2098,3 +2098,7 @@ input:focus, select:focus, textarea:focus {
   .pnl2-big,.pnl2-big small{font-size:26px}
   .pnl2-strip{height:40px}
 }
+
+/* Доходы и расходы: «Ещё N категорий» */
+.tx-more{display:flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;color:#0d4ea8;background:rgba(31,117,255,.05);border:1px dashed rgba(31,117,255,.3);border-radius:8px;padding:5px;margin:7px 0 2px;cursor:pointer;user-select:none;transition:background .16s}
+.tx-more:hover{background:rgba(31,117,255,.1)}

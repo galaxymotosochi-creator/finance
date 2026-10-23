@@ -83,6 +83,8 @@ export default function Transactions() {
   const [periodFrom, setPeriodFrom] = useState('');
   const [periodTo, setPeriodTo] = useState('');
   const [toast, setToast] = useState(null);
+  const [incMore, setIncMore] = useState(false);
+  const [expMore, setExpMore] = useState(false);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
   const [showPeriod, setShowPeriod] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
@@ -656,13 +658,18 @@ export default function Transactions() {
           <div className="tx-m5">
             <div className="side l">
               <div className="hd"><span className="dot" style={{background:'#1F75FF'}}></span><span>Доходы</span><span className="amt">{incomeTotal.toLocaleString()} {cur}</span></div>
-              {incomeCatsList.map((c, i) => (
+              {(incMore ? incomeCatsList : incomeCatsList.slice(0, 5)).map((c, i) => (
                 <div className="cat" key={i}>
                   <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
                   <div className="tr"><i className="inc" style={{width:(incomeTotal ? c.amount/incomeTotal*100 : 0)+'%'}}></i></div>
                   <div className="pc">{incomeTotal ? Math.round(c.amount/incomeTotal*100) : 0}% от доходов</div>
                 </div>
               ))}
+              {incomeCatsList.length > 5 && (
+                <div className="tx-more" onClick={() => setIncMore(v => !v)}>
+                  {incMore ? '▴ Свернуть' : `▾ Ещё ${incomeCatsList.length - 5} ${incomeCatsList.length - 5 === 1 ? 'категория' : (incomeCatsList.length - 5 < 5 ? 'категории' : 'категорий')}`}
+                </div>
+              )}
               {incomeCatsList.length === 0 && <div className="pc">Доходов за период нет</div>}
               <div className="tot"><span>Итого доходы</span><span>{incomeTotal.toLocaleString()} {cur}</span></div>
             </div>
@@ -671,13 +678,18 @@ export default function Transactions() {
 
             <div className="side r">
               <div className="hd"><span className="dot" style={{background:'#3c4553'}}></span><span>Расходы</span><span className="amt">{expenseTotal.toLocaleString()} {cur}</span></div>
-              {expenseCatsList.map((c, i) => (
+              {(expMore ? expenseCatsList : expenseCatsList.slice(0, 5)).map((c, i) => (
                 <div className="cat" key={i}>
                   <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
                   <div className="tr"><i className="exp" style={{width:(expenseTotal ? c.amount/expenseTotal*100 : 0)+'%'}}></i></div>
                   <div className="pc">{expenseTotal ? Math.round(c.amount/expenseTotal*100) : 0}% от расходов</div>
                 </div>
               ))}
+              {expenseCatsList.length > 5 && (
+                <div className="tx-more" onClick={() => setExpMore(v => !v)}>
+                  {expMore ? '▴ Свернуть' : `▾ Ещё ${expenseCatsList.length - 5} ${expenseCatsList.length - 5 === 1 ? 'категория' : (expenseCatsList.length - 5 < 5 ? 'категории' : 'категорий')}`}
+                </div>
+              )}
               {expenseCatsList.length === 0 && <div className="pc">Расходов за период нет</div>}
               <div className="tot"><span>Итого расходы</span><span>{expenseTotal.toLocaleString()} {cur}</span></div>
             </div>
