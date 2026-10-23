@@ -353,13 +353,11 @@ export default function QuickSale({ onClose }) {
           {/* Клиент */}
           <div className="v2-card">
           <div className="form-group"><label>Клиент</label>
-          <div style={{display:'flex',gap:'6px'}}>
-            <div style={{position:'relative',flex:1}}>
+            <div style={{position:'relative',display:'block',width:'100%'}}>
               <input type="text" placeholder="Поиск по имени или телефону..." value={selectedClient ? (clients.find(c => c.id === selectedClient)?.name || clientSearch) : clientSearch}
                 onChange={e => { setClientSearch(e.target.value); setSelectedClient(''); setLoyaltyPct(0); setClientDrop(true); }}
                 onFocus={() => setClientDrop(true)}
-                onBlur={() => setTimeout(() => setClientDrop(false), 200)}
-                style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
+                onBlur={() => setTimeout(() => setClientDrop(false), 200)} />
               {clientDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#fff',border:'1px solid #eee',borderRadius:'8px',boxShadow:'0 4px 12px rgba(0,0,0,.1)',zIndex:10,maxHeight:'150px',overflowY:'auto',marginTop:'2px'}}>
                   {(clientSearch ? clients.filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.phone?.includes(clientSearch)) : clients).map(c => (
@@ -374,11 +372,10 @@ export default function QuickSale({ onClose }) {
           </div>
           </div>
 
-          {/* Товары */}
+          {/* Услуги */}
           <div className="v2-card">
           <div className="form-group"><label>Услуга</label>
-          <input type="text" placeholder="Поиск услуги..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{width:'100%',padding:'.5rem .65rem',fontSize:'.82rem',border:'1.5px solid var(--border)',borderRadius:'var(--radius-md)',outline:'none',fontFamily:'var(--font)',boxSizing:'border-box'}} />
+          <input type="text" placeholder="Поиск услуги..." value={search} onChange={e => setSearch(e.target.value)} />
           
           <div style={{maxHeight:'120px',overflowY:'auto',marginBottom:'8px'}}>
             {(search.trim() ? products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : []).map(p => (
@@ -476,7 +473,6 @@ export default function QuickSale({ onClose }) {
               </span>
             </label>
             <span style={{fontSize:'13px',fontWeight:500,color:'#111'}}>Не оплачивать сейчас (долг)</span>
-          </div>
           </div>
 
         <div style={{padding:'0 20px 18px'}}>
