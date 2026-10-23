@@ -161,13 +161,13 @@ export default function Shifts() {
           <table className="sk-table sk-shifts">
             <thead>
               <tr>
-                <th>Дата</th>
+                <th style={{whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
                 <th>Кассир</th>
                 <th>Смена №</th>
                 <th>Начальный остаток</th>
                 <th>Выручка</th>
                 <th>Конечный остаток</th>
-                <th>Время</th>
+                <th style={{whiteSpace:'nowrap',width:'64px',minWidth:'64px'}}>Время</th>
                 <th>Статус</th>
               </tr>
             </thead>

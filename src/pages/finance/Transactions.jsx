@@ -707,8 +707,8 @@ export default function Transactions() {
           <table className="sk-table sk-tx-table">
             <thead id="colHeaders">
               <tr>
-                <th style={{textAlign:'left'}}>Дата</th>
-                <th style={{textAlign:'left'}}>Время</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap',width:'64px',minWidth:'64px'}}>Время</th>
                 <th style={{textAlign:'left'}}>Название</th>
                 <th style={{textAlign:'left'}}>Сумма</th>
                 <th style={{textAlign:'left'}}>Комментарий</th>

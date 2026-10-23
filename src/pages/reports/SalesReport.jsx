@@ -287,7 +287,7 @@ function FragmentRow({ e, cur, fmtD, expanded, onToggle }) {
               <table className="data-table">
                 <thead id="colHeaders">
                   <tr>
-                    <th style={{ textAlign: 'left', paddingLeft: 0 }}>Дата</th>
+                    <th style={{ textAlign: 'left', paddingLeft: 0, whiteSpace:'nowrap', width:'92px', minWidth:'92px' }}>Дата</th>
                     <th style={{ textAlign: 'left' }}>Позиция</th>
                     <th style={{ textAlign: 'left' }}>Тип</th>
                     <th style={{ textAlign: 'left' }}>Сумма</th>

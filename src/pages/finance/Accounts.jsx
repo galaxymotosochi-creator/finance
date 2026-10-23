@@ -789,7 +789,7 @@ export default function Accounts() {
               <table className="data-table">
                 <thead id="colHeaders">
                   <tr>
-                    <th style={{textAlign:'left',paddingLeft:0,minWidth:'90px'}}>Дата</th>
+                    <th style={{textAlign:'left',paddingLeft:0,whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
                     <th style={{textAlign:'left'}}>Описание</th>
                     <th style={{width:'90px',textAlign:'right'}}>Сумма</th>
                   </tr>

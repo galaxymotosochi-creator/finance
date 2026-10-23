@@ -523,8 +523,8 @@ const load = async () => {
           <thead id="supplyColHeaders">
             <tr>
               <th style={{textAlign:'left'}}>№</th>
-              <th style={{textAlign:'left'}}>Дата</th>
-              <th style={{textAlign:'left'}}>Время</th>
+              <th style={{textAlign:'left',whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
+              <th style={{textAlign:'left',whiteSpace:'nowrap',width:'64px',minWidth:'64px'}}>Время</th>
               <th style={{textAlign:'left'}}>Поставщик</th>
               <th style={{textAlign:'left'}}>Товары</th>
               <th style={{textAlign:'left'}}>Поставка</th>

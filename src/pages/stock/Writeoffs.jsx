@@ -299,7 +299,7 @@ export default function Writeoffs() {
               <th style={{textAlign:'left'}}>Кол-во</th>
               <th style={{textAlign:'left'}}>Сумма</th>
               <th style={{textAlign:'left'}}>Причина</th>
-              <th style={{textAlign:'left'}}>Дата</th>
+              <th style={{textAlign:'left',whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
               <th style={{width:'130px',textAlign:'left'}}></th>
             </tr>
           </thead>
