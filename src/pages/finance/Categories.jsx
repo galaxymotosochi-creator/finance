@@ -180,7 +180,7 @@ export default function Categories() {
           <span className="cat-sub">Структура доходов и расходов бизнеса</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
-          <button type="button" className="cat-add-btn" onClick={function () { openModal(null); }}>Добавить</button>
+          <button type="button" className="cat-add-btn" style={{marginLeft:'auto'}} onClick={function () { openModal(null); }}>Добавить</button>
         </div>
       </div>
 

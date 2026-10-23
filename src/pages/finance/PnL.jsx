@@ -298,7 +298,7 @@ export default function PnL() {
           <span className="cat-sub">Доходы минус расходы за период</span>
           </div>
         </div>
-        <div className={'sk-period-wrap' + (periodOpen ? ' open' : '')} style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
+        <div className={'sk-period-wrap' + (periodOpen ? ' open' : '')} style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0,marginLeft:'auto'}}>
           <button type="button"
             style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
             onClick={e => { e.stopPropagation(); setPeriodOpen(o => !o); }}>

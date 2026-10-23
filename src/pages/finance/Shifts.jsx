@@ -150,6 +150,7 @@ export default function Shifts() {
           </div>
           <span className="cat-sub">Контроль работы касс и выручки</span>
         </div>
+        <div className="sk-bar-acts" style={{marginLeft:'auto'}}></div>
       </div>
 
       {!loading && (
