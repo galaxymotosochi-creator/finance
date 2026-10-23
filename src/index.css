@@ -2110,3 +2110,32 @@ input:focus, select:focus, textarea:focus {
 /* Доходы и расходы: «Ещё N категорий» */
 .tx-more{display:flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;color:#0d4ea8;background:rgba(31,117,255,.05);border:1px dashed rgba(31,117,255,.3);border-radius:8px;padding:5px;margin:7px 0 2px;cursor:pointer;user-select:none;transition:background .16s}
 .tx-more:hover{background:rgba(31,117,255,.1)}
+
+/* ===== Табель: трёхшаговая модалка дня ===== */
+.ts-pcard{border:1px solid rgba(29,120,252,.16);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:#fff}
+.ts-pcard-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.ts-av{width:27px;height:27px;border-radius:50%;background:rgba(31,117,255,.1);color:#0d4ea8;display:grid;place-items:center;font-size:.62rem;font-weight:800;flex:none}
+.ts-pname{font-size:.8125rem;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ts-cap{display:block;font-size:.66rem;color:#5b6472;font-weight:600;margin-bottom:3px}
+.ts-input{width:100%;font-family:var(--font);font-size:.875rem;font-weight:700;padding:.5rem .6rem;border:1.5px solid rgba(0,0,0,.18);border-radius:9px;font-variant-numeric:tabular-nums;text-align:right;outline:none}
+.ts-input:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.ts-sel{font-family:var(--font);font-size:.75rem;font-weight:700;color:#333;padding:.4rem .5rem;border:1.5px solid rgba(0,0,0,.2);border-radius:8px;background:#fff;outline:none;-webkit-appearance:none;appearance:none;max-width:140px}
+.ts-sel:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.ts-qb{flex:1;font-family:var(--font);font-size:.68rem;font-weight:700;padding:.4rem .3rem;border-radius:8px;border:1.5px solid rgba(0,0,0,.14);background:#fff;color:#33405a;cursor:pointer}
+.ts-qb.on{border-color:rgba(31,117,255,.5);background:rgba(31,117,255,.07);color:#0d4ea8}
+.ts-seclab{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:7px}
+.ts-add{font-size:.76rem;font-weight:700;color:#0d4ea8;padding:.45rem 0;cursor:pointer}
+.ts-del{width:26px;height:26px;flex:none;border-radius:8px;background:rgba(0,0,0,.04);color:#8b93a3;display:grid;place-items:center;font-size:.68rem;cursor:pointer;transition:background .15s,color .15s}
+.ts-del:hover{background:rgba(220,38,38,.1);color:#dc2626}
+/* таблица под календарём */
+.ts-daytbl{width:100%;border-collapse:collapse;font-size:.7rem;font-variant-numeric:tabular-nums}
+.ts-daytbl th{font-size:.56rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:800;text-align:left;padding:.4rem .3rem;border-bottom:1px solid rgba(29,120,252,.14);white-space:nowrap}
+.ts-daytbl td{padding:.4rem .3rem;border-bottom:1px solid #f2f5fa;white-space:nowrap}
+.ts-daytbl .rt{text-align:right}
+.ts-daytbl tfoot td{font-weight:800;border-top:1px solid rgba(29,120,252,.18);padding-top:.5rem}
+.ts-st{font-size:.56rem;font-weight:800;border-radius:5px;padding:2px 5px;white-space:nowrap}
+.ts-st.p{background:rgba(31,117,255,.1);color:#0d4ea8}
+.ts-st.s{background:rgba(249,115,22,.14);color:#c2410c}
+.ts-st.a{background:rgba(17,17,17,.08);color:#111}
+.ts-st.v{background:rgba(59,130,246,.14);color:#1d4ed8}
+.ts-st.z{background:rgba(139,147,163,.16);color:#5b6472}
