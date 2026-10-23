@@ -1,4 +1,5 @@
 import { useAuth } from '../../hooks/useAuth';
+import SmartSelect from '../../components/SmartSelect';
 import RowMenu from '../../components/RowMenu';
 import { supabase } from '../../lib/supabase';
 import useOptimisticSync from '../../hooks/useOptimisticSync';
@@ -651,15 +652,16 @@ export default function Accounts() {
               {!editingId && (
                 <div className="form-group">
                   <label>Тип счета</label>
-                  <select value={modalType} onChange={e=>setModalType(e.target.value)} required>
-                    <option value=""><span className="sel-ph">— выберите —</span></option>
-                    {ACC_TYPES.filter(t => {
+                  <SmartSelect
+                    value={modalType}
+                    onChange={setModalType}
+                    options={ACC_TYPES.filter(t => {
                       // Нельзя создать второй системный счёт: только один cash и один cash_register
                       if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
                       if (t.type === 'cash_register' && accounts.some(a => a.type === 'cash_register')) return false;
                       return true;
-                    }).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
-                  </select>
+                    }).map(t => ({ value: t.type, label: t.label }))}
+                  />
                   <div style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.3rem'}}>Системные счета «Наличные» и «Кассовый ящик» могут быть только в одном экземпляре</div>
                 </div>
               )}
@@ -689,11 +691,11 @@ export default function Accounts() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Тип</label>
-                  <select value={corType} onChange={e=>setCorType(e.target.value)} required>
-                    <option value=""><span className="sel-ph">— выберите —</span></option>
-                    <option value="income">Приход</option>
-                    <option value="expense">Расход</option>
-                  </select>
+                  <SmartSelect
+                    value={corType}
+                    onChange={setCorType}
+                    options={[{ value: 'income', label: 'Приход' }, { value: 'expense', label: 'Расход' }]}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Сумма </label>
@@ -747,14 +749,17 @@ export default function Accounts() {
                         <button type="button" onClick={()=>setNewAccs(newAccs.filter(function(_,i){return i!==idx}))} style={{background:'none',border:'none',color:'#dc3545',cursor:'pointer',fontSize:'1rem',lineHeight:1,padding:'0 .2rem'}} title="Удалить">×</button>
                       </div>
                       <input placeholder="Комментарий" value={na.desc} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],desc:e.target.value};setNewAccs(r);}} style={{marginTop:'.4rem',width:'100%'}} />
-                      <select value={na.type || ''} onChange={e=>{var r=[...newAccs];r[idx]={...r[idx],type:e.target.value};setNewAccs(r);}} required style={{marginTop:'.4rem',width:'100%'}}>
-                        <option value=""><span className="sel-ph">— выберите —</span></option>
-                        {ACC_TYPES.filter(t => {
+                      <div style={{marginTop:'.4rem'}}>
+                      <SmartSelect
+                        value={na.type || ''}
+                        onChange={function(v){var r=[...newAccs];r[idx]={...r[idx],type:v};setNewAccs(r);}}
+                        options={ACC_TYPES.filter(t => {
                           if (t.type === 'cash' && accounts.some(a => a.type === 'cash')) return false;
                           if (t.type === 'cash_register' && accounts.some(a => a.type === 'cash_register')) return false;
                           return true;
-                        }).map(t=><option key={t.type} value={t.type}>{t.label}</option>)}
-                      </select>
+                        }).map(t => ({ value: t.type, label: t.label }))}
+                      />
+                      </div>
                     </div>
                   );
                 })}

@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import RowMenu from '../../components/RowMenu';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -246,11 +247,11 @@ export default function Categories() {
             </div>
             <div className="form-group">
               <label>Тип категории</label>
-              <select value={dirType} onChange={function (e) { setDirType(e.target.value); }}>
-                <option value=""><span className="sel-ph">— выберите —</span></option>
-                <option value="income">Доход</option>
-                <option value="expense">Расход</option>
-              </select>
+              <SmartSelect
+                value={dirType}
+                onChange={setDirType}
+                options={[{ value: 'income', label: 'Доход' }, { value: 'expense', label: 'Расход' }]}
+              />
             </div>
           </div>
           <div className="modal-actions">
