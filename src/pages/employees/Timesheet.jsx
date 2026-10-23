@@ -15,6 +15,7 @@ const STATUS_OPTS = [
   { value: 'sick', label: 'Больничный' },
   { value: 'vacation', label: 'Отпуск опл.' },
   { value: 'own_expense', label: 'За свой счёт' },
+  { value: 'dayoff', label: 'Выходной' },
   { value: 'absent', label: 'Прогул' },
 ];
 
