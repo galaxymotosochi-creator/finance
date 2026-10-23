@@ -508,7 +508,7 @@ export default function Timesheet() {
       )}
 
       {/* МОДАЛКА ДНЯ */}
-      <Modal open={showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="Статусы сотрудников и события дня" width="wide">
+      <Modal open={showDay} onClose={() => setShowDay(null)} title={(showDay||'').split('T')[0].split('-').reverse().join('.') || '—'} subtitle="" width="wide" className="modal-v2 cat-modal">
 
             <div style={{border:'1px solid var(--border)',borderRadius:'14px',overflow:'hidden',marginBottom:'.65rem'}}>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.55rem .75rem',background:'#fafbfe',borderBottom:'1px solid var(--border)'}}>
@@ -605,7 +605,8 @@ export default function Timesheet() {
             })()}
 
             <div className="modal-actions">
-              <button type="button" className="btn btn-dark" onClick={async () => {
+              <button type="button" className="v2-ghost" onClick={() => setShowDay(null)}>Отмена</button>
+              <button type="button" className="cat-add-btn" onClick={async () => {
                 setSaving(true);
                 let anyQueued = false;
                 try {
