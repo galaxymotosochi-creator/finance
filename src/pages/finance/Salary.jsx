@@ -738,10 +738,11 @@ export default function Salary() {
 
   return (
     <>
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Зарплата</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Зарплата</h1>
             <SectionHelp
               title="Раздел «Зарплата»"
               intro="Начисления и выплаты сотрудникам. Видно, сколько всего начислено, сколько уже выплачено и сколько осталось."
@@ -806,7 +807,8 @@ export default function Salary() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>Расчет начислений с привязкой к табелю</div>
+          <span className="cat-sub">Расчёт начислений с привязкой к табелю</span>
+          </div>
         </div>
         <div className="sk-bar-acts">
           <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить</button>

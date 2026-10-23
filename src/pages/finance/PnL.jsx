@@ -268,10 +268,11 @@ export default function PnL() {
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: 'var(--font)' }}>
       {/* Шапка — фирменный стиль: голубая плашка + подсказка (как в «Чеках» и остальных разделах) */}
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Чистая прибыль</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Чистая прибыль</h1>
             <SectionHelp
               title="Раздел «Чистая прибыль»"
               intro="Здесь видно, сколько бизнес заработал за период: доходы минус расходы. Сверху — итог и рентабельность, ниже — отчёт, который раскрывается по группам."
@@ -292,6 +293,8 @@ export default function PnL() {
                   <div>Если <b>расходы выше доходов</b> — период убыточный. Раскройте <b>«Расходы»</b> и посмотрите, какая статья съела больше всего.</div>
                 ) },
               ]} />
+          </div>
+          <span className="cat-sub">Доходы минус расходы за период</span>
           </div>
         </div>
         <div className={'sk-period-wrap' + (periodOpen ? ' open' : '')} style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>

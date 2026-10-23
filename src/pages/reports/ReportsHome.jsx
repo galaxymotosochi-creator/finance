@@ -70,10 +70,10 @@ export default function ReportsHome() {
   const n = useNavigate();
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1>Отчеты</h1>
-          <div className="sub">Выберите отчет — дальше добавим новые</div>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
+        <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <h1 className="cat-title">Отчёты</h1>
+          <span className="cat-sub">Выберите отчёт — дальше добавим новые</span>
         </div>
       </div>
       <div className="nav-sep" style={{ margin: '.25rem 0 1rem', width: '100%', border: 'none', borderTop: '1px solid var(--border)' }} />

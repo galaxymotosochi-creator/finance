@@ -188,10 +188,11 @@ export default function Promos() {
 
   return (
     <>
-      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF',flexWrap:'nowrap'}}>
         <div className="grow" style={{minWidth:0}}>
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Акции</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Акции</h1>
             <SectionHelp
               title="Раздел «Акции»"
               intro="Акции — это временные спецпредложения со скидкой: сезонные распродажи, праздничные предложения, скидки на категорию или конкретные товары."
@@ -212,7 +213,8 @@ export default function Promos() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'280px'}}>Управление специальными предложениями и скидками</div>
+          <span className="cat-sub">Управление специальными предложениями и скидками</span>
+          </div>
         </div>
         <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>

@@ -180,10 +180,11 @@ export default function Clients() {
 
   return (
     <>
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>База клиентов</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">База клиентов</h1>
             <SectionHelp
               title="Раздел «База клиентов»"
               intro="Здесь хранятся все покупатели: контакты, день рождения, история покупок, сумма и долг, а также уровень лояльности."
@@ -212,7 +213,8 @@ export default function Clients() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>История покупок, лояльность и статистика</div>
+          <span className="cat-sub">История покупок, лояльность и статистика</span>
+          </div>
         </div>
         <div className="***">
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>

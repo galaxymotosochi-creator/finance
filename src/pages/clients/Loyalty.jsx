@@ -178,10 +178,11 @@ export default function Loyalty() {
 
   return (
     <>
-      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF',flexWrap:'nowrap'}}>
         <div className="grow" style={{minWidth:0}}>
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Лояльность</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Лояльность</h1>
             <SectionHelp
               title="Раздел «Программы лояльности»"
               intro="Программы лояльности — это скидки и поощрения для клиентов. Чем больше клиент покупает, тем выгоднее ему с вами работать."
@@ -208,7 +209,8 @@ export default function Loyalty() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>Системы скидок и поощрений для клиентов</div>
+          <span className="cat-sub">Системы скидок и поощрений для клиентов</span>
+          </div>
         </div>
         <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
           <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>

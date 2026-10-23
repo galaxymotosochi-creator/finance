@@ -296,10 +296,11 @@ export default function Timesheet() {
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%',minHeight:0}}>
-      <div className="sk-bar" style={{flexWrap:'nowrap'}}>
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF',flexWrap:'nowrap'}}>
         <div className="grow" style={{minWidth:0}}>
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Табель</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Табель</h1>
             <SectionHelp
               title="Раздел «Табель»"
               intro="Табель — учет рабочего времени. Здесь отмечаются отработанные дни, больничные и отпуска. От табеля считается процент от выручки."
@@ -322,7 +323,8 @@ export default function Timesheet() {
               ]}
             />
           </div>
-          <div className="sub" style={{maxWidth:'210px'}}>Учет рабочего времени, бонусы и штрафы</div>
+          <span className="cat-sub">Учёт рабочего времени, бонусы и штрафы</span>
+          </div>
         </div>
       </div>
 
