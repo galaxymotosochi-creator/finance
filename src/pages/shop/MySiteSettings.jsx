@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 const inp = { width:'100%', padding:'10px 14px', border:'1px solid #e5e7eb', borderRadius:10,
   fontSize:'0.9rem', outline:'none', boxSizing:'border-box', background:'#fff' };
 const lbl = { display:'block', fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:6 };
 
 export default function MySiteSettings({ shop, slug, setShop, setSlug, onSave, saving }) {
+  const { businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [form, setForm] = useState(shop || {});
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -55,10 +58,12 @@ export default function MySiteSettings({ shop, slug, setShop, setSlug, onSave, s
 
       <div style={{ marginTop:20, paddingTop:18, borderTop:'1px solid #f0f0f0' }}>
         <div style={{ fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:10 }}>Режимы витрины</div>
-        {[
+        {(isServices ? [
+          { k:'use_booking', t:'Использовать календарь записей', d:'Для услуг — клиент записывается на время', def:false },
+        ] : [
           { k:'use_cart', t:'Использовать корзину', d:'Для товаров — клиент оформляет заказ', def:true },
           { k:'use_booking', t:'Использовать календарь записей', d:'Для услуг — клиент записывается на время', def:false },
-        ].map(x => {
+        ]).map(x => {
           const on = form[x.k] === undefined ? x.def : !!form[x.k];
           return (
             <div key={x.k} onClick={() => setForm({ ...form, [x.k]: !on })}

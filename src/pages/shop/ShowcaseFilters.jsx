@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 const chk = { display:'flex', alignItems:'center', gap:9, padding:'8px 10px', borderRadius:9,
   cursor:'pointer', fontSize:'0.85rem', userSelect:'none' };
 
 export default function ShowcaseFilters({ form, setForm, products, onSave, saving }) {
+  const { businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [q, setQ] = useState('');
   const types = form.show_types || [];
   const cats = form.show_cats || [];
@@ -26,10 +29,12 @@ export default function ShowcaseFilters({ form, setForm, products, onSave, savin
 
       <div style={{ fontSize:'0.78rem', fontWeight:600, color:'#6b7280', marginBottom:8 }}>1. Тип</div>
       <div style={{ display:'grid', gap:8, marginBottom:18 }}>
-        {[
+        {(isServices ? [
+          { k:'service', t:'Услуги', d:'Показывать услуги — для записи на время' },
+        ] : [
           { k:'product', t:'Товары', d:'Показывать товары в каталоге с корзиной' },
           { k:'service', t:'Услуги', d:'Показывать услуги — для записи на время' },
-        ].map(x => {
+        ]).map(x => {
           const on = types.length === 0 || types.includes(x.k);
           return (
             <div key={x.k} onClick={() => setForm({ ...form, show_types: toggle(types, x.k) })}
