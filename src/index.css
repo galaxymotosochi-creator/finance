@@ -2092,6 +2092,8 @@ input:focus, select:focus, textarea:focus {
 .pnl2-sh.exp .tot{color:#111}
 .pnl2-row{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
 .pnl2-row:last-child{border-bottom:none;padding-bottom:2px}
+.pnl2-row.totrow{border-top:1px solid rgba(29,120,252,.18);border-bottom:none;margin-top:4px;padding-top:9px;font-weight:800}
+.pnl2-row.totrow .nm{font-weight:800;color:#111}
 .pnl2-row .nm{color:#33405a;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:640px){
   .pnl2-kpi{grid-template-columns:1fr 1fr}
