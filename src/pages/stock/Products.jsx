@@ -1,5 +1,6 @@
 import Modal from '../../components/Modal';
 import RowMenu from '../../components/RowMenu';
+import SmartSelect from '../../components/SmartSelect';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
@@ -1004,10 +1005,11 @@ export default function Products() {
             </div>
             <div className="form-group" style={{marginBottom:'8px'}}>
               <label>Категория</label>
-              <select value={fCat} onChange={e => setFCat(e.target.value)}>
-                <option value=""><span className="sel-ph">— выберите —</span></option>
-                {(catsLoaded ? cats : []).filter(c => !c.type || c.type === (isFood ? 'product' : 'service')).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-              </select>
+              <SmartSelect
+                value={fCat}
+                onChange={setFCat}
+                options={(catsLoaded ? cats : []).filter(c => !c.type || c.type === (isFood ? 'product' : 'service')).map(c => ({ value: c.name, label: c.name }))}
+              />
             </div>
             {isFood && (
               <div className="form-group" style={{marginBottom:'8px'}}>
@@ -1121,10 +1123,11 @@ export default function Products() {
               </div>
               <div className="form-group">
                 <label>Ед. измерения</label>
-                <select value={fUnit} onChange={e => setFUnit(e.target.value)}>
-                  <option value=""><span className="sel-ph">— выберите —</span></option>
-                  {(isServices ? SERVICE_UNITS : UNITS).map(u => <option key={u} value={u}>{u}</option>)}
-                </select>
+                <SmartSelect
+                  value={fUnit}
+                  onChange={setFUnit}
+                  options={(isServices ? SERVICE_UNITS : UNITS).map(u => ({ value: u, label: u }))}
+                />
               </div>
             </div>
             {fType !== 'service' && fType !== 'combo' && (
