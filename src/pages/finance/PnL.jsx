@@ -362,9 +362,9 @@ export default function PnL() {
 
         {/* Три KPI */}
         <div className="pnl2-kpi">
-          <div className="pnl2-cell"><div className="l">Доходы</div><div className="v num">{fmt(incomeTotal)}</div></div>
-          <div className="pnl2-cell"><div className="l">Расходы</div><div className="v num">{fmt(expenseTotal)}</div></div>
-          <div className="pnl2-cell"><div className="l">Деньги на счетах</div><div className="v num">{fmt(d.totalCash)}</div></div>
+          <div className="pnl2-cell"><div className="l">Доходы</div><div className="v num">{fmt(incomeTotal)} {cur}</div></div>
+          <div className="pnl2-cell"><div className="l">Расходы</div><div className="v num">{fmt(expenseTotal)} {cur}</div></div>
+          <div className="pnl2-cell"><div className="l">Деньги на счетах</div><div className="v num">{fmt(d.totalCash)} {cur}</div></div>
         </div>
       </div>
 
