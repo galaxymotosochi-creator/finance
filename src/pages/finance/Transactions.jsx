@@ -644,12 +644,12 @@ export default function Transactions() {
       {!loading && (
         <div className="tx-card">
           <div className="tx-mirror">
-            <div className="half">
-              <div className="b inc" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? incomeTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}><span className="sm">{incomeTotal.toLocaleString()} {cur}</span><span className="sep"> · </span><span className="pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</span></div>
+            <div className="half l">
+              <div className="b inc"><span className="sm">{incomeTotal.toLocaleString()} {cur}</span><span className="sep"> · </span><span className="pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</span></div>
             </div>
             <div className="center"></div>
             <div className="half r">
-              <div className="b exp" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? expenseTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}><span className="pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</span><span className="sep"> · </span><span className="sm">{expenseTotal.toLocaleString()} {cur}</span></div>
+              <div className="b exp"><span className="pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</span><span className="sep"> · </span><span className="sm">{expenseTotal.toLocaleString()} {cur}</span></div>
             </div>
           </div>
 
