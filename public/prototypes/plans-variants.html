@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Планирование — 5 вариантов</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF;--rd:14px}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6fb;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:18px;max-width:1500px;margin:0 auto}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:18px;box-shadow:0 2px 12px rgba(11,18,32,.05)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15.5px;font-weight:800;margin:0 0 3px;letter-spacing:-.01em}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+.fact{font-size:10.5px;color:#0d9488;font-weight:700;background:rgba(13,148,136,.08);border-radius:6px;padding:1px 6px;display:inline-block}
+.bar{height:7px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-d),var(--blue))}
+.bar i.ok{background:linear-gradient(90deg,#0d9488,#2dd4bf)}
+.bar i.over{background:linear-gradient(90deg,#b45309,#f59e0b)}
+.num{font-variant-numeric:tabular-nums}
+/* 1 */
+.v1grid{display:grid;gap:10px}
+.v1row{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff}
+.v1top{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
+.v1nm{font-size:12.5px;font-weight:700;flex:1}
+.v1pc{font-size:13px;font-weight:800;color:var(--blue-d)}
+.v1val{font-size:11px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between}
+/* 2 */
+.v2big{display:flex;align-items:flex-end;gap:14px;margin-bottom:14px}
+.v2ring{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none;box-shadow:0 12px 24px -14px rgba(11,18,32,.4)}
+.v2ring:after{content:"";position:absolute;inset:16px;background:#fff;border-radius:50%}
+.v2in{position:relative;z-index:2;text-align:center}
+.v2in b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.v2in span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.v2list{flex:1;display:flex;flex-direction:column;gap:7px}
+.v2li{display:flex;align-items:center;gap:7px;font-size:11.5px}
+.v2li .d{width:9px;height:9px;border-radius:3px;flex:none}
+.v2li .n{flex:1;color:#33405a}
+.v2li .v{font-weight:800;font-variant-numeric:tabular-nums}
+/* 3 */
+.v3tabs{display:inline-flex;background:#eef2f9;border-radius:99px;padding:3px;gap:2px;margin-bottom:12px}
+.v3tabs span{font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;color:#5b6472}
+.v3tabs span.on{background:#fff;color:var(--blue);box-shadow:0 2px 6px rgba(11,18,32,.1)}
+.v3spl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.v3cell{border:1px solid var(--line);border-radius:12px;padding:10px 11px;background:var(--soft)}
+.v3cell .l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.v3cell .v{font-size:16px;font-weight:800;margin-top:3px}
+.v3tx{display:flex;flex-direction:column;gap:8px}
+.v3tr{display:grid;grid-template-columns:88px 1fr 66px;gap:8px;align-items:center;font-size:11.5px}
+.v3tr .n{color:#33405a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v3tr .v{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+/* 4 */
+.v4head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
+.v4head .big{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.v4head .sd{font-size:11px;color:var(--muted);margin-top:2px}
+.v4badge{font-size:10.5px;font-weight:800;color:#0d9488;background:rgba(13,148,136,.1);border-radius:99px;padding:4px 9px}
+.v4chart{display:flex;align-items:flex-end;gap:6px;height:86px;margin:14px 0 6px;padding-top:4px;border-bottom:1px dashed rgba(29,120,252,.2)}
+.v4b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;height:100%}
+.v4b .p{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#4d9bff,#1F75FF)}
+.v4b .p.dim{background:#e6eefb}
+.v4b .p.cur{background:linear-gradient(180deg,#ffdd2d,#f5c500)}
+.v4cap{display:flex;gap:6px;font-size:9.5px;color:var(--muted);text-align:center}
+.v4cap span{flex:1}
+.v4foot{display:flex;justify-content:space-between;font-size:11px;color:#33405a;margin-top:9px;font-weight:700}
+/* 5 */
+.v5row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f2f5fa}
+.v5row:last-child{border-bottom:none}
+.v5ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:14px;flex:none;background:rgba(31,117,255,.08)}
+.v5body{flex:1;min-width:0}
+.v5nm{font-size:12px;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px}
+.v5nm span{font-weight:800;font-variant-numeric:tabular-nums}
+.v5sub{font-size:10px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between}
+.v5in{width:96px;border:1.5px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px;text-align:right;font-family:inherit;font-variant-numeric:tabular-nums;color:#111;background:#fff}
+.v5in:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.pill{display:inline-block;font-size:10px;font-weight:800;border-radius:99px;padding:2px 7px;background:rgba(31,117,255,.09);color:var(--blue-d)}
+.note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:9px}
+</style></head><body>
+<h1>Планирование — 5 вариантов</h1>
+<div class="sub">Данные примерные (октябрь): выручка 1 284 500 ₽ · план 1 500 000 ₽ · прибыль 348 300 ₽ · расходы 936 200 ₽</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>Карточки с прогрессом</h2>
+  <div class="hint">Цель сверху, шкала выполнения, факт под ней. Видно сразу, где недотягиваем.</div>
+  <div class="v1grid">
+    <div class="v1row">
+      <div class="v1top"><span class="v1nm">💰 Выручка</span><span class="v1pc num">86%</span></div>
+      <div class="bar"><i style="width:86%"></i></div>
+      <div class="v1val num"><span>1 284 500 ₽ <span class="fact">факт</span></span><span>план 1 500 000 ₽</span></div>
+    </div>
+    <div class="v1row">
+      <div class="v1top"><span class="v1nm">📈 Прибыль</span><span class="v1pc num">99%</span></div>
+      <div class="bar"><i class="ok" style="width:99%"></i></div>
+      <div class="v1val num"><span>348 300 ₽ <span class="fact">факт</span></span><span>план 350 000 ₽</span></div>
+    </div>
+    <div class="v1row">
+      <div class="v1top"><span class="v1nm">💸 Расходы (бюджет)</span><span class="v1pc num">104%</span></div>
+      <div class="bar"><i class="over" style="width:100%"></i></div>
+      <div class="v1val num"><span>936 200 ₽ <span class="fact">факт</span></span><span>план 900 000 ₽</span></div>
+    </div>
+    <div class="v1row">
+      <div class="v1top"><span class="v1nm">👥 Новых клиентов</span><span class="v1pc num">60%</span></div>
+      <div class="bar"><i style="width:60%"></i></div>
+      <div class="v1val num"><span>18 <span class="fact">факт</span></span><span>план 30</span></div>
+    </div>
+  </div>
+  <div class="note">Самый «рабочий»: человек открыл раздел и сразу видит, что выручка отстаёт, а расходы уже перебраны. Цели правятся прямо в этих же карточках.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Кольцо общего выполнения</h2>
+  <div class="hint">Один большой акцент — сколько выполнено в целом, справа расшифровка по целям.</div>
+  <div class="v2big">
+    <div class="v2ring" style="background:conic-gradient(#1F75FF 0 312deg,#eef2f9 312deg 360deg)">
+      <div class="v2in"><b>87%</b><span>выполнено</span></div>
+    </div>
+    <div class="v2list">
+      <div class="v2li"><span class="d" style="background:#1F75FF"></span><span class="n">Выручка</span><span class="v num">1 284 500 / 1 500 000</span></div>
+      <div class="v2li"><span class="d" style="background:#2dd4bf"></span><span class="n">Прибыль</span><span class="v num">348 300 / 350 000</span></div>
+      <div class="v2li"><span class="d" style="background:#f59e0b"></span><span class="n">Расходы</span><span class="v num">936 200 / 900 000</span></div>
+      <div class="v2li"><span class="d" style="background:#a78bfa"></span><span class="n">Клиенты</span><span class="v num">18 / 30</span></div>
+    </div>
+  </div>
+  <div class="note">Красиво для одного взгляда, но детали прячутся. Хорошо, если целей много и нужен общий пульс бизнеса.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>План / факт в таблице</h2>
+  <div class="hint">Строгая таблица с колонками: цель, план, факт, остаток. Как в бухгалтерской ведомости.</div>
+  <div class="v3tabs"><span class="on">Месяц</span><span>Квартал</span><span>Год</span></div>
+  <div class="v3spl">
+    <div class="v3cell"><div class="l">Выполнено</div><div class="v num">86%</div></div>
+    <div class="v3cell"><div class="l">До цели</div><div class="v num">215 500 ₽</div></div>
+  </div>
+  <div class="v3tx">
+    <div class="v3tr"><span class="n">Выручка</span><div class="bar"><i style="width:86%"></i></div><span class="v">215 500</span></div>
+    <div class="v3tr"><span class="n">Прибыль</span><div class="bar"><i class="ok" style="width:99%"></i></div><span class="v">1 700</span></div>
+    <div class="v3tr"><span class="n">Расходы</span><div class="bar"><i class="over" style="width:100%"></i></div><span class="v">−36 200</span></div>
+    <div class="v3tr"><span class="n">Клиенты</span><div class="bar"><i style="width:60%"></i></div><span class="v">12</span></div>
+  </div>
+  <div class="note">Максимум информации, но скучновато. Рядом с каждой строкой — сколько денег осталось до цели.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Цель месяца крупным числом</h2>
+  <div class="hint">Одна главная цель большая сверху, остальные — компактно. Плюс мини-график по месяцам.</div>
+  <div class="v4head">
+    <div><div class="big num">1 284 500 ₽</div><div class="sd">из 1 500 000 ₽ · выручка за октябрь</div></div>
+    <span class="v4badge num">86%</span>
+  </div>
+  <div class="bar" style="height:9px"><i style="width:86%"></i></div>
+  <div class="v4chart">
+    <div class="v4b"><div class="p dim" style="height:52%"></div></div>
+    <div class="v4b"><div class="p dim" style="height:64%"></div></div>
+    <div class="v4b"><div class="p dim" style="height:58%"></div></div>
+    <div class="v4b"><div class="p dim" style="height:71%"></div></div>
+    <div class="v4b"><div class="p dim" style="height:78%"></div></div>
+    <div class="v4b"><div class="p cur" style="height:86%"></div></div>
+  </div>
+  <div class="v4cap"><span>май</span><span>июн</span><span>июл</span><span>авг</span><span>сен</span><span class="num">окт</span></div>
+  <div class="v4foot num"><span>Прибыль 348 300 / 350 000</span><span>Расходы 936 200 / 900 000</span></div>
+  <div class="note">Показывает не только «сколько», но и «растём ли». Работает, когда главная цель одна — выручка.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 5</div>
+  <h2>Рабочий список с вводом</h2>
+  <div class="hint">Каждая цель — строка с полем ввода плана прямо здесь. Ниже факт, % и сколько осталось.</div>
+  <div class="v5row">
+    <div class="v5ic">💰</div>
+    <div class="v5body">
+      <div class="v5nm"><span>Выручка</span><span class="pill num">86%</span></div>
+      <div class="bar"><i style="width:86%"></i></div>
+      <div class="v5sub num"><span>факт 1 284 500 ₽</span><span>до цели 215 500 ₽</span></div>
+    </div>
+    <input class="v5in" value="1 500 000">
+  </div>
+  <div class="v5row">
+    <div class="v5ic">📈</div>
+    <div class="v5body">
+      <div class="v5nm"><span>Прибыль</span><span class="pill num">99%</span></div>
+      <div class="bar"><i class="ok" style="width:99%"></i></div>
+      <div class="v5sub num"><span>факт 348 300 ₽</span><span>до цели 1 700 ₽</span></div>
+    </div>
+    <input class="v5in" value="350 000">
+  </div>
+  <div class="v5row">
+    <div class="v5ic">💸</div>
+    <div class="v5body">
+      <div class="v5nm"><span>Расходы (бюджет)</span><span class="pill num" style="background:rgba(245,158,11,.12);color:#b45309">104%</span></div>
+      <div class="bar"><i class="over" style="width:100%"></i></div>
+      <div class="v5sub num"><span>факт 936 200 ₽</span><span style="color:#b45309">перерасход 36 200 ₽</span></div>
+    </div>
+    <input class="v5in" value="900 000">
+  </div>
+  <div class="v5row">
+    <div class="v5ic">👥</div>
+    <div class="v5body">
+      <div class="v5nm"><span>Новых клиентов</span><span class="pill num">60%</span></div>
+      <div class="bar"><i style="width:60%"></i></div>
+      <div class="v5sub num"><span>факт 18</span><span>до цели 12</span></div>
+    </div>
+    <input class="v5in" value="30">
+  </div>
+  <div class="note">Полностью рабочий: план вводится тут же, факт подтягивается из продаж, всё считается само. Ничего лишнего.</div>
+</div>
+
+</div></body></html>
