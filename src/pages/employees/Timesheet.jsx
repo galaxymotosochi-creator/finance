@@ -151,10 +151,11 @@ export default function Timesheet() {
     if (de.some(e => e.status === 'sick')) dots.push('#f97316');
     if (de.some(e => e.status === 'vacation')) dots.push('#3b82f6');
     if (de.some(e => e.status === 'absent')) dots.push('#111');
-    if (de.some(e => e.status === 'remote')) dots.push('#8b5cf6');
+    if (de.some(e => e.status === 'own_expense')) dots.push('#8b93a3');
+    if (de.some(e => e.status === 'dayoff')) dots.push('#c3cad6');
     if (hasBonus) dots.push('#16a34a');
     if (hasDeduct) dots.push('#dc2626');
-    return { hasBonus, hasDeduct, dots, hasEntries: de.length > 0 };
+    return { hasBonus, hasDeduct, dots, hasEntries: de.length > 0 || de.some(e => (e.day_rate || 0) > 0 || (e.day_hours || 0) > 0) };
   };
 
   const openDay = (d, dateStr) => {
@@ -305,7 +306,7 @@ export default function Timesheet() {
           const r = await supabase.from('timesheet_entries').update({ deduct_amount: 0, deduct_comment: '' }).eq('id', e.id); if (r.queued) anyQueued = true;
         }
       }
-      if (!anyQueued) await load();
+      await load();
       setShowDay(null);
     } catch (err) { alert('Ошибка: ' + err.message); }
     setSaving(false);
