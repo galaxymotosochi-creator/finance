@@ -475,8 +475,17 @@ export default function Timesheet() {
               </tr></thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
-                  <tr><td colSpan={6}><div className="empty-products"><div className="big-icon">📅</div><p>Нет записей за выбранный период</p>
-                        <p style={{color:'var(--muted)',margin:'.5rem 0 0'}}>Отметьте день в календаре выше</p></div></td></tr>
+                  <tr><td colSpan={6}>
+                    <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
+                      <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
+                        <b>Как заполнить табель:</b><br />
+                        • Выберите месяц и нажмите на день в календаре выше<br />
+                        • Отметьте статус каждого сотрудника: рабочий день, выходной, больничный, отпуск<br />
+                        • При необходимости добавьте бонус или штраф<br />
+                        • Нажмите «Сохранить» — запись появится в таблице
+                      </div>
+                    </div>
+                  </td></tr>
                 ) : (filteredEntries.map(e => (
                   <tr key={e.id}>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{(e.date||'').split('T')[0].split('-').reverse().join('.') || '—'}</td>
