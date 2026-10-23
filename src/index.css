@@ -2244,3 +2244,5 @@ input:focus, select:focus, textarea:focus {
 
 /* Переключатель внутри плашки — без своей обводки, просто внутри плашки */
 .modal-box .v2-card .v2-seg{background:transparent !important;border:none !important;padding:0 !important;border-radius:0 !important;box-shadow:none !important;margin-bottom:10px !important}
+/* Модалка «Начислить зарплату» — ширина как у «Новый сотрудник» */
+.modal-box.modal-salary.emp-modal-wide{max-width:560px}

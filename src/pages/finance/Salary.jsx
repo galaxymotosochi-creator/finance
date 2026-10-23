@@ -953,7 +953,7 @@ export default function Salary() {
       )}
 
       {/* МОДАЛКА НАЧИСЛЕНИЯ */}
-      <Modal open={show} onClose={()=>setShow(false)} width={660} hideHead className="modal-salary">
+      <Modal open={show} onClose={()=>setShow(false)} width="medium" hideHead className="modal-salary emp-modal-wide">
         <div className="sal-head sal-head-v2">
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
           <p className="modal-sub">Выберите сотрудника и период</p>
