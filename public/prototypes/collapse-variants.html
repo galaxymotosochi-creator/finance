@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Категории — 4 варианта сворачивания</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 70px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6fb;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px;max-width:1500px;margin:0 auto}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:20px;box-shadow:0 2px 14px rgba(11,18,32,.05)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15.5px;font-weight:800;margin:0 0 3px;letter-spacing:-.01em}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+.panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.sh{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);margin-bottom:6px}
+.sh .dt{width:8px;height:8px;border-radius:3px;background:var(--blue);flex:none}
+.sh .tot{margin-left:auto;font-size:11px;font-weight:800;text-transform:none;letter-spacing:0}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
+.row:last-child{border-bottom:none}
+.row .nm{color:#33405a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.totrow{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;font-weight:800;padding-top:9px;margin-top:4px;border-top:1px solid rgba(29,120,252,.18);font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:10px}
+/* 1 */
+.v1more{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--blue-d);background:rgba(31,117,255,.06);border:1px dashed rgba(31,117,255,.35);border-radius:9px;padding:7px 10px;margin-top:8px;cursor:pointer}
+.v1more:hover{background:rgba(31,117,255,.1)}
+.v1more .car{transition:transform .2s}
+.v1hidden{display:none}
+.v1hidden.on{display:block}
+/* 2 */
+.v2head{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.v2car{font-size:9px;color:#9aa7bd;transition:transform .2s;display:inline-block}
+.v2panel .body{overflow:hidden;transition:max-height .25s ease;max-height:0}
+.v2panel .body.on{max-height:420px}
+/* 3 */
+.v3 {border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.v3top{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--soft);cursor:pointer}
+.v3top .nm{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d)}
+.v3top .amt{margin-left:auto;font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.v3top .car{font-size:9px;color:#9aa7bd;transition:transform .2s}
+.v3top.on .car{transform:rotate(180deg)}
+.v3body{display:none;padding:6px 13px 12px}
+.v3body.on{display:block}
+/* 4 */
+.v4grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.v4cellb{display:flex;align-items:center;gap:6px;background:var(--soft);border-radius:9px;padding:8px 10px;font-size:11px;font-variant-numeric:tabular-nums}
+.v4cellb .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:#33405a}
+.v4cellb .v{font-weight:800;font-size:11px}
+.v4more{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:700;color:var(--blue-d);background:#fff;border:1px dashed rgba(31,117,255,.35);border-radius:9px;padding:8px;cursor:pointer;margin-top:2px}
+</style></head><body>
+<h1>Длинный список категорий — 4 варианта</h1>
+<div class="sub">Пример: 9 категорий доходов. Показываем 5, остальные — за треугольником</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>«Показать ещё N»</h2>
+  <div class="hint">Первые 5 строк, ниже пунктирная кнопка «Ещё 4 категории». Нажали — раскрылись все, кнопка меняется на «Свернуть».</div>
+  <div class="panel">
+    <div class="sh"><span class="dt"></span>Доходы<span class="tot num">500 ₽</span></div>
+    <div class="row"><span class="nm">Выручка от продаж</span><span class="num">240 ₽ · 48%</span></div>
+    <div class="row"><span class="nm">Услуги</span><span class="num">120 ₽ · 24%</span></div>
+    <div class="row"><span class="nm">Доставка</span><span class="num">60 ₽ · 12%</span></div>
+    <div class="row"><span class="nm">Консультации</span><span class="num">40 ₽ · 8%</span></div>
+    <div class="row"><span class="nm">Аренда оборудования</span><span class="num">25 ₽ · 5%</span></div>
+    <div class="v1hidden on">
+      <div class="row"><span class="nm">Подарочные карты</span><span class="num">8 ₽ · 2%</span></div>
+      <div class="row"><span class="nm">Прочее</span><span class="num">5 ₽ · 1%</span></div>
+      <div class="row"><span class="nm">Возвраты поставщиков</span><span class="num">2 ₽ · 0%</span></div>
+    </div>
+    <div class="v1more">▾ Ещё 3 категории</div>
+    <div class="totrow"><span>Итого доходы</span><span class="num">500 ₽</span></div>
+  </div>
+  <div class="note">Самое понятное: текст прямо говорит, сколько спрятано. Итог всегда виден внизу.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Треугольник у заголовка</h2>
+  <div class="hint">Треугольник слева от «Доходы» — клик по заголовку скрывает/показывает весь список. Итог остаётся на месте.</div>
+  <div class="panel v2panel">
+    <div class="v2head">
+      <span class="v2car">▼</span>
+      <div class="sh" style="margin:0;flex:1"><span class="dt"></span>Доходы</div>
+      <span class="num" style="font-size:11px;font-weight:800">500 ₽</span>
+    </div>
+    <div class="body on" style="margin-top:6px">
+      <div class="row"><span class="nm">Выручка от продаж</span><span class="num">240 ₽ · 48%</span></div>
+      <div class="row"><span class="nm">Услуги</span><span class="num">120 ₽ · 24%</span></div>
+      <div class="row"><span class="nm">Доставка</span><span class="num">60 ₽ · 12%</span></div>
+      <div class="row"><span class="nm">Консультации</span><span class="num">40 ₽ · 8%</span></div>
+      <div class="row"><span class="nm">Аренда оборудования</span><span class="num">25 ₽ · 5%</span></div>
+      <div class="row"><span class="nm">Подарочные карты</span><span class="num">8 ₽ · 2%</span></div>
+      <div class="row"><span class="nm">Прочее</span><span class="num">5 ₽ · 1%</span></div>
+      <div class="totrow"><span>Итого доходы</span><span class="num">500 ₽</span></div>
+    </div>
+  </div>
+  <div class="note">Компактно: можно свернуть весь блок целиком, если он мешает. Но при 9 строках всё равно длинно.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>Шапка-аккордеон</h2>
+  <div class="hint">Категории вложены внутрь заголовка-плашки. Свёрнуто — одна строка с итогом, раскрыто — список.</div>
+  <div class="v3">
+    <div class="v3top on">
+      <span class="car">▼</span>
+      <span class="nm">Доходы</span>
+      <span class="amt">500 ₽</span>
+    </div>
+    <div class="v3body on">
+      <div class="row"><span class="nm">Выручка от продаж</span><span class="num">240 ₽ · 48%</span></div>
+      <div class="row"><span class="nm">Услуги</span><span class="num">120 ₽ · 24%</span></div>
+      <div class="row"><span class="nm">Доставка</span><span class="num">60 ₽ · 12%</span></div>
+      <div class="row"><span class="nm">Консультации</span><span class="num">40 ₽ · 8%</span></div>
+      <div class="row"><span class="nm">Аренда оборудования</span><span class="num">25 ₽ · 5%</span></div>
+      <div class="row"><span class="nm">Подарочные карты</span><span class="num">8 ₽ · 2%</span></div>
+      <div class="row"><span class="nm">Прочее</span><span class="num">5 ₽ · 1%</span></div>
+      <div class="totrow"><span>Итого доходы</span><span class="num">500 ₽</span></div>
+    </div>
+  </div>
+  <div class="note">Строго и аккуратно, легко переиспользовать и для расходов. Спрятать можно всё — и держать только итог.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Плитки + «ещё»</h2>
+  <div class="hint">Первые 4 категории — плитками в две колонки, остальные за кнопкой. Когда категорий мало — всё видно сразу.</div>
+  <div class="panel">
+    <div class="sh"><span class="dt"></span>Доходы<span class="tot num">500 ₽</span></div>
+    <div class="v4grid">
+      <div class="v4cellb"><span class="n">Выручка от продаж</span><span class="v num">240 ₽</span></div>
+      <div class="v4cellb"><span class="n">Услуги</span><span class="v num">120 ₽</span></div>
+      <div class="v4cellb"><span class="n">Доставка</span><span class="v num">60 ₽</span></div>
+      <div class="v4cellb"><span class="n">Консультации</span><span class="v num">40 ₽</span></div>
+      <div class="v4more">▾ Ещё 3 категории</div>
+    </div>
+    <div class="totrow"><span>Итого доходы</span><span class="num">500 ₽</span></div>
+  </div>
+  <div class="note">Самое «толстое» по высоте из четырёх: две колонки экономят место, а плашки легко читать.</div>
+</div>
+
+</div>
+<script>
+// 1: показать ещё
+document.querySelectorAll('.v1more').forEach(function(b){ b.onclick = function(){ var h=b.previousElementSibling; var on=h.classList.toggle('on'); b.textContent = on ? '▴ Свернуть' : '▾ Ещё 3 категории'; }; });
+// 2
+document.querySelectorAll('.v2panel').forEach(function(p){ var h=p.querySelector('.v2head'), b=p.querySelector('.body'), c=p.querySelector('.v2car'); h.onclick=function(){ var on=b.classList.toggle('on'); c.textContent = on?'▼':'▶'; }; });
+// 3
+document.querySelectorAll('.v3top').forEach(function(h){ h.onclick=function(){ var b=h.nextElementSibling; h.classList.toggle('on'); b.classList.toggle('on'); }; });
+// 4
+document.querySelectorAll('.v4more').forEach(function(b){ b.onclick=function(){ b.previousElementSibling; var g=b.parentElement; var rows=document.querySelectorAll('.v4more'); b.textContent='▾ Ещё 3 категории'; }; });
+</script>
+</body></html>
