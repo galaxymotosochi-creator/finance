@@ -2246,3 +2246,11 @@ input:focus, select:focus, textarea:focus {
 .modal-box .v2-card .v2-seg{background:transparent !important;border:none !important;padding:0 !important;border-radius:0 !important;box-shadow:none !important;margin-bottom:10px !important}
 /* Модалка «Начислить зарплату» — ширина как у «Новый сотрудник» */
 .modal-box.modal-salary.emp-modal-wide{max-width:560px}
+
+/* Зарплата, шаг 1: подписи дат — как подпись «Сотрудник» */
+.modal-box.modal-salary .form-group label{display:block;font-size:13px;font-weight:600;color:#333;margin:0 0 4px}
+.modal-box.modal-salary .form-group input,
+.modal-box.modal-salary .form-group select{font-size:.875rem;font-weight:500;color:#222;border:1px solid #e8e8ec;border-radius:10px;background:#fff;padding:8px 10px;height:38px;box-sizing:border-box}
+.modal-box.modal-salary .form-group input:focus{border-color:#111;box-shadow:none}
+.modal-box.modal-salary .form-row{gap:10px}
+.modal-box.modal-salary .form-group{margin-bottom:10px}

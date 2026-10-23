@@ -974,15 +974,15 @@ export default function Salary() {
                   options={employees.map(e=>({ value: e.id, label: e.name }))}
                 />
               </div>
-              <div className="sal-row2">
-                <div className="sal-field">
-                  <span className="sal-cap">Начало периода</span>
-                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required className="sal-input"
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Начало периода</label>
+                  <input type="date" value={fPeriodFrom} onChange={e=>setFPeriodFrom(e.target.value)} required
                     onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
                 </div>
-                <div className="sal-field">
-                  <span className="sal-cap">Конец периода</span>
-                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required className="sal-input"
+                <div className="form-group">
+                  <label>Конец периода</label>
+                  <input type="date" value={fPeriodTo} onChange={e=>setFPeriodTo(e.target.value)} required
                     onFocus={e=>e.target.showPicker&&e.target.showPicker()} />
                 </div>
               </div>
