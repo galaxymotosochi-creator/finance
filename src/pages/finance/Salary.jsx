@@ -405,7 +405,7 @@ export default function Salary() {
     } else {
       setFSalaryTotal(fBaseSalary || 0);
     }
-    setFDays(calcDays(fPeriodFrom, fPeriodTo));
+    setFDays(tsWorked || calcDays(fPeriodFrom, fPeriodTo));
   }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalaryType]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
@@ -461,6 +461,7 @@ export default function Salary() {
   // Бонус от выручки пропорционален отработанным дням (по табелю): если табель за период заполнен —
   // умножаем на (рабочие дни / дни периода), если нет — полный процент
   const tsWorked = tsEntries.filter(en => en.status === 'present' || en.status === 'remote').length;
+  const fDayRate = (tsEntries.find(en => (en.day_rate||0) > 0) || {}).day_rate || 0;
   const hasTs = tsEntries.length > 0;
   const periodDays = Math.max(1, calcDays(fPeriodFrom, fPeriodTo) || 1);
   const dayFactor = hasTs ? Math.min(1, tsWorked / periodDays) : 1;
@@ -1015,40 +1016,22 @@ export default function Salary() {
                 </div>
               )}
 
-              {/* Расчет */}
-              <div className="sal-seclab">Расчёт</div>
-              <div className="sk-dd-wrap sal-dd-wrap" style={{marginBottom:'.5rem'}}>
-                <button type="button" className={'f-pill'+(fSalaryType ? ' on' : '')}
-                  onClick={e=>{e.stopPropagation();setSalTypeOpen(!salTypeOpen)}}>
-                  {(SALARY_TYPES.find(t=>t.value===fSalaryType)||SALARY_TYPES[0]).label} <span className="car-tri">▾</span>
-                </button>
-                {salTypeOpen && (
-                  <div className="f-menu">
-                    <div className="f-list">
-                      {SALARY_TYPES.map(t => {
-                        const sel = fSalaryType === t.value;
-                        return (
-                          <div key={t.value} onClick={()=>{setFSalaryType(t.value);setSalTypeOpen(false)}}
-                            className={'f-opt'+(sel?' sel':'')}>
-                            <span className="dot"></span>{t.label}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="form-row" style={{marginBottom:'1rem'}}>
-                <div className="form-group" style={{marginBottom:0}}>
-                  <label>{fSalaryType === 'shift' ? 'Ставка за смену' : fSalaryType === 'piecework' ? 'Сумма за сделанное' : 'Оклад (мес.)'}</label>
-                  <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} />
+              {/* Отработано по табелю */}
+              <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#333',margin:'2px 0 4px'}}>Отработано по табелю</label>
+              <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'10px 12px',fontSize:'12px',color:'#5b6472',lineHeight:'1.75',marginBottom:'10px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                  <span>Отработано</span><b style={{color:'#0d4ea8'}}>{fDays} из {(calcDays(fPeriodFrom,fPeriodTo)||0)} дн.</b>
                 </div>
-                {fSalaryType !== 'piecework' && (
-                  <div className="form-group" style={{marginBottom:0}}>
-                    <label>Отработано</label>
-                    <input type="text" value={fDays + ' дн. / ' + (calcDays(fPeriodFrom,fPeriodTo)||'?') + ' дн.'} disabled />
-                  </div>
-                )}
+                <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                  <span>Ставка за день</span><b style={{color:'#0d4ea8'}}>{fDayRate ? fDayRate.toLocaleString() + ' ' + cur : 'не задана'}</b>
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
+                  <span>Начислено по табелю</span><b style={{color:'#0d4ea8'}}>{(fDayRate * fDays).toLocaleString()} {cur}</b>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Оклад <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
+                <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0" />
               </div>
 
               </>)}
