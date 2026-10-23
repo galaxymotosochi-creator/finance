@@ -810,7 +810,7 @@ export default function Salary() {
           <span className="cat-sub">Расчёт начислений с привязкой к табелю</span>
           </div>
         </div>
-        <div className="sk-bar-acts">
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'auto'}}>
           <button className="cat-add-btn" onClick={openAdd}>Начислить</button>
         </div>
       </div>
