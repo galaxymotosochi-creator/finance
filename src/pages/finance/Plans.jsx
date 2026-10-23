@@ -26,7 +26,9 @@ const parseAmount = (raw) => {
 };
 
 export default function Plans() {
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
+  const isServices = businessType === 'services';
+  const LABELS = isServices ? Object.fromEntries(Object.entries(TARGET_LABELS).filter(([k]) => k !== 'sales_qty' && k !== 'procurement')) : TARGET_LABELS;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [period, setPeriod] = useState('month');
@@ -59,13 +61,13 @@ export default function Plans() {
       if (error) throw error;
 
       const existing = data || [];
-      const plansList = Object.keys(TARGET_LABELS).map(key => {
+      const plansList = Object.keys(LABELS).map(key => {
         const found = existing.find(p => p.target_type === key);
         return {
           id: found?.id || null,
           target_type: key,
           target_amount: found?.target_amount || 0,
-          ...TARGET_LABELS[key],
+          ...LABELS[key],
         };
       });
       setPlans(plansList);

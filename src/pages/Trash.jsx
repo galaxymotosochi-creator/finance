@@ -5,7 +5,7 @@ import CenterSpinner from '../components/CenterSpinner';
 
 // Человеческие названия таблиц для корзины
 const TABLE_LABELS = {
-  products: 'Товар / услуга',
+  products: 'Услуга',
   categories: 'Фин. категория',
   stock_categories: 'Категория склада',
   accounts: 'Счет',
