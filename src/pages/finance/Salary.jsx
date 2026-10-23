@@ -811,7 +811,7 @@ export default function Salary() {
           </div>
         </div>
         <div className="sk-bar-acts">
-          <button className="sk-dd-btn" style={{animation:'skpulse 2s ease-in-out infinite'}} onClick={openAdd}>Начислить</button>
+          <button className="cat-add-btn" onClick={openAdd}>Начислить</button>
         </div>
       </div>
 

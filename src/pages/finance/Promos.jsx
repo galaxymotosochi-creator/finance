@@ -217,7 +217,7 @@ export default function Promos() {
           </div>
         </div>
         <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
-          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+          <button type="button" className="cat-add-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
 

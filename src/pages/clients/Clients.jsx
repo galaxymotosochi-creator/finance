@@ -218,7 +218,7 @@ export default function Clients() {
           </div>
         </div>
         <div className="***">
-          <button type="button" className="sk-dd-btn" onClick={openAdd}>Добавить</button>
+          <button type="button" className="cat-add-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
 
