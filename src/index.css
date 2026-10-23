@@ -2173,3 +2173,70 @@ input:focus, select:focus, textarea:focus {
 .modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-month-field,
 .modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-day-field,
 .modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-year-field{color:rgba(0,0,0,.38) !important}
+
+/* ============================================================
+   ЭТАЛОН МОДАЛОК (утверждён 24.10.2026)
+   Плашка: #fefeff / рамка 1px rgba(0,16,36,.07) / радиус 12px
+   Поле: фон #fff / рамка 1px #e8e8ec / фокус — чёрная рамка #111
+   Подпись: .8125rem / 500 / #333
+   Подсказка: rgba(0,0,0,.38) / 400
+   ============================================================ */
+
+/* Плашка группы полей */
+.modal-box .v2-card {
+  background: #fefeff !important;
+  border: 1px solid rgba(0,16,36,.07) !important;
+  border-radius: 12px !important;
+}
+
+/* Поля во всех модалках — единая светлая рамка, чёрная при фокусе */
+.modal-box .form-group input,
+.modal-box .form-group select,
+.modal-box .form-group textarea,
+.modal-box .v2-card input,
+.modal-box .v2-card select,
+.modal-box .v2-card textarea {
+  background: #fff !important;
+  border: 1px solid #e8e8ec !important;
+  border-radius: 10px !important;
+  color: #222 !important;
+  font-size: .875rem !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.modal-box .form-group input:focus,
+.modal-box .form-group select:focus,
+.modal-box .form-group textarea:focus,
+.modal-box .v2-card input:focus,
+.modal-box .v2-card select:focus,
+.modal-box .v2-card textarea:focus {
+  border: 1px solid #111 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Выпадашки (SmartSelect) — та же рамка и фокус */
+.modal-box .cat-sel-wrap > button {
+  background: #fff !important;
+  border: 1px solid #e8e8ec !important;
+  border-radius: 10px !important;
+  color: #222 !important;
+  font-size: .875rem !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+.modal-box .cat-sel-wrap > button:focus {
+  border: 1px solid #111 !important;
+  box-shadow: none !important;
+}
+
+/* Заглушки */
+.modal-box input::placeholder,
+.modal-box textarea::placeholder {
+  color: rgba(0,0,0,.38) !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
+.modal-box .cat-sel-wrap > button span:first-child { font-weight: 500; }
