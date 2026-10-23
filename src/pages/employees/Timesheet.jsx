@@ -667,7 +667,7 @@ export default function Timesheet() {
             {dayStep === 3 && (
               <div>
                 <div className="ts-seclab">Премии</div>
-                {bonusRows.filter(r => r.empId || r.amount).map((row, idx) => (
+                {bonusRows.map((row, idx) => (row.empId || row.amount) && (
                   <div key={'b'+idx} className="ts-pcard">
                     <div style={{display:'flex',gap:'7px',alignItems:'center',marginBottom:'7px'}}>
                       <select className="ts-sel" style={{flex:1,maxWidth:'none'}} value={row.empId} onChange={e => setBonusRows(bonusRows.map((r,i)=>i===idx?{...r,empId:e.target.value}:r))}>
@@ -685,10 +685,10 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <div className="ts-add" onClick={() => setBonusRows([...bonusRows, emptyRow()])}>+ Добавить премию</div>
+                <button type="button" className="ts-add" onClick={() => setBonusRows([...bonusRows, emptyRow()])}>+ Добавить премию</button>
 
                 <div className="ts-seclab" style={{marginTop:'12px'}}>Штрафы</div>
-                {deductRows.filter(r => r.empId || r.amount).map((row, idx) => (
+                {deductRows.map((row, idx) => (row.empId || row.amount) && (
                   <div key={'d'+idx} className="ts-pcard">
                     <div style={{display:'flex',gap:'7px',alignItems:'center',marginBottom:'7px'}}>
                       <select className="ts-sel" style={{flex:1,maxWidth:'none'}} value={row.empId} onChange={e => setDeductRows(deductRows.map((r,i)=>i===idx?{...r,empId:e.target.value}:r))}>
@@ -706,7 +706,7 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <div className="ts-add" onClick={() => setDeductRows([...deductRows, emptyRow()])}>+ Добавить штраф</div>
+                <button type="button" className="ts-add" onClick={() => setDeductRows([...deductRows, emptyRow()])}>+ Добавить штраф</button>
               </div>
             )}
 
