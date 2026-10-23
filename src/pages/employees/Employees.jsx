@@ -612,7 +612,7 @@ export default function Employees() {
                 </div>
 
                 {/* От всей выручки */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                <div style={{ background: '#fefeff', border: '1px solid rgba(0,16,36,.07)', borderRadius: '12px', padding: '12px 14px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>От всей выручки</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Процент от продаж за период. В чеках указывать не нужно.</div>
                   <div style={{ width: '50%', maxWidth: '50%', background: '#fff', border: '1.5px solid ' + (storeRule() ? '#111' : '#e5e7eb'), borderRadius: '12px', padding: '9px 10px' }}>
@@ -641,7 +641,7 @@ export default function Employees() {
                 </div>
 
                 {/* По типу */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                <div style={{ background: '#fefeff', border: '1px solid rgba(0,16,36,.07)', borderRadius: '12px', padding: '12px 14px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По типу</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>{isServices ? 'Своя ставка для всех услуг' : 'Своя ставка для всех услуг и для всех товаров'}</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -666,7 +666,7 @@ export default function Employees() {
                 </div>
 
                 {/* По категориям */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
+                <div style={{ background: '#fefeff', border: '1px solid rgba(0,16,36,.07)', borderRadius: '12px', padding: '12px 14px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>По категориям</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для позиций категории. Заменяет «По типу».</div>
                   {fBonusRules.filter(r => r.scope === 'service_category' || (!isServices && r.scope === 'product_category')).map((rule, ri) => (
@@ -717,7 +717,7 @@ export default function Employees() {
                 </div>
 
                 {/* Конкретные позиции */}
-                <div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: '14px', padding: '14px 16px' }}>
+                <div style={{ background: '#fefeff', border: '1px solid rgba(0,16,36,.07)', borderRadius: '12px', padding: '12px 14px' }}>
                   <div style={{ fontSize: '.8125rem', fontWeight: 600, color: '#333', marginBottom: '.25rem' }}>Конкретные позиции</div>
                   <div style={{ fontSize: '.68rem', color: '#aaa', marginBottom: '8px' }}>Своя ставка для одной позиции. Заменяет категории и «По типу».</div>
                   {fBonusRules.filter(r => r.scope === 'service' || (!isServices && r.scope === 'product')).map((rule, ri) => (
@@ -767,7 +767,7 @@ export default function Employees() {
                   )}
                 </div>
 
-                <div style={{ marginTop: '10px', background: '#f8f9fa', borderRadius: '10px', padding: '8px 10px', fontSize: '.7rem', color: '#888', lineHeight: 1.6 }}>
+                <div style={{ marginTop: '10px', background: '#fefeff', border: '1px solid rgba(0,16,36,.07)', borderRadius: '12px', padding: '8px 12px', fontSize: '.7rem', color: '#888', lineHeight: 1.6 }}>
                   ⚡ Приоритет: <b>конкретная позиция</b> → <b>категория</b> → <b>по типу</b> (услуги/товары).
                 </div>
               </div>
