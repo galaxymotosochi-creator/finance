@@ -2067,3 +2067,34 @@ input:focus, select:focus, textarea:focus {
 
 /* v2: модалка с отступами сверху и снизу */
 
+/* Чистая прибыль — вариант 3 (полоса-соотношение + секции) */
+.pnl2-card{border:1px solid rgba(29,120,252,.16);border-radius:16px;padding:18px 18px 16px;background:#fff;box-shadow:0 2px 14px rgba(11,18,32,.05);margin-bottom:14px}
+.pnl2-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.pnl2-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;margin-bottom:5px}
+.pnl2-big{font-size:32px;font-weight:800;letter-spacing:-.035em;line-height:1;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.pnl2-big small{font-size:32px;font-weight:800;letter-spacing:-.035em;color:var(--ink)}
+.pnl2-dt{font-size:11.5px;color:var(--muted);margin-top:6px}
+.pnl2-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:12px;padding:7px 12px;background:rgba(31,117,255,.08);color:#0d4ea8;box-shadow:inset 0 0 0 1px rgba(31,117,255,.22);white-space:nowrap}
+.pnl2-strip{display:flex;height:46px;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(29,120,252,.14)}
+.pnl2-s1{background:linear-gradient(90deg,#0d4ea8,#1F75FF);display:flex;align-items:center;padding:0 12px;color:#fff;font-size:11px;font-weight:800;min-width:0;overflow:hidden}
+.pnl2-s2{background:linear-gradient(90deg,#3c4553,#20252e);display:flex;align-items:center;justify-content:flex-end;padding:0 12px;color:#fff;font-size:11px;font-weight:800;flex:1;min-width:0}
+.pnl2-legend{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:10.5px;color:var(--muted)}
+.pnl2-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}
+.pnl2-cell{border:1px solid rgba(29,120,252,.14);border-radius:13px;padding:11px;background:#F6F9FF}
+.pnl2-cell .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+.pnl2-cell .v{font-size:14.5px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
+.pnl2-sec{margin-top:14px;border:1px solid rgba(29,120,252,.14);border-radius:14px;padding:11px 13px;background:#fff}
+.pnl2-sh{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#0d4ea8;margin-bottom:6px}
+.pnl2-sh .dt{width:8px;height:8px;border-radius:3px;background:#1F75FF;flex:none}
+.pnl2-sh.exp{color:#3c4553}
+.pnl2-sh.exp .dt{background:#20252e}
+.pnl2-sh .tot{margin-left:auto;font-size:11px;font-weight:800;text-transform:none;letter-spacing:0;color:#0d4ea8}
+.pnl2-sh.exp .tot{color:#111}
+.pnl2-row{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
+.pnl2-row:last-child{border-bottom:none;padding-bottom:2px}
+.pnl2-row .nm{color:#33405a;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:640px){
+  .pnl2-kpi{grid-template-columns:1fr 1fr}
+  .pnl2-big,.pnl2-big small{font-size:26px}
+  .pnl2-strip{height:40px}
+}

@@ -254,6 +254,18 @@ export default function PnL() {
   // Строки отчета: группа «Доходы» (итог зеленым) → группа «Расходы» (итог красным)
   const incomeTotal = (d.salesRev + d.discounts) + d.otherIncome + d.surpluses;
   const expenseTotal = d.discounts + d.totalCogs + d.opTotal + d.shortages;
+  const incomeRows = [
+    { name: 'Доход от продаж', value: d.salesRev + d.discounts },
+    { name: 'Прочие доходы', value: d.otherIncome },
+    { name: 'Излишки по инвентаризации', value: d.surpluses },
+  ];
+  const expenseRows = [
+    ...(d.discounts > 0 ? [{ name: 'Скидки с продаж', value: d.discounts }] : []),
+    ...(isServices ? [] : [{ name: 'Закупка товара', value: d.totalCogs }]),
+    ...d.opList.map(([name, amt]) => ({ name, value: amt })),
+    ...(d.shortages > 0 ? [{ name: 'Недостачи по инвентаризации', value: d.shortages }] : []),
+  ];
+
   const rowData = [
     { key: 'h-inc', name: 'Доходы', value: `${fmt(incomeTotal)} ${cur}`, nameColor: '#16a34a', valueColor: '#16a34a', valueWeight: 400 },
     { key: 'sales', name: 'Доход от продаж', value: fmt(d.salesRev + d.discounts) },
@@ -267,8 +279,8 @@ export default function PnL() {
   ];
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', fontFamily: 'var(--font)' }}>
-      {/* Шапка — фирменный стиль: голубая плашка + подсказка (как в «Чеках» и остальных разделах) */}
+    <div style={{ maxWidth: '760px', margin: '0 auto', fontFamily: 'var(--font)' }}>
+      {/* Шапка */}
       <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
           <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
@@ -276,22 +288,19 @@ export default function PnL() {
             <h1 className="cat-title">Чистая прибыль</h1>
             <SectionHelp
               title="Раздел «Чистая прибыль»"
-              intro="Здесь видно, сколько бизнес заработал за период: доходы минус расходы. Сверху — итог и рентабельность, ниже — отчёт, который раскрывается по группам."
+              intro="Здесь видно, сколько бизнес заработал за период: доходы минус расходы. Сверху — итог и рентабельность, ниже — подробная расшифровка доходов и расходов."
               faq={[
                 { q: 'Что такое чистая прибыль?', a: (
                   <div>Это <b>все доходы</b> за период минус <b>все расходы</b>: закупка товара, зарплата, аренда и прочие операционные расходы, скидки, недостачи по инвентаризации.</div>
                 ) },
                 { q: 'Что показывает рентабельность?', a: (
-                  <div><b>Рентабельность</b> — какую долю от выручки составляет чистая прибыль. Например, 27.5% значит: с каждых 100 ₽ выручки 27.5 ₽ остаётся прибылью.</div>
+                  <div><b>Рентабельность</b> — какую долю от выручки составляет чистая прибыль. Например, 27% значит: с каждых 100 ₽ выручки 27 ₽ остаётся прибылью.</div>
                 ) },
-                { q: 'Как посмотреть подробности?', a: (
-                  <div>Нажмите на <b>«Доходы»</b> или <b>«Расходы»</b> — блок раскроется, и внутри будут все статьи. Повторный клик — свернёт. Треугольник слева показывает, что блок можно открыть.</div>
-                ) },
-                { q: 'Как выбрать период?', a: (
-                  <div>Кнопкой <b>«Период»</b> справа вверху. Можно взять <b>Месяц</b>, <b>Квартал</b>, <b>Год</b> или выбрать <b>свой период</b> — две даты и кнопка «Применить».</div>
+                { q: 'Откуда берутся проценты у статей?', a: (
+                  <div>Проценты считаются от итога той же группы: у доходов — от общей суммы доходов, у расходов — от общей суммы расходов.</div>
                 ) },
                 { q: 'Почему прибыль может быть минусовой?', a: (
-                  <div>Если <b>расходы выше доходов</b> — период убыточный. Раскройте <b>«Расходы»</b> и посмотрите, какая статья съела больше всего.</div>
+                  <div>Если <b>расходы выше доходов</b> — период убыточный. Раскройте секцию <b>«Расходы»</b> и посмотрите, какая статья съела больше всего.</div>
                 ) },
               ]} />
           </div>
@@ -305,7 +314,7 @@ export default function PnL() {
             {period === 'custom' ? 'Свой период' : (period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год')}
             <span className="car-tri">▾</span>
           </button>
-          <div className="sk-period-menu" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'260px',padding:'.4rem',zIndex:100,display:'none'}}>
+          <div className="sk-dd-menu" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'260px',padding:'.4rem',zIndex:100,display:'none'}}>
             {[['month','Месяц'],['quarter','Квартал'],['year','Год']].map(([k,l]) => (
               <button key={k} type="button"
                 style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
@@ -328,69 +337,63 @@ export default function PnL() {
         </div>
       </div>
 
-      {/* Окно — фирменные сине-жёлтые цвета */}
-      <div className="pnl-frame">
-        <div className="pnl-top">
-        {/* KPI: чистая прибыль (жёлтый блок 1-в-1 с макетом) */}
-        <div className="pnl-kpi">
-          <div className="pnl-kpi-card">
-            <div className="lbl">Чистая прибыль</div>
-            <div className="big">{fmt(d.netProfit)} {cur}</div>
-            <div className="chips">
-              <div className="chip"><div className="lbl">Рентабельность</div><b>{d.profitability}%</b></div>
-              <div className="chip"><div className="lbl">Выручка</div><b>{fmt(incomeTotal)} {cur}</b></div>
-            </div>
+      {/* Итог */}
+      <div className="pnl2-card">
+        <div className="pnl2-head">
+          <div style={{minWidth:0}}>
+            <div className="pnl2-lbl">Чистая прибыль</div>
+            <div className="pnl2-big num">{fmt(d.netProfit)} <small>₽</small></div>
+            <div className="pnl2-dt">за {periodLabel.toLowerCase()}</div>
           </div>
+          <span className="pnl2-pill">Рентабельность <b>{d.profitability}%</b></span>
         </div>
 
-        {/* Отчет о прибыли — Доходы/Расходы раскрываются */}
-        <div style={{ flex: 1, minWidth: '290px' }}>
-          <div className="pnl-rhead">
-            <span>Отчёт о прибыли</span>
-            <span>{periodLabel}</span>
+        {/* Полоса-соотношение */}
+        <div className="pnl2-strip">
+          <div className="pnl2-s1" style={{width: Math.max(0, Math.min(100, d.profitability)) + '%'}}>
+            {d.profitability > 8 ? <>{d.profitability}%</> : null}
           </div>
-
-          <div className={'pnl-acc' + (pnlOpen.inc ? ' open' : '')}>
-            <div className="pnl-acc-head" onClick={() => setPnlOpen(o => ({ ...o, inc: !o.inc }))}>
-              <div className="pnl-acc-left">
-                <span className="pnl-acc-car">▼</span>
-                <span>Доходы</span>
-              </div>
-              <span className="pnl-acc-val inc">{fmt(incomeTotal)} {cur}</span>
-            </div>
-            <div className="pnl-acc-body">
-              <div className="pnl-r"><span className="nm">Доход от продаж</span><span className="v">{fmt(d.salesRev + d.discounts)} {cur}</span></div>
-              <div className="pnl-r"><span className="nm">Прочие доходы</span><span className="v">{fmt(d.otherIncome)} {cur}</span></div>
-              <div className="pnl-r"><span className="nm">Излишки по инвентаризации</span><span className="v">{fmt(d.surpluses)} {cur}</span></div>
-            </div>
-          </div>
-
-          <div className={'pnl-acc' + (pnlOpen.exp ? ' open' : '')}>
-            <div className="pnl-acc-head" onClick={() => setPnlOpen(o => ({ ...o, exp: !o.exp }))}>
-              <div className="pnl-acc-left">
-                <span className="pnl-acc-car">▼</span>
-                <span>Расходы</span>
-              </div>
-              <span className="pnl-acc-val exp">{fmt(expenseTotal)} {cur}</span>
-            </div>
-            <div className="pnl-acc-body">
-              {d.discounts > 0 && <div className="pnl-r"><span className="nm">Скидки с продаж</span><span className="v">{fmt(d.discounts)} {cur}</span></div>}
-              {!isServices && <div className="pnl-r"><span className="nm">Закупка товара</span><span className="v">{fmt(d.totalCogs)} {cur}</span></div>}
-              {d.opList.map(([name, amt], i) => (
-                <div className="pnl-r" key={i}><span className="nm">{name}</span><span className="v">{fmt(amt)} {cur}</span></div>
-              ))}
-              {d.shortages > 0 && <div className="pnl-r"><span className="nm">Недостачи по инвентаризации</span><span className="v">{fmt(d.shortages)} {cur}</span></div>}
-            </div>
-          </div>
-
-          {/* Мини-плашки: закупка, запас, деньги */}
-          <div className="pnl-grid3">
-            {!isServices && <div className="pnl-mini"><div className="lbl">ЗАКУПКА ТОВАРА</div><b>{fmt(d.totalCogs)} {cur}</b></div>}
-            {!isServices && <div className="pnl-mini"><div className="lbl">ТОВАРНЫЙ ЗАПАС</div><b>{fmt(d.stockValue)} {cur}</b></div>}
-            <div className="pnl-mini"><div className="lbl">ДЕНЬГИ НА СЧЕТАХ</div><b>{fmt(d.totalCash)} {cur}</b></div>
-          </div>
+          <div className="pnl2-s2">{Math.max(0, 100 - d.profitability)}%</div>
         </div>
+        <div className="pnl2-legend">
+          <span className="num">осталось {fmt(d.netProfit)} {cur}</span>
+          <span className="num">потрачено {fmt(expenseTotal)} {cur}</span>
         </div>
+
+        {/* Три KPI */}
+        <div className="pnl2-kpi">
+          <div className="pnl2-cell"><div className="l">Доходы</div><div className="v num">{fmt(incomeTotal)}</div></div>
+          <div className="pnl2-cell"><div className="l">Расходы</div><div className="v num">{fmt(expenseTotal)}</div></div>
+          <div className="pnl2-cell"><div className="l">Деньги на счетах</div><div className="v num">{fmt(d.totalCash)}</div></div>
+        </div>
+      </div>
+
+      {/* Доходы */}
+      <div className="pnl2-sec">
+        <div className="pnl2-sh">
+          <span className="dt"></span>Доходы
+          <span className="num tot inc">{fmt(incomeTotal)} {cur}</span>
+        </div>
+        {incomeRows.map((r, i) => (
+          <div className="pnl2-row" key={'i' + i}>
+            <span className="nm">{r.name}</span>
+            <span className="num">{fmt(r.value)} {cur} · {incomeTotal > 0 ? Math.round(r.value / incomeTotal * 100) : 0}%</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Расходы */}
+      <div className="pnl2-sec">
+        <div className="pnl2-sh exp">
+          <span className="dt"></span>Расходы
+          <span className="num tot">{fmt(expenseTotal)} {cur}</span>
+        </div>
+        {expenseRows.map((r, i) => (
+          <div className="pnl2-row" key={'e' + i}>
+            <span className="nm">{r.name}</span>
+            <span className="num">{fmt(r.value)} {cur} · {expenseTotal > 0 ? Math.round(r.value / expenseTotal * 100) : 0}%</span>
+          </div>
+        ))}
       </div>
     </div>
   );
