@@ -2152,3 +2152,12 @@ input:focus, select:focus, textarea:focus {
 
 /* Модалка «Добавить сотрудника» — пошире, чтобы поля помещались */
 .modal-box.modal-v2.emp-modal-wide{max-width:560px}
+
+/* Поле даты: дата-подсказка приглушённая + фирменный мигающий треугольник */
+.dt-wrap{position:relative}
+.dt-wrap .dt-input{width:100%;font-family:var(--font);font-size:.875rem;padding:.5rem .65rem;padding-right:2rem;border:1.5px solid rgba(0,0,0,.26);border-radius:var(--radius-md);background:var(--body-bg);color:#222;outline:none;box-sizing:border-box;min-height:38px}
+.dt-wrap .dt-input::-webkit-datetime-edit{color:#222}
+.dt-wrap .dt-input.placeholder::-webkit-datetime-edit{color:rgba(0,0,0,.38)}
+.dt-wrap .dt-input:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.dt-wrap .dt-tri{position:absolute;right:10px;top:50%;margin-top:-9px;pointer-events:none;font-size:15px}
+.dt-wrap .dt-input::-webkit-calendar-picker-indicator{opacity:0;width:0;height:0;position:absolute;right:0}

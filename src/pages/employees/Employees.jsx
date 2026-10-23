@@ -590,7 +590,10 @@ export default function Employees() {
                 </div>
                 <div className="form-group">
                   <label>Дата приема</label>
-                  <input type="date" value={fHireDate} onChange={e=>setFHireDate(e.target.value)} />
+                  <div className="dt-wrap">
+                    <input type="date" className="dt-input" value={fHireDate} onChange={e=>setFHireDate(e.target.value)} />
+                    <span className="car-tri dt-tri">▾</span>
+                  </div>
                 </div>
               </div>
               <div className="form-group">
