@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Планирование — пошаговый мастер</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 16px 70px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(180deg,#eef4ff,#f7f9fd 320px);color:var(--ink)}
+.shell{max-width:560px;margin:0 auto}
+.top{text-align:center;margin-bottom:18px}
+.top .em{font-size:26px}
+.top h1{font-size:19px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.top p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5}
+.dots{display:flex;gap:6px;justify-content:center;margin:14px 0 20px}
+.dots i{width:26px;height:4px;border-radius:99px;background:#dde6f5;transition:.25s}
+.dots i.on{background:var(--blue);width:34px}
+.dots i.done{background:#9dc0ff}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:22px;box-shadow:0 16px 40px -26px rgba(11,18,32,.55)}
+.step{display:none;animation:in .28s ease}
+.step.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.q{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:0 0 5px}
+.qh{font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+.opt{display:flex;align-items:center;gap:11px;border:1.5px solid #e8eef8;border-radius:14px;padding:13px 14px;margin-bottom:9px;cursor:pointer;transition:.18s;background:#fff}
+.opt:hover{border-color:rgba(31,117,255,.45);background:var(--soft);transform:translateY(-1px)}
+.opt.on{border-color:var(--blue);background:var(--soft);box-shadow:0 0 0 3px rgba(31,117,255,.1)}
+.opt .ic{width:38px;height:38px;border-radius:11px;background:rgba(31,117,255,.09);display:grid;place-items:center;font-size:17px;flex:none}
+.opt .tx{flex:1;min-width:0}
+.opt .nm{font-size:13.5px;font-weight:700}
+.opt .ds{font-size:11px;color:var(--muted);margin-top:2px}
+.opt .chk{width:20px;height:20px;border-radius:50%;border:1.5px solid #d7e0ee;flex:none;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:800}
+.opt.on .chk{background:var(--blue);border-color:var(--blue)}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:11.5px;font-weight:700;color:#5b6472;margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:1.5px solid #e2e9f5;border-radius:13px;font-size:15px;font-family:inherit;font-variant-numeric:tabular-nums;font-weight:700;background:#fbfdff;transition:.18s}
+.field input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.field .h{font-size:10.5px;color:var(--muted);margin-top:5px}
+.btn{width:100%;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;transition:.18s;background:#111;color:#fff}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px -14px rgba(0,0,0,.7)}
+.btn.ghost{background:transparent;color:#5b6472;font-weight:700;box-shadow:inset 0 0 0 1.5px #e2e9f5;margin-top:8px}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1.5px #c9d6ea;background:#fbfdff}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.row{display:flex;gap:9px;margin-top:16px}
+.row .btn{margin-top:0}
+.pill{display:inline-block;font-size:10.5px;font-weight:800;border-radius:99px;padding:3px 9px;background:rgba(31,117,255,.1);color:var(--blue-d)}
+/* прогресс-бар в шаге 2 */
+.pbar{height:8px;border-radius:99px;background:#eef2f9;overflow:hidden;margin-top:8px}
+.pbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-d),var(--blue));transition:width .3s}
+.pv{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+/* финал: вариант 5 */
+.frow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f2f5fa}
+.frow:last-of-type{border-bottom:none}
+.fic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:14px;flex:none;background:rgba(31,117,255,.08)}
+.fbody{flex:1;min-width:0}
+.fnm{font-size:12px;font-weight:700;margin-bottom:5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.fsub{font-size:10px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.fin{width:100px;border:1.5px solid var(--line);border-radius:9px;padding:7px 8px;font-size:12px;text-align:right;font-family:inherit;font-variant-numeric:tabular-nums;font-weight:700;background:#fff}
+.fin:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.bar{height:7px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-d),var(--blue))}
+.bar i.ok{background:linear-gradient(90deg,#0d9488,#2dd4bf)}
+.bar i.over{background:linear-gradient(90deg,#b45309,#f59e0b)}
+.ffoot{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(29,120,252,.2);font-size:11px;color:var(--muted);line-height:1.5}
+.done{text-align:center;padding:8px 0 4px}
+.done .ic{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:grid;place-items:center;margin:0 auto 12px;font-size:26px;box-shadow:0 14px 28px -16px rgba(13,148,136,.9)}
+.done h2{font-size:17px;font-weight:800;margin:0 0 6px}
+.done p{font-size:12px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+</style></head><body>
+<div class="shell">
+  <div class="top">
+    <div class="em">🎯</div>
+    <h1>Запланируем бюджет бизнеса</h1>
+    <p>Четыре коротких шага — и у вас цели на период</p>
+  </div>
+  <div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+
+  <div class="card">
+    <!-- ШАГ 1: период -->
+    <div class="step on" data-s="0">
+      <div class="q">На какой срок планируем?</div>
+      <div class="qh">Выберите период — цели сохранятся именно на него.</div>
+      <div class="opt on" data-k="month"><div class="ic">📅</div><div class="tx"><div class="nm">Месяц</div><div class="ds">Октябрь 2026</div></div><div class="chk">✓</div></div>
+      <div class="opt" data-k="quarter"><div class="ic">🗓️</div><div class="tx"><div class="nm">Квартал</div><div class="ds">IV квартал 2026</div></div><div class="chk">✓</div></div>
+      <div class="opt" data-k="half"><div class="ic">📆</div><div class="tx"><div class="nm">Полгода</div><div class="ds">Июль — декабрь 2026</div></div><div class="chk">✓</div></div>
+      <div class="opt" data-k="year"><div class="ic">🎯</div><div class="tx"><div class="nm">Год</div><div class="ds">2026</div></div><div class="chk">✓</div></div>
+      <div class="row"><button class="btn" onclick="next()">Дальше →</button></div>
+    </div>
+
+    <!-- ШАГ 2: выручка -->
+    <div class="step" data-s="1">
+      <div class="q">Сколько хотите заработать?</div>
+      <div class="qh">Планируемая выручка за выбранный период. Если не уверены — начните с факта прошлого периода.</div>
+      <div class="field">
+        <label>Цель по выручке, ₽</label>
+        <input id="rev" type="text" inputmode="numeric" placeholder="1 500 000" oninput="calc()">
+        <div class="h">Факт за прошлый месяц: 1 284 500 ₽</div>
+      </div>
+      <div class="pbar"><i id="revbar" style="width:0%"></i></div>
+      <div class="pv"><span>0 ₽</span><span id="revhint">цель пока не задана</span></div>
+      <div class="row">
+        <button class="btn ghost" onclick="prev()">← Назад</button>
+        <button class="btn" onclick="next()">Дальше →</button>
+      </div>
+    </div>
+
+    <!-- ШАГ 3: расходы -->
+    <div class="step" data-s="2">
+      <div class="q">Сколько готовы потратить?</div>
+      <div class="qh">Бюджет на расходы. Разница с выручкой станет целью по прибыли.</div>
+      <div class="field">
+        <label>Бюджет расходов, ₽</label>
+        <input id="exp" type="text" inputmode="numeric" placeholder="900 000" oninput="calc()">
+        <div class="h">В этот бюджет входят зарплата, аренда, закупки и прочее</div>
+      </div>
+      <div class="opt" style="cursor:default;background:var(--soft);border-color:rgba(31,117,255,.35)">
+        <div class="ic">📈</div>
+        <div class="tx"><div class="nm">Прибыль по плану</div><div class="ds" id="profitHint" style="font-variant-numeric:tabular-nums">— ₽</div></div>
+      </div>
+      <div class="row">
+        <button class="btn ghost" onclick="prev()">← Назад</button>
+        <button class="btn" onclick="next()">Дальше →</button>
+      </div>
+    </div>
+
+    <!-- ШАГ 4: клиенты -->
+    <div class="step" data-s="3">
+      <div class="q">Новые клиенты</div>
+      <div class="qh">Сколько новых клиентов хотите привлечь за период? Это необязательно.</div>
+      <div class="field">
+        <label>Цель по новым клиентам</label>
+        <input id="cl" type="text" inputmode="numeric" placeholder="30">
+        <div class="h">Можно пропустить — нажмите «Дальше»</div>
+      </div>
+      <div class="row">
+        <button class="btn ghost" onclick="prev()">← Назад</button>
+        <button class="btn" onclick="next()">Дальше →</button>
+      </div>
+    </div>
+
+    <!-- ШАГ 5: подтверждение -->
+    <div class="step" data-s="4">
+      <div class="q">Проверьте цели</div>
+      <div class="qh">Всё верно? После сохранения план начнёт сравниваться с фактом.</div>
+      <div class="opt" style="cursor:default"><div class="ic">📅</div><div class="tx"><div class="nm" id="sPeriod">Месяц</div><div class="ds">Период планирования</div></div></div>
+      <div class="opt" style="cursor:default"><div class="ic">💰</div><div class="tx"><div class="nm" id="sRev">— ₽</div><div class="ds">Цель по выручке</div></div></div>
+      <div class="opt" style="cursor:default"><div class="ic">💸</div><div class="tx"><div class="nm" id="sExp">— ₽</div><div class="ds">Бюджет расходов</div></div></div>
+      <div class="opt" style="cursor:default"><div class="ic">📈</div><div class="tx"><div class="nm" id="sProf">— ₽</div><div class="ds">Прибыль по плану</div></div></div>
+      <div class="opt" style="cursor:default"><div class="ic">👥</div><div class="tx"><div class="nm" id="sCl">—</div><div class="ds">Новые клиенты</div></div></div>
+      <div class="row">
+        <button class="btn ghost" onclick="prev()">← Назад</button>
+        <button class="btn" onclick="finish()">Сохранить план ✓</button>
+      </div>
+    </div>
+
+    <!-- ФИНАЛ: вариант 5 -->
+    <div class="step" data-s="5">
+      <div class="done">
+        <div class="ic">✓</div>
+        <h2>План сохранён</h2>
+        <p>Теперь факт подтянется сам — из продаж, расходов и базы клиентов</p>
+      </div>
+      <div class="frow"><div class="fic">💰</div><div class="fbody"><div class="fnm"><span>Выручка</span><span class="pill" id="p1">0%</span></div><div class="bar"><i id="b1" style="width:0%"></i></div><div class="fsub"><span id="f1">факт 1 284 500 ₽</span><span id="r1">—</span></div></div><input class="fin" id="i1" value=""></div>
+      <div class="frow"><div class="fic">📈</div><div class="fbody"><div class="fnm"><span>Прибыль</span><span class="pill" id="p2">0%</span></div><div class="bar"><i id="b2" class="ok" style="width:0%"></i></div><div class="fsub"><span id="f2">факт 348 300 ₽</span><span id="r2">—</span></div></div><input class="fin" id="i2" value=""></div>
+      <div class="frow"><div class="fic">💸</div><div class="fbody"><div class="fnm"><span>Расходы (бюджет)</span><span class="pill" id="p3">0%</span></div><div class="bar"><i id="b3" class="over" style="width:0%"></i></div><div class="fsub"><span id="f3">факт 936 200 ₽</span><span id="r3">—</span></div></div><input class="fin" id="i3" value=""></div>
+      <div class="frow"><div class="fic">👥</div><div class="fbody"><div class="fnm"><span>Новых клиентов</span><span class="pill" id="p4">0%</span></div><div class="bar"><i id="b4" style="width:0%"></i></div><div class="fsub"><span id="f4">факт 18</span><span id="r4">—</span></div></div><input class="fin" id="i4" value=""></div>
+      <div class="ffoot">Факт пересчитывается автоматически. Планы можно менять прямо в этих полях — нажмите «Сохранить».</div>
+      <div class="row"><button class="btn" onclick="alert('В приложении: планы сохранены')">Сохранить</button></div>
+      <div class="row"><button class="btn ghost" onclick="restart()">Пройти заново</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var facts = { rev: 1284500, profit: 348300, exp: 936200, cl: 18 };
+var state = { period: 'month', rev: '', exp: '', cl: '' };
+var step = 0;
+
+function fmt(n){ n = Math.round(Number(n)||0); return n.toLocaleString('ru-RU'); }
+function num(v){ return Number(String(v).replace(/[^\d]/g,''))||0; }
+function setDots(){
+  var d = document.getElementById('dots').children;
+  for (var i=0;i<d.length;i++){ d[i].className = i===step ? 'on' : (i<step?'done':''); }
+}
+function show(n){
+  step = n;
+  var ss = document.querySelectorAll('.step');
+  for (var i=0;i<ss.length;i++) ss[i].className = 'step' + (i===n?' on':'');
+  setDots();
+  if (n===3) { document.getElementById('cl').value = state.cl; }
+  if (n===4) fillSummary();
+  if (n===5) renderFinal();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){
+  if (step===1){ state.rev = document.getElementById('rev').value; }
+  if (step===2){ state.exp = document.getElementById('exp').value; }
+  if (step===3){ state.cl = document.getElementById('cl').value; }
+  show(Math.min(step+1,5));
+}
+function prev(){ show(Math.max(step-1,0)); }
+function calc(){
+  var r = num(document.getElementById('rev').value);
+  var e = num(document.getElementById('exp').value);
+  document.getElementById('revbar').style.width = Math.min(100, r/1500000*100) + '%';
+  document.getElementById('revhint').textContent = r ? 'цель ' + fmt(r) + ' ₽' : 'цель пока не задана';
+  document.getElementById('profitHint').textContent = (r||e) ? fmt(r-e) + ' ₽' : '— ₽';
+}
+function fillSummary(){
+  var pn = { month:'Месяц — октябрь 2026', quarter:'Квартал — IV квартал 2026', half:'Полгода — июль-декабрь 2026', year:'Год — 2026' };
+  var r = num(state.rev), e = num(state.exp), c = num(state.cl);
+  document.getElementById('sPeriod').textContent = pn[state.period];
+  document.getElementById('sRev').textContent = r ? fmt(r) + ' ₽' : 'не задано';
+  document.getElementById('sExp').textContent = e ? fmt(e) + ' ₽' : 'не задано';
+  document.getElementById('sProf').textContent = (r||e) ? fmt(r-e) + ' ₽' : '—';
+  document.getElementById('sCl').textContent = c ? c + ' чел.' : 'не задано';
+}
+function finish(){ show(5); }
+function renderFinal(){
+  var r = num(state.rev), e = num(state.exp), c = num(state.cl);
+  var prof = r - e;
+  document.getElementById('i1').value = r ? fmt(r) : '';
+  document.getElementById('i2').value = prof ? fmt(prof) : '';
+  document.getElementById('i3').value = e ? fmt(e) : '';
+  document.getElementById('i4').value = c ? String(c) : '';
+  upd('1', facts.rev, r, false);
+  upd('2', facts.profit, prof, true);
+  upd('3', facts.exp, e, true, true);
+  upd('4', facts.cl, c, false);
+  ['i1','i2','i3','i4'].forEach(function(id){
+    document.getElementById(id).oninput = function(){
+      var rr = num(document.getElementById('i1').value);
+      var ee = num(document.getElementById('i3').value);
+      document.getElementById('i2').value = fmt(rr-ee);
+      upd('1', facts.rev, rr, false);
+      upd('2', facts.profit, rr-ee, true);
+      upd('3', facts.exp, ee, true, true);
+      upd('4', facts.cl, num(document.getElementById('i4').value), false);
+    };
+  });
+}
+function upd(k, fact, plan, okGreen, inverse){
+  var pc = plan > 0 ? Math.round(fact/plan*100) : 0;
+  var elP = document.getElementById('p'+k), elB = document.getElementById('b'+k), elR = document.getElementById('r'+k);
+  elP.textContent = plan > 0 ? pc + '%' : '—';
+  elB.style.width = Math.min(100, pc) + '%';
+  elB.className = '';
+  if (plan > 0) elB.className = (inverse && fact > plan) ? 'over' : (okGreen ? 'ok' : '');
+  if (!plan) { elR.textContent = 'план не задан'; return; }
+  var left = plan - fact;
+  elR.textContent = left >= 0 ? 'до цели ' + fmt(left) : (inverse ? 'перерасход ' + fmt(-left) : 'план перевыполнен на ' + fmt(-left));
+}
+function restart(){ state = { period:'month', rev:'', exp:'', cl:'' }; document.getElementById('rev').value=''; document.getElementById('exp').value=''; document.getElementById('cl').value=''; calc(); show(0); }
+
+document.querySelectorAll('.opt[data-k]').forEach(function(el){
+  el.onclick = function(){
+    document.querySelectorAll('.opt[data-k]').forEach(function(x){ x.className = 'opt'; });
+    el.className = 'opt on';
+    state.period = el.getAttribute('data-k');
+  };
+});
+setDots();
+</script>
+</body></html>
