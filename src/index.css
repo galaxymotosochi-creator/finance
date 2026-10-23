@@ -2241,5 +2241,5 @@ input:focus, select:focus, textarea:focus {
 }
 .modal-box .cat-sel-wrap > button span:first-child { font-weight: 500; }
 
-/* Переключатель внутри плашки — своя пилюля с тонкой светло-серой рамкой */
-.modal-box .v2-card .v2-seg{background:#fff !important;border:1px solid #e8e8ec !important;padding:4px !important;border-radius:100px !important;box-shadow:none !important;margin-bottom:10px !important}
+/* Переключатель внутри плашки — без своей обводки, просто внутри плашки */
+.modal-box .v2-card .v2-seg{background:transparent !important;border:none !important;padding:0 !important;border-radius:0 !important;box-shadow:none !important;margin-bottom:10px !important}
