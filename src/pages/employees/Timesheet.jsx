@@ -432,9 +432,6 @@ export default function Timesheet() {
                 return (
                   <div key={d} className={'day' + (isToday(d) ? ' today' : '') + (stat.hasEntries && !isToday(d) ? ' has-entries' : '') + (isPast(d) && !stat.hasEntries && !isToday(d) ? ' other' : '')} onClick={() => openDay(d)}>
                     {d}
-                    <div style={{display:'flex',gap:'2px',justifyContent:'center',marginTop:'2px'}}>
-                      {stat.dots.map((c, idx) => <span key={idx} style={{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:c}} />)}
-                    </div>
                   </div>
                 );
               })}
