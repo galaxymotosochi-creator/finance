@@ -577,19 +577,19 @@ export default function Timesheet() {
                       {getEmpName(e.employee_id)}{e.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
                     </td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
-                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#16a34a'}}>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
-                    <td style={{textAlign:'left',color:'#5b6472',maxWidth:'200px'}}>
+                    <td style={{textAlign:'left',color:'#222',maxWidth:'200px'}}>
                       {(e.bonus_amount||0)>0 ? (e.bonus_comment || '—') : '—'}
                     </td>
-                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#dc2626'}}>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                       {(e.deduct_amount||0)>0 ? '-'+Number(e.deduct_amount).toLocaleString()+' ₽' : '—'}
                     </td>
-                    <td style={{textAlign:'left',color:'#5b6472',maxWidth:'200px'}}>
+                    <td style={{textAlign:'left',color:'#222',maxWidth:'200px'}}>
                       {(e.deduct_amount||0)>0 ? (e.deduct_comment || '—') : '—'}
                     </td>
-                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#5b6472'}}>{e.filled_by || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{e.filled_by || '—'}</td>
                     <td style={{textAlign:'right',whiteSpace:'nowrap'}}>
                       <div style={{display:'inline-block',position:'relative'}} className="prod-more-wrap">
                         <RowMenu items={[
