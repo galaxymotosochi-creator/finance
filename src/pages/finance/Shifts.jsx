@@ -73,10 +73,11 @@ export default function Shifts() {
         }}>{toast}</div>
       )}
 
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Смены</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Смены</h1>
             <SectionHelp
               title="Раздел «Смены»"
               intro="Здесь видна история работы касс: когда открыли смену, кто был кассиром, сколько выручки и каким остатком закрыли."
@@ -111,7 +112,8 @@ export default function Shifts() {
               ]}
             />
           </div>
-          <div className="sub">Контроль работы касс и выручки</div>
+          </div>
+          <span className="cat-sub">Контроль работы касс и выручки</span>
         </div>
       </div>
 

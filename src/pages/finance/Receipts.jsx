@@ -449,12 +449,14 @@ export default function Receipts() {
   if (loading) {
     return (
       <div>
-        <div className="sk-bar">
+        <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
           <div className="grow">
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h1>Чеки</h1>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+              <h1 className="cat-title">Чеки</h1>
             </div>
-            <div className="sub">Все чеки: касса и быстрые продажи</div>
+            <span className="cat-sub">Все чеки: касса и быстрые продажи</span>
+            </div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
@@ -467,10 +469,11 @@ export default function Receipts() {
   return (
     <div>
       {new URLSearchParams(window.location.search).get('debug') === '1' && <DebugWatch name="Чеки" />}
-      <div className="sk-bar">
+      <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',paddingLeft:'14px',borderLeft:'3px solid #1F75FF'}}>
         <div className="grow">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <h1>Чеки</h1>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:'3px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
+            <h1 className="cat-title">Чеки</h1>
             <SectionHelp
               title="Раздел «Чеки»"
               intro="Здесь все чеки: пробитые через кассу и быстрые продажи. Видно сумму, оплату, долг клиента, скидку и возвраты."
@@ -513,7 +516,8 @@ export default function Receipts() {
               ]}
             />
           </div>
-          <div className="sub">Все чеки, пробитые через кассу и быстрые продажи</div>
+          </div>
+          <span className="cat-sub">Все чеки, пробитые через кассу и быстрые продажи</span>
         </div>
       </div>
 

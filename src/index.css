@@ -1034,10 +1034,15 @@ input:focus, select:focus, textarea:focus {
 .sk-search input{border:none;outline:none;font-family:inherit;font-size:12.5px;background:none;padding:0}
 /* таблица чеков */
 .sk-table.sk-receipts{min-width:1150px}
-.sk-table.sk-tx-table{min-width:980px}
-.sk-table.sk-tx-table thead th:nth-child(3),.sk-table.sk-tx-table tbody td:nth-child(3){min-width:260px;white-space:normal}
-.sk-table.sk-tx-table thead th:nth-child(4),.sk-table.sk-tx-table tbody td:nth-child(4){min-width:130px}
-.sk-table.sk-tx-table thead th:nth-child(8),.sk-table.sk-tx-table tbody td:nth-child(8){width:60px;text-align:right}
+.sk-table.sk-tx-table{min-width:1180px}
+/* Дата и Время — узкие колонки, только под сам формат */
+.sk-table.sk-tx-table thead th:nth-child(1),.sk-table.sk-tx-table tbody td:nth-child(1){width:92px;min-width:92px;white-space:nowrap}
+.sk-table.sk-tx-table thead th:nth-child(2),.sk-table.sk-tx-table tbody td:nth-child(2){width:56px;min-width:56px;white-space:nowrap}
+.sk-table.sk-tx-table thead th:nth-child(3),.sk-table.sk-tx-table tbody td:nth-child(3){min-width:220px;white-space:normal}
+.sk-table.sk-tx-table thead th:nth-child(4),.sk-table.sk-tx-table tbody td:nth-child(4){min-width:120px;white-space:nowrap}
+/* Комментарий */
+.sk-table.sk-tx-table thead th:nth-child(5),.sk-table.sk-tx-table tbody td:nth-child(5){min-width:180px;max-width:260px}
+.sk-table.sk-tx-table thead th:nth-child(9),.sk-table.sk-tx-table tbody td:nth-child(9){width:60px;text-align:right}
 /* Чеки: первая колонка «№ чека» — компактная (вмещается номер вида 64837) */
 .sk-table.sk-receipts thead th:nth-child(1),.sk-table.sk-receipts tbody td:nth-child(1){min-width:96px;width:96px}
 .sk-table.sk-receipts tbody tr{cursor:pointer}
