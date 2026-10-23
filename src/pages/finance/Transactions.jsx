@@ -642,48 +642,50 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div className="pnl2-card">
-          {/* Сводка: суммы и проценты */}
-          <div className="tx-ptop">
-            <div className="tx-ptop-l num">{incomeTotal.toLocaleString()} {cur} <span className="sep">·</span> <b>{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</b></div>
-            <div className="tx-ptop-r num">{expenseTotal.toLocaleString()} {cur} <span className="sep">·</span> <b>{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</b></div>
-          </div>
-          <div className="pnl2-strip">
-            <div className="pnl2-s1" style={{width: Math.max(0, Math.min(100, (incomeTotal+expenseTotal ? incomeTotal/(incomeTotal+expenseTotal)*100 : 0))) + '%'}}>
-              {incomeTotal+expenseTotal && incomeTotal/(incomeTotal+expenseTotal) > 0.08 ? <>{Math.round(incomeTotal/(incomeTotal+expenseTotal)*100)}%</> : null}
+        <div className="tx-card">
+          <div className="tx-mirror">
+            <div className="half">
+              <div className="b inc" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? incomeTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}><span className="sm">{incomeTotal.toLocaleString()} {cur}</span><span className="sep"> · </span><span className="pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</span></div>
             </div>
-            <div className="pnl2-s2">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
+            <div className="center"></div>
+            <div className="half r">
+              <div className="b exp" style={{width: Math.min(100, (incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? expenseTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0) + 12) + '%'}}><span className="pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</span><span className="sep"> · </span><span className="sm">{expenseTotal.toLocaleString()} {cur}</span></div>
+            </div>
           </div>
 
-          {/* Доходы */}
-          <div className="pnl2-sh" style={{marginTop:'16px'}}>
-            <span className="dt"></span>Доходы
-            <span className="num tot">{incomeTotal.toLocaleString()} {cur}</span>
-          </div>
-          {incomeCatsList.map((c, i) => (
-            <div className="pnl2-row" key={'i' + i}>
-              <span className="nm">{c.name}</span>
-              <span className="num">{c.amount.toLocaleString()} {cur} · {incomeTotal ? Math.round(c.amount/incomeTotal*100) : 0}% от доходов</span>
+          <div className="tx-m5">
+            <div className="side l">
+              <div className="hd"><span className="dot" style={{background:'#1F75FF'}}></span><span>Доходы</span><span className="amt">{incomeTotal.toLocaleString()} {cur}</span></div>
+              {incomeCatsList.map((c, i) => (
+                <div className="cat" key={i}>
+                  <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
+                  <div className="tr"><i className="inc" style={{width:(incomeTotal ? c.amount/incomeTotal*100 : 0)+'%'}}></i></div>
+                  <div className="pc">{incomeTotal ? Math.round(c.amount/incomeTotal*100) : 0}% от доходов</div>
+                </div>
+              ))}
+              {incomeCatsList.length === 0 && <div className="pc">Доходов за период нет</div>}
+              <div className="tot"><span>Итого доходы</span><span>{incomeTotal.toLocaleString()} {cur}</span></div>
             </div>
-          ))}
-          {incomeCatsList.length === 0 && <div className="pnl2-row"><span className="nm">Доходов за период нет</span><span className="num">0 {cur}</span></div>}
-          <div className="pnl2-row totrow"><span className="nm">Итого доходы</span><span className="num">{incomeTotal.toLocaleString()} {cur}</span></div>
 
-          {/* Расходы */}
-          <div className="pnl2-sh exp" style={{marginTop:'16px'}}>
-            <span className="dt"></span>Расходы
-            <span className="num tot">{expenseTotal.toLocaleString()} {cur}</span>
-          </div>
-          {expenseCatsList.map((c, i) => (
-            <div className="pnl2-row" key={'e' + i}>
-              <span className="nm">{c.name}</span>
-              <span className="num">{c.amount.toLocaleString()} {cur} · {expenseTotal ? Math.round(c.amount/expenseTotal*100) : 0}% от расходов</span>
+            <div className="divider"></div>
+
+            <div className="side r">
+              <div className="hd"><span className="dot" style={{background:'#3c4553'}}></span><span>Расходы</span><span className="amt">{expenseTotal.toLocaleString()} {cur}</span></div>
+              {expenseCatsList.map((c, i) => (
+                <div className="cat" key={i}>
+                  <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
+                  <div className="tr"><i className="exp" style={{width:(expenseTotal ? c.amount/expenseTotal*100 : 0)+'%'}}></i></div>
+                  <div className="pc">{expenseTotal ? Math.round(c.amount/expenseTotal*100) : 0}% от расходов</div>
+                </div>
+              ))}
+              {expenseCatsList.length === 0 && <div className="pc">Расходов за период нет</div>}
+              <div className="tot"><span>Итого расходы</span><span>{expenseTotal.toLocaleString()} {cur}</span></div>
             </div>
-          ))}
-          {expenseCatsList.length === 0 && <div className="pnl2-row"><span className="nm">Расходов за период нет</span><span className="num">0 {cur}</span></div>}
-          <div className="pnl2-row totrow"><span className="nm">Итого расходы</span><span className="num">{expenseTotal.toLocaleString()} {cur}</span></div>
+          </div>
         </div>
       )}
+
+
 
       {txs.length > 0 ? (
         <div className="sk-tablewrap">
