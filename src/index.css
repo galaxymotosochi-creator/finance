@@ -228,7 +228,7 @@ button.nav-parent { width: 100%; text-align: left; font-family: var(--font); }
 
 @media (max-width: 768px) {
   /* бургер фиксирован сверху слева — даём под него отступ, чтобы не наезжал на заголовок */
-  .content { padding: 2.2rem .75rem .75rem .75rem; }
+  .content { padding: 1.7rem .75rem .75rem .75rem; }
   .content h1 { font-size: 1.15rem; }
   .app-header { padding: .4rem .75rem; }
 }
