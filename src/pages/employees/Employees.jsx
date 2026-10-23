@@ -541,7 +541,7 @@ export default function Employees() {
       )}
 
       {/* ============ МОДАЛКА ============ */}
-      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="Создание карточки сотрудника" width="wide" hideHead={wStep>0}>
+      <Modal open={show} onClose={()=>setShow(false)} title={editId ? 'Редактировать сотрудника' : 'Новый сотрудник'} subtitle="" width="medium" className="modal-v2 cat-modal">
         <form onSubmit={save}>
 
               {/* ШАГ 1: ДАННЫЕ */}
@@ -781,12 +781,12 @@ export default function Employees() {
                   ))}
                 </div>
                 {wStep > 0 && (
-                  <button type="button" className="sk-dd-btn sk-dd-btn-gray" onClick={()=>setWStep(wStep-1)}>← Назад</button>
+                  <button type="button" className="v2-ghost" onClick={()=>setWStep(wStep-1)}>← Назад</button>
                 )}
                 {wStep < 2 ? (
-                  <button type="button" className="sk-dd-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
+                  <button type="button" className="cat-add-btn" onClick={()=>setWStep(wStep+1)}>Далее →</button>
                 ) : (
-                  <button type="submit" className="sk-dd-btn">Сохранить</button>
+                  <button type="submit" className="cat-add-btn">Сохранить</button>
                 )}
               </div>
             </form>
