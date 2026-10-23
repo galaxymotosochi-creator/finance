@@ -11,7 +11,7 @@ import Onboarding from '../pages/Onboarding';
 import { useNavigate, Outlet } from 'react-router-dom';
 
 export default function AppLayout({ children }) {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, businessType, signOut } = useAuth();
   const n = useNavigate();
   const [showSale, setShowSale] = useState(false);
   const [showSupply, setShowSupply] = useState(false);
@@ -24,7 +24,7 @@ export default function AppLayout({ children }) {
     { label: 'Поставка', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="19.5" r="1.5"/><circle cx="18.5" cy="19.5" r="1.5"/></svg>', action: () => n('/stock/supplies?add=supply') },
     { label: 'Доход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', action: () => n('/finance/transactions?add=income') },
     { label: 'Расход', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>', action: () => n('/finance/transactions?add=expense') },
-  ];
+  ].filter(a => !(businessType === 'services' && a.label === 'Поставка'));
 
   const { daysLeft, isExpired, loading: subLoading } = useSubscription();
   // Онбординг: показываем, только если профиль загружен, почта подтверждена
