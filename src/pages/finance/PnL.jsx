@@ -257,13 +257,13 @@ export default function PnL() {
   const incomeRows = [
     { name: 'Доход от продаж', value: d.salesRev + d.discounts },
     { name: 'Прочие доходы', value: d.otherIncome },
-    { name: 'Излишки по инвентаризации', value: d.surpluses },
+    ...(isServices ? [] : [{ name: 'Излишки по инвентаризации', value: d.surpluses }]),
   ];
   const expenseRows = [
     ...(d.discounts > 0 ? [{ name: 'Скидки с продаж', value: d.discounts }] : []),
     ...(isServices ? [] : [{ name: 'Закупка товара', value: d.totalCogs }]),
     ...d.opList.map(([name, amt]) => ({ name, value: amt })),
-    ...(d.shortages > 0 ? [{ name: 'Недостачи по инвентаризации', value: d.shortages }] : []),
+    ...(!isServices && d.shortages > 0 ? [{ name: 'Недостачи по инвентаризации', value: d.shortages }] : []),
   ];
 
   const rowData = [
