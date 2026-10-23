@@ -483,7 +483,7 @@ export default function Accounts() {
                           <span className="pct">{pct}%</span>
                           <span className="amt">{v.toLocaleString()} {cur}</span>
                         </div>
-                        <div className="sk-leg-bar" style={{maxWidth:'1000px',width:'100%'}}><i style={{width:pct+'%',background:col}}></i></div>
+                        <div className="sk-leg-bar" style={{width:'100%'}}><i style={{width:pct+'%',background:col}}></i></div>
                       </div>
                     );
                   })}
