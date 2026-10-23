@@ -217,7 +217,7 @@ export default function Clients() {
           <span className="cat-sub">История покупок, лояльность и статистика</span>
           </div>
         </div>
-        <div className="***">
+        <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px',flexShrink:0}}>
           <button type="button" className="cat-add-btn" onClick={openAdd}>Добавить</button>
         </div>
       </div>
