@@ -2162,9 +2162,14 @@ input:focus, select:focus, textarea:focus {
 .dt-wrap .dt-tri{position:absolute;right:10px;top:50%;margin-top:-9px;pointer-events:none;font-size:15px}
 .dt-wrap .dt-input::-webkit-calendar-picker-indicator{opacity:0;width:0;height:0;position:absolute;right:0}
 
-/* Дата-подсказка бледная, пока значение не выбрано (перебивает общие правила) */
+/* Дата-подсказка: чёрная, когда дата выбрана; бледная — пока поле пустое */
 .modal-box .dt-wrap .dt-input::-webkit-datetime-edit,
 .modal-box .dt-wrap .dt-input::-webkit-datetime-edit-text,
 .modal-box .dt-wrap .dt-input::-webkit-datetime-edit-month-field,
 .modal-box .dt-wrap .dt-input::-webkit-datetime-edit-day-field,
-.modal-box .dt-wrap .dt-input::-webkit-datetime-edit-year-field{color:rgba(0,0,0,.38) !important}
+.modal-box .dt-wrap .dt-input::-webkit-datetime-edit-year-field{color:#222 !important}
+.modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit,
+.modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-text,
+.modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-month-field,
+.modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-day-field,
+.modal-box .dt-wrap .dt-input.placeholder::-webkit-datetime-edit-year-field{color:rgba(0,0,0,.38) !important}
