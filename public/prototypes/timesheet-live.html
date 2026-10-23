@@ -207,7 +207,7 @@ function renderStep(){
   document.getElementById('s1').className = step>1?'done':(step===1?'on':'');
   document.getElementById('s2').className = step>2?'done':(step===2?'on':'');
   document.getElementById('s3').className = step===3?'on':'';
-  document.getElementById('mp').textContent = 'Шаг '+step+' · '+(step===1?'кто работал':step===2?'ставка и часы':'премии и штрафы');
+  document.getElementById('mp').textContent = '';
   document.getElementById('step1').style.display = step===1?'block':'none';
   document.getElementById('step2').style.display = step===2?'block':'none';
   document.getElementById('step3').style.display = step===3?'block':'none';
