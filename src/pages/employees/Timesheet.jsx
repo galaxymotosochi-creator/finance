@@ -7,6 +7,7 @@ import useOptimisticSync from '../../hooks/useOptimisticSync';
 import { getCurrencySymbol } from '../../lib/currency';
 import CenterSpinner from '../../components/CenterSpinner';
 import SectionHelp from '../../components/SectionHelp';
+import SmartSelect from '../../components/SmartSelect';
 
 
 const STATUS_OPTS = [
@@ -616,13 +617,12 @@ export default function Timesheet() {
                     <div className="ts-pcard-top">
                       <span className="ts-av">{emp.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</span>
                       <span className="ts-pname">{emp.name}</span>
-                      <div className="ts-selwrap">
-                        <select className={"ts-sel ts-sel-wide" + (!localStatuses[emp.id] ? " placeholder" : "")} value={localStatuses[emp.id]||''}
-                          onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}>
-                          <option value="">— выберите —</option>
-                          {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                        </select>
-                        <span className="ts-caret">▾</span>
+                      <div style={{flex:1,minWidth:0}}>
+                        <SmartSelect
+                          value={localStatuses[emp.id] || ''}
+                          onChange={v => setLocalStatuses({...localStatuses, [emp.id]: v})}
+                          options={STATUS_OPTS.map(o => ({ value: o.value, label: o.label }))}
+                        />
                       </div>
                     </div>
                   </div>
