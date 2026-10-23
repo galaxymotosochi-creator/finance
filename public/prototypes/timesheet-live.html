@@ -61,7 +61,10 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
 .srow:last-child{border-bottom:none}
 .av{width:28px;height:28px;border-radius:50%;background:rgba(31,117,255,.1);color:#0d4ea8;display:grid;place-items:center;font-size:10.5px;font-weight:800;flex:none}
 .nm{flex:1;font-size:13px;font-weight:600;color:#333;min-width:0}
-.sel{font-family:inherit;font-size:12px;font-weight:700;color:#333;padding:6px 8px;border:1.5px solid rgba(0,0,0,.2);border-radius:8px;background:#fff}
+.sel{font-family:inherit;font-size:12px;font-weight:700;color:#333;padding:6px 8px;border:1.5px solid rgba(0,0,0,.2);border-radius:8px;background:#fff;outline:none;-webkit-appearance:none;appearance:none}
+.sel:focus{outline:none;border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.pair .f input{outline:none}
+.pair .f input:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
 .pcard{border:1px solid rgba(29,120,252,.16);border-radius:12px;padding:11px 12px;margin-bottom:9px}
 .pcard .top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .pcard .n{font-size:13px;font-weight:700;flex:1}
