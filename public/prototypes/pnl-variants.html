@@ -71,6 +71,12 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
 .v3cell .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
 .v3cell .v{font-size:14.5px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
 .v3stack{margin-top:14px}
+.v3sec{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:11px 13px;background:#fff}
+.v3sec:first-of-type{background:linear-gradient(180deg,rgba(31,117,255,.045),transparent)}
+.v3sh{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);margin-bottom:6px}
+.v3sh .dt{width:8px;height:8px;border-radius:3px;background:var(--blue)}
+.v3sh.exp{color:#3c4553;margin-top:4px}
+.v3sh.exp .dt{background:#20252e}
 .v3srow{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
 .v3srow:last-child{border:none}
 .v3srow .nm{color:#33405a;font-weight:600}
@@ -192,10 +198,18 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
     <div class="v3cell"><div class="l">Расходы</div><div class="v num">936 200</div></div>
     <div class="v3cell"><div class="l">Деньги</div><div class="v num">412 700</div></div>
   </div>
-  <div class="v3stack">
+  <div class="v3sec">
+    <div class="v3sh"><span class="dt"></span>Доходы <span class="num" style="margin-left:auto;color:#0d4ea8;font-weight:800">1 284 500 ₽</span></div>
+    <div class="v3srow"><span class="nm">Доход от продаж</span><span class="num">1 260 000 ₽ · 98%</span></div>
+    <div class="v3srow"><span class="nm">Прочие доходы</span><span class="num">24 500 ₽ · 2%</span></div>
+    <div class="v3srow"><span class="nm">Излишки по инвентаризации</span><span class="num">0 ₽ · 0%</span></div>
+  </div>
+  <div class="v3sec">
+    <div class="v3sh exp"><span class="dt"></span>Расходы <span class="num" style="margin-left:auto;color:#c2410c;font-weight:800">936 200 ₽</span></div>
     <div class="v3srow"><span class="nm">Зарплата</span><span class="num">543 200 ₽ · 58%</span></div>
     <div class="v3srow"><span class="nm">Аренда</span><span class="num">196 600 ₽ · 21%</span></div>
     <div class="v3srow"><span class="nm">Закупки</span><span class="num">131 100 ₽ · 14%</span></div>
+    <div class="v3srow"><span class="nm">Прочее</span><span class="num">65 300 ₽ · 7%</span></div>
   </div>
   <div class="note">Максимально наглядно про главное: из каждого рубля 27 копеек остаётся вам, 73 уходит в расходы.</div>
 </div>
