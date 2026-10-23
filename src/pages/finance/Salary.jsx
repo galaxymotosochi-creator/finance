@@ -965,8 +965,9 @@ export default function Salary() {
               {/* ═══ ШАГ 1 ═══ */}
               {salStep === 1 && (<>
               {/* Сотрудник + период */}
-              <div className="sal-seclab">Сотрудник и период</div>
-              <div className="sal-row">
+              <div className="sal-seclab">Сотрудник</div>
+              <div className="form-group" style={{marginBottom:'.75rem'}}>
+                <label>ФИО</label>
                 <SmartSelect
                   value={fEmpId}
                   onChange={setFEmpId}
