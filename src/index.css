@@ -1688,14 +1688,14 @@ input:focus, select:focus, textarea:focus {
 .tx-mirror .half{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-right:4px;height:100%}
 .tx-mirror .half.r{align-items:flex-start;padding-left:4px;padding-right:0}
 .tx-mirror .b{height:34px;border-radius:8px 2px 2px 8px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:12px;font-weight:800;white-space:nowrap;max-width:100%;overflow:hidden;min-width:0}
-.tx-mirror .half.r .b{border-radius:2px 8px 8px 2px;justify-content:flex-start}
+.tx-mirror .half.r .b{border-radius:2px 8px 8px 2px;justify-content:flex-end}
 .tx-mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
 .tx-mirror .half.r .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
 .tx-mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
 /* Мобильная версия: текст не прячется в узкой плашке */
 @media(max-width:640px){
-  .tx-mirror .b .pc,.tx-mirror .b .sm,.tx-mirror .b .sep{flex:none;white-space:nowrap}
-  .tx-mirror .b{padding:9px 10px}
+  .tx-mirror .b .pc,.tx-mirror .b .sm{flex:none}
+  .tx-mirror .b .sep{flex:none}
 }
 .tx-m5{display:flex;gap:0;align-items:stretch;width:100%;margin:18px 0 0}
 .tx-m5 .side{flex:1;min-width:0;padding:0}
