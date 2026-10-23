@@ -903,9 +903,12 @@ input:focus, select:focus, textarea:focus {
 .sk-ring-block .sk-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden;max-width:none;width:100%}
 .sk-leg-bar i{display:block;height:100%}
 @media(max-width:1200px){
-  /* Планшет: круг слева, легенда справа — от начала до конца ширины таблицы */
-  .sk-ring-block{width:100%;max-width:none;padding:0;justify-content:flex-start;gap:18px}
-  .sk-ring-block .sk-legend{flex:1 1 auto;min-width:0;max-width:none;width:100%}
+  /* Планшет: круг слева, легенда справа от него — до конца ширины таблицы */
+  .sk-ring-block{width:100%;max-width:none;padding:0;justify-content:flex-start;gap:18px;flex-wrap:nowrap}
+  .sk-ring-block .sk-legend{flex:1 1 auto;min-width:0;max-width:none;width:auto}
+}
+@media(max-width:768px){
+  .sk-ring-block{flex-wrap:wrap}
 }
 @media(max-width:640px){
   /* Круг — первым и по центру, полосы/легенда — под ним во всю ширину */
