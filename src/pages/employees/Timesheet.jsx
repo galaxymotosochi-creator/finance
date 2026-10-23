@@ -672,7 +672,7 @@ export default function Timesheet() {
             {dayStep === 3 && (
               <div>
                 <div className="ts-seclab">Премии</div>
-                {bonusRows.map((row, idx) => (row.empId || row.amount) && (
+                {bonusRows.map((row, idx) => (
                   <div key={'b'+idx} className="ts-pcard">
                     <div style={{display:'flex',gap:'7px',alignItems:'center',marginBottom:'7px'}}>
                       <select className="ts-sel" style={{flex:1,maxWidth:'none'}} value={row.empId} onChange={e => setBonusRows(bonusRows.map((r,i)=>i===idx?{...r,empId:e.target.value}:r))}>
@@ -690,10 +690,10 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <button type="button" className="ts-add" onClick={() => setBonusRows(r => r.length ? [...r, emptyRow()] : [emptyRow()])}>+ Добавить премию</button>
+                <div style={{display:'flex',justifyContent:'center'}}><button type="button" className="ts-add" onClick={() => setBonusRows(prev => [...prev, emptyRow()])}>+ Добавить премию</button></div>
 
                 <div className="ts-seclab" style={{marginTop:'12px'}}>Штрафы</div>
-                {deductRows.map((row, idx) => (row.empId || row.amount) && (
+                {deductRows.map((row, idx) => (
                   <div key={'d'+idx} className="ts-pcard">
                     <div style={{display:'flex',gap:'7px',alignItems:'center',marginBottom:'7px'}}>
                       <select className="ts-sel" style={{flex:1,maxWidth:'none'}} value={row.empId} onChange={e => setDeductRows(deductRows.map((r,i)=>i===idx?{...r,empId:e.target.value}:r))}>
@@ -711,7 +711,7 @@ export default function Timesheet() {
                     </div>
                   </div>
                 ))}
-                <button type="button" className="ts-add" onClick={() => setDeductRows(r => r.length ? [...r, emptyRow()] : [emptyRow()])}>+ Добавить штраф</button>
+                <div style={{display:'flex',justifyContent:'center'}}><button type="button" className="ts-add" onClick={() => setDeductRows(prev => [...prev, emptyRow()])}>+ Добавить штраф</button></div>
               </div>
             )}
 
