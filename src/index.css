@@ -227,7 +227,8 @@ button.nav-parent { width: 100%; text-align: left; font-family: var(--font); }
 .app-header .logout-btn:hover { background: #f0f0f0; border-color: #bbb; }
 
 @media (max-width: 768px) {
-  .content { padding: .2rem .75rem .75rem .75rem; }
+  /* бургер фиксирован сверху слева — даём под него отступ, чтобы не наезжал на заголовок */
+  .content { padding: 2.9rem .75rem .75rem .75rem; }
   .content h1 { font-size: 1.15rem; }
   .app-header { padding: .4rem .75rem; }
 }
