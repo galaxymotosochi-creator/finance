@@ -13,6 +13,8 @@ export default function Shifts() {
   const [transactions, setTransactions] = useState([]);
   const [receipts, setReceipts] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [ownerData, setOwnerData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [toastError, setToastError] = useState(false);
@@ -34,17 +36,26 @@ export default function Shifts() {
     if (!user) return;
     (async () => {
       try {
-        const [sRes, tRes, aRes, rRes] = await Promise.all([
+        const [sRes, tRes, aRes, rRes, eRes, pRes] = await Promise.all([
           supabase.from('shifts').select('*').eq('user_id', user.id).order('opened_at', { ascending: false }),
           supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(500),
           supabase.from('accounts').select('*').order('created_at', { ascending: true }),
           supabase.from('receipts').select('shift_id,paid_amount').eq('user_id', user.id),
+          supabase.from('employees').select('id, name').eq('user_id', user.id),
+          supabase.from('user_profiles').select('last_name, first_name, patronymic, email').eq('user_id', user.id).maybeSingle(),
         ]);
         if (sRes.error) throw sRes.error;
         setShifts(sRes.data || []);
         setTransactions(tRes.data || []);
         setAccounts(aRes.data || []);
         setReceipts(rRes.data || []);
+        setEmployees(eRes?.data || []);
+        const pr = pRes?.data || null;
+        if (pr && (pr.last_name || pr.first_name)) {
+          setOwnerData({ surname: pr.last_name || '', initials: [pr.first_name, pr.patronymic].filter(Boolean).map(function(x){ return x.charAt(0) + '.'; }).join(' '), email: pr.email || '' });
+        } else if (pr && pr.email) {
+          setOwnerData({ surname: '', initials: '', email: pr.email });
+        }
       } catch (e) {
         showToast('Ошибка загрузки: ' + (e.message || 'неизвестная ошибка'), true);
       } finally {
@@ -52,6 +63,30 @@ export default function Shifts() {
       }
     })();
   }, [user]);
+
+  // Расшифровка кассира: сотрудник по имени → «Фамилия И.О.»;
+  // владелец (имя «Кассир» или совпадает с профилем) → ФИО из профиля, иначе почта.
+  const cashierLabel = function (name) {
+    var raw = (name || '').trim();
+    if (!raw || raw === 'Кассир') return ownerLabel() || '—';
+    var emp = (employees || []).find(function (e) { return (e.name || '').trim() === raw; });
+    var src = emp ? raw : raw;
+    var parts = src.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return parts[0] + ' ' + parts.slice(1).map(function (w) { return w.charAt(0).toUpperCase() + '.'; }).join(' ');
+    }
+    // одно слово — проверяем, не совпадает ли с владельцем
+    if (ownerData && ownerData.surname && parts[0] === ownerData.surname) return ownerLabel();
+    return ownerLabel() || raw;
+  };
+
+  const ownerLabel = function () {
+    if (ownerData) {
+      if (ownerData.surname) return ownerData.surname + (ownerData.initials ? ' ' + ownerData.initials : '');
+      if (ownerData.email) return ownerData.email;
+    }
+    return user?.email || '';
+  };
 
   // Выручка смены = сумма оплаченного по чекам смены (только кассовые чеки, быстрые продажи не входят)
   const getShiftIncome = (s) => {
@@ -146,7 +181,7 @@ export default function Shifts() {
                 const timeOpen = opened ? opened.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '—';
                 const timeClose = s.closed_at ? new Date(s.closed_at).toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '—';
                 const sCloseBal = parseFloat(s.closing_balance)||0;
-                const cashier = s.current_cashier_name || s.cashier_name;
+                const cashier = cashierLabel(s.current_cashier_name || s.cashier_name);
                 return (
                   <tr key={s.id}>
                     <td>{dateStr}</td>
