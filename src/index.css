@@ -887,7 +887,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Круг «Структура денег» на странице Счета */
-.sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;justify-content:center;margin:0 auto 16px}
+.sk-ring-block{display:flex;gap:22px;flex-wrap:wrap;align-items:center;justify-content:center;margin:0 auto 16px;width:100%}
 .sk-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
 .sk-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 48%),linear-gradient(158deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 44%, rgba(0,0,0,.26) 100%)}
 .sk-ring:after{content:"";position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:0 8px 16px -8px rgba(11,18,32,.28),0 -2px 6px -3px rgba(11,18,32,.1) inset}
@@ -902,6 +902,11 @@ input:focus, select:focus, textarea:focus {
 .sk-leg .amt{font-size:13.5px;font-weight:800;min-width:100px;text-align:right}
 .sk-ring-block .sk-leg-bar{height:5px;border-radius:3px;background:#eef4ff;overflow:hidden;max-width:1000px}
 .sk-leg-bar i{display:block;height:100%}
+@media(max-width:1200px){
+  /* Планшет: круг слева, легенда справа — от начала до конца ширины таблицы */
+  .sk-ring-block{width:100%;max-width:none;padding:0;justify-content:flex-start;gap:18px}
+  .sk-ring-block .sk-legend{flex:1 1 auto;min-width:0;max-width:none;width:auto}
+}
 @media(max-width:640px){
   /* Круг — первым и по центру, полосы/легенда — под ним во всю ширину */
   .sk-ring-block{flex-direction:column;align-items:stretch;gap:14px}
