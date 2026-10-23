@@ -70,6 +70,29 @@
   .mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
   .mirror .half.r .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
   .mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
+
+  /* Вариант 5 (расширенный): зеркальные столбики + расшифровка */
+  .m5{display:flex;gap:0;align-items:stretch}
+  .m5 .side{flex:1;min-width:0;padding:0 12px}
+  .m5 .side.l{padding-left:0}
+  .m5 .side.r{padding-right:0}
+  .m5 .divider{width:1px;background:rgba(29,120,252,.14);flex:none;margin:4px 0}
+  .m5 .hd{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;margin-bottom:8px}
+  .m5 .side.r .hd{justify-content:flex-end}
+  .m5 .hd .dot{width:10px;height:10px;border-radius:3px;flex:none}
+  .m5 .hd .amt{margin-left:auto;font-variant-numeric:tabular-nums}
+  .m5 .side.r .hd .amt{margin-left:0;margin-right:auto;order:-1}
+  .m5 .cat{margin-bottom:9px}
+  .m5 .cat .ct{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:#33405a;margin-bottom:3px}
+  .m5 .cat .ct b{font-weight:700;color:#111;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .m5 .cat .tr{height:7px;border-radius:99px;background:#eef2f9;overflow:hidden}
+  .m5 .cat .tr i{display:block;height:100%;border-radius:99px}
+  .m5 .cat .tr i.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+  .m5 .cat .tr i.exp{background:linear-gradient(90deg,#20252e,#4a5464)}
+  .m5 .cat .pc{font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
+  .m5 .side.r .cat{text-align:right}
+  .m5 .side.r .cat .tr i{margin-left:auto}
+  .m5 .tot{font-size:11.5px;color:var(--muted);border-top:1px dashed rgba(29,120,252,.18);padding-top:7px;margin-top:2px;display:flex;justify-content:space-between;font-weight:700;color:#111}
 </style>
 </head>
 <body>
@@ -161,17 +184,74 @@
   </div>
 
   <!-- 5 -->
-  <div class="card">
+  <div class="card" style="max-width:none;flex-basis:100%">
     <div class="tag">Вариант 5</div>
-    <h2>Зеркальные столбики от центра</h2>
-    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Доходы влево, расходы вправо, в центре — прибыль</div>
-    <div class="mirror">
+    <h2>Зеркальные столбики от центра + расшифровка</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Доходы слева, расходы справа, статьи раскрыты сбоку от графика</div>
+
+    <div class="mirror" style="height:120px">
       <div class="half"><div class="b inc" style="width:100%">1 284 500 ₽ · 58%</div></div>
       <div class="center"></div>
       <div class="half r"><div class="b exp" style="width:73%">42% · 936 200 ₽</div></div>
     </div>
-    <div class="net" style="margin-top:8px"><span class="l">Чистая прибыль</span><span class="r v">348 300 ₽</span></div>
-    <div class="note">Симметрично и наглядно: сразу видно, куда перевес — в доходы или расходы.</div>
+
+    <div class="m5" style="margin-top:18px">
+      <!-- ДОХОДЫ -->
+      <div class="side l">
+        <div class="hd"><span class="dot" style="background:#1F75FF"></span><span>Доходы</span><span class="amt v">1 284 500 ₽</span></div>
+
+        <div class="cat">
+          <div class="ct"><span>Доход от продаж</span><b>1 142 000 ₽</b></div>
+          <div class="tr"><i class="inc" style="width:100%"></i></div>
+          <div class="pc">89% от доходов</div>
+        </div>
+        <div class="cat">
+          <div class="ct"><span>Прочие доходы</span><b>118 500 ₽</b></div>
+          <div class="tr"><i class="inc" style="width:10%"></i></div>
+          <div class="pc">9% от доходов</div>
+        </div>
+        <div class="cat">
+          <div class="ct"><span>Излишки по инвентаризации</span><b>24 000 ₽</b></div>
+          <div class="tr"><i class="inc" style="width:2%"></i></div>
+          <div class="pc">2% от доходов</div>
+        </div>
+
+        <div class="tot"><span>Итого доходы</span><span class="v">1 284 500 ₽</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- РАСХОДЫ -->
+      <div class="side r">
+        <div class="hd"><span class="amt v">936 200 ₽</span><span>Расходы</span><span class="dot" style="background:#3c4553"></span></div>
+
+        <div class="cat">
+          <div class="ct"><span>Закупка товара</span><b>382 400 ₽</b></div>
+          <div class="tr"><i class="exp" style="width:100%"></i></div>
+          <div class="pc">41% от расходов</div>
+        </div>
+        <div class="cat">
+          <div class="ct"><span>Зарплата</span><b>268 000 ₽</b></div>
+          <div class="tr"><i class="exp" style="width:70%"></i></div>
+          <div class="pc">29% от расходов</div>
+        </div>
+        <div class="cat">
+          <div class="ct"><span>Аренда</span><b>160 000 ₽</b></div>
+          <div class="tr"><i class="exp" style="width:42%"></i></div>
+          <div class="pc">17% от расходов</div>
+        </div>
+        <div class="cat">
+          <div class="ct"><span>Прочие расходы</span><b>125 800 ₽</b></div>
+          <div class="tr"><i class="exp" style="width:33%"></i></div>
+          <div class="pc">13% от расходов</div>
+        </div>
+
+        <div class="tot"><span class="v">936 200 ₽</span><span>Итого расходы</span></div>
+      </div>
+    </div>
+
+    <div class="net" style="margin-top:16px"><span class="l">Чистая прибыль</span><span class="r v">348 300 ₽</span></div>
+    <div class="note">Верхняя полоса — общий перевес. Ниже — те же зеркальные колонки, но с раскрытыми статьями и процентом каждой внутри своей группы.</div>
   </div>
 
 </div>
