@@ -50,8 +50,10 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
 .form-group label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
 .form-group input,.form-group select{width:100%;font-family:inherit;font-size:14px;color:#333;padding:8px 10px;border:1.5px solid rgba(0,0,0,.26);border-radius:10px;outline:none;background:#fff}
 .form-group input:focus,.form-group select:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
-.v2-ghost{border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:#5b6472;padding:9px 14px;border-radius:99px;cursor:pointer}
-.cat-add-btn{border:none;background:#111;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:99px;cursor:pointer}
+.v2-ghost{border:none;background:#f1f3f7;font-family:inherit;font-size:13px;font-weight:600;color:#5b6472;padding:9px 16px;border-radius:99px;cursor:pointer;transition:background .15s}
+.v2-ghost:hover{background:#e8ebf1}
+.cat-add-btn{border:none;background:#111;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:99px;cursor:pointer;transition:background .15s}
+.cat-add-btn:hover{background:#000}
 .cat-add-btn:disabled{background:#c9d0da;cursor:not-allowed}
 .steps{display:flex;gap:5px;margin-bottom:14px}
 .steps i{flex:1;height:4px;border-radius:99px;background:#e7eefb;transition:background .2s}
@@ -72,6 +74,8 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
 .pair .f span{display:block;font-size:10.5px;color:#5b6472;font-weight:600;margin-bottom:3px}
 .pair .f input{width:100%;font-family:inherit;font-size:14px;font-weight:700;padding:8px 10px;border:1.5px solid rgba(0,0,0,.18);border-radius:9px;font-variant-numeric:tabular-nums;text-align:right}
 .pcard .calc{font-size:10.5px;color:#8b93a3;margin-top:6px;font-weight:600}
+.del{width:26px;height:26px;flex:none;border-radius:8px;background:rgba(0,0,0,.04);color:#8b93a3;display:grid;place-items:center;font-size:11px;cursor:pointer;transition:background .15s,color .15s}
+.del:hover{background:rgba(220,38,38,.1);color:#dc2626}
 .qrow{display:flex;gap:5px;margin-top:7px}
 .qb{flex:1;font-family:inherit;font-size:11px;font-weight:700;padding:6px 4px;border-radius:8px;border:1.5px solid rgba(0,0,0,.14);background:#fff;color:#33405a;cursor:pointer}
 .qb.on{border-color:rgba(31,117,255,.5);background:rgba(31,117,255,.07);color:#0d4ea8}
@@ -260,13 +264,17 @@ function bonusBlock(key, title, btn){
         '<input type="number" class="sel" style="max-width:90px;text-align:right" value="'+(r.amount||'')+'" placeholder="0" oninput="draft.'+key+'['+i+'].amount=this.value;updSum()">' +
         '<span style="font-size:11px;color:#8b93a3">₽</span>' +
       '</div>' +
-      '<input class="sel" style="width:100%;max-width:none;font-weight:500;font-size:12px" placeholder="За что" value="'+(r.reason||'')+'" oninput="draft.'+key+'['+i+'].reason=this.value">' +
+      '<div style="display:flex;gap:7px;align-items:center">' +
+        '<input class="sel" style="flex:1;max-width:none;font-weight:500;font-size:12px" placeholder="За что" value="'+(r.reason||'')+'" oninput="draft.'+key+'['+i+'].reason=this.value">' +
+        '<span class="del" onclick="delRow(\''+key+'\','+i+')" title="Удалить">✕</span>' +
+      '</div>' +
     '</div>';
   });
   html += '<div style="font-size:12px;font-weight:700;color:#0d4ea8;padding:7px 0;cursor:pointer" onclick="addRow(\''+key+'\')">+ '+btn+'</div></div></div>';
   return html;
 }
 function addRow(key){ draft[key].push({emp:EMP[0].id, amount:'', reason:''}); renderStep(); }
+function delRow(key, i){ draft[key].splice(i,1); renderStep(); }
 function draftTotal(){
   let sum = 0;
   EMP.forEach(e => { const st = draft.statuses[e.id]; if(st==='work'||st==='vac') sum += parseFloat(draft.rate[e.id])||0; });
