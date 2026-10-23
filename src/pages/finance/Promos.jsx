@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import RowMenu from '../../components/RowMenu';
 import SectionHelp from '../../components/SectionHelp';
 import { useState, useEffect } from 'react';
@@ -374,12 +375,11 @@ export default function Promos() {
               {(targetType === 'category_products' || targetType === 'category_services') && (
                 <div className="form-group">
                   <label>Выберите категорию</label>
-                  <select value={targetCat} onChange={e => setTargetCat(e.target.value)}>
-                    <option value=""><span className="sel-ph">— выберите —</span></option>
-                    {categories.filter(c => c.type === (targetType === 'category_products' ? 'product' : 'service')).map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+                  <SmartSelect
+                    value={targetCat}
+                    onChange={setTargetCat}
+                    options={categories.filter(c => c.type === (targetType === 'category_products' ? 'product' : 'service')).map(c => ({ value: c.id, label: c.name }))}
+                  />
                 </div>
               )}
               {(targetType === 'specific_products' || targetType === 'specific_services') && (

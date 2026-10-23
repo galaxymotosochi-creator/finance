@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import RowMenu from '../../components/RowMenu';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -960,10 +961,11 @@ export default function Salary() {
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
-                <select value={fEmpId} onChange={e=>setFEmpId(e.target.value)} required className="sal-input sal-select">
-                  <option value=""><span className="sel-ph">— выберите —</span></option>
-                  {employees.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}
-                </select>
+                <SmartSelect
+                  value={fEmpId}
+                  onChange={setFEmpId}
+                  options={employees.map(e=>({ value: e.id, label: e.name }))}
+                />
               </div>
               <div className="sal-row2">
                 <div className="sal-field">

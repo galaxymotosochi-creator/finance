@@ -1,4 +1,5 @@
 import Modal from '../../components/Modal';
+import SmartSelect from '../../components/SmartSelect';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -851,10 +852,13 @@ export default function Receipts() {
               if (payList.length === 0) return (
                 <div style={{ fontSize: '.72rem', color: '#777', marginTop: '5px' }}>
                   По чеку нет разбивки оплаты — выберите счет возврата:
-                  <select value={refundAc} onChange={e => setRefundAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid var(--border)', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
-                    <option value=""><span className="sel-ph">— выберите —</span></option>
-                    {accounts.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.max(0, Math.round(accBalance(a.id))).toLocaleString()} {cur}</option>)}
-                  </select>
+                  <div style={{ marginTop: '4px' }}>
+                  <SmartSelect
+                    value={refundAc}
+                    onChange={setRefundAc}
+                    options={accounts.map(a => ({ value: a.id, label: a.name + ' — ' + Math.max(0, Math.round(accBalance(a.id))).toLocaleString() + ' ' + cur }))}
+                  />
+                  </div>
                 </div>
               );
               return (
@@ -863,10 +867,13 @@ export default function Receipts() {
                   {shortage ? (
                     <>
                       <div style={{ color: '#dc2626', marginTop: '2px' }}>⚠️ На счетах оплаты недостаточно средств (касса могла быть инкассирована). Выберите счет, с которого вернуть:</div>
-                      <select value={refundAltAc} onChange={e => setRefundAltAc(e.target.value)} style={{ marginTop: '4px', width: '100%', padding: '8px', border: '1.5px solid #fca5a5', borderRadius: '8px', fontFamily: 'inherit', fontSize: '.82rem', outline: 'none', background: '#fff' }}>
-                        <option value=""><span className="sel-ph">— выберите —</span></option>
-                        {withMoney.map(a => <option key={a.id} value={a.id}>{a.name} — {Math.round(accBalance(a.id)).toLocaleString()} {cur}</option>)}
-                      </select>
+                      <div style={{ marginTop: '4px' }}>
+                      <SmartSelect
+                        value={refundAltAc}
+                        onChange={setRefundAltAc}
+                        options={withMoney.map(a => ({ value: a.id, label: a.name + ' — ' + Math.round(accBalance(a.id)).toLocaleString() + ' ' + cur }))}
+                      />
+                      </div>
                     </>
                   ) : (
                     <div style={{ color: '#777' }}>Вернем с этих же счетов пропорционально. Если клиент возьмет другой товар — пробьете новый чек</div>
@@ -891,10 +898,11 @@ export default function Receipts() {
           </div>
           <div className="form-group">
             <label>Счет зачисления</label>
-            <select value={payAc} onChange={e => setPayAc(e.target.value)}>
-              <option value=""><span className="sel-ph">— выберите —</span></option>
-              {accounts.filter(a => a.type !== 'cash').map(a => <option key={a.id} value={a.id}>{a.type === 'cash_register' ? 'Наличные' : a.name}</option>)}
-            </select>
+            <SmartSelect
+              value={payAc}
+              onChange={setPayAc}
+              options={accounts.filter(a => a.type !== 'cash').map(a => ({ value: a.id, label: a.type === 'cash_register' ? 'Наличные' : a.name }))}
+            />
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={() => setPayReceipt(null)}>Отмена</button>
