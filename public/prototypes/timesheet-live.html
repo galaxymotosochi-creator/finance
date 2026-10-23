@@ -113,8 +113,8 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
 
 <script>
 const EMP = [
-  {id:'r', name:'Руководитель', ini:'Р', rate:3000, hourRate:375},
-  {id:'e', name:'Елена мастер', ini:'ЕМ', rate:2500, hourRate:313},
+  {id:'r', name:'Руководитель', ini:'Р', rate:3000, hourRate:250},
+  {id:'e', name:'Елена мастер', ini:'ЕМ', rate:2500, hourRate:208},
 ];
 const STATUSES = [
   {v:'work', l:'Работал'}, {v:'absent', l:'Не вышел'}, {v:'sick', l:'Больничный'},
@@ -129,7 +129,7 @@ function money(n){ return (Math.round(n)).toLocaleString('ru-RU') + ' ₽'; }
 function getDay(d){ if(!DAYS[d]) DAYS[d] = defaultDay(); return DAYS[d]; }
 function defaultDay(){
   const s = {}, r = {}, h = {};
-  EMP.forEach(e => { s[e.id]='work'; r[e.id]=e.rate; h[e.id]=8; });
+  EMP.forEach(e => { s[e.id]='work'; r[e.id]=e.rate; h[e.id]=12; });
   return {statuses:s, rate:r, hours:h, bonus:[], fine:[]};
 }
 function dayTotal(d){
@@ -222,16 +222,19 @@ function renderStep(){
   // шаг 2
   const workers = EMP.filter(e => draft.statuses[e.id]==='work');
   document.getElementById('step2').innerHTML = workers.length ? workers.map(e => {
-    const h = draft.hours[e.id]||8;
+    const h = draft.hours[e.id]!=null ? draft.hours[e.id] : 12;
     return '<div class="pcard"><div class="top"><span class="av">'+e.ini+'</span><span class="n">'+e.name+'</span></div>' +
       '<div class="pair">' +
         '<div class="f"><span>Ставка за день</span><input type="number" value="'+draft.rate[e.id]+'" oninput="setRate(\''+e.id+'\',this.value)"></div>' +
         '<div class="f"><span>Часов</span><input type="number" min="0" max="24" value="'+h+'" oninput="setHours(\''+e.id+'\',this.value)"></div>' +
       '</div>' +
+      '<div class="qrow">' +
+        '<button class="qb '+(h===12?'on':'')+'" onclick="setHours(\''+e.id+'\',12)">Полная смена · 12 ч</button>' +
+        '<button class="qb '+(h===6?'on':'')+'" onclick="setHours(\''+e.id+'\',6)">Пол дня · 6 ч</button>' +
+      '</div>' +
       '<div class="calc">= '+money(draft.rate[e.id])+' за смену · '+money(e.hourRate)+' в час</div>' +
-      '<div class="qrow">' + [4,8,12].map(x => '<button class="qb '+(h===x?'on':'')+'" onclick="setHours(\''+e.id+'\','+x+')">'+x+' ч</button>').join('') + '</div>' +
     '</div>';
-  }).join('') + '<div class="hint">Часы меняют ставку: 8 ч — полная смена, 4 ч — половина. Можно вписать свою ставку вручную — тогда она главнее часов.</div>'
+  }).join('') + '<div class="hint">Полная смена — 12 ч, пол дня — 6 ч. Ставка пересчитывается по часам, но её можно вписать вручную — тогда она главнее.</div>'
      : '<div class="hint">Никто не отмечен как работавший. Вернитесь на шаг 1.</div>';
 
   // шаг 3
