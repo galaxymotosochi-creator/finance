@@ -8,7 +8,8 @@ import SectionHelp from '../../components/SectionHelp';
 
 export default function PnL() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [period, setPeriod] = useState('month');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -260,7 +261,7 @@ export default function PnL() {
     ...(d.surpluses > 0 ? [{ key: 'sur', name: 'Излишки по инвентаризации', value: fmt(d.surpluses) }] : []),
     { key: 'h-exp', name: 'Расходы', value: `${fmt(expenseTotal)} ${cur}`, nameColor: '#dc2626', valueColor: '#dc2626', valueWeight: 400 },
     ...(d.discounts > 0 ? [{ key: 'disc', name: 'Скидки с продаж', value: fmt(d.discounts) }] : []),
-    { key: 'cogs', name: 'Закупка товара', value: fmt(d.totalCogs) },
+    ...(isServices ? [] : [{ key: 'cogs', name: 'Закупка товара', value: fmt(d.totalCogs) }]),
     ...d.opList.map(([name, amt], i) => ({ key: 'op' + i, name, value: fmt(amt) })),
     ...(d.shortages > 0 ? [{ key: 'short', name: 'Недостачи по инвентаризации', value: fmt(d.shortages) }] : []),
   ];
@@ -374,7 +375,7 @@ export default function PnL() {
             </div>
             <div className="pnl-acc-body">
               {d.discounts > 0 && <div className="pnl-r"><span className="nm">Скидки с продаж</span><span className="v">{fmt(d.discounts)} {cur}</span></div>}
-              <div className="pnl-r"><span className="nm">Закупка товара</span><span className="v">{fmt(d.totalCogs)} {cur}</span></div>
+              {!isServices && <div className="pnl-r"><span className="nm">Закупка товара</span><span className="v">{fmt(d.totalCogs)} {cur}</span></div>}
               {d.opList.map(([name, amt], i) => (
                 <div className="pnl-r" key={i}><span className="nm">{name}</span><span className="v">{fmt(amt)} {cur}</span></div>
               ))}
@@ -384,8 +385,8 @@ export default function PnL() {
 
           {/* Мини-плашки: закупка, запас, деньги */}
           <div className="pnl-grid3">
-            <div className="pnl-mini"><div className="lbl">ЗАКУПКА ТОВАРА</div><b>{fmt(d.totalCogs)} {cur}</b></div>
-            <div className="pnl-mini"><div className="lbl">ТОВАРНЫЙ ЗАПАС</div><b>{fmt(d.stockValue)} {cur}</b></div>
+            {!isServices && <div className="pnl-mini"><div className="lbl">ЗАКУПКА ТОВАРА</div><b>{fmt(d.totalCogs)} {cur}</b></div>}
+            {!isServices && <div className="pnl-mini"><div className="lbl">ТОВАРНЫЙ ЗАПАС</div><b>{fmt(d.stockValue)} {cur}</b></div>}
             <div className="pnl-mini"><div className="lbl">ДЕНЬГИ НА СЧЕТАХ</div><b>{fmt(d.totalCash)} {cur}</b></div>
           </div>
         </div>
