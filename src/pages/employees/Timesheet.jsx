@@ -437,8 +437,7 @@ export default function Timesheet() {
               })}
             </div>
             <div className="promo-cal-legend" style={{borderTop:'1px solid #f0f3f8',paddingTop:'10px',marginTop:'10px'}}>
-              <span><span className="promo-dot" style={{background:'#16a34a'}}></span> Бонус</span>
-              <span><span className="promo-dot" style={{background:'#dc2626'}}></span> Штраф</span>
+              <span><span className="promo-dot" style={{background:'#eff6ff',border:'1px solid rgba(31,117,255,.45)'}}></span> Табель заполнен</span>
             </div>
           </div>
 
