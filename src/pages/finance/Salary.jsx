@@ -156,6 +156,7 @@ export default function Salary() {
   const [fPeriodTo, setFPeriodTo] = useState('');
   const [fBaseSalary, setFBaseSalary] = useState(0);
   const [fSalaryType, setFSalaryType] = useState('fixed');
+  const [salStep, setSalStep] = useState(1);
   const [fSalaryTotal, setFSalaryTotal] = useState(0);
   const [fDays, setFDays] = useState(0);
   const [fPayType, setFPayType] = useState('salary');
@@ -485,6 +486,7 @@ export default function Salary() {
     const _d = new Date(_from + 'T12:00:00');
     _d.setMonth(_d.getMonth() + 1);
     const _to = _d.toLocaleDateString('en-CA');
+    setSalStep(1);
     setEditId(null); setFEmpId(''); setFPeriodFrom(_from); setFPeriodTo(_to);
     setFBaseSalary(0); setFSalaryType('fixed'); setFSalaryTotal(0); setFDays(0);
     setFPayType('salary'); setFStatus('pending'); setFDate(new Date().toISOString().split('T')[0]);
@@ -960,6 +962,8 @@ export default function Salary() {
         </div>
         <form onSubmit={save} style={{display:'flex',flexDirection:'column',gap:'.75rem'}}>
 
+              {/* ═══ ШАГ 1 ═══ */}
+              {salStep === 1 && (<>
               {/* Сотрудник + период */}
               <div className="sal-seclab">Сотрудник и период</div>
               <div className="sal-row">
@@ -1046,6 +1050,10 @@ export default function Salary() {
                 )}
               </div>
 
+              </>)}
+
+              {/* ═══ ШАГ 2 ═══ */}
+              {salStep === 2 && (<>
               {/* Продажи и услуги сотрудника — бонусы с продаж */}
               <div className="sal-seclab">Включить в начисление</div>
               {(()=>{
@@ -1340,18 +1348,42 @@ export default function Salary() {
                 </div>
               </>
 
+              </>)}
+
               {/* Итого */}
-              <div className="sal-total">
+              {salStep === 2 && <div className="sal-total">
                 <div className="cap">К начислению</div>
                 <div className="big">{grandTotal.toLocaleString()} {cur}</div>
-              </div>
+              </div>}
 
-              {/* Кнопки */}
+              {/* Кнопки + точки шагов */}
               <div className="modal-actions">
-                <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
-                <button type="submit" className="cat-add-btn">
-                  {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}
-                </button>
+                <div style={{display:'flex',alignItems:'center',gap:'.45rem',marginRight:'auto'}}>
+                  {[1,2].map(function(i){
+                    var act = salStep === i;
+                    return (
+                      <span key={i} onClick={function(){ setSalStep(i); }} title={'Шаг ' + i}
+                        style={{cursor:'pointer',width:'11px',height:'11px',borderRadius:'50%',
+                          background: act ? '#1d78fc' : '#bcd8fe',
+                          boxShadow: act ? '0 0 0 3px rgba(29,120,252,.18)' : 'none',
+                          transition:'all .22s', transform: act ? 'scale(1.12)' : 'scale(1)'}}>
+                      </span>
+                    );
+                  })}
+                </div>
+                {salStep === 1 ? (
+                  <>
+                    <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
+                    <button type="button" className="cat-add-btn" onClick={()=>setSalStep(2)}>Далее →</button>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="v2-ghost" onClick={()=>setSalStep(1)}>← Назад</button>
+                    <button type="submit" className="cat-add-btn">
+                      {editId ? 'Сохранить' : 'Начислить'} {grandTotal.toLocaleString()} {cur}
+                    </button>
+                  </>
+                )}
               </div>
 
             </form>
