@@ -2139,3 +2139,11 @@ input:focus, select:focus, textarea:focus {
 .ts-st.a{background:rgba(17,17,17,.08);color:#111}
 .ts-st.v{background:rgba(59,130,246,.14);color:#1d4ed8}
 .ts-st.z{background:rgba(139,147,163,.16);color:#5b6472}
+
+/* Табель, шаг 1: селект статуса — ширина как поле в модалке услуги */
+.ts-selwrap{position:relative;flex:1;min-width:0}
+.ts-sel.ts-sel-wide{width:100%;max-width:none;padding-right:26px;font-weight:500}
+.ts-selwrap .ts-caret{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.6rem;color:#9aa7bd;pointer-events:none;animation:tsBlink 1.6s ease-in-out infinite}
+@keyframes tsBlink{0%,100%{opacity:.25}50%{opacity:1}}
+.ts-sel.ts-sel-wide:not(:focus){color:#111}
+.ts-sel.ts-sel-wide.placeholder{color:rgba(0,0,0,.38) !important;font-weight:400 !important}

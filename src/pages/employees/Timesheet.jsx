@@ -616,10 +616,14 @@ export default function Timesheet() {
                     <div className="ts-pcard-top">
                       <span className="ts-av">{emp.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</span>
                       <span className="ts-pname">{emp.name}</span>
-                      <select className="ts-sel" value={localStatuses[emp.id]||'present'}
-                        onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}>
-                        {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                      </select>
+                      <div className="ts-selwrap">
+                        <select className={"ts-sel ts-sel-wide" + (!localStatuses[emp.id] ? " placeholder" : "")} value={localStatuses[emp.id]||''}
+                          onChange={e => setLocalStatuses({...localStatuses, [emp.id]: e.target.value})}>
+                          <option value="">— выберите —</option>
+                          {STATUS_OPTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                        </select>
+                        <span className="ts-caret">▾</span>
+                      </div>
                     </div>
                   </div>
                 ))}
