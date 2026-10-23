@@ -418,15 +418,15 @@ export default function QuickSale({ onClose }) {
           {/* Способ оплаты */}
           <div className="v2-card">
           <div className="form-group"><label>Способ оплаты</label>
-          <div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginBottom:'2px'}}>
+          <div className="v2-seg" style={{marginBottom:'2px'}}>
             {accounts.filter(function(a){return a.type !== 'cash';}).map(a => (
-              <button key={a.id} onClick={() => setPayMode(a.id)} style={{
-                    flex:1, padding:'8px 6px', borderRadius:'8px', border:'1.5px solid #eee',
-                    background: payMode === a.id ? '#111' : '#fff',
-                    color: payMode === a.id ? '#fff' : '#555',
-                    fontSize:'11px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', minWidth:'60px'
-                  }}>{a.type === 'cash_register' ? 'Наличные' : a.name}</button>
+              <button key={a.id} type="button" className={payMode === a.id ? 'on' : ''} onClick={() => setPayMode(a.id)}>
+                {a.type === 'cash_register' ? 'Наличные' : a.name}
+              </button>
             ))}
+            {accounts.filter(function(a){return a.type !== 'cash';}).length === 0 && (
+              <div style={{fontSize:'12px',color:'#7b8494',padding:'7px 4px'}}>Счета не найдены — добавьте счет в разделе «Счета»</div>
+            )}
           </div>
           </div>
           </div>
