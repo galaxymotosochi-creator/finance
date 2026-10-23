@@ -470,7 +470,7 @@ export default function Accounts() {
                   })}
                   <div className="in"><div className="t">Общий баланс</div><div className="v">{(total||0).toLocaleString()} {cur}</div></div>
                 </div>
-                <div className="sk-legend" style={{flex:'0 0 auto',maxWidth:'100%',minWidth:0}}>
+                <div className="sk-legend" style={{flex:'1 1 auto',maxWidth:'none',minWidth:0,width:'auto'}}>
                   {sorted.map((a,i) => {
                     const v = vals[i];
                     const pct = Math.round(v/sum*100);
