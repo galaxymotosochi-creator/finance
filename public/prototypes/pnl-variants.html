@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Чистая прибыль — 5 вариантов</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--blue-l:#E6F0FF;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 70px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6fb;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:18px;max-width:1560px;margin:0 auto}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:20px;box-shadow:0 2px 14px rgba(11,18,32,.05)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15.5px;font-weight:800;margin:0 0 3px;letter-spacing:-.01em}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:16px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:10px}
+
+/* ---------- 1: командный центр ---------- */
+.v1hero{border-radius:18px;padding:20px;background:linear-gradient(135deg,#0d4ea8,#1F75FF 55%,#4d9bff);color:#fff;position:relative;overflow:hidden;margin-bottom:14px}
+.v1hero:after{content:"";position:absolute;right:-50px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.09)}
+.v1hero .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;opacity:.85;font-weight:700}
+.v1hero .b{font-size:31px;font-weight:800;letter-spacing:-.03em;margin:6px 0 2px;line-height:1}
+.v1hero .d{font-size:11.5px;opacity:.9}
+.v1chips{display:flex;gap:8px;position:relative;z-index:2;margin-top:16px;flex-wrap:wrap}
+.v1chip{background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border-radius:11px;padding:8px 11px;font-size:10px;font-weight:700;letter-spacing:.03em}
+.v1chip b{display:block;font-size:14px;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+.v1flow{display:flex;align-items:center;gap:0;margin:16px 0 6px}
+.v1fcell{flex:1;text-align:center}
+.v1fcell .l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.v1fcell .v{font-size:15px;font-weight:800;margin-top:3px;letter-spacing:-.01em}
+.v1fcell .v.inc{color:#0d9488}
+.v1fcell .v.exp{color:#c2410c}
+.v1farrow{color:#c9d6ea;font-size:16px;font-weight:800;padding:0 4px}
+.v1bars{margin-top:14px}
+.v1brow{display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:11.5px}
+.v1brow .n{width:104px;color:#33405a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v1track{flex:1;height:9px;border-radius:99px;background:#eef2f9;overflow:hidden;position:relative}
+.v1track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.v1brow .v{width:74px;text-align:right;font-weight:800;font-size:11px}
+
+/* ---------- 2: водопад ---------- */
+.v2grid{display:grid;grid-template-columns:1fr;gap:10px}
+.v2row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.v2row.total{background:var(--blue-l);border-color:rgba(31,117,255,.35)}
+.v2row.final{background:linear-gradient(135deg,#0d4ea8,#1F75FF);border:none;color:#fff}
+.v2row .n{flex:1;font-size:12px;font-weight:600}
+.v2row.total .n{font-weight:800;color:#0d4ea8}
+.v2row.final .n{font-weight:800;color:#fff}
+.v2row .v{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.v2row .v.neg{color:#c2410c}
+.v2row.final .v{font-size:15px}
+.v2minus{font-size:13px;color:#c9d6ea;font-weight:800}
+.v2water{display:flex;align-items:flex-end;gap:3px;height:64px;margin:14px 0 4px;border-bottom:1px dashed var(--line)}
+.v2w{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#4d9bff,#1F75FF)}
+.v2w.exp{background:linear-gradient(180deg,#f8b48b,#ea580c)}
+.v2w.net{background:linear-gradient(180deg,#2dd4bf,#0d9488)}
+.v2cap{display:flex;gap:3px;font-size:9px;color:var(--muted);text-align:center}
+.v2cap span{flex:1}
+
+/* ---------- 3: полоса-соотношение ---------- */
+.v3top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.v3big{font-size:32px;font-weight:800;letter-spacing:-.035em;line-height:1}
+.v3big small{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:0}
+.v3pill{font-size:10.5px;font-weight:800;border-radius:99px;padding:5px 11px;background:rgba(13,148,136,.1);color:#0d9488}
+.v3strip{display:flex;height:46px;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(29,120,252,.14)}
+.v3s1{background:linear-gradient(90deg,#0d4ea8,#1F75FF);display:flex;align-items:center;padding:0 12px;color:#fff;font-size:11px;font-weight:800}
+.v3s2{background:linear-gradient(90deg,#3c4553,#20252e);display:flex;align-items:center;justify-content:flex-end;padding:0 12px;color:#fff;font-size:11px;font-weight:800;flex:1}
+.v3legend{display:flex;justify-content:space-between;margin-top:7px;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.v3kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}
+.v3cell{border:1px solid var(--line);border-radius:13px;padding:11px;background:var(--soft)}
+.v3cell .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+.v3cell .v{font-size:14.5px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
+.v3stack{margin-top:14px}
+.v3srow{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #f2f5fa;font-variant-numeric:tabular-nums}
+.v3srow:last-child{border:none}
+.v3srow .nm{color:#33405a;font-weight:600}
+
+/* ---------- 4: карточки-метрики --- */
+.v4hero{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.v4ring{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none;background:conic-gradient(#1F75FF 0 248deg,#eef2f9 248deg 360deg)}
+.v4ring:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.v4in{position:relative;z-index:2;text-align:center}
+.v4in b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.v4in span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.v4side{flex:1}
+.v4side .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}
+.v4side .b{font-size:25px;font-weight:800;letter-spacing:-.03em;margin:4px 0 3px;line-height:1}
+.v4side .d{font-size:11px;color:var(--muted);line-height:1.45}
+.v4cells{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.v4c{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+.v4c .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800;display:flex;justify-content:space-between;gap:6px}
+.v4c .v{font-size:15px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
+.v4c .bar{height:5px;border-radius:99px;background:#eef2f9;margin-top:8px;overflow:hidden}
+.v4c .bar i{display:block;height:100%;border-radius:99px;background:var(--blue)}
+.v4c .bar i.exp{background:#ea580c}
+
+/* ---------- 5: две колонки ---------- */
+.v5head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.v5head .b{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.v5head .s{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.v5cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.v5col{padding:14px}
+.v5col.l{border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(31,117,255,.05),transparent)}
+.v5col.r{background:linear-gradient(180deg,rgba(32,37,46,.04),transparent)}
+.v5ch{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);margin-bottom:3px}
+.v5ch .d{width:8px;height:8px;border-radius:3px;background:var(--blue)}
+.v5col.r .v5ch{color:#3c4553}
+.v5col.r .v5ch .d{background:#20252e}
+.v5tot{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+.v5line{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:5px 0;font-variant-numeric:tabular-nums;color:#33405a}
+.v5line .pc{color:var(--muted);font-weight:700;font-size:10px}
+.v5foot{margin-top:12px;border-radius:14px;padding:13px;background:linear-gradient(135deg,#0d4ea8,#1F75FF);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.v5foot .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;font-weight:800}
+.v5foot .v{font-size:18px;font-weight:800;letter-spacing:-.02em}
+</style></head><body>
+<h1>Чистая прибыль — 5 вариантов оформления</h1>
+<div class="sub">Данные примерные: выручка 1 284 500 ₽ · расходы 936 200 ₽ · прибыль 348 300 ₽ · рентабельность 27%</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>Командный центр</h2>
+  <div class="hint">Синий градиентный блок с прибылью, под ним движение денег: доходы → расходы → прибыль, ниже — статьи расходов полосами.</div>
+  <div class="v1hero">
+    <div class="l">Чистая прибыль</div>
+    <div class="b num">348 300 ₽</div>
+    <div class="d">за октябрь 2026 · рентабельность 27%</div>
+    <div class="v1chips">
+      <div class="v1chip">ДОХОДЫ<b class="num">1 284 500 ₽</b></div>
+      <div class="v1chip">РАСХОДЫ<b class="num">936 200 ₽</b></div>
+      <div class="v1chip">ДЕНЬГИ<b class="num">412 700 ₽</b></div>
+    </div>
+  </div>
+  <div class="v1flow">
+    <div class="v1fcell"><div class="l">Доходы</div><div class="v inc num">1 284 500</div></div>
+    <div class="v1farrow">−</div>
+    <div class="v1fcell"><div class="l">Расходы</div><div class="v exp num">936 200</div></div>
+    <div class="v1farrow">=</div>
+    <div class="v1fcell"><div class="l">Прибыль</div><div class="v num">348 300</div></div>
+  </div>
+  <div class="v1bars">
+    <div class="v1brow"><span class="n">Зарплата</span><div class="v1track"><i style="width:58%;background:linear-gradient(90deg,#c2410c,#ea580c)"></i></div><span class="v num">58%</span></div>
+    <div class="v1brow"><span class="n">Аренда</span><div class="v1track"><i style="width:21%;background:linear-gradient(90deg,#c2410c,#f08c4a)"></i></div><span class="v num">21%</span></div>
+    <div class="v1brow"><span class="n">Закупки</span><div class="v1track"><i style="width:14%;background:linear-gradient(90deg,#c2410c,#f6b08a)"></i></div><span class="v num">14%</span></div>
+    <div class="v1brow"><span class="n">Прочее</span><div class="v1track"><i style="width:7%;background:linear-gradient(90deg,#c2410c,#fbd0b5)"></i></div><span class="v num">7%</span></div>
+  </div>
+  <div class="note">Выглядит как пульт управления: прибыль на первом месте, движение денег объясняет, откуда она взялась.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Водопад</h2>
+  <div class="hint">Пошаговый расчёт сверху вниз: выручка, минус статьи расходов, итог. Плюс мини-диаграмма.</div>
+  <div class="v2grid">
+    <div class="v2row total"><span class="n">Выручка</span><span class="v num">1 284 500 ₽</span></div>
+    <div class="v2row"><span class="v2minus">−</span><span class="n">Зарплата</span><span class="v neg num">543 200 ₽</span></div>
+    <div class="v2row"><span class="v2minus">−</span><span class="n">Аренда</span><span class="v neg num">196 600 ₽</span></div>
+    <div class="v2row"><span class="v2minus">−</span><span class="n">Закупки</span><span class="v neg num">131 100 ₽</span></div>
+    <div class="v2row"><span class="v2minus">−</span><span class="n">Прочие расходы</span><span class="v neg num">65 300 ₽</span></div>
+    <div class="v2row final"><span class="n">Чистая прибыль</span><span class="v num">348 300 ₽</span></div>
+  </div>
+  <div class="v2water">
+    <div class="v2w" style="height:100%"></div>
+    <div class="v2w exp" style="height:42%"></div>
+    <div class="v2w exp" style="height:15%"></div>
+    <div class="v2w exp" style="height:10%"></div>
+    <div class="v2w exp" style="height:5%"></div>
+    <div class="v2w net" style="height:27%"></div>
+  </div>
+  <div class="v2cap"><span>выручка</span><span>зп</span><span>аренда</span><span>закуп</span><span>проч</span><span>прибыль</span></div>
+  <div class="note">Самое понятное для нефинансиста: видно, куда уходит каждый рубль и сколько остаётся в конце.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>Полоса-соотношение</h2>
+  <div class="hint">Одна крупная цифра, полоса «сколько осталось / сколько ушло», под ней три KPI и расшифровка.</div>
+  <div class="v3top">
+    <div>
+      <div class="s" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;margin-bottom:5px">Чистая прибыль</div>
+      <div class="v3big num">348 300 <small>₽</small></div>
+    </div>
+    <span class="v3pill num">рентабельность 27%</span>
+  </div>
+  <div class="v3strip">
+    <div class="v3s1" style="width:27%">27%</div>
+    <div class="v3s2">73%</div>
+  </div>
+  <div class="v3legend"><span class="num">осталось 348 300 ₽</span><span class="num">потрачено 936 200 ₽</span></div>
+  <div class="v3kpi">
+    <div class="v3cell"><div class="l">Доходы</div><div class="v num">1 284 500</div></div>
+    <div class="v3cell"><div class="l">Расходы</div><div class="v num">936 200</div></div>
+    <div class="v3cell"><div class="l">Деньги</div><div class="v num">412 700</div></div>
+  </div>
+  <div class="v3stack">
+    <div class="v3srow"><span class="nm">Зарплата</span><span class="num">543 200 ₽ · 58%</span></div>
+    <div class="v3srow"><span class="nm">Аренда</span><span class="num">196 600 ₽ · 21%</span></div>
+    <div class="v3srow"><span class="nm">Закупки</span><span class="num">131 100 ₽ · 14%</span></div>
+  </div>
+  <div class="note">Максимально наглядно про главное: из каждого рубля 27 копеек остаётся вам, 73 уходит в расходы.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Кольцо и метрики</h2>
+  <div class="hint">Кольцо заполнения по рентабельности слева, цифра справа, ниже карточки ключевых показателей.</div>
+  <div class="v4hero">
+    <div class="v4ring"><div class="v4in"><b class="num">27%</b><span>остаётся</span></div></div>
+    <div class="v4side">
+      <div class="l">Чистая прибыль</div>
+      <div class="b num">348 300 ₽</div>
+      <div class="d">За октябрь 2026<br>из 1 284 500 ₽ выручки</div>
+    </div>
+  </div>
+  <div class="v4cells">
+    <div class="v4c"><div class="l"><span>Доходы</span><span class="num">100%</span></div><div class="v num">1 284 500 ₽</div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="v4c"><div class="l"><span>Расходы</span><span class="num">73%</span></div><div class="v num">936 200 ₽</div><div class="bar"><i class="exp" style="width:73%"></i></div></div>
+    <div class="v4c"><div class="l"><span>Прибыль</span><span class="num">27%</span></div><div class="v num">348 300 ₽</div><div class="bar"><i style="width:27%"></i></div></div>
+    <div class="v4c"><div class="l"><span>Средний чек</span><span class="num">1 250 ₽</span></div><div class="v num">1 028 чеков</div><div class="bar"><i style="width:62%"></i></div></div>
+  </div>
+  <div class="note">Компактно и сбалансированно: одно кольцо задаёт настроение, карточки дают факты.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 5</div>
+  <h2>Две колонки</h2>
+  <div class="hint">Доходы и расходы зеркально, как в нашем разделе «Доходы и расходы», а прибыль — крупной полосой внизу.</div>
+  <div class="v5head">
+    <div><div class="s">Период · октябрь 2026</div><div class="b num">348 300 ₽</div></div>
+    <span class="v3pill num">27%</span>
+  </div>
+  <div class="v5cols">
+    <div class="v5col l">
+      <div class="v5ch"><span class="d"></span>Доходы</div>
+      <div class="v5tot num">1 284 500 ₽</div>
+      <div class="v5line"><span>Доход от продаж</span><span class="num">1 260 000 ₽</span></div>
+      <div class="v5line"><span>Прочие доходы</span><span class="num">24 500 ₽</span></div>
+      <div class="v5line"><span>Излишки</span><span class="num">0 ₽</span></div>
+    </div>
+    <div class="v5col r">
+      <div class="v5ch"><span class="d"></span>Расходы</div>
+      <div class="v5tot num">936 200 ₽</div>
+      <div class="v5line"><span>Зарплата</span><span class="num">543 200 ₽</span></div>
+      <div class="v5line"><span>Аренда</span><span class="num">196 600 ₽</span></div>
+      <div class="v5line"><span>Закупки</span><span class="num">131 100 ₽</span></div>
+      <div class="v5line"><span>Прочее</span><span class="num">65 300 ₽</span></div>
+    </div>
+  </div>
+  <div class="v5foot">
+    <span class="l">Чистая прибыль</span>
+    <span class="v num">348 300 ₽</span>
+  </div>
+  <div class="note">Единый язык с разделом «Доходы и расходы»: та же зеркальная логика, только итог финансового результата.</div>
+</div>
+
+</div></body></html>
