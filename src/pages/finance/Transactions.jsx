@@ -642,7 +642,7 @@ export default function Transactions() {
       </div>
 
       {!loading && (
-        <div className="tx-card">
+        <div className="tx-card pnl2-card">
           <div className="tx-mirror">
             <div className="half">
               <div className="b inc" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? incomeTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}><span className="sm">{incomeTotal.toLocaleString()} {cur}</span><span className="sep"> · </span><span className="pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</span></div>
