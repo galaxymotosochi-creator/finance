@@ -906,7 +906,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ===== Доходы и расходы: карточка «круг + структура» (дизайн tx-panels v3) ===== */
-.tx-card{background:transparent;border:none;border-radius:0;padding:0;margin-bottom:16px;box-shadow:none}
+.tx-card{background:transparent;border:none;border-radius:0;padding:0;margin-bottom:28px;box-shadow:none;width:100%}
 .tx-ring-block{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
 .tx-ring{width:150px;height:150px;flex:none;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 16px 30px -14px rgba(11,18,32,.34),0 10px 20px -10px rgba(11,18,32,.2)}
 .tx-ring:before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;background:none}
@@ -1677,7 +1677,7 @@ input:focus, select:focus, textarea:focus {
 /* Доходы и расходы: два круга рядом */
 .tx-rings{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
 /* Доходы и расходы: зеркальные столбики от центра + расшифровка (вариант 5) */
-.tx-mirror{display:flex;align-items:center;gap:0;height:120px;max-width:900px;margin:0 auto}
+.tx-mirror{display:flex;align-items:center;gap:0;height:120px;width:100%;margin:0}
 .tx-mirror .half{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-right:4px;height:100%}
 .tx-mirror .half.r{align-items:flex-start;padding-left:4px;padding-right:0}
 .tx-mirror .b{height:34px;border-radius:8px 2px 2px 8px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:12px;font-weight:800;white-space:nowrap;max-width:100%}
@@ -1685,11 +1685,9 @@ input:focus, select:focus, textarea:focus {
 .tx-mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
 .tx-mirror .half.r .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
 .tx-mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
-.tx-m5{display:flex;gap:0;align-items:stretch;max-width:900px;margin:18px auto 0}
-.tx-m5 .side{flex:1;min-width:0;padding:0 12px}
-.tx-m5 .side.l{padding-left:0}
-.tx-m5 .side.r{padding-right:0}
-.tx-m5 .divider{width:1px;background:rgba(29,120,252,.14);flex:none;margin:4px 0}
+.tx-m5{display:flex;gap:0;align-items:stretch;width:100%;margin:18px 0 0}
+.tx-m5 .side{flex:1;min-width:0;padding:0}
+.tx-m5 .divider{width:1px;background:rgba(29,120,252,.14);flex:none;margin:4px 14px}
 .tx-m5 .hd{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;margin-bottom:8px;color:#111}
 .tx-m5 .hd .dot{width:10px;height:10px;border-radius:3px;flex:none}
 .tx-m5 .hd .amt{margin-left:auto;font-variant-numeric:tabular-nums}
