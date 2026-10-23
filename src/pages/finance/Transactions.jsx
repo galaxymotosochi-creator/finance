@@ -960,23 +960,23 @@ export default function Transactions() {
                 <label>Комментарий</label>
                 <input type="text" placeholder="Например: инвестиции, партнерские, проценты" value={incName} onChange={function(e){setIncName(e.target.value)}} />
               </div>
-          <div className="form-group">
-            <label>{txKind === 'expense' ? 'С какого счета списать' : 'На какой счет зачислить'}</label>
-            <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
-              {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
-              {accs.map(function(a){
-                var sel = String(a.id) === String(selectedAcc);
-                return (
-                  <div key={a.id} onClick={function(){setSelectedAcc(a.id)}}
-                    style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'10px',background:sel?'#E6F0FF':'#fff',border:'1px solid '+(sel?'#1F75FF':'#e8e8ec')}}>
-                    <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
-                    <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
-                    <span style={{fontSize:'.875rem',fontWeight:500,color:'#222',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+              </div>
+              <div className="form-group">
+                <label>{txKind === 'expense' ? 'С какого счета списать' : 'На какой счет зачислить'}</label>
+                <div style={{display:'flex',flexDirection:'column',gap:'.35rem',margin:'.25rem 0 .5rem'}}>
+                  {accs.length === 0 && <div style={{padding:'.4rem .25rem',fontSize:'.8rem',color:'var(--muted)'}}>Нет счетов</div>}
+                  {accs.map(function(a){
+                    var sel = String(a.id) === String(selectedAcc);
+                    return (
+                      <div key={a.id} onClick={function(){setSelectedAcc(a.id)}}
+                        style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.6rem .75rem',cursor:'pointer',borderRadius:'10px',background:sel?'#E6F0FF':'#fff',border:'1px solid '+(sel?'#1F75FF':'#e8e8ec')}}>
+                        <span style={{width:'18px',height:'18px',flexShrink:0,border:'2px solid '+(sel?'#111':'#cfcfd6'),borderRadius:'50%',borderWidth:sel?'6px':'2px',boxSizing:'border-box',display:'inline-block'}} />
+                        <span style={{flex:1,fontSize:'.875rem',fontWeight:500,color:'#222',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{a.name}</span>
+                        <span style={{fontSize:'.875rem',fontWeight:500,color:'#222',whiteSpace:'nowrap'}}>{Math.round(accBalance[a.id]||0).toLocaleString()} {cur}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="modal-actions">
                 <button type="button" className="v2-ghost" onClick={function(){setShowIncome(false);setEditingId(null)}}>Отмена</button>
