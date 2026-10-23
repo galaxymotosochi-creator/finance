@@ -1997,7 +1997,7 @@ input:focus, select:focus, textarea:focus {
 
 /* серая плашка-группа (как .price-card в превью) */
 .v2-card {
-  background: #fcfcfe; border: 1px solid rgba(0,16,36,.09);
+  background: #fefeff; border: 1px solid rgba(0,16,36,.07);
   border-radius: 12px; padding: 10px 12px 2px; margin-bottom: 10px;
 }
 .v2-card .form-group { margin-bottom: 10px; }
