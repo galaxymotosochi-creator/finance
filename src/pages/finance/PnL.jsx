@@ -314,7 +314,7 @@ export default function PnL() {
             {period === 'custom' ? 'Свой период' : (period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год')}
             <span className="car-tri">▾</span>
           </button>
-          <div className="sk-dd-menu" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'260px',padding:'.4rem',zIndex:100,display:'none'}}>
+          <div className="sk-dd-menu" style={{position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'260px',padding:'.4rem',zIndex:100,display:periodOpen?'block':'none'}}>
             {[['month','Месяц'],['quarter','Квартал'],['year','Год']].map(([k,l]) => (
               <button key={k} type="button"
                 style={period === k ? { background:'#E6F0FF', color:'#0d4ea8', fontWeight:700 } : undefined}
