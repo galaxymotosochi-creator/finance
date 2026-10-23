@@ -649,7 +649,7 @@ export default function Transactions() {
             </div>
             <div className="center"></div>
             <div className="half r">
-              <div className="b exp" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? expenseTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}><span className="pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</span><span className="sep"> · </span><span className="sm">{expenseTotal.toLocaleString()} {cur}</span></div>
+              <div className="b exp" style={{width: Math.min(100, (incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? expenseTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0) + 12) + '%'}}><span className="pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</span><span className="sep"> · </span><span className="sm">{expenseTotal.toLocaleString()} {cur}</span></div>
             </div>
           </div>
 
