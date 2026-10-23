@@ -14,7 +14,8 @@ const daysShort = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
 export default function Promos() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
+  const isServices = businessType === 'services';
   const [promos, setPromos] = useState([]);
   const [cal, setCal] = useState(new Date());
   const [show, setShow] = useState(false);
@@ -124,7 +125,7 @@ export default function Promos() {
       conditions.catName = categories.find(c => c.id === parseInt(targetCat))?.name || '';
     }
     if (targetType === 'specific_products' || targetType === 'specific_services') {
-      if (!targetProducts.length) return alert('Выберите товары');
+      if (!targetProducts.length) return alert(isServices ? 'Выберите услуги' : 'Выберите товары');
       conditions.productIds = targetProducts;
     }
     const data = {
@@ -167,9 +168,9 @@ export default function Promos() {
   };
 
   const targetLabel = (p) => {
-    if (!p.conditions || !p.conditions.type) return 'Все товары';
+    if (!p.conditions || !p.conditions.type) return isServices ? 'Все услуги' : 'Все товары';
     const t = p.conditions.type;
-    if (t === 'all') return 'Все товары';
+    if (t === 'all') return isServices ? 'Все услуги' : 'Все товары';
     if (t === 'category_products') return 'Категория: ' + (p.conditions.catName || p.conditions.catId);
     if (t === 'specific_products') return (p.conditions.productIds?.length || 0) + ' товаров';
     if (t === 'category_services') return 'Категория услуг: ' + (p.conditions.catName || p.conditions.catId);
@@ -195,7 +196,7 @@ export default function Promos() {
             <h1 className="cat-title">Акции</h1>
             <SectionHelp
               title="Раздел «Акции»"
-              intro="Акции — это временные спецпредложения со скидкой: сезонные распродажи, праздничные предложения, скидки на категорию или конкретные товары."
+              intro={isServices ? "Акции — это временные спецпредложения со скидкой: сезонные распродажи, праздничные предложения, скидки на категорию или конкретные услуги." : "Акции — это временные спецпредложения со скидкой: сезонные распродажи, праздничные предложения, скидки на категорию или конкретные товары."}
               faq={[
                 { q: 'Как создать акцию?', a: (
                   <div>Нажмите <b>«Добавить»</b> справа вверху. Укажите название, размер скидки, сроки и на что она распространяется.</div>
@@ -316,10 +317,10 @@ export default function Promos() {
                 </div>
               )}
 
-              <div style={{fontSize:'.82rem',fontWeight:600,marginBottom:'.35rem'}}>Товары под акцией ({matchedProducts.length})</div>
+              <div style={{fontSize:'.82rem',fontWeight:600,marginBottom:'.35rem'}}>{isServices ? 'Услуги под акцией' : 'Товары под акцией'} ({matchedProducts.length})</div>
               <div style={{maxHeight:'200px',overflowY:'auto',border:'1px solid var(--border)',borderRadius:'var(--radius-md)',padding:'.25rem'}}>
                 {matchedProducts.length === 0 ? (
-                  <div style={{padding:'.5rem',textAlign:'center',color:'var(--muted)',fontSize:'.78rem'}}>Нет товаров</div>
+                  <div style={{padding:'.5rem',textAlign:'center',color:'var(--muted)',fontSize:'.78rem'}}>{isServices ? 'Нет услуг' : 'Нет товаров'}</div>
                 ) : matchedProducts.slice(0,50).map(x => (
                   <div key={x.id} style={{display:'flex',justifyContent:'space-between',padding:'.3rem .5rem',borderBottom:'1px solid #f0f0f0',fontSize:'.78rem'}}>
                     <span>{x.name}</span>
@@ -370,7 +371,11 @@ export default function Promos() {
                 <SmartSelect
                   value={targetType}
                   onChange={setTargetType}
-                  options={[
+                  options={isServices ? [
+                    { value: 'all', label: 'На все услуги' },
+                    { value: 'category_services', label: 'На категорию услуг' },
+                    { value: 'specific_services', label: 'На конкретные услуги' },
+                  ] : [
                     { value: 'all', label: 'На все позиции' },
                     { value: 'category_products', label: 'На категорию товаров' },
                     { value: 'category_services', label: 'На категорию услуг' },
