@@ -643,58 +643,45 @@ export default function Transactions() {
 
       {!loading && (
         <div className="tx-card">
-          <div className="tx-bars">
-            <div className="tx-bar-row">
-              <div className="tx-bar-hd">
-                <span className="nm">Доходы</span>
-                <span className="amt inc">+{incomeTotal.toLocaleString()} {cur}</span>
-              </div>
-              <div className="tx-bar-track"><i className="inc" style={{width:(incomeTotal+expenseTotal ? incomeTotal/(incomeTotal+expenseTotal)*100 : 0)+'%'}}></i></div>
-              <div className="tx-bar-pc">{incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
+          <div className="tx-mirror">
+            <div className="half">
+              <div className="b inc" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? incomeTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}>{incomeTotal.toLocaleString()} {cur} · {incomeTotal+expenseTotal ? Math.round(incomeTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
             </div>
-            <div className="tx-bar-row">
-              <div className="tx-bar-hd">
-                <span className="nm">Расходы</span>
-                <span className="amt exp">−{expenseTotal.toLocaleString()} {cur}</span>
-              </div>
-              <div className="tx-bar-track"><i className="exp" style={{width:(incomeTotal+expenseTotal ? expenseTotal/(incomeTotal+expenseTotal)*100 : 0)+'%'}}></i></div>
-              <div className="tx-bar-pc">{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}%</div>
+            <div className="center"></div>
+            <div className="half r">
+              <div className="b exp" style={{width:(incomeTotal+expenseTotal ? Math.max(incomeTotal,expenseTotal) ? expenseTotal/Math.max(incomeTotal,expenseTotal)*100 : 0 : 0)+'%'}}>{incomeTotal+expenseTotal ? Math.round(expenseTotal/(incomeTotal+expenseTotal)*100) : 0}% · {expenseTotal.toLocaleString()} {cur}</div>
             </div>
           </div>
-          <div className="tx-ring-totals">
-            <span className="ttl-inc">Доходы <b>+{incomeTotal.toLocaleString()} {cur}</b></span>
-            <span className="ttl-exp">Расходы <b>−{expenseTotal.toLocaleString()} {cur}</b></span>
-            <span className={centerVal >= 0 ? 'ttl-prof' : 'ttl-loss'}>{centerVal >= 0 ? 'Прибыль' : 'Убыток'} <b>{centerVal >= 0 ? '+' : '−'}{Math.abs(centerVal).toLocaleString()} {cur}</b></span>
+
+          <div className="tx-m5">
+            <div className="side l">
+              <div className="hd"><span className="dot" style={{background:'#1F75FF'}}></span><span>Доходы</span><span className="amt">{incomeTotal.toLocaleString()} {cur}</span></div>
+              {incomeCatsList.map((c, i) => (
+                <div className="cat" key={i}>
+                  <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
+                  <div className="tr"><i className="inc" style={{width:(incomeTotal ? c.amount/incomeTotal*100 : 0)+'%'}}></i></div>
+                  <div className="pc">{incomeTotal ? Math.round(c.amount/incomeTotal*100) : 0}% от доходов</div>
+                </div>
+              ))}
+              {incomeCatsList.length === 0 && <div className="pc">Доходов за период нет</div>}
+              <div className="tot"><span>Итого доходы</span><span>{incomeTotal.toLocaleString()} {cur}</span></div>
+            </div>
+
+            <div className="divider"></div>
+
+            <div className="side r">
+              <div className="hd"><span className="dot" style={{background:'#3c4553'}}></span><span>Расходы</span><span className="amt">{expenseTotal.toLocaleString()} {cur}</span></div>
+              {expenseCatsList.map((c, i) => (
+                <div className="cat" key={i}>
+                  <div className="ct"><span>{c.name}</span><b>{c.amount.toLocaleString()} {cur}</b></div>
+                  <div className="tr"><i className="exp" style={{width:(expenseTotal ? c.amount/expenseTotal*100 : 0)+'%'}}></i></div>
+                  <div className="pc">{expenseTotal ? Math.round(c.amount/expenseTotal*100) : 0}% от расходов</div>
+                </div>
+              ))}
+              {expenseCatsList.length === 0 && <div className="pc">Расходов за период нет</div>}
+              <div className="tot"><span>Итого расходы</span><span>{expenseTotal.toLocaleString()} {cur}</span></div>
+            </div>
           </div>
-          {(incomeCatsList.length + expenseCatsList.length) >= 1 && (
-          <div className="tx-legend-wrap">
-            {typeFilter !== 'expense' && incomeCatsList.length > 0 && (
-              <div className="tx-legend-col">
-                <div className="tx-grp-h">Доходы<span className="grp-amt">+{incomeTotal.toLocaleString()} {cur}</span></div>
-                <div className="tx-sub">
-                  {incomeCatsList.map((c, i) => (
-                    <div key={i}>
-                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, INC_COLORS, i)}}></span><span className="nm">{c.name}</span><span className="pct">{incomeTotal ? Math.round(c.amount / incomeTotal * 100) : 0}%</span><span className="amt">+{c.amount.toLocaleString()} {cur}</span></div>
-                      <div className="tx-leg-bar"><i style={{width:(incomeTotal ? c.amount / incomeTotal * 100 : 0) + '%', background:colorByName(c.name, INC_COLORS, i)}}></i></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {typeFilter !== 'income' && expenseCatsList.length > 0 && (
-              <div className="tx-legend-col">
-                <div className="tx-grp-h">Расходы<span className="grp-amt">−{expenseTotal.toLocaleString()} {cur}</span></div>
-                <div className="tx-sub">
-                  {expenseCatsList.map((c, i) => (
-                    <div key={i}>
-                      <div className="tx-leg"><span className="dot" style={{background:colorByName(c.name, EXP_COLORS, i)}}></span><span className="nm">{c.name}</span><span className="pct">{expenseTotal ? Math.round(c.amount / expenseTotal * 100) : 0}%</span><span className="amt">−{c.amount.toLocaleString()} {cur}</span></div>
-                      <div className="tx-leg-bar"><i style={{width:(expenseTotal ? c.amount / expenseTotal * 100 : 0) + '%', background:colorByName(c.name, EXP_COLORS, i)}}></i></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>)}
         </div>
       )}
 
