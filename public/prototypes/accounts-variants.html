@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Счета — 5 вариантов отображения</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--soft:#F6F9FF}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 18px 70px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6fb;color:var(--ink)}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+.wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(450px,1fr));gap:18px;max-width:1520px;margin:0 auto}
+.card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:20px;padding:20px;box-shadow:0 2px 14px rgba(11,18,32,.05)}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-d);background:rgba(31,117,255,.09);border-radius:99px;padding:3px 9px;margin-bottom:9px}
+.card h2{font-size:15.5px;font-weight:800;margin:0 0 3px;letter-spacing:-.01em}
+.hint{font-size:11.5px;color:var(--muted);margin-bottom:16px;line-height:1.45}
+.num{font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.5;border-top:1px dashed rgba(29,120,252,.18);padding-top:10px}
+.pill{display:inline-block;font-size:10px;font-weight:800;border-radius:99px;padding:2px 8px;background:rgba(31,117,255,.09);color:var(--blue-d)}
+
+/* 1 — карточки-счета */
+.v1hero{border-radius:16px;padding:16px 18px;background:linear-gradient(135deg,#0d4ea8,#1F75FF 60%,#4d9bff);color:#fff;margin-bottom:12px;position:relative;overflow:hidden}
+.v1hero:after{content:"";position:absolute;right:-40px;top:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.1)}
+.v1hero .l{font-size:10px;text-transform:uppercase;letter-spacing:.07em;opacity:.85;font-weight:800}
+.v1hero .v{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:5px}
+.v1hero .d{font-size:11px;opacity:.88;margin-top:3px}
+.v1grid{display:grid;gap:8px}
+.v1row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff}
+.v1ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:15px;flex:none}
+.v1mid{flex:1;min-width:0}
+.v1nm{font-size:12.5px;font-weight:700;margin-bottom:4px}
+.v1bar{height:6px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.v1bar i{display:block;height:100%;border-radius:99px}
+.v1r{text-align:right;flex:none}
+.v1r b{font-size:12.5px;font-weight:800;display:block}
+.v1r span{font-size:10px;color:var(--muted);font-weight:700}
+
+/* 2 — полосы-стеки */
+.v2top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.v2big{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.v2lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}
+.v2stack{display:flex;height:40px;border-radius:12px;overflow:hidden;margin:12px 0 10px;box-shadow:inset 0 0 0 1px var(--line)}
+.v2seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff;overflow:hidden}
+.v2leg{display:flex;flex-direction:column;gap:6px}
+.v2li{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.v2li .d{width:9px;height:9px;border-radius:3px;flex:none}
+.v2li .n{flex:1;color:#33405a;font-weight:600}
+.v2li .p{font-size:10px;color:var(--muted);font-weight:700;width:36px;text-align:right}
+.v2li .a{font-weight:800;width:76px;text-align:right}
+
+/* 3 — плитки */
+.v3grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.v3cell{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;position:relative;overflow:hidden}
+.v3cell.tot{grid-column:1/-1;background:linear-gradient(135deg,#0d4ea8,#1F75FF);color:#fff;border:none}
+.v3cell .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800;display:flex;justify-content:space-between;gap:6px}
+.v3cell.tot .l{color:rgba(255,255,255,.8)}
+.v3cell .v{font-size:16px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
+.v3cell.tot .v{font-size:24px}
+.v3cell .bar{height:5px;border-radius:99px;background:#eef2f9;margin-top:9px;overflow:hidden}
+.v3cell .bar i{display:block;height:100%;border-radius:99px}
+
+/* 4 — список-таблица */
+.v4head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.v4head .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}
+.v4head .v{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.v4row{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #f2f5fa}
+.v4row:last-child{border-bottom:none}
+.v4row .d{width:9px;height:9px;border-radius:3px;flex:none}
+.v4row .n{flex:1;font-size:12px;font-weight:600;color:#33405a}
+.v4row .p{font-size:10px;font-weight:700;color:var(--muted);width:34px;text-align:right}
+.v4row .a{font-size:12.5px;font-weight:800;width:90px;text-align:right}
+.v4foot{display:flex;justify-content:space-between;padding-top:10px;border-top:1px dashed rgba(29,120,252,.2);font-size:11.5px;font-weight:800;margin-top:4px}
+
+/* 5 — счета как карточки-плитки с балансом */
+.v5grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.v5c{border:1px solid var(--line);border-radius:16px;padding:13px;background:linear-gradient(180deg,#fafcff,#fff)}
+.v5c .top{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.v5c .ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;flex:none}
+.v5c .nm{font-size:11.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v5c .v{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.v5c .p{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
+.v5c .track{height:4px;border-radius:99px;background:#eef2f9;margin-top:9px;overflow:hidden}
+.v5c .track i{display:block;height:100%;border-radius:99px}
+</style></head><body>
+<h1>Счета — 5 вариантов отображения</h1>
+<div class="sub">Пример: 3 счёта · наличные в сейфе 0 ₽ · кассовый ящик 0 ₽ · Сбербанк 350 ₽ · итого 350 ₽</div>
+<div class="wrap">
+
+<div class="card">
+  <div class="tag">Вариант 1</div>
+  <h2>Карточки-счета</h2>
+  <div class="hint">Сверху синяя карточка общего баланса, ниже каждый счёт с иконкой, полоской доли и суммой.</div>
+  <div class="v1hero">
+    <div class="l">Общий баланс</div>
+    <div class="v num">350 ₽</div>
+    <div class="d">3 счёта · обновлено сейчас</div>
+  </div>
+  <div class="v1grid">
+    <div class="v1row">
+      <div class="v1ic" style="background:rgba(31,117,255,.09)">🏦</div>
+      <div class="v1mid"><div class="v1nm">Сбербанк</div><div class="v1bar"><i style="width:100%;background:linear-gradient(90deg,#0d4ea8,#1F75FF)"></i></div></div>
+      <div class="v1r"><b class="num">350 ₽</b><span class="num">100%</span></div>
+    </div>
+    <div class="v1row">
+      <div class="v1ic" style="background:rgba(13,148,136,.09)">🔒</div>
+      <div class="v1mid"><div class="v1nm">Наличные в сейфе</div><div class="v1bar"><i style="width:0%;background:#0d9488"></i></div></div>
+      <div class="v1r"><b class="num">0 ₽</b><span class="num">0%</span></div>
+    </div>
+    <div class="v1row">
+      <div class="v1ic" style="background:rgba(245,158,11,.12)">💰</div>
+      <div class="v1mid"><div class="v1nm">Кассовый ящик</div><div class="v1bar"><i style="width:0%;background:#f59e0b"></i></div></div>
+      <div class="v1r"><b class="num">0 ₽</b><span class="num">0%</span></div>
+    </div>
+  </div>
+  <div class="note">Самый «человеческий»: каждый счёт как отдельная карточка, видно и сумму, и долю.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 2</div>
+  <h2>Одна полоса-стек</h2>
+  <div class="hint">Весь баланс как одна горизонтальная полоса из сегментов — сразу видно, из чего он состоит.</div>
+  <div class="v2top">
+    <div><div class="v2lbl">Общий баланс</div><div class="v2big num">350 ₽</div></div>
+    <span class="pill num">3 счёта</span>
+  </div>
+  <div class="v2stack">
+    <div class="v2seg" style="flex:100;background:linear-gradient(90deg,#0d4ea8,#1F75FF)">Сбербанк 100%</div>
+  </div>
+  <div class="v2leg">
+    <div class="v2li"><span class="d" style="background:#1F75FF"></span><span class="n">Сбербанк</span><span class="p num">100%</span><span class="a num">350 ₽</span></div>
+    <div class="v2li"><span class="d" style="background:#0d9488"></span><span class="n">Наличные в сейфе</span><span class="p num">0%</span><span class="a num">0 ₽</span></div>
+    <div class="v2li"><span class="d" style="background:#f59e0b"></span><span class="n">Кассовый ящик</span><span class="p num">0%</span><span class="a num">0 ₽</span></div>
+  </div>
+  <div class="note">Очень компактно. Если счетов станет много — полоса покажет структуру с одного взгляда.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 3</div>
+  <h2>Плитки с балансом</h2>
+  <div class="hint">Общий баланс широкой плиткой сверху, под ним счета плитками в две колонки.</div>
+  <div class="v3grid">
+    <div class="v3cell tot">
+      <div class="l">Общий баланс</div>
+      <div class="v num">350 ₽</div>
+    </div>
+    <div class="v3cell">
+      <div class="l"><span>Сбербанк</span><span class="num">100%</span></div>
+      <div class="v num">350 ₽</div>
+      <div class="bar"><i style="width:100%;background:linear-gradient(90deg,#0d4ea8,#1F75FF)"></i></div>
+    </div>
+    <div class="v3cell">
+      <div class="l"><span>Наличные в сейфе</span><span class="num">0%</span></div>
+      <div class="v num">0 ₽</div>
+      <div class="bar"><i style="width:0%;background:#0d9488"></i></div>
+    </div>
+    <div class="v3cell">
+      <div class="l"><span>Кассовый ящик</span><span class="num">0%</span></div>
+      <div class="v num">0 ₽</div>
+      <div class="bar"><i style="width:0%;background:#f59e0b"></i></div>
+    </div>
+  </div>
+  <div class="note">Хорошо смотрится на телефоне: две колонки, крупные цифры, ничего не мелкое.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 4</div>
+  <h2>Список с итогом</h2>
+  <div class="hint">Строгий список счетов с процентами и суммой, общий баланс — сверху и в итоговой строке.</div>
+  <div class="v4head"><span class="l">Общий баланс</span><span class="v num">350 ₽</span></div>
+  <div class="v4row"><span class="d" style="background:#1F75FF"></span><span class="n">Сбербанк</span><span class="p num">100%</span><span class="a num">350 ₽</span></div>
+  <div class="v4row"><span class="d" style="background:#0d9488"></span><span class="n">Наличные в сейфе</span><span class="p num">0%</span><span class="a num">0 ₽</span></div>
+  <div class="v4row"><span class="d" style="background:#f59e0b"></span><span class="n">Кассовый ящик</span><span class="p num">0%</span><span class="a num">0 ₽</span></div>
+  <div class="v4foot"><span>Итого</span><span class="num">350 ₽</span></div>
+  <div class="note">Спокойный и деловой вариант — подходит, если счетов много и важна читаемость.</div>
+</div>
+
+<div class="card">
+  <div class="tag">Вариант 5</div>
+  <h2>Счета-плитки с долькой</h2>
+  <div class="hint">Каждый счёт — своя плитка с иконкой, балансом и тонкой шкалой доли. Без общего блока сверху.</div>
+  <div class="v5grid">
+    <div class="v5c">
+      <div class="top"><span class="ic" style="background:rgba(31,117,255,.09)">🏦</span><span class="nm">Сбербанк</span></div>
+      <div class="v num">350 ₽</div>
+      <div class="p num">100% от баланса</div>
+      <div class="track"><i style="width:100%;background:linear-gradient(90deg,#0d4ea8,#1F75FF)"></i></div>
+    </div>
+    <div class="v5c">
+      <div class="top"><span class="ic" style="background:rgba(13,148,136,.09)">🔒</span><span class="nm">Наличные в сейфе</span></div>
+      <div class="v num">0 ₽</div>
+      <div class="p num">0% от баланса</div>
+      <div class="track"><i style="width:0%;background:#0d9488"></i></div>
+    </div>
+    <div class="v5c">
+      <div class="top"><span class="ic" style="background:rgba(245,158,11,.12)">💰</span><span class="nm">Кассовый ящик</span></div>
+      <div class="v num">0 ₽</div>
+      <div class="p num">0% от баланса</div>
+      <div class="track"><i style="width:0%;background:#f59e0b"></i></div>
+    </div>
+    <div class="v5c" style="border-style:dashed;display:grid;place-items:center;color:#0d4ea8;font-size:11.5px;font-weight:700;cursor:pointer">+ Добавить счёт</div>
+  </div>
+  <div class="note">Современная «доска»: счета как виджеты, четвёртая плитка — быстрый старт нового счёта.</div>
+</div>
+
+</div></body></html>
