@@ -310,7 +310,7 @@ export default function Products() {
   }, []);
 
   const showToast = (msg) => {
-    setToast(msg || 'Товар успешно добавлен!');
+    setToast(msg || (isServices ? 'Услуга успешно добавлена!' : 'Товар успешно добавлен!'));
     setTimeout(() => setToast(null), 3000);
   };
 
@@ -409,14 +409,14 @@ export default function Products() {
         if (insData && insData[0] && insData[0].queued) {
           setShowModal(false);
           setFreshPhotoUrl('');
-          showToast('⏳ Интернета нет — товар добавлен, синхронизируется при появлении связи');
+          showToast(isServices ? '⏳ Интернета нет — услуга добавлена, синхронизируется при появлении связи' : '⏳ Интернета нет — товар добавлен, синхронизируется при появлении связи');
           return;
         }
       }
       setShowModal(false);
       load();
       setFreshPhotoUrl(''); // фото сохранено — больше не удаляем
-      showToast(editId ? 'Товар успешно сохранен!' : 'Товар успешно добавлен!');
+      showToast(editId ? (isServices ? 'Услуга успешно сохранена!' : 'Товар успешно сохранен!') : (isServices ? 'Услуга успешно добавлена!' : 'Товар успешно добавлен!'));
     } finally {
       setSaving(false);
     }
@@ -441,7 +441,7 @@ export default function Products() {
     }
     // Убираем товар из списка сразу (без ожидания перезагрузки)
     setProductsState(prev => prev.filter(x => x.id !== id));
-    showToast('Товар успешно удален!');
+    showToast(isServices ? 'Услуга успешно удалена!' : 'Товар успешно удален!');
     setShowRemoveModal(false);
     setRemoveTarget(null);
   };
@@ -450,7 +450,7 @@ export default function Products() {
     const { error, queued } = await supabase.from('products').update({ hidden: true }).eq('id', id);
     if (error) return alert(error.message);
     if (!queued) load();
-    showToast('Товар успешно скрыт!');
+    showToast(isServices ? 'Услуга успешно скрыта!' : 'Товар успешно скрыт!');
   };
 
   const unhide = async (id) => {
@@ -471,7 +471,7 @@ export default function Products() {
     });
     if (error) return showToast('Ошибка: ' + error.message);
     if (!queued) await load();
-    showToast('Товар успешно скопирован!');
+    showToast(isServices ? 'Услуга успешно скопирована!' : 'Товар успешно скопирован!');
   };
 
   const restore = async (id) => {
@@ -485,7 +485,7 @@ export default function Products() {
     setTrash([...trash]);
     if (!queued) await load();
     setShowModal(false);
-    showToast('Товар успешно восстановлен!');
+    showToast(isServices ? 'Услуга успешно восстановлена!' : 'Товар успешно восстановлен!');
   };
 
   const toggleCol = (id) => {
@@ -538,7 +538,7 @@ export default function Products() {
 
   const exportExcel = () => {
     const items = products || [];
-    if (items.length === 0) { showToast('Нет товаров для выгрузки'); return; }
+    if (items.length === 0) { showToast(isServices ? 'Нет услуг для выгрузки' : 'Нет товаров для выгрузки'); return; }
     const typeLabel = (t) => t === 'service' ? 'Услуга' : t === 'combo' ? 'Комбо' : 'Товар';
     const data = items.map(p => ({
       'Название': p.name,
@@ -558,8 +558,8 @@ export default function Products() {
     const ws = XLSX.utils.json_to_sheet(data);
     ws['!cols'] = [{wch:35},{wch:10},{wch:15},{wch:12},{wch:12},{wch:10},{wch:12},{wch:15},{wch:15},{wch:10},{wch:30}];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Товары');
-    XLSX.writeFile(wb, 'Товары.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, isServices ? 'Услуги' : 'Товары');
+    XLSX.writeFile(wb, isServices ? 'Услуги.xlsx' : 'Товары.xlsx');
   };
 
   const exportTemplate = () => {
@@ -733,17 +733,20 @@ export default function Products() {
                 { title: 'Типы позиций', items: isFood ? [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
                   <><b>Комбо</b> — набор из нескольких позиций, продается как одна.</>,
+                ] : (isServices ? [
+                  <><b>Услуга</b> — работа или сервис. Остатков нет, просто продается в кассе.</>,
+                  <><b>Комбо</b> — набор из нескольких услуг, продается как одна.</>,
                 ] : [
                   <><b>Товар</b> — физический продукт. Учитывается на складе (остатки, поставки, списания).</>,
                   <><b>Услуга</b> — работа или сервис. Остатков нет, просто продается в кассе.</>,
                   <><b>Комбо</b> — набор из нескольких позиций, продается как одна.</>,
-                ]},
-                { title: isFood ? 'Кнопка «Добавить позицию»' : 'Кнопка «Добавить товар, услугу»', items: [
+                ])},
+                { title: isFood ? 'Кнопка «Добавить позицию»' : (isServices ? 'Кнопка «Добавить услугу»' : 'Кнопка «Добавить товар, услугу»'), items: [
                   <>Создает новую позицию: название, категория, цена, артикул, штрихкод, единица измерения, фото и другие поля.</>,
                 ]},
                 { title: 'Поиск и фильтры', items: [
                   <>🔍 <b>Быстрый поиск</b> — ищет по названию, артикулу и штрихкоду.</>,
-                  <>«<b>Тип</b>» — показать только товары / услуги / комбо (галочки, «Выбрать все» / «Очистить»).</>,
+                  <>{isServices ? '«<b>Тип</b>» — показать только услуги или комбо (галочки, «Выбрать все» / «Очистить»).' : '«<b>Тип</b>» — показать только товары / услуги / комбо (галочки, «Выбрать все» / «Очистить»).'}</>,
                   <>«<b>Категории</b>» — показать позиции выбранных категорий.</>,
                   <>«<b>Столбцы</b>» — включать и выключать столбцы таблицы.</>,
                   <>«<b>Корзина</b>» — удаленные позиции. Их можно восстановить.</>,
@@ -751,7 +754,7 @@ export default function Products() {
                 ]},
                 { title: 'Столбцы таблицы', items: [
                   <><b>Название</b> — клик по нему открывает карточку позиции (фото и подробности).</>,
-                  <><b>Тип</b> — товар, услуга или комбо.</>,
+                  <>{isServices ? 'Тип — услуга или комбо.' : 'Тип — товар, услуга или комбо.'}</>,
                   <><b>Категория</b> — группа, к которой относится позиция.</>,
                   <><b>Себестоимость</b> — средняя цена закупа. Считается автоматически из начальных остатков и поставок.</>,
                   <><b>Цена</b> — цена продажи.</>,
@@ -1195,7 +1198,7 @@ export default function Products() {
       </Modal>
 
       {/* Модалка подтверждения удаления */}
-      <Modal open={showRemoveModal} onClose={() => { setShowRemoveModal(false); setRemoveTarget(null); }} title="Удалить товар?" subtitle="Он перенесется в корзину и будет удален через 30 дней" width="narrow"
+      <Modal open={showRemoveModal} onClose={() => { setShowRemoveModal(false); setRemoveTarget(null); }} title={isServices ? "Удалить услугу?" : "Удалить товар?"} subtitle={isServices ? "Она перенесется в корзину и будет удалена через 30 дней" : "Он перенесется в корзину и будет удален через 30 дней"} width="narrow"
         actions={<>
           <button className="btn btn-ghost" onClick={() => { setShowRemoveModal(false); setRemoveTarget(null); }}>Нет</button>
           <button className="btn btn-primary" style={{background:'#dc2626',color:'#fff'}} onClick={confirmRemove}>Да</button>
@@ -1261,7 +1264,7 @@ export default function Products() {
       </Modal>
 
       {/* Корзина модалка */}
-      <Modal open={showTrash} onClose={() => setShowTrash(false)} title="Корзина" subtitle="Товары хранятся в корзине в течение 30 дней после удаления" width="medium">
+      <Modal open={showTrash} onClose={() => setShowTrash(false)} title="Корзина" subtitle={isServices ? "Услуги хранятся в корзине в течение 30 дней после удаления" : "Товары хранятся в корзине в течение 30 дней после удаления"} width="medium">
             {(() => {
               const trash = getTrash();
               if (!trash.length) {
@@ -1272,7 +1275,7 @@ export default function Products() {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th style={{width:'50%'}}>Товар</th>
+                        <th style={{width:'50%'}}>{isServices ? 'Услуга' : 'Товар'}</th>
                         <th style={{width:'25%'}}>Статус</th>
                         <th style={{width:'25%'}}></th>
                       </tr>
@@ -1298,7 +1301,7 @@ export default function Products() {
                                   trash.splice(idx, 1);
                                   setTrash([...trash]);
                                   await load();
-                                  showToast('Товар успешно восстановлен!');
+                                  showToast(isServices ? 'Услуга успешно восстановлена!' : 'Товар успешно восстановлен!');
                                 }
                               }} style={{color:'var(--primary)',background:'transparent',border:'none',fontSize:'.78rem',fontWeight:600,cursor:'pointer',fontFamily:'var(--font)',padding:'.25rem .5rem',borderRadius:'var(--radius)'}}>Восстановить</button>
                             </td>
