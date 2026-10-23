@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Доходы / Расходы — 5 вариантов столбиков</title>
+<style>
+  :root{--ink:#111;--muted:#8b93a3;--line:rgba(29,120,252,.14);--blue:#1F75FF;--blue2:#0d4ea8;--green:#16a34a;--red:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f7f9fc;color:var(--ink)}
+  h1{font-size:19px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+  .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px 20px;flex:1;min-width:340px;max-width:520px}
+  .card h2{font-size:14px;margin:0 0 2px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#e8f0ff;color:var(--blue2);margin-bottom:12px}
+  .note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+  .v{font-variant-numeric:tabular-nums}
+
+  /* общие колонки */
+  .cols{display:flex;align-items:flex-end;gap:22px;height:190px;padding:0 4px 0}
+  .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+  .bar{width:100%;border-radius:12px 12px 6px 6px;position:relative;transition:.2s}
+  .bar.inc{background:linear-gradient(160deg,#3a8bff,#1F75FF 45%,#0d4ea8)}
+  .bar.exp{background:linear-gradient(160deg,#5b6472,#3c4553 60%,#242b36)}
+  .bar .top{position:absolute;top:-24px;left:0;right:0;text-align:center;font-size:12.5px;font-weight:800}
+  .bar .pct{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;font-weight:800;color:#fff;opacity:.92}
+  .lbl{margin-top:9px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .base{height:1px;background:rgba(29,120,252,.14)}
+
+  /* 1 — два столбика, проценты внутри */
+  .net{margin-top:14px;display:flex;justify-content:space-between;align-items:baseline;background:#fff9db;background:linear-gradient(135deg,#ffdd2d,#fff9db);border-radius:12px;padding:10px 14px}
+  .net .l{font-size:12px;font-weight:600;color:#5b4a00}
+  .net .r{font-size:16px;font-weight:800}
+
+  /* 2 — столбики с дорожками (progress) */
+  .rows{display:flex;flex-direction:column;gap:16px;padding-top:6px}
+  .row .hd{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:6px}
+  .track{height:16px;border-radius:99px;background:#eef2f9;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:99px}
+  .track i.inc{background:linear-gradient(90deg,#3a8bff,#0d4ea8)}
+  .track i.exp{background:linear-gradient(90deg,#78818f,#242b36)}
+
+  /* 3 — столбики-стек по месяцам (доходы над осью, расходы под осью) */
+  .axis{position:relative;height:200px;display:flex;align-items:center;gap:10px;padding:0 2px}
+  .axis .zero{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(29,120,252,.22)}
+  .axis .m{flex:1;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
+  .axis .m .up,.axis .m .dn{width:16px;border-radius:6px}
+  .axis .m .up{background:linear-gradient(180deg,#3a8bff,#0d4ea8);margin-bottom:1px}
+  .axis .m .dn{background:linear-gradient(0deg,#78818f,#242b36);margin-top:1px}
+  .axis .cap{position:absolute;bottom:-2px;font-size:10px;color:var(--muted);font-weight:600}
+
+  /* 4 — карточки-столбики с крупным % */
+  .duo{display:flex;gap:12px}
+  .duo .b{flex:1;border-radius:14px;padding:16px;color:#fff;display:flex;flex-direction:column;gap:6px;min-height:132px;justify-content:space-between}
+  .duo .b.inc{background:linear-gradient(150deg,#3a8bff,#0d4ea8)}
+  .duo .b.exp{background:linear-gradient(150deg,#3c4553,#20252e)}
+  .duo .b .t{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.8}
+  .duo .b .num{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .duo .b .pr{font-size:12.5px;font-weight:700;opacity:.92}
+  .duo .b .mini{height:6px;border-radius:99px;background:rgba(255,255,255,.28);overflow:hidden}
+  .duo .b .mini i{display:block;height:100%;background:#fff;border-radius:99px}
+
+  /* 5 — зеркальные столбики от центра + дельта */
+  .mirror{display:flex;align-items:center;gap:0;height:170px}
+  .mirror .half{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-right:4px;height:100%}
+  .mirror .half.r{align-items:flex-start;padding-left:4px;padding-right:0}
+  .mirror .b{height:34px;border-radius:8px 2px 2px 8px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:12px;font-weight:800;white-space:nowrap}
+  .mirror .half.r .b{border-radius:2px 8px 8px 2px;justify-content:flex-end}
+  .mirror .b.inc{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+  .mirror .half.r .b.exp{background:linear-gradient(90deg,#3c4553,#20252e)}
+  .mirror .center{width:2px;height:100%;background:rgba(29,120,252,.22);flex:none}
+</style>
+</head>
+<body>
+<h1>Доходы и расходы — 5 вариантов оформления</h1>
+<div class="sub">Данные примерные (месяц): доходы 1 284 500 ₽ · расходы 936 200 ₽ · прибыль 348 300 ₽</div>
+
+<div class="wrap">
+
+  <!-- 1 -->
+  <div class="card">
+    <div class="tag">Вариант 1</div>
+    <h2>Два столбика с процентами</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Высота — от большего значения, % — доля в общей сумме</div>
+    <div class="cols">
+      <div class="col">
+        <div class="bar inc" style="height:100%"><span class="top v">1 284 500 ₽</span><span class="pct">58%</span></div>
+        <div class="lbl">Доходы</div>
+      </div>
+      <div class="col">
+        <div class="bar exp" style="height:73%"><span class="top v">936 200 ₽</span><span class="pct">42%</span></div>
+        <div class="lbl">Расходы</div>
+      </div>
+    </div>
+    <div class="base"></div>
+    <div class="net"><span class="l">Чистая прибыль</span><span class="r v">348 300 ₽</span></div>
+    <div class="note">Синий = доходы (фирменный цвет сайта), графит = расходы. Чистый, легко читается.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="tag">Вариант 2</div>
+    <h2>Горизонтальные полосы</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Заполнение полосы = доля в общей сумме</div>
+    <div class="rows">
+      <div class="row">
+        <div class="hd"><span>Доходы</span><span class="v">1 284 500 ₽ · 58%</span></div>
+        <div class="track"><i class="inc" style="width:100%"></i></div>
+      </div>
+      <div class="row">
+        <div class="hd"><span>Расходы</span><span class="v">936 200 ₽ · 42%</span></div>
+        <div class="track"><i class="exp" style="width:73%"></i></div>
+      </div>
+      <div class="row">
+        <div class="hd"><span>Прибыль</span><span class="v">348 300 ₽ · 27%</span></div>
+        <div class="track"><i style="width:27%;background:linear-gradient(90deg,#ffdd2d,#f5c500)"></i></div>
+      </div>
+    </div>
+    <div class="note">Самый компактный — хорошо встаёт в мобильную версию и в узкую колонку отчёта.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="tag">Вариант 3</div>
+    <h2>Столбики по месяцам</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Сверху доходы, снизу расходы — видно динамику</div>
+    <div class="axis">
+      <div class="zero"></div>
+      <div class="m"><div class="up" style="height:58px"></div><div class="dn" style="height:38px"></div><span class="cap">Июл</span></div>
+      <div class="m"><div class="up" style="height:66px"></div><div class="dn" style="height:44px"></div><span class="cap">Авг</span></div>
+      <div class="m"><div class="up" style="height:54px"></div><div class="dn" style="height:50px"></div><span class="cap">Сен</span></div>
+      <div class="m"><div class="up" style="height:78px"></div><div class="dn" style="height:40px"></div><span class="cap">Окт</span></div>
+      <div class="m"><div class="up" style="height:70px"></div><div class="dn" style="height:52px"></div><span class="cap">Ноя</span></div>
+      <div class="m"><div class="up" style="height:86px"></div><div class="dn" style="height:46px"></div><span class="cap">Дек</span></div>
+    </div>
+    <div class="note">Больше смысла, чем проценты: показывает, растёт бизнес или проседает.</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="tag">Вариант 4</div>
+    <h2>Две карточки с крупным %</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Процент — главный акцент, сумма — под ним</div>
+    <div class="duo">
+      <div class="b inc">
+        <div class="t">Доходы</div>
+        <div class="num v">1 284 500 ₽</div>
+        <div class="pr">58% от оборота</div>
+        <div class="mini"><i style="width:100%"></i></div>
+      </div>
+      <div class="b exp">
+        <div class="t">Расходы</div>
+        <div class="num v">936 200 ₽</div>
+        <div class="pr">42% от оборота</div>
+        <div class="mini"><i style="width:73%"></i></div>
+      </div>
+    </div>
+    <div class="net" style="margin-top:12px"><span class="l">Чистая прибыль</span><span class="r v">348 300 ₽</span></div>
+    <div class="note">Заменяет текущие «круги»: те же две карточки, но с полосой и процентом.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="tag">Вариант 5</div>
+    <h2>Зеркальные столбики от центра</h2>
+    <div style="font-size:12px;color:#8b93a3;margin-bottom:14px">Доходы влево, расходы вправо, в центре — прибыль</div>
+    <div class="mirror">
+      <div class="half"><div class="b inc" style="width:100%">1 284 500 ₽ · 58%</div></div>
+      <div class="center"></div>
+      <div class="half r"><div class="b exp" style="width:73%">42% · 936 200 ₽</div></div>
+    </div>
+    <div class="net" style="margin-top:8px"><span class="l">Чистая прибыль</span><span class="r v">348 300 ₽</span></div>
+    <div class="note">Симметрично и наглядно: сразу видно, куда перевес — в доходы или расходы.</div>
+  </div>
+
+</div>
+</body>
+</html>
