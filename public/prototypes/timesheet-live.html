@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Табель — живая модалка, 3 шага</title>
+<style>
+:root{--blue:#1F75FF;--blue-d:#0d4ea8;--muted:#8b93a3}
+*{box-sizing:border-box}
+body{margin:0;padding:26px 16px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef1f6;color:#111}
+.page{max-width:980px;margin:0 auto}
+h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.sub{font-size:12.5px;color:#8b93a3;margin-bottom:18px;line-height:1.55}
+.btn-open{border:none;background:#111;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px 20px;border-radius:99px;cursor:pointer;margin-bottom:22px}
+/* календарь */
+.cal{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:16px;padding:14px;margin-bottom:16px}
+.cal h2{font-size:14px;font-weight:800;margin:0 0 10px}
+.cgrid{display:grid;grid-template-columns:100px repeat(7,1fr);gap:2px;font-size:10px}
+.cgrid .hd{text-align:center;font-weight:800;color:var(--blue-d);text-transform:uppercase;font-size:8.5px;padding:4px 0}
+.cgrid .nm{font-size:10.5px;font-weight:700;padding:5px 4px;display:flex;align-items:center}
+.cell{text-align:center;padding:6px 2px;border-radius:6px;font-weight:700;color:#c3cad6;cursor:pointer;background:#fafbfe}
+.cell.work{background:rgba(31,117,255,.08);color:#0d4ea8}
+.cell.sick{background:rgba(249,115,22,.14);color:#c2410c}
+.cell.abs{background:rgba(17,17,17,.07);color:#111}
+.cell.vac{background:rgba(59,130,246,.14);color:#1d4ed8}
+.cell.own{background:rgba(139,147,163,.16);color:#5b6472}
+.cell.sel{outline:2px solid var(--blue)}
+/* таблица под календарём */
+.tblcard{background:#fff;border:1px solid rgba(29,120,252,.14);border-radius:16px;padding:14px}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums}
+.tbl th{font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:#8b93a3;font-weight:800;text-align:left;padding:7px 5px;border-bottom:1px solid rgba(29,120,252,.14)}
+.tbl td{padding:7px 5px;border-bottom:1px solid #f2f5fa}
+.tbl .rt{text-align:right}
+.tbl tfoot td{font-weight:800;border-top:1px solid rgba(29,120,252,.2);padding-top:9px;font-size:12px}
+.st{font-size:9px;font-weight:800;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.st.p{background:rgba(31,117,255,.1);color:#0d4ea8}
+.st.s{background:rgba(249,115,22,.14);color:#c2410c}
+.st.a{background:rgba(17,17,17,.08);color:#111}
+.st.v{background:rgba(59,130,246,.14);color:#1d4ed8}
+.st.z{background:rgba(139,147,163,.16);color:#5b6472}
+/* модалка */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.ovl.on{display:flex}
+.mod{width:440px;max-width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.2);display:flex;flex-direction:column;max-height:calc(100vh - 64px)}
+.v2-head{background:linear-gradient(135deg,#1F75FF,#0d4ea8);padding:18px 20px 16px;position:relative;flex:none;border-radius:16px 16px 0 0}
+.v2-head h1{margin:0;font-size:19px;font-weight:800;color:#fff}
+.v2-head p{margin:2px 0 0;font-size:12.5px;color:rgba(255,255,255,.82)}
+.v2-head .x{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:15px;cursor:pointer}
+.modal-body{padding:16px 20px 20px;overflow-y:auto;flex:1;min-height:0;font-size:14px}
+.modal-actions{margin:16px 0 0;display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.v2-card{background:#fcfcfe;border:1px solid rgba(0,16,36,.09);border-radius:12px;padding:10px 12px 2px;margin-bottom:10px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:4px}
+.form-group input,.form-group select{width:100%;font-family:inherit;font-size:14px;color:#333;padding:8px 10px;border:1.5px solid rgba(0,0,0,.26);border-radius:10px;outline:none;background:#fff}
+.form-group input:focus,.form-group select:focus{border-color:#1F75FF;box-shadow:0 0 0 3px rgba(31,117,255,.12)}
+.v2-ghost{border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:#5b6472;padding:9px 14px;border-radius:99px;cursor:pointer}
+.cat-add-btn{border:none;background:#111;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:99px;cursor:pointer}
+.cat-add-btn:disabled{background:#c9d0da;cursor:not-allowed}
+.steps{display:flex;gap:5px;margin-bottom:14px}
+.steps i{flex:1;height:4px;border-radius:99px;background:#e7eefb;transition:background .2s}
+.steps i.done{background:#9dc0ff}
+.steps i.on{background:linear-gradient(90deg,#0d4ea8,#1F75FF)}
+.srow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f2f5fa}
+.srow:last-child{border-bottom:none}
+.av{width:28px;height:28px;border-radius:50%;background:rgba(31,117,255,.1);color:#0d4ea8;display:grid;place-items:center;font-size:10.5px;font-weight:800;flex:none}
+.nm{flex:1;font-size:13px;font-weight:600;color:#333;min-width:0}
+.sel{font-family:inherit;font-size:12px;font-weight:700;color:#333;padding:6px 8px;border:1.5px solid rgba(0,0,0,.2);border-radius:8px;background:#fff}
+.pcard{border:1px solid rgba(29,120,252,.16);border-radius:12px;padding:11px 12px;margin-bottom:9px}
+.pcard .top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.pcard .n{font-size:13px;font-weight:700;flex:1}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair .f span{display:block;font-size:10.5px;color:#5b6472;font-weight:600;margin-bottom:3px}
+.pair .f input{width:100%;font-family:inherit;font-size:14px;font-weight:700;padding:8px 10px;border:1.5px solid rgba(0,0,0,.18);border-radius:9px;font-variant-numeric:tabular-nums;text-align:right}
+.pcard .calc{font-size:10.5px;color:#8b93a3;margin-top:6px;font-weight:600}
+.qrow{display:flex;gap:5px;margin-top:7px}
+.qb{flex:1;font-family:inherit;font-size:11px;font-weight:700;padding:6px 4px;border-radius:8px;border:1.5px solid rgba(0,0,0,.14);background:#fff;color:#33405a;cursor:pointer}
+.qb.on{border-color:rgba(31,117,255,.5);background:rgba(31,117,255,.07);color:#0d4ea8}
+.sumbox{display:flex;justify-content:space-between;align-items:baseline;background:#F6F9FF;border:1px solid rgba(29,120,252,.16);border-radius:11px;padding:9px 11px;margin:12px 0 4px}
+.sumbox .l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8b93a3;font-weight:800}
+.sumbox .v{font-size:17px;font-weight:800}
+.hint{font-size:10.5px;color:#8b93a3;margin-top:6px;line-height:1.45}
+@media(max-width:600px){.cgrid{grid-template-columns:70px repeat(7,1fr);font-size:9px}}
+</style></head><body>
+<div class="page">
+<h1>Табель — живая модалка в 3 шага</h1>
+<div class="sub">Нажмите на любой день в календаре или на кнопку — откроется пошаговый ввод. Ставка умножается на часы, если задана стоимость часа: посмотрите, как меняется сумма при изменении часов.</div>
+<button class="btn-open" onclick="openDay()">Открыть день · 24 октября</button>
+
+<div class="cal">
+  <h2>Октябрь 2026</h2>
+  <div class="cgrid" id="cal"></div>
+</div>
+
+<div class="tblcard">
+  <table class="tbl" id="out">
+    <thead><tr><th>Сотрудник</th><th>Статус</th><th class="rt">Ставка</th><th class="rt">Часы</th><th class="rt">Премия</th><th class="rt">Штраф</th><th class="rt">Итого</th></tr></thead>
+    <tbody></tbody>
+    <tfoot><tr><td colspan="6">Итого за день</td><td class="rt" id="grand">0 ₽</td></tr></tfoot>
+  </table>
+</div>
+</div>
+
+<div class="ovl" id="ovl">
+  <div class="mod">
+    <div class="v2-head"><h1 id="mh">24 октября 2026</h1><p id="mp">Шаг 1 · кто работал</p><span class="x" onclick="closeDay()">✕</span></div>
+    <div class="modal-body">
+      <div class="steps"><i id="s1"></i><i id="s2"></i><i id="s3"></i></div>
+      <div id="step1"></div>
+      <div id="step2" style="display:none"></div>
+      <div id="step3" style="display:none"></div>
+      <div class="sumbox" id="sbox"><span class="l">За день</span><span class="v" id="sum">0 ₽</span></div>
+      <div class="modal-actions" id="acts"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMP = [
+  {id:'r', name:'Руководитель', ini:'Р', rate:3000, hourRate:375},
+  {id:'e', name:'Елена мастер', ini:'ЕМ', rate:2500, hourRate:313},
+];
+const STATUSES = [
+  {v:'work', l:'Работал'}, {v:'absent', l:'Не вышел'}, {v:'sick', l:'Больничный'},
+  {v:'vac', l:'Отпуск опл.'}, {v:'own', l:'За свой счёт'}
+];
+const STLBL = {work:'работал', absent:'не вышел', sick:'больничный', vac:'отпуск опл.', own:'за свой счёт'};
+const STCLS = {work:'p', absent:'a', sick:'s', vac:'v', own:'z'};
+const DAYS = {}; // date -> {statuses:{}, rate:{}, hours:{}, bonus:[], fine:[]}
+let curDate = '2026-10-24', step = 1, draft = null;
+
+function money(n){ return (Math.round(n)).toLocaleString('ru-RU') + ' ₽'; }
+function getDay(d){ if(!DAYS[d]) DAYS[d] = defaultDay(); return DAYS[d]; }
+function defaultDay(){
+  const s = {}, r = {}, h = {};
+  EMP.forEach(e => { s[e.id]='work'; r[e.id]=e.rate; h[e.id]=8; });
+  return {statuses:s, rate:r, hours:h, bonus:[], fine:[]};
+}
+function dayTotal(d){
+  const D = getDay(d); let sum = 0;
+  EMP.forEach(e => {
+    const st = D.statuses[e.id];
+    if (st === 'work' || st === 'vac') sum += (parseFloat(D.rate[e.id])||0);
+  });
+  D.bonus.forEach(b => sum += parseFloat(b.amount)||0);
+  D.fine.forEach(f => sum -= parseFloat(f.amount)||0);
+  return sum;
+}
+function personTotal(eid, D){
+  const st = D.statuses[eid];
+  let base = (st === 'work' || st === 'vac') ? (parseFloat(D.rate[eid])||0) : 0;
+  const b = D.bonus.filter(x=>x.emp===eid).reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  const f = D.fine.filter(x=>x.emp===eid).reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  return base + b - f;
+}
+
+/* календарь */
+function renderCal(){
+  const el = document.getElementById('cal');
+  let html = '<div class="hd nm">Сотрудник</div>';
+  ['пн','вт','ср','чт','пт','сб','вс'].forEach(w => html += '<div class="hd">'+w+'</div>');
+  const first = new Date(2026,9,1); let off = first.getDay(); off = off===0?6:off-1;
+  html += '<div class="nm">Руководитель</div>';
+  for(let i=0;i<off;i++) html += '<div></div>';
+  for(let d=1; d<=31; d++){
+    const ds = '2026-10-'+String(d).padStart(2,'0');
+    const D = DAYS[ds];
+    const st = D ? D.statuses['r'] : null;
+    html += '<div class="cell '+(st?st:'')+' '+(ds===curDate?'sel':'')+'" onclick="openDay(\''+ds+'\')">'+d+'</div>';
+  }
+  const rowEnd = (7 - ((off+31)%7))%7;
+  for(let i=0;i<rowEnd;i++) html += '<div></div>';
+  html += '<div class="nm">Елена мастер</div>';
+  for(let i=0;i<off;i++) html += '<div></div>';
+  for(let d=1; d<=31; d++){
+    const ds = '2026-10-'+String(d).padStart(2,'0');
+    const D = DAYS[ds];
+    const st = D ? D.statuses['e'] : null;
+    html += '<div class="cell '+(st?st:'')+' '+(ds===curDate?'sel':'')+'" onclick="openDay(\''+ds+'\')">'+d+'</div>';
+  }
+  for(let i=0;i<rowEnd;i++) html += '<div></div>';
+  el.innerHTML = html;
+}
+
+/* модалка */
+function openDay(ds){
+  if(ds) curDate = ds;
+  const D = getDay(curDate);
+  draft = JSON.parse(JSON.stringify(D));
+  step = 1;
+  document.getElementById('ovl').classList.add('on');
+  document.getElementById('mh').textContent = fmtLong(curDate);
+  renderStep();
+}
+function closeDay(){ document.getElementById('ovl').classList.remove('on'); }
+function fmtLong(ds){
+  const [y,m,d] = ds.split('-');
+  const mo = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return parseInt(d)+' '+mo[parseInt(m)-1]+' '+y;
+}
+function setStatus(id, v){ draft.statuses[id]=v; renderStep(); }
+function setRate(id, v){ draft.rate[id]=parseFloat(v)||0; updSum(); }
+function setHours(id, v){
+  const h = Math.max(0, Math.min(24, parseFloat(v)||0));
+  draft.hours[id] = h;
+  const e = EMP.find(x=>x.id===id);
+  draft.rate[id] = Math.round(e.hourRate * h);
+  renderStep();
+}
+function renderStep(){
+  document.getElementById('s1').className = step>1?'done':(step===1?'on':'');
+  document.getElementById('s2').className = step>2?'done':(step===2?'on':'');
+  document.getElementById('s3').className = step===3?'on':'';
+  document.getElementById('mp').textContent = 'Шаг '+step+' · '+(step===1?'кто работал':step===2?'ставка и часы':'премии и штрафы');
+  document.getElementById('step1').style.display = step===1?'block':'none';
+  document.getElementById('step2').style.display = step===2?'block':'none';
+  document.getElementById('step3').style.display = step===3?'block':'none';
+
+  // шаг 1
+  document.getElementById('step1').innerHTML =
+    '<div class="v2-card"><div style="padding:2px 0 8px">' +
+    EMP.map(e => '<div class="srow"><span class="av">'+e.ini+'</span><span class="nm">'+e.name+'</span>' +
+      '<select class="sel" onchange="setStatus(\''+e.id+'\',this.value)">' +
+      STATUSES.map(s => '<option value="'+s.v+'" '+(draft.statuses[e.id]===s.v?'selected':'')+'>'+s.l+'</option>').join('') +
+      '</select></div>').join('') +
+    '</div></div>';
+
+  // шаг 2
+  const workers = EMP.filter(e => draft.statuses[e.id]==='work');
+  document.getElementById('step2').innerHTML = workers.length ? workers.map(e => {
+    const h = draft.hours[e.id]||8;
+    return '<div class="pcard"><div class="top"><span class="av">'+e.ini+'</span><span class="n">'+e.name+'</span></div>' +
+      '<div class="pair">' +
+        '<div class="f"><span>Ставка за день</span><input type="number" value="'+draft.rate[e.id]+'" oninput="setRate(\''+e.id+'\',this.value)"></div>' +
+        '<div class="f"><span>Часов</span><input type="number" min="0" max="24" value="'+h+'" oninput="setHours(\''+e.id+'\',this.value)"></div>' +
+      '</div>' +
+      '<div class="calc">= '+money(draft.rate[e.id])+' за смену · '+money(e.hourRate)+' в час</div>' +
+      '<div class="qrow">' + [4,8,12].map(x => '<button class="qb '+(h===x?'on':'')+'" onclick="setHours(\''+e.id+'\','+x+')">'+x+' ч</button>').join('') + '</div>' +
+    '</div>';
+  }).join('') + '<div class="hint">Часы меняют ставку: 8 ч — полная смена, 4 ч — половина. Можно вписать свою ставку вручную — тогда она главнее часов.</div>'
+     : '<div class="hint">Никто не отмечен как работавший. Вернитесь на шаг 1.</div>';
+
+  // шаг 3
+  document.getElementById('step3').innerHTML =
+    bonusBlock('bonus','Премии','Добавить премию') + bonusBlock('fine','Штрафы','Добавить штраф');
+
+  document.getElementById('sum').textContent = money(draftTotal());
+  const acts = document.getElementById('acts');
+  if (step === 1) acts.innerHTML = '<button class="v2-ghost" onclick="closeDay()">Отмена</button><button class="cat-add-btn" onclick="go(2)">Дальше →</button>';
+  else if (step === 2) acts.innerHTML = '<button class="v2-ghost" onclick="go(1)">← Назад</button><button class="cat-add-btn" onclick="go(3)">Дальше →</button>';
+  else acts.innerHTML = '<button class="v2-ghost" onclick="go(2)">← Назад</button><button class="cat-add-btn" onclick="saveDay()">Сохранить</button>';
+}
+function bonusBlock(key, title, btn){
+  let html = '<div class="v2-card"><div style="padding:6px 0 8px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#8b93a3;margin-bottom:6px">'+title+'</div>';
+  draft[key].forEach((r,i) => {
+    html += '<div class="srow"><select class="sel" onchange="draft.'+key+'['+i+'].emp=this.value;updSum()">' +
+      EMP.map(e => '<option value="'+e.id+'" '+(r.emp===e.id?'selected':'')+'>'+e.name+'</option>').join('') + '</select>' +
+      '<input type="number" class="sel" style="max-width:80px;text-align:right" value="'+(r.amount||'')+'" placeholder="0" oninput="draft.'+key+'['+i+'].amount=this.value;updSum()">' +
+      '<span style="font-size:11px;color:#8b93a3">₽</span></div>';
+  });
+  html += '<div style="font-size:12px;font-weight:700;color:#0d4ea8;padding:7px 0;cursor:pointer" onclick="addRow(\''+key+'\')">+ '+btn+'</div></div></div>';
+  return html;
+}
+function addRow(key){ draft[key].push({emp:EMP[0].id, amount:''}); renderStep(); }
+function draftTotal(){
+  let sum = 0;
+  EMP.forEach(e => { const st = draft.statuses[e.id]; if(st==='work'||st==='vac') sum += parseFloat(draft.rate[e.id])||0; });
+  draft.bonus.forEach(b => sum += parseFloat(b.amount)||0);
+  draft.fine.forEach(f => sum -= parseFloat(f.amount)||0);
+  return sum;
+}
+function updSum(){ document.getElementById('sum').textContent = money(draftTotal()); }
+function go(s){ step = s; renderStep(); }
+function saveDay(){
+  DAYS[curDate] = JSON.parse(JSON.stringify(draft));
+  closeDay(); renderCal(); renderOut();
+}
+function renderOut(){
+  const D = getDay(curDate);
+  const tb = document.querySelector('#out tbody');
+  tb.innerHTML = EMP.map(e => {
+    const st = D.statuses[e.id];
+    const b = D.bonus.filter(x=>x.emp===e.id).reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+    const f = D.fine.filter(x=>x.emp===e.id).reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+    const rate = (st==='work'||st==='vac') ? money(D.rate[e.id]) : '—';
+    const hrs = (st==='work') ? D.hours[e.id] : '—';
+    return '<tr><td>'+e.name+'</td><td><span class="st '+STCLS[st]+'">'+STLBL[st]+'</span></td>' +
+      '<td class="rt">'+rate+'</td><td class="rt">'+hrs+'</td>' +
+      '<td class="rt">'+(b?money(b):'—')+'</td><td class="rt">'+(f?money(f):'—')+'</td>' +
+      '<td class="rt"><b>'+money(personTotal(e.id,D))+'</b></td></tr>';
+  }).join('');
+  document.getElementById('grand').textContent = money(dayTotal(curDate));
+}
+renderCal(); renderOut();
+</script>
+</body></html>
