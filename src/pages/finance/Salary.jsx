@@ -278,7 +278,14 @@ export default function Salary() {
     const emp = employees.find(e => e.id === fEmpId);
     if (!emp) return;
     // Если за этот период уже есть начисление с окладом — не подставляем оклад повторно
-    const alreadyBase = dupBaseSum > 0;
+    const alreadyBase = (list || []).some(x =>
+      x.employee_id === fEmpId &&
+      String(x.period_from || '').slice(0, 10) === fPeriodFrom &&
+      String(x.period_to || '').slice(0, 10) === fPeriodTo &&
+      x.status !== 'cancelled' &&
+      x.id !== editId &&
+      (Number(x.base_salary) || 0) > 0
+    );
     if (alreadyBase && !editId) { setFBaseSalary(0); return; }
     setFBaseSalary(emp.base_salary || 0);
   }, [fEmpId, employees, fPeriodFrom, fPeriodTo, list, editId]);
@@ -425,8 +432,16 @@ export default function Salary() {
     const daySum = (tsEntries || [])
       .filter(en => en.status === 'present' || en.status === 'remote')
       .reduce((sum, en) => sum + (Number(en.day_rate) || 0), 0);
-    if (daySum > 0 && !(dupBaseSum > 0 && !editId)) setFBaseSalary(daySum);
-  }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo, dupBaseSum, editId]);
+    const baseDone = (list || []).some(x =>
+      x.employee_id === fEmpId &&
+      String(x.period_from || '').slice(0, 10) === fPeriodFrom &&
+      String(x.period_to || '').slice(0, 10) === fPeriodTo &&
+      x.status !== 'cancelled' &&
+      x.id !== editId &&
+      (Number(x.base_salary) || 0) > 0
+    );
+    if (daySum > 0 && !(baseDone && !editId)) setFBaseSalary(daySum);
+  }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo, list, editId]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
   // Берём из empDebts — реальные долги, которые ещё висят. Никаких «авансов» здесь нет.
