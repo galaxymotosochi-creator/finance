@@ -498,7 +498,7 @@ export default function Salary() {
   const salesBonusOn = (salesOn && !doneSales) ? itemsBonusTotal : 0;
   const storeBonusOnFinal = (storeOn && !doneStore) ? storeBonusOn : 0;
   const rewardOnTotal = (rewardOn && !doneReward) ? rewardTotal : 0;
-  const bonusOnTotal = (bonusOpen && !doneBonus) ? checkedBonusTotal : 0;
+  const bonusOnTotal = bonusOpen ? checkedBonusTotal : 0;
   const deductOnTotal = (fineOpen && !doneDeduct) ? checkedDeductTotal : 0;
   const debtOnTotal = 0;
   // Итог = только то, что отмечено галочками И ещё не начислено прошлым начислением за период
@@ -1046,7 +1046,7 @@ export default function Salary() {
                     if (hasStoreRate && storeOn && !doneStore) items.push({ n:'Бонус от выручки', v: storeBonus });
                     if (salesOn && salesBonusTotal > 0 && !doneSales) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
                     if (rewardOn && rewardTotal > 0 && !doneReward) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
-                    if (bonusOpen && checkedBonusTotal > 0 && !doneBonus) items.push({ n:'Премии', v: checkedBonusTotal });
+                    if (bonusOpen && checkedBonusTotal > 0) items.push({ n:'Премии', v: checkedBonusTotal });
                     if (!items.length) return null;
                     return (
                       <div style={{ marginTop:'.35rem', fontSize:'.76rem', color:'#0b1220' }}>
