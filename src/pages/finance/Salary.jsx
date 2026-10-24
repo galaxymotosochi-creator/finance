@@ -99,6 +99,13 @@ export default function Salary() {
   const [salStatus, setSalStatus] = useState(null);
   const [salEmp, setSalEmp] = useState(null);       // фильтр по сотруднику
   const [salEmpOpen, setSalEmpOpen] = useState(false);
+  const salEmpRef = useRef(null);
+  useEffect(() => {
+    if (!salEmpOpen) return;
+    const h = (e) => { if (salEmpRef.current && !salEmpRef.current.contains(e.target)) setSalEmpOpen(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [salEmpOpen]);
   const [salSearch, setSalSearch] = useState('');
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
   const [salTypeOpen, setSalTypeOpen] = useState(false);
@@ -860,7 +867,7 @@ export default function Salary() {
             ))}
           </div>
         </div>
-        <div className="sk-dd-wrap" style={{position:'relative'}}>
+        <div className="sk-dd-wrap" ref={salEmpRef} style={{position:'relative'}}>
           <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
             onClick={e=>{e.stopPropagation();setSalPeriodOpen(false);setSalEmpOpen(!salEmpOpen)}}>
             {salEmp ? (employees.find(x=>String(x.id)===String(salEmp))||{}).name || 'Сотрудник' : 'Сотрудник'} <span className="car-tri">▾</span>
@@ -881,7 +888,7 @@ export default function Salary() {
           )}
         </div>
         <div className="sal-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
-          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setSalPeriodOpen(!salPeriodOpen)}}>
+          <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setSalEmpOpen(false);setSalPeriodOpen(!salPeriodOpen)}}>
             {salPeriodLabel}
             <span className="car-tri">▾</span>
           </button>
