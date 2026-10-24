@@ -1299,7 +1299,7 @@ export default function Salary() {
                           {tsBonuses.map(e => (
                             <tr key={e.id} onClick={()=>toggleBonus(e.id)} style={{cursor:'pointer',opacity:bonusChecks[e.id]?1:.45}}>
                               <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
-                                <span style={{width:'16px',height:'16px',border:'1.5px solid '+(bonusChecks[e.id]?'#111':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:bonusChecks[e.id]?'#111':'transparent',color:'#fff'}}>
+                                <span style={{width:'16px',height:'16px',border:'2px solid '+(bonusChecks[e.id]?'#428bf9':'#c3ccd8'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:bonusChecks[e.id]?'#428bf9':'transparent',borderRadius:'5px',color:'#fff'}}>
                                   {bonusChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
@@ -1347,7 +1347,7 @@ export default function Salary() {
                           {tsDeducts.map(e => (
                             <tr key={e.id} onClick={()=>toggleDeduct(e.id)} style={{cursor:'pointer',opacity:deductChecks[e.id]?1:.45}}>
                               <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
-                                <span style={{width:'16px',height:'16px',border:'1.5px solid '+(deductChecks[e.id]?'#111':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:deductChecks[e.id]?'#111':'transparent',color:'#fff'}}>
+                                <span style={{width:'16px',height:'16px',border:'2px solid '+(deductChecks[e.id]?'#428bf9':'#c3ccd8'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:deductChecks[e.id]?'#428bf9':'transparent',borderRadius:'5px',color:'#fff'}}>
                                   {deductChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
