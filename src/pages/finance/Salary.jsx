@@ -977,7 +977,7 @@ export default function Salary() {
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
           <p className="modal-sub">Выберите сотрудника и период</p>
         </div>
-        <form onSubmit={(e)=>{ if (salStep === 1) { e.preventDefault(); setSalStep(2); return; } save(e); }} style={{display:'flex',flexDirection:'column',gap:'0'}}>
+        <form onSubmit={(e)=>{ e.preventDefault(); if (salStep === 1) { if (fEmpId && fPeriodFrom && fPeriodTo) setSalStep(2); return; } save(e); }} style={{display:'flex',flexDirection:'column',gap:'0'}}>
 
               {/* ═══ ШАГ 1 ═══ */}
               {salStep === 1 && (<>
@@ -1368,7 +1368,7 @@ export default function Salary() {
                 {salStep === 1 ? (
                   <>
                     <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
-                    <button type="button" className="cat-add-btn" onClick={()=>setSalStep(2)}>Далее →</button>
+                    <button type="button" className="cat-add-btn" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); setSalStep(2); }}>Далее →</button>
                   </>
                 ) : (
                   <>
