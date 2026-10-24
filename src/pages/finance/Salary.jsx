@@ -537,6 +537,7 @@ export default function Salary() {
     const re = {};
     if (s.reward_items && Array.isArray(s.reward_items)) s.reward_items.forEach(i => { if (i.itemId) re[i.itemId] = i.amount; });
     setRewardEdit(re);
+    setSalStep(1);
     setShow(true);
   };
 
