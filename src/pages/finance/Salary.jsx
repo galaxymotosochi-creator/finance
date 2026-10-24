@@ -1368,7 +1368,10 @@ export default function Salary() {
                 {salStep === 1 ? (
                   <>
                     <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
-                    <button type="button" className="cat-add-btn" onClick={()=>setSalStep(2)}>Далее →</button>
+                    <button type="button" className="cat-add-btn" onClick={()=>{
+                      try { window.__salDiag = []; setSalStep(2); }
+                      catch(err){ window.__salErr = (err && (err.stack || err.message)) || String(err); alert('Ошибка перехода: ' + window.__salErr); }
+                    }}>Далее →</button>
                   </>
                 ) : (
                   <>
