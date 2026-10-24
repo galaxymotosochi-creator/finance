@@ -1287,8 +1287,9 @@ export default function Salary() {
                   ) : (
                     <>
                       <table className="sal-tbl">
-                        <colgroup><col style={{width:'22%'}} /><col style={{width:'50%'}} /><col style={{width:'28%'}} /></colgroup>
+                        <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
+                          <th></th>
                           <th>Дата</th>
                           <th>За что</th>
                           <th className="num">Сумма</th>
@@ -1296,6 +1297,11 @@ export default function Salary() {
                         <tbody>
                           {tsBonuses.map(e => (
                             <tr key={e.id} onClick={()=>toggleBonus(e.id)} style={{cursor:'pointer',opacity:bonusChecks[e.id]?1:.45}}>
+                              <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                                <span style={{width:'16px',height:'16px',border:'1.5px solid '+(bonusChecks[e.id]?'#111':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:bonusChecks[e.id]?'#111':'transparent',color:'#fff'}}>
+                                  {bonusChecks[e.id] ? '✓' : ''}
+                                </span>
+                              </td>
                               <td className="date">{fmtDate(e.date)}</td>
                               <td className="name">{e.bonus_comment||'—'}</td>
                               <td className="num">{Number(e.bonus_amount).toLocaleString()} {cur}</td>
@@ -1327,8 +1333,9 @@ export default function Salary() {
                   ) : (
                     <>
                       <table className="sal-tbl">
-                        <colgroup><col style={{width:'22%'}} /><col style={{width:'50%'}} /><col style={{width:'28%'}} /></colgroup>
+                        <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
+                          <th></th>
                           <th>Дата</th>
                           <th>За что</th>
                           <th className="num">Сумма</th>
@@ -1336,6 +1343,11 @@ export default function Salary() {
                         <tbody>
                           {tsDeducts.map(e => (
                             <tr key={e.id} onClick={()=>toggleDeduct(e.id)} style={{cursor:'pointer',opacity:deductChecks[e.id]?1:.45}}>
+                              <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)'}}>
+                                <span style={{width:'16px',height:'16px',border:'1.5px solid '+(deductChecks[e.id]?'#111':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',background:deductChecks[e.id]?'#111':'transparent',color:'#fff'}}>
+                                  {deductChecks[e.id] ? '✓' : ''}
+                                </span>
+                              </td>
                               <td className="date">{fmtDate(e.date)}</td>
                               <td className="name">{e.deduct_comment||'—'}</td>
                               <td className="num">{Number(e.deduct_amount).toLocaleString()} {cur}</td>
