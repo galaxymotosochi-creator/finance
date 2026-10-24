@@ -1206,7 +1206,7 @@ export default function Salary() {
                   ) : !salesLoaded ? (
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>Загрузка...</div>
                   ) : rewardRows.length === 0 ? (
-                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет выплат исполнителю из чеков за этот период'}</div>
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fPeriodFrom || !fPeriodTo ? 'Заполните даты периода' : 'Нет данных за период'}</div>
                   ) : (
                     <>
                       <div className="sal-tblwrap">
@@ -1319,7 +1319,7 @@ export default function Salary() {
               <div className="sal-sub" style={{display: fineOpen ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
                   {tsDeducts.length === 0 ? (
-                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет штрафов за этот период'}</div>
+                    <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет данных за период'}</div>
                   ) : (
                     <>
                       <table className="sal-tbl">
