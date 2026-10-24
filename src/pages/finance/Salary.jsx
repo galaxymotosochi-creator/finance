@@ -1005,7 +1005,6 @@ export default function Salary() {
       <Modal open={show} onClose={()=>setShow(false)} width="medium" hideHead className="modal-salary emp-modal-wide">
         <div className="sal-head sal-head-v2">
           <h1 className="modal-title">{editId?'Редактировать':'Начислить зарплату'}</h1>
-          <p className="modal-sub">Выберите сотрудника и период</p>
         </div>
         <form onSubmit={(e)=>{ e.preventDefault(); e.stopPropagation(); if (salStep !== 2) return; save(e); }} style={{display:'flex',flexDirection:'column',gap:'0'}}>
 
