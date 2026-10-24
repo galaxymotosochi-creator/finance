@@ -1286,7 +1286,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет премий за этот период'}</div>
                   ) : (
                     <>
-                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem .45rem'}}>
+                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem 0',margin:'0 -.75rem'}}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
@@ -1334,7 +1334,7 @@ export default function Salary() {
                     ) : null
                   ) : (
                     <>
-                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem .45rem'}}>
+                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem 0',margin:'0 -.75rem'}}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
