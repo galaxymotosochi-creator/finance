@@ -440,7 +440,11 @@ export default function Salary() {
       x.id !== editId &&
       (Number(x.base_salary) || 0) > 0
     );
-    if (daySum > 0 && !(baseDone && !editId)) setFBaseSalary(daySum);
+    // Ставку из табеля подставляем только когда период/сотрудник сменились или поле пустое —
+    // введённую вручную сумму не перезатираем
+    if (daySum > 0 && !(baseDone && !editId)) {
+      setFBaseSalary(prev => (prev && prev > 0 ? prev : daySum));
+    }
   }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo, list, editId]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
@@ -518,7 +522,8 @@ export default function Salary() {
     .reduce((sum, en) => sum + (Number(en.day_rate) || 0), 0);
   const hasTs = tsEntries.length > 0;
   const periodDays = Math.max(1, calcDays(fPeriodFrom, fPeriodTo) || 1);
-  const dayFactor = hasTs ? Math.min(1, tsWorked / periodDays) : 1;
+  // Норму берём по календарным дням периода, но не режем бонус, если в табеле есть хоть одна смена
+  const dayFactor = (hasTs && tsWorked > 0) ? Math.min(1, tsWorked / periodDays) : 1;
   const storeBonus = storeInfo ? (storeInfo.pct != null
     ? Math.round(storeInfo.revenue * storeInfo.pct / 100 * dayFactor)
     : Math.round((storeInfo.fixed || 0) * dayFactor)) : 0;
