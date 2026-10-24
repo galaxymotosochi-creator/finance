@@ -97,6 +97,8 @@ export default function Salary() {
   const [payAmount, setPayAmount] = useState(''); // сумма к выплате (можно выплатить часть)
   // Фильтры (как в разделе «Чеки»)
   const [salStatus, setSalStatus] = useState(null);
+  const [salEmp, setSalEmp] = useState(null);       // фильтр по сотруднику
+  const [salEmpOpen, setSalEmpOpen] = useState(false);
   const [salSearch, setSalSearch] = useState('');
   const [salPeriodOpen, setSalPeriodOpen] = useState(false);
   const [salTypeOpen, setSalTypeOpen] = useState(false);
@@ -718,6 +720,7 @@ export default function Salary() {
   const salFiltered = (list || []).filter(s => {
     if (salStatus === 'pending' && s.status !== 'pending' && s.status !== 'accrued') return false;
     if (salStatus && salStatus !== 'pending' && s.status !== salStatus) return false;
+    if (salEmp && String(s.employee_id) !== String(salEmp)) return false;
     if (salSearch) {
       const q = salSearch.toLowerCase();
       const nm = (s.employee_name || '').toLowerCase();
@@ -856,6 +859,26 @@ export default function Salary() {
                 onClick={e=>{e.currentTarget.closest('.sk-dd-wrap').classList.remove('open');setSalStatus(o.v)}}>{o.label}</button>
             ))}
           </div>
+        </div>
+        <div className="sk-dd-wrap" style={{position:'relative'}}>
+          <button type="button" style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}
+            onClick={e=>{e.stopPropagation();setSalPeriodOpen(false);setSalEmpOpen(!salEmpOpen)}}>
+            {salEmp ? (employees.find(x=>String(x.id)===String(salEmp))||{}).name || 'Сотрудник' : 'Сотрудник'} <span className="car-tri">▾</span>
+          </button>
+          {salEmpOpen && (
+            <div onClick={e=>e.stopPropagation()} style={{display:'block',position:'absolute',top:'100%',right:0,marginTop:'4px',background:'#fff',border:'1px solid rgba(29,120,252,.18)',borderRadius:'.85rem',boxShadow:'0 16px 40px -14px rgba(11,18,32,.3)',minWidth:'200px',maxHeight:'260px',overflowY:'auto',padding:'.4rem',zIndex:100}}>
+              {[{id:null,name:'Все сотрудники'}].concat(employees.map(e=>({id:e.id,name:e.name}))).map(o=>{
+                const isActive = String(salEmp||'') === String(o.id||'');
+                return (
+                  <div key={String(o.id)} onClick={()=>{setSalEmp(o.id);setSalEmpOpen(false)}}
+                    style={{display:'flex',alignItems:'center',gap:'.4rem',padding:'.5rem .55rem',borderRadius:'.5rem',cursor:'pointer',fontSize:'.8rem',color:isActive?'#0d4ea8':'#5b6472',fontWeight:isActive?700:500,background:isActive?'#E6F0FF':'transparent'}}>
+                    <span style={{width:'8px',height:'8px',borderRadius:'50%',background:isActive?'#1F75FF':'#dfe6f2',flexShrink:0}}></span>
+                    {o.name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         <div className="sal-period-wrap" style={{position:'relative',display:'inline-flex',alignItems:'center',flexShrink:0}}>
           <button style={{display:'inline-flex',alignItems:'center',gap:'4px',border:'none',borderRadius:'9999px',padding:'6px 6px',fontSize:'.76rem',fontWeight:600,lineHeight:'18px',color:'#5b6472',background:'transparent',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}} onClick={e=>{e.stopPropagation();document.querySelectorAll('.sk-dd-wrap.open').forEach(w=>w.classList.remove('open'));setSalPeriodOpen(!salPeriodOpen)}}>
@@ -1010,9 +1033,6 @@ export default function Salary() {
                     <span style={{ flex:1, minWidth:'200px' }}>
                       За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{dupTotalSum.toLocaleString()} {cur}</b>{dupAll.length > 1 ? ' (в ' + dupAll.length + ' начислениях)' : ''}
                     </span>
-                    {dupSalary.status !== 'paid' && (
-                      <button type="button" className="sk-dd-btn sal-open-btn" onClick={() => openEdit(dupSalary)}>Открыть</button>
-                    )}
                   </div>
                   {(() => {
                     // Что ещё НЕ вошло в уже сохранённое начисление
