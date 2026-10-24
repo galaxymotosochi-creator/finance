@@ -409,9 +409,12 @@ export default function Salary() {
 
   // Отработано = дни по табелю за период (present + remote), не длина периода
   useEffect(() => {
-    if (!fEmpId) { setFDays(0); return; }
+    if (!fEmpId) { setFDays(0); setFBaseSalary(0); return; }
     const worked = (tsEntries || []).filter(en => en.status === 'present' || en.status === 'remote').length;
     setFDays(worked);
+    // Ставка дня из табеля × отработанные дни — подставляем в «К начислению»
+    const rate = (tsEntries || []).reduce((m, en) => Math.max(m, Number(en.day_rate) || 0), 0);
+    if (rate > 0) setFBaseSalary(rate * worked);
   }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
@@ -1036,7 +1039,7 @@ export default function Salary() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Оклад <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
+                <label>К начислению <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
                 <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0" />
               </div>
 
