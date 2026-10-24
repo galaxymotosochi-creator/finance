@@ -1302,8 +1302,8 @@ export default function Salary() {
                                   {bonusChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td className="date">{fmtDate(e.date)}</td>
-                              <td className="name">{e.bonus_comment||'—'}</td>
+                              <td className="date" style={{color:'#111',fontWeight:500}}>{fmtDate(e.date)}</td>
+                              <td className="name" style={{color:'#111',fontWeight:500}}>{e.bonus_comment||'—'}</td>
                               <td className="num">{Number(e.bonus_amount).toLocaleString()} {cur}</td>
                             </tr>
                           ))}
@@ -1348,8 +1348,8 @@ export default function Salary() {
                                   {deductChecks[e.id] ? '✓' : ''}
                                 </span>
                               </td>
-                              <td className="date">{fmtDate(e.date)}</td>
-                              <td className="name">{e.deduct_comment||'—'}</td>
+                              <td className="date" style={{color:'#111',fontWeight:500}}>{fmtDate(e.date)}</td>
+                              <td className="name" style={{color:'#111',fontWeight:500}}>{e.deduct_comment||'—'}</td>
                               <td className="num">{Number(e.deduct_amount).toLocaleString()} {cur}</td>
                             </tr>
                           ))}
