@@ -1020,7 +1020,7 @@ export default function Salary() {
               <label style={{display:'block',fontSize:'13px',fontWeight:600,color:'#333',margin:'2px 0 4px'}}>Отработано по табелю</label>
               <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'10px 12px',fontSize:'13px',color:'#222',lineHeight:'1.85',marginBottom:'10px'}}>
                 <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
-                  <span>Отработано</span><b style={{color:'#222',fontWeight:600}}>{fDays} из {(calcDays(fPeriodFrom,fPeriodTo)||0)} дн.</b>
+                  <span>Отработано</span><b style={{color:'#222',fontWeight:600}}>{fDays} дн.</b>
                 </div>
                 <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
                   <span>Ставка за день</span><b style={{color:'#222',fontWeight:600}}>{fDayRate ? fDayRate.toLocaleString() + ' ' + cur : 'не задана'}</b>
