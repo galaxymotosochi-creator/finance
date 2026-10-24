@@ -412,9 +412,11 @@ export default function Salary() {
     if (!fEmpId) { setFDays(0); setFBaseSalary(0); return; }
     const worked = (tsEntries || []).filter(en => en.status === 'present' || en.status === 'remote').length;
     setFDays(worked);
-    // Ставка дня из табеля × отработанные дни — подставляем в «К начислению»
-    const rate = (tsEntries || []).reduce((m, en) => Math.max(m, Number(en.day_rate) || 0), 0);
-    if (rate > 0) setFBaseSalary(rate * worked);
+    // Сумма ставок по отработанным дням — подставляем в «К начислению»
+    const daySum = (tsEntries || [])
+      .filter(en => en.status === 'present' || en.status === 'remote')
+      .reduce((sum, en) => sum + (Number(en.day_rate) || 0), 0);
+    if (daySum > 0) setFBaseSalary(daySum);
   }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
@@ -471,6 +473,10 @@ export default function Salary() {
   // умножаем на (рабочие дни / дни периода), если нет — полный процент
   const tsWorked = tsEntries.filter(en => en.status === 'present' || en.status === 'remote').length;
   const fDayRate = (tsEntries.find(en => (en.day_rate||0) > 0) || {}).day_rate || 0;
+  // Сумма ставок по каждому отработанному дню (ставка может отличаться день ко дню)
+  const tsDaySum = tsEntries
+    .filter(en => en.status === 'present' || en.status === 'remote')
+    .reduce((sum, en) => sum + (Number(en.day_rate) || 0), 0);
   const hasTs = tsEntries.length > 0;
   const periodDays = Math.max(1, calcDays(fPeriodFrom, fPeriodTo) || 1);
   const dayFactor = hasTs ? Math.min(1, tsWorked / periodDays) : 1;
@@ -1032,10 +1038,7 @@ export default function Salary() {
                   <span>Отработано</span><b style={{color:'#222',fontWeight:600}}>{fDays} дн.</b>
                 </div>
                 <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
-                  <span>Ставка за день</span><b style={{color:'#222',fontWeight:600}}>{fDayRate ? fDayRate.toLocaleString() + ' ' + cur : 'не задана'}</b>
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between',gap:'10px'}}>
-                  <span>Начислено по табелю</span><b style={{color:'#222',fontWeight:600}}>{(fDayRate * fDays).toLocaleString()} {cur}</b>
+                  <span>Общая сумма за отработанные дни</span><b style={{color:'#222',fontWeight:600}}>{tsDaySum.toLocaleString()} {cur}</b>
                 </div>
               </div>
               <div className="form-group">
