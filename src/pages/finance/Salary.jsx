@@ -1312,8 +1312,7 @@ export default function Salary() {
               </div>
 
               {/* Долги по недостачам (инвентаризация) */}
-              <>
-                <div className={'sal-pick'+(debtOpen?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
+              <div className={'sal-pick'+(debtOpen?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
                 <span className="cb">{debtOpen ? '✓' : ''}</span>
                 <span className="nm">Долги по недостачам</span>
                 <span className="vl">−{checkedDebtTotal.toLocaleString()} {cur}</span>
@@ -1343,7 +1342,6 @@ export default function Salary() {
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
                   </div>
                 </div>
-                </>
               </>)}
 
               {/* Итого */}
