@@ -566,7 +566,7 @@ export default function Salary() {
         bonus_amount: bonusOnTotal, bonus_items: bonusOpen ? takeBonus.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.bonus_amount, comment: e.bonus_comment||'' })) : [],
         sales_bonus: salesBonusOn + storeBonusOn,
         sales_items: ((salesOn || storeOn) ? salesRows.map(row => ({ itemId: row.itemId, date: row.date, name: row.name, total: row.total, bonus: salesOn ? (Number(salesBonus[row.itemId]?.rub) || 0) : 0 })) : [])
-          .concat(storeOn ? [{ store: true, amount: storeBonusOn }] : []),   // маркер: бонус от выручки начислен
+          .concat((storeOn && storeBonusOn > 0) ? [{ store: true, amount: storeBonusOn }] : []),   // маркер: бонус от выручки начислен
         reward_amount: rewardOnTotal, reward_items: rewardOn ? rewardRows.map(row => { const ed = rewardEdit[row.itemId]; const amt = ed !== undefined && ed !== '' ? (parseFloat(ed) || 0) : row.amount; return { date: row.date, name: row.name, amount: amt }; }) : [],
         deduct_amount: deductOnTotal + debtOnTotal, deduct_items: (fineOpen ? takeDeduct.map(e => ({ tsEntryId: e.id, date: e.date, amount: e.deduct_amount, comment: e.deduct_comment||'' })) : []).concat(debtOpen ? debtItems : []),
         paid_at: null,
@@ -1076,7 +1076,7 @@ export default function Salary() {
               {(()=>{
                 const noEmp = !fEmpId;
                 const hasStoreRate = !!(storeInfo && storeInfo.pct != null);
-                const blocked = doneStore;
+                const blocked = doneStore && hasStoreRate && storeBonus > 0;
                 const on = noEmp ? true : (storeOn && hasStoreRate && !blocked);
                 return (
                   <div className={'sal-pick'+(on?' on':'')}
