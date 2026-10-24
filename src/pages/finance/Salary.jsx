@@ -1397,7 +1397,7 @@ export default function Salary() {
                 {salStep === 1 ? (
                   <>
                     <button type="button" className="v2-ghost" onClick={()=>setShow(false)}>Отмена</button>
-                    <button type="button" className="cat-add-btn" disabled={!fEmpId} style={!fEmpId?{opacity:.45,cursor:'not-allowed'}:null} onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); if(!fEmpId) return; setSalStep(2); }}>Далее →</button>
+                    <button type="button" className="cat-add-btn" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); if(!fEmpId) return alert('Выберите сотрудника'); setSalStep(2); }}>Далее →</button>
                   </>
                 ) : (
                   <>
