@@ -84,7 +84,7 @@ function calcSalesBonus(rules, row, prods, cats) {
 
 export default function Salary() {
   const cur = getCurrencySymbol();
-  const { user } = useAuth();
+  const { user, businessType } = useAuth();
   const [list, setList] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [accs, setAccs] = useState([]);
@@ -1107,6 +1107,7 @@ export default function Salary() {
                   </div>
                 )}
               </div>
+              {businessType !== 'services' && (<>
               <div className={'sal-pick'+((salesOn && !doneSales)?' on':'')}
                 title={doneSales ? 'Уже начислено за этот период' : ''}
                 style={doneSales ? {opacity:.5, cursor:'not-allowed'} : {}}
@@ -1189,6 +1190,7 @@ export default function Salary() {
                   )}
                 </div>
               </div>
+              </>)}
 
               {/* Вознаграждение исполнителю из чеков */}
               <div className={'sal-pick'+((rewardOn && !doneReward)?' on':'')}
