@@ -1293,7 +1293,7 @@ export default function Salary() {
                           <th></th>
                           <th>Дата</th>
                           <th>За что</th>
-                          <th className="num">Сумма</th>
+                          <th className="num" style={{paddingRight:'2rem'}}>Сумма</th>
                         </tr></thead>
                         <tbody>
                           {tsBonuses.map(e => (
@@ -1305,7 +1305,7 @@ export default function Salary() {
                               </td>
                               <td className="date" style={{color:'#111',fontWeight:500}}>{fmtDate(e.date)}</td>
                               <td className="name" style={{color:'#111',fontWeight:500}}>{e.bonus_comment||'—'}</td>
-                              <td className="num">{Number(e.bonus_amount).toLocaleString()} {cur}</td>
+                              <td className="num" style={{paddingRight:'2rem'}}>{Number(e.bonus_amount).toLocaleString()} {cur}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -1341,7 +1341,7 @@ export default function Salary() {
                           <th></th>
                           <th>Дата</th>
                           <th>За что</th>
-                          <th className="num">Сумма</th>
+                          <th className="num" style={{paddingRight:'2rem'}}>Сумма</th>
                         </tr></thead>
                         <tbody>
                           {tsDeducts.map(e => (
@@ -1353,7 +1353,7 @@ export default function Salary() {
                               </td>
                               <td className="date" style={{color:'#111',fontWeight:500}}>{fmtDate(e.date)}</td>
                               <td className="name" style={{color:'#111',fontWeight:500}}>{e.deduct_comment||'—'}</td>
-                              <td className="num">{Number(e.deduct_amount).toLocaleString()} {cur}</td>
+                              <td className="num" style={{paddingRight:'2rem'}}>{Number(e.deduct_amount).toLocaleString()} {cur}</td>
                             </tr>
                           ))}
                         </tbody>
