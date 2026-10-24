@@ -464,6 +464,19 @@ export default function Salary() {
   const doneReward = dupAll.some(s => s.reward_items && Array.isArray(s.reward_items) && s.reward_items.length > 0);
   const doneBonus = dupAll.some(s => Number(s.bonus_amount) > 0);
   const doneDeduct = dupAll.some(s => Number(s.deduct_amount) > 0);
+  const doneBase = dupBaseSum > 0;
+  const doneSalesSum = dupAll.reduce((sum, s) => sum + (Number(s.sales_bonus) || 0), 0);
+  const doneStoreSum = dupAll.reduce((sum, s) => sum + (Array.isArray(s.sales_items) ? s.sales_items.filter(i => i && i.store === true).reduce((a2, i) => a2 + (Number(i.amount) || 0), 0) : 0), 0);
+  const doneRewardSum = dupAll.reduce((sum, s) => sum + (Number(s.reward_amount) || 0), 0);
+  const doneBonusSum = dupAll.reduce((sum, s) => sum + (Number(s.bonus_amount) || 0), 0);
+  const doneDeductSum = dupAll.reduce((sum, s) => sum + (Number(s.deduct_amount) || 0), 0);
+  const alreadyItems = [];
+  if (doneBase) alreadyItems.push({ n:'Оклад / по табелю', v: dupBaseSum });
+  if (doneStoreSum > 0) alreadyItems.push({ n:'Бонус от выручки', v: doneStoreSum });
+  if (doneSalesSum - doneStoreSum > 0) alreadyItems.push({ n:'Продажи сотрудника', v: doneSalesSum - doneStoreSum });
+  if (doneRewardSum > 0) alreadyItems.push({ n:'Вознаграждение исполнителю', v: doneRewardSum });
+  if (doneBonusSum > 0) alreadyItems.push({ n:'Премии', v: doneBonusSum });
+  if (doneDeductSum > 0) alreadyItems.push({ n:'Удержания', v: -doneDeductSum });
 
   const tsBonuses = tsEntries.filter(e => (e.bonus_amount||0) > 0);
   const tsDeducts = tsEntries.filter(e => (e.deduct_amount||0) > 0);
@@ -1039,6 +1052,15 @@ export default function Salary() {
                       За период {fmtDate(fPeriodFrom)} – {fmtDate(fPeriodTo)} уже начислено: <b>{dupTotalSum.toLocaleString()} {cur}</b>{dupAll.length > 1 ? ' (в ' + dupAll.length + ' начислениях)' : ''}
                     </span>
                   </div>
+                  {alreadyItems.length > 0 && (
+                    <div style={{ marginTop:'.35rem', display:'flex', gap:'.5rem', flexWrap:'wrap', fontSize:'.72rem' }}>
+                      {alreadyItems.map((x, i) => (
+                        <span key={i} style={{ background:'#fff', border:'1px solid #c7ddff', borderRadius:'6px', padding:'.1rem .4rem' }}>
+                          {x.n}: <b>{x.v.toLocaleString()} {cur}</b>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {(() => {
                     // Что ещё НЕ вошло в уже сохранённое начисление
                     const items = [];
@@ -1069,7 +1091,11 @@ export default function Salary() {
               </div>
               <div className="form-group">
                 <label>К начислению <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
-                <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0" />
+                <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0"
+                  disabled={!!doneBase && !editId} style={(doneBase && !editId) ? {background:'#f2f4f8',color:'#8b93a3'} : null} />
+                {doneBase && !editId && (
+                  <div style={{fontSize:'.7rem',color:'#8b93a3',marginTop:'.25rem'}}>Оклад за период уже начислен — можно только доначислить бонусы</div>
+                )}
               </div>
 
               </>)}
