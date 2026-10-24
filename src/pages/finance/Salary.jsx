@@ -425,8 +425,8 @@ export default function Salary() {
     const daySum = (tsEntries || [])
       .filter(en => en.status === 'present' || en.status === 'remote')
       .reduce((sum, en) => sum + (Number(en.day_rate) || 0), 0);
-    if (daySum > 0) setFBaseSalary(daySum);
-  }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo]);
+    if (daySum > 0 && !(dupBaseSum > 0 && !editId)) setFBaseSalary(daySum);
+  }, [tsEntries, fEmpId, fPeriodFrom, fPeriodTo, dupBaseSum, editId]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
   // Берём из empDebts — реальные долги, которые ещё висят. Никаких «авансов» здесь нет.
@@ -1094,12 +1094,11 @@ export default function Salary() {
                 </div>
               </div>
               <div className="form-group">
-                <label>К начислению <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
-                <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0"
-                  disabled={!!doneBase && !editId} style={(doneBase && !editId) ? {background:'#f2f4f8',color:'#8b93a3'} : null} />
+                <label>{doneBase && !editId ? 'Доначислить оклад' : 'К начислению'} <span style={{fontWeight:400,color:'#8b93a3'}}>(можно поправить)</span></label>
                 {doneBase && !editId && (
-                  <div style={{fontSize:'.7rem',color:'#8b93a3',marginTop:'.25rem'}}>Оклад за период уже начислен — можно только доначислить бонусы</div>
+                  <div style={{fontSize:'.7rem',color:'#8b93a3',margin:'0 0 .3rem'}}>Оклад за период уже начислен: <b style={{color:'#111'}}>{dupBaseSum.toLocaleString()} {cur}</b> — введите сумму доплаты</div>
                 )}
+                <input type="number" value={fBaseSalary||""} onChange={e=>setFBaseSalary(e.target.value?parseFloat(e.target.value):0)} placeholder="0" />
               </div>
 
               </>)}
@@ -1397,7 +1396,7 @@ export default function Salary() {
 
               {/* Итого */}
               {salStep === 2 && <div className="sal-total">
-                <div className="cap">К начислению</div>
+                <div className="cap">{dupAll.length > 0 && !editId ? 'Доначислить' : 'К начислению'}</div>
                 <div className="big">{grandTotal.toLocaleString()} {cur}</div>
               </div>}
 
