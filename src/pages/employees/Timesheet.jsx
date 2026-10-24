@@ -550,6 +550,7 @@ export default function Timesheet() {
                 <th style={{textAlign:'left',whiteSpace:'nowrap',width:'92px',minWidth:'92px'}}>Дата</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Сотрудник</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Статус</th>
+                <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Начислено</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Бонус</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Комментарий к бонусу</th>
                 <th style={{textAlign:'left',whiteSpace:'nowrap'}}>Штраф</th>
@@ -559,7 +560,7 @@ export default function Timesheet() {
               </tr></thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
-                  <tr><td colSpan={8}>
+                  <tr><td colSpan={9}>
                     <div style={{ padding:'28px 24px', textAlign:'center', color:'var(--muted)' }}>
                       <div style={{ maxWidth:'420px', margin:'0 auto', textAlign:'left', fontSize:'.8rem', color:'#555', lineHeight:1.6 }}>
                         <b>Как заполнить табель:</b><br />
@@ -577,6 +578,9 @@ export default function Timesheet() {
                       {getEmpName(e.employee_id)}{e.pending && <span title="Ожидает синхронизации" style={{display:'inline-block',width:'12px',height:'12px',borderRadius:'50%',background:'#dc2626',boxShadow:'0 0 6px rgba(220,38,38,.6)',marginLeft:'6px',verticalAlign:'middle'}} />}
                     </td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>{STATUS_MAP[e.status] || e.status || '—'}</td>
+                    <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
+                      {(['present','vacation'].includes(e.status) && (e.day_rate||0) > 0) ? Number(e.day_rate).toLocaleString()+' ₽' : '—'}
+                    </td>
                     <td style={{textAlign:'left',whiteSpace:'nowrap',color:'#222'}}>
                       {(e.bonus_amount||0)>0 ? '+'+Number(e.bonus_amount).toLocaleString()+' ₽' : '—'}
                     </td>
