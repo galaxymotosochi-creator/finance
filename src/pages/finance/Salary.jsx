@@ -469,6 +469,8 @@ export default function Salary() {
   const doneStoreSum = dupAll.reduce((sum, s) => sum + (Array.isArray(s.sales_items) ? s.sales_items.filter(i => i && i.store === true).reduce((a2, i) => a2 + (Number(i.amount) || 0), 0) : 0), 0);
   const doneRewardSum = dupAll.reduce((sum, s) => sum + (Number(s.reward_amount) || 0), 0);
   const doneBonusSum = dupAll.reduce((sum, s) => sum + (Number(s.bonus_amount) || 0), 0);
+  const doneBonusIds = new Set();
+  dupAll.forEach(s => { (Array.isArray(s.bonus_items) ? s.bonus_items : []).forEach(i => { if (i && i.tsEntryId != null) doneBonusIds.add(String(i.tsEntryId)); }); });
   const doneDeductSum = dupAll.reduce((sum, s) => sum + (Number(s.deduct_amount) || 0), 0);
   const alreadyItems = [];
   if (doneBase) alreadyItems.push({ n:'Оклад / по табелю', v: dupBaseSum });
@@ -1068,7 +1070,9 @@ export default function Salary() {
                     if (hasStoreRate && storeOn && !doneStore) items.push({ n:'Бонус от выручки', v: storeBonus });
                     if (salesOn && salesBonusTotal > 0 && !doneSales) items.push({ n:'Продажи сотрудника', v: itemsBonusTotal });
                     if (rewardOn && rewardTotal > 0 && !doneReward) items.push({ n:'Вознаграждение исполнителю', v: rewardTotal });
-                    if (bonusOpen && checkedBonusTotal > 0) items.push({ n:'Премии', v: checkedBonusTotal });
+                    // Показываем только те премии, которых ещё нет в сохранённом начислении
+                    const newBonusTotal = tsBonuses.filter(e => bonusChecks[e.id] && !doneBonusIds.has(String(e.id))).reduce((a2, e) => a2 + (Number(e.bonus_amount) || 0), 0);
+                    if (bonusOpen && newBonusTotal > 0) items.push({ n:'Премии', v: newBonusTotal });
                     if (!items.length) return null;
                     return (
                       <div style={{ marginTop:'.35rem', fontSize:'.76rem', color:'#0b1220' }}>
