@@ -1286,6 +1286,7 @@ export default function Salary() {
                     <div style={{fontSize:'.72rem',color:'var(--muted)'}}>{!fEmpId ? 'Выберите сотрудника' : !tsLoaded ? 'Загрузка...' : 'Нет премий за этот период'}</div>
                   ) : (
                     <>
+                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem .45rem'}}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
@@ -1309,7 +1310,8 @@ export default function Salary() {
                           ))}
                         </tbody>
                       </table>
-                      <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Снимите галочку — премия останется на будущее</div>
+                      <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px',padding:'0 .2rem .2rem'}}>Снимите галочку — премия останется на будущее</div>
+                      </div>
                     </>
                   )}
                 </div>
@@ -1332,6 +1334,7 @@ export default function Salary() {
                     ) : null
                   ) : (
                     <>
+                      <div style={{background:'#F6F9FE',borderRadius:'10px',padding:'.35rem .45rem'}}>
                       <table className="sal-tbl">
                         <colgroup><col style={{width:'30px'}} /><col style={{width:'20%'}} /><col style={{width:'47%'}} /><col style={{width:'26%'}} /></colgroup>
                         <thead><tr>
@@ -1355,6 +1358,7 @@ export default function Salary() {
                           ))}
                         </tbody>
                       </table>
+                      </div>
                     </>
                   )}
                 </div>
