@@ -500,9 +500,8 @@ export default function Salary() {
   const rewardOnTotal = (rewardOn && !doneReward) ? rewardTotal : 0;
   const bonusOnTotal = (bonusOpen && !doneBonus) ? checkedBonusTotal : 0;
   const deductOnTotal = (fineOpen && !doneDeduct) ? checkedDeductTotal : 0;
-  const debtOnTotal = debtOpen ? checkedDebtTotal : 0;
+  const debtOnTotal = 0;
   // Итог = только то, что отмечено галочками И ещё не начислено прошлым начислением за период
-  // Долги по недостачам уже учтены в debtOnTotal — отдельного вычитания больше нет
   const grandTotal = fSalaryTotal + salesBonusOn + storeBonusOnFinal + rewardOnTotal + bonusOnTotal - deductOnTotal - debtOnTotal;
 
   const openAdd = () => {
@@ -1338,39 +1337,7 @@ export default function Salary() {
                   )}
                 </div>
               </div>
-
-              {/* Долги по недостачам (инвентаризация) */}
-              <div className={'sal-pick'+(debtOpen?' on':'')} onClick={()=>setDebtOpen(!debtOpen)}>
-                <span className="cb">{debtOpen ? '✓' : ''}</span>
-                <span className="nm">Долги по недостачам</span>
-                <span className="vl">−{checkedDebtTotal.toLocaleString()} {cur}</span>
-              </div>
-              <div className="sal-sub" style={{display: (debtOpen && empDebts.length > 0) ? 'block' : 'none'}}>
-                  <div style={{padding:'.5rem .65rem'}}>
-                    <table className="sal-tbl">
-                      <thead><tr><th style={{width:'30px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}></th>
-                        <th style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>Сумма</th>
-                        <th style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:500,fontSize:'.72rem',textAlign:'left'}}>За что</th>
-                      </tr></thead>
-                      <tbody>
-                        {empDebts.map(d => (
-                          <tr key={d.id}>
-                            <td style={{textAlign:'left',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',fontSize:'.72rem'}}>
-                              <span onClick={()=>setDebtChecks(prev => ({...prev, [d.id]: !prev[d.id]}))}
-                                style={{width:'16px',height:'16px',border:'1.5px solid '+(debtChecks[d.id]?'#ea580c':'var(--border)'),borderRadius:'4px',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',cursor:'pointer',background:debtChecks[d.id]?'#ea580c':'transparent',color:'#fff'}}>
-                                {debtChecks[d.id] ? '✓' : ''}
-                              </span>
-                            </td>
-                            <td style={{width:'80px',padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'#ea580c',fontWeight:600,fontSize:'.72rem',textAlign:'left'}}>-{Number(d.amount).toLocaleString()} {cur}</td>
-                            <td style={{padding:'.3rem .35rem',borderBottom:'1px solid var(--border)',color:'var(--muted)',fontWeight:400,fontSize:'.72rem',textAlign:'left'}}>{d.comment||'Недостача'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
-                  </div>
-                </div>
-              </>)}
+              </> )}
 
               {/* Итого */}
               {salStep === 2 && <div className="sal-total">
