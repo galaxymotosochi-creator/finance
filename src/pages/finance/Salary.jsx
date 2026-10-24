@@ -1106,13 +1106,13 @@ export default function Salary() {
                 )}
               </div>
               {businessType !== 'services' && (<>
-              <div className={'sal-pick'+((salesOn && !doneSales)?' on':'')}
-                title={doneSales ? 'Уже начислено за этот период' : ''}
-                style={doneSales ? {opacity:.5, cursor:'not-allowed'} : {}}
-                onClick={()=>{ if (doneSales) return; setSalesOn(!salesOn); }}>
-                <span className="cb">{(salesOn && !doneSales) ? '✓' : ''}</span>
+              <div className={'sal-pick'+((salesOn && !doneSales && salesRows.length > 0)?' on':'')}
+                title={doneSales ? 'Уже начислено за этот период' : (salesRows.length === 0 ? 'Нет продаж сотрудника за период' : '')}
+                style={(doneSales || salesRows.length === 0) ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (doneSales || salesRows.length === 0) return; setSalesOn(!salesOn); }}>
+                <span className="cb">{(salesOn && !doneSales && salesRows.length > 0) ? '✓' : ''}</span>
                 <span className="nm">Продажи сотрудника (он продавец)</span>
-                <span className="vl">{doneSales ? 'уже начислено' : '+' + itemsBonusTotal.toLocaleString() + ' ' + cur}</span>
+                <span className="vl">{doneSales ? 'уже начислено' : (salesRows.length === 0 ? '' : '+' + itemsBonusTotal.toLocaleString() + ' ' + cur)}</span>
               </div>
               <div className="sal-sub" style={{display: salesOn ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
@@ -1191,13 +1191,13 @@ export default function Salary() {
               </>)}
 
               {/* Вознаграждение исполнителю из чеков */}
-              <div className={'sal-pick'+((rewardOn && !doneReward)?' on':'')}
-                title={doneReward ? 'Уже начислено за этот период' : ''}
-                style={doneReward ? {opacity:.5, cursor:'not-allowed'} : {}}
-                onClick={()=>{ if (doneReward) return; setRewardOn(!rewardOn); }}>
-                <span className="cb">{(rewardOn && !doneReward) ? '✓' : ''}</span>
+              <div className={'sal-pick'+((rewardOn && !doneReward && rewardRows.length > 0)?' on':'')}
+                title={doneReward ? 'Уже начислено за этот период' : (rewardRows.length === 0 ? 'Нет вознаграждений исполнителю за период' : '')}
+                style={(doneReward || rewardRows.length === 0) ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (doneReward || rewardRows.length === 0) return; setRewardOn(!rewardOn); }}>
+                <span className="cb">{(rewardOn && !doneReward && rewardRows.length > 0) ? '✓' : ''}</span>
                 <span className="nm">Вознаграждение исполнителю (он мастер)</span>
-                <span className="vl">{doneReward ? 'уже начислено' : '+' + rewardTotal.toLocaleString() + ' ' + cur}</span>
+                <span className="vl">{doneReward ? 'уже начислено' : (rewardRows.length === 0 ? '' : '+' + rewardTotal.toLocaleString() + ' ' + cur)}</span>
               </div>
               <div className="sal-sub" style={{display: rewardOn ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
@@ -1270,10 +1270,13 @@ export default function Salary() {
               </div>
 
               {/* Премии из табеля */}
-              <div className={'sal-pick'+(bonusOpen?' on':'')} onClick={()=>setBonusOpen(!bonusOpen)}>
-                <span className="cb">{bonusOpen ? '✓' : ''}</span>
+              <div className={'sal-pick'+((bonusOpen && tsBonuses.length > 0)?' on':'')}
+                title={tsBonuses.length === 0 ? 'Нет премий за период' : ''}
+                style={tsBonuses.length === 0 ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (tsBonuses.length === 0) return; setBonusOpen(!bonusOpen); }}>
+                <span className="cb">{(bonusOpen && tsBonuses.length > 0) ? '✓' : ''}</span>
                 <span className="nm">Премии из табеля</span>
-                <span className="vl">+{checkedBonusTotal.toLocaleString()} {cur}</span>
+                <span className="vl">{tsBonuses.length === 0 ? '' : '+' + checkedBonusTotal.toLocaleString() + ' ' + cur}</span>
               </div>
               <div className="sal-sub" style={{display: bonusOpen ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
@@ -1305,10 +1308,13 @@ export default function Salary() {
               </div>
 
               {/* Штрафы из табеля */}
-              <div className={'sal-pick'+(fineOpen?' on':'')} onClick={()=>setFineOpen(!fineOpen)}>
-                <span className="cb">{fineOpen ? '✓' : ''}</span>
+              <div className={'sal-pick'+((fineOpen && tsDeducts.length > 0)?' on':'')}
+                title={tsDeducts.length === 0 ? 'Нет штрафов за период' : ''}
+                style={tsDeducts.length === 0 ? {opacity:.5, cursor:'not-allowed'} : {}}
+                onClick={()=>{ if (tsDeducts.length === 0) return; setFineOpen(!fineOpen); }}>
+                <span className="cb">{(fineOpen && tsDeducts.length > 0) ? '✓' : ''}</span>
                 <span className="nm">Штрафы из табеля</span>
-                <span className="vl">−{checkedDeductTotal.toLocaleString()} {cur}</span>
+                <span className="vl">{tsDeducts.length === 0 ? '' : '−' + checkedDeductTotal.toLocaleString() + ' ' + cur}</span>
               </div>
               <div className="sal-sub" style={{display: fineOpen ? 'block' : 'none'}}>
                 <div style={{padding:'.5rem .65rem'}}>
