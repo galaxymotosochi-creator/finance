@@ -1342,8 +1342,7 @@ export default function Salary() {
                     <div style={{fontSize:'.65rem',color:'var(--muted)',marginTop:'4px'}}>Отмеченные долги вычтутся из зарплаты. Снимите галочку — долг останется висеть</div>
                   </div>
                 </div>
-              </>
-
+                </>
               </>)}
 
               {/* Итого */}
