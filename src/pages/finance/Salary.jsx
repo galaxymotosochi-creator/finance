@@ -405,8 +405,13 @@ export default function Salary() {
     } else {
       setFSalaryTotal(fBaseSalary || 0);
     }
-    setFDays(tsWorked || calcDays(fPeriodFrom, fPeriodTo));
   }, [fBaseSalary, fPeriodFrom, fPeriodTo, fSalaryType]);
+
+  // Отработано = дни по табелю за период (present + remote), не длина периода
+  useEffect(() => {
+    const worked = (tsEntries || []).filter(en => en.status === 'present' || en.status === 'remote').length;
+    setFDays(worked);
+  }, [tsEntries, fPeriodFrom, fPeriodTo]);
 
   // Долг сотрудника = его недостачи по инвентаризации (employee_debts, статус pending).
   // Берём из empDebts — реальные долги, которые ещё висят. Никаких «авансов» здесь нет.
